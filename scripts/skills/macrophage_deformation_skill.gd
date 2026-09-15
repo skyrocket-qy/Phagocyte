@@ -13,6 +13,7 @@ func _init() -> void:
 	skill_id = "macrophage_pseudopods"
 	name_key = "SKILL_DEFORM_NAME"
 	desc_key = "SKILL_DEFORM_DESC"
+	bio_key = "SKILL_DEFORM_BIO"
 	icon_symbol = "🦠"
 	is_innate = true
 	is_passive = true

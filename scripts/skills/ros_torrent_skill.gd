@@ -8,6 +8,7 @@ func _init() -> void:
 	skill_id = "ros_torrent"
 	name_key = "SKILL_ROS_NAME"
 	desc_key = "SKILL_ROS_DESC"
+	bio_key = "SKILL_ROS_BIO"
 	icon_symbol = "💨"
 	is_innate = false
 	is_passive = false

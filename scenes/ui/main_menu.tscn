@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/codex_modal.tscn" id="2_codex"]
 
 [sub_resource type="Curve" id="Curve_menu_ambient"]
 _data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.5, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -408,52 +409,8 @@ mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 16
 text = "🚀 开始出击"
 
-[node name="CodexModal" type="PanelContainer" parent="."]
+[node name="CodexModal" parent="." instance=ExtResource("2_codex")]
 visible = false
-z_index = 20
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -320.0
-offset_top = -200.0
-offset_right = 320.0
-offset_bottom = 200.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
-
-[node name="VBox" type="VBoxContainer" parent="CodexModal"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="Title" type="Label" parent="CodexModal/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 1)
-theme_override_font_sizes/font_size = 20
-text = "🔬 微观档案馆 (Immunology Codex)"
-
-[node name="Content" type="Label" parent="CodexModal/VBox"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 13
-text = "欢迎查阅人体防御系统微观档案：
-
-• 巨噬细胞 (Macrophage)：先天免疫核心，能以阿米巴伪足吞噬入侵病原体，并透过溶酶体进行降解。
-• 呼吸爆发 (Respiratory Burst)：白血球吞噬大量抗原后激活 NADPH 氧化酶，产生大量活性氧 (ROS) 杀灭病原。
-• 金黄色葡萄球菌 (Staph)：常驻于表皮，破裂创口入侵后易抱团形成葡萄状簇抵御免疫识别。
-
-更多冷冻电镜 (Cryo-EM) 结构与病原体数据库即将陆续上线！"
-autowrap_mode = 3
-
-[node name="CloseButton" type="Button" parent="CodexModal/VBox"]
-custom_minimum_size = Vector2(140, 36)
-layout_mode = 2
-size_flags_horizontal = 4
-mouse_default_cursor_shape = 2
-text = "关闭档案"
 
 [node name="LangButton" type="Button" parent="."]
 z_index = 10

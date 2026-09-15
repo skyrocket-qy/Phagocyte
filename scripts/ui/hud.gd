@@ -20,12 +20,24 @@ const GM = preload("res://scripts/core/game_manager.gd")
 @onready var pause_modal: PanelContainer = $PauseModal
 @onready var pause_title: Label = $PauseModal/VBox/Title
 @onready var resume_btn: Button = $PauseModal/VBox/ResumeButton
+@onready var manual_btn: Button = $PauseModal/VBox/ManualButton
 @onready var restart_btn: Button = $PauseModal/VBox/RestartButton
 @onready var menu_btn: Button = $PauseModal/VBox/MenuButton
+@onready var codex_modal = $CodexModal
 
-## Skill Bar Nodes
+## Skill Bar & Tooltip Nodes
 @onready var skill_title_lbl: Label = $SkillContainer/VBox/TitleLabel
 @onready var slots_container: HBoxContainer = $SkillContainer/VBox/SlotsContainer
+
+@onready var skill_tooltip: PanelContainer = $SkillTooltip
+@onready var tooltip_icon: Label = $SkillTooltip/VBox/HeaderHBox/TooltipIcon
+@onready var tooltip_title: Label = $SkillTooltip/VBox/HeaderHBox/TooltipTitle
+@onready var tooltip_badge: Label = $SkillTooltip/VBox/HeaderHBox/TooltipBadge
+@onready var tooltip_stats: Label = $SkillTooltip/VBox/TooltipStats
+@onready var tooltip_desc: Label = $SkillTooltip/VBox/TooltipDesc
+@onready var tooltip_bio: Label = $SkillTooltip/VBox/TooltipBio
+
+var hovered_slot_idx: int = -1
 
 # Cached last stats for re-rendering upon language change
 var last_health: float = 100.0
@@ -45,10 +57,14 @@ func _ready() -> void:
 
 	if not resume_btn.pressed.is_connected(resume_game):
 		resume_btn.pressed.connect(resume_game)
+	if not manual_btn.pressed.is_connected(_on_manual_pressed):
+		manual_btn.pressed.connect(_on_manual_pressed)
 	if not restart_btn.pressed.is_connected(_on_restart_pressed):
 		restart_btn.pressed.connect(_on_restart_pressed)
 	if not menu_btn.pressed.is_connected(_on_menu_pressed):
 		menu_btn.pressed.connect(_on_menu_pressed)
+
+	_setup_slot_hover_signals()
 
 	GM.add_language_listener(_on_language_changed)
 	_update_localized_texts()
@@ -81,8 +97,12 @@ func _update_localized_texts() -> void:
 
 	pause_title.text = tr("PAUSE_TITLE")
 	resume_btn.text = tr("PAUSE_RESUME")
+	manual_btn.text = tr("PAUSE_MANUAL")
 	restart_btn.text = tr("PAUSE_RESTART")
 	menu_btn.text = tr("PAUSE_MENU")
+
+	if hovered_slot_idx >= 0 and is_instance_valid(skill_tooltip) and skill_tooltip.visible:
+		_refresh_tooltip_content(hovered_slot_idx)
 
 	_update_skill_slots()
 
@@ -136,18 +156,105 @@ func _on_restart_pressed() -> void:
 func _on_menu_pressed() -> void:
 	GM.go_to_menu(get_tree())
 
+func _on_manual_pressed() -> void:
+	codex_modal.open_codex(0)
+
+func _setup_slot_hover_signals() -> void:
+	var slot_children = slots_container.get_children()
+	for i in range(slot_children.size()):
+		var card = slot_children[i]
+		card.mouse_filter = Control.MOUSE_FILTER_STOP
+		var idx = i
+		card.mouse_entered.connect(func(): _on_slot_mouse_entered(idx, card))
+		card.mouse_exited.connect(func(): _on_slot_mouse_exited(idx))
+
+func _on_slot_mouse_entered(slot_idx: int, card: Control) -> void:
+	hovered_slot_idx = slot_idx
+	_refresh_tooltip_content(slot_idx)
+
+	var card_rect = card.get_global_rect()
+	var vp_size = get_viewport().get_visible_rect().size
+	var target_x = clampf(card_rect.get_center().x - 150.0, 10.0, vp_size.x - 310.0)
+	var target_y = card_rect.position.y - skill_tooltip.size.y - 10.0
+	skill_tooltip.global_position = Vector2(target_x, target_y)
+	skill_tooltip.visible = true
+
+func _on_slot_mouse_exited(slot_idx: int) -> void:
+	if hovered_slot_idx == slot_idx:
+		hovered_slot_idx = -1
+		skill_tooltip.visible = false
+
+func _refresh_tooltip_content(slot_idx: int) -> void:
+	if not player_ref or not is_instance_valid(player_ref):
+		player_ref = get_tree().get_first_node_in_group("player")
+		if not player_ref:
+			return
+	var sm = player_ref.get_node_or_null("SkillManager")
+	if not sm or not sm.has_method("get_all_ui_data"):
+		return
+
+	var skills_data = sm.get_all_ui_data()
+	if slot_idx < 0 or slot_idx >= skills_data.size():
+		return
+
+	var data = skills_data[slot_idx]
+	if data["id"] != "":
+		tooltip_icon.text = data["icon"]
+		tooltip_title.text = data["name"]
+
+		var badge_text = ""
+		var badge_color = Color(1, 1, 1)
+		var stats_text = ""
+
+		if data["is_innate"]:
+			badge_text = "[ " + tr("TOOLTIP_TAG_INNATE") + " ]"
+			badge_color = Color(0.4, 0.95, 0.8)
+			stats_text = tr("TOOLTIP_ALWAYS_ACTIVE") + " • " + (tr("TOOLTIP_LV_FORMAT") % [data["level"], data["max_level"]])
+		elif data["is_passive"]:
+			badge_text = "[ " + tr("TOOLTIP_TAG_PASSIVE") + " ]"
+			badge_color = Color(0.6, 0.8, 1.0)
+			stats_text = tr("TOOLTIP_ALWAYS_ACTIVE") + " • " + (tr("TOOLTIP_LV_FORMAT") % [data["level"], data["max_level"]])
+		else:
+			badge_text = "[ " + tr("TOOLTIP_TAG_ACTIVE") + " ]"
+			badge_color = Color(1.0, 0.85, 0.3)
+			var max_cd = data.get("cooldown_max", 3.2)
+			stats_text = (tr("TOOLTIP_CD") % max_cd) + " • " + (tr("TOOLTIP_LV_FORMAT") % [data["level"], data["max_level"]])
+
+		tooltip_badge.text = badge_text
+		tooltip_badge.modulate = badge_color
+		tooltip_stats.text = stats_text
+		tooltip_desc.text = "【 战术机制 / Tactical Effect 】\n" + data["description"]
+		var bio_text = data.get("biochemistry", "")
+		tooltip_bio.text = "【 生物机制 / Bio-Mechanism 】\n" + bio_text
+		tooltip_bio.visible = (bio_text != "")
+	else:
+		tooltip_icon.text = "+"
+		tooltip_title.text = tr("TOOLTIP_EMPTY_TITLE")
+		tooltip_badge.text = "[ 空 / EMPTY ]"
+		tooltip_badge.modulate = Color(0.6, 0.6, 0.6)
+		tooltip_stats.text = tr("SKILL_BAR_TITLE")
+		tooltip_desc.text = tr("TOOLTIP_EMPTY_DESC")
+		tooltip_bio.text = ""
+		tooltip_bio.visible = false
+
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_pause") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
+		if codex_modal.visible:
+			codex_modal.close_codex()
+			return
 		toggle_pause()
 
 func toggle_pause() -> void:
 	var paused = not get_tree().paused
 	get_tree().paused = paused
 	pause_modal.visible = paused
+	if not paused:
+		codex_modal.visible = false
 
 func resume_game() -> void:
 	get_tree().paused = false
 	pause_modal.visible = false
+	codex_modal.visible = false
 
 func connect_player(player: Node2D) -> void:
 	player_ref = player

@@ -74,6 +74,146 @@ const MAP_DATA = {
 	}
 }
 
+## Skill Catalog for Manual and Tooltips
+const SKILL_CATALOG = {
+	"macrophage_pseudopods": {
+		"id": "macrophage_pseudopods",
+		"name_key": "SKILL_DEFORM_NAME",
+		"desc_key": "SKILL_DEFORM_DESC",
+		"bio_key": "SKILL_DEFORM_BIO",
+		"icon": "🦠",
+		"type": "innate",
+		"class_id": "macrophage",
+		"cooldown": 0.0,
+		"max_level": 5
+	},
+	"ros_torrent": {
+		"id": "ros_torrent",
+		"name_key": "SKILL_ROS_NAME",
+		"desc_key": "SKILL_ROS_DESC",
+		"bio_key": "SKILL_ROS_BIO",
+		"icon": "💨",
+		"type": "active",
+		"class_id": "",
+		"cooldown": 3.2,
+		"max_level": 5
+	},
+	"complement_cascade": {
+		"id": "complement_cascade",
+		"name_key": "SKILL_COMPLEMENT_NAME",
+		"desc_key": "SKILL_COMPLEMENT_DESC",
+		"bio_key": "SKILL_COMPLEMENT_BIO",
+		"icon": "💥",
+		"type": "active",
+		"class_id": "",
+		"cooldown": 5.0,
+		"max_level": 5
+	},
+	"lysosomal_overload": {
+		"id": "lysosomal_overload",
+		"name_key": "SKILL_LYSOSOME_NAME",
+		"desc_key": "SKILL_LYSOSOME_DESC",
+		"bio_key": "SKILL_LYSOSOME_BIO",
+		"icon": "🧪",
+		"type": "active",
+		"class_id": "",
+		"cooldown": 4.5,
+		"max_level": 5
+	},
+	"interferon_pulse": {
+		"id": "interferon_pulse",
+		"name_key": "SKILL_INTERFERON_NAME",
+		"desc_key": "SKILL_INTERFERON_DESC",
+		"bio_key": "SKILL_INTERFERON_BIO",
+		"icon": "📡",
+		"type": "active",
+		"class_id": "",
+		"cooldown": 6.0,
+		"max_level": 5
+	},
+	"perforin_injection": {
+		"id": "perforin_injection",
+		"name_key": "SKILL_PERFORIN_NAME",
+		"desc_key": "SKILL_PERFORIN_DESC",
+		"bio_key": "SKILL_PERFORIN_BIO",
+		"icon": "🗡️",
+		"type": "innate",
+		"class_id": "ctl",
+		"cooldown": 0.0,
+		"max_level": 5
+	},
+	"net_trap": {
+		"id": "net_trap",
+		"name_key": "SKILL_NET_NAME",
+		"desc_key": "SKILL_NET_DESC",
+		"bio_key": "SKILL_NET_BIO",
+		"icon": "🕸️",
+		"type": "innate",
+		"class_id": "neutrophil",
+		"cooldown": 8.0,
+		"max_level": 5
+	},
+	"phagocytic_instinct": {
+		"id": "phagocytic_instinct",
+		"name_key": "SKILL_INSTINCT_NAME",
+		"desc_key": "SKILL_INSTINCT_DESC",
+		"bio_key": "SKILL_INSTINCT_BIO",
+		"icon": "🩸",
+		"type": "passive",
+		"class_id": "",
+		"cooldown": 0.0,
+		"max_level": 5
+	},
+	"chemotaxis_guidance": {
+		"id": "chemotaxis_guidance",
+		"name_key": "SKILL_CHEMOTAXIS_NAME",
+		"desc_key": "SKILL_CHEMOTAXIS_DESC",
+		"bio_key": "SKILL_CHEMOTAXIS_BIO",
+		"icon": "🧭",
+		"type": "passive",
+		"class_id": "",
+		"cooldown": 0.0,
+		"max_level": 5
+	}
+}
+
+## Pathogen Catalog for Codex
+const PATHOGEN_CATALOG = {
+	"staph": {
+		"id": "staph",
+		"name_key": "PATHOGEN_STAPH_NAME",
+		"desc_key": "PATHOGEN_STAPH_DESC",
+		"trait_key": "PATHOGEN_STAPH_TRAIT",
+		"icon": "🧫",
+		"danger_level": "★☆☆"
+	},
+	"s_virus": {
+		"id": "s_virus",
+		"name_key": "PATHOGEN_SVIRUS_NAME",
+		"desc_key": "PATHOGEN_SVIRUS_DESC",
+		"trait_key": "PATHOGEN_SVIRUS_TRAIT",
+		"icon": "🦠",
+		"danger_level": "★★☆"
+	},
+	"flu_drift": {
+		"id": "flu_drift",
+		"name_key": "PATHOGEN_FLUDRIFT_NAME",
+		"desc_key": "PATHOGEN_FLUDRIFT_DESC",
+		"trait_key": "PATHOGEN_FLUDRIFT_TRAIT",
+		"icon": "🧬",
+		"danger_level": "★★★"
+	},
+	"malignant_cell": {
+		"id": "malignant_cell",
+		"name_key": "PATHOGEN_MALIGNANT_NAME",
+		"desc_key": "PATHOGEN_MALIGNANT_DESC",
+		"trait_key": "PATHOGEN_MALIGNANT_TRAIT",
+		"icon": "☣️",
+		"danger_level": "★★★★"
+	}
+}
+
+
 func _ready() -> void:
 	# Initialize locale
 	set_language(current_language)
@@ -122,6 +262,43 @@ static func get_map_info(key: String) -> Dictionary:
 		"threat": TranslationServer.translate(d["threat_key"]),
 		"bg_color": d["bg_color"],
 		"unlocked": d["unlocked"]
+	}
+
+static func get_skill_info(key: String) -> Dictionary:
+	if not SKILL_CATALOG.has(key):
+		return {}
+	var d = SKILL_CATALOG[key]
+	var type_label = ""
+	match d["type"]:
+		"innate":
+			type_label = TranslationServer.translate("TOOLTIP_TAG_INNATE")
+		"active":
+			type_label = TranslationServer.translate("TOOLTIP_TAG_ACTIVE")
+		"passive":
+			type_label = TranslationServer.translate("TOOLTIP_TAG_PASSIVE")
+	return {
+		"id": d["id"],
+		"name": TranslationServer.translate(d["name_key"]),
+		"description": TranslationServer.translate(d["desc_key"]),
+		"biochemistry": TranslationServer.translate(d["bio_key"]),
+		"icon": d["icon"],
+		"type": d["type"],
+		"type_label": type_label,
+		"cooldown": d["cooldown"],
+		"max_level": d["max_level"]
+	}
+
+static func get_pathogen_info(key: String) -> Dictionary:
+	if not PATHOGEN_CATALOG.has(key):
+		return {}
+	var d = PATHOGEN_CATALOG[key]
+	return {
+		"id": d["id"],
+		"name": TranslationServer.translate(d["name_key"]),
+		"description": TranslationServer.translate(d["desc_key"]),
+		"trait": TranslationServer.translate(d["trait_key"]),
+		"icon": d["icon"],
+		"danger_level": d["danger_level"]
 	}
 
 static func start_game(tree: SceneTree) -> void:

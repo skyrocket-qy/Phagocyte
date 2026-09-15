@@ -19,11 +19,6 @@ const GM = preload("res://scripts/core/game_manager.gd")
 @onready var codex_btn: Button = $TitleView/VBox/CodexButton
 @onready var quit_btn: Button = $TitleView/VBox/QuitButton
 
-## Codex Modal Controls
-@onready var codex_title_lbl: Label = $CodexModal/VBox/Title
-@onready var codex_content_lbl: Label = $CodexModal/VBox/Content
-@onready var codex_close_btn: Button = $CodexModal/VBox/CloseButton
-
 ## Class View Controls
 @onready var class_header_lbl: Label = $ClassView/HeaderLabel
 @onready var class_list_container: VBoxContainer = $ClassView/HBox/ClassList
@@ -59,9 +54,8 @@ func _ready() -> void:
 
 	# Title signals
 	start_btn.pressed.connect(_on_start_pressed)
-	codex_btn.pressed.connect(func(): codex_modal.visible = true)
+	codex_btn.pressed.connect(func(): codex_modal.open_codex(0))
 	quit_btn.pressed.connect(func(): get_tree().quit())
-	codex_close_btn.pressed.connect(func(): codex_modal.visible = false)
 
 	# Class signals
 	class_back_btn.pressed.connect(func(): _switch_to_view(title_view))
@@ -92,11 +86,6 @@ func _update_all_texts() -> void:
 	start_btn.text = tr("BTN_START")
 	codex_btn.text = tr("BTN_CODEX")
 	quit_btn.text = tr("BTN_QUIT")
-
-	# Codex Modal
-	codex_title_lbl.text = tr("CODEX_TITLE")
-	codex_content_lbl.text = tr("CODEX_CONTENT")
-	codex_close_btn.text = tr("BTN_CLOSE")
 
 	# Class View
 	class_header_lbl.text = tr("HEADER_SELECT_CLASS")

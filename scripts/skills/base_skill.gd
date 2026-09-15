@@ -8,6 +8,7 @@ signal skill_upgraded(new_level: int)
 @export var skill_id: String = ""
 @export var name_key: String = ""
 @export var desc_key: String = ""
+@export var bio_key: String = ""
 @export var icon_symbol: String = "⚡"
 @export var level: int = 1
 @export var max_level: int = 5
@@ -52,11 +53,13 @@ func get_ui_data() -> Dictionary:
 		"id": skill_id,
 		"name": tr(name_key),
 		"description": tr(desc_key),
+		"biochemistry": tr(bio_key) if bio_key != "" else "",
 		"icon": icon_symbol,
 		"level": level,
 		"max_level": max_level,
 		"is_passive": is_passive,
 		"is_innate": is_innate,
+		"cooldown_max": cooldown,
 		"cooldown_ratio": cd_pct,
 		"cooldown_time": max(0.0, cooldown_timer)
 	}
