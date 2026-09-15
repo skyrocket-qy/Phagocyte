@@ -1,6 +1,8 @@
 class_name Main
 extends Node2D
 
+const GM = preload("res://scripts/core/game_manager.gd")
+
 @export var staph_scene: PackedScene = preload("res://scenes/enemies/staph_enemy.tscn")
 @export var max_pathogens: int = 35
 @export var arena_size: Vector2 = Vector2(2400, 2400)
@@ -10,21 +12,60 @@ extends Node2D
 @onready var enemy_container: Node2D = $EnemyContainer
 @onready var camera: Camera2D = $Macrophage/Camera2D
 
+@onready var arena_bg: ColorRect = $Background/ArenaBG
+@onready var arena_borders: Line2D = $Background/ArenaBorders
+
 var spawn_timer: float = 0.0
+var environment_time: float = 0.0
+var map_id: String = "acute_wound"
 
 func _ready() -> void:
 	player.add_to_group("player")
 	if hud.has_method("connect_player"):
 		hud.connect_player(player)
 
+	# Read map configuration from GM
+	map_id = GM.selected_map
+	_configure_map_environment()
+
 	# Initial pathogen wave
 	_spawn_initial_wave(24)
 
+func _configure_map_environment() -> void:
+	if map_id == "alveolar_space":
+		arena_bg.color = Color(0.03, 0.09, 0.12, 1.0)
+		arena_borders.default_color = Color(0.2, 0.65, 0.7, 0.7)
+	else:
+		# acute_wound default
+		arena_bg.color = Color(0.05, 0.07, 0.11, 1.0)
+		arena_borders.default_color = Color(0.35, 0.45, 0.6, 0.65)
+
 func _physics_process(delta: float) -> void:
+	environment_time += delta
+
+	# Map mechanics
+	_process_map_mechanics(delta)
+
 	spawn_timer += delta
 	if spawn_timer >= 1.5:
 		spawn_timer = 0.0
 		_maintain_population()
+
+func _process_map_mechanics(delta: float) -> void:
+	if map_id == "alveolar_space":
+		# SPEC Section 5: Periodic breathing airflow thrust in lung alveoli
+		var breath_force = sin(environment_time * 1.2) * 28.0
+		var breath_vec = Vector2(breath_force, sin(environment_time * 0.6) * 12.0)
+		# Gently pushes all free pathogens and player with fluid current
+		for enemy in enemy_container.get_children():
+			if enemy is Node2D and not enemy.get("is_being_eaten"):
+				enemy.position += breath_vec * delta * 0.6
+	elif map_id == "acute_wound":
+		# SPEC Section 5: Directional tissue fluid suction towards wound tear
+		var suction_vec = Vector2(16.0, 10.0)
+		for enemy in enemy_container.get_children():
+			if enemy is Node2D and not enemy.get("is_being_eaten"):
+				enemy.position += suction_vec * delta * 0.4
 
 func _spawn_initial_wave(count: int) -> void:
 	for i in range(count):
