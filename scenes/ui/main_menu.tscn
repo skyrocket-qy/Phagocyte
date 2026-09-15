@@ -41,6 +41,38 @@ content_margin_top = 25.0
 content_margin_right = 30.0
 content_margin_bottom = 25.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lang_btn"]
+bg_color = Color(0.1, 0.18, 0.26, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.6, 0.8, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lang_btn_hover"]
+bg_color = Color(0.18, 0.32, 0.46, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.8, 1, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
 [node name="MainMenu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -57,6 +89,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.03, 0.06, 0.09, 1)
 
 [node name="Particles" type="CPUParticles2D" parent="."]
@@ -83,6 +116,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="TitleLabel" type="Label" parent="TitleView"]
 layout_mode = 1
@@ -104,14 +138,14 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -300.0
+offset_left = -360.0
 offset_top = 180.0
-offset_right = 300.0
+offset_right = 360.0
 offset_bottom = 220.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 0.8)
-theme_override_font_sizes/font_size = 20
-text = "微觀免疫動作肉鴿 • 吞噬、分化與生化風暴"
+theme_override_font_sizes/font_size = 18
+text = "微观免疫动作肉鸽 • 吞噬、分化与生化风暴"
 horizontal_alignment = 1
 
 [node name="VBox" type="VBoxContainer" parent="TitleView"]
@@ -132,20 +166,23 @@ theme_override_constants/separation = 16
 [node name="StartButton" type="Button" parent="TitleView/VBox"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
+mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 18
-text = "🩸 開始免疫行動"
+text = "🩸 开始免疫行动"
 
 [node name="CodexButton" type="Button" parent="TitleView/VBox"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
+mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 16
-text = "🔬 微觀檔案館 (Codex)"
+text = "🔬 微观档案馆 (Codex)"
 
 [node name="QuitButton" type="Button" parent="TitleView/VBox"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 15
-text = "退出遊戲"
+text = "退出游戏"
 
 [node name="ClassView" type="Control" parent="."]
 visible = false
@@ -155,6 +192,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="HeaderLabel" type="Label" parent="ClassView"]
 layout_mode = 1
@@ -168,7 +206,7 @@ offset_bottom = 85.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
 theme_override_font_sizes/font_size = 26
-text = "選擇你的免疫防禦細胞"
+text = "选择你的免疫防御细胞"
 horizontal_alignment = 1
 
 [node name="HBox" type="HBoxContainer" parent="ClassView"]
@@ -204,34 +242,34 @@ theme_override_constants/separation = 14
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
 theme_override_font_sizes/font_size = 22
-text = "巨噬細胞 (Macrophage)"
+text = "巨噬细胞 (Macrophage)"
 
 [node name="ClassStatusLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "狀態：已解鎖 (READY)"
+text = "状态：已解锁 (READY)"
 
 [node name="ClassRoleLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
-text = "定位：近戰重裝 / 吞噬"
+text = "定位：近战重装 / 吞噬"
 
 [node name="ClassTraitLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "變形特性：頂點位移幅度極大，偽足延伸速度快"
+text = "变形特性：顶点位移幅度极大，伪足延伸速度快"
 autowrap_mode = 3
 
 [node name="ClassPassiveLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "固有被動：巨噬本能：吞噬範圍 +40%；每消化一隻病原體恢復 0.5% 最大生命值。"
+text = "固有被动：巨噬本能：吞噬范围 +40%；每消化一只病原体恢复 0.5% 最大生命值。"
 autowrap_mode = 3
 
 [node name="ClassBurstLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "終極技能：呼吸爆發：飽食度滿時移速 +150%，釋放高壓酸性腐蝕力場 6 秒。"
+text = "终极技能：呼吸爆发：饱食度满时移速 +150%，释放高压酸性腐蚀力场 6 秒。"
 autowrap_mode = 3
 
 [node name="Buttons" type="HBoxContainer" parent="ClassView"]
@@ -252,14 +290,16 @@ theme_override_constants/separation = 40
 [node name="BackButton" type="Button" parent="ClassView/Buttons"]
 custom_minimum_size = Vector2(180, 46)
 layout_mode = 2
+mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 16
-text = "返回主標題"
+text = "返回主标题"
 
 [node name="ConfirmButton" type="Button" parent="ClassView/Buttons"]
 custom_minimum_size = Vector2(240, 46)
 layout_mode = 2
+mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 16
-text = "下一步：選擇病理戰場"
+text = "下一步：选择病理战场"
 
 [node name="MapView" type="Control" parent="."]
 visible = false
@@ -269,6 +309,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="HeaderLabel" type="Label" parent="MapView"]
 layout_mode = 1
@@ -282,7 +323,7 @@ offset_bottom = 85.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
 theme_override_font_sizes/font_size = 26
-text = "選擇病理戰場"
+text = "选择病理战场"
 horizontal_alignment = 1
 
 [node name="HBox" type="HBoxContainer" parent="MapView"]
@@ -323,19 +364,19 @@ text = "表皮裂口 (Acute Wound)"
 [node name="MapEnvLabel" type="Label" parent="MapView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
-text = "環境：微血管破裂，體液滲出區"
+text = "环境：微血管破裂，体液渗出区"
 
 [node name="MapMechLabel" type="Label" parent="MapView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "病理機制：微血管破裂，週期性產生指向傷口外緣的強大組織液吸力；地面微血管網造成流體阻力。"
+text = "病理机制：微血管破裂，周期性产生指向伤口外缘的强大组织液吸力；地面微血管网造成流体阻力。"
 autowrap_mode = 3
 
 [node name="MapThreatLabel" type="Label" parent="MapView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.5, 0.5, 1)
 theme_override_font_sizes/font_size = 14
-text = "威脅病原體：金黃色葡萄球菌 (Staph) 抱團侵襲"
+text = "威胁病原体：金黄色葡萄球菌 (Staph) 抱团侵袭"
 autowrap_mode = 3
 
 [node name="Buttons" type="HBoxContainer" parent="MapView"]
@@ -356,17 +397,20 @@ theme_override_constants/separation = 40
 [node name="BackButton" type="Button" parent="MapView/Buttons"]
 custom_minimum_size = Vector2(180, 46)
 layout_mode = 2
+mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 16
-text = "返回選擇細胞"
+text = "返回选择细胞"
 
 [node name="DeployButton" type="Button" parent="MapView/Buttons"]
 custom_minimum_size = Vector2(220, 46)
 layout_mode = 2
+mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 16
-text = "🚀 開始出擊"
+text = "🚀 开始出击"
 
 [node name="CodexModal" type="PanelContainer" parent="."]
 visible = false
+z_index = 20
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -389,23 +433,42 @@ theme_override_constants/separation = 14
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 1)
 theme_override_font_sizes/font_size = 20
-text = "🔬 微觀檔案館 (Immunology Codex)"
+text = "🔬 微观档案馆 (Immunology Codex)"
 
 [node name="Content" type="Label" parent="CodexModal/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 13
-text = "歡迎查閱人體防禦系統微觀檔案：
+text = "欢迎查阅人体防御系统微观档案：
 
-• 巨噬細胞 (Macrophage)：先天免疫核心，能以阿米巴偽足吞噬入侵病原體，並透過溶酶體進行降解。
-• 呼吸爆發 (Respiratory Burst)：白血球吞噬大量抗原後激活 NADPH 氧化酶，產生大量活性氧 (ROS) 殺滅病原。
-• 金黃色葡萄球菌 (Staph)：常駐於表皮，破裂創口入侵後易抱團形成葡萄狀簇抵禦免疫識別。
+• 巨噬细胞 (Macrophage)：先天免疫核心，能以阿米巴伪足吞噬入侵病原体，并透过溶酶体进行降解。
+• 呼吸爆发 (Respiratory Burst)：白血球吞噬大量抗原后激活 NADPH 氧化酶，产生大量活性氧 (ROS) 杀灭病原。
+• 金黄色葡萄球菌 (Staph)：常驻于表皮，破裂创口入侵后易抱团形成葡萄状簇抵御免疫识别。
 
-更多冷凍電鏡 (Cryo-EM) 結構與病原體數據庫即將陸續上線！"
+更多冷冻电镜 (Cryo-EM) 结构与病原体数据库即将陆续上线！"
 autowrap_mode = 3
 
 [node name="CloseButton" type="Button" parent="CodexModal/VBox"]
 custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 size_flags_horizontal = 4
-text = "關閉檔案"
+mouse_default_cursor_shape = 2
+text = "关闭档案"
+
+[node name="LangButton" type="Button" parent="."]
+z_index = 10
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -170.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = 64.0
+grow_horizontal = 0
+mouse_filter = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_lang_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_lang_btn_hover")
+theme_override_font_sizes/font_size = 15
+text = "🌐 English"

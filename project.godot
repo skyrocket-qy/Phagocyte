@@ -66,6 +66,10 @@ toggle_pause={
 ]
 }
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://assets/translations/translations.en.translation", "res://assets/translations/translations.zh_CN.translation")
+
 [layer_names]
 
 2d_physics/layer_1="Player"
