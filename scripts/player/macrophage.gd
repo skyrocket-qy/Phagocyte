@@ -6,7 +6,7 @@ signal stats_changed(health: float, max_health: float, satiety: float, max_satie
 signal burst_state_changed(is_active: bool, time_left: float, max_time: float)
 signal pathogen_digested(pathogen: Node2D, atp_gained: float)
 
-## Base Stats (Macrophage profile: Heavy melee / High engulfment / Large pseudopods)
+## Base Stats
 @export var max_health: float = 100.0
 var health: float = 100.0
 
@@ -14,17 +14,14 @@ var health: float = 100.0
 var current_speed: float = 230.0
 
 # Base radius with Macrophage passive (+40% engulfment range)
-# Standard base is 45.0, with +40% it's 63.0
 @export var base_radius: float = 63.0
 var current_radius: float = 63.0
 
 @export var max_satiety: float = 100.0
 var satiety: float = 0.0
 
-## Deformation Parameters
-@export var vertex_count: int = 32
+## Deformation Parameters (Delegated to MacrophageDeformationSkill)
 @export var deformation_speed: float = 3.6
-@export var base_deformation_mag: float = 30.0
 var current_deformation_mag: float = 30.0
 
 ## Respiratory Burst (呼吸爆發)
@@ -34,10 +31,6 @@ const BURST_DURATION: float = 6.0
 
 ## Digestion tracking
 var digested_count: int = 0
-
-## FastNoiseLite instance for organic pseudopod movement
-var noise: FastNoiseLite
-var noise_time: float = 0.0
 
 ## Inertial Nucleus offset
 var nucleus_offset: Vector2 = Vector2.ZERO
@@ -52,6 +45,7 @@ var nucleus_target_offset: Vector2 = Vector2.ZERO
 @onready var acidic_aura: Area2D = $AcidicAura
 @onready var aura_collider: CollisionShape2D = $AcidicAura/AuraCollider
 @onready var burst_particles: CPUParticles2D = $BurstParticles
+@onready var skill_manager: SkillManager = $SkillManager
 
 # Cytoplasm coloring
 const COLOR_NORMAL: Color = Color(0.18, 0.72, 0.65, 0.62)
@@ -63,36 +57,44 @@ func _ready() -> void:
 	health = max_health
 	current_speed = base_speed
 	current_radius = base_radius
-	current_deformation_mag = base_deformation_mag
 
-	# Initialize FastNoiseLite
-	noise = FastNoiseLite.new()
-	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
-	noise.seed = randi()
-	noise.frequency = 0.65
-	noise.fractal_octaves = 2
+	# Connect engulfment signals
+	if not engulf_area.area_entered.is_connected(_on_engulf_area_entered):
+		engulf_area.area_entered.connect(_on_engulf_area_entered)
+	if not acidic_aura.area_entered.is_connected(_on_acidic_aura_entered):
+		acidic_aura.area_entered.connect(_on_acidic_aura_entered)
 
-	# Connect engulfment signal
-	engulf_area.area_entered.connect(_on_engulf_area_entered)
-	acidic_aura.area_entered.connect(_on_acidic_aura_entered)
 	acidic_aura.monitoring = false
 	burst_particles.emitting = false
 
-	# Setup nucleus vertices (16 vertices)
+	# Setup nucleus shape
 	_setup_nucleus_shape()
 
-	# Emit initial stats
+	# Initialize 6-Slot Skill System
+	skill_manager.setup(self)
+
+	# Slot 1: Macrophage Exclusive Innate Deformation Skill
+	var deform_skill = MacrophageDeformationSkill.new()
+	skill_manager.equip_skill(deform_skill, 0)
+
+	# Slot 2: Active Cytokine Skill - ROS Torrent (活性氧射流)
+	var ros_skill = ROSTorrentSkill.new()
+	skill_manager.equip_skill(ros_skill, 1)
+
+	# Run initial deformation tick so polygons are immediately populated
+	_update_pseudopod_deformation(0.016)
+
 	_emit_stats()
 
 func _physics_process(delta: float) -> void:
 	_handle_movement(delta)
 	_handle_burst(delta)
-	_update_pseudopod_deformation(delta)
-	_update_nucleus(delta)
+
+	# Delegate skill execution (drives deformation, weapons, passive ticks)
+	skill_manager.update_all_skills(delta)
 
 func _handle_movement(delta: float) -> void:
 	var input_vec := Vector2.ZERO
-	# Support input actions with fallback to direct key checks
 	if Input.is_action_pressed("move_left") or Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
 		input_vec.x -= 1.0
 	if Input.is_action_pressed("move_right") or Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
@@ -105,7 +107,6 @@ func _handle_movement(delta: float) -> void:
 	if input_vec != Vector2.ZERO:
 		input_vec = input_vec.normalized()
 		velocity = velocity.move_toward(input_vec * current_speed, current_speed * 5.0 * delta)
-		# Fluid inertia pull on nucleus (opposite to movement)
 		nucleus_target_offset = -input_vec * (current_radius * 0.28)
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, current_speed * 4.0 * delta)
@@ -113,64 +114,12 @@ func _handle_movement(delta: float) -> void:
 
 	move_and_slide()
 
-## Organic procedural pseudopod deformation with FastNoiseLite
+## Delegator for deformation updates
 func _update_pseudopod_deformation(delta: float) -> void:
-	noise_time += delta * deformation_speed
-
-	# Radius expansion based on satiety (1.0x at 0 satiety, up to 2.5x at 100 satiety)
-	var expansion_ratio: float = 1.0 + (satiety / max_satiety) * 1.5
-	current_radius = base_radius * expansion_ratio
-	current_deformation_mag = base_deformation_mag * expansion_ratio
-
-	# Additional boost during Respiratory Burst
-	if is_respiratory_burst:
-		current_radius *= 1.15
-		current_deformation_mag *= 1.35
-
-	var points := PackedVector2Array()
-	var angle_step: float = TAU / float(vertex_count)
-
-	# Movement direction bias to form directional leading pseudopod
-	var move_dir: Vector2 = velocity.normalized() if velocity.length() > 20.0 else Vector2.ZERO
-
-	for i in range(vertex_count):
-		var angle: float = i * angle_step
-		var dir := Vector2(cos(angle), sin(angle))
-
-		# Sample noise in circle perimeter coordinates + time
-		var nx: float = cos(angle) * 1.8
-		var ny: float = sin(angle) * 1.8
-		var n_val: float = noise.get_noise_3d(nx, ny, noise_time)
-
-		# Directional bias: pseudopods stretch forward when moving
-		var forward_bias: float = 0.0
-		if move_dir != Vector2.ZERO:
-			var dot: float = max(0.0, dir.dot(move_dir))
-			forward_bias = dot * (current_deformation_mag * 0.6)
-
-		var r: float = current_radius + (n_val * current_deformation_mag) + forward_bias
-		points.append(dir * max(15.0, r))
-
-	# Update visual Polygon2D
-	cytoplasm.polygon = points
-
-	# Update closed membrane Line2D
-	var line_points := points.duplicate()
-	if line_points.size() > 0:
-		line_points.append(points[0]) # close loop
-	membrane.points = line_points
-
-	# "What you see is what you touch": Deep copy to CollisionPolygon2D
-	engulf_collider.polygon = points
-
-## Spring-lag inertia for nucleus
-func _update_nucleus(delta: float) -> void:
-	nucleus_offset = nucleus_offset.lerp(nucleus_target_offset, 8.0 * delta)
-	nucleus.position = nucleus_offset
-
-	# Scale nucleus slightly with overall cell size
-	var n_scale: float = 1.0 + (satiety / max_satiety) * 0.8
-	nucleus.scale = Vector2(n_scale, n_scale)
+	var deform_skill = skill_manager.get_slot(0)
+	if deform_skill and deform_skill.has_method("_update_pseudopod_deformation"):
+		deform_skill._update_pseudopod_deformation(delta)
+		deform_skill._update_nucleus(delta)
 
 func _setup_nucleus_shape() -> void:
 	var n_pts := PackedVector2Array()
@@ -178,7 +127,6 @@ func _setup_nucleus_shape() -> void:
 	var n_radius: float = 20.0
 	for i in range(n_count):
 		var a: float = i * (TAU / float(n_count))
-		# Slightly kidney/amoeboid lobed nucleus
 		var r: float = n_radius * (1.0 + 0.25 * sin(a * 2.0))
 		n_pts.append(Vector2(cos(a) * r, sin(a) * r))
 	nucleus.polygon = n_pts
@@ -207,13 +155,12 @@ func _consume_pathogen(enemy: Node2D) -> void:
 	enemy.be_engulfed(self)
 	digested_count += 1
 
-	# Satiety accumulation
 	if not is_respiratory_burst:
 		satiety = clampf(satiety + atp, 0.0, max_satiety)
 		if satiety >= max_satiety:
 			trigger_respiratory_burst()
 
-	# Macrophage Passive (巨噬本能): Restores 0.5% max HP per digested pathogen
+	# Macrophage Passive: Heals 0.5% max HP
 	heal(max_health * 0.005)
 
 	pathogen_digested.emit(enemy, atp)
@@ -227,15 +174,12 @@ func trigger_respiratory_burst() -> void:
 	is_respiratory_burst = true
 	burst_timer = BURST_DURATION
 
-	# Speed +150% (total 2.5x base speed)
 	current_speed = base_speed * 2.5
 	deformation_speed = 6.0
 
-	# Visual change: glowing acidic cytoplasm
 	cytoplasm.color = COLOR_BURST
 	membrane.default_color = MEMBRANE_BURST
 
-	# Activate acidic aura
 	acidic_aura.monitoring = true
 	burst_particles.emitting = true
 
@@ -246,8 +190,6 @@ func _handle_burst(delta: float) -> void:
 		return
 
 	burst_timer -= delta
-
-	# Slowly consume satiety during burst as fuel
 	satiety = clampf((burst_timer / BURST_DURATION) * max_satiety, 0.0, max_satiety)
 	burst_state_changed.emit(true, max(0.0, burst_timer), BURST_DURATION)
 	_emit_stats()
@@ -278,9 +220,6 @@ func heal(amount: float) -> void:
 func take_damage(amount: float) -> void:
 	health = clampf(health - amount, 0.0, max_health)
 	_emit_stats()
-	if health <= 0.0:
-		# Player death handling
-		pass
 
 func _emit_stats() -> void:
 	var ratio: float = current_radius / base_radius

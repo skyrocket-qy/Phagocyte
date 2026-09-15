@@ -23,6 +23,10 @@ const GM = preload("res://scripts/core/game_manager.gd")
 @onready var restart_btn: Button = $PauseModal/VBox/RestartButton
 @onready var menu_btn: Button = $PauseModal/VBox/MenuButton
 
+## Skill Bar Nodes
+@onready var skill_title_lbl: Label = $SkillContainer/VBox/TitleLabel
+@onready var slots_container: HBoxContainer = $SkillContainer/VBox/SlotsContainer
+
 # Cached last stats for re-rendering upon language change
 var last_health: float = 100.0
 var last_max_health: float = 100.0
@@ -31,6 +35,8 @@ var last_max_satiety: float = 100.0
 var last_radius_ratio: float = 1.0
 var last_digested_count: int = 0
 var last_burst_time_left: float = 0.0
+
+var player_ref: Node2D = null
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -50,6 +56,9 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	GM.remove_language_listener(_on_language_changed)
 
+func _process(_delta: float) -> void:
+	_update_skill_slots()
+
 func _on_language_changed(_locale: String) -> void:
 	_update_localized_texts()
 
@@ -65,6 +74,7 @@ func _update_localized_texts() -> void:
 	size_label.text = tr("HUD_SIZE") % last_radius_ratio
 	count_label.text = tr("HUD_DIGESTED") % last_digested_count
 	help_label.text = tr("HUD_GUIDE")
+	skill_title_lbl.text = tr("SKILL_BAR_TITLE")
 
 	if burst_panel.visible:
 		burst_label.text = tr("HUD_BURST_ALERT") % last_burst_time_left
@@ -73,6 +83,52 @@ func _update_localized_texts() -> void:
 	resume_btn.text = tr("PAUSE_RESUME")
 	restart_btn.text = tr("PAUSE_RESTART")
 	menu_btn.text = tr("PAUSE_MENU")
+
+	_update_skill_slots()
+
+func _update_skill_slots() -> void:
+	if not player_ref or not is_instance_valid(player_ref):
+		player_ref = get_tree().get_first_node_in_group("player")
+		if not player_ref:
+			return
+
+	var sm = player_ref.get_node_or_null("SkillManager")
+	if not sm or not sm.has_method("get_all_ui_data"):
+		return
+
+	var skills_data = sm.get_all_ui_data()
+	var slot_children = slots_container.get_children()
+
+	for i in range(mini(slot_children.size(), skills_data.size())):
+		var slot_card = slot_children[i]
+		var data = skills_data[i]
+
+		var icon_lbl = slot_card.get_node_or_null("IconLabel")
+		var badge_lbl = slot_card.get_node_or_null("BadgeLabel")
+		var cd_overlay = slot_card.get_node_or_null("CooldownBar")
+
+		if data["id"] != "":
+			# Active or Innate Skill
+			if icon_lbl:
+				icon_lbl.text = data["icon"]
+			if badge_lbl:
+				if data["is_innate"]:
+					badge_lbl.text = tr("SKILL_INNATE_TAG")
+					badge_lbl.modulate = Color(0.4, 0.95, 0.8)
+				else:
+					badge_lbl.text = tr("SKILL_LV") % data["level"]
+					badge_lbl.modulate = Color(1.0, 0.9, 0.3)
+			if cd_overlay:
+				cd_overlay.visible = data["cooldown_ratio"] > 0.0
+				cd_overlay.value = data["cooldown_ratio"]
+		else:
+			# Empty Slot
+			if icon_lbl:
+				icon_lbl.text = "+"
+			if badge_lbl:
+				badge_lbl.text = ""
+			if cd_overlay:
+				cd_overlay.visible = false
 
 func _on_restart_pressed() -> void:
 	GM.restart_game(get_tree())
@@ -94,12 +150,15 @@ func resume_game() -> void:
 	pause_modal.visible = false
 
 func connect_player(player: Node2D) -> void:
+	player_ref = player
 	if player.has_signal("stats_changed") and not player.stats_changed.is_connected(_on_player_stats_changed):
 		player.stats_changed.connect(_on_player_stats_changed)
 	if player.has_signal("burst_state_changed") and not player.burst_state_changed.is_connected(_on_player_burst_state_changed):
 		player.burst_state_changed.connect(_on_player_burst_state_changed)
 	if player.has_signal("pathogen_digested") and not player.pathogen_digested.is_connected(_on_pathogen_digested):
 		player.pathogen_digested.connect(_on_pathogen_digested)
+
+	_update_skill_slots()
 
 func _on_player_stats_changed(health: float, max_health: float, satiety: float, max_satiety: float, radius_ratio: float) -> void:
 	last_health = health

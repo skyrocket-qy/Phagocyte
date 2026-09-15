@@ -73,6 +73,41 @@ content_margin_top = 24.0
 content_margin_right = 32.0
 content_margin_bottom = 24.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skill_panel"]
+bg_color = Color(0.06, 0.1, 0.14, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.45, 0.65, 0.8)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot"]
+bg_color = Color(0.1, 0.14, 0.2, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.6, 0.8, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cd_overlay"]
+bg_color = Color(0.0, 0.0, 0.0, 0.65)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="HUD" type="CanvasLayer"]
 process_mode = 3
 script = ExtResource("1_hud")
@@ -95,13 +130,13 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
 theme_override_font_sizes/font_size = 15
-text = "巨噬細胞 (Macrophage) - 狀態"
+text = "巨噬细胞 (Macrophage) - 状态"
 
 [node name="MapLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.75, 0.3, 1)
 theme_override_font_sizes/font_size = 12
-text = "戰場：表皮裂口 (Acute Wound)"
+text = "战场：表皮裂口 (Acute Wound)"
 
 [node name="HPContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -127,7 +162,7 @@ theme_override_constants/separation = 2
 [node name="ATPLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/ATPContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
-text = "飽食能量 (ATP): 0%"
+text = "饱食能量 (ATP): 0%"
 
 [node name="ATPBar" type="ProgressBar" parent="MarginContainer/PanelContainer/VBoxContainer/ATPContainer"]
 custom_minimum_size = Vector2(0, 12)
@@ -140,13 +175,13 @@ show_percentage = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
 theme_override_font_sizes/font_size = 12
-text = "細胞半徑擴展: 1.0x"
+text = "细胞半径扩展: 1.0x"
 
 [node name="CountLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.4, 1)
 theme_override_font_sizes/font_size = 12
-text = "已吞噬病原體: 0"
+text = "已吞噬病原体: 0"
 
 [node name="BurstContainer" type="PanelContainer" parent="."]
 anchors_preset = 5
@@ -167,8 +202,8 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 14
-text = "⚡ 呼吸爆發 (Respiratory Burst) 剩餘 6.0s ⚡
-移速 +150% | 酸性腐蝕力場生效中"
+text = "⚡ 呼吸爆发 (Respiratory Burst) 剩余 6.0s ⚡
+移速 +150% | 酸性腐蚀力场生效中"
 horizontal_alignment = 1
 
 [node name="BurstBar" type="ProgressBar" parent="BurstContainer/VBox"]
@@ -199,10 +234,204 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 0.9)
 theme_override_font_sizes/font_size = 12
 text = "🎮 操作指南：
-• [W][A][S][D] / 方向鍵：平滑游動走位
-• [ESC]：暫停遊戲 / 返回主菜單
-• 偽足邊界接觸病原體即可吞噬 (恢復 0.5% 生命)
-• 飽食度滿觸發「呼吸爆發」高壓酸性力場"
+• [W][A][S][D] / 方向键：平滑游动走位
+• [ESC]：暂停游戏 / 返回主菜单
+• 伪足边界接触病原体即可吞噬 (恢复 0.5% 生命)
+• 饱食度满触发「呼吸爆发」高压酸性力场"
+
+[node name="SkillContainer" type="PanelContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -210.0
+offset_top = -90.0
+offset_right = 210.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_skill_panel")
+
+[node name="VBox" type="VBoxContainer" parent="SkillContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="SkillContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 0.85)
+theme_override_font_sizes/font_size = 11
+text = "生化技能槽 (6 Slots)"
+horizontal_alignment = 1
+
+[node name="SlotsContainer" type="HBoxContainer" parent="SkillContainer/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Slot0" type="PanelContainer" parent="SkillContainer/VBox/SlotsContainer"]
+custom_minimum_size = Vector2(52, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="IconLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot0"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "🦠"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BadgeLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot0"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(0.4, 0.95, 0.8, 1)
+theme_override_font_sizes/font_size = 9
+text = "INNATE"
+horizontal_alignment = 1
+
+[node name="CooldownBar" type="ProgressBar" parent="SkillContainer/VBox/SlotsContainer/Slot0"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+max_value = 1.0
+show_percentage = false
+
+[node name="Slot1" type="PanelContainer" parent="SkillContainer/VBox/SlotsContainer"]
+custom_minimum_size = Vector2(52, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="IconLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot1"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "💨"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BadgeLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot1"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 9
+text = "Lv.1"
+horizontal_alignment = 1
+
+[node name="CooldownBar" type="ProgressBar" parent="SkillContainer/VBox/SlotsContainer/Slot1"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+max_value = 1.0
+show_percentage = false
+
+[node name="Slot2" type="PanelContainer" parent="SkillContainer/VBox/SlotsContainer"]
+custom_minimum_size = Vector2(52, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="IconLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.5, 0.6, 0.6)
+theme_override_font_sizes/font_size = 18
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BadgeLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot2"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+
+[node name="CooldownBar" type="ProgressBar" parent="SkillContainer/VBox/SlotsContainer/Slot2"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+max_value = 1.0
+show_percentage = false
+
+[node name="Slot3" type="PanelContainer" parent="SkillContainer/VBox/SlotsContainer"]
+custom_minimum_size = Vector2(52, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="IconLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot3"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.5, 0.6, 0.6)
+theme_override_font_sizes/font_size = 18
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BadgeLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot3"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+
+[node name="CooldownBar" type="ProgressBar" parent="SkillContainer/VBox/SlotsContainer/Slot3"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+max_value = 1.0
+show_percentage = false
+
+[node name="Slot4" type="PanelContainer" parent="SkillContainer/VBox/SlotsContainer"]
+custom_minimum_size = Vector2(52, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="IconLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot4"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.5, 0.6, 0.6)
+theme_override_font_sizes/font_size = 18
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BadgeLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot4"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+
+[node name="CooldownBar" type="ProgressBar" parent="SkillContainer/VBox/SlotsContainer/Slot4"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+max_value = 1.0
+show_percentage = false
+
+[node name="Slot5" type="PanelContainer" parent="SkillContainer/VBox/SlotsContainer"]
+custom_minimum_size = Vector2(52, 48)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
+
+[node name="IconLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot5"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.5, 0.6, 0.6)
+theme_override_font_sizes/font_size = 18
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BadgeLabel" type="Label" parent="SkillContainer/VBox/SlotsContainer/Slot5"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+
+[node name="CooldownBar" type="ProgressBar" parent="SkillContainer/VBox/SlotsContainer/Slot5"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_overlay")
+max_value = 1.0
+show_percentage = false
 
 [node name="PauseModal" type="PanelContainer" parent="."]
 visible = false
@@ -227,23 +456,23 @@ theme_override_constants/separation = 16
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
 theme_override_font_sizes/font_size = 22
-text = "⏸ 免疫戰鬥暫停"
+text = "⏸ 免疫战斗暂停"
 horizontal_alignment = 1
 
 [node name="ResumeButton" type="Button" parent="PauseModal/VBox"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "▶ 繼續戰鬥"
+text = "▶ 继续战斗"
 
 [node name="RestartButton" type="Button" parent="PauseModal/VBox"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
-text = "🔄 重新開始"
+text = "🔄 重新开始"
 
 [node name="MenuButton" type="Button" parent="PauseModal/VBox"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
-text = "🏠 返回主菜單"
+text = "🏠 返回主菜单"

@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/skills/ros_jet.gd" id="1_ros_jet"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jet"]
+radius = 10.0
+height = 56.0
+
+[node name="ROSJet" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_ros_jet")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_jet")
