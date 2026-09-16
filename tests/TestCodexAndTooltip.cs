@@ -58,8 +58,8 @@ public partial class TestCodexAndTooltip : SceneTree
         AssertThat(GameManager.SkillCatalog.ContainsKey("ros_torrent")).IsTrue();
         GD.Print("[PASS] GameManager.SkillCatalog contains complete skill definitions.");
 
-        AssertThat(GameManager.PathogenCatalog.Count >= 4).IsTrue();
-        GD.Print("[PASS] GameManager.PathogenCatalog contains 4 complete pathogen definitions.");
+        AssertThat(GameManager.PathogenCatalog.Count >= 20).IsTrue();
+        GD.Print($"[PASS] GameManager.PathogenCatalog contains {GameManager.PathogenCatalog.Count} complete pathogen definitions.");
 
         // 2. Verify In-Game Skill Tooltip
         var skillTooltip = hud.SkillTooltip;

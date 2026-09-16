@@ -254,6 +254,134 @@ public partial class GameManager : Node
             { "trait_key", "PATHOGEN_MALIGNANT_TRAIT" },
             { "icon", "☣️" },
             { "danger_level", "★★★★" }
+        }},
+        { "pseudomonas", new Dictionary {
+            { "id", "pseudomonas" },
+            { "name_key", "PATHOGEN_PSEUDOMONAS_NAME" },
+            { "desc_key", "PATHOGEN_PSEUDOMONAS_DESC" },
+            { "trait_key", "PATHOGEN_PSEUDOMONAS_TRAIT" },
+            { "icon", "🧪" },
+            { "danger_level", "★★☆" }
+        }},
+        { "e_coli", new Dictionary {
+            { "id", "e_coli" },
+            { "name_key", "PATHOGEN_ECOLI_NAME" },
+            { "desc_key", "PATHOGEN_ECOLI_DESC" },
+            { "trait_key", "PATHOGEN_ECOLI_TRAIT" },
+            { "icon", "⚡" },
+            { "danger_level", "★★☆" }
+        }},
+        { "tb", new Dictionary {
+            { "id", "tb" },
+            { "name_key", "PATHOGEN_TB_NAME" },
+            { "desc_key", "PATHOGEN_TB_DESC" },
+            { "trait_key", "PATHOGEN_TB_TRAIT" },
+            { "icon", "🔥" },
+            { "danger_level", "★★★" }
+        }},
+        { "tetanus", new Dictionary {
+            { "id", "tetanus" },
+            { "name_key", "PATHOGEN_TETANUS_NAME" },
+            { "desc_key", "PATHOGEN_TETANUS_DESC" },
+            { "trait_key", "PATHOGEN_TETANUS_TRAIT" },
+            { "icon", "🎯" },
+            { "danger_level", "★★★" }
+        }},
+        { "h_pylori", new Dictionary {
+            { "id", "h_pylori" },
+            { "name_key", "PATHOGEN_HPYLORI_NAME" },
+            { "desc_key", "PATHOGEN_HPYLORI_DESC" },
+            { "trait_key", "PATHOGEN_HPYLORI_TRAIT" },
+            { "icon", "🌀" },
+            { "danger_level", "★★☆" }
+        }},
+        { "anthrax_spore", new Dictionary {
+            { "id", "anthrax_spore" },
+            { "name_key", "PATHOGEN_ANTHRAX_NAME" },
+            { "desc_key", "PATHOGEN_ANTHRAX_DESC" },
+            { "trait_key", "PATHOGEN_ANTHRAX_TRAIT" },
+            { "icon", "🛡️" },
+            { "danger_level", "★★★" }
+        }},
+        { "hiv", new Dictionary {
+            { "id", "hiv" },
+            { "name_key", "PATHOGEN_HIV_NAME" },
+            { "desc_key", "PATHOGEN_HIV_DESC" },
+            { "trait_key", "PATHOGEN_HIV_TRAIT" },
+            { "icon", "🩸" },
+            { "danger_level", "★★★" }
+        }},
+        { "rabies", new Dictionary {
+            { "id", "rabies" },
+            { "name_key", "PATHOGEN_RABIES_NAME" },
+            { "desc_key", "PATHOGEN_RABIES_DESC" },
+            { "trait_key", "PATHOGEN_RABIES_TRAIT" },
+            { "icon", "💥" },
+            { "danger_level", "★★★" }
+        }},
+        { "ebola", new Dictionary {
+            { "id", "ebola" },
+            { "name_key", "PATHOGEN_EBOLA_NAME" },
+            { "desc_key", "PATHOGEN_EBOLA_DESC" },
+            { "trait_key", "PATHOGEN_EBOLA_TRAIT" },
+            { "icon", "🐍" },
+            { "danger_level", "★★★★" }
+        }},
+        { "norovirus", new Dictionary {
+            { "id", "norovirus" },
+            { "name_key", "PATHOGEN_NOROVIRUS_NAME" },
+            { "desc_key", "PATHOGEN_NOROVIRUS_DESC" },
+            { "trait_key", "PATHOGEN_NOROVIRUS_TRAIT" },
+            { "icon", "🌊" },
+            { "danger_level", "★☆☆" }
+        }},
+        { "varicella_zoster", new Dictionary {
+            { "id", "varicella_zoster" },
+            { "name_key", "PATHOGEN_ZOSTER_NAME" },
+            { "desc_key", "PATHOGEN_ZOSTER_DESC" },
+            { "trait_key", "PATHOGEN_ZOSTER_TRAIT" },
+            { "icon", "👻" },
+            { "danger_level", "★★★" }
+        }},
+        { "candida", new Dictionary {
+            { "id", "candida" },
+            { "name_key", "PATHOGEN_CANDIDA_NAME" },
+            { "desc_key", "PATHOGEN_CANDIDA_DESC" },
+            { "trait_key", "PATHOGEN_CANDIDA_TRAIT" },
+            { "icon", "🍄" },
+            { "danger_level", "★★★" }
+        }},
+        { "aspergillus", new Dictionary {
+            { "id", "aspergillus" },
+            { "name_key", "PATHOGEN_ASPERGILLUS_NAME" },
+            { "desc_key", "PATHOGEN_ASPERGILLUS_DESC" },
+            { "trait_key", "PATHOGEN_ASPERGILLUS_TRAIT" },
+            { "icon", "☣️" },
+            { "danger_level", "★★★" }
+        }},
+        { "plasmodium", new Dictionary {
+            { "id", "plasmodium" },
+            { "name_key", "PATHOGEN_PLASMODIUM_NAME" },
+            { "desc_key", "PATHOGEN_PLASMODIUM_DESC" },
+            { "trait_key", "PATHOGEN_PLASMODIUM_TRAIT" },
+            { "icon", "🦟" },
+            { "danger_level", "★★★" }
+        }},
+        { "toxoplasma", new Dictionary {
+            { "id", "toxoplasma" },
+            { "name_key", "PATHOGEN_TOXOPLASMA_NAME" },
+            { "desc_key", "PATHOGEN_TOXOPLASMA_DESC" },
+            { "trait_key", "PATHOGEN_TOXOPLASMA_TRAIT" },
+            { "icon", "🧠" },
+            { "danger_level", "★★★" }
+        }},
+        { "prion", new Dictionary {
+            { "id", "prion" },
+            { "name_key", "PATHOGEN_PRION_NAME" },
+            { "desc_key", "PATHOGEN_PRION_DESC" },
+            { "trait_key", "PATHOGEN_PRION_TRAIT" },
+            { "icon", "💎" },
+            { "danger_level", "★★★★★" }
         }}
     };
 

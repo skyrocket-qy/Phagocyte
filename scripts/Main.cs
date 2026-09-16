@@ -4,6 +4,7 @@ using Phagocyte.Core;
 using Phagocyte.Player;
 using Phagocyte.Skills;
 using Phagocyte.UI;
+using Phagocyte.Enemies;
 
 namespace Phagocyte;
 
@@ -238,25 +239,21 @@ public partial class Main : Node2D
 
     private void SpawnInitialWave(int count)
     {
-        for (int i = 0; i < count; i++)
-        {
-            SpawnStaphAroundPlayer((float)GD.RandRange(200.0, 950.0));
-        }
+        if (Player == null || EnemyContainer == null)
+            return;
+        PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, count);
     }
 
     private void MaintainPopulation()
     {
-        if (EnemyContainer == null)
+        if (EnemyContainer == null || Player == null)
             return;
 
         int currentCount = EnemyContainer.GetChildCount();
         if (currentCount < MaxPathogens)
         {
-            int spawnBatch = Mathf.Min(5, MaxPathogens - currentCount);
-            for (int i = 0; i < spawnBatch; i++)
-            {
-                SpawnStaphAroundPlayer((float)GD.RandRange(450.0, 1100.0));
-            }
+            int spawnBatch = Mathf.Min(3, MaxPathogens - currentCount);
+            PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, spawnBatch);
         }
     }
 

@@ -66,6 +66,14 @@ public partial class BaseCell : CharacterBody2D
     public Vector2 NucleusTargetOffset { get; set; } = Vector2.Zero;
     public Vector2 NucleusVelocity { get; set; } = Vector2.Zero;
 
+    // Status debuffs
+    public float SlowTimer { get; set; } = 0.0f;
+    public float SlowFactor { get; set; } = 1.0f;
+    public float StunTimer { get; set; } = 0.0f;
+    public float InvertControlsTimer { get; set; } = 0.0f;
+    public float TbBurnTimer { get; set; } = 0.0f;
+    public float TbBurnDps { get; set; } = 0.0f;
+
     // Node references
     public Polygon2D? Cytoplasm { get; set; }
     public Line2D? Membrane { get; set; }
@@ -139,6 +147,28 @@ public partial class BaseCell : CharacterBody2D
     public override void _PhysicsProcess(double delta)
     {
         float dt = (float)delta;
+
+        // Process status debuffs
+        if (SlowTimer > 0.0f)
+        {
+            SlowTimer -= dt;
+            if (SlowTimer <= 0.0f)
+                SlowFactor = 1.0f;
+        }
+        if (StunTimer > 0.0f)
+        {
+            StunTimer -= dt;
+        }
+        if (InvertControlsTimer > 0.0f)
+        {
+            InvertControlsTimer -= dt;
+        }
+        if (TbBurnTimer > 0.0f)
+        {
+            TbBurnTimer -= dt;
+            TakeDamage(TbBurnDps * dt);
+        }
+
         HandleRegen(dt);
         HandleMovement(dt);
         HandleBurst(dt);
@@ -215,19 +245,32 @@ public partial class BaseCell : CharacterBody2D
     private void HandleMovement(float delta)
     {
         Vector2 inputVec = Vector2.Zero;
-        if (Input.IsActionPressed("move_left") || Input.IsKeyPressed(Key.A) || Input.IsKeyPressed(Key.Left))
-            inputVec.X -= 1.0f;
-        if (Input.IsActionPressed("move_right") || Input.IsKeyPressed(Key.D) || Input.IsKeyPressed(Key.Right))
-            inputVec.X += 1.0f;
-        if (Input.IsActionPressed("move_up") || Input.IsKeyPressed(Key.W) || Input.IsKeyPressed(Key.Up))
-            inputVec.Y -= 1.0f;
-        if (Input.IsActionPressed("move_down") || Input.IsKeyPressed(Key.S) || Input.IsKeyPressed(Key.Down))
-            inputVec.Y += 1.0f;
+
+        if (StunTimer <= 0.0f)
+        {
+            if (Input.IsActionPressed("move_left") || Input.IsKeyPressed(Key.A) || Input.IsKeyPressed(Key.Left))
+                inputVec.X -= 1.0f;
+            if (Input.IsActionPressed("move_right") || Input.IsKeyPressed(Key.D) || Input.IsKeyPressed(Key.Right))
+                inputVec.X += 1.0f;
+            if (Input.IsActionPressed("move_up") || Input.IsKeyPressed(Key.W) || Input.IsKeyPressed(Key.Up))
+                inputVec.Y -= 1.0f;
+            if (Input.IsActionPressed("move_down") || Input.IsKeyPressed(Key.S) || Input.IsKeyPressed(Key.Down))
+                inputVec.Y += 1.0f;
+
+            if (InvertControlsTimer > 0.0f)
+            {
+                inputVec = -inputVec;
+            }
+        }
 
         float targetSpeed = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
         if (IsBurst)
         {
             targetSpeed = GetBurstMoveSpeed(targetSpeed);
+        }
+        if (SlowTimer > 0.0f)
+        {
+            targetSpeed *= SlowFactor;
         }
 
         CurrentSpeed = targetSpeed;
@@ -411,8 +454,19 @@ public partial class BaseCell : CharacterBody2D
         if (enemy == null || enemy.IsQueuedForDeletion())
             return;
 
+        if (enemy is BaseEnemy be && !be.CanBeEngulfed)
+        {
+            be.OnEngulfAttemptFailed(this);
+            return;
+        }
+
         float atp = 12.0f;
-        if (enemy is StaphEnemy se)
+        if (enemy is BaseEnemy baseEnemy)
+        {
+            atp = baseEnemy.GetAtpValue();
+            baseEnemy.BeEngulfed(this);
+        }
+        else if (enemy is StaphEnemy se)
         {
             atp = se.GetAtpValue();
             se.BeEngulfed(this);
@@ -541,6 +595,36 @@ public partial class BaseCell : CharacterBody2D
             Health = Mathf.Clamp(Health, 0.0f, maxHp);
         }
         EmitStatsSignal();
+    }
+
+    public void ApplySlow(float duration, float factor)
+    {
+        SlowTimer = duration;
+        SlowFactor = Mathf.Min(SlowFactor, factor);
+    }
+
+    public void ApplyStun(float duration)
+    {
+        StunTimer = duration;
+    }
+
+    public void ApplyInvertControls(float duration)
+    {
+        InvertControlsTimer = duration;
+    }
+
+    public void ApplyTBDigestionBurn(float duration, float dps)
+    {
+        TbBurnTimer = duration;
+        TbBurnDps = dps;
+    }
+
+    public void DrainAtp(float amount)
+    {
+        Satiety = Mathf.Max(0.0f, Satiety - amount);
+        CurrentExp = Mathf.Max(0.0f, CurrentExp - amount);
+        EmitStatsSignal();
+        EmitSignal(SignalName.ExpChanged, CurrentExp, ExpToNextLevel, CurrentLevel);
     }
 
     public void EmitStatsSignal()
