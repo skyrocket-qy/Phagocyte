@@ -15,11 +15,11 @@ public partial class Macrophage : BaseCell
     public Area2D? AcidicAura { get; set; }
     public CollisionShape2D? AuraCollider { get; set; }
 
-    // Cytoplasm coloring
-    public static readonly Color ColorNormal = new(0.18f, 0.72f, 0.65f, 0.62f);
-    public static readonly Color ColorBurst = new(0.96f, 0.82f, 0.16f, 0.82f);
-    public static readonly Color MembraneNormal = new(0.45f, 0.95f, 0.85f, 0.9f);
-    public static readonly Color MembraneBurst = new(1.0f, 0.95f, 0.4f, 1.0f);
+    // Cytoplasm coloring (Deep Transparent Aqueous Glass + Deep Violet Chromatin Nucleus)
+    public static readonly Color ColorNormal = new(0.18f, 0.32f, 0.52f, 0.22f);
+    public static readonly Color ColorBurst = new(0.95f, 0.65f, 0.20f, 0.40f);
+    public static readonly Color MembraneNormal = new(0.80f, 0.92f, 1.0f, 0.60f);
+    public static readonly Color MembraneBurst = new(1.0f, 0.92f, 0.50f, 0.95f);
 
     // Backward-compatibility alias for tests and HUD
     public bool IsRespiratoryBurst
@@ -33,7 +33,7 @@ public partial class Macrophage : BaseCell
         MaxHealth = 100.0f;
         BaseSpeed = 230.0f;
         BaseRadius = 48.0f;
-        BaseDeformationMag = 24.0f;
+        BaseDeformationMag = 28.0f;
         DeformationSpeed = 3.6f;
 
         Noise = new FastNoiseLite
@@ -71,7 +71,7 @@ public partial class Macrophage : BaseCell
         if (Nucleus != null)
         {
             Nucleus.Polygon = nPts;
-            Nucleus.Color = new Color(0.42f, 0.22f, 0.68f, 0.85f);
+            Nucleus.Color = new Color(0.48f, 0.18f, 0.68f, 0.88f);
         }
     }
 

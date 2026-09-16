@@ -12,10 +12,10 @@ namespace Phagocyte.Player;
 /// </summary>
 public partial class CtlCell : BaseCell
 {
-    public static readonly Color ColorNormal = new(0.85f, 0.18f, 0.32f, 0.65f);
-    public static readonly Color ColorBurst = new(1.0f, 0.45f, 0.15f, 0.85f);
-    public static readonly Color MembraneNormal = new(1.0f, 0.35f, 0.50f, 0.95f);
-    public static readonly Color MembraneBurst = new(1.0f, 0.85f, 0.30f, 1.0f);
+    public static readonly Color ColorNormal = new(0.85f, 0.32f, 0.45f, 0.45f);
+    public static readonly Color ColorBurst = new(1.0f, 0.45f, 0.25f, 0.75f);
+    public static readonly Color MembraneNormal = new(0.95f, 0.55f, 0.68f, 0.80f);
+    public static readonly Color MembraneBurst = new(1.0f, 0.85f, 0.45f, 0.95f);
 
     public override void SetupCellIdentity()
     {
@@ -56,7 +56,7 @@ public partial class CtlCell : BaseCell
         if (Nucleus != null)
         {
             Nucleus.Polygon = nPts;
-            Nucleus.Color = new Color(0.48f, 0.06f, 0.16f, 0.92f);
+            Nucleus.Color = new Color(0.48f, 0.12f, 0.32f, 0.92f);
         }
     }
 

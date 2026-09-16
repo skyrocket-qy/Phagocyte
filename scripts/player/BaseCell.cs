@@ -173,7 +173,7 @@ public partial class BaseCell : CharacterBody2D
         if (Nucleus != null)
         {
             Nucleus.Polygon = nPts;
-            Nucleus.Color = new Color(0.4f, 0.2f, 0.6f, 0.85f);
+            Nucleus.Color = new Color(0.48f, 0.18f, 0.68f, 0.88f);
         }
     }
 
@@ -187,16 +187,12 @@ public partial class BaseCell : CharacterBody2D
         var mat = new ShaderMaterial { Shader = shader };
         Color baseCol = Cytoplasm.Color;
         mat.SetShaderParameter("tint_color", baseCol);
-        Color rimCol = new Color(
-            Mathf.Clamp(baseCol.R * 1.6f, 0.35f, 1.8f),
-            Mathf.Clamp(baseCol.G * 2.2f, 0.6f, 2.2f),
-            Mathf.Clamp(baseCol.B * 2.5f, 0.8f, 2.5f),
-            1.0f
-        );
+        Color rimCol = new Color(0.85f, 0.95f, 1.25f, 1.0f);
         mat.SetShaderParameter("rim_color", rimCol);
-        mat.SetShaderParameter("rim_power", 2.4f);
-        mat.SetShaderParameter("inner_alpha", 0.42f);
-        mat.SetShaderParameter("flow_speed", 1.2f);
+        mat.SetShaderParameter("rim_power", 3.2f);
+        mat.SetShaderParameter("inner_alpha", 0.22f);
+        mat.SetShaderParameter("flow_speed", 1.0f);
+        mat.SetShaderParameter("cell_radius", CurrentRadius > 0 ? CurrentRadius : BaseRadius);
         Cytoplasm.Material = mat;
     }
 
@@ -284,18 +280,22 @@ public partial class BaseCell : CharacterBody2D
             float angle = i * angleStep;
             var dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 
-            float nx = Mathf.Cos(angle) * 1.8f;
-            float ny = Mathf.Sin(angle) * 1.8f;
-            float nVal = Noise != null ? Noise.GetNoise3D(nx, ny, NoiseTime) : 0.0f;
+            float nx1 = Mathf.Cos(angle) * 1.5f;
+            float ny1 = Mathf.Sin(angle) * 1.5f;
+            float nVal1 = Noise != null ? Noise.GetNoise3D(nx1, ny1, NoiseTime) : 0.0f;
+
+            float nx2 = Mathf.Cos(angle * 2.0f) * 2.4f;
+            float ny2 = Mathf.Sin(angle * 2.0f) * 2.4f;
+            float nVal2 = Noise != null ? Noise.GetNoise3D(nx2, ny2, NoiseTime * 1.35f) * 0.40f : 0.0f;
 
             float forwardBias = 0.0f;
             if (moveDir != Vector2.Zero)
             {
                 float dot = Mathf.Max(0.0f, dir.Dot(moveDir));
-                forwardBias = dot * (CurrentDeformationMag * 0.6f);
+                forwardBias = dot * (CurrentDeformationMag * 0.85f);
             }
 
-            float r = curR + (nVal * CurrentDeformationMag) + forwardBias;
+            float r = curR + ((nVal1 + nVal2) * CurrentDeformationMag) + forwardBias;
             points[i] = dir * Mathf.Max(12.0f, r);
         }
 
@@ -311,6 +311,10 @@ public partial class BaseCell : CharacterBody2D
                 uvs[i] = (smoothPoints[i] / uvDenom) + new Vector2(0.5f, 0.5f);
             }
             Cytoplasm.UV = uvs;
+            if (Cytoplasm.Material is ShaderMaterial smat)
+            {
+                smat.SetShaderParameter("cell_radius", curR);
+            }
         }
 
         if (Membrane != null)
