@@ -1,0 +1,548 @@
+using Godot;
+using System;
+using Phagocyte.Core;
+using Phagocyte.Skills;
+using Phagocyte.Enemies;
+
+namespace Phagocyte.Player;
+
+/// <summary>
+/// Base class for all Immune Defense Cells in Project: Phagocyte.
+/// Encapsulates universal stats, physics movement, 32-vertex organic deformation,
+/// satiety accumulation, digestion, experience progression, and ultimate burst states.
+/// </summary>
+public partial class BaseCell : CharacterBody2D
+{
+    [Signal]
+    public delegate void StatsChangedEventHandler(float health, float maxHealth, float satiety, float maxSatiety, float radiusRatio);
+
+    [Signal]
+    public delegate void BurstStateChangedEventHandler(bool isActive, float timeLeft, float maxTime);
+
+    [Signal]
+    public delegate void PathogenDigestedEventHandler(Node2D pathogen, float atpGained);
+
+    [Signal]
+    public delegate void LevelUpEventHandler(int newLevel);
+
+    [Signal]
+    public delegate void ExpChangedEventHandler(float currentExp, float maxExp, int level);
+
+    // Level & EXP Progression
+    public int CurrentLevel { get; set; } = 1;
+    public float CurrentExp { get; set; } = 0.0f;
+    public float ExpToNextLevel { get; set; } = 30.0f;
+
+    // Base Stats
+    [Export] public float MaxHealth { get; set; } = 100.0f;
+    [Export] public float BaseSpeed { get; set; } = 230.0f;
+    [Export] public float BaseRadius { get; set; } = 48.0f;
+    public float CurrentRadius { get; set; } = 48.0f;
+
+    [Export] public float MaxSatiety { get; set; } = 100.0f;
+    public float Satiety { get; set; } = 0.0f;
+
+    public float Health { get; set; } = 100.0f;
+    public float CurrentSpeed { get; set; } = 230.0f;
+
+    // Deformation Parameters
+    [Export] public int VertexCount { get; set; } = 32;
+    [Export] public float DeformationSpeed { get; set; } = 3.6f;
+    [Export] public float BaseDeformationMag { get; set; } = 24.0f;
+    public float CurrentDeformationMag { get; set; } = 24.0f;
+    public FastNoiseLite? Noise { get; set; }
+    public float NoiseTime { get; set; } = 0.0f;
+
+    // Ultimate Burst
+    public bool IsBurst { get; set; } = false;
+    public float BurstTimer { get; set; } = 0.0f;
+    [Export] public float BurstDuration { get; set; } = 6.0f;
+
+    // Digestion tracking
+    public int DigestedCount { get; set; } = 0;
+
+    // Inertial Nucleus offset
+    public Vector2 NucleusOffset { get; set; } = Vector2.Zero;
+    public Vector2 NucleusTargetOffset { get; set; } = Vector2.Zero;
+    public Vector2 NucleusVelocity { get; set; } = Vector2.Zero;
+
+    // Node references
+    public Polygon2D? Cytoplasm { get; set; }
+    public Line2D? Membrane { get; set; }
+    public Polygon2D? Nucleus { get; set; }
+    public CollisionPolygon2D? EngulfCollider { get; set; }
+    public Area2D? EngulfArea { get; set; }
+    public CpuParticles2D? BurstParticles { get; set; }
+    public SkillManager? CellSkillManager { get; set; }
+
+    public CellStats? Stats { get; set; }
+
+    public override void _Ready()
+    {
+        AddToGroup("player");
+
+        Cytoplasm = GetNodeOrNull<Polygon2D>("Cytoplasm");
+        Membrane = GetNodeOrNull<Line2D>("Membrane");
+        Nucleus = GetNodeOrNull<Polygon2D>("Nucleus");
+        EngulfCollider = GetNodeOrNull<CollisionPolygon2D>("EngulfArea/EngulfCollider");
+        EngulfArea = GetNodeOrNull<Area2D>("EngulfArea");
+        BurstParticles = GetNodeOrNull<CpuParticles2D>("BurstParticles");
+        CellSkillManager = GetNodeOrNull<SkillManager>("SkillManager");
+
+        // Ensure CellStats container node is initialized
+        if (HasNode("CellStats"))
+        {
+            Stats = GetNode<CellStats>("CellStats");
+        }
+        else
+        {
+            Stats = new CellStats { Name = "CellStats" };
+            AddChild(Stats);
+        }
+
+        SetupCellIdentity();
+
+        Stats.SetBase("max_health", MaxHealth);
+        Stats.SetBase("move_speed", BaseSpeed);
+        Health = Stats.GetStat("max_health");
+        CurrentSpeed = Stats.GetStat("move_speed");
+        CurrentRadius = BaseRadius * Stats.GetStat("area");
+
+        Stats.StatChanged += OnStatChanged;
+
+        // Connect engulfment signals
+        if (EngulfArea != null)
+        {
+            EngulfArea.AreaEntered += OnEngulfAreaEntered;
+        }
+
+        if (BurstParticles != null)
+        {
+            BurstParticles.Emitting = false;
+        }
+
+        SetupNucleusShape();
+        SetupCytoplasmShader();
+
+        // Initialize Skill System (5 Active + 5 Passive)
+        if (CellSkillManager != null)
+        {
+            CellSkillManager.Setup(this);
+            SetupInitialSkills();
+        }
+
+        // Initial deformation tick
+        UpdatePseudopodDeformation(0.016f);
+        EmitStatsSignal();
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        float dt = (float)delta;
+        HandleRegen(dt);
+        HandleMovement(dt);
+        HandleBurst(dt);
+        UpdatePseudopodDeformation(dt);
+
+        if (CellSkillManager != null)
+        {
+            CellSkillManager.UpdateAllSkills(delta);
+        }
+    }
+
+    public virtual void SetupCellIdentity()
+    {
+        Noise = new FastNoiseLite
+        {
+            NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex,
+            Seed = (int)GD.Randi(),
+            Frequency = 0.65f,
+            FractalOctaves = 2
+        };
+    }
+
+    public virtual void SetupNucleusShape()
+    {
+        var nPts = new Vector2[16];
+        float nRadius = 16.0f;
+        for (int i = 0; i < 16; i++)
+        {
+            float a = i * (Mathf.Tau / 16.0f);
+            nPts[i] = new Vector2(Mathf.Cos(a) * nRadius, Mathf.Sin(a) * nRadius);
+        }
+        if (Nucleus != null)
+        {
+            Nucleus.Polygon = nPts;
+            Nucleus.Color = new Color(0.4f, 0.2f, 0.6f, 0.85f);
+        }
+    }
+
+    public void SetupCytoplasmShader()
+    {
+        if (Cytoplasm == null)
+            return;
+        var shader = GD.Load<Shader>("res://shaders/cytoplasm_gel.gdshader");
+        if (shader == null)
+            return;
+        var mat = new ShaderMaterial { Shader = shader };
+        Color baseCol = Cytoplasm.Color;
+        mat.SetShaderParameter("tint_color", baseCol);
+        Color rimCol = new Color(
+            Mathf.Clamp(baseCol.R * 1.6f, 0.35f, 1.8f),
+            Mathf.Clamp(baseCol.G * 2.2f, 0.6f, 2.2f),
+            Mathf.Clamp(baseCol.B * 2.5f, 0.8f, 2.5f),
+            1.0f
+        );
+        mat.SetShaderParameter("rim_color", rimCol);
+        mat.SetShaderParameter("rim_power", 2.4f);
+        mat.SetShaderParameter("inner_alpha", 0.42f);
+        mat.SetShaderParameter("flow_speed", 1.2f);
+        Cytoplasm.Material = mat;
+    }
+
+    public virtual void SetupInitialSkills()
+    {
+    }
+
+    private void HandleRegen(float delta)
+    {
+        if (Stats != null)
+        {
+            float regen = Stats.GetStat("health_regen");
+            if (regen > 0.0f)
+            {
+                Heal(regen * delta);
+            }
+        }
+    }
+
+    private void HandleMovement(float delta)
+    {
+        Vector2 inputVec = Vector2.Zero;
+        if (Input.IsActionPressed("move_left") || Input.IsKeyPressed(Key.A) || Input.IsKeyPressed(Key.Left))
+            inputVec.X -= 1.0f;
+        if (Input.IsActionPressed("move_right") || Input.IsKeyPressed(Key.D) || Input.IsKeyPressed(Key.Right))
+            inputVec.X += 1.0f;
+        if (Input.IsActionPressed("move_up") || Input.IsKeyPressed(Key.W) || Input.IsKeyPressed(Key.Up))
+            inputVec.Y -= 1.0f;
+        if (Input.IsActionPressed("move_down") || Input.IsKeyPressed(Key.S) || Input.IsKeyPressed(Key.Down))
+            inputVec.Y += 1.0f;
+
+        float targetSpeed = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
+        if (IsBurst)
+        {
+            targetSpeed = GetBurstMoveSpeed(targetSpeed);
+        }
+
+        CurrentSpeed = targetSpeed;
+
+        if (inputVec != Vector2.Zero)
+        {
+            inputVec = inputVec.Normalized();
+            Velocity = Velocity.MoveToward(inputVec * CurrentSpeed, CurrentSpeed * 5.0f * delta);
+            NucleusTargetOffset = -inputVec * (CurrentRadius * 0.28f);
+        }
+        else
+        {
+            Velocity = Velocity.MoveToward(Vector2.Zero, CurrentSpeed * 4.0f * delta);
+            NucleusTargetOffset = Vector2.Zero;
+        }
+
+        MoveAndSlide();
+    }
+
+    public virtual float GetBurstMoveSpeed(float baseSp)
+    {
+        return baseSp * 2.5f;
+    }
+
+    public virtual void UpdatePseudopodDeformation(float delta)
+    {
+        NoiseTime += delta * DeformationSpeed;
+
+        float expansionRatio = 1.0f + (Satiety / Mathf.Max(1.0f, MaxSatiety)) * 1.5f;
+        float areaScale = Stats != null ? Stats.GetStat("area") : 1.0f;
+
+        float curR = BaseRadius * expansionRatio * areaScale;
+        CurrentDeformationMag = BaseDeformationMag * expansionRatio * areaScale;
+
+        if (IsBurst)
+        {
+            curR *= 1.15f;
+            CurrentDeformationMag *= 1.35f;
+        }
+
+        CurrentRadius = curR;
+
+        var points = new Vector2[VertexCount];
+        float angleStep = Mathf.Tau / (float)VertexCount;
+        Vector2 vel = Velocity;
+        Vector2 moveDir = vel.Length() > 20.0f ? vel.Normalized() : Vector2.Zero;
+
+        for (int i = 0; i < VertexCount; i++)
+        {
+            float angle = i * angleStep;
+            var dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+
+            float nx = Mathf.Cos(angle) * 1.8f;
+            float ny = Mathf.Sin(angle) * 1.8f;
+            float nVal = Noise != null ? Noise.GetNoise3D(nx, ny, NoiseTime) : 0.0f;
+
+            float forwardBias = 0.0f;
+            if (moveDir != Vector2.Zero)
+            {
+                float dot = Mathf.Max(0.0f, dir.Dot(moveDir));
+                forwardBias = dot * (CurrentDeformationMag * 0.6f);
+            }
+
+            float r = curR + (nVal * CurrentDeformationMag) + forwardBias;
+            points[i] = dir * Mathf.Max(12.0f, r);
+        }
+
+        var smoothPoints = SmoothClosedPolygon(points, 2);
+
+        if (Cytoplasm != null)
+        {
+            Cytoplasm.Polygon = smoothPoints;
+            var uvs = new Vector2[smoothPoints.Length];
+            float uvDenom = Mathf.Max(24.0f, curR * 2.4f);
+            for (int i = 0; i < smoothPoints.Length; i++)
+            {
+                uvs[i] = (smoothPoints[i] / uvDenom) + new Vector2(0.5f, 0.5f);
+            }
+            Cytoplasm.UV = uvs;
+        }
+
+        if (Membrane != null)
+        {
+            var linePoints = new Vector2[smoothPoints.Length + 1];
+            Array.Copy(smoothPoints, linePoints, smoothPoints.Length);
+            linePoints[^1] = smoothPoints[0];
+            Membrane.Points = linePoints;
+        }
+
+        if (EngulfCollider != null)
+        {
+            EngulfCollider.Polygon = points;
+        }
+
+        UpdateNucleus(delta);
+    }
+
+    /// <summary>
+    /// Closed Catmull-Rom Spline interpolation.
+    /// Converts N control points into N * subdivisions smoothly curving vertices.
+    /// </summary>
+    public static Vector2[] SmoothClosedPolygon(Vector2[] pts, int subdivisions = 2)
+    {
+        int n = pts.Length;
+        if (n < 4 || subdivisions <= 1)
+            return pts;
+
+        var smoothed = new Vector2[n * subdivisions];
+        float step = 1.0f / (float)subdivisions;
+        int idx = 0;
+
+        for (int i = 0; i < n; i++)
+        {
+            Vector2 p0 = pts[(i - 1 + n) % n];
+            Vector2 p1 = pts[i];
+            Vector2 p2 = pts[(i + 1) % n];
+            Vector2 p3 = pts[(i + 2) % n];
+
+            for (int s = 0; s < subdivisions; s++)
+            {
+                float t = s * step;
+                float t2 = t * t;
+                float t3 = t2 * t;
+                Vector2 pt = 0.5f * (
+                    (2.0f * p1) +
+                    (-p0 + p2) * t +
+                    (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
+                    (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3
+                );
+                smoothed[idx++] = pt;
+            }
+        }
+
+        return smoothed;
+    }
+
+    public void UpdateNucleus(float delta)
+    {
+        if (Nucleus == null)
+            return;
+
+        // Physical inertia lag: nucleus lags behind opposite to velocity vector
+        Vector2 targetLag = -Velocity * 0.08f;
+        float maxLag = CurrentRadius * 0.32f;
+        if (targetLag.Length() > maxLag)
+        {
+            targetLag = targetLag.Normalized() * maxLag;
+        }
+
+        // Damped harmonic oscillator
+        float springK = 48.0f;
+        float damping = 9.5f;
+        Vector2 accel = (targetLag - NucleusOffset) * springK - NucleusVelocity * damping;
+        NucleusVelocity += accel * delta;
+        NucleusOffset += NucleusVelocity * delta;
+        Nucleus.Position = NucleusOffset;
+
+        float nScale = 1.0f + (Satiety / Mathf.Max(1.0f, MaxSatiety)) * 0.8f;
+        Nucleus.Scale = new Vector2(nScale, nScale);
+    }
+
+    private void OnEngulfAreaEntered(Area2D area)
+    {
+        var enemy = area.GetParent();
+        if (enemy != null && enemy.HasMethod("be_engulfed"))
+        {
+            ConsumePathogen((Node2D)enemy);
+        }
+    }
+
+    public void ConsumePathogen(Node2D enemy)
+    {
+        if (enemy == null || enemy.IsQueuedForDeletion())
+            return;
+
+        float atp = 12.0f;
+        if (enemy is StaphEnemy se)
+        {
+            atp = se.GetAtpValue();
+            se.BeEngulfed(this);
+        }
+        else
+        {
+            if (enemy.HasMethod("get_atp_value"))
+                atp = (float)enemy.Call("get_atp_value");
+            else if (enemy.HasMethod("GetAtpValue"))
+                atp = (float)enemy.Call("GetAtpValue");
+
+            if (enemy.HasMethod("be_engulfed"))
+                enemy.Call("be_engulfed", this);
+            else if (enemy.HasMethod("BeEngulfed"))
+                enemy.Call("BeEngulfed", this);
+        }
+
+        DigestedCount += 1;
+
+        if (!IsBurst)
+        {
+            Satiety = Mathf.Clamp(Satiety + atp, 0.0f, MaxSatiety);
+            if (Satiety >= MaxSatiety)
+            {
+                TriggerBurst();
+            }
+        }
+
+        OnPathogenConsumed(enemy, atp);
+
+        float growthMult = Stats != null ? Stats.GetStat("growth") : 1.0f;
+        AddExp(atp * growthMult);
+
+        EmitSignal(SignalName.PathogenDigested, enemy, atp);
+        EmitStatsSignal();
+    }
+
+    public virtual void OnPathogenConsumed(Node2D enemy, float atp)
+    {
+    }
+
+    public void AddExp(float amount)
+    {
+        CurrentExp += amount;
+        while (CurrentExp >= ExpToNextLevel)
+        {
+            CurrentExp -= ExpToNextLevel;
+            CurrentLevel += 1;
+            ExpToNextLevel = ExpToNextLevel * 1.35f + 15.0f;
+            EmitSignal(SignalName.LevelUp, CurrentLevel);
+        }
+        EmitSignal(SignalName.ExpChanged, CurrentExp, ExpToNextLevel, CurrentLevel);
+    }
+
+    public void TriggerBurst()
+    {
+        if (IsBurst)
+            return;
+        IsBurst = true;
+        BurstTimer = BurstDuration;
+        float sp = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
+        CurrentSpeed = GetBurstMoveSpeed(sp);
+        if (BurstParticles != null)
+        {
+            BurstParticles.Emitting = true;
+        }
+        ApplyBurstVisuals(true);
+        EmitSignal(SignalName.BurstStateChanged, true, BurstTimer, BurstDuration);
+    }
+
+    private void HandleBurst(float delta)
+    {
+        if (!IsBurst)
+            return;
+        BurstTimer -= delta;
+        Satiety = Mathf.Clamp((BurstTimer / BurstDuration) * MaxSatiety, 0.0f, MaxSatiety);
+        EmitSignal(SignalName.BurstStateChanged, true, Mathf.Max(0.0f, BurstTimer), BurstDuration);
+        EmitStatsSignal();
+
+        if (BurstTimer <= 0.0f)
+        {
+            EndBurst();
+        }
+    }
+
+    private void EndBurst()
+    {
+        IsBurst = false;
+        BurstTimer = 0.0f;
+        Satiety = 0.0f;
+        CurrentSpeed = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
+        if (BurstParticles != null)
+        {
+            BurstParticles.Emitting = false;
+        }
+        ApplyBurstVisuals(false);
+        EmitSignal(SignalName.BurstStateChanged, false, 0.0f, BurstDuration);
+        EmitStatsSignal();
+    }
+
+    public virtual void ApplyBurstVisuals(bool active)
+    {
+    }
+
+    public void Heal(float amount)
+    {
+        float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
+        Health = Mathf.Clamp(Health + amount, 0.0f, maxHp);
+        EmitStatsSignal();
+    }
+
+    public void TakeDamage(float amount)
+    {
+        float dr = Stats != null ? Stats.GetDamageReductionRatio() : 0.0f;
+        float finalDmg = amount * (1.0f - dr);
+        float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
+        Health = Mathf.Clamp(Health - finalDmg, 0.0f, maxHp);
+        EmitStatsSignal();
+    }
+
+    private void OnStatChanged(string statName, float val)
+    {
+        if (statName == "max_health" && Stats != null)
+        {
+            float maxHp = Stats.GetStat("max_health");
+            Health = Mathf.Clamp(Health, 0.0f, maxHp);
+        }
+        EmitStatsSignal();
+    }
+
+    public void EmitStatsSignal()
+    {
+        float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
+        float ratio = CurrentRadius / BaseRadius;
+        EmitSignal(SignalName.StatsChanged, Health, maxHp, Satiety, MaxSatiety, ratio);
+    }
+}

@@ -1,0 +1,186 @@
+using Godot;
+using GdUnit4;
+using static GdUnit4.Assertions;
+using System;
+using Phagocyte.Core;
+using Phagocyte.Skills;
+using Phagocyte.UI;
+
+namespace Phagocyte.Tests;
+
+[TestSuite]
+public partial class TestAchievementSystem : SceneTree
+{
+    private int _phase = 0;
+    private int _frameCount = 0;
+    private CodexModal? _codexInstance = null;
+    private MainMenu? _menuInstance = null;
+
+    public override void _Initialize()
+    {
+        GD.Print("==================================================================");
+        GD.Print(">>> STARTING ACHIEVEMENT & IMMUNE CELL PROGRESSION TEST <<<");
+        GD.Print("==================================================================");
+    }
+
+    public override bool _Process(double delta)
+    {
+        switch (_phase)
+        {
+            case 0:
+                // --- Step 1: Initial State (Only Macrophage unlocked, others locked) ---
+                AchievementManager.ResetAll();
+
+                AssertThat(GameManager.IsClassUnlocked("macrophage")).IsTrue();
+                AssertThat(GameManager.IsClassUnlocked("ctl")).IsFalse();
+                AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsFalse();
+                AssertThat(GameManager.IsClassUnlocked("b_cell")).IsFalse();
+                AssertThat(GameManager.IsClassUnlocked("dendritic")).IsFalse();
+
+                GD.Print("[PASS] Step 1: Default state strictly enforces only Macrophage unlocked.");
+
+                // --- Step 2: Skill Locking in UpgradeManager Choice Pool ---
+                var mockPlayer = new CharacterBody2D();
+                var stats = new CellStats { Name = "CellStats" };
+                mockPlayer.AddChild(stats);
+                var sm = new SkillManager { Name = "SkillManager" };
+                mockPlayer.AddChild(sm);
+                sm.Setup(mockPlayer);
+                sm.EquipActive(new RosTorrentSkill(), 0);
+
+                // While other 4 cells are locked, their active skills must NEVER be offered
+                string[] lockedSkillIds = ["perforin_lance", "complement_cascade", "antibody_salvo", "pseudopod_lunge"];
+                for (int iter = 0; iter < 15; iter++)
+                {
+                    var choices = UpgradeManager.GenerateChoices(mockPlayer, 3);
+                    foreach (var c in choices)
+                    {
+                        string id = c["id"].AsString();
+                        AssertThat(Array.IndexOf(lockedSkillIds, id) >= 0).IsFalse();
+                    }
+                }
+
+                GD.Print("[PASS] Step 2: Locked cells' signature skills are completely excluded from upgrade pool.");
+
+                // --- Step 3: Event-Driven Achievement Unlocks & Cell Rewards ---
+                // Test 3a: Digestion 20 -> Unlocks CTL and Perforin Lance
+                AchievementManager.RecordEvent("pathogen_digested", 20);
+                AssertThat(AchievementManager.IsUnlocked("ach_first_digestion")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("ach_engulf_20")).IsTrue();
+                AssertThat(GameManager.IsClassUnlocked("ctl")).IsTrue();
+
+                // Now perforin_lance should be allowed in the candidate pool
+                bool sawPerforin = false;
+                for (int iter = 0; iter < 30; iter++)
+                {
+                    var choices = UpgradeManager.GenerateChoices(mockPlayer, 3);
+                    foreach (var c in choices)
+                    {
+                        if (c["id"].AsString() == "perforin_lance")
+                        {
+                            sawPerforin = true;
+                            break;
+                        }
+                    }
+                    if (sawPerforin) break;
+                }
+                AssertThat(sawPerforin).IsTrue();
+                GD.Print("[PASS] Step 3a: Engulf 20 unlocks CTL and adds Perforin Lance to upgrade pool.");
+
+                // Test 3b: Burst Activated -> Unlocks Neutrophil
+                AchievementManager.RecordEvent("burst_activated");
+                AssertThat(AchievementManager.IsUnlocked("ach_trigger_burst")).IsTrue();
+                AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsTrue();
+                GD.Print("[PASS] Step 3b: Burst activation unlocks Neutrophil.");
+
+                // Test 3c: Level 5 -> Unlocks B-Cell
+                AchievementManager.RecordEvent("level_up", 5);
+                AssertThat(AchievementManager.IsUnlocked("ach_reach_level_5")).IsTrue();
+                AssertThat(GameManager.IsClassUnlocked("b_cell")).IsTrue();
+                GD.Print("[PASS] Step 3c: Level 5 unlocks B-Cell.");
+
+                // Test 3d: Survival 180s -> Unlocks Dendritic Cell
+                AchievementManager.RecordEvent("survival_time", 185.0f);
+                AssertThat(AchievementManager.IsUnlocked("ach_survive_180s")).IsTrue();
+                AssertThat(GameManager.IsClassUnlocked("dendritic")).IsTrue();
+                GD.Print("[PASS] Step 3d: Survival 180s unlocks Dendritic Cell.");
+
+                mockPlayer.QueueFree();
+
+                // --- Step 4: Disk Persistence Verification ---
+                AchievementManager.SaveToDisk();
+                AchievementManager.UnlockedIds.Clear();
+                AchievementManager.ProgressData.Clear();
+                AchievementManager.LoadFromDisk();
+
+                AssertThat(AchievementManager.IsUnlocked("ach_engulf_20")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("ach_trigger_burst")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("ach_reach_level_5")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("ach_survive_180s")).IsTrue();
+                AssertThat(GameManager.IsClassUnlocked("ctl")).IsTrue();
+                AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsTrue();
+                AssertThat(GameManager.IsClassUnlocked("b_cell")).IsTrue();
+                AssertThat(GameManager.IsClassUnlocked("dendritic")).IsTrue();
+                GD.Print("[PASS] Step 4: Full disk persistence (user://achievements.json) verified.");
+
+                // --- Step 5: Codex Modal Tab 4 (Achievements) UI ---
+                var codexScene = GD.Load<PackedScene>("res://scenes/ui/codex_modal.tscn");
+                AssertThat(codexScene).IsNotNull();
+                _codexInstance = codexScene!.Instantiate<CodexModal>();
+                Root.AddChild(_codexInstance);
+                _codexInstance.OpenCodex(4); // Open to achievements tab
+
+                AssertThat(_codexInstance.CurrentTab).IsEqual(4);
+                AssertThat(_codexInstance.ItemList!.GetChildCount()).IsEqual(AchievementManager.Achievements.Count);
+                AssertThat(string.IsNullOrEmpty(_codexInstance.DetailTitle!.Text)).IsFalse();
+                AssertThat(_codexInstance.DetailBadge!.Text.Contains("COMPLETED") || _codexInstance.DetailBadge.Text.Contains("达成")).IsTrue();
+                GD.Print("[PASS] Step 5: CodexModal Tab 4 (Achievements) UI rendering verified.");
+
+                // --- Step 6: Main Menu Locked Cell Status & Confirm Button Test ---
+                AchievementManager.ResetAll(); // Reset so cells are locked again
+                _codexInstance.QueueFree();
+
+                var menuScene = GD.Load<PackedScene>("scenes/ui/main_menu.tscn");
+                AssertThat(menuScene).IsNotNull();
+                _menuInstance = menuScene!.Instantiate<MainMenu>();
+                Root.AddChild(_menuInstance);
+                _phase = 1;
+                return false;
+
+            case 1:
+                _frameCount++;
+                if (_frameCount < 3)
+                    return false;
+
+                // Call OnStartPressed
+                _menuInstance!.StartBtn!.EmitSignal(Button.SignalName.Pressed);
+
+                // Select locked cell CTL
+                _menuInstance.SelectClass("ctl");
+                AssertThat(_menuInstance.ClassConfirmBtn!.Disabled).IsTrue();
+                AssertThat(_menuInstance.ClassStatusLbl!.Text.Contains("🏆")).IsTrue();
+
+                // Select unlocked cell Macrophage
+                _menuInstance.SelectClass("macrophage");
+                AssertThat(_menuInstance.ClassConfirmBtn.Disabled).IsFalse();
+
+                // Unlock CTL and refresh
+                AchievementManager.Unlock("ach_engulf_20");
+                _menuInstance.UpdateAllTexts();
+                _menuInstance.SelectClass("ctl");
+                AssertThat(_menuInstance.ClassConfirmBtn.Disabled).IsFalse();
+
+                GD.Print("[PASS] Step 6: Main Menu locked condition UI and button disabling verified.");
+                GD.Print("==================================================================");
+                GD.Print(">>> ACHIEVEMENT & IMMUNE CELL PROGRESSION SUITE PASSED! <<<");
+                GD.Print("==================================================================");
+
+                _menuInstance.QueueFree();
+                AchievementManager.ResetAll();
+                Quit(0);
+                return true;
+        }
+
+        return false;
+    }
+}

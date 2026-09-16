@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/skills/ros_jet.gd" id="1_ros_jet"]
+[ext_resource type="Script" path="res://scripts/skills/RosJet.cs" id="1_ros_jet"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jet"]
 radius = 10.0

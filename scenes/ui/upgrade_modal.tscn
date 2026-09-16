@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://epluj3fksdbj"]
 
-[ext_resource type="Script" path="res://scripts/ui/upgrade_modal.gd" id="1_modal"]
+[ext_resource type="Script" path="res://scripts/ui/UpgradeModal.cs" id="1_modal"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg_dim"]
 bg_color = Color(0.02, 0.04, 0.07, 0.78)

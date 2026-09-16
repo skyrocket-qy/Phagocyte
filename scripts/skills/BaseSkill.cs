@@ -1,0 +1,262 @@
+using Godot;
+using Godot.Collections;
+using System;
+using Phagocyte.Core;
+
+namespace Phagocyte.Skills;
+
+/// <summary>
+/// Base class for all Active Cytokine Weapons and Passive Organelle Traits in Phagocyte.
+/// Interacts directly with the universal CellStats system.
+/// </summary>
+public partial class BaseSkill : Node2D
+{
+    [Signal]
+    public delegate void CooldownUpdatedEventHandler(float timeLeft, float maxTime);
+
+    [Signal]
+    public delegate void SkillActivatedEventHandler();
+
+    [Signal]
+    public delegate void SkillUpgradedEventHandler(int newLevel);
+
+    [Export] public string SkillId { get; set; } = "";
+    [Export] public string NameKey { get; set; } = "";
+    [Export] public string DescKey { get; set; } = "";
+    [Export] public string BioKey { get; set; } = "";
+    [Export] public string IconSymbol { get; set; } = "⚡";
+    [Export] public int Level { get; set; } = 1;
+    [Export] public int MaxLevel { get; set; } = 5;
+    [Export] public float Cooldown { get; set; } = 0.0f;
+    [Export] public bool IsPassive { get; set; } = false;
+    [Export] public bool IsInnate { get; set; } = false;
+
+    public float CooldownTimer { get; set; } = 0.0f;
+    public int SlotIndex { get; set; } = -1;
+    public CharacterBody2D? Host { get; set; } = null;
+    public Node? Stats { get; set; } = null;
+
+    public virtual void Setup(CharacterBody2D pHost, int pSlot)
+    {
+        Host = pHost;
+        SlotIndex = pSlot;
+
+        if (Host != null)
+        {
+            if (Host.HasNode("CellStats"))
+            {
+                Stats = Host.GetNode<Node>("CellStats");
+            }
+            else
+            {
+                var statsProp = Host.Get("stats");
+                if (statsProp.VariantType == Variant.Type.Object && statsProp.AsGodotObject() is Node n)
+                {
+                    Stats = n;
+                }
+            }
+        }
+
+        if (IsPassive)
+        {
+            ApplyPassiveModifiers();
+        }
+    }
+
+    public virtual void UpdateSkill(double delta)
+    {
+        if (IsPassive)
+            return;
+
+        float currentCd = GetCalculatedCooldown();
+        if (currentCd <= 0.0f)
+            return;
+
+        if (CooldownTimer > 0.0f)
+        {
+            CooldownTimer -= (float)delta;
+            EmitSignal(SignalName.CooldownUpdated, Mathf.Max(0.0f, CooldownTimer), currentCd);
+            if (CooldownTimer <= 0.0f)
+            {
+                Trigger();
+            }
+        }
+    }
+
+    public virtual void Trigger()
+    {
+        EmitSignal(SignalName.SkillActivated);
+        CooldownTimer = GetCalculatedCooldown();
+    }
+
+    public virtual void Upgrade()
+    {
+        if (Level < MaxLevel)
+        {
+            if (IsPassive)
+            {
+                RemovePassiveModifiers();
+            }
+            Level += 1;
+            if (IsPassive)
+            {
+                ApplyPassiveModifiers();
+            }
+            EmitSignal(SignalName.SkillUpgraded, Level);
+        }
+    }
+
+    public override void _ExitTree()
+    {
+        if (IsPassive)
+        {
+            RemovePassiveModifiers();
+        }
+    }
+
+    // --- Stat Consumption Helpers for Active Skills ---
+
+    public float GetCalculatedCooldown()
+    {
+        if (Cooldown <= 0.0f)
+            return 0.0f;
+
+        if (Stats is CellStats cs)
+        {
+            float cdr = cs.GetStat("cooldown_reduction");
+            return Cooldown * (1.0f - cdr);
+        }
+        else if (Stats != null && Stats.HasMethod("get_stat"))
+        {
+            float cdr = (float)Stats.Call("get_stat", "cooldown_reduction");
+            return Cooldown * (1.0f - cdr);
+        }
+        return Cooldown;
+    }
+
+    public Dictionary GetCalculatedDamage(float baseDmg)
+    {
+        var result = new Dictionary
+        {
+            ["damage"] = baseDmg,
+            ["is_crit"] = false
+        };
+
+        if (Stats is CellStats cs)
+        {
+            float might = cs.GetStat("might");
+            float dmg = baseDmg * might;
+            if (cs.RollCritical())
+            {
+                result["damage"] = dmg * cs.GetStat("crit_damage");
+                result["is_crit"] = true;
+            }
+            else
+            {
+                result["damage"] = dmg;
+            }
+            return result;
+        }
+        else if (Stats != null && Stats.HasMethod("get_stat"))
+        {
+            float might = (float)Stats.Call("get_stat", "might");
+            float dmg = baseDmg * might;
+            bool rollCrit = Stats.HasMethod("roll_critical") && (bool)Stats.Call("roll_critical");
+            if (rollCrit)
+            {
+                result["damage"] = dmg * (float)Stats.Call("get_stat", "crit_damage");
+                result["is_crit"] = true;
+            }
+            else
+            {
+                result["damage"] = dmg;
+            }
+            return result;
+        }
+
+        return result;
+    }
+
+    public float GetCalculatedArea(float baseArea)
+    {
+        if (Stats is CellStats cs)
+            return baseArea * cs.GetStat("area");
+        if (Stats != null && Stats.HasMethod("get_stat"))
+            return baseArea * (float)Stats.Call("get_stat", "area");
+        return baseArea;
+    }
+
+    public int GetCalculatedAmount(int baseAmount)
+    {
+        if (Stats is CellStats cs)
+            return baseAmount + (int)cs.GetStat("amount");
+        if (Stats != null && Stats.HasMethod("get_stat"))
+            return baseAmount + (int)(float)Stats.Call("get_stat", "amount");
+        return baseAmount;
+    }
+
+    public int GetCalculatedPierce(int basePierce)
+    {
+        if (Stats is CellStats cs)
+            return basePierce + (int)cs.GetStat("pierce");
+        if (Stats != null && Stats.HasMethod("get_stat"))
+            return basePierce + (int)(float)Stats.Call("get_stat", "pierce");
+        return basePierce;
+    }
+
+    public float GetCalculatedSpeed(float baseSpeed)
+    {
+        if (Stats is CellStats cs)
+            return baseSpeed * cs.GetStat("projectile_speed");
+        if (Stats != null && Stats.HasMethod("get_stat"))
+            return baseSpeed * (float)Stats.Call("get_stat", "projectile_speed");
+        return baseSpeed;
+    }
+
+    public float GetCalculatedDuration(float baseDuration)
+    {
+        if (Stats is CellStats cs)
+            return baseDuration * cs.GetStat("duration");
+        if (Stats != null && Stats.HasMethod("get_stat"))
+            return baseDuration * (float)Stats.Call("get_stat", "duration");
+        return baseDuration;
+    }
+
+    // --- Virtual Hooks for Passive Traits to provide Stat Modifiers ---
+
+    public virtual void ApplyPassiveModifiers()
+    {
+    }
+
+    public virtual void RemovePassiveModifiers()
+    {
+    }
+
+    // --- UI Representation ---
+
+    public virtual Dictionary GetUiData()
+    {
+        float cdPct = 0.0f;
+        float effCd = GetCalculatedCooldown();
+        if (effCd > 0.0f && !IsPassive)
+        {
+            cdPct = Mathf.Clamp(CooldownTimer / effCd, 0.0f, 1.0f);
+        }
+
+        return new Dictionary
+        {
+            ["id"] = SkillId,
+            ["name"] = !string.IsNullOrEmpty(NameKey) ? Tr(NameKey) : SkillId,
+            ["description"] = !string.IsNullOrEmpty(DescKey) ? Tr(DescKey) : "",
+            ["biochemistry"] = !string.IsNullOrEmpty(BioKey) ? Tr(BioKey) : "",
+            ["icon"] = IconSymbol,
+            ["level"] = Level,
+            ["max_level"] = MaxLevel,
+            ["is_passive"] = IsPassive,
+            ["is_innate"] = IsInnate,
+            ["cooldown_max"] = effCd,
+            ["cooldown_ratio"] = cdPct,
+            ["cooldown_time"] = Mathf.Max(0.0f, CooldownTimer)
+        };
+    }
+}

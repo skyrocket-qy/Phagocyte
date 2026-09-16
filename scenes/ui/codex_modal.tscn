@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/codex_modal.gd" id="1_codex"]
+[ext_resource type="Script" path="res://scripts/ui/CodexModal.cs" id="1_codex"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
 bg_color = Color(0.04, 0.08, 0.13, 0.96)

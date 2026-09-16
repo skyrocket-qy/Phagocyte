@@ -1,10 +1,10 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/Main.cs" id="1_main"]
 [ext_resource type="Shader" path="res://shaders/microscope_tissue_bg.gdshader" id="2_bg_shader"]
 [ext_resource type="PackedScene" path="res://scenes/characters/macrophage.tscn" id="3_macrophage"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="4_hud"]
-[ext_resource type="Script" path="res://scripts/environment/microscope_parallax.gd" id="5_parallax"]
+[ext_resource type="Script" path="res://scripts/environment/MicroscopeParallax.cs" id="5_parallax"]
 [ext_resource type="Shader" path="res://shaders/microscope_postprocess.gdshader" id="6_postprocess"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]

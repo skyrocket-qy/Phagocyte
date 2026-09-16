@@ -1,0 +1,164 @@
+using Godot;
+using System;
+using Godot.Collections;
+
+namespace Phagocyte.Core;
+
+/// <summary>
+/// Manages audio volume, graphics display modes, and persistent configuration.
+/// </summary>
+public partial class SettingsManager : Node
+{
+    [Signal]
+    public delegate void SettingsChangedEventHandler();
+
+    private const string SavePath = "user://settings.json";
+
+    public static SettingsManager Instance = null;
+
+    public static float MasterVolume = 1.0f;
+    public static float SfxVolume = 1.0f;
+    public static float BgmVolume = 0.8f;
+    public static bool Fullscreen = false;
+    public static bool Vsync = true;
+
+    public SettingsManager()
+    {
+        Instance = this;
+    }
+
+    public override void _Ready()
+    {
+        Instance = this;
+        LoadFromDisk();
+        ApplySettings();
+    }
+
+    /// <summary>
+    /// Apply runtime audio and display server settings
+    /// </summary>
+    public static void ApplySettings()
+    {
+        // Audio Bus volumes if buses exist
+        if (AudioServer.GetBusCount() > 0)
+        {
+            int masterIdx = AudioServer.GetBusIndex("Master");
+            if (masterIdx >= 0)
+            {
+                float db = MasterVolume > 0.0f ? Mathf.LinearToDb(Mathf.Max(0.0001f, MasterVolume)) : -80.0f;
+                AudioServer.SetBusVolumeDb(masterIdx, db);
+            }
+        }
+
+        // Window display mode
+        if (DisplayServer.HasFeature(DisplayServer.Feature.Subwindows))
+        {
+            var mode = Fullscreen ? DisplayServer.WindowMode.Fullscreen : DisplayServer.WindowMode.Windowed;
+            DisplayServer.WindowSetMode(mode);
+        }
+
+        // VSync mode
+        var vsyncMode = Vsync ? DisplayServer.VSyncMode.Enabled : DisplayServer.VSyncMode.Disabled;
+        DisplayServer.WindowSetVsyncMode(vsyncMode);
+
+        if (Instance != null && IsInstanceValid(Instance))
+        {
+            Instance.EmitSignal(SignalName.SettingsChanged);
+        }
+    }
+
+    public static void SetMasterVolume(float val)
+    {
+        MasterVolume = Mathf.Clamp(val, 0.0f, 1.0f);
+        ApplySettings();
+        SaveToDisk();
+    }
+
+    public static void SetSfxVolume(float val)
+    {
+        SfxVolume = Mathf.Clamp(val, 0.0f, 1.0f);
+        ApplySettings();
+        SaveToDisk();
+    }
+
+    public static void SetBgmVolume(float val)
+    {
+        BgmVolume = Mathf.Clamp(val, 0.0f, 1.0f);
+        ApplySettings();
+        SaveToDisk();
+    }
+
+    public static void SetFullscreen(bool enabled)
+    {
+        Fullscreen = enabled;
+        ApplySettings();
+        SaveToDisk();
+    }
+
+    public static void SetVsync(bool enabled)
+    {
+        Vsync = enabled;
+        ApplySettings();
+        SaveToDisk();
+    }
+
+    public static void SaveToDisk()
+    {
+        var payload = new Godot.Collections.Dictionary<string, Variant>
+        {
+            { "master_volume", MasterVolume },
+            { "sfx_volume", SfxVolume },
+            { "bgm_volume", BgmVolume },
+            { "fullscreen", Fullscreen },
+            { "vsync", Vsync }
+        };
+        var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
+        if (file != null)
+        {
+            file.StoreString(Json.Stringify(payload, "\t"));
+            file.Close();
+        }
+    }
+
+    public static void LoadFromDisk()
+    {
+        if (!FileAccess.FileExists(SavePath))
+        {
+            return;
+        }
+
+        var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Read);
+        if (file == null)
+        {
+            return;
+        }
+
+        string text = file.GetAsText();
+        file.Close();
+
+        var json = new Json();
+        if (json.Parse(text) == Error.Ok && json.Data.VariantType == Variant.Type.Dictionary)
+        {
+            var d = json.Data.AsGodotDictionary();
+            MasterVolume = d.ContainsKey("master_volume") ? (float)d["master_volume"] : 1.0f;
+            SfxVolume = d.ContainsKey("sfx_volume") ? (float)d["sfx_volume"] : 1.0f;
+            BgmVolume = d.ContainsKey("bgm_volume") ? (float)d["bgm_volume"] : 0.8f;
+            Fullscreen = d.ContainsKey("fullscreen") ? (bool)d["fullscreen"] : false;
+            Vsync = d.ContainsKey("vsync") ? (bool)d["vsync"] : true;
+        }
+    }
+
+    public static void ResetDefaults()
+    {
+        MasterVolume = 1.0f;
+        SfxVolume = 1.0f;
+        BgmVolume = 0.8f;
+        Fullscreen = false;
+        Vsync = true;
+        ApplySettings();
+        if (FileAccess.FileExists(SavePath))
+        {
+            DirAccess.RemoveAbsolute(SavePath);
+        }
+    }
+}
