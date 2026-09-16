@@ -11,6 +11,8 @@
   - **所見即所得的有機物理變形**：白血球外形動態隨機伸展，多邊形邊界與碰撞箱完全即時同步。
   - **硬核生理學機制遊戲化**：將抗原呈遞、調理作用、過載消化、NETosis 轉化為核心爽點，實現「遊玩即理解免疫學」。
   - **「底盤 ＋ 形態模組 ＋ 外掛細胞器」解耦架構**：所有白血球共享相同微絲微管底盤，形態與行為完全技能化與參數化，支持自由裝配與異變。
+  - **純通用全域 Stat 數值矩陣**：嚴格依循 Survivor-like 哲學，所有屬性 100% 通用化，絕無單一技能特化私有屬性。
+  - **經典「主動 5 ＋ 被動 5」欄位與 1:1 終極超武閉環**：5 大自動發射主動生化技能，5 大通用 Stat 被動特質，滿級二合一合成 5 大終極表觀遺傳超武。
   - **PoE 式單一聯合造血幹細胞天賦大星盤**：基於骨髓系與淋巴系真實分化路徑，所有細胞共享星盤但具備不同起始特化門戶，支持跨界生化流派構築（Build）。
 
 ---
@@ -22,8 +24,8 @@
 ```mermaid
 graph TD
     A["走位與誘捕 (Navigating & Luring)<br>利用動態偽足邊界包裹病原體"] --> B["接觸吞噬與儲能 (Phagocytosis & ATP)<br>病原體入體消化，體積動態膨脹"]
-    B --> C["抗原採樣與過載 (Antigen Sampling & Burst)<br>達閾值觸發呼吸爆發或高壓酵素噴射"]
-    C --> D["表觀遺傳質變 (Epigenetic Mutations)<br>局內三選一：解鎖沉睡幹細胞技能與超武融合"]
+    B --> C["抗原採樣與過載 (Antigen Sampling & Burst)<br>達閾值觸發呼吸爆發或全自動技能齊射"]
+    C --> D["表觀遺傳質變 (Epigenetic Mutations)<br>局內三選一：升級主動5/被動5與超武二合一融合"]
     D --> E["病理波次結算 (Wave Clear & Differentiation)<br>獲得遺傳代碼，點亮造血幹細胞天賦星盤"]
     E --> A
 ```
@@ -38,7 +40,7 @@ graph TD
 2. **頂點噪聲參數模組（Morphology Modifiers）**：
    - 不使用骨骼動畫，而是透過 `FastNoiseLite` 驅動 `Polygon2D` 頂點動態位移。
    - 提煉三大底層噪聲參數池，供技能與天賦系統隨時動態修改：
-     - **Amplitude（偽足伸展振幅）**：控制偽足伸出的長度。數值越高，偽足越長、越具攻擊侵略性。
+     - **Amplitude（偽足伸展振幅）**：控制偽足伸出的長度。受全域通用屬性 `area` 動態加成。
      - **Frequency（突觸/刺突密度）**：控制邊緣起伏的頻率。數值越高，毛刺與突起越密集（如樹突細胞）；數值越低，輪廓越圓滑平整（如未活化 T/B 細胞）。
      - **Smoothness（黏滯流體度）**：決定邊界如阿米巴流體般蠕動，或是像堅硬細胞壁般緊湊微顫。
 3. **外掛式細胞器（Modular Organelles）**：
@@ -75,91 +77,144 @@ graph TD
 #### 體積動態聯動公式
 
 定義全域即時體積縮放係數 $\alpha$：
-$$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = (1.0 + \Delta_{\text{talent}}) \times \left(1.0 + \frac{\text{Satiety}}{\text{MaxSatiety}} \times 1.5\right)$$
+$$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area} \times \left(1.0 + \frac{\text{Satiety}}{\text{MaxSatiety}} \times 1.5\right)$$
 
-- **投射物尺寸（Projectile Scaling）**：投射物半徑 $R_{\text{proj}} = R_{\text{proj\_base}} \times \alpha$。大細胞發射的酸霧是覆蓋半屏的巨浪，小細胞發射的則是細針穿透束。
-- **AoE 與光環半徑（Aura Scaling）**：生化地雷（補體瀑布）或被動酸霧範圍直接乘上 $\alpha$。
-- **表面發射點數量（Emission Points）**：周長 $C = 2\pi R_{\text{current}} \propto \alpha$。小細胞發射 3 枚抗體；巨大化細胞邊緣周長擴增，如刺蝟般全向齊射 12～24 枚。
+- **投射物與 AoE 縮放**：所有技能判定範圍直接隨 $\alpha$ 等比擴大。大細胞發射的酸霧是覆蓋半屏的巨浪，小細胞發射的則是細針穿透束。
+- **表面發射點數量（Emission Points）**：周長 $C = 2\pi R_{\text{current}} \propto \alpha$。隨體積增大，多發射源技能（如抗體齊射）自動獲得彈道發射點加成。
 - **質量慣性與擊退穿透（Mass & Knockback）**：大細胞具備極高物理質量與擊退抗性，衝撞時附帶壓碎判定；小細胞慣性小，轉向急停無延遲，投射物自帶高暴擊穿刺。
 
-#### 大小細胞數值平衡與生態剋制
-
-| 戰鬥維度 | 巨型細胞（巨噬型態 / 飽食膨脹） | 微型細胞（T 細胞型態 / 靜息基底） |
-| :--- | :--- | :--- |
-| **判定面特性** | 受擊判定面龐大，易觸碰病毒刺突；但**吞噬覆蓋面同等巨大**。 | 受擊判定面極小，可在彈幕縫隙走位；但吞噬需貼臉精準操作。 |
-| **機動與手感** | 啟動具黏滯滑行感，轉向阻尼大，具備重型機甲壓迫感。 | 零延遲急停、瞬間響應，具備穿梭刺客手感。 |
-| **生存機制** | 依賴龐大血池、常駐百分比減傷（生化厚壁）與高額吞噬吸血。 | 依賴衝刺無敵幀（i-frames）、高閃避率與能量護盾。 |
-| **剋制：微型病毒潮** | **天生優勢**：如吸塵器般直接碾過整群流感雜兵，瞬間秒殺清場。 | **處於劣勢**：必須依靠高頻穿刺技能開闢走位血路。 |
-| **剋制：毒素/刺突菁英怪** | **處於劣勢**：體型巨大極易被刺突刮傷或陷入毒霧，需靠外掛遠程破甲。 | **天生優勢**：靈活繞背刺殺，精準鎖定核心打出凋亡暴擊。 |
-
-#### 局內體積戰術調節
-
-- **飽食膨脹（Satiety Expansion）**：吞噬累積能量使半徑暫時擴增至最高 2.5 倍，提供極致清怪爽感，但也使躲避 Boss 必殺技難度飆升。
-- **脫水穿梭（Squeeze Mode）**：按住特定鍵消耗生化質，將細胞強制壓縮至 $40\%$ 體積並大幅提升移速，專門用於鑽過毛細血管死角或規避全屏轟炸。
-
 ---
 
-## 4. 技能體系、特質與表觀遺傳突變（Skills & Epigenetics）
+## 4. 全域通用 Stat 屬性矩陣（Universal Character Stats）
 
-本系統分為：**主動生化技能（6種）**、**被動代謝特質（5種）**、以及二者滿級合成的**終極表觀遺傳質變（4種超武）**。
+為貫徹模組化與高可複用性，本遊戲的數值系統**徹底剔除任何「單一技能特化屬性」**。所有角色、被動特質、天賦節點與局內升級均僅操作以下純通用屬性池：
 
-### 主動生化技能（Active Cytokines & Weapons）
+```
+                    ┌─────────────────────────┐
+                    │ 全域通用 Stat 字典 (Pool) │
+                    └────────────┬────────────┘
+         ┌───────────────────────┼───────────────────────┐
+         ▼                       ▼                       ▼
+【通用戰鬥屬性 (Combat)】     【通用生存屬性 (Defense)】   【通用輔助與機制 (Utility)】
+· Might (力量/傷害倍率)       · Max Health (最大生命)    · Magnet (拾取半徑)
+· Area (範圍/體積)           · Health Regen (生命自癒)  · Growth (經驗/ATP加成)
+· Cooldown Reduction (CDR)  · Armor (減傷/護甲)       · Luck (抗原幸運度)
+· Projectile Speed (彈道速度)· Move Speed (移動速度)    · Curse (環境感染難度)
+· Duration (持續時間)        · Revival (復甦次數)
+· Amount (額外數量)
+· Pierce (穿透次數)
+· Knockback (擊退力道)
+· Crit Chance (暴擊機率)
+· Crit Damage (暴擊倍率)
+```
 
-| 技能名稱 | 醫學底層機制 | 遊戲內表現與機制 | 戰術定位 |
+### 通用 Stat 詳細字典
+
+#### 1. 通用戰鬥屬性（Combat Stats）—— 所有 5 大主動技能共通消費
+| 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
 | :--- | :--- | :--- | :--- |
-| **活性氧射流<br>(ROS Spray)** | 呼吸爆發釋放超氧陰離子與 $\text{H}_2\text{O}_2$ | 朝滑鼠方向持續噴射高壓生化酸霧，擊中溶解敵方蛋白質外殼，造成 DoT 持續腐蝕並削減抗性。 | 中近程錐形穿透、破防撕裂 |
-| **穿孔素長矛<br>(Perforin Lance)** | 殺手 T 細胞在靶膜打孔導入溶酶素 | 朝最近的菁英怪射出高初速螺旋射線，貫穿路徑雜兵，並在目標身上留下破孔標記（孔洞承受增傷）。 | 直線遠程貫穿、單體重創 |
-| **補體瀑布<br>(Complement Cascade)** | 補體蛋白（C3b 至 C9）沉積引發連鎖反應 | 在周圍隨機生成化學共振環，標記踏入的病毒；2 秒後引發連鎖生化裂解爆破，直接溶解所有標記目標。 | 延遲地雷、大範圍群控清場 |
-| **Y 型抗體齊射<br>(Antibody Salvo)** | 漿細胞向體液持續噴發特異性抗體 | 週期性自細胞表面受體彈出 3～8 枚自動尋航 Y 型微型飛彈，命中定身病毒並附加「調理狀態（易傷）」。 | 全自動制導、雜兵點殺、增傷 |
-| **NETs 網狀纖維陷阱<br>(NETs Extrusion)** | 嗜中性球主動拋射 DNA 與組蛋白網 | 在移動軌跡後方留下一長條黏滯纖維網，大幅減速穿過的敵群，並持續消耗病毒外殼耐久度。 | 風箏防守、後方防線阻絕 |
-| **偽足猛擊<br>(Pseudopod Lunge)** | 肌動蛋白微絲瞬間定向聚合彈射 | 朝指定方向猛烈彈射一條阿米巴長偽足（IK 捕捉爪），將路徑上的敵群強行向內拖拽直接拉入體內吞噬。 | 主動控制、強力聚怪、抓取單體 |
+| `might` | **力量 / 傷害倍率** | `1.0` (100%) | 全域傷害百分比乘數。無論是直擊、DoT 腐蝕、吞噬包裹或地雷爆破，通通乘以此係數。 |
+| `area` | **範圍 / 體積** | `1.0` (100%) | 全域尺寸乘數。等比放大投射物尺寸、AoE 爆炸半徑、噴霧角度以及**細胞本體偽足吞噬判定面**。 |
+| `cooldown_reduction` | **冷卻縮減 (CDR)** | `0.0` (0%) | 百分比縮短所有主動技能的循環冷卻時間（上限設為 `0.75` 即 75%）。 |
+| `projectile_speed` | **彈道速度** | `1.0` (100%) | 所有投射物（抗體、射線、酸液水滴、彈出的偽足抓手）的飛行速度乘數。 |
+| `duration` | **持續時間** | `1.0` (100%) | 所有場上留存實體（酸霧 DoT 殘留、補體陣列地雷、黏網陷阱）的存活時間乘數。 |
+| `amount` | **額外數量** | `0` (發) | **固定增加所有技能的單次發射/生成個數**（如抗體 $+1$ 枚、穿孔素連發 $+1$ 束、偽足多出 $+1$ 爪）。 |
+| `pierce` | **穿透次數** | `0` (次) | 投射物貫穿敵人的額外次數（穿透後繼續向前飛行）。 |
+| `knockback` | **擊退力道** | `1.0` (100%) | 任何技能或碰撞命中敵人時施加的物理推擠衝量倍率。 |
+| `crit_chance` | **暴擊機率** | `0.05` (5%) | 任何傷害來源命中敵人弱點時觸發致命特異性暴擊的機率。 |
+| `crit_damage` | **暴擊倍率** | `2.0` (200%) | 觸發暴擊時的結算傷害倍率。 |
+
+#### 2. 通用生存與防禦屬性（Defense & Survival）
+| 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
+| :--- | :--- | :--- | :--- |
+| `max_health` | **最大生命值** | `100.0` | 細胞膜破裂前可承受的最大總耐久。 |
+| `health_regen` | **生命自癒率** | `0.0` (HP/s) | 胞膜每秒自動修復的固定生命值。 |
+| `armor` | **膜剛性 / 護甲** | `0.0` (點) | 通用護甲公式：$\text{減傷率} = \frac{\text{Armor}}{\text{Armor} + 50}$，提供平滑邊際減傷。 |
+| `move_speed` | **移動速度** | `230.0` (px/s) | 玩家細胞在常態巡航下的基礎遊動速度。 |
+| `revival` | **復甦次數** | `0` (次) | 生命歸零時的原地裂變重生次數（回復 $50\%$ 生命並附帶 1 秒清屏無敵震波）。 |
+
+#### 3. 通用輔助與機制屬性（Utility & Economy）
+| 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
+| :--- | :--- | :--- | :--- |
+| `magnet` | **趨化引力 (拾取)** | `150.0` (px) | 自動吸附周遭經驗光點（ATP）、抗原碎片與遺傳代碼的有效半徑。 |
+| `growth` | **代謝產能 (經驗)** | `1.0` (100%) | 獲取 ATP 與遺傳代碼經驗值時的百分比增益乘數。 |
+| `luck` | **抗原幸運度** | `1.0` (100%) | 提升精英怪物掉落率、局內升級三選一出現高階質變卡與超武的權重。 |
+| `curse` | **感染烈度 (難度)** | `1.0` (100%) | 增加敵人刷新密度、跑速與血量，同時等比提升通關結算獎勵。 |
 
 ---
 
-### 被動細胞特質與胞器（Passive Organelles & Metabolic Traits）
+## 5. 技能欄位「主動 5 ＋ 被動 5」與終極超武體系
 
-| 特質名稱 | 生理機制聯動 | 遊戲核心數值與形態影響 |
+玩家在單局內最多持有 **5 個主動生化技能** 與 **5 個被動代謝特質**，滿級時 1:1 合成 5 大終極超武：
+
+```
+┌────────────────────────────────────────────────────────┐
+│ 主動技能槽位 (Active Cytokines x5) - 全自動獨立循環開火    │
+│ [1: 穿孔素長矛] [2: 補體瀑布] [3: 抗體齊射] [4: 活性氧射流] [5: 偽足猛擊] │
+├────────────────────────────────────────────────────────┤
+│ 被動特質槽位 (Passive Organelles x5) - 提供純通用 Stat 加成│
+│ [1: 溶酶體酵素] [2: 肌動蛋白] [3: 調理素]   [4: 線粒體]   [5: 趨化受體] │
+│   (Might+Regen)  (Area+Speed)  (Crit+Dmg)     (CDR+Dur)   (Magnet+Luck) │
+└────────────────────────────────────────────────────────┘
+```
+
+### 5 大主動生化技能（Active Cytokines）—— 自動循環發射
+所有主動技能依循冷卻時間（Cooldown）獨立循環觸發，自動調用通用 Stat 計算：
+
+| 主動技能名稱 | 醫學機制 | 消耗的通用 Stat | 戰鬥表現與機制 |
+| :--- | :--- | :--- | :--- |
+| **1. 穿孔素長矛<br>(Perforin Lance)** | 膜上穿孔素成孔 | `might`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近精英射出高初速螺旋光束。`amount` 增加連發數，`pierce` 增加貫穿人數。 |
+| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解反應 | `might`, `area`, `cooldown_reduction`, `duration`, `knockback` | 在隨機周遭地面生成生化光環，`area` 擴大地雷半徑，延遲 2 秒引發強烈擊退爆破。 |
+| **3. Y 型抗體齊射<br>(Antibody Salvo)** | 游離特異性抗體分泌 | `might`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發尋航 Y 型飛彈，`amount` 直接增加飛彈發射數量。 |
+| **4. 活性氧射流<br>(ROS Spray)** | 呼吸爆發釋放 $\text{H}_2\text{O}_2$ | `might`, `area`, `duration`, `cooldown_reduction` | 朝游動方向噴射高壓錐形酸霧，`area` 擴大噴射錐形面積，造成 DoT 溶解破甲。 |
+| **5. 偽足猛擊<br>(Pseudopod Lunge)** | 微絲聚合瞬間彈射 | `might`, `area`, `amount`, `knockback`, `cooldown_reduction` | 向外猛烈彈射阿米巴抓手，`area` 增加抓手伸長距離，`amount` 增加多向抓手數量。 |
+
+---
+
+### 5 大被動代謝特質（Passive Organelles）—— 提供純通用 Stat
+被動技能不包含任何特定技能邏輯，純粹為宿主提供通用 Stat 加成：
+
+| 被動特質名稱 | 生物學包裝 | 提供的純通用 Stat 加成（每級遞增） |
 | :--- | :--- | :--- |
-| **肌動蛋白微絲聚合<br>(Actin Polymerization)** | 骨架微絲聚合驅動變形 | 直接放大 `Polygon2D` 噪聲振幅（Amplitude $+25\%$）；移速 $+15\%$；衝刺（Dash）時附帶 0.3 秒無敵判定。 |
-| **溶酶體酶活性<br>(Lysosome Priming)** | 加速內部酸性水解酶水解週期 | 體內病原體消化速度 $+30\%$；呼吸爆發所需吞噬量降低 $20\%$；每次消化完畢散發一波微型酸性脈衝。 |
-| **趨化因子受體<br>(Chemokine Receptors)** | 強化對碎屑與化學趨化信號的敏感度 | 等同倖存者磁鐵（Magnet），大幅提升 ATP 能量滴、抗原碎片與遺傳代碼的自動吸附半徑（$+50\%$）。 |
-| **線粒體超頻<br>(Mitochondrial Overclock)** | 強化三羧酸循環與 ATP 合成速率 | 冷卻時間縮減（CDR）$+12\%$，全主動生化技能施放頻率顯著加快。 |
-| **調理素親和性<br>(Opsonin Affinity)** | 特化對被抗體/補體標記病原體的受體識別 | 對處於負面狀態（定身、破甲、減速）的目標，暴擊率提升 $40\%$，且吞噬判定半徑對其直接翻倍。 |
+| **1. 溶酶體酵素 (Lysosome Priming)** | 胞內水解酶活化 | `might +10%` / `health_regen +0.6 HP/s`（全傷害強化與自噬修復） |
+| **2. 肌動蛋白微絲 (Actin Polymerization)** | 骨架微絲定向聚合 | `area +12%` / `move_speed +6%`（全技能範圍放大與走位加速） |
+| **3. 調理素親和 (Opsonin Affinity)** | 特異性識別受體增生 | `crit_chance +5%` / `crit_damage +25%`（全傷害暴擊率與暴擊倍率飆升） |
+| **4. 線粒體超頻 (Mitochondrial Overclock)**| 三羧酸循環產能倍增 | `cooldown_reduction +8%` / `duration +10%`（全技能開火加速與留場延長） |
+| **5. 趨化因子受體 (Chemokine Receptors)** | 表面化學天線陣列 | `magnet +15%` / `luck +10%`（自動吸附範圍擴大與稀有掉落提升） |
 
 ---
 
-### 終極表觀遺傳質變（Epigenetic Evolutions / 超武二合一）
+### 5 大終極表觀遺傳超武（Epigenetic Evolutions / 1:1 滿級合成）
 
-當特定主動技能升至滿級（Lv.5）並持有對應被動特質時，於精英掉落物或升級箱中解鎖質變形態：
+當主動技能達 Lv.5（Max）且持有對應被動特質時，於精英寶箱解鎖質變形態：
 
 ```mermaid
 graph LR
-    subgraph 超武合成矩陣
-        A1["穿孔素長矛 (Max)"] + B1["溶酶體酶活性"] --> EVO1["【顆粒酶死刑】<br>(Granzyme Apoptosis)"]
-        A2["補體瀑布 (Max)"] + B2["肌動蛋白聚合"] --> EVO2["【膜攻擊終結陣列】<br>(MAC Hyper-Array)"]
-        A3["Y型抗體齊射 (Max)"] + B3["調理素親和性"] --> EVO3["【中和高壓風暴】<br>(Neutralizing Tempest)"]
+    subgraph 5組超武二合一矩陣
+        A1["穿孔素長矛 (Max)"] + B1["溶酶體酵素"] --> EVO1["【顆粒酶死刑】<br>(Granzyme Apoptosis)"]
+        A2["補體瀑布 (Max)"] + B2["肌動蛋白微絲"] --> EVO2["【膜攻擊終結陣列】<br>(MAC Hyper-Array)"]
+        A3["Y型抗體齊射 (Max)"] + B3["調理素親和"] --> EVO3["【中和高壓風暴】<br>(Neutralizing Tempest)"]
         A4["活性氧射流 (Max)"] + B4["線粒體超頻"] --> EVO4["【過氧化利維坦】<br>(Superoxide Leviathan)"]
+        A5["偽足猛擊 (Max)"] + B5["趨化因子受體"] --> EVO5["【阿米巴原生巨口】<br>(Amoebic Maelstrom)"]
     end
 ```
 
-1. **顆粒酶死刑 (Granzyme Apoptosis)**：
-   - **配方**：穿孔素長矛（Max）＋ 溶酶體酶活性
-   - **質變機制**：穿孔長矛命中後注入高活性顆粒酶，強制引發病毒核酸「程序性凋亡」。目標 1 秒後裂解自爆，並向 360 度噴射 6 枚連鎖穿孔射線，引發骨牌式連鎖清屏。
-2. **膜攻擊終結陣列 (MAC Hyper-Array)**：
-   - **配方**：補體瀑布（Max）＋ 肌動蛋白微絲聚合
-   - **質變機制**：補體共振環不再固定於地面，而是直接附著於延伸的偽足末端。細胞每次伸展偽足即在戰場留下移動化學渦流，接觸的病毒直接形成膜攻擊複合物（MAC）穿孔裂解，轉化為高濃度能量液。
-3. **中和高壓風暴 (Neutralizing Tempest)**：
-   - **配方**：Y 型抗體齊射（Max）＋ 調理素親和性
-   - **質變機制**：全向抗體齊射量暴增至 32 發。當抗體命中不同目標時，會在它們之間拉起一道「高壓免疫網線」，穿過網線的所有其餘雜兵承受最大生命值百分比的真實傷害。
-4. **過氧化利維坦 (Superoxide Leviathan)**：
-   - **配方**：活性氧射流（Max）＋ 線粒體超頻
-   - **質變機制**：取消前方定向噴射。細胞周身邊界包裹一層青藍色超氧離子等離子光膜，整隻細胞化為高速旋轉粉碎機，所有非 Boss 病原體接觸即刻融化。
+1. **【顆粒酶死刑】(Granzyme Apoptosis)**（穿孔素長矛 ＋ 溶酶體酵素）：
+   - 注入顆粒酶引發程序性凋亡。目標 1 秒後炸裂自毀，並向四周噴射 6 枚連鎖穿孔射線，引發骨牌式清屏。
+2. **【膜攻擊終結陣列】(MAC Hyper-Array)**（補體瀑布 ＋ 肌動蛋白微絲）：
+   - 補體地雷直接附著在玩家偽足末端，走位即在戰場留下移動化學渦流，接觸病毒直接裂解為 ATP 經驗滴。
+3. **【中和高壓風暴】(Neutralizing Tempest)**（Y 型抗體齊射 ＋ 調理素親和）：
+   - 發射 32 枚高頻抗體。抗體命中不同目標時在其間拉出「高壓免疫網線」，對切割過的所有雜兵造成最大生命值百分比真傷。
+4. **【過氧化利維坦】(Superoxide Leviathan)**（活性氧射流 ＋ 線粒體超頻）：
+   - 取消前方噴射。全細胞邊界包裹青藍色超氧離子等離子光膜，化為接觸即融化一切非 Boss 病原體的旋轉粉碎機。
+5. **【阿米巴原生巨口】(Amoebic Maelstrom)**（偽足猛擊 ＋ 趨化因子受體）：
+   - 偽足彈射分裂為 4 根全向巨型阿米巴抓手，形成超大吸力生化風暴，將全屏病毒與經驗光點一口氣強力拖入腹中吞噬！
 
 ---
 
-## 5. 造血幹細胞天賦星盤（Hematopoiesis Talent Matrix）
+## 6. 造血幹細胞天賦星盤（Hematopoiesis Talent Matrix）
 
-本系統採用 PoE 式全域相連大星盤，所有角色從中央【全能造血幹細胞 (HSC)】出發，但各自緊鄰專屬的分化起始門戶：
+所有角色從中央【全能造血幹細胞 (HSC)】出發，出門小節點本質即為通用 `StatModifier`：
 
 ```mermaid
 graph TD
@@ -177,183 +232,162 @@ graph TD
     Hub3 -.跨盤聯通.-> Hub1
 ```
 
-### 五大特化區域節點規劃
+### 五大特化區域提供的通用 Stat 導向
 
-#### 1. 巨噬起點：【單核巨化區域 (Macrocytic Hub)】
-- **出門小節點（Minor）**：
-  - 細胞膜延展性：基礎半徑 $+5\%$。
-  - 胞質耐受度：最大生命上限 $+10\%$。
-  - 吞噬消化速率：消化時間 $-8\%$。
-- **關鍵節點（Notable）**：
-  - 【**貪婪偽足 (Voracious Pseudopod)**】：基礎半徑額外 $+25\%$，且吞噬判定對所有半徑小於自身的非精英病原體直接產生秒殺吸入效果。
-  - 【**生化厚壁 (Biochemical Fortress)**】：細胞半徑每比基準值擴大 $10\%$，獲得常駐 $3\%$ 全傷害減免（最高減免 $45\%$）。
-
-#### 2. 殺手 T 細胞起點：【極化纖毛區域 (Polarized Motility)】
-- **出門小節點（Minor）**：
-  - 微管剛性：衝刺冷卻時間 $-8\%$。
-  - 受體靈敏度：全攻擊暴擊率 $+5\%$。
-  - 免疫突觸極化：衝刺後 1.5 秒內傷害 $+20\%$。
-- **關鍵節點（Notable）**：
-  - 【**穿膜衝鋒 (Transmembrane Rush)**】：當細胞體積保持小於等於基準值時，衝刺自帶穿透判定與 0.4 秒完全無敵幀，貫穿敵人時造成破甲。
-  - 【**靶向凋亡處決 (Apoptotic Execution)**】：對生命值低於 $25\%$ 的被標記菁英怪，攻擊直接觸發細胞程序性死亡（秒殺）。
-
-#### 3. 嗜中性球起點：【顆粒活化區域 (Degranulation Core)】
-- **出門小節點（Minor）**：
-  - 酸性囊泡儲備：生化酸液傷害 $+12\%$。
-  - 脆弱胞膜：移動速度 $+8\%$，但本體防禦力 $-5\%$。
-  - 殺菌顆粒釋放頻率：彈道射速 $+10\%$。
-- **關鍵節點（Notable）**：
-  - 【**臨界過載 (Critical Overload)**】：受到傷害時向四周猛烈噴濺破甲酸液；當生命值低於 $30\%$ 時，酸液覆蓋範圍與傷害直接翻倍。
-  - 【**NETosis 殉爆激化**】：死亡或觸發致命傷時，在原地留下的 DNA 黏網持續時間延長至 12 秒，並將周圍敵人強行向中心吸引。
-
-#### 4. B 細胞起點：【內質網工廠 (Endoplasmic Matrix)】
-- **出門小節點（Minor）**：
-  - 核醣體轉錄效率：投射物發射速度 $+6\%$。
-  - 抗體誘導半徑：尋航投射物鎖定射程 $+10\%$。
-  - 內質網擴充：投射物穿透次數 $+1$。
-- **關鍵節點（Notable）**：
-  - 【**全向發射槽 (Omni-Receptor Slots)**】：細胞表面生成環狀發射陣列，所有發射類技能的散射彈道數量常駐 $+2$。
-  - 【**抗體親和力成熟 (Affinity Maturation)**】：同一技能每次連續命中相同目標，該技能對其造成的傷害遞增 $15\%$（最高疊加 $150\%$）。
-
-#### 5. 樹突細胞起點：【抗原感知中樞 (Antigenic Nexus)】
-- **出門小節點（Minor）**：
-  - 樹突分支密度：邊界噪聲頻率（Frequency）$+10\%$，觸鬚更密集。
-  - 細胞因子傳導力：所有光環與輔助效果範圍 $+15\%$。
-  - 抗原採樣效率：擊殺掉落經驗/抗原機率 $+15\%$。
-- **關鍵節點（Notable）**：
-  - 【**神經網共振 (Network Resonance)**】：被任何一根長樹突觸碰的敵人，其身上的負面狀態會即時以電化學信號傳導給周邊 5 個敵人。
-  - 【**微血管巡邏援軍 (Patrol Summoner)**】：每隔 20 秒自屏幕邊緣呼叫 3 隻巡邏淋巴球協同作戰，吸引火力並發射微型干擾素。
+- **單核巨化區域（巨噬起點）**：側重 `area`（體積）、`max_health`（血上限）、`armor`（膜剛性減傷）。
+- **極化纖毛區域（T 細胞起點）**：側重 `move_speed`（移速）、`crit_chance`（暴擊率）、`crit_damage`（處決倍率）。
+- **顆粒活化區域（嗜中性球起點）**：側重 `might`（傷害）、`knockback`（擊退）、瀕死殉爆傷害。
+- **內質網工廠（B 細胞起點）**：側重 `amount`（彈道數）、`projectile_speed`（彈速）、`cooldown_reduction`（CDR）。
+- **抗原感知中樞（樹突細胞起點）**：側重 `magnet`（拾取半徑）、`luck`（幸運度）、`growth`（經驗效率）。
 
 ---
 
-## 6. 關卡病理機制與敵人圖鑑
+## 7. 關卡病理機制與敵人圖鑑
 
 ### 動態病理關卡
-
-關卡不再是單純背景，而是宿主器官的病理狀態：
-
 - **急性表皮裂口（Acute Wound）**：微血管破裂，週期性產生指向傷口外緣的強大組織液吸力；地面覆蓋血纖維蛋白網，阻礙常規移動。
 - **肺泡腔室（Alveolar Space）**：週期性呼吸氣流帶來大範圍流體推力；需利用偽足錨定在肺泡上皮細胞壁以防失控。
 - **全域危機：細胞因子風暴（Cytokine Storm）**：擊殺頻率過高導致促炎因子超標，全場進入過熱發燒狀態：玩家輸出提升 $100\%$，但宿主生命條持續遞減，需在器官衰竭前清場。
 
 ### 病原體行為矩陣
-
-| 病原體名稱 | 生物特徵 | 遊戲內 AI 與機制表現 |
-| :--- | :--- | :--- |
-| **冠狀病毒<br>(S-Virus)** | 表面覆滿刺突蛋白 | 碰撞玩家時施加減速黏著效果；隨時間入侵周邊紅血球進行複製繁殖。 |
-| **金黃色葡萄球菌<br>(Staph)** | 產生凝固酶，聚集呈葡萄串狀 | 抱團成群移動，外層包裹纖維蛋白護盾，需以酸液破盾後方可吞噬。 |
-| **變異流感病毒<br>(Flu-Drift)** | 高頻抗原漂移 | 每隔 45 秒更換一次表面抗原，強制重置玩家已獲得的特異性靶向暴擊加成。 |
-| **異變癌細胞<br>(Malignant Cell)** | 下調表面 MHC-I 標籤 | 免疫常規 T 細胞鎖定；必須由巨噬細胞直接接觸破膜，或由 NK 模組擊破。 |
+- **冠狀病毒 (S-Virus)**：表面刺突蛋白，碰撞施加減速；定時侵入周邊紅血球複製。
+- **金黃色葡萄球菌 (Staph)**：葡萄串抱團移動，外層纖維蛋白護盾需酸液擊破。
+- **變異流感病毒 (Flu-Drift)**：每 45 秒抗原漂移，強制重置特異性暴擊加成。
+- **異變癌細胞 (Malignant Cell)**：下調 MHC-I 隱匿標籤，免疫常規鎖定，需直接接觸破膜。
 
 ---
 
-## 7. 技術管線與 Godot 4 程式架構
+## 8. 技術管線與 Godot 4 程式架構
 
-### 自訂資源架構（Custom Resource Data Pipeline）
-
-所有細胞數值與特徵完全與節點代碼分離，定義於 `CellData.gd`：
+### 通用屬性類實作規範（`Stat.gd` & `CellStats.gd`）
 
 ```gdscript
-class_name CellData
-extends Resource
+# scripts/core/stat.gd
+class_name Stat
+extends RefCounted
 
-@export var cell_name: String = "Macrophage"
-@export var base_radius: float = 24.0
-@export var base_health: float = 100.0
-@export var base_speed: float = 230.0
-@export var inertia_drag: float = 4.0 # 阻尼係數：巨噬細胞大，T細胞小
+var base_value: float = 0.0
+var flat_bonus: float = 0.0
+var percent_bonus: float = 0.0
 
-# 形態噪聲參數池 (Morphology Modifier Parameters)
-@export var noise_amplitude: float = 28.0   # 偽足伸展長度
-@export var noise_frequency: float = 0.65   # 邊緣突觸頻率
-@export var deformation_speed: float = 3.6  # 蠕動頻率
-@export var vertex_count: int = 32
+func _init(p_base: float = 0.0) -> void:
+	base_value = p_base
 
-# 細胞核外觀定義
-@export var nucleus_type: String = "kidney" # kidney, large_round, multi_lobed, cartwheel, dendritic_oval
-@export var nucleus_color: Color = Color(0.42, 0.22, 0.68, 0.85)
+func get_value() -> float:
+	return (base_value + flat_bonus) * (1.0 + percent_bonus)
 
-# 初始裝配技能與起點門戶
-@export var starting_skill_scene: PackedScene
-@export var starting_hub_id: String = "macrocytic_hub"
+func add_modifier(flat: float, pct: float) -> void:
+	flat_bonus += flat
+	percent_bonus += pct
 ```
 
-### 即時變形與物理深拷貝管線
-
-由 `CellMorphController` 控制器統籌運算，保證「所見即所得」：
+`CellStats.gd` 統一管理宿主的全域 Stat 實例：
 
 ```gdscript
-# 綜合即時半徑運算公式
-var effective_radius: float = cell_data.base_radius * (1.0 + passive_radius_modifier) * (1.0 + (satiety / max_satiety) * 1.5)
+# scripts/core/cell_stats.gd
+class_name CellStats
+extends Node
 
-# 頂點噪聲變形計算後深拷貝至物理判定
-cytoplasm_polygon.polygon = generated_points
-engulf_collider.polygon = generated_points
+var might: Stat = Stat.new(1.0)
+var area: Stat = Stat.new(1.0)
+var cooldown_reduction: Stat = Stat.new(0.0)
+var projectile_speed: Stat = Stat.new(1.0)
+var duration: Stat = Stat.new(1.0)
+var amount: Stat = Stat.new(0.0)
+var pierce: Stat = Stat.new(0.0)
+var knockback: Stat = Stat.new(1.0)
+var crit_chance: Stat = Stat.new(0.05)
+var crit_damage: Stat = Stat.new(2.0)
+
+var max_health: Stat = Stat.new(100.0)
+var health_regen: Stat = Stat.new(0.0)
+var armor: Stat = Stat.new(0.0)
+var move_speed: Stat = Stat.new(230.0)
+var revival: Stat = Stat.new(0.0)
+
+var magnet: Stat = Stat.new(150.0)
+var growth: Stat = Stat.new(1.0)
+var luck: Stat = Stat.new(1.0)
+var curse: Stat = Stat.new(1.0)
 ```
 
-### 效能優化標準
+### 主動技能調用通用 Stat 規範
 
-- **同屏千怪渲染**：病原體統一採用 `MultiMeshInstance2D` 批次提交 GPU 繪製，邏輯更新與物理檢測採用四叉樹（QuadTree）空間分割。
-- **物理碰撞優化**：僅玩家實體使用 `CollisionPolygon2D` 動態同步；海量病原體一律配置輕量級 `CircleShape2D`。
-- **擬真微觀渲染**：2D CanvasItem Shader 實現菲涅爾邊緣螢光（Fresnel Glow）。背景多層次視差滾動（`ParallaxBackground`），低層模糊紅血球模擬顯微鏡景深（DoF）。
+```gdscript
+# 所有 ActiveSkill 在計算彈道或傷害時的統一寫法
+func get_calculated_damage() -> float:
+	var base = base_damage * stats.might.get_value()
+	if randf() < stats.crit_chance.get_value():
+		return base * stats.crit_damage.get_value()
+	return base
 
----
+func get_calculated_cooldown() -> float:
+	var cdr = clampf(stats.cooldown_reduction.get_value(), 0.0, 0.75)
+	return base_cooldown * (1.0 - cdr)
 
-## 8. 知識傳遞與教育功能設計（Edutainment）
+func get_projectile_count() -> int:
+	return base_amount + int(stats.amount.get_value())
+```
 
-為保證知識準確性且不破壞遊戲節奏，知識模組採「非侵入式分層呈現」：
+### 技能管理器（`SkillManager.gd`）「主動 5 ＋ 被動 5」架構
 
-- **機制即科普**：抗原呈遞、調理作用、補體裂解、呼吸爆發等名詞直接作為核心戰鬥機制與數值名稱。
-- **微觀檔案館（Immunology Codex）**：收錄真實冷凍電鏡（Cryo-EM）結構圖像與高倍光學縮時攝影對比，以百字短文闡釋致病機制與人體實際防禦手段。
-- **病歷單結算系統**：
-  - **通關面板**：「宿主成功產生特異性中和抗體，感染受控。」
-  - **陣亡面板**：「宿主死於全身性發炎反應綜合徵（SIRS），嗜中性球浸潤過載。」
-  - **病因分析**：隨附本次戰鬥中佔比最高的致死病原體成因分析。
+```gdscript
+# scripts/skills/skill_manager.gd
+const MAX_ACTIVE_SLOTS: int = 5
+const MAX_PASSIVE_SLOTS: int = 5
+
+var active_slots: Array[BaseSkill] = []
+var passive_slots: Array[BaseSkill] = []
+
+func update_all_skills(delta: float) -> void:
+	# 僅主動技能執行每幀循環計時與發射
+	for skill in active_slots:
+		if skill:
+			skill.update_skill(delta)
+```
 
 ---
 
 ## 9. 研發實施任務清單（Implementation TODO Checklist）
 
-### Phase 1: 核心玩法與變形物理原型 (Core Gameplay Prototype)
-- [ ] 搭建通用玩家白血球底盤節點場景 (`Player.tscn`)，統一初始半徑 `base_radius = 24.0`
-- [ ] 實現 `CellMorphController` 與 `FastNoiseLite` 驅動的頂點參數化算法（振幅、頻率、平滑度）
-- [ ] 實現每幀頂點深拷貝至 `CollisionPolygon2D` 的「所見即所得」物理碰撞同步
-- [ ] 實現慣性與阻尼滑行控制器（手把 / 鍵鼠）
-- [ ] 實現基礎病原體生成與碰撞包裹/吞噬檢測邏輯
+### Phase 1: 核心通用 Stat 與技能架構 (Core Stats & 5+5 Architecture)
+- [ ] 實作 `Stat.gd` 數值計算類（支援 base / flat / percent 複合運算）
+- [ ] 實作 `CellStats.gd` 全域屬性管理器，封裝 16 個通用屬性池
+- [ ] 重構 `SkillManager.gd` 為「主動 5 ＋ 被動 5」獨立槽位架構
+- [ ] 搭建通用白血球底盤節點 (`Player.tscn`)，物理半徑統一標準化 `base_radius = 24.0`
+- [ ] 實現 `CellMorphController` 與 `FastNoiseLite` 動態頂點變形深拷貝至 `CollisionPolygon2D`
 
-### Phase 2: 飽食能量循環與戰鬥機制 (Combat & Energy Loop)
-- [ ] 實現飽食度（ATP / 生化質）計算與動態半徑擴展公式（最高 2.5 倍）
-- [ ] 實現飽食度 100%「呼吸爆發（Respiratory Burst）」狀態（移速 $+150\%$、酸性腐蝕力場）
-- [ ] 實現脫水縮小穿梭機制（Squeeze Mode：體積壓縮至 $40\%$、急加速避險）
-- [ ] 實現擊殺掉落抗原採樣與局內三選一突變卡（Rogue Mutation）抽取系統
+### Phase 2: 飽食循環與戰鬥手感 (Combat & Satiety Loop)
+- [ ] 實現吞噬病原體入體轉化為 ATP 經驗與飽食度計量
+- [ ] 實現飽食度滿 100%「呼吸爆發（Respiratory Burst）」狀態（移速加成、全域酸性力場）
+- [ ] 實現按住空白鍵「脫水穿梭（Squeeze Mode）」避險機制（體積壓縮 40%，關閉吞噬，移速提升）
+- [ ] 實現局內三選一升級抽取介面（主動 5 / 被動 5 / 質變突變卡）
 
-### Phase 3: 角色矩陣與細胞形態實作 (Immune Cell Classes & Morphology)
-- [ ] 實現 `CellData.gd` Custom Resource 數值與形態配置
-- [ ] **巨噬細胞 (Macrophage)**：流體阿米巴邊界、偏心腎形核、大偽足伸展
-- [ ] **殺手 T 細胞 (CTL)**：微絨毛緊湊球體、80% 佔比大圓核、極化突觸衝刺
-- [ ] **嗜中性球 (Neutrophil)**：高頻焦躁顫膜、3～5 葉分節核、殺菌顆粒釋放
-- [ ] **B 淋巴細胞 (B-Cell)**：圓球外觀、車輪狀核、外圍受體光點、漿細胞活化膨脹
-- [ ] **樹突狀細胞 (Dendritic)**：星狀長樹突突起、中心卵形核、廣域感知觸角
+### Phase 3: 五大白血球形態與細胞核 (Immune Cell Morphology)
+- [ ] 實作 `CellData.gd` Custom Resource 數值與外觀映射
+- [ ] **巨噬細胞**：流體阿米巴邊界、偏心腎形/馬蹄形核、大偽足
+- [ ] **殺手 T 細胞**：緊湊正圓球體、80% 佔比大圓核、極化突觸
+- [ ] **嗜中性球**：高頻焦躁顫膜、3～5 葉分節核、殺菌顆粒
+- [ ] **B 淋巴細胞**：圓球外觀、車輪狀核、外圍受體光點
+- [ ] **樹突狀細胞**：星芒樹突海葵狀、中心卵形核、廣域感知觸角
 
-### Phase 4: 主被動技能體系與超武質變 (Skills & Epigenetic Evolutions)
-- [ ] 建立 6 大主動生化技能：活性氧射流、穿孔素長矛、補體瀑布、Y 型抗體齊射、NETs 陷阱、偽足猛擊
-- [ ] 建立外掛細胞器子節點：`PseudopodLimb.tscn` (IK 捕捉爪)、`ReceptorSpikes.tscn` (受體棘刺)
-- [ ] 建立 5 大被動代謝特質：肌動蛋白微絲聚合、溶酶體酶活性、趨化因子受體、線粒體超頻、調理素親和性
-- [ ] 實現 4 大終極表觀遺傳超武合成邏輯：
-  - [ ] 【顆粒酶死刑】（穿孔素長矛 ＋ 溶酶體酶活性）
-  - [ ] 【膜攻擊終結陣列】（補體瀑布 ＋ 肌動蛋白微絲聚合）
-  - [ ] 【中和高壓風暴】（Y 型抗體齊射 ＋ 調理素親和性）
+### Phase 4: 5 主動 ＋ 5 被動 ＋ 5 終極超武實作 (Skills & Evolutions)
+- [ ] 實作 5 大主動生化技能：穿孔素長矛、補體瀑布、Y 型抗體齊射、活性氧射流、偽足猛擊
+- [ ] 實作外掛細胞器：`PseudopodLimb.tscn` (IK 抓爪)、`ReceptorSpikes.tscn` (受體棘刺)
+- [ ] 實作 5 大被動特質（純通用 Stat 增幅）：溶酶體酵素、肌動蛋白微絲、調理素親和、線粒體超頻、趨化因子受體
+- [ ] 實作 5 大終極表觀遺傳超武合成邏輯：
+  - [ ] 【顆粒酶死刑】（穿孔素長矛 ＋ 溶酶體酵素）
+  - [ ] 【膜攻擊終結陣列】（補體瀑布 ＋ 肌動蛋白微絲）
+  - [ ] 【中和高壓風暴】（Y 型抗體齊射 ＋ 調理素親和）
   - [ ] 【過氧化利維坦】（活性氧射流 ＋ 線粒體超頻）
+  - [ ] 【阿米巴原生巨口】（偽足猛擊 ＋ 趨化因子受體）
 
 ### Phase 5: 造血幹細胞天賦星盤實作 (Hematopoiesis Talent Matrix)
 - [ ] 搭建 PoE 式全域相連天賦星盤 UI 與數據儲存架構
 - [ ] 實現中央幹細胞向五大起點門戶分化邏輯
-- [ ] 實現【單核巨化區域】節點（貪婪偽足、生化厚壁）
-- [ ] 實現【極化纖毛區域】節點（穿膜衝鋒、靶向凋亡）
-- [ ] 實現【顆粒活化區域】節點（臨界過載、NETosis 激化）
-- [ ] 實現【內質網工廠】節點（全向發射槽、抗體親和力成熟）
-- [ ] 實現【抗原感知中樞】節點（神經網共振、巡邏援軍鏈）
-- [ ] 驗證跨盤點法（如 T 細胞跨點巨化節點的重裝突擊流派）
+- [ ] 實現出門小節點通用 `StatModifier` 累加計算
+- [ ] 實現五大特化核心關鍵節點
+- [ ] 驗證跨盤點法（如 T 細胞跨盤點巨化節點走重裝突擊流派）
 
 ### Phase 6: 敵人體系與高併發效能優化 (Enemies & Performance Pipeline)
 - [ ] 實現 2D `QuadTree` 空間分割管理
