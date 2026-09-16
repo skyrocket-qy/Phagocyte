@@ -124,8 +124,8 @@ func _select_skill(key: String) -> void:
 			detail_badge.modulate = Color(0.6, 0.8, 1.0)
 			detail_stats.text = tr("TOOLTIP_ALWAYS_ACTIVE") + " • " + (tr("TOOLTIP_LV_FORMAT") % [1, d["max_level"]])
 
-	detail_desc.text = "【 战术机制 / Tactical Effect 】\n" + d["description"]
-	detail_bio.text = "【 生物与生化背景 / Bio-Mechanism 】\n" + d["biochemistry"]
+	detail_desc.text = tr("CODEX_HEADER_TACTICAL") + "\n" + d["description"]
+	detail_bio.text = tr("CODEX_HEADER_BIO") + "\n" + d["biochemistry"]
 
 func _render_cells_tab() -> void:
 	var first_key: String = ""
@@ -152,8 +152,8 @@ func _select_cell(key: String) -> void:
 	detail_badge.modulate = Color(0.3, 1.0, 0.4) if d["unlocked"] else Color(0.9, 0.6, 0.2)
 	detail_stats.text = tr("LABEL_ROLE") + d["role"]
 
-	detail_desc.text = "【 变形特性 】\n" + d["trait"]
-	detail_bio.text = "【 固有被动 】\n" + d["passive"] + "\n\n【 终极技能 】\n" + d["burst"]
+	detail_desc.text = tr("CODEX_HEADER_TRAIT") + "\n" + d["trait"]
+	detail_bio.text = tr("CODEX_HEADER_PASSIVE") + "\n" + d["passive"] + "\n\n" + tr("CODEX_HEADER_BURST") + "\n" + d["burst"]
 
 func _render_pathogens_tab() -> void:
 	var first_key: String = ""
@@ -176,12 +176,12 @@ func _select_pathogen(key: String) -> void:
 	active_item_key = key
 	var d = GM.get_pathogen_info(key)
 	detail_title.text = d["icon"] + " " + d["name"]
-	detail_badge.text = "[ 威胁等级: " + d["danger_level"] + " ]"
+	detail_badge.text = "[ " + (tr("CODEX_THREAT_LV") % d["danger_level"]) + " ]"
 	detail_badge.modulate = Color(1.0, 0.4, 0.4)
 	detail_stats.text = d["trait"]
 
-	detail_desc.text = "【 生物特征与病原机制 】\n" + d["description"]
-	detail_bio.text = "【 免疫战术建议 】\n利用阿米巴伪足接触包裹；若敌群密集抱团，可借助生化射流或高压酸性爆发击碎菌团。"
+	detail_desc.text = tr("CODEX_HEADER_PATHOGEN_TRAIT") + "\n" + d["description"]
+	detail_bio.text = tr("CODEX_HEADER_TACTIC_ADVICE") + "\n" + tr("CODEX_PATHOGEN_ADVICE_DEFAULT")
 
 func _render_maps_tab() -> void:
 	var first_key: String = ""
@@ -204,9 +204,9 @@ func _select_map(key: String) -> void:
 	active_item_key = key
 	var d = GM.get_map_info(key)
 	detail_title.text = "🌐 " + d["name"]
-	detail_badge.text = "[ 阶段状态: 开放 ]"
+	detail_badge.text = "[ " + tr("CODEX_STAGE_STATUS_OPEN") + " ]"
 	detail_badge.modulate = Color(0.4, 0.8, 1.0)
 	detail_stats.text = tr("LABEL_ENV") + d["environment"]
 
-	detail_desc.text = "【 病理机制 】\n" + d["mechanic"]
-	detail_bio.text = "【 核心威胁 】\n" + d["threat"]
+	detail_desc.text = tr("CODEX_HEADER_MECH") + "\n" + d["mechanic"]
+	detail_bio.text = tr("CODEX_HEADER_THREAT") + "\n" + d["threat"]

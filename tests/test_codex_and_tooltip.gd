@@ -219,6 +219,35 @@ func _process(_delta: float) -> bool:
 		printerr("[FAIL] English tooltip title mismatch: " + hud.tooltip_title.text)
 		quit(1)
 		return true
+	if hud.tooltip_desc.text.contains("战术机制"):
+		printerr("[FAIL] English tooltip description must NOT contain Chinese headers: " + hud.tooltip_desc.text)
+		quit(1)
+		return true
+
+	# Test Codex in English: ensure NO Chinese headers
+	codex_modal.open_codex(1) # Cells tab
+	codex_modal._select_cell("macrophage")
+	if codex_modal.detail_desc.text.contains("变形特性"):
+		printerr("[FAIL] English cell details must NOT contain Chinese: " + codex_modal.detail_desc.text)
+		quit(1)
+		return true
+	if not codex_modal.detail_desc.text.contains("Deformation Trait"):
+		printerr("[FAIL] English cell details must contain 'Deformation Trait': " + codex_modal.detail_desc.text)
+		quit(1)
+		return true
+
+	codex_modal.switch_tab(0) # Skills tab
+	codex_modal._select_skill("macrophage_pseudopods")
+	if codex_modal.detail_desc.text.contains("战术机制"):
+		printerr("[FAIL] English skill details must NOT contain Chinese: " + codex_modal.detail_desc.text)
+		quit(1)
+		return true
+	if not codex_modal.detail_desc.text.contains("Tactical Effect"):
+		printerr("[FAIL] English skill details must contain 'Tactical Effect': " + codex_modal.detail_desc.text)
+		quit(1)
+		return true
+
+	codex_modal.close_codex()
 
 	GM.set_language("zh_CN")
 	hud._on_slot_mouse_entered(0, card0)
@@ -231,8 +260,12 @@ func _process(_delta: float) -> bool:
 		printerr("[FAIL] Chinese tooltip title mismatch: " + hud.tooltip_title.text)
 		quit(1)
 		return true
+	if not hud.tooltip_desc.text.contains("战术机制"):
+		printerr("[FAIL] Chinese tooltip description should contain Chinese header: " + hud.tooltip_desc.text)
+		quit(1)
+		return true
 	hud._on_slot_mouse_exited(0)
-	print("[PASS] Tooltip and Manual dynamic bilingual switching verified.")
+	print("[PASS] Tooltip and Manual dynamic bilingual switching verified without residual Chinese.")
 
 	print("--- ALL CODEX & TOOLTIP TESTS PASSED SUCCESSFULLY! ---")
 	quit(0)

@@ -52,20 +52,14 @@ func _process(_delta: float) -> bool:
 		return true
 	print("[PASS] Transition to ClassView verified.")
 
-	# 3. Test Class Selection (Macrophage vs Locked Class)
-	menu._select_class("macrophage")
-	if menu.class_confirm_btn.disabled:
-		printerr("Macrophage should be unlocked and confirmable")
-		quit(1)
-		return true
-	print("[PASS] Macrophage selectable and unlocked.")
-
-	menu._select_class("ctl")
-	if not menu.class_confirm_btn.disabled:
-		printerr("CTL should be locked")
-		quit(1)
-		return true
-	print("[PASS] CTL properly locked with status info displayed.")
+	# 3. Test All 5 Classes are Selectable & Unlocked
+	for cell_id in ["macrophage", "ctl", "neutrophil", "b_cell", "dendritic"]:
+		menu._select_class(cell_id)
+		if menu.class_confirm_btn.disabled:
+			printerr("Class '%s' should be unlocked and confirmable" % cell_id)
+			quit(1)
+			return true
+	print("[PASS] All 5 immune defense cells (Macrophage, CTL, Neutrophil, B-Cell, Dendritic) selectable and unlocked.")
 
 	# Re-select Macrophage and proceed
 	menu._select_class("macrophage")

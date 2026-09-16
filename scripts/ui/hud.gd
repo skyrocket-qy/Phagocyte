@@ -2,6 +2,8 @@ class_name HUD
 extends CanvasLayer
 
 const GM = preload("res://scripts/core/game_manager.gd")
+const UpgradeModalClass = preload("res://scripts/ui/upgrade_modal.gd")
+const UpgradeModalScene = preload("res://scenes/ui/upgrade_modal.tscn")
 
 @onready var title_label: Label = $MarginContainer/PanelContainer/VBoxContainer/TitleLabel
 @onready var map_label: Label = $MarginContainer/PanelContainer/VBoxContainer/MapLabel
@@ -49,11 +51,19 @@ var last_digested_count: int = 0
 var last_burst_time_left: float = 0.0
 
 var player_ref: Node2D = null
+var upgrade_modal: UpgradeModalClass = null
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	burst_panel.visible = false
 	pause_modal.visible = false
+
+	if has_node("UpgradeModal"):
+		upgrade_modal = $UpgradeModal as UpgradeModalClass
+	else:
+		if UpgradeModalScene:
+			upgrade_modal = UpgradeModalScene.instantiate() as UpgradeModalClass
+			add_child(upgrade_modal)
 
 	if not resume_btn.pressed.is_connected(resume_game):
 		resume_btn.pressed.connect(resume_game)
@@ -111,6 +121,8 @@ func _update_skill_slots() -> void:
 		player_ref = get_tree().get_first_node_in_group("player")
 		if not player_ref:
 			return
+		if player_ref.has_signal("level_up") and not player_ref.level_up.is_connected(_on_player_level_up):
+			player_ref.level_up.connect(_on_player_level_up)
 
 	var sm = player_ref.get_node_or_null("SkillManager")
 	if not sm or not sm.has_method("get_all_ui_data"):
@@ -223,14 +235,14 @@ func _refresh_tooltip_content(slot_idx: int) -> void:
 		tooltip_badge.text = badge_text
 		tooltip_badge.modulate = badge_color
 		tooltip_stats.text = stats_text
-		tooltip_desc.text = "【 战术机制 / Tactical Effect 】\n" + data["description"]
+		tooltip_desc.text = tr("CODEX_HEADER_TACTICAL") + "\n" + data["description"]
 		var bio_text = data.get("biochemistry", "")
-		tooltip_bio.text = "【 生物机制 / Bio-Mechanism 】\n" + bio_text
+		tooltip_bio.text = tr("CODEX_HEADER_BIO") + "\n" + bio_text
 		tooltip_bio.visible = (bio_text != "")
 	else:
 		tooltip_icon.text = "+"
 		tooltip_title.text = tr("TOOLTIP_EMPTY_TITLE")
-		tooltip_badge.text = "[ 空 / EMPTY ]"
+		tooltip_badge.text = "[ " + tr("SKILL_EMPTY") + " ]"
 		tooltip_badge.modulate = Color(0.6, 0.6, 0.6)
 		tooltip_stats.text = tr("SKILL_BAR_TITLE")
 		tooltip_desc.text = tr("TOOLTIP_EMPTY_DESC")
@@ -297,3 +309,7 @@ func _on_pathogen_digested(_enemy: Node2D, _atp: float) -> void:
 	if player and "digested_count" in player:
 		last_digested_count = player.digested_count
 		count_label.text = tr("HUD_DIGESTED") % last_digested_count
+
+func _on_player_level_up(_new_level: int) -> void:
+	if upgrade_modal and is_instance_valid(upgrade_modal):
+		upgrade_modal.open_upgrade_modal(player_ref)

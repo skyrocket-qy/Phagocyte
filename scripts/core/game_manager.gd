@@ -10,6 +10,19 @@ signal language_changed(locale: String)
 ## Static callback list for decoupled notification
 static var _language_listeners: Array[Callable] = []
 
+const CELL_SCENES = {
+	"macrophage": preload("res://scenes/characters/macrophage.tscn"),
+	"ctl": preload("res://scenes/characters/ctl_cell.tscn"),
+	"neutrophil": preload("res://scenes/characters/neutrophil_cell.tscn"),
+	"b_cell": preload("res://scenes/characters/b_cell.tscn"),
+	"dendritic": preload("res://scenes/characters/dendritic_cell.tscn"),
+}
+
+static func get_cell_scene(class_id: String) -> PackedScene:
+	if CELL_SCENES.has(class_id):
+		return CELL_SCENES[class_id]
+	return CELL_SCENES["macrophage"]
+
 ## Class Metadata referencing translation keys
 const CLASS_DATA = {
 	"macrophage": {
@@ -26,7 +39,7 @@ const CLASS_DATA = {
 		"trait_key": "CLASS_CTL_TRAIT",
 		"passive_key": "CLASS_CTL_PASSIVE",
 		"burst_key": "CLASS_CTL_BURST",
-		"unlocked": false
+		"unlocked": true
 	},
 	"neutrophil": {
 		"name_key": "CLASS_NEUTROPHIL_NAME",
@@ -34,7 +47,7 @@ const CLASS_DATA = {
 		"trait_key": "CLASS_NEUTROPHIL_TRAIT",
 		"passive_key": "CLASS_NEUTROPHIL_PASSIVE",
 		"burst_key": "CLASS_NEUTROPHIL_BURST",
-		"unlocked": false
+		"unlocked": true
 	},
 	"b_cell": {
 		"name_key": "CLASS_B_CELL_NAME",
@@ -42,7 +55,7 @@ const CLASS_DATA = {
 		"trait_key": "CLASS_B_CELL_TRAIT",
 		"passive_key": "CLASS_B_CELL_PASSIVE",
 		"burst_key": "CLASS_B_CELL_BURST",
-		"unlocked": false
+		"unlocked": true
 	},
 	"dendritic": {
 		"name_key": "CLASS_DENDRITIC_NAME",
@@ -50,7 +63,7 @@ const CLASS_DATA = {
 		"trait_key": "CLASS_DENDRITIC_TRAIT",
 		"passive_key": "CLASS_DENDRITIC_PASSIVE",
 		"burst_key": "CLASS_DENDRITIC_BURST",
-		"unlocked": false
+		"unlocked": true
 	}
 }
 

@@ -4,8 +4,8 @@ extends Node2D
 const GM = preload("res://scripts/core/game_manager.gd")
 
 @export var staph_scene: PackedScene = preload("res://scenes/enemies/staph_enemy.tscn")
-@export var max_pathogens: int = 35
-@export var arena_size: Vector2 = Vector2(2400, 2400)
+@export var max_pathogens: int = 50
+@export var arena_size: Vector2 = Vector2(4800, 4800)
 
 @onready var player: CharacterBody2D = $Macrophage
 @onready var hud: CanvasLayer = $HUD
@@ -20,6 +20,19 @@ var environment_time: float = 0.0
 var map_id: String = "acute_wound"
 
 func _ready() -> void:
+	if GM.selected_class != "" and GM.selected_class != "macrophage":
+		var cell_scene = GM.get_cell_scene(GM.selected_class)
+		if cell_scene:
+			var cam = $Macrophage/Camera2D
+			$Macrophage.remove_child(cam)
+			$Macrophage.queue_free()
+
+			player = cell_scene.instantiate()
+			player.name = "PlayerCell"
+			add_child(player)
+			player.add_child(cam)
+			camera = cam
+
 	player.add_to_group("player")
 	if hud.has_method("connect_player"):
 		hud.connect_player(player)
@@ -29,7 +42,7 @@ func _ready() -> void:
 	_configure_map_environment()
 
 	# Initial pathogen wave
-	_spawn_initial_wave(24)
+	_spawn_initial_wave(35)
 
 func _configure_map_environment() -> void:
 	if map_id == "alveolar_space":
