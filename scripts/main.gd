@@ -78,11 +78,17 @@ func _connect_achievement_events() -> void:
 
 func _configure_map_environment() -> void:
 	if map_id == "alveolar_space":
-		arena_bg.color = Color(0.03, 0.09, 0.12, 1.0)
+		if arena_bg.material:
+			arena_bg.material.set_shader_parameter("bg_color_deep", Color(0.02, 0.06, 0.10, 1.0))
+			arena_bg.material.set_shader_parameter("bg_color_accent", Color(0.04, 0.12, 0.16, 1.0))
+			arena_bg.material.set_shader_parameter("fiber_color", Color(0.2, 0.5, 0.65, 0.35))
 		arena_borders.default_color = Color(0.2, 0.65, 0.7, 0.7)
 	else:
 		# acute_wound default
-		arena_bg.color = Color(0.05, 0.07, 0.11, 1.0)
+		if arena_bg.material:
+			arena_bg.material.set_shader_parameter("bg_color_deep", Color(0.04, 0.05, 0.09, 1.0))
+			arena_bg.material.set_shader_parameter("bg_color_accent", Color(0.14, 0.04, 0.08, 1.0))
+			arena_bg.material.set_shader_parameter("fiber_color", Color(0.22, 0.18, 0.32, 0.35))
 		arena_borders.default_color = Color(0.35, 0.45, 0.6, 0.65)
 
 func _physics_process(delta: float) -> void:

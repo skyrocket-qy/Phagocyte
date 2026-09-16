@@ -1,8 +1,19 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
-[ext_resource type="PackedScene" path="res://scenes/characters/macrophage.tscn" id="2_macrophage"]
-[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3_hud"]
+[ext_resource type="Shader" path="res://shaders/microscope_tissue_bg.gdshader" id="2_bg_shader"]
+[ext_resource type="PackedScene" path="res://scenes/characters/macrophage.tscn" id="3_macrophage"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="4_hud"]
+[ext_resource type="Script" path="res://scripts/environment/microscope_parallax.gd" id="5_parallax"]
+[ext_resource type="Shader" path="res://shaders/microscope_postprocess.gdshader" id="6_postprocess"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
+shader = ExtResource("2_bg_shader")
+shader_parameter/bg_color_deep = Color(0.04, 0.05, 0.09, 1)
+shader_parameter/bg_color_accent = Color(0.14, 0.04, 0.08, 1)
+shader_parameter/fiber_color = Color(0.18, 0.28, 0.38, 0.35)
+shader_parameter/flow_speed = 0.2
+shader_parameter/fiber_density = 18.0
 
 [sub_resource type="Curve" id="Curve_ambient"]
 _data = [Vector2(0, 0.2), 0.0, 0.0, 0, 0, Vector2(0.5, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -17,17 +28,44 @@ size = Vector2(4840, 40)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vert"]
 size = Vector2(40, 4840)
 
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 3
+glow_enabled = true
+glow_levels/1 = 1.0
+glow_levels/2 = 0.8
+glow_levels/3 = 0.6
+glow_levels/5 = 0.2
+glow_intensity = 0.6
+glow_bloom = 0.2
+glow_blend_mode = 0
+glow_hdr_threshold = 1.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_post"]
+shader = ExtResource("6_postprocess")
+shader_parameter/vignette_radius = 0.75
+shader_parameter/vignette_softness = 0.45
+shader_parameter/vignette_opacity = 0.65
+shader_parameter/chromatic_aberration = 0.005
+shader_parameter/noise_amount = 0.012
+
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
 
 [node name="Background" type="Node2D" parent="."]
 
 [node name="ArenaBG" type="ColorRect" parent="Background"]
+material = SubResource("ShaderMaterial_bg")
 offset_left = -2400.0
 offset_top = -2400.0
 offset_right = 2400.0
 offset_bottom = 2400.0
 color = Color(0.04, 0.075, 0.11, 1)
+
+[node name="MicroscopeParallax" type="Node2D" parent="Background"]
+script = ExtResource("5_parallax")
 
 [node name="FluidParticles" type="CPUParticles2D" parent="Background"]
 amount = 128
@@ -73,7 +111,7 @@ shape = SubResource("RectangleShape2D_vert")
 
 [node name="EnemyContainer" type="Node2D" parent="."]
 
-[node name="Macrophage" parent="." instance=ExtResource("2_macrophage")]
+[node name="Macrophage" parent="." instance=ExtResource("3_macrophage")]
 
 [node name="Camera2D" type="Camera2D" parent="Macrophage"]
 zoom = Vector2(0.5, 0.5)
@@ -85,4 +123,16 @@ limit_smoothed = true
 position_smoothing_enabled = true
 position_smoothing_speed = 6.0
 
-[node name="HUD" parent="." instance=ExtResource("3_hud")]
+[node name="MicroscopePostProcess" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="LensOverlay" type="ColorRect" parent="MicroscopePostProcess"]
+material = SubResource("ShaderMaterial_post")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]

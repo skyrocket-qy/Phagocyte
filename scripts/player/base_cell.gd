@@ -47,6 +47,7 @@ var digested_count: int = 0
 ## Inertial Nucleus offset
 var nucleus_offset: Vector2 = Vector2.ZERO
 var nucleus_target_offset: Vector2 = Vector2.ZERO
+var nucleus_velocity: Vector2 = Vector2.ZERO
 
 ## Node references
 @onready var cytoplasm: Polygon2D = $Cytoplasm
@@ -90,6 +91,7 @@ func _ready() -> void:
 
 	# Setup nucleus shape
 	_setup_nucleus_shape()
+	_setup_cytoplasm_shader()
 
 	# Initialize Skill System (5 Active + 5 Passive)
 	if skill_manager:
@@ -128,6 +130,29 @@ func _setup_nucleus_shape() -> void:
 	if nucleus:
 		nucleus.polygon = n_pts
 		nucleus.color = Color(0.4, 0.2, 0.6, 0.85)
+
+## Setup cytoplasm shader with semi-transparent gel & Fresnel bioluminescent rim
+func _setup_cytoplasm_shader() -> void:
+	if not cytoplasm:
+		return
+	var shader = load("res://shaders/cytoplasm_gel.gdshader")
+	if not shader:
+		return
+	var mat = ShaderMaterial.new()
+	mat.shader = shader
+	var base_col = cytoplasm.color
+	mat.set_shader_parameter("tint_color", base_col)
+	var rim_col = Color(
+		clampf(base_col.r * 1.6, 0.35, 1.8),
+		clampf(base_col.g * 2.2, 0.6, 2.2),
+		clampf(base_col.b * 2.5, 0.8, 2.5),
+		1.0
+	)
+	mat.set_shader_parameter("rim_color", rim_col)
+	mat.set_shader_parameter("rim_power", 2.4)
+	mat.set_shader_parameter("inner_alpha", 0.42)
+	mat.set_shader_parameter("flow_speed", 1.2)
+	cytoplasm.material = mat
 
 ## Virtual method: Cell subclasses override to equip their starting weapon
 func _setup_initial_skills() -> void:
@@ -205,23 +230,72 @@ func _update_pseudopod_deformation(delta: float) -> void:
 		var r: float = cur_r + (n_val * current_deformation_mag) + forward_bias
 		points.append(dir * max(12.0, r))
 
+	var smooth_points := _smooth_closed_polygon(points, 2)
+
 	if cytoplasm:
-		cytoplasm.polygon = points
+		cytoplasm.polygon = smooth_points
+		var uvs := PackedVector2Array()
+		var uv_denom: float = max(24.0, cur_r * 2.4)
+		for pt in smooth_points:
+			uvs.append((pt / uv_denom) + Vector2(0.5, 0.5))
+		cytoplasm.uv = uvs
 	if membrane:
-		var line_points := points.duplicate()
+		var line_points := smooth_points.duplicate()
 		if line_points.size() > 0:
-			line_points.append(points[0])
+			line_points.append(smooth_points[0])
 		membrane.points = line_points
 	if engulf_collider:
 		engulf_collider.polygon = points
 
 	_update_nucleus(delta)
 
+## Closed Catmull-Rom Spline interpolation.
+## Converts N control points into N * subdivisions smoothly curving vertices.
+static func _smooth_closed_polygon(pts: PackedVector2Array, subdivisions: int = 2) -> PackedVector2Array:
+	var n: int = pts.size()
+	if n < 4 or subdivisions <= 1:
+		return pts
+
+	var smoothed := PackedVector2Array()
+	var step: float = 1.0 / float(subdivisions)
+
+	for i in range(n):
+		var p0: Vector2 = pts[(i - 1 + n) % n]
+		var p1: Vector2 = pts[i]
+		var p2: Vector2 = pts[(i + 1) % n]
+		var p3: Vector2 = pts[(i + 2) % n]
+
+		for s in range(subdivisions):
+			var t: float = s * step
+			var t2: float = t * t
+			var t3: float = t2 * t
+			var pt: Vector2 = 0.5 * (
+				(2.0 * p1) +
+				(-p0 + p2) * t +
+				(2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 +
+				(-p0 + 3.0 * p1 - 3.0 * p2 + p3) * t3
+			)
+			smoothed.append(pt)
+
+	return smoothed
+
 func _update_nucleus(delta: float) -> void:
 	if not nucleus:
 		return
-	nucleus_offset = nucleus_offset.lerp(nucleus_target_offset, 8.0 * delta)
+	# Physical inertia lag: nucleus lags behind opposite to velocity vector
+	var target_lag: Vector2 = -velocity * 0.08
+	var max_lag: float = current_radius * 0.32
+	if target_lag.length() > max_lag:
+		target_lag = target_lag.normalized() * max_lag
+
+	# Damped harmonic oscillator
+	var spring_k: float = 48.0
+	var damping: float = 9.5
+	var accel: Vector2 = (target_lag - nucleus_offset) * spring_k - nucleus_velocity * damping
+	nucleus_velocity += accel * delta
+	nucleus_offset += nucleus_velocity * delta
 	nucleus.position = nucleus_offset
+
 	var n_scale: float = 1.0 + (satiety / max(1.0, max_satiety)) * 0.8
 	nucleus.scale = Vector2(n_scale, n_scale)
 

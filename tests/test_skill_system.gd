@@ -90,21 +90,21 @@ func _process(_delta: float) -> bool:
 			return true
 	print("[PASS] Passive Slots 0 to 4 are initially empty and available.")
 
-	# 5. Verify procedural 32-vertex deformation & collision sync
+	# 5. Verify smooth 64-vertex deformation & 32-vertex collision sync
 	player._update_pseudopod_deformation(0.016)
-	if player.cytoplasm.polygon.size() != 32:
-		printerr("[FAIL] Cytoplasm polygon vertices != 32: " + str(player.cytoplasm.polygon.size()))
+	if player.cytoplasm.polygon.size() != 64:
+		printerr("[FAIL] Cytoplasm polygon vertices != 64: " + str(player.cytoplasm.polygon.size()))
 		quit(1)
 		return true
 	if player.engulf_collider.polygon.size() != 32:
 		printerr("[FAIL] EngulfCollider polygon vertices != 32: " + str(player.engulf_collider.polygon.size()))
 		quit(1)
 		return true
-	if player.membrane.points.size() != 33: # 32 + 1 to close loop
-		printerr("[FAIL] Membrane points != 33: " + str(player.membrane.points.size()))
+	if player.membrane.points.size() != 65: # 64 + 1 to close loop
+		printerr("[FAIL] Membrane points != 65: " + str(player.membrane.points.size()))
 		quit(1)
 		return true
-	print("[PASS] 32-vertex organic pseudopod deformation & CollisionPolygon2D sync verified.")
+	print("[PASS] Smooth 64-vertex organic pseudopod deformation & CollisionPolygon2D sync verified.")
 
 	# 6. Test ROS Torrent auto-targeting & firing
 	var staph_scene = load("res://scenes/enemies/staph_enemy.tscn")

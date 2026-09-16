@@ -28,9 +28,9 @@ func _process(_delta: float) -> bool:
 				assert(cell.stats != null, "'%s' must have CellStats" % cid)
 				assert(cell.skill_manager != null, "'%s' must have SkillManager" % cid)
 
-				# Check 32-vertex organic deformation
+				# Check smooth 64-vertex organic deformation
 				cell._update_pseudopod_deformation(0.016)
-				assert(cell.cytoplasm.polygon.size() == 32, "'%s' cytoplasm must have 32 vertices" % cid)
+				assert(cell.cytoplasm.polygon.size() == 64, "'%s' cytoplasm must have 64 vertices" % cid)
 				assert(cell.engulf_collider.polygon.size() == 32, "'%s' engulf collider must have 32 vertices" % cid)
 				assert(cell.nucleus.polygon.size() >= 16, "'%s' nucleus must have geometry" % cid)
 

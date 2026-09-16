@@ -87,12 +87,19 @@ func _update_pseudopod_deformation(delta: float) -> void:
 		var r: float = cur_r + (n_val * current_deformation_mag * 0.6) + arm_val + forward_bias
 		points.append(dir * max(14.0, r))
 
+	var smooth_points := _smooth_closed_polygon(points, 2)
+
 	if cytoplasm:
-		cytoplasm.polygon = points
+		cytoplasm.polygon = smooth_points
+		var uvs := PackedVector2Array()
+		var uv_denom: float = max(24.0, cur_r * 2.4)
+		for pt in smooth_points:
+			uvs.append((pt / uv_denom) + Vector2(0.5, 0.5))
+		cytoplasm.uv = uvs
 	if membrane:
-		var line_points := points.duplicate()
+		var line_points := smooth_points.duplicate()
 		if line_points.size() > 0:
-			line_points.append(points[0])
+			line_points.append(smooth_points[0])
 		membrane.points = line_points
 	if engulf_collider:
 		engulf_collider.polygon = points

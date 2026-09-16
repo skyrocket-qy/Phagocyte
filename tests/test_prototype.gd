@@ -41,13 +41,13 @@ func _process(_delta: float) -> bool:
 		quit(1)
 		return true
 
-	# 1. Verify 32 vertices deformation & collision sync
+	# 1. Verify 64 smooth visual vertices deformation & 32 collider sync
 	player._update_pseudopod_deformation(0.016)
-	if player.cytoplasm.polygon.size() != 32 or player.engulf_collider.polygon.size() != 32:
+	if player.cytoplasm.polygon.size() != 64 or player.engulf_collider.polygon.size() != 32:
 		printerr("Deformation points mismatch: " + str(player.cytoplasm.polygon.size()))
 		quit(1)
 		return true
-	print("[PASS] Initial 32-vertex pseudopod deformation & collision sync verified.")
+	print("[PASS] Initial smooth 64-vertex pseudopod deformation & 32-vertex collision sync verified.")
 
 	# 2. Check initial stats
 	if player.health != 100.0 or player.satiety != 0.0 or player.current_radius != player.base_radius:

@@ -52,18 +52,28 @@ func _physics_process(delta: float) -> void:
 	velocity = velocity.lerp(wander_dir * float_speed, 2.0 * delta)
 	position += velocity * delta
 
+	# Rhythmic organic breathing oscillation
+	var breathe: float = 1.0 + sin(Time.get_ticks_msec() * 0.0035 + drift_timer) * 0.05
+	scale = Vector2(breathe, breathe)
+
 func _draw() -> void:
-	# Draw golden cocci cluster
+	# Draw golden cocci cluster with 3D sphere gradient and electron specular highlights
 	for s in cluster_spheres:
 		var pos: Vector2 = s["offset"]
 		var rad: float = s["radius"]
 		var col: Color = s["color"]
-		# Draw outer cell wall / membrane
-		draw_circle(pos, rad + 1.2, Color(0.65, 0.45, 0.05, 0.9))
-		# Draw golden cytoplasm
+
+		# 1. Peptidoglycan cell wall / capsule
+		draw_circle(pos, rad + 1.6, Color(0.65, 0.42, 0.05, 0.85))
+
+		# 2. Main spherical cytoplasm
 		draw_circle(pos, rad, col)
-		# Draw glossy specular highlight (electron microscope vibe)
-		draw_circle(pos + Vector2(-rad * 0.3, -rad * 0.3), rad * 0.32, Color(1.0, 1.0, 0.8, 0.8))
+
+		# 3. 3D Spherical volume light gradient
+		draw_circle(pos + Vector2(-rad * 0.15, -rad * 0.15), rad * 0.72, col.lightened(0.18))
+
+		# 4. Glossy specular highlight (electron microscope vibe with HDR glow)
+		draw_circle(pos + Vector2(-rad * 0.32, -rad * 0.32), rad * 0.28, Color(1.4, 1.35, 0.9, 0.85))
 
 func get_atp_value() -> float:
 	return atp_value
