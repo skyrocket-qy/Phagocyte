@@ -57,14 +57,14 @@ public partial class TestVisualOverhaul : SceneTree
         }
 
         // =========================================================================
-        // TEST 1: Catmull-Rom Polygon Smoothing (32 -> 64 vertices)
+        // TEST 1: Catmull-Rom Polygon Smoothing (32 -> 128 high-density vertices)
         // =========================================================================
         player.UpdatePseudopodDeformation(0.016f);
-        AssertThat(player.Cytoplasm!.Polygon.Length).IsEqual(64);
-        AssertThat(player.Membrane!.Points.Length).IsEqual(65);
+        AssertThat(player.Cytoplasm!.Polygon.Length).IsEqual(128);
+        AssertThat(player.Membrane!.Points.Length).IsEqual(129);
         AssertThat(player.EngulfCollider!.Polygon.Length).IsEqual(32);
-        AssertThat(player.Cytoplasm.UV.Length).IsEqual(64);
-        GD.Print("[PASS] 1. Catmull-Rom spline smoothing verified: 32 control points -> 64 smooth visual vertices + 65-point closed membrane.");
+        AssertThat(player.Cytoplasm.UV.Length).IsEqual(128);
+        GD.Print("[PASS] 1. Catmull-Rom spline smoothing verified: 32 control points -> 128 smooth visual vertices + 129-point closed membrane.");
 
         // =========================================================================
         // TEST 2: Cytoplasm Gel Shader & Fresnel Rim

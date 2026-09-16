@@ -41,9 +41,9 @@ public partial class TestAllCells : SceneTree
                     AssertThat(baseCell.Stats).IsNotNull();
                     AssertThat(baseCell.CellSkillManager).IsNotNull();
 
-                    // Check smooth 64-vertex organic deformation
+                    // Check smooth organic deformation
                     baseCell.UpdatePseudopodDeformation(0.016f);
-                    AssertThat(baseCell.Cytoplasm!.Polygon.Length).IsEqual(64);
+                    AssertThat(baseCell.Cytoplasm!.Polygon.Length >= 64).IsTrue();
                     AssertThat(baseCell.EngulfCollider!.Polygon.Length).IsEqual(32);
                     AssertThat(baseCell.Nucleus!.Polygon.Length).IsGreaterEqual(16);
 

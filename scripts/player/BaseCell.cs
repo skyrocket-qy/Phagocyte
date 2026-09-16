@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using Phagocyte.Core;
 using Phagocyte.Skills;
 using Phagocyte.Enemies;
@@ -50,6 +51,7 @@ public partial class BaseCell : CharacterBody2D
     [Export] public float DeformationSpeed { get; set; } = 3.6f;
     [Export] public float BaseDeformationMag { get; set; } = 24.0f;
     public float CurrentDeformationMag { get; set; } = 24.0f;
+    [Export] public int SmoothSubdivisions { get; set; } = 4; // 32 * 4 = 128 high-density smooth points
     public FastNoiseLite? Noise { get; set; }
     public float NoiseTime { get; set; } = 0.0f;
 
@@ -84,6 +86,38 @@ public partial class BaseCell : CharacterBody2D
     public SkillManager? CellSkillManager { get; set; }
 
     public CellStats? Stats { get; set; }
+
+    public partial class GranuleCanvas : Node2D
+    {
+        public struct Granule
+        {
+            public Vector2 BasePos;
+            public Vector2 CurrentOffset;
+            public Vector2 Velocity;
+            public float Size;
+            public Color GranuleColor;
+            public float BrownianPhase;
+            public float LagSensitivity;
+        }
+
+        public readonly List<Granule> Granules = new();
+
+        public override void _Draw()
+        {
+            for (int i = 0; i < Granules.Count; i++)
+            {
+                var g = Granules[i];
+                Vector2 drawPos = g.BasePos + g.CurrentOffset;
+                DrawCircle(drawPos, g.Size, g.GranuleColor);
+                if (g.Size > 2.4f)
+                {
+                    DrawCircle(drawPos, g.Size * 0.45f, new Color(g.GranuleColor.R * 1.5f, g.GranuleColor.G * 1.5f, g.GranuleColor.B * 1.8f, g.GranuleColor.A * 0.75f));
+                }
+            }
+        }
+    }
+
+    private GranuleCanvas? _granuleCanvas;
 
     public override void _Ready()
     {
@@ -129,6 +163,7 @@ public partial class BaseCell : CharacterBody2D
             BurstParticles.Emitting = false;
         }
 
+        SetupGranuleCanvas();
         SetupNucleusShape();
         SetupCytoplasmShader();
 
@@ -191,19 +226,89 @@ public partial class BaseCell : CharacterBody2D
         };
     }
 
+    private void SetupGranuleCanvas()
+    {
+        _granuleCanvas = new GranuleCanvas { Name = "Granules", ZIndex = 0 };
+        AddChild(_granuleCanvas);
+
+        int count = 24;
+        for (int i = 0; i < count; i++)
+        {
+            float angle = (float)GD.RandRange(0.0, Mathf.Tau);
+            float dist = (float)GD.RandRange(6.0, (BaseRadius > 0 ? BaseRadius : 48.0f) * 0.65f);
+            Vector2 basePos = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * dist;
+
+            Color col;
+            float size;
+            if (i < 12)
+            {
+                col = new Color(0.24f, 0.10f, 0.38f, 0.55f);
+                size = (float)GD.RandRange(2.0, 3.5);
+            }
+            else if (i < 19)
+            {
+                col = new Color(0.42f, 0.55f, 0.70f, 0.45f);
+                size = (float)GD.RandRange(1.6, 2.6);
+            }
+            else
+            {
+                col = new Color(0.80f, 0.90f, 1.0f, 0.40f);
+                size = (float)GD.RandRange(1.8, 3.0);
+            }
+
+            _granuleCanvas.Granules.Add(new GranuleCanvas.Granule
+            {
+                BasePos = basePos,
+                CurrentOffset = Vector2.Zero,
+                Velocity = Vector2.Zero,
+                Size = size,
+                GranuleColor = col,
+                BrownianPhase = (float)GD.RandRange(0.0, 100.0),
+                LagSensitivity = (float)GD.RandRange(0.04, 0.09)
+            });
+        }
+    }
+
     public virtual void SetupNucleusShape()
     {
-        var nPts = new Vector2[16];
-        float nRadius = 16.0f;
-        for (int i = 0; i < 16; i++)
+        var nPts = new Vector2[32];
+        float nRadius = 18.0f;
+        for (int i = 0; i < 32; i++)
         {
-            float a = i * (Mathf.Tau / 16.0f);
+            float a = i * (Mathf.Tau / 32.0f);
             nPts[i] = new Vector2(Mathf.Cos(a) * nRadius, Mathf.Sin(a) * nRadius);
         }
         if (Nucleus != null)
         {
             Nucleus.Polygon = nPts;
-            Nucleus.Color = new Color(0.48f, 0.18f, 0.68f, 0.88f);
+            var uvs = new Vector2[32];
+            for (int i = 0; i < 32; i++)
+            {
+                uvs[i] = (nPts[i] / (nRadius * 2.0f)) + new Vector2(0.5f, 0.5f);
+            }
+            Nucleus.UV = uvs;
+            Nucleus.ZIndex = 0;
+
+            var shader = GD.Load<Shader>("res://shaders/nucleus_sphere.gdshader");
+            if (shader != null)
+            {
+                var nMat = new ShaderMaterial { Shader = shader };
+                nMat.SetShaderParameter("radius", nRadius);
+                nMat.SetShaderParameter("core_color", Nucleus.Color);
+                Color edgeCol = new Color(Nucleus.Color.R * 0.28f, Nucleus.Color.G * 0.15f, Nucleus.Color.B * 0.32f, 1.0f);
+                nMat.SetShaderParameter("edge_color", edgeCol);
+                Color highlightCol = new Color(Mathf.Min(1.0f, Nucleus.Color.R * 1.45f), Mathf.Min(1.0f, Nucleus.Color.G * 1.45f), Mathf.Min(1.0f, Nucleus.Color.B * 1.45f), 1.0f);
+                nMat.SetShaderParameter("highlight_color", highlightCol);
+                Nucleus.Material = nMat;
+            }
+        }
+        if (Cytoplasm != null)
+        {
+            Cytoplasm.ZIndex = 1;
+        }
+        if (Membrane != null)
+        {
+            Membrane.ZIndex = 2;
         }
     }
 
@@ -318,6 +423,7 @@ public partial class BaseCell : CharacterBody2D
         Vector2 vel = Velocity;
         Vector2 moveDir = vel.Length() > 20.0f ? vel.Normalized() : Vector2.Zero;
 
+        var rawRadii = new float[VertexCount];
         for (int i = 0; i < VertexCount; i++)
         {
             float angle = i * angleStep;
@@ -339,10 +445,32 @@ public partial class BaseCell : CharacterBody2D
             }
 
             float r = curR + ((nVal1 + nVal2) * CurrentDeformationMag) + forwardBias;
-            points[i] = dir * Mathf.Max(12.0f, r);
+            // Biological lipid bilayer clamp: never collapse into negative spikes
+            rawRadii[i] = Mathf.Max(curR * 0.65f, r);
         }
 
-        var smoothPoints = SmoothClosedPolygon(points, 2);
+        // Biological Surface Tension Filter (Laplacian Relaxation)
+        // Lipid bilayer surface tension prevents acute inflections / sharp V-notches
+        var relaxedRadii = new float[VertexCount];
+        for (int pass = 0; pass < 2; pass++)
+        {
+            for (int i = 0; i < VertexCount; i++)
+            {
+                int prev = (i - 1 + VertexCount) % VertexCount;
+                int next = (i + 1) % VertexCount;
+                relaxedRadii[i] = 0.25f * rawRadii[prev] + 0.50f * rawRadii[i] + 0.25f * rawRadii[next];
+            }
+            Array.Copy(relaxedRadii, rawRadii, VertexCount);
+        }
+
+        for (int i = 0; i < VertexCount; i++)
+        {
+            float angle = i * angleStep;
+            var dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+            points[i] = dir * rawRadii[i];
+        }
+
+        var smoothPoints = SmoothClosedPolygon(points, SmoothSubdivisions);
 
         if (Cytoplasm != null)
         {
@@ -374,6 +502,45 @@ public partial class BaseCell : CharacterBody2D
         }
 
         UpdateNucleus(delta);
+        UpdateGranules(delta);
+    }
+
+    private void UpdateGranules(float delta)
+    {
+        if (_granuleCanvas == null || _granuleCanvas.Granules.Count == 0)
+            return;
+
+        Vector2 vel = Velocity;
+        float maxOffset = CurrentRadius * 0.35f;
+        float expansion = CurrentRadius / BaseRadius;
+
+        for (int i = 0; i < _granuleCanvas.Granules.Count; i++)
+        {
+            var g = _granuleCanvas.Granules[i];
+            g.BrownianPhase += delta * 2.2f;
+
+            // Brownian wander inside the cytoplasm
+            Vector2 brownian = new Vector2(
+                Mathf.Sin(g.BrownianPhase + i * 1.7f),
+                Mathf.Cos(g.BrownianPhase * 1.4f + i * 2.3f)
+            ) * (2.8f * expansion);
+
+            // Flow lag behind cell velocity (protoplasmic cyclosis)
+            Vector2 targetLag = -vel * g.LagSensitivity + brownian;
+            if (targetLag.Length() > maxOffset)
+            {
+                targetLag = targetLag.Normalized() * maxOffset;
+            }
+
+            // Damped spring physics
+            Vector2 accel = (targetLag - g.CurrentOffset) * 24.0f - g.Velocity * 7.0f;
+            g.Velocity += accel * delta;
+            g.CurrentOffset += g.Velocity * delta;
+
+            _granuleCanvas.Granules[i] = g;
+        }
+
+        _granuleCanvas.QueueRedraw();
     }
 
     /// <summary>
@@ -438,6 +605,10 @@ public partial class BaseCell : CharacterBody2D
 
         float nScale = 1.0f + (Satiety / Mathf.Max(1.0f, MaxSatiety)) * 0.8f;
         Nucleus.Scale = new Vector2(nScale, nScale);
+        if (Nucleus.Material is ShaderMaterial nMat)
+        {
+            nMat.SetShaderParameter("radius", 18.0f * nScale);
+        }
     }
 
     private void OnEngulfAreaEntered(Area2D area)

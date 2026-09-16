@@ -18,6 +18,9 @@ collision_layer = 1
 collision_mask = 4
 script = ExtResource("1_ctl")
 
+[node name="Nucleus" type="Polygon2D" parent="."]
+color = Color(0.48, 0.06, 0.16, 0.92)
+
 [node name="Cytoplasm" type="Polygon2D" parent="."]
 color = Color(0.85, 0.18, 0.32, 0.65)
 
@@ -27,9 +30,6 @@ default_color = Color(1, 0.35, 0.5, 0.95)
 joint_mode = 2
 begin_cap_mode = 2
 end_cap_mode = 2
-
-[node name="Nucleus" type="Polygon2D" parent="."]
-color = Color(0.48, 0.06, 0.16, 0.92)
 
 [node name="WallCollider" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_wall")
