@@ -2,12 +2,14 @@ class_name MainMenu
 extends Control
 
 const GM = preload("res://scripts/core/game_manager.gd")
+const AM = preload("res://scripts/core/achievement_manager.gd")
 
 ## Views
 @onready var title_view: Control = $TitleView
 @onready var class_view: Control = $ClassView
 @onready var map_view: Control = $MapView
 @onready var codex_modal: PanelContainer = $CodexModal
+@onready var settings_modal: PanelContainer = $SettingsModal
 
 ## Language Switcher
 @onready var lang_btn: Button = $LangButton
@@ -17,6 +19,7 @@ const GM = preload("res://scripts/core/game_manager.gd")
 @onready var subtitle_lbl: Label = $TitleView/SubtitleLabel
 @onready var start_btn: Button = $TitleView/VBox/StartButton
 @onready var codex_btn: Button = $TitleView/VBox/CodexButton
+@onready var settings_btn: Button = $TitleView/VBox/SettingsButton
 @onready var quit_btn: Button = $TitleView/VBox/QuitButton
 
 ## Class View Controls
@@ -47,6 +50,7 @@ var active_map_key: String = "acute_wound"
 func _ready() -> void:
 	_switch_to_view(title_view)
 	codex_modal.visible = false
+	settings_modal.visible = false
 
 	# Language toggle
 	lang_btn.pressed.connect(_on_lang_toggle_pressed)
@@ -55,6 +59,7 @@ func _ready() -> void:
 	# Title signals
 	start_btn.pressed.connect(_on_start_pressed)
 	codex_btn.pressed.connect(func(): codex_modal.open_codex(0))
+	settings_btn.pressed.connect(func(): settings_modal.open_settings(0))
 	quit_btn.pressed.connect(func(): get_tree().quit())
 
 	# Class signals
@@ -85,6 +90,7 @@ func _update_all_texts() -> void:
 	subtitle_lbl.text = tr("SUBTITLE_MAIN")
 	start_btn.text = tr("BTN_START")
 	codex_btn.text = tr("BTN_CODEX")
+	settings_btn.text = tr("BTN_SETTINGS")
 	quit_btn.text = tr("BTN_QUIT")
 
 	# Class View
@@ -139,8 +145,9 @@ func _select_class(key: String) -> void:
 		class_confirm_btn.disabled = false
 		class_confirm_btn.text = tr("BTN_CONFIRM_CLASS")
 	else:
-		class_status_lbl.text = tr("STATUS_LOCKED")
-		class_status_lbl.modulate = Color(0.9, 0.6, 0.2)
+		var req_text = AM.get_cell_unlock_requirement_text(key)
+		class_status_lbl.text = req_text
+		class_status_lbl.modulate = Color(1.0, 0.68, 0.25)
 		class_confirm_btn.disabled = true
 		class_confirm_btn.text = tr("BTN_CONFIRM_CLASS_LOCKED")
 

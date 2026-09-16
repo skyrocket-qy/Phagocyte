@@ -65,42 +65,50 @@ theme_override_font_sizes/font_size = 20
 text = "🔬 微观档案馆与免疫手册"
 
 [node name="CloseButton" type="Button" parent="VBox/Header"]
-custom_minimum_size = Vector2(100, 32)
+custom_minimum_size = Vector2(36, 32)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-text = "关闭档案"
+theme_override_font_sizes/font_size = 16
+text = "✕"
 
 [node name="TabBar" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="SkillsTab" type="Button" parent="VBox/TabBar"]
-custom_minimum_size = Vector2(170, 36)
+custom_minimum_size = Vector2(150, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
 text = "⚡ 技能与生化因子"
 
 [node name="CellsTab" type="Button" parent="VBox/TabBar"]
-custom_minimum_size = Vector2(160, 36)
+custom_minimum_size = Vector2(150, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
 text = "🛡️ 免疫防御细胞"
 
 [node name="PathogensTab" type="Button" parent="VBox/TabBar"]
-custom_minimum_size = Vector2(160, 36)
+custom_minimum_size = Vector2(150, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
 text = "🦠 病原体图鉴"
 
 [node name="MapsTab" type="Button" parent="VBox/TabBar"]
-custom_minimum_size = Vector2(160, 36)
+custom_minimum_size = Vector2(150, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
 text = "🌐 病理战场"
+
+[node name="AchievementsTab" type="Button" parent="VBox/TabBar"]
+custom_minimum_size = Vector2(150, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "🎖️ 成就系统"
 
 [node name="HBox" type="HBoxContainer" parent="VBox"]
 layout_mode = 2

@@ -2,6 +2,7 @@ class_name Main
 extends Node2D
 
 const GM = preload("res://scripts/core/game_manager.gd")
+const AM = preload("res://scripts/core/achievement_manager.gd")
 
 @export var staph_scene: PackedScene = preload("res://scenes/enemies/staph_enemy.tscn")
 @export var max_pathogens: int = 50
@@ -37,12 +38,43 @@ func _ready() -> void:
 	if hud.has_method("connect_player"):
 		hud.connect_player(player)
 
+	_connect_achievement_events()
+
 	# Read map configuration from GM
 	map_id = GM.selected_map
 	_configure_map_environment()
 
 	# Initial pathogen wave
 	_spawn_initial_wave(35)
+
+func _connect_achievement_events() -> void:
+	if player.has_signal("pathogen_digested"):
+		player.pathogen_digested.connect(func(_p, _atp):
+			AM.record_event("pathogen_digested", player.digested_count)
+		)
+	if player.has_signal("burst_state_changed"):
+		player.burst_state_changed.connect(func(is_active, _t, _m):
+			if is_active:
+				AM.record_event("burst_activated")
+		)
+	if player.has_signal("level_up"):
+		player.level_up.connect(func(lvl):
+			AM.record_event("level_up", lvl)
+		)
+	if player.has_signal("stats_changed"):
+		player.stats_changed.connect(func(_h, _mh, _s, _ms, rr):
+			AM.record_event("radius_ratio", rr)
+		)
+
+	var sm = player.get_node_or_null("SkillManager")
+	if sm and sm.has_signal("skills_changed"):
+		sm.skills_changed.connect(func():
+			var count = 0
+			for s in sm.active_slots:
+				if s != null:
+					count += 1
+			AM.record_event("active_skills_count", count)
+		)
 
 func _configure_map_environment() -> void:
 	if map_id == "alveolar_space":
@@ -55,6 +87,7 @@ func _configure_map_environment() -> void:
 
 func _physics_process(delta: float) -> void:
 	environment_time += delta
+	AM.record_event("survival_time", environment_time)
 
 	# Map mechanics
 	_process_map_mechanics(delta)

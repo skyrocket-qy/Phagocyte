@@ -2,6 +2,7 @@ class_name CodexModal
 extends PanelContainer
 
 const GM = preload("res://scripts/core/game_manager.gd")
+const AM = preload("res://scripts/core/achievement_manager.gd")
 
 signal closed()
 
@@ -13,6 +14,7 @@ signal closed()
 @onready var tab_cells_btn: Button = $VBox/TabBar/CellsTab
 @onready var tab_pathogens_btn: Button = $VBox/TabBar/PathogensTab
 @onready var tab_maps_btn: Button = $VBox/TabBar/MapsTab
+@onready var tab_achievements_btn: Button = $VBox/TabBar/AchievementsTab
 
 ## Content Panels
 @onready var item_list: VBoxContainer = $VBox/HBox/Scroll/ItemList
@@ -35,6 +37,7 @@ func _ready() -> void:
 	tab_cells_btn.pressed.connect(func(): switch_tab(1))
 	tab_pathogens_btn.pressed.connect(func(): switch_tab(2))
 	tab_maps_btn.pressed.connect(func(): switch_tab(3))
+	tab_achievements_btn.pressed.connect(func(): switch_tab(4))
 
 	GM.add_language_listener(_on_language_changed)
 	update_localized_texts()
@@ -55,11 +58,12 @@ func _on_language_changed(_locale: String) -> void:
 
 func update_localized_texts() -> void:
 	title_label.text = tr("CODEX_TITLE")
-	close_btn.text = tr("BTN_CLOSE")
+	close_btn.text = "✕"
 	tab_skills_btn.text = tr("CODEX_TAB_SKILLS")
 	tab_cells_btn.text = tr("CODEX_TAB_CELLS")
 	tab_pathogens_btn.text = tr("CODEX_TAB_PATHOGENS")
 	tab_maps_btn.text = tr("CODEX_TAB_MAPS")
+	tab_achievements_btn.text = tr("CODEX_TAB_ACHIEVEMENTS")
 
 	_render_current_tab()
 
@@ -71,6 +75,7 @@ func switch_tab(tab_idx: int) -> void:
 	tab_cells_btn.modulate = Color(1, 1, 1) if tab_idx == 1 else Color(0.7, 0.7, 0.7)
 	tab_pathogens_btn.modulate = Color(1, 1, 1) if tab_idx == 2 else Color(0.7, 0.7, 0.7)
 	tab_maps_btn.modulate = Color(1, 1, 1) if tab_idx == 3 else Color(0.7, 0.7, 0.7)
+	tab_achievements_btn.modulate = Color(1, 1, 1) if tab_idx == 4 else Color(0.7, 0.7, 0.7)
 
 	active_item_key = ""
 	_render_current_tab()
@@ -89,6 +94,8 @@ func _render_current_tab() -> void:
 			_render_pathogens_tab()
 		3:
 			_render_maps_tab()
+		4:
+			_render_achievements_tab()
 
 func _render_skills_tab() -> void:
 	var first_key: String = ""
@@ -152,7 +159,10 @@ func _select_cell(key: String) -> void:
 	detail_badge.modulate = Color(0.3, 1.0, 0.4) if d["unlocked"] else Color(0.9, 0.6, 0.2)
 	detail_stats.text = tr("LABEL_ROLE") + d["role"]
 
-	detail_desc.text = tr("CODEX_HEADER_TRAIT") + "\n" + d["trait"]
+	if d["unlocked"]:
+		detail_desc.text = tr("CODEX_HEADER_TRAIT") + "\n" + d["trait"]
+	else:
+		detail_desc.text = AM.get_cell_unlock_requirement_text(key) + "\n\n" + tr("CODEX_HEADER_TRAIT") + "\n" + d["trait"]
 	detail_bio.text = tr("CODEX_HEADER_PASSIVE") + "\n" + d["passive"] + "\n\n" + tr("CODEX_HEADER_BURST") + "\n" + d["burst"]
 
 func _render_pathogens_tab() -> void:
@@ -176,7 +186,8 @@ func _select_pathogen(key: String) -> void:
 	active_item_key = key
 	var d = GM.get_pathogen_info(key)
 	detail_title.text = d["icon"] + " " + d["name"]
-	detail_badge.text = "[ " + (tr("CODEX_THREAT_LV") % d["danger_level"]) + " ]"
+	var danger_lv = d.get("danger_level", d.get("threat_level", "I"))
+	detail_badge.text = "[ " + (tr("CODEX_THREAT_LV") % danger_lv) + " ]"
 	detail_badge.modulate = Color(1.0, 0.4, 0.4)
 	detail_stats.text = d["trait"]
 
@@ -210,3 +221,44 @@ func _select_map(key: String) -> void:
 
 	detail_desc.text = tr("CODEX_HEADER_MECH") + "\n" + d["mechanic"]
 	detail_bio.text = tr("CODEX_HEADER_THREAT") + "\n" + d["threat"]
+
+func _render_achievements_tab() -> void:
+	var ach_list = AM.get_all_achievements()
+	var first_id = ""
+	for ach in ach_list:
+		if first_id == "":
+			first_id = ach["id"]
+		var btn = Button.new()
+		btn.custom_minimum_size = Vector2(230, 42)
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		var status_icon = " ✅ " if ach["unlocked"] else " 🔒 "
+		btn.text = status_icon + ach["icon"] + " " + ach["title"]
+		var aid = ach["id"]
+		btn.pressed.connect(func(): _select_achievement(aid))
+		item_list.add_child(btn)
+
+	var target = active_item_key if active_item_key != "" and AM.ACHIEVEMENTS.has(active_item_key) else first_id
+	if target != "":
+		_select_achievement(target)
+
+func _select_achievement(ach_id: String) -> void:
+	active_item_key = ach_id
+	var d = AM.get_achievement_info(ach_id)
+	detail_title.text = d["icon"] + " " + d["title"]
+	detail_badge.text = "[ " + (tr("STATUS_ACH_COMPLETED") if d["unlocked"] else tr("STATUS_ACH_LOCKED")) + " ]"
+	detail_badge.modulate = Color(0.3, 1.0, 0.4) if d["unlocked"] else Color(0.9, 0.6, 0.2)
+
+	var cur_val_str = str(int(d["current_value"])) if d["target_value"] >= 1.0 else "%.1f" % d["current_value"]
+	var target_val_str = str(int(d["target_value"])) if d["target_value"] >= 1.0 else "%.1f" % d["target_value"]
+	detail_stats.text = "%s: %s / %s (%d%%)" % [
+		(tr("STATUS_ACH_COMPLETED") if d["unlocked"] else tr("STATUS_ACH_LOCKED")),
+		cur_val_str,
+		target_val_str,
+		int(d["progress_ratio"] * 100)
+	]
+
+	detail_desc.text = tr("LABEL_UNLOCK_REQ") + "\n" + d["desc"]
+	if d["reward"] != "":
+		detail_bio.text = tr("LABEL_REWARD") + "\n" + d["reward"]
+	else:
+		detail_bio.text = ""

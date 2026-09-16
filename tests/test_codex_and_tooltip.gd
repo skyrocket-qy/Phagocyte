@@ -175,13 +175,21 @@ func _process(_delta: float) -> bool:
 		return true
 	print("[PASS] Codex Pathological Stages tab displays %d maps." % item_list.get_child_count())
 
+	# Switch to Tab 4 (Achievements)
+	codex_modal.switch_tab(4)
+	if item_list.get_child_count() < 7:
+		printerr("[FAIL] Codex Achievements tab items count < 7, got: " + str(item_list.get_child_count()))
+		quit(1)
+		return true
+	print("[PASS] Codex Achievements tab displays %d achievements." % item_list.get_child_count())
+
 	# Close Codex
 	codex_modal.close_codex()
 	if codex_modal.visible:
 		printerr("[FAIL] CodexModal still visible after close_codex()")
 		quit(1)
 		return true
-	print("[PASS] CodexModal open/close and 4-tab switching verified.")
+	print("[PASS] CodexModal open/close and 5-tab switching verified.")
 
 	# 4. Verify Pause Menu Manual Button
 	hud.toggle_pause()

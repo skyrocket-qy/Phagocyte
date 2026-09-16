@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/codex_modal.tscn" id="2_codex"]
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_modal.tscn" id="3_settings"]
 
 [sub_resource type="Curve" id="Curve_menu_ambient"]
 _data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.5, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -177,6 +178,13 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 16
 text = "🔬 微观档案馆 (Codex)"
+
+[node name="SettingsButton" type="Button" parent="TitleView/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 16
+text = "⚙️ 系統設定"
 
 [node name="QuitButton" type="Button" parent="TitleView/VBox"]
 custom_minimum_size = Vector2(0, 40)
@@ -410,6 +418,9 @@ theme_override_font_sizes/font_size = 16
 text = "🚀 开始出击"
 
 [node name="CodexModal" parent="." instance=ExtResource("2_codex")]
+visible = false
+
+[node name="SettingsModal" parent="." instance=ExtResource("3_settings")]
 visible = false
 
 [node name="LangButton" type="Button" parent="."]

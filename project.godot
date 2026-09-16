@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameManager="*res://scripts/core/game_manager.gd"
+AchievementManager="*res://scripts/core/achievement_manager.gd"
+SettingsManager="*res://scripts/core/settings_manager.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]

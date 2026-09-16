@@ -2,8 +2,15 @@ class_name HUD
 extends CanvasLayer
 
 const GM = preload("res://scripts/core/game_manager.gd")
+const AM = preload("res://scripts/core/achievement_manager.gd")
 const UpgradeModalClass = preload("res://scripts/ui/upgrade_modal.gd")
 const UpgradeModalScene = preload("res://scenes/ui/upgrade_modal.tscn")
+
+var achievement_banner: PanelContainer = null
+var ach_banner_title: Label = null
+var ach_banner_desc: Label = null
+var ach_banner_icon: Label = null
+var ach_tween: Tween = null
 
 @onready var title_label: Label = $MarginContainer/PanelContainer/VBoxContainer/TitleLabel
 @onready var map_label: Label = $MarginContainer/PanelContainer/VBoxContainer/MapLabel
@@ -13,7 +20,6 @@ const UpgradeModalScene = preload("res://scenes/ui/upgrade_modal.tscn")
 @onready var atp_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPLabel
 @onready var size_label: Label = $MarginContainer/PanelContainer/VBoxContainer/SizeLabel
 @onready var count_label: Label = $MarginContainer/PanelContainer/VBoxContainer/CountLabel
-@onready var help_label: Label = $HelpContainer/HelpPanel/HelpLabel
 
 @onready var burst_panel: PanelContainer = $BurstContainer
 @onready var burst_label: Label = $BurstContainer/VBox/BurstLabel
@@ -22,14 +28,16 @@ const UpgradeModalScene = preload("res://scenes/ui/upgrade_modal.tscn")
 @onready var pause_modal: PanelContainer = $PauseModal
 @onready var pause_title: Label = $PauseModal/VBox/Title
 @onready var resume_btn: Button = $PauseModal/VBox/ResumeButton
+@onready var settings_btn: Button = $PauseModal/VBox/SettingsButton
 @onready var manual_btn: Button = $PauseModal/VBox/ManualButton
 @onready var restart_btn: Button = $PauseModal/VBox/RestartButton
 @onready var menu_btn: Button = $PauseModal/VBox/MenuButton
 @onready var codex_modal = $CodexModal
+@onready var settings_modal = $SettingsModal
 
 ## Skill Bar & Tooltip Nodes
 @onready var skill_title_lbl: Label = $SkillContainer/VBox/TitleLabel
-@onready var slots_container: HBoxContainer = $SkillContainer/VBox/SlotsContainer
+@onready var slots_container: GridContainer = $SkillContainer/VBox/SlotsContainer
 
 @onready var skill_tooltip: PanelContainer = $SkillTooltip
 @onready var tooltip_icon: Label = $SkillTooltip/VBox/HeaderHBox/TooltipIcon
@@ -67,6 +75,8 @@ func _ready() -> void:
 
 	if not resume_btn.pressed.is_connected(resume_game):
 		resume_btn.pressed.connect(resume_game)
+	if settings_btn and not settings_btn.pressed.is_connected(_on_settings_pressed):
+		settings_btn.pressed.connect(_on_settings_pressed)
 	if not manual_btn.pressed.is_connected(_on_manual_pressed):
 		manual_btn.pressed.connect(_on_manual_pressed)
 	if not restart_btn.pressed.is_connected(_on_restart_pressed):
@@ -75,11 +85,14 @@ func _ready() -> void:
 		menu_btn.pressed.connect(_on_menu_pressed)
 
 	_setup_slot_hover_signals()
+	_setup_achievement_banner()
 
+	AM.add_unlock_listener(_on_achievement_unlocked)
 	GM.add_language_listener(_on_language_changed)
 	_update_localized_texts()
 
 func _exit_tree() -> void:
+	AM.remove_unlock_listener(_on_achievement_unlocked)
 	GM.remove_language_listener(_on_language_changed)
 
 func _process(_delta: float) -> void:
@@ -99,14 +112,15 @@ func _update_localized_texts() -> void:
 	atp_label.text = tr("HUD_ATP") % [int((last_satiety / max(1.0, last_max_satiety)) * 100.0)]
 	size_label.text = tr("HUD_SIZE") % last_radius_ratio
 	count_label.text = tr("HUD_DIGESTED") % last_digested_count
-	help_label.text = tr("HUD_GUIDE")
-	skill_title_lbl.text = tr("SKILL_BAR_TITLE")
+	skill_title_lbl.text = tr("SKILL_BAR_DUAL_TITLE")
 
 	if burst_panel.visible:
 		burst_label.text = tr("HUD_BURST_ALERT") % last_burst_time_left
 
 	pause_title.text = tr("PAUSE_TITLE")
 	resume_btn.text = tr("PAUSE_RESUME")
+	if settings_btn:
+		settings_btn.text = tr("BTN_SETTINGS")
 	manual_btn.text = tr("PAUSE_MANUAL")
 	restart_btn.text = tr("PAUSE_RESTART")
 	menu_btn.text = tr("PAUSE_MENU")
@@ -140,23 +154,31 @@ func _update_skill_slots() -> void:
 		var cd_overlay = slot_card.get_node_or_null("CooldownBar")
 
 		if data["id"] != "":
-			# Active or Innate Skill
 			if icon_lbl:
 				icon_lbl.text = data["icon"]
+				icon_lbl.modulate = Color(1, 1, 1, 1)
 			if badge_lbl:
-				if data["is_innate"]:
+				if data.get("is_innate", false):
 					badge_lbl.text = tr("SKILL_INNATE_TAG")
 					badge_lbl.modulate = Color(0.4, 0.95, 0.8)
+				elif data.get("is_passive", false) or i >= 5:
+					badge_lbl.text = tr("SKILL_LV") % data["level"]
+					badge_lbl.modulate = Color(0.8, 0.6, 1.0)
 				else:
 					badge_lbl.text = tr("SKILL_LV") % data["level"]
 					badge_lbl.modulate = Color(1.0, 0.9, 0.3)
 			if cd_overlay:
-				cd_overlay.visible = data["cooldown_ratio"] > 0.0
-				cd_overlay.value = data["cooldown_ratio"]
+				var has_cd = (not data.get("is_passive", false)) and data.get("cooldown_ratio", 0.0) > 0.0
+				cd_overlay.visible = has_cd
+				cd_overlay.value = data.get("cooldown_ratio", 0.0)
 		else:
 			# Empty Slot
 			if icon_lbl:
 				icon_lbl.text = "+"
+				if i >= 5:
+					icon_lbl.modulate = Color(0.65, 0.55, 0.8, 0.5)
+				else:
+					icon_lbl.modulate = Color(0.4, 0.5, 0.6, 0.6)
 			if badge_lbl:
 				badge_lbl.text = ""
 			if cd_overlay:
@@ -170,6 +192,10 @@ func _on_menu_pressed() -> void:
 
 func _on_manual_pressed() -> void:
 	codex_modal.open_codex(0)
+
+func _on_settings_pressed() -> void:
+	if settings_modal and settings_modal.has_method("open_settings"):
+		settings_modal.open_settings(0)
 
 func _setup_slot_hover_signals() -> void:
 	var slot_children = slots_container.get_children()
@@ -242,15 +268,23 @@ func _refresh_tooltip_content(slot_idx: int) -> void:
 	else:
 		tooltip_icon.text = "+"
 		tooltip_title.text = tr("TOOLTIP_EMPTY_TITLE")
-		tooltip_badge.text = "[ " + tr("SKILL_EMPTY") + " ]"
-		tooltip_badge.modulate = Color(0.6, 0.6, 0.6)
-		tooltip_stats.text = tr("SKILL_BAR_TITLE")
+		if slot_idx >= 5:
+			tooltip_badge.text = "[ " + tr("TOOLTIP_TAG_PASSIVE") + " ]"
+			tooltip_badge.modulate = Color(0.75, 0.55, 1.0)
+			tooltip_stats.text = "🧬 被动特质槽 (Passive Slot)"
+		else:
+			tooltip_badge.text = "[ " + tr("SKILL_EMPTY") + " ]"
+			tooltip_badge.modulate = Color(0.6, 0.6, 0.6)
+			tooltip_stats.text = tr("SKILL_BAR_TITLE")
 		tooltip_desc.text = tr("TOOLTIP_EMPTY_DESC")
 		tooltip_bio.text = ""
 		tooltip_bio.visible = false
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_pause") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
+		if settings_modal and settings_modal.visible:
+			settings_modal.close_settings()
+			return
 		if codex_modal.visible:
 			codex_modal.close_codex()
 			return
@@ -262,11 +296,15 @@ func toggle_pause() -> void:
 	pause_modal.visible = paused
 	if not paused:
 		codex_modal.visible = false
+		if settings_modal:
+			settings_modal.visible = false
 
 func resume_game() -> void:
 	get_tree().paused = false
 	pause_modal.visible = false
 	codex_modal.visible = false
+	if settings_modal:
+		settings_modal.visible = false
 
 func connect_player(player: Node2D) -> void:
 	player_ref = player
@@ -313,3 +351,87 @@ func _on_pathogen_digested(_enemy: Node2D, _atp: float) -> void:
 func _on_player_level_up(_new_level: int) -> void:
 	if upgrade_modal and is_instance_valid(upgrade_modal):
 		upgrade_modal.open_upgrade_modal(player_ref)
+
+func _setup_achievement_banner() -> void:
+	achievement_banner = PanelContainer.new()
+	achievement_banner.name = "AchievementBanner"
+	achievement_banner.visible = false
+	achievement_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	achievement_banner.custom_minimum_size = Vector2(400, 60)
+	achievement_banner.anchor_left = 0.5
+	achievement_banner.anchor_right = 0.5
+	achievement_banner.anchor_top = 0.0
+	achievement_banner.anchor_bottom = 0.0
+	achievement_banner.offset_left = -200.0
+	achievement_banner.offset_right = 200.0
+	achievement_banner.offset_top = 18.0
+	achievement_banner.offset_bottom = 78.0
+
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.07, 0.09, 0.15, 0.95)
+	style.border_color = Color(1.0, 0.84, 0.28, 0.95)
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(8)
+	style.content_margin_left = 16.0
+	style.content_margin_right = 16.0
+	style.content_margin_top = 8.0
+	style.content_margin_bottom = 8.0
+	achievement_banner.add_theme_stylebox_override("panel", style)
+
+	var hbox = HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 14)
+	achievement_banner.add_child(hbox)
+
+	ach_banner_icon = Label.new()
+	ach_banner_icon.text = "🏆"
+	ach_banner_icon.add_theme_font_size_override("font_size", 28)
+	hbox.add_child(ach_banner_icon)
+
+	var vbox = VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_child(vbox)
+
+	ach_banner_title = Label.new()
+	ach_banner_title.text = tr("TOAST_ACH_UNLOCKED")
+	ach_banner_title.add_theme_font_size_override("font_size", 15)
+	ach_banner_title.modulate = Color(1.0, 0.9, 0.3)
+	vbox.add_child(ach_banner_title)
+
+	ach_banner_desc = Label.new()
+	ach_banner_desc.text = ""
+	ach_banner_desc.add_theme_font_size_override("font_size", 12)
+	ach_banner_desc.modulate = Color(0.9, 0.95, 1.0)
+	vbox.add_child(ach_banner_desc)
+
+	add_child(achievement_banner)
+
+func _on_achievement_unlocked(_ach_id: String, ach_info: Dictionary) -> void:
+	if achievement_banner == null:
+		return
+
+	ach_banner_icon.text = ach_info.get("icon", "🏆")
+	ach_banner_title.text = tr("TOAST_ACH_UNLOCKED") + " " + ach_info.get("title", "")
+
+	var sub_text = ach_info.get("desc", "")
+	if ach_info.get("reward_cell", "") != "":
+		var cell_info = GM.get_class_info(ach_info["reward_cell"])
+		var c_name = cell_info.get("name", ach_info["reward_cell"])
+		sub_text = tr("TOAST_CELL_UNLOCKED") % c_name
+	elif ach_info.get("reward", "") != "":
+		sub_text = ach_info["reward"]
+	ach_banner_desc.text = sub_text
+
+	achievement_banner.visible = true
+	achievement_banner.modulate.a = 0.0
+	achievement_banner.position.y = 0.0
+
+	if ach_tween and ach_tween.is_valid():
+		ach_tween.kill()
+	ach_tween = create_tween()
+	ach_tween.set_parallel(true)
+	ach_tween.tween_property(achievement_banner, "modulate:a", 1.0, 0.35)
+	ach_tween.tween_property(achievement_banner, "position:y", 18.0, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	ach_tween.chain().tween_interval(3.2)
+	ach_tween.chain().tween_property(achievement_banner, "modulate:a", 0.0, 0.5)
+	ach_tween.chain().tween_callback(func(): achievement_banner.visible = false)
+

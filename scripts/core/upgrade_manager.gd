@@ -15,13 +15,15 @@ const PassiveMitochondriaClass = preload("res://scripts/skills/passive_mitochond
 const PassiveOpsoninClass = preload("res://scripts/skills/passive_opsonin_affinity.gd")
 const PassiveChemokineClass = preload("res://scripts/skills/passive_chemokine_receptors.gd")
 
+const GM = preload("res://scripts/core/game_manager.gd")
+
 ## All catalog active weapon classes
 static var ACTIVE_CATALOG: Array[Dictionary] = [
-	{ "id": "ros_torrent", "name": "SKILL_ROS_NAME", "desc": "SKILL_ROS_DESC", "icon": "💨", "class": ROSTorrentClass },
-	{ "id": "perforin_lance", "name": "SKILL_PERFORIN_NAME", "desc": "SKILL_PERFORIN_DESC", "icon": "🗡️", "class": PerforinLanceClass },
-	{ "id": "complement_cascade", "name": "SKILL_COMPLEMENT_NAME", "desc": "SKILL_COMPLEMENT_DESC", "icon": "💥", "class": ComplementCascadeClass },
-	{ "id": "antibody_salvo", "name": "SKILL_ANTIBODY_NAME", "desc": "SKILL_ANTIBODY_DESC", "icon": "🏹", "class": AntibodySalvoClass },
-	{ "id": "pseudopod_lunge", "name": "SKILL_LUNGE_NAME", "desc": "SKILL_LUNGE_DESC", "icon": "🥊", "class": PseudopodLungeClass }
+	{ "id": "ros_torrent", "name": "SKILL_ROS_NAME", "desc": "SKILL_ROS_DESC", "icon": "💨", "class": ROSTorrentClass, "class_id": "macrophage" },
+	{ "id": "perforin_lance", "name": "SKILL_PERFORIN_NAME", "desc": "SKILL_PERFORIN_DESC", "icon": "🗡️", "class": PerforinLanceClass, "class_id": "ctl" },
+	{ "id": "complement_cascade", "name": "SKILL_COMPLEMENT_NAME", "desc": "SKILL_COMPLEMENT_DESC", "icon": "💥", "class": ComplementCascadeClass, "class_id": "neutrophil" },
+	{ "id": "antibody_salvo", "name": "SKILL_ANTIBODY_NAME", "desc": "SKILL_ANTIBODY_DESC", "icon": "🏹", "class": AntibodySalvoClass, "class_id": "b_cell" },
+	{ "id": "pseudopod_lunge", "name": "SKILL_LUNGE_NAME", "desc": "SKILL_LUNGE_DESC", "icon": "🥊", "class": PseudopodLungeClass, "class_id": "dendritic" }
 ]
 
 ## All catalog passive trait classes
@@ -85,6 +87,10 @@ static func generate_choices(player: Node2D, count: int = 3) -> Array[Dictionary
 	# New Actives if slots available (< 5)
 	if active_count < SkillManager.MAX_ACTIVE_SLOTS:
 		for item in ACTIVE_CATALOG:
+			# Check if required cell class is unlocked
+			var req_class = item.get("class_id", "")
+			if req_class != "" and not GM.is_class_unlocked(req_class):
+				continue
 			if not equipped_active_ids.has(item["id"]):
 				candidates.append({
 					"type": "new_active",

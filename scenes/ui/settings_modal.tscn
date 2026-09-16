@@ -1,0 +1,279 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/settings_modal.gd" id="1_settings"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
+bg_color = Color(0.05, 0.08, 0.14, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.65, 0.85, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.08, 0.12, 0.18, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.45, 0.65, 0.7)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 16.0
+content_margin_top = 14.0
+content_margin_right = 16.0
+content_margin_bottom = 14.0
+
+[node name="SettingsModal" type="PanelContainer"]
+z_index = 40
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -240.0
+offset_right = 380.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+script = ExtResource("1_settings")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 1)
+theme_override_font_sizes/font_size = 20
+text = "⚙️ 系統設定"
+
+[node name="CloseButton" type="Button" parent="VBox/Header"]
+custom_minimum_size = Vector2(36, 32)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 16
+text = "✕"
+
+[node name="TabBar" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ControlsTab" type="Button" parent="VBox/TabBar"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "🎮 操作指南"
+
+[node name="AudioTab" type="Button" parent="VBox/TabBar"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "🔊 聲音音效"
+
+[node name="GraphicsTab" type="Button" parent="VBox/TabBar"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "🖥️ 畫面顯示"
+
+[node name="Content" type="PanelContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="ControlsPanel" type="VBoxContainer" parent="VBox/Content"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="HeaderLabel" type="Label" parent="VBox/Content/ControlsPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.35, 1)
+theme_override_font_sizes/font_size = 15
+text = "走位操控與吞噬機制"
+
+[node name="MoveRow" type="HBoxContainer" parent="VBox/Content/ControlsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="KeyLabel" type="Label" parent="VBox/Content/ControlsPanel/MoveRow"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "[W][A][S][D] / ↑↓←→"
+
+[node name="DescLabel" type="Label" parent="VBox/Content/ControlsPanel/MoveRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
+theme_override_font_sizes/font_size = 13
+text = "流體偽足游動走位。"
+
+[node name="PauseRow" type="HBoxContainer" parent="VBox/Content/ControlsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="KeyLabel" type="Label" parent="VBox/Content/ControlsPanel/PauseRow"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ESC]"
+
+[node name="DescLabel" type="Label" parent="VBox/Content/ControlsPanel/PauseRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
+theme_override_font_sizes/font_size = 13
+text = "暫停遊戲 / 開啟系統設定與檔案庫。"
+
+[node name="PhagoRow" type="HBoxContainer" parent="VBox/Content/ControlsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="KeyLabel" type="Label" parent="VBox/Content/ControlsPanel/PhagoRow"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "偽足接觸 (Contact)"
+
+[node name="DescLabel" type="Label" parent="VBox/Content/ControlsPanel/PhagoRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
+theme_override_font_sizes/font_size = 13
+text = "自動包裹吞噬入侵病原體（恢復生命值與飽食能量）。"
+
+[node name="BurstRow" type="HBoxContainer" parent="VBox/Content/ControlsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="KeyLabel" type="Label" parent="VBox/Content/ControlsPanel/BurstRow"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "100% 飽食度"
+
+[node name="DescLabel" type="Label" parent="VBox/Content/ControlsPanel/BurstRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
+theme_override_font_sizes/font_size = 13
+text = "觸發終極爆發形態，大幅加速並釋放強酸腐蝕力場。"
+
+[node name="AudioPanel" type="VBoxContainer" parent="VBox/Content"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="MasterRow" type="HBoxContainer" parent="VBox/Content/AudioPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="VBox/Content/AudioPanel/MasterRow"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "主音量："
+
+[node name="Slider" type="HSlider" parent="VBox/Content/AudioPanel/MasterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+value = 100.0
+
+[node name="ValLabel" type="Label" parent="VBox/Content/AudioPanel/MasterRow"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "100%"
+horizontal_alignment = 2
+
+[node name="SFXRow" type="HBoxContainer" parent="VBox/Content/AudioPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="VBox/Content/AudioPanel/SFXRow"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "音效音量："
+
+[node name="Slider" type="HSlider" parent="VBox/Content/AudioPanel/SFXRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+value = 100.0
+
+[node name="ValLabel" type="Label" parent="VBox/Content/AudioPanel/SFXRow"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "100%"
+horizontal_alignment = 2
+
+[node name="BGMRow" type="HBoxContainer" parent="VBox/Content/AudioPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="VBox/Content/AudioPanel/BGMRow"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "音樂音量："
+
+[node name="Slider" type="HSlider" parent="VBox/Content/AudioPanel/BGMRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+value = 80.0
+
+[node name="ValLabel" type="Label" parent="VBox/Content/AudioPanel/BGMRow"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "80%"
+horizontal_alignment = 2
+
+[node name="GraphicsPanel" type="VBoxContainer" parent="VBox/Content"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="FullscreenCheck" type="CheckBox" parent="VBox/Content/GraphicsPanel"]
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "全螢幕模式"
+
+[node name="VSyncCheck" type="CheckBox" parent="VBox/Content/GraphicsPanel"]
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+button_pressed = true
+text = "垂直同步 (VSync)"

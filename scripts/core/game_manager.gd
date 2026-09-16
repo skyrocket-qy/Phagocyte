@@ -24,14 +24,15 @@ static func get_cell_scene(class_id: String) -> PackedScene:
 	return CELL_SCENES["macrophage"]
 
 ## Class Metadata referencing translation keys
-const CLASS_DATA = {
+static var CLASS_DATA: Dictionary = {
 	"macrophage": {
 		"name_key": "CLASS_MACROPHAGE_NAME",
 		"role_key": "CLASS_MACROPHAGE_ROLE",
 		"trait_key": "CLASS_MACROPHAGE_TRAIT",
 		"passive_key": "CLASS_MACROPHAGE_PASSIVE",
 		"burst_key": "CLASS_MACROPHAGE_BURST",
-		"unlocked": true
+		"unlocked": true,
+		"unlock_achievement": ""
 	},
 	"ctl": {
 		"name_key": "CLASS_CTL_NAME",
@@ -39,7 +40,8 @@ const CLASS_DATA = {
 		"trait_key": "CLASS_CTL_TRAIT",
 		"passive_key": "CLASS_CTL_PASSIVE",
 		"burst_key": "CLASS_CTL_BURST",
-		"unlocked": true
+		"unlocked": false,
+		"unlock_achievement": "ach_engulf_20"
 	},
 	"neutrophil": {
 		"name_key": "CLASS_NEUTROPHIL_NAME",
@@ -47,7 +49,8 @@ const CLASS_DATA = {
 		"trait_key": "CLASS_NEUTROPHIL_TRAIT",
 		"passive_key": "CLASS_NEUTROPHIL_PASSIVE",
 		"burst_key": "CLASS_NEUTROPHIL_BURST",
-		"unlocked": true
+		"unlocked": false,
+		"unlock_achievement": "ach_trigger_burst"
 	},
 	"b_cell": {
 		"name_key": "CLASS_B_CELL_NAME",
@@ -55,7 +58,8 @@ const CLASS_DATA = {
 		"trait_key": "CLASS_B_CELL_TRAIT",
 		"passive_key": "CLASS_B_CELL_PASSIVE",
 		"burst_key": "CLASS_B_CELL_BURST",
-		"unlocked": true
+		"unlocked": false,
+		"unlock_achievement": "ach_reach_level_5"
 	},
 	"dendritic": {
 		"name_key": "CLASS_DENDRITIC_NAME",
@@ -63,7 +67,8 @@ const CLASS_DATA = {
 		"trait_key": "CLASS_DENDRITIC_TRAIT",
 		"passive_key": "CLASS_DENDRITIC_PASSIVE",
 		"burst_key": "CLASS_DENDRITIC_BURST",
-		"unlocked": true
+		"unlocked": false,
+		"unlock_achievement": "ach_survive_180s"
 	}
 }
 
@@ -251,6 +256,19 @@ static func toggle_language() -> String:
 	set_language(next_lang)
 	return next_lang
 
+static func unlock_class(key: String) -> void:
+	if CLASS_DATA.has(key):
+		CLASS_DATA[key]["unlocked"] = true
+
+static func lock_class(key: String) -> void:
+	if CLASS_DATA.has(key) and key != "macrophage":
+		CLASS_DATA[key]["unlocked"] = false
+
+static func is_class_unlocked(key: String) -> bool:
+	if CLASS_DATA.has(key):
+		return CLASS_DATA[key]["unlocked"]
+	return false
+
 static func get_class_info(key: String) -> Dictionary:
 	if not CLASS_DATA.has(key):
 		return {}
@@ -261,7 +279,8 @@ static func get_class_info(key: String) -> Dictionary:
 		"trait": TranslationServer.translate(d["trait_key"]),
 		"passive": TranslationServer.translate(d["passive_key"]),
 		"burst": TranslationServer.translate(d["burst_key"]),
-		"unlocked": d["unlocked"]
+		"unlocked": d["unlocked"],
+		"unlock_achievement": d.get("unlock_achievement", "")
 	}
 
 static func get_map_info(key: String) -> Dictionary:
