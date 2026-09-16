@@ -3,6 +3,8 @@ extends BaseSkill
 
 @export var jet_scene: PackedScene = preload("res://scenes/skills/ros_jet.tscn")
 @export var attack_range: float = 650.0
+@export var base_jet_speed: float = 520.0
+@export var base_jet_lifetime: float = 0.9
 
 func _init() -> void:
 	skill_id = "ros_torrent"
@@ -23,7 +25,21 @@ func trigger() -> void:
 		return
 
 	var target_dir = _find_target_direction()
-	_fire_jet(target_dir)
+	var amount = get_calculated_amount(1)
+	var area_scale = get_calculated_area(1.0)
+	var jet_speed = get_calculated_speed(base_jet_speed)
+	var jet_life = get_calculated_duration(base_jet_lifetime)
+
+	if amount <= 1:
+		_fire_jet(target_dir, area_scale, jet_speed, jet_life)
+	else:
+		# Fire fan spread of jets
+		var spread_angle: float = 0.22 # radians
+		var start_angle: float = -spread_angle * (float(amount - 1) / 2.0)
+		for i in range(amount):
+			var angle = start_angle + i * spread_angle
+			var dir = target_dir.rotated(angle)
+			_fire_jet(dir, area_scale, jet_speed, jet_life)
 
 func _find_target_direction() -> Vector2:
 	var pathogens = host.get_tree().get_nodes_in_group("pathogens")
@@ -45,7 +61,10 @@ func _find_target_direction() -> Vector2:
 		return host.velocity.normalized()
 	return Vector2.RIGHT
 
-func _fire_jet(dir: Vector2) -> void:
+func _fire_jet(dir: Vector2, area_mult: float, speed_val: float, life_val: float) -> void:
 	var jet = jet_scene.instantiate()
 	host.get_parent().add_child(jet)
 	jet.setup(host, host.global_position, dir)
+	jet.speed = speed_val
+	jet.lifetime = life_val
+	jet.scale = Vector2(area_mult, area_mult)

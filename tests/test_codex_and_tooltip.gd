@@ -78,36 +78,32 @@ func _process(_delta: float) -> bool:
 	var t_title = hud.tooltip_title.text
 	var t_badge = hud.tooltip_badge.text
 	var t_bio = hud.tooltip_bio.text
-	if t_icon != "🦠":
+	if t_icon != "💨":
 		printerr("[FAIL] Slot 0 tooltip icon mismatch: " + t_icon)
 		quit(1)
 		return true
-	if not t_badge.contains("固有") and not t_badge.contains("INNATE"):
-		printerr("[FAIL] Slot 0 tooltip badge should indicate innate, got: " + t_badge)
-		quit(1)
-		return true
-	if t_bio == "":
-		printerr("[FAIL] Slot 0 tooltip should include biochemistry background description")
-		quit(1)
-		return true
-	print("[PASS] Slot 0 Innate Deformation Tooltip verified: '%s %s' (%s)" % [t_icon, t_title, t_badge])
-
-	# Test Hover Slot 1 (Active ROS Torrent)
-	var card1 = slots_container.get_child(1)
-	hud._on_slot_mouse_entered(1, card1)
-	if hud.tooltip_icon.text != "💨":
-		printerr("[FAIL] Slot 1 tooltip icon mismatch: " + hud.tooltip_icon.text)
-		quit(1)
-		return true
 	if not hud.tooltip_badge.text.contains("主动") and not hud.tooltip_badge.text.contains("ACTIVE"):
-		printerr("[FAIL] Slot 1 tooltip badge should indicate active, got: " + hud.tooltip_badge.text)
+		printerr("[FAIL] Slot 0 tooltip badge should indicate active, got: " + t_badge)
 		quit(1)
 		return true
 	if not hud.tooltip_stats.text.contains("3.2"):
-		printerr("[FAIL] Slot 1 tooltip stats should show 3.2s cooldown, got: " + hud.tooltip_stats.text)
+		printerr("[FAIL] Slot 0 tooltip stats should show 3.2s cooldown, got: " + hud.tooltip_stats.text)
 		quit(1)
 		return true
-	print("[PASS] Slot 1 Active Weapon Tooltip verified: '%s %s' with cooldown." % [hud.tooltip_icon.text, hud.tooltip_title.text])
+	print("[PASS] Slot 0 Active Weapon Tooltip verified: '%s %s' (%s)" % [t_icon, t_title, t_badge])
+
+	# Test Hover Slot 1 (Empty Slot)
+	var card1 = slots_container.get_child(1)
+	hud._on_slot_mouse_entered(1, card1)
+	if hud.tooltip_icon.text != "+":
+		printerr("[FAIL] Slot 1 empty tooltip icon mismatch: " + hud.tooltip_icon.text)
+		quit(1)
+		return true
+	if hud.tooltip_bio.visible:
+		printerr("[FAIL] Empty slot tooltip should not display bio text")
+		quit(1)
+		return true
+	print("[PASS] Slot 1 Empty Slot Tooltip verified: '%s %s'" % [hud.tooltip_icon.text, hud.tooltip_title.text])
 
 	# Test Hover Slot 2 (Empty Slot)
 	var card2 = slots_container.get_child(2)
@@ -215,11 +211,11 @@ func _process(_delta: float) -> bool:
 	GM.set_language("en")
 	hud._on_slot_mouse_entered(0, card0)
 	var en_badge = hud.tooltip_badge.text
-	if not en_badge.contains("INNATE"):
+	if not en_badge.contains("ACTIVE"):
 		printerr("[FAIL] English tooltip badge mismatch: " + en_badge)
 		quit(1)
 		return true
-	if not hud.tooltip_title.text.contains("Pseudopods"):
+	if not hud.tooltip_title.text.contains("ROS Torrent"):
 		printerr("[FAIL] English tooltip title mismatch: " + hud.tooltip_title.text)
 		quit(1)
 		return true
@@ -227,11 +223,11 @@ func _process(_delta: float) -> bool:
 	GM.set_language("zh_CN")
 	hud._on_slot_mouse_entered(0, card0)
 	var zh_badge = hud.tooltip_badge.text
-	if not zh_badge.contains("固有"):
+	if not zh_badge.contains("主动"):
 		printerr("[FAIL] Chinese tooltip badge mismatch: " + zh_badge)
 		quit(1)
 		return true
-	if not hud.tooltip_title.text.contains("伪足"):
+	if not hud.tooltip_title.text.contains("活性氧射流"):
 		printerr("[FAIL] Chinese tooltip title mismatch: " + hud.tooltip_title.text)
 		quit(1)
 		return true
