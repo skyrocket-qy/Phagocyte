@@ -36,6 +36,15 @@ public partial class Hud : CanvasLayer
     public ProgressBar? AtpBar { get => ExpBar; set { } }
     public Label? AtpLabel { get => ExpLabel; set { } }
 
+    // Survivor-like Bottom HUD & Vignette Nodes
+    public ProgressBar? BottomExpBar { get; set; }
+    public ProgressBar? TopExpBar { get => BottomExpBar; set => BottomExpBar = value; }
+    public PanelContainer? TopCenterCapsule { get; set; }
+    public Label? KillLabel { get; set; }
+    public ColorRect? VignetteRect { get; set; }
+    public Label? BuffTag { get; set; }
+    public PanelContainer? SkillContainer { get; set; }
+
     public PanelContainer? BurstPanel { get; set; }
     public Label? BurstLabel { get; set; }
     public ProgressBar? BurstBar { get; set; }
@@ -92,24 +101,40 @@ public partial class Hud : CanvasLayer
         LevelLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/LevelBadge/LevelLabel");
         TitleLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/TitleLabel")
             ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/TitleLabel");
-        TimerLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/TimerLabel");
+        TopCenterCapsule = GetNodeOrNull<PanelContainer>("TopCenterCapsule");
+        TimerLabel = GetNodeOrNull<Label>("TopCenterCapsule/HBox/TimerLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/TimerLabel");
+        KillLabel = GetNodeOrNull<Label>("TopCenterCapsule/HBox/KillLabel");
         MapLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/MapLabel");
+        BuffTag = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/BuffContainer/BuffTag");
 
-        HpTitleLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPTopHBox/HPTitleLabel");
-        HpBar = GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPBar");
+        BottomExpBar = GetNodeOrNull<ProgressBar>("BottomExpBar")
+            ?? GetNodeOrNull<ProgressBar>("TopExpBar");
+        VignetteRect = GetNodeOrNull<ColorRect>("CriticalHpVignette");
+        SkillContainer = GetNodeOrNull<PanelContainer>("SkillContainer");
+
+        HpTitleLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPTopHBox/HPTitleLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/HPTitleLabel");
+        HpBar = GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPBar")
+            ?? GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/HPBar");
         HpLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPTopHBox/HPLabel")
-            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPLabel");
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/HPLabel");
 
-        ExpTitleLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPTitleLabel");
+        ExpTitleLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPTitleLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/EXPTitleLabel");
         ExpBar = GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPBar")
-            ?? GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPBar");
+            ?? GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPBar")
+            ?? GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/EXPBar");
         ExpLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPLabel")
-            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPLabel");
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/EXPLabel");
 
         SizeLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/SizeLabel")
             ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/SizeLabel");
         CountLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/CountLabel")
-            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/CountLabel");
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/CountLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/CountLabel");
         SpeedLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/SpeedLabel");
 
         BurstPanel = GetNodeOrNull<PanelContainer>("BurstContainer");
@@ -188,7 +213,70 @@ public partial class Hud : CanvasLayer
             }
         }
 
+        // Low-HP Vignette Pulse (<30% HP)
+        if (VignetteRect != null && VignetteRect.Material is ShaderMaterial vignetteMat)
+        {
+            float hpRatio = LastMaxHealth > 0 ? LastHealth / LastMaxHealth : 1.0f;
+            if (hpRatio < 0.30f && LastHealth > 0.0f)
+            {
+                float dangerFactor = 1.0f - (hpRatio / 0.30f);
+                float pulse = 0.45f + 0.35f * Mathf.Sin(SurvivalTime * 7.5f);
+                float intensity = Mathf.Clamp(dangerFactor * pulse, 0.0f, 1.0f);
+                vignetteMat.SetShaderParameter("pulse_intensity", intensity);
+            }
+            else
+            {
+                vignetteMat.SetShaderParameter("pulse_intensity", 0.0f);
+            }
+        }
+
+        // Dynamic Transparency for Skill Bar (35% in combat, 100% on hover/pause)
+        if (SkillContainer != null)
+        {
+            bool isInteracting = HoveredSlotIdx >= 0 || GetTree().Paused;
+            float targetAlpha = isInteracting ? 1.0f : 0.35f;
+            Color c = SkillContainer.Modulate;
+            float newA = Mathf.MoveToward(c.A, targetAlpha, (float)delta * 3.0f);
+            SkillContainer.Modulate = new Color(c.R, c.G, c.B, newA);
+        }
+
+        UpdateBuffStatus();
         UpdateSkillSlots();
+    }
+
+    private void UpdateBuffStatus()
+    {
+        if (BuffTag == null) return;
+
+        if (LastBurstTimeLeft > 0.0f)
+        {
+            BuffTag.Visible = true;
+            BuffTag.Text = TextFormatter.Format(Tr("HUD_BURST_BUFF"), LastBurstTimeLeft);
+            BuffTag.Modulate = new Color(1.0f, 0.85f, 0.25f, 0.95f);
+        }
+        else if (PlayerRef is BaseCell bc && bc.TbBurnTimer > 0.0f)
+        {
+            BuffTag.Visible = true;
+            BuffTag.Text = TextFormatter.Format(Tr("HUD_TB_DEBUFF"), bc.TbBurnTimer);
+            BuffTag.Modulate = new Color(1.0f, 0.35f, 0.35f, 0.95f);
+        }
+        else if (PlayerRef is BaseCell bc2 && bc2.InvertControlsTimer > 0.0f)
+        {
+            BuffTag.Visible = true;
+            BuffTag.Text = $"🌀 {Tr("STATUS_CONFUSION")}: {bc2.InvertControlsTimer:F1}s";
+            BuffTag.Modulate = new Color(0.85f, 0.45f, 1.0f, 0.95f);
+        }
+        else if (PlayerRef is BaseCell bc3 && bc3.SlowTimer > 0.0f)
+        {
+            BuffTag.Visible = true;
+            BuffTag.Text = $"🐌 {Tr("STATUS_SLOW")}: {bc3.SlowTimer:F1}s";
+            BuffTag.Modulate = new Color(0.4f, 0.8f, 0.5f, 0.95f);
+        }
+        else
+        {
+            BuffTag.Visible = false;
+            BuffTag.Text = "";
+        }
     }
 
     public void UpdateLocalizedTexts()
@@ -208,6 +296,7 @@ public partial class Hud : CanvasLayer
         UpdateExpDisplay();
 
         if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), LastDigestedCount);
+        if (KillLabel != null) KillLabel.Text = TextFormatter.Format(Tr("HUD_KILL_COUNT"), LastDigestedCount);
         if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), LastRadiusRatio);
         if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
         if (SkillTitleLbl != null) SkillTitleLbl.Text = Tr("SKILL_BAR_DUAL_TITLE");
@@ -216,6 +305,8 @@ public partial class Hud : CanvasLayer
         {
             BurstLabel.Text = TextFormatter.Format(Tr("HUD_BURST_ALERT"), LastBurstTimeLeft);
         }
+
+        UpdateBuffStatus();
 
         if (PauseTitle != null) PauseTitle.Text = Tr("PAUSE_TITLE");
         if (ResumeBtn != null) ResumeBtn.Text = Tr("PAUSE_RESUME");
@@ -238,6 +329,11 @@ public partial class Hud : CanvasLayer
         {
             ExpBar.MaxValue = Mathf.Max(1.0f, LastExpToNext);
             ExpBar.Value = LastCurrentExp;
+        }
+        if (BottomExpBar != null)
+        {
+            BottomExpBar.MaxValue = Mathf.Max(1.0f, LastExpToNext);
+            BottomExpBar.Value = LastCurrentExp;
         }
         int percent = (int)((LastCurrentExp / Mathf.Max(1.0f, LastExpToNext)) * 100.0f);
         if (ExpLabel != null)
@@ -610,6 +706,7 @@ public partial class Hud : CanvasLayer
             UpdateExpDisplay();
             if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), LastRadiusRatio);
             if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), LastDigestedCount);
+            if (KillLabel != null) KillLabel.Text = TextFormatter.Format(Tr("HUD_KILL_COUNT"), LastDigestedCount);
             if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
         }
         else
@@ -640,6 +737,7 @@ public partial class Hud : CanvasLayer
                 player.Connect("exp_changed", Callable.From((float c, float m, int l) => OnPlayerExpChanged(c, m, l)));
         }
 
+        UpdateBuffStatus();
         UpdateSkillSlots();
     }
 
@@ -693,6 +791,7 @@ public partial class Hud : CanvasLayer
             }
             if (BurstLabel != null) BurstLabel.Text = TextFormatter.Format(Tr("HUD_BURST_ALERT"), timeLeft);
         }
+        UpdateBuffStatus();
     }
 
     private void OnPathogenDigested(Node2D _enemy, float _atp)
@@ -705,6 +804,7 @@ public partial class Hud : CanvasLayer
             {
                 LastDigestedCount = digProp.AsInt32();
                 if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), LastDigestedCount);
+                if (KillLabel != null) KillLabel.Text = TextFormatter.Format(Tr("HUD_KILL_COUNT"), LastDigestedCount);
             }
         }
     }
