@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using Phagocyte.Core;
 using Phagocyte.Player;
 using Phagocyte.Skills;
@@ -16,6 +17,9 @@ public partial class Main : Node2D
     [Export] public PackedScene? StaphScene { get; set; }
     [Export] public int MaxPathogens { get; set; } = 50;
     [Export] public Vector2 ArenaSize { get; set; } = new(4800.0f, 4800.0f);
+    [Export] public float RunGoalSeconds { get; set; } = 300.0f;
+
+    public bool RunEnded { get; private set; } = false;
 
     public CharacterBody2D? Player { get; set; }
     public Hud? HudNode { get; set; }
@@ -64,6 +68,7 @@ public partial class Main : Node2D
             ApplyTreeLoadout();
             if (HudNode != null)
             {
+                HudNode.GoalSeconds = RunGoalSeconds;
                 HudNode.ConnectPlayer(Player);
             }
 
@@ -129,6 +134,8 @@ public partial class Main : Node2D
             {
                 AchievementManager.RecordEvent("radius_ratio", radiusRatio);
             };
+
+            bc.Died += () => EndRun(false);
         }
         else
         {
@@ -154,6 +161,10 @@ public partial class Main : Node2D
                 {
                     AchievementManager.RecordEvent("radius_ratio", rr);
                 }));
+            }
+            if (Player.HasSignal("died"))
+            {
+                Player.Connect("died", Callable.From(() => EndRun(false)));
             }
         }
 
@@ -198,6 +209,12 @@ public partial class Main : Node2D
         float dt = (float)delta;
         EnvironmentTime += dt;
         AchievementManager.RecordEvent("survival_time", EnvironmentTime);
+
+        if (!RunEnded && RunGoalSeconds > 0.0f && EnvironmentTime >= RunGoalSeconds)
+        {
+            EndRun(true);
+            return;
+        }
 
         // Map mechanics
         ProcessMapMechanics(dt);
@@ -314,6 +331,53 @@ public partial class Main : Node2D
             int spawnBatch = Mathf.Min(3, MaxPathogens - currentCount);
             PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, spawnBatch);
         }
+    }
+
+    /// <summary>
+    /// Ends the run (victory when the survival goal is reached, defeat on death),
+    /// persists the settlement record, and shows the medical record modal.
+    /// </summary>
+    public void EndRun(bool victory)
+    {
+        if (RunEnded)
+            return;
+        RunEnded = true;
+
+        var cell = Player as BaseCell;
+        string classId = GameManager.SelectedClass;
+
+        var skillIds = new List<string>();
+        var sm = Player?.GetNodeOrNull<SkillManager>("SkillManager");
+        if (sm != null)
+        {
+            foreach (var skill in sm.ActiveSlots)
+            {
+                if (skill != null && !string.IsNullOrEmpty(skill.SkillId))
+                    skillIds.Add(skill.SkillId);
+            }
+        }
+
+        var record = RunRecordManager.RecordRun(
+            victory ? RunRecordManager.ResultVictory : RunRecordManager.ResultDefeat,
+            classId,
+            MapId,
+            EnvironmentTime,
+            cell?.CurrentLevel ?? 1,
+            cell?.DigestedCount ?? 0,
+            PassiveTreeManager.GetSpentPoints(classId),
+            skillIds.ToArray());
+
+        if (HudNode != null)
+        {
+            HudNode.PauseInputSuppressed = true;
+            HudNode.ResumeGame();
+        }
+
+        var modal = GetNodeOrNull<RunRecordsModal>("UIOverlay/RunRecordsModal");
+        if (modal != null)
+            modal.OpenSettlement(record);
+
+        GetTree().Paused = true;
     }
 
     private void SpawnStaphAroundPlayer(float dist)

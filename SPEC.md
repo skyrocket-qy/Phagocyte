@@ -413,4 +413,4 @@ func update_all_skills(delta: float) -> void:
 - [x] 細胞核懸浮微幅延遲彈簧物理（Spring Physics）
 - [x] 多層次視差滾動與景深模擬 (DoF)
 - [x] 微觀檔案館（Immunology Codex）圖鑑系統與冷凍電鏡資料
-- [ ] 病歷單結算系統（通關抗體中和 / 陣亡 SIRS 分析）
+- [x] 病歷單結算系統（存活達 05:00 觸發抗體中和通關；HP 歸零且無 Revival 觸發 SIRS 陣亡；結算面板含該場數據、通關/陣亡分類與可持久化的歷史病歷）

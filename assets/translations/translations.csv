@@ -426,3 +426,22 @@ SKILL_ENDOTOXIN_BIO,Biochem: Down-regulation of TLR4-MD2 inflammatory cascade pr
 SKILL_HEMATOPOIETIC_NAME,Hematopoietic Reserve,造血干细胞储备
 SKILL_HEMATOPOIETIC_DESC,"Max HP +10%, grants Revival +1.",最大生命值 +10%，获得一次原地满血重生机会。
 SKILL_HEMATOPOIETIC_BIO,Biochem: Pluripotent hematopoietic stem cells in bone marrow niches trigger emergency clonal replenishment upon leukocyte lysis.,生物机制：保留多能造血干细胞种子，在白血球发生不可逆裂解破损时触发紧急克隆增殖，实现原地满血重生。
+BTN_RECORDS,📋 Run Records,📋 病歷記錄
+RECORDS_TITLE,📋 Medical Records,📋 病歷記錄
+RECORDS_SETTLEMENT_VICTORY,✅ Antibody Neutralization — Run Cleared,✅ 抗體中和 — 通關
+RECORDS_SETTLEMENT_DEFEAT,☠️ SIRS Analysis — Run Failed,☠️ SIRS 分析 — 陣亡
+RECORDS_HISTORY_FMT,%s runs • %s victories • Best %s,%s 場 • 勝 %s 場 • 最佳 %s
+RECORDS_CLASS,Cell Line,細胞譜系
+RECORDS_MAP,Host Region,宿主區域
+RECORDS_TIME,Survival Time,存活時間
+RECORDS_LEVEL,Level,等級
+RECORDS_DIGESTED,Pathogens Digested,吞噬病原數
+RECORDS_POINTS,Passive Points Spent,投入被動點數
+RECORDS_SKILLS,Active Skills,主動技能
+RECORDS_EMPTY,No runs recorded yet.,尚無病歷記錄。
+RECORDS_CLEAR,Clear Records,清除病歷
+RECORDS_CLEAR_CONFIRM,Confirm Clear?,確認清除？
+RECORDS_RETRY,Deploy Again,再次出擊
+RECORDS_MENU,Return to Menu,返回主選單
+RECORDS_VICTORY_TAG,VICTORY,通關
+RECORDS_DEFEAT_TAG,DEFEAT,陣亡

@@ -85,6 +85,11 @@ public partial class Hud : CanvasLayer
     public float LastSpeed { get; set; } = 230.0f;
     public float SurvivalTime { get; set; } = 0.0f;
 
+    // Survival goal shown next to the timer (0 hides it).
+    public float GoalSeconds { get; set; } = 0.0f;
+    // Blocks tree/pause hotkeys once the settlement screen is up.
+    public bool PauseInputSuppressed { get; set; } = false;
+
     public Node2D? PlayerRef { get; set; } = null;
     public UpgradeModal? CellUpgradeModal { get; set; } = null;
 
@@ -202,7 +207,14 @@ public partial class Hud : CanvasLayer
             int seconds = (int)(SurvivalTime % 60.0f);
             if (TimerLabel != null)
             {
-                TimerLabel.Text = $"⏱️ {minutes:D2}:{seconds:D2}";
+                string timerText = $"⏱️ {minutes:D2}:{seconds:D2}";
+                if (GoalSeconds > 0.0f)
+                {
+                    int goalMinutes = (int)(GoalSeconds / 60.0f);
+                    int goalSeconds = (int)(GoalSeconds % 60.0f);
+                    timerText += $" / {goalMinutes:D2}:{goalSeconds:D2}";
+                }
+                TimerLabel.Text = timerText;
             }
         }
 
@@ -624,6 +636,9 @@ public partial class Hud : CanvasLayer
 
     public override void _Input(InputEvent @event)
     {
+        if (PauseInputSuppressed)
+            return;
+
         if (@event.IsActionPressed("toggle_tree") || (@event is InputEventKey treeKey && treeKey.Pressed && treeKey.Keycode == Key.C))
         {
             ToggleTreeOverlay();

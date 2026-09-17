@@ -13,6 +13,7 @@ public partial class MainMenu : Control
     public Control? MapView { get; set; }
     public CodexModal? CellCodexModal { get; set; }
     public SettingsModal? CellSettingsModal { get; set; }
+    public RunRecordsModal? RecordsModal { get; set; }
 
     // Language Switcher
     public Button? LangBtn { get; set; }
@@ -22,6 +23,7 @@ public partial class MainMenu : Control
     public Label? SubtitleLbl { get; set; }
     public Button? StartBtn { get; set; }
     public Button? CodexBtn { get; set; }
+    public Button? RecordsBtn { get; set; }
     public Button? SettingsBtn { get; set; }
     public Button? QuitBtn { get; set; }
 
@@ -78,6 +80,7 @@ public partial class MainMenu : Control
         MapView = GetNodeOrNull<Control>("MapView");
         CellCodexModal = GetNodeOrNull<CodexModal>("CodexModal");
         CellSettingsModal = GetNodeOrNull<SettingsModal>("SettingsModal");
+        RecordsModal = GetNodeOrNull<RunRecordsModal>("RunRecordsModal");
 
         LangBtn = GetNodeOrNull<Button>("LangButton");
 
@@ -85,6 +88,7 @@ public partial class MainMenu : Control
         SubtitleLbl = GetNodeOrNull<Label>("TitleView/SubtitleLabel");
         StartBtn = GetNodeOrNull<Button>("TitleView/VBox/StartButton");
         CodexBtn = GetNodeOrNull<Button>("TitleView/VBox/CodexButton");
+        RecordsBtn = GetNodeOrNull<Button>("TitleView/VBox/RecordsButton");
         SettingsBtn = GetNodeOrNull<Button>("TitleView/VBox/SettingsButton");
         QuitBtn = GetNodeOrNull<Button>("TitleView/VBox/QuitButton");
 
@@ -135,6 +139,8 @@ public partial class MainMenu : Control
             CellCodexModal.Visible = false;
         if (CellSettingsModal != null)
             CellSettingsModal.Visible = false;
+        if (RecordsModal != null)
+            RecordsModal.Visible = false;
 
         if (LangBtn != null)
             LangBtn.Pressed += OnLangTogglePressed;
@@ -146,6 +152,8 @@ public partial class MainMenu : Control
             StartBtn.Pressed += OnStartPressed;
         if (CodexBtn != null)
             CodexBtn.Pressed += () => CellCodexModal?.OpenCodex(0);
+        if (RecordsBtn != null)
+            RecordsBtn.Pressed += () => RecordsModal?.OpenHistory();
         if (SettingsBtn != null)
             SettingsBtn.Pressed += () => CellSettingsModal?.OpenSettings(0);
         if (QuitBtn != null)
@@ -202,6 +210,7 @@ public partial class MainMenu : Control
         if (SubtitleLbl != null) SubtitleLbl.Text = Tr("SUBTITLE_MAIN");
         if (StartBtn != null) StartBtn.Text = Tr("BTN_START");
         if (CodexBtn != null) CodexBtn.Text = Tr("BTN_CODEX");
+        if (RecordsBtn != null) RecordsBtn.Text = Tr("BTN_RECORDS");
         if (SettingsBtn != null) SettingsBtn.Text = Tr("BTN_SETTINGS");
         if (QuitBtn != null) QuitBtn.Text = Tr("BTN_QUIT");
 

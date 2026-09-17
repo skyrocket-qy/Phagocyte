@@ -26,6 +26,9 @@ public partial class BaseCell : CharacterBody2D
     [Signal]
     public delegate void ExpChangedEventHandler(float currentExp, float maxExp, int level);
 
+    [Signal]
+    public delegate void DiedEventHandler();
+
     // Level & EXP Progression
     public int CurrentLevel { get; set; } = 1;
     public float CurrentExp { get; set; } = 0.0f;
@@ -39,6 +42,7 @@ public partial class BaseCell : CharacterBody2D
 
     public float Health { get; set; } = 100.0f;
     public float CurrentSpeed { get; set; } = 230.0f;
+    public bool IsDead { get; set; } = false;
 
     // Deformation Parameters
     [Export] public int VertexCount { get; set; } = 32;
@@ -275,6 +279,12 @@ public partial class BaseCell : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
+        if (IsDead)
+        {
+            Velocity = Vector2.Zero;
+            return;
+        }
+
         float dt = (float)delta;
 
         // Process status debuffs
@@ -765,23 +775,35 @@ public partial class BaseCell : CharacterBody2D
 
     public void TakeDamage(float amount)
     {
+        if (IsDead)
+            return;
+
         float dr = Stats != null ? Stats.GetDamageReductionRatio() : 0.0f;
         float finalDmg = amount * (1.0f - dr);
         float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
         Health = Mathf.Clamp(Health - finalDmg, 0.0f, maxHp);
 
         // Check fatal damage & revival
-        if (Health <= 0.0f && Stats != null && Stats.GetStat("revival") >= 1.0f)
+        if (Health <= 0.0f)
         {
-            Stats.AddModifier("revival", -1.0f, 0.0f);
-            Health = maxHp;
-            if (Cytoplasm != null)
+            if (Stats != null && Stats.GetStat("revival") >= 1.0f)
             {
-                if (_hitFlashTween != null && _hitFlashTween.IsValid())
-                    _hitFlashTween.Kill();
-                _hitFlashTween = CreateTween();
-                Cytoplasm.Modulate = new Color(3.0f, 3.0f, 3.0f, 1.0f);
-                _hitFlashTween.TweenProperty(Cytoplasm, "modulate", new Color(1.0f, 1.0f, 1.0f, 1.0f), 0.4);
+                Stats.AddModifier("revival", -1.0f, 0.0f);
+                Health = maxHp;
+                if (Cytoplasm != null)
+                {
+                    if (_hitFlashTween != null && _hitFlashTween.IsValid())
+                        _hitFlashTween.Kill();
+                    _hitFlashTween = CreateTween();
+                    Cytoplasm.Modulate = new Color(3.0f, 3.0f, 3.0f, 1.0f);
+                    _hitFlashTween.TweenProperty(Cytoplasm, "modulate", new Color(1.0f, 1.0f, 1.0f, 1.0f), 0.4);
+                }
+            }
+            else
+            {
+                Health = 0.0f;
+                IsDead = true;
+                EmitSignal(SignalName.Died);
             }
         }
 

@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="4_hud"]
 [ext_resource type="Script" path="res://scripts/environment/MicroscopeParallax.cs" id="5_parallax"]
 [ext_resource type="Shader" path="res://shaders/microscope_postprocess.gdshader" id="6_postprocess"]
+[ext_resource type="PackedScene" path="res://scenes/ui/run_records_modal.tscn" id="7_records"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
 shader = ExtResource("2_bg_shader")
@@ -136,3 +137,8 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
+
+[node name="UIOverlay" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="RunRecordsModal" parent="UIOverlay" instance=ExtResource("7_records")]

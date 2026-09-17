@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/ui/MainMenu.cs" id="1_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/codex_modal.tscn" id="2_codex"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_modal.tscn" id="3_settings"]
+[ext_resource type="PackedScene" path="res://scenes/ui/run_records_modal.tscn" id="6_records"]
 [ext_resource type="Script" path="res://scripts/ui/HoloBodyScanner.cs" id="4_scanner"]
 [ext_resource type="Script" path="res://scripts/ui/PassiveTreeView.cs" id="5_tree"]
 
@@ -180,6 +181,13 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 16
 text = "🔬 微观档案馆 (Codex)"
+
+[node name="RecordsButton" type="Button" parent="TitleView/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 16
+text = "📋 病歷記錄"
 
 [node name="SettingsButton" type="Button" parent="TitleView/VBox"]
 custom_minimum_size = Vector2(0, 44)
@@ -601,6 +609,9 @@ text = "🚀 开始出击"
 visible = false
 
 [node name="SettingsModal" parent="." instance=ExtResource("3_settings")]
+visible = false
+
+[node name="RunRecordsModal" parent="." instance=ExtResource("6_records")]
 visible = false
 
 [node name="LangButton" type="Button" parent="."]
