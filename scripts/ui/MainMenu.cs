@@ -385,17 +385,12 @@ public partial class MainMenu : Control
         }
 
         int stacks = PassiveTreeManager.GetNodeStacks(ActiveTreeClassKey, node.Id);
-        string status = PassiveTreeManager.GetNodeName(node.Id)
-            + " • " + TextFormatter.Format(Tr("TREE_NODE_STACKS"), stacks, node.MaxStacks);
+        string status = PassiveTreeManager.GetNodeName(node.Id);
         if (stacks >= node.MaxStacks)
             status += " • " + Tr("TREE_MAXED");
-        else if (PassiveTreeManager.IsAtrophic(ActiveTreeClassKey, node.Id))
-            status += " • " + Tr("TREE_ATROPHY_STATUS");
         else if (PassiveTreeManager.CanPurchase(ActiveTreeClassKey, node.Id))
             status += " • " + Tr("TREE_PURCHASE_HINT");
-        else if (PassiveTreeManager.GetPointsAvailable(ActiveTreeClassKey) < node.PointCost)
-            status += " • " + Tr("TREE_NO_POINTS");
-        else
+        else if (PassiveTreeManager.GetPointsAvailable(ActiveTreeClassKey) >= node.PointCost)
             status += " • " + Tr("TREE_LOCKED");
         TreeStatusLbl.Text = status;
     }

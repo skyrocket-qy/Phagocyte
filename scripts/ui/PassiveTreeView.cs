@@ -5,9 +5,10 @@ using Phagocyte.Core;
 namespace Phagocyte.UI;
 
 /// <summary>
-/// Confocal-fluorescence radial bloodweb for the shared passive tree.
-/// The pluripotent HSC sits in the nucleus; five lineage sectors grow outward
-/// through concentric cytoplasmic rings, wired by glowing microtubule strands.
+/// Confocal-fluorescence grid board for the shared passive tree.
+/// The pluripotent HSC sits at the lattice center; five lineage bands and the
+/// core metabolism block are wired by orthogonal microtubule traces between
+/// adjacent cells, so routes never overlap or cross.
 /// Pan, zoom, hover tooltips, left-click purchases, right-click refunds.
 /// </summary>
 public partial class PassiveTreeView : Control
@@ -31,12 +32,9 @@ public partial class PassiveTreeView : Control
     private const float MinZoom = 0.12f;
     private const float MaxZoom = 1.75f;
     private const float WorldSize = 4800.0f;
-    private const float SectorHalfAngle = 30.0f;
-    private const float SectorOuterRadius = 1430.0f;
 
     private static readonly Color BackgroundColor = new(0.020f, 0.043f, 0.078f, 1.0f);
     private static readonly Color PlasmaCyan = new(0.35f, 0.92f, 1.00f, 1.0f);
-    private static readonly Color NecrosisColor = new(0.72f, 0.18f, 0.24f, 1.0f);
 
     private static readonly Dictionary<string, Color> BranchColors = new()
     {
@@ -70,14 +68,11 @@ public partial class PassiveTreeView : Control
     private Vector2 _panStartCamera = Vector2.Zero;
     private bool _panMoved;
     private Vector2 _rootPosition = Vector2.Zero;
-    private Vector2 _cameraVelocity = Vector2.Zero;
-    private Vector2 _lastCamera = Vector2.Zero;
-    private bool _cameraInitialized;
     private bool _nodeDragging;
     private string _nodeDragId = "";
     private Vector2 _nodePressPosition = Vector2.Zero;
     private bool _nodeDragMoved;
-    private Vector2[]?[] _edgeRoutes = System.Array.Empty<Vector2[]?>();
+    private string _tooltipShownId = "\0";
 
     private partial class TreeGraphLayer : Control
     {
@@ -198,7 +193,6 @@ public partial class PassiveTreeView : Control
             _nodeDragging = false;
             _nodeDragId = "";
         }
-        UpdateCameraVelocity((float)delta);
         UpdateHoverFromMouse();
         UpdateButtonPositions();
         QueueRedraw();
@@ -242,6 +236,7 @@ public partial class PassiveTreeView : Control
 
         UpdateTransform();
         UpdateButtonPositions();
+        _tooltipShownId = "\0";
         UpdateTooltipText();
         QueueRedraw();
         _graphLayer?.QueueRedraw();
@@ -291,8 +286,6 @@ public partial class PassiveTreeView : Control
 
         _zoom = Mathf.Clamp(Mathf.Min(Size.X / bounds.Size.X, Size.Y / bounds.Size.Y), MinZoom, MaxZoom);
         _camera = bounds.GetCenter();
-        _cameraVelocity = Vector2.Zero;
-        _lastCamera = _camera;
         _needsFit = false;
         ClampCamera();
         UpdateTransform();
@@ -370,6 +363,7 @@ public partial class PassiveTreeView : Control
                     UpdateTransform();
                 }
             }
+            UpdateTooltipText();
             UpdateTooltipPosition();
             AcceptEvent();
         }
@@ -430,6 +424,7 @@ public partial class PassiveTreeView : Control
         {
             _mouseInside = false;
             SetHoveredNode("");
+            UpdateTooltipText();
             return;
         }
 
@@ -438,12 +433,24 @@ public partial class PassiveTreeView : Control
         {
             _mouseInside = false;
             SetHoveredNode("");
+            UpdateTooltipText();
             return;
         }
 
+        UpdateHoverAt(local);
+    }
+
+    /// <summary>
+    /// Resolves the hovered node and refreshes the tooltip for a view-local
+    /// mouse position. Kept separate from the OS mouse so tests and tools can
+    /// drive hover deterministically.
+    /// </summary>
+    internal void UpdateHoverAt(Vector2 viewPosition)
+    {
         _mouseInside = true;
-        _mousePosition = local;
-        SetHoveredNode(HitTestVisualPosition(ScreenToWorld(local)) ?? "");
+        _mousePosition = viewPosition;
+        SetHoveredNode(HitTestVisualPosition(ScreenToWorld(viewPosition)) ?? "");
+        UpdateTooltipText();
     }
 
     private string? HitTestVisualPosition(Vector2 worldPosition)
@@ -452,13 +459,12 @@ public partial class PassiveTreeView : Control
         float bestScore = float.MaxValue;
         foreach (var node in PassiveTreeManager.Nodes)
         {
-            float hitRadius = GetNodeRadius(node) + 22.0f;
-            Vector2 position = PassiveTreeManager.IsNucleus(node.Id) ? node.Position : VisualPosition(node);
-            float distance = worldPosition.DistanceTo(position);
-            if (distance > hitRadius)
+            float half = GetNodeRadius(node) + 17.0f;
+            Vector2 delta = worldPosition - node.Position;
+            if (Mathf.Abs(delta.X) > half || Mathf.Abs(delta.Y) > half)
                 continue;
 
-            float score = distance / hitRadius;
+            float score = delta.Length() / half;
             if (score < bestScore)
             {
                 bestScore = score;
@@ -483,23 +489,6 @@ public partial class PassiveTreeView : Control
         return Size * 0.5f - _camera * _zoom;
     }
 
-    private void UpdateCameraVelocity(float delta)
-    {
-        float step = Mathf.Max(delta, 0.0001f);
-        if (!_cameraInitialized)
-        {
-            _lastCamera = _camera;
-            _cameraInitialized = true;
-        }
-        Vector2 instantaneous = (_camera - _lastCamera) / step;
-        _lastCamera = _camera;
-        _cameraVelocity = _cameraVelocity.Lerp(instantaneous, Mathf.Min(1.0f, 12.0f * step));
-        if (_cameraVelocity.Length() > 900.0f)
-            _cameraVelocity = _cameraVelocity.Normalized() * 900.0f;
-        if (_cameraVelocity.LengthSquared() < 0.01f)
-            _cameraVelocity = Vector2.Zero;
-    }
-
     private void UpdateTransform()
     {
         if (_zoomRoot == null || Size.X <= 0.0f || Size.Y <= 0.0f)
@@ -520,7 +509,7 @@ public partial class PassiveTreeView : Control
                 continue;
 
             Vector2 size = button.Size.X > 1.0f ? button.Size : button.CustomMinimumSize;
-            button.Position = VisualPosition(node) - size * 0.5f;
+            button.Position = node.Position - size * 0.5f;
         }
     }
 
@@ -553,7 +542,6 @@ public partial class PassiveTreeView : Control
         float radius = GetNodeRadius(node);
         Vector2 size = new Vector2(radius * 2.0f + 34.0f, radius * 2.0f + 34.0f);
         int stacks = PassiveTreeManager.GetNodeStacks(TreeClassKey, node.Id);
-        bool atrophic = PassiveTreeManager.IsAtrophic(TreeClassKey, node.Id);
         bool available = PassiveTreeManager.CanPurchase(TreeClassKey, node.Id);
         var button = new Button
         {
@@ -578,7 +566,6 @@ public partial class PassiveTreeView : Control
         button.AddThemeFontOverride("font", ThemeDB.FallbackFont);
         button.AddThemeFontSizeOverride("font_size", Mathf.RoundToInt(radius * (node.Rarity == PassiveTreeManager.TreeRarity.Unique ? 0.95f : 0.82f)));
         Color iconColor = stacks > 0 ? new Color(1, 1, 1, 1)
-            : atrophic ? new Color(0.62f, 0.32f, 0.36f, 1.0f)
             : available ? new Color(0.88f, 0.98f, 1.0f, 1.0f)
             : new Color(0.60f, 0.68f, 0.78f, 1.0f);
         button.AddThemeColorOverride("font_color", iconColor);
@@ -653,13 +640,18 @@ public partial class PassiveTreeView : Control
         if (_tooltipPanel == null || _tooltipText == null)
             return;
 
-        if (!_mouseInside || string.IsNullOrEmpty(HoveredNodeId))
+        string target = _mouseInside ? HoveredNodeId : "";
+        if (target == _tooltipShownId)
+            return;
+
+        _tooltipShownId = target;
+        if (string.IsNullOrEmpty(target))
         {
             _tooltipPanel.Visible = false;
             return;
         }
 
-        string text = PassiveTreeManager.GetNodeTooltipText(TreeClassKey, HoveredNodeId);
+        string text = PassiveTreeManager.GetNodeTooltipText(TreeClassKey, target);
         if (string.IsNullOrEmpty(text))
         {
             _tooltipPanel.Visible = false;
@@ -709,6 +701,8 @@ public partial class PassiveTreeView : Control
             DrawTextureRect(_glowTexture, new Rect2(center - new Vector2(glowRadius, glowRadius), new Vector2(glowRadius * 2.0f, glowRadius * 2.0f)), false);
         }
 
+        DrawGrid();
+
         var random = new RandomNumberGenerator { Seed = 90210 };
         Vector2 parallax = (_rootPosition - Size * 0.5f) * 0.06f;
         for (int i = 0; i < 120; i++)
@@ -728,22 +722,72 @@ public partial class PassiveTreeView : Control
         DrawBranchLabels();
     }
 
+    private void DrawGrid()
+    {
+        float step = PassiveTreeManager.GridStep;
+        Vector2 center = PassiveTreeManager.WorldCenter;
+        Rect2 bounds = GetTreeBounds();
+        int minCol = Mathf.FloorToInt((bounds.Position.X - center.X) / step) - 1;
+        int maxCol = Mathf.CeilToInt((bounds.End.X - center.X) / step) + 1;
+        int minRow = Mathf.FloorToInt((center.Y - bounds.End.Y) / step) - 1;
+        int maxRow = Mathf.CeilToInt((center.Y - bounds.Position.Y) / step) + 1;
+        var fine = new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.045f);
+        var strong = new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.085f);
+        for (int col = minCol; col <= maxCol; col++)
+        {
+            float x = center.X + col * step;
+            Color color = col % 2 == 0 ? strong : fine;
+            DrawLine(WorldToScreen(new Vector2(x, bounds.Position.Y)),
+                WorldToScreen(new Vector2(x, bounds.End.Y)), color, 1.0f);
+        }
+        for (int row = minRow; row <= maxRow; row++)
+        {
+            float y = center.Y - row * step;
+            Color color = row % 2 == 0 ? strong : fine;
+            DrawLine(WorldToScreen(new Vector2(bounds.Position.X, y)),
+                WorldToScreen(new Vector2(bounds.End.X, y)), color, 1.0f);
+        }
+    }
+
+    private Vector2 WorldToScreen(Vector2 world)
+    {
+        return _rootPosition + world * _zoom;
+    }
+
     private void DrawBranchLabels()
     {
         Font font = ThemeDB.FallbackFont;
         foreach (string branch in BranchOrder)
         {
-            if (!PassiveTreeManager.BranchBaseAngles.TryGetValue(branch, out float baseAngle))
+            Rect2 bounds = GetBranchBounds(branch);
+            if (bounds.Size.X <= 0.0f && bounds.Size.Y <= 0.0f)
                 continue;
 
-            Vector2 world = Polar(SectorOuterRadius + 104.0f, baseAngle);
-            Vector2 screen = _rootPosition + world * _zoom;
+            Vector2 farthest = bounds.GetCenter();
+            float bestDistance = -1.0f;
+            foreach (var node in PassiveTreeManager.Nodes)
+            {
+                if (node.Branch != branch)
+                    continue;
+                float distance = node.Position.DistanceTo(PassiveTreeManager.WorldCenter);
+                if (distance > bestDistance)
+                {
+                    bestDistance = distance;
+                    farthest = node.Position;
+                }
+            }
+
+            Vector2 direction = farthest - PassiveTreeManager.WorldCenter;
+            if (direction.LengthSquared() < 1.0f)
+                direction = new Vector2(0, -1);
+            Vector2 world = farthest + direction.Normalized() * 44.0f;
+            Vector2 screen = WorldToScreen(world);
             if (screen.X < 60.0f || screen.Y < 20.0f || screen.X > Size.X - 60.0f || screen.Y > Size.Y - 20.0f)
                 continue;
 
             string label = GetBranchLabel(branch);
             Vector2 textSize = font.GetStringSize(label, HorizontalAlignment.Left, -1, 14);
-            Vector2 origin = screen - new Vector2(textSize.X * 0.5f, 0.0f);
+            Vector2 origin = screen - new Vector2(textSize.X * 0.5f, textSize.Y * 0.5f);
             DrawString(font, origin + new Vector2(1.0f, 1.0f), label, HorizontalAlignment.Left, -1, 14, new Color(0.0f, 0.0f, 0.0f, 0.55f));
             DrawString(font, origin, label, HorizontalAlignment.Left, -1, 14, GetBranchColor(branch, 0.62f));
         }
@@ -757,8 +801,7 @@ public partial class PassiveTreeView : Control
         {
             (BranchColors["core"], "TREE_RING_NUCLEUS"),
             (PlasmaCyan, "TREE_RING_CYTOPLASM"),
-            (BranchColors["vitality"], "TREE_RING_MEMBRANE"),
-            (NecrosisColor, "TREE_ATROPHY_STATUS")
+            (BranchColors["vitality"], "TREE_RING_MEMBRANE")
         };
         for (int i = 0; i < rows.Length; i++)
         {
@@ -776,76 +819,67 @@ public partial class PassiveTreeView : Control
 
         var owned = PassiveTreeManager.GetAllocation(TreeClassKey);
         string start = PassiveTreeManager.GetStartNode(TreeClassKey);
-        var atrophic = PassiveTreeManager.GetAtrophicNodes(TreeClassKey);
 
-        DrawSectors(_graphLayer);
-        DrawCytoskeleton(_graphLayer);
-        DrawEdges(_graphLayer, owned, start, atrophic);
+        DrawBands(_graphLayer);
+        DrawEdges(_graphLayer, owned, start);
         DrawNucleus(_graphLayer);
-        DrawNodes(_graphLayer, owned, start, atrophic);
+        DrawNodes(_graphLayer, owned, start);
     }
 
-    private void DrawSectors(Control layer)
+    private void DrawBands(Control layer)
     {
-        const int steps = 14;
-        const int bands = 16;
+        float pad = PassiveTreeManager.GridStep * 0.62f;
         foreach (string branch in BranchOrder)
         {
-            if (!PassiveTreeManager.BranchBaseAngles.TryGetValue(branch, out float baseAngle))
+            Rect2 bounds = GetBranchBounds(branch);
+            if (bounds.Size.X <= 0.0f && bounds.Size.Y <= 0.0f)
                 continue;
 
             Color color = GetBranchColor(branch, 1.0f);
-            for (int b = 0; b < bands; b++)
-            {
-                float radius0 = 90.0f + (SectorOuterRadius - 90.0f) * b / bands;
-                float radius1 = 90.0f + (SectorOuterRadius - 90.0f) * (b + 1) / bands;
-                float alpha = Mathf.Lerp(0.075f, 0.012f, b / (float)(bands - 1));
-                var quad = new Vector2[2 * (steps + 1)];
-                for (int i = 0; i <= steps; i++)
-                {
-                    float angle = baseAngle - SectorHalfAngle + 2.0f * SectorHalfAngle * i / steps;
-                    quad[i * 2] = Polar(radius0, angle);
-                    quad[i * 2 + 1] = Polar(radius1, angle);
-                }
-                layer.DrawColoredPolygon(quad, new Color(color.R, color.G, color.B, alpha));
-            }
+            Rect2 rect = ExpandBounds(bounds, pad);
+            layer.DrawRect(rect, new Color(color.R, color.G, color.B, 0.040f));
+            layer.DrawRect(rect, new Color(color.R, color.G, color.B, 0.14f), false, 1.5f);
+        }
 
-            Vector2 previous = Polar(SectorOuterRadius, baseAngle - SectorHalfAngle);
-            for (int i = 1; i <= steps; i++)
-            {
-                float angle = baseAngle - SectorHalfAngle + 2.0f * SectorHalfAngle * i / steps;
-                Vector2 next = Polar(SectorOuterRadius, angle);
-                layer.DrawLine(previous, next, new Color(color.R, color.G, color.B, 0.18f), 1.6f, true);
-                previous = next;
-            }
+        Rect2 core = GetBranchBounds("core");
+        if (core.Size.X > 0.0f || core.Size.Y > 0.0f)
+        {
+            Color coreColor = GetBranchColor("core", 1.0f);
+            Rect2 rect = ExpandBounds(core, pad * 1.2f);
+            layer.DrawRect(rect, new Color(coreColor.R, coreColor.G, coreColor.B, 0.055f));
+            layer.DrawRect(rect, new Color(coreColor.R, coreColor.G, coreColor.B, 0.20f), false, 1.8f);
         }
     }
 
-    private void DrawCytoskeleton(Control layer)
+    private static Rect2 GetBranchBounds(string branch)
     {
-        for (int ring = 1; ring <= 5; ring++)
+        bool started = false;
+        Vector2 min = Vector2.Zero;
+        Vector2 max = Vector2.Zero;
+        foreach (var node in PassiveTreeManager.Nodes)
         {
-            float radius = PassiveTreeManager.GetRingRadius(ring);
-            var points = new Vector2[121];
-            for (int i = 0; i <= 120; i++)
+            if (node.Branch != branch)
+                continue;
+            if (!started)
             {
-                float angle = Mathf.Tau * i / 120.0f;
-                float wobble = 1.0f
-                    + 0.012f * Mathf.Sin(angle * 6.0f + _time * 0.35f + ring * 1.3f)
-                    + 0.006f * Mathf.Sin(angle * 11.0f - _time * 0.22f);
-                points[i] = PassiveTreeManager.WorldCenter
-                    + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius * wobble;
+                min = node.Position;
+                max = node.Position;
+                started = true;
             }
-            layer.DrawPolyline(points, new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, ring == 1 ? 0.10f : 0.045f),
-                ring == 1 ? 2.0f : 1.2f, true);
+            else
+            {
+                min = new Vector2(Mathf.Min(min.X, node.Position.X), Mathf.Min(min.Y, node.Position.Y));
+                max = new Vector2(Mathf.Max(max.X, node.Position.X), Mathf.Max(max.Y, node.Position.Y));
+            }
         }
+        if (!started)
+            return new Rect2(Vector2.Zero, Vector2.Zero);
+        return new Rect2(min, max - min);
+    }
 
-        for (int i = 0; i < 5; i++)
-        {
-            float angle = 54.0f + 72.0f * i;
-            layer.DrawLine(Polar(130.0f, angle), Polar(SectorOuterRadius + 46.0f, angle),
-                new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.035f), 1.0f, true);
-        }
+    private static Rect2 ExpandBounds(Rect2 bounds, float pad)
+    {
+        return new Rect2(bounds.Position - new Vector2(pad, pad), bounds.Size + new Vector2(pad * 2.0f, pad * 2.0f));
     }
 
     private void DrawNucleus(Control layer)
@@ -870,17 +904,16 @@ public partial class PassiveTreeView : Control
         }
     }
 
-    private void DrawEdges(Control layer, Godot.Collections.Dictionary<string, int> owned, string start, HashSet<string> atrophic)
+    private void DrawEdges(Control layer, Godot.Collections.Dictionary<string, int> owned, string start)
     {
-        EnsureEdgeRoutes();
         for (int i = 0; i < PassiveTreeManager.Edges.Length; i++)
         {
             var edge = PassiveTreeManager.Edges[i];
             if (!PassiveTreeManager.TryGetNode(edge.From, out var fromNode) || !PassiveTreeManager.TryGetNode(edge.To, out var toNode))
                 continue;
 
-            Vector2 from = VisualPosition(fromNode);
-            Vector2 to = VisualPosition(toNode);
+            Vector2 from = fromNode.Position;
+            Vector2 to = toNode.Position;
             if (from.DistanceSquaredTo(to) < 1.0f)
                 continue;
 
@@ -889,52 +922,21 @@ public partial class PassiveTreeView : Control
             bool lit = fromActive && toActive;
             bool highlighted = HoveredNodeId == edge.From || HoveredNodeId == edge.To
                 || SelectedNodeId == edge.From || SelectedNodeId == edge.To;
-            bool starving = !lit && (atrophic.Contains(edge.From) || atrophic.Contains(edge.To));
-            Color color = starving
-                ? new Color(NecrosisColor.R, NecrosisColor.G, NecrosisColor.B, 0.30f)
-                : GetEdgeColor(edge.From, edge.To, lit, highlighted);
+            Color color = GetEdgeColor(edge.From, edge.To, lit, highlighted);
             float width = (lit ? 4.4f : 2.0f) + (highlighted ? 1.4f : 0.0f);
-            var points = ShiftRoute(_edgeRoutes[i], fromNode, from, toNode, to);
 
-            if (starving)
-            {
-                float flicker = 0.65f + 0.35f * Mathf.Sin(_time * 2.2f + i);
-                for (int k = 0; k + 1 < points.Length; k += 3)
-                {
-                    layer.DrawLine(points[k], points[k + 1],
-                        new Color(color.R, color.G, color.B, color.A * flicker), width * 0.7f, true);
-                }
-            }
-            else
-            {
-                layer.DrawPolyline(points, new Color(color.R, color.G, color.B, color.A * 0.26f), width * 2.8f, true);
-                layer.DrawPolyline(points, color, width, true);
-            }
+            layer.DrawLine(from, to, new Color(color.R, color.G, color.B, color.A * 0.26f), width * 2.8f, true);
+            layer.DrawLine(from, to, color, width, true);
 
             if (lit)
             {
+                Vector2[] points = { from, to };
                 float travel = Mathf.PosMod(_time * 0.22f + i * 0.137f, 1.0f);
                 layer.DrawCircle(PointAlong(points, travel), 4.2f, Colors.White);
                 float echo = Mathf.PosMod(travel + 0.22f, 1.0f);
                 layer.DrawCircle(PointAlong(points, echo), 2.6f, new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.55f));
             }
         }
-    }
-
-    private static Vector2[] ShiftRoute(Vector2[]? route, PassiveTreeManager.TreeNode fromNode, Vector2 from, PassiveTreeManager.TreeNode toNode, Vector2 to)
-    {
-        if (route == null || route.Length < 2)
-            return new[] { from, to };
-
-        var points = new Vector2[route.Length];
-        Vector2 shiftFrom = from - fromNode.Position;
-        Vector2 shiftTo = to - toNode.Position;
-        int last = route.Length - 1;
-        for (int k = 0; k < route.Length; k++)
-            points[k] = route[k] + shiftFrom.Lerp(shiftTo, k / (float)last);
-        points[0] = from;
-        points[last] = to;
-        return points;
     }
 
     private static Vector2 PointAlong(Vector2[] points, float t)
@@ -948,92 +950,7 @@ public partial class PassiveTreeView : Control
         return points[index].Lerp(points[index + 1], local);
     }
 
-    /// <summary>
-    /// Routes every microtubule once: straight radial lines are kept when clear,
-    /// otherwise the strand bows onto a polar arc that slides around other vesicles.
-    /// Routes depend only on static node positions, so they are cached.
-    /// </summary>
-    private void EnsureEdgeRoutes()
-    {
-        if (_edgeRoutes.Length == PassiveTreeManager.Edges.Length)
-            return;
-
-        _edgeRoutes = new Vector2[]?[PassiveTreeManager.Edges.Length];
-        for (int i = 0; i < PassiveTreeManager.Edges.Length; i++)
-        {
-            var edge = PassiveTreeManager.Edges[i];
-            if (!PassiveTreeManager.TryGetNode(edge.From, out var from) || !PassiveTreeManager.TryGetNode(edge.To, out var to))
-                continue;
-            _edgeRoutes[i] = BuildEdgeRoute(from, to);
-        }
-    }
-
-    private static Vector2[] BuildEdgeRoute(PassiveTreeManager.TreeNode from, PassiveTreeManager.TreeNode to)
-    {
-        var straight = PolarRoute(from.Position, to.Position, 0.0f);
-        float straightClearance = RouteClearance(straight, from.Id, to.Id);
-        if (straightClearance >= 4.0f)
-            return straight;
-
-        Vector2[] best = straight;
-        float bestClearance = straightClearance;
-        foreach (float offset in new[] { 16.0f, -16.0f, 30.0f, -30.0f, 46.0f, -46.0f, 64.0f, -64.0f })
-        {
-            var candidate = PolarRoute(from.Position, to.Position, offset);
-            float clearance = RouteClearance(candidate, from.Id, to.Id);
-            if (clearance > bestClearance + 0.5f)
-            {
-                bestClearance = clearance;
-                best = candidate;
-            }
-        }
-        return best;
-    }
-
-    private static Vector2[] PolarRoute(Vector2 from, Vector2 to, float offset)
-    {
-        const int samples = 24;
-        Vector2 center = PassiveTreeManager.WorldCenter;
-        Vector2 relativeFrom = from - center;
-        Vector2 relativeTo = to - center;
-        float radius0 = relativeFrom.Length();
-        float radius1 = relativeTo.Length();
-        float angle0 = relativeFrom.Angle();
-        float deltaAngle = Mathf.Wrap(relativeTo.Angle() - angle0, -Mathf.Pi, Mathf.Pi);
-
-        var points = new Vector2[samples + 1];
-        for (int i = 0; i <= samples; i++)
-        {
-            float t = i / (float)samples;
-            float eased = t * t * (3.0f - 2.0f * t);
-            float radius = Mathf.Lerp(radius0, radius1, eased);
-            float angle = angle0 + deltaAngle * eased
-                + offset * Mathf.Sin(Mathf.Pi * t) / Mathf.Max(90.0f, radius);
-            points[i] = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
-        }
-        points[0] = from;
-        points[samples] = to;
-        return points;
-    }
-
-    private static float RouteClearance(Vector2[] points, string fromId, string toId)
-    {
-        float clearance = float.MaxValue;
-        foreach (var node in PassiveTreeManager.Nodes)
-        {
-            if (node.Id == fromId || node.Id == toId)
-                continue;
-
-            float required = GetNodeRadius(node) + 18.0f;
-            float nearest = float.MaxValue;
-            for (int i = 1; i < points.Length; i += 2)
-                nearest = Mathf.Min(nearest, node.Position.DistanceTo(points[i]));
-            clearance = Mathf.Min(clearance, nearest - required);
-        }
-        return clearance;
-    }
-
-    private void DrawNodes(Control layer, Godot.Collections.Dictionary<string, int> owned, string start, HashSet<string> atrophic)
+    private void DrawNodes(Control layer, Godot.Collections.Dictionary<string, int> owned, string start)
     {
         var ordered = new List<PassiveTreeManager.TreeNode>(PassiveTreeManager.Nodes);
         ordered.Sort((a, b) =>
@@ -1045,12 +962,11 @@ public partial class PassiveTreeView : Control
         foreach (var node in ordered)
         {
             bool isNucleus = PassiveTreeManager.IsNucleus(node.Id);
-            Vector2 position = isNucleus ? node.Position : VisualPosition(node);
+            Vector2 position = node.Position;
             int stacks = owned.TryGetValue(node.Id, out int ownedStacks) ? ownedStacks : 0;
             bool hovered = HoveredNodeId == node.Id;
             bool selected = SelectedNodeId == node.Id;
             bool isStart = node.Id == start;
-            bool isAtrophic = atrophic.Contains(node.Id);
             float radius = GetNodeRadius(node);
             float wobblePhase = Hash(node.Id) * Mathf.Tau;
             Color rarityColor = GetRarityColor(node.Rarity);
@@ -1059,39 +975,19 @@ public partial class PassiveTreeView : Control
             if (hovered)
                 layer.DrawCircle(position, radius + 18.0f, new Color(1, 1, 1, 0.08f));
 
-            if (!isAtrophic)
-            {
-                float halo = stacks > 0 ? 0.30f : 0.13f;
-                layer.DrawCircle(position, radius + 7.0f, new Color(branchColor.R, branchColor.G, branchColor.B, halo));
-            }
+            float halo = stacks > 0 ? 0.30f : 0.13f;
+            layer.DrawCircle(position, radius + 7.0f, new Color(branchColor.R, branchColor.G, branchColor.B, halo));
 
-            Color fill = isAtrophic
-                ? new Color(0.09f, 0.035f, 0.05f, 0.92f)
-                : stacks > 0
-                    ? new Color(branchColor.R, branchColor.G, branchColor.B, 0.34f)
-                    : new Color(0.035f, 0.065f, 0.11f, 0.90f);
-            Color edge = isAtrophic
-                ? NecrosisColor
-                : stacks > 0
-                    ? rarityColor.Lightened(0.25f)
-                    : rarityColor.Darkened(hovered ? -0.05f : 0.18f);
+            Color fill = stacks > 0
+                ? new Color(branchColor.R, branchColor.G, branchColor.B, 0.34f)
+                : new Color(0.035f, 0.065f, 0.11f, 0.90f);
+            Color edge = stacks > 0
+                ? rarityColor.Lightened(0.25f)
+                : rarityColor.Darkened(hovered ? -0.05f : 0.18f);
 
             layer.DrawColoredPolygon(NodeShape(node, radius, wobblePhase), fill);
             layer.DrawPolyline(ClosedShape(node, radius, wobblePhase), edge,
                 node.Rarity == PassiveTreeManager.TreeRarity.Unique ? 4.6f : 2.8f, true);
-
-            if (isAtrophic)
-            {
-                float diagonal = radius * 0.62f;
-                layer.DrawLine(position + new Vector2(-diagonal, diagonal), position + new Vector2(diagonal, -diagonal),
-                    new Color(NecrosisColor.R, NecrosisColor.G, NecrosisColor.B, 0.60f), 2.0f, true);
-                for (int i = 0; i < 6; i++)
-                {
-                    float startAngle = Mathf.Tau * i / 6.0f + _time * 0.25f;
-                    layer.DrawArc(position, radius + 5.0f, startAngle, startAngle + 0.62f, 10,
-                        new Color(NecrosisColor.R, NecrosisColor.G, NecrosisColor.B, 0.45f), 2.0f, true);
-                }
-            }
 
             if (isNucleus)
             {
@@ -1105,23 +1001,6 @@ public partial class PassiveTreeView : Control
             }
             if (selected)
                 layer.DrawArc(position, radius + 10.0f, 0.0f, Mathf.Tau, 64, new Color(1.0f, 0.90f, 0.42f, 0.95f), 3.5f, true);
-
-            if (node.MaxStacks > 1)
-                DrawStackPips(layer, node, position, stacks, branchColor);
-        }
-    }
-
-    private void DrawStackPips(Control layer, PassiveTreeManager.TreeNode node, Vector2 position, int stacks, Color branchColor)
-    {
-        float radius = GetNodeRadius(node) + 15.0f;
-        for (int i = 0; i < node.MaxStacks; i++)
-        {
-            float angle = Mathf.DegToRad(55.0f + (70.0f * i / Mathf.Max(1, node.MaxStacks - 1)));
-            Vector2 pip = position + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
-            if (i < stacks)
-                layer.DrawCircle(pip, 4.6f, branchColor.Lightened(0.25f));
-            else
-                layer.DrawArc(pip, 4.6f, 0.0f, Mathf.Tau, 16, new Color(1, 1, 1, 0.30f), 1.5f, true);
         }
     }
 
@@ -1142,12 +1021,6 @@ public partial class PassiveTreeView : Control
         };
     }
 
-    private static Vector2 Polar(float radius, float angleDegrees)
-    {
-        float radians = Mathf.DegToRad(angleDegrees);
-        return PassiveTreeManager.WorldCenter + new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius;
-    }
-
     private static float Hash(string text)
     {
         uint hash = 2166136261;
@@ -1157,25 +1030,6 @@ public partial class PassiveTreeView : Control
             hash *= 16777619;
         }
         return (hash % 997) / 997.0f;
-    }
-
-    private static Vector2 DriftOffset(PassiveTreeManager.TreeNode node, float time)
-    {
-        if (PassiveTreeManager.IsNucleus(node.Id))
-            return Vector2.Zero;
-
-        float seed = Hash(node.Id) * 12.0f;
-        float amplitude = 0.7f + node.Ring * 0.45f;
-        float speed = 0.26f + Hash(node.Id + "s") * 0.18f;
-        return new Vector2(
-            Mathf.Sin(time * speed + seed * 7.1f) + 0.35f * Mathf.Sin(time * speed * 2.3f + seed),
-            Mathf.Cos(time * speed * 0.83f + seed * 3.7f) + 0.35f * Mathf.Cos(time * speed * 1.9f + seed * 1.7f)) * amplitude;
-    }
-
-    private Vector2 VisualPosition(PassiveTreeManager.TreeNode node)
-    {
-        Vector2 lag = _cameraVelocity * (0.010f + 0.0022f * node.Ring);
-        return node.Position + DriftOffset(node, _time) + lag.LimitLength(10.0f);
     }
 
     private static Vector2[] NodeShape(PassiveTreeManager.TreeNode node, float radius, float wobblePhase)

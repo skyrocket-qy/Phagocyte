@@ -825,7 +825,7 @@ public partial class Hud : CanvasLayer
 
                 string icon = PassiveTreeManager.GetNodeIcon(node.Id);
                 string nodeName = PassiveTreeManager.GetNodeName(node.Id);
-                text.AppendLine(icon + " " + nodeName + " " + TextFormatter.Format(Tr("TREE_NODE_STACKS"), stacks, PassiveTreeManager.GetMaxStacks(node.Id)));
+                text.AppendLine(icon + " " + nodeName);
                 string description = PassiveTreeManager.GetNodeDescription(node.Id);
                 if (!string.IsNullOrEmpty(description))
                 {

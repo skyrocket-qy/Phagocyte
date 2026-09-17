@@ -132,17 +132,13 @@ public partial class TestExpandedSkills : SceneTree
         AssertThat(cellStats.GetStat("might")).IsEqualApprox(1.04f, 0.01f);
         glycolysis.RemovePassiveModifiers();
 
-        // 4.4 Kinesin Transit: Speed +15% per level, Pierce +1 at Lv.3/Lv.5
+        // 4.4 Kinesin Transit: Speed +15%, Pierce +1
         var kinesin = new PassiveKinesinTransit();
         kinesin.Setup(dummyHost, 0);
         AssertThat(cellStats.GetStat("projectile_speed")).IsEqualApprox(1.15f, 0.01f);
-        AssertThat(cellStats.GetStat("pierce")).IsEqual(0.0f);
-        kinesin.Upgrade(); // Lv.2
-        kinesin.Upgrade(); // Lv.3
         AssertThat(cellStats.GetStat("pierce")).IsEqual(1.0f);
-        kinesin.Upgrade(); // Lv.4
-        kinesin.Upgrade(); // Lv.5
-        AssertThat(cellStats.GetStat("pierce")).IsEqual(2.0f);
+        kinesin.Upgrade();
+        AssertThat(cellStats.GetStat("pierce")).IsEqual(1.0f);
         kinesin.RemovePassiveModifiers();
         AssertThat(cellStats.GetStat("pierce")).IsEqual(0.0f);
 
@@ -167,12 +163,9 @@ public partial class TestExpandedSkills : SceneTree
         AssertThat(cellStats.GetStat("knockback_resist")).IsEqualApprox(0.20f, 0.01f);
         endotoxin.RemovePassiveModifiers();
 
-        // 4.8 Hematopoietic Reserve: MaxHP +10%, Revival +1 at Lv.3
+        // 4.8 Hematopoietic Reserve: MaxHP +10%, Revival +1
         var hematopoietic = new PassiveHematopoieticReserve();
         hematopoietic.Setup(dummyHost, 0);
-        AssertThat(cellStats.GetStat("revival")).IsEqual(0.0f);
-        hematopoietic.Upgrade(); // Lv.2
-        hematopoietic.Upgrade(); // Lv.3
         AssertThat(cellStats.GetStat("revival")).IsEqual(1.0f);
         hematopoietic.RemovePassiveModifiers();
         AssertThat(cellStats.GetStat("revival")).IsEqual(0.0f);

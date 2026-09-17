@@ -29,7 +29,7 @@ TREE_RARITY_MAGIC,Magic,魔法
 TREE_RARITY_RARE,Rare,稀有
 TREE_RARITY_UNIQUE,Unique,传奇
 TREE_EFFECT_LINE,%s %s,%s%s
-TREE_EFFECTS_PER_STACK,Effects per stack:,每层效果：
+TREE_EFFECTS_PER_STACK,Effects:,效果：
 TREE_COST,Cost: %d point(s),消耗：%d 点
 TREE_ZOOM_OUT,Zoom Out,缩小
 TREE_ZOOM_IN,Zoom In,放大
@@ -40,13 +40,11 @@ TREE_BRANCH_MOTILITY,Granule Activation Region,颗粒活化区域
 TREE_BRANCH_BALLISTICS,Endoplasmic Factory,内质网工厂
 TREE_BRANCH_VITALITY,Monocyte Giantization Region,单核巨化区域
 TREE_BRANCH_CORE,Hematopoietic Core,造血核心区
-TREE_RING_NUCLEUS,Nucleus Ring · R0-R1,核区 · R0-R1
-TREE_RING_CYTOPLASM,Cytoplasmic Matrix · R2-R3,胞质基质 · R2-R3
-TREE_RING_MEMBRANE,Membrane Cortex · R4-R5,胞膜皮层 · R4-R5
-TREE_ATROPHY_STATUS,Autophagic atrophy,自噬退化
-TREE_ATROPHY_LOCKED,Autophagic atrophy: commit points to this lineage or refund elsewhere to restore it.,自噬退化：投资此谱系或返还其他点数即可恢复。
+TREE_RING_NUCLEUS,Core Layer · L1,核区 · L1
+TREE_RING_CYTOPLASM,Cytoplasmic Matrix · L2-L3,胞质基质 · L2-L3
+TREE_RING_MEMBRANE,Membrane Cortex · L4+,胞膜皮层 · L4+
 TREE_NODE_HSC_NAME,Pluripotent HSC,全能造血干细胞
-TREE_NUCLEUS_DESC,"The shared hematopoietic stem cell chassis. All five lineage portals radiate from this nucleus.",共享的造血干细胞底盘。五大谱系门户皆由核心向外辐射分化。
+TREE_NUCLEUS_DESC,The shared hematopoietic stem cell chassis. All five lineage portals radiate from this nucleus.,共享的造血干细胞底盘。五大谱系门户皆由核心向外辐射分化。
 TREE_NUCLEUS_INNATE,Innate · always active,先天核心 · 永久生效
 TREE_NUCLEUS_ACTIVE,The nucleus is always active.,核心永久生效。
 STAT_MIGHT,Might,伤害
@@ -108,7 +106,7 @@ TREE_NODE_ADAPTIVE_OVERDRIVE_NAME,Adaptive Overdrive,适应性超载
 TREE_NODE_IMMORTAL_CULTURE_NAME,Immortal Culture,不朽培养
 TREE_NODE_OMNIPOTENT_CYTOPLASM_NAME,Omnipotent Cytoplasm,全能胞质
 TREE_NODE_LYSOSOME_NAME,Lysosome Priming,溶酶体激活
-TREE_NODE_LYSOSOME_DESC,"Might +10%, Health Regen +0.6 HP/s per level.",伤害 +10%，生命自然回复 +0.6 HP/s（每级）。
+TREE_NODE_LYSOSOME_DESC,"Might +10%, Health Regen +0.6 HP/s.",伤害 +10%，生命自然回复 +0.6 HP/s。
 TREE_OVERLAY_TITLE,Passive Tree Loadout,被动树配置
 TREE_OVERLAY_LEVEL,Tree Level %d • Sortie Level %d,天赋等级 %d • 本局等级 %d
 TREE_OVERLAY_EMPTY,No tree passives purchased.,尚未购买任何被动树节点。
@@ -310,16 +308,16 @@ SKILL_LUNGE_NAME,Pseudopod Lunge,伪足猛击
 SKILL_LUNGE_DESC,Snaps out an elongated amoebic pseudopod to whip and drag enemies.,向前快速弹射延伸伪足鞭击敌群，造成重击并拉扯病原体。
 SKILL_LUNGE_BIO,Biochem: Rapid actin cross-linking via filamin and arp2/3 drives localized cytoplasmic projection.,生物机制：细丝蛋白与 Arp2/3 复合体介导微丝快速成束与交联，爆发性延伸突触。
 SKILL_ACTIN_NAME,Actin Polymerization,肌动蛋白微丝聚合
-SKILL_ACTIN_DESC,"All skill Area +12%, Base Swim Speed +6% per level.",所有技能范围 +12%，基础游动速度 +6%（每级）。
+SKILL_ACTIN_DESC,"All skill Area +12%, Base Swim Speed +6%.",所有技能范围 +12%，基础游动速度 +6%。
 SKILL_ACTIN_BIO,Biochem: Dynamic G-actin to F-actin polymerization powers cell motility and lamellipodia expansion.,生物机制：球状 G-肌动蛋白聚合成纤维状 F-微丝骨架，驱动细胞爬行与板状伪足延展。
 SKILL_MITOCHONDRIA_NAME,Mitochondrial Overclock,线粒体超频呼吸
-SKILL_MITOCHONDRIA_DESC,"Cooldown Reduction +8% (max 75%), Skill Duration +10% per level.",技能冷却缩减 (CDR) +8%（上限 75%），技能持续时间 +10%（每级）。
+SKILL_MITOCHONDRIA_DESC,"Cooldown Reduction +8% (max 75%), Skill Duration +10%.",技能冷却缩减 (CDR) +8%（上限 75%），技能持续时间 +10%。
 SKILL_MITOCHONDRIA_BIO,Biochem: Oxidative phosphorylation upregulation accelerates ATP turnover to recharge cellular effectors.,生物机制：氧化磷酸化上调促进呼吸链电子传递，极大加快高能磷酸键合成周转。
 SKILL_OPSONIN_NAME,Opsonin Affinity,调理素表面吸附
-SKILL_OPSONIN_DESC,"Critical Hit Chance +5%, Critical Damage +25% per level.",暴击几率 +5%，暴击伤害 +25%（每级）。
+SKILL_OPSONIN_DESC,"Critical Hit Chance +5%, Critical Damage +25%.",暴击几率 +5%，暴击伤害 +25%。
 SKILL_OPSONIN_BIO,Biochem: IgG and complement C3b coating lowers phagocytic threshold and exposes pathogen core weaknesses.,生物机制：IgG 与 C3b 调理素涂层降低吞噬阈值，诱导细胞毒性物质直击病原体弱点。
 SKILL_CHEMOKINE_NAME,Chemokine Receptors,趋化因子受体
-SKILL_CHEMOKINE_DESC,"Magnet Pickup Radius +15%, Luck +10% per level.",吸附磁力范围 +15%，突变幸运度 +10%（每级）。
+SKILL_CHEMOKINE_DESC,"Magnet Pickup Radius +15%, Luck +10%.",吸附磁力范围 +15%，突变幸运度 +10%。
 SKILL_CHEMOKINE_BIO,Biochem: Upregulated CCR5 and CXCR4 receptors sense inflammatory gradients and attract free metabolites.,生物机制：膜表面 CCR5 与 CXCR4 受体密集表达，感知化学趋化梯度吸附微环境代谢物。
 CODEX_HEADER_TRAIT,【 Deformation Trait 】,【 变形特性 】
 CODEX_HEADER_TACTICAL,【 Tactical Effect 】,【 战术机制 】
@@ -405,26 +403,26 @@ SKILL_HISTAMINE_NAME,Histamine Surge,肥大细胞组胺涌浪
 SKILL_HISTAMINE_DESC,"Blasts a massive frontal cone dilation shockwave, knocking back hordes and causing tear damage.",朝前方喷射组胺引发微血管扩张震波，大幅击退正面怪潮并造成撕裂伤。
 SKILL_HISTAMINE_BIO,"Biochem: Massive degranulation releases biogenic amine histamine, inducing rapid endothelial contraction and vascular fluid thrust.",生物机制：肥大细胞脱颗粒释放大量生物胺组胺，诱发局域血管内皮急速扩张与强烈体液推力冲刷。
 SKILL_BILAYER_NAME,Bilayer Hardening,磷脂双分子层致密化
-SKILL_BILAYER_DESC,"Max Health +15%, Armor +2 per level.",最大生命值 +15%，护甲 +2（每级）。
+SKILL_BILAYER_DESC,"Max Health +15%, Armor +2.",最大生命值 +15%，护甲 +2。
 SKILL_BILAYER_BIO,Biochem: Enhanced cholesterol and saturated lipid packing improves membrane structural integrity and shear resistance.,生物机制：提高膜内胆固醇与饱和脂肪酸堆积密度，显著增强细胞物理抗剪切与抗破膜能力。
 SKILL_AUTOPHAGY_NAME,Autophagic Recycle,自噬体修复再生
-SKILL_AUTOPHAGY_DESC,Health Regen +0.4 HP/s per level.,生命自然回复 +0.4 HP/s（每级）。
+SKILL_AUTOPHAGY_DESC,Health Regen +0.4 HP/s.,生命自然回复 +0.4 HP/s。
 SKILL_AUTOPHAGY_BIO,Biochem: Macroautophagy degrades damaged organelles to recycle amino acids and repair cellular membrane breaches.,生物机制：巨自噬途径降解衰老与受损胞器，回收生化底物持续修复细胞膜与胞质微缺损。
 SKILL_GLYCOLYSIS_NAME,Aerobic Glycolysis,瓦伯格有氧糖酵解
-SKILL_GLYCOLYSIS_DESC,"Growth (EXP) +12%, Might +4% per level.",免疫经验获取 +12%，伤害 +4%（每级）。
+SKILL_GLYCOLYSIS_DESC,"Growth (EXP) +12%, Might +4%.",免疫经验获取 +12%，伤害 +4%。
 SKILL_GLYCOLYSIS_BIO,Biochem: Warburg metabolic reprogramming splits glucose into lactate for high-rate ATP fluxes and nucleotide synthesis.,生物机制：瓦伯格代谢重编程将葡萄糖极速转化为乳酸与高通量能量，大幅加速抗原经验吸收。
 SKILL_KINESIN_NAME,Kinesin Rapid-Transit,微管驱动蛋白轨道
-SKILL_KINESIN_DESC,"Projectile Speed +15% per level, Pierce +1 at Lv.3 and Lv.5.",投射物速度 +15%（每级），且在 Lv.3 与 Lv.5 分别获得贯穿 +1。
+SKILL_KINESIN_DESC,"Projectile Speed +15%, Pierce +1.",投射物速度 +15%，贯穿 +1。
 SKILL_KINESIN_BIO,Biochem: ATP-dependent kinesin motor proteins walk along microtubule tracks to accelerate vesicle and projectile transit.,生物机制：驱动蛋白马达利用 ATP 水解沿微管细胞骨架高速步进，提升远端弹药初速与穿透势能。
 SKILL_LONGEVITY_NAME,Cytokine Longevity,细胞因子半衰期延展
-SKILL_LONGEVITY_DESC,"Skill Duration +15%, Knockback +10% per level.",技能持续时间 +15%，击退力道 +10%（每级）。
+SKILL_LONGEVITY_DESC,"Skill Duration +15%, Knockback +10%.",技能持续时间 +15%，击退力道 +10%。
 SKILL_LONGEVITY_BIO,Biochem: Sialylation and glycosylation modifications protect signaling cytokines from plasma protease degradation.,生物机制：糖基化与唾液酸修饰保护细胞因子免受细胞外蛋白酶快速降解，延长有效作用半衰期。
 SKILL_VDJ_NAME,V(D)J Diversity,V(D)J 基因重排多样性
-SKILL_VDJ_DESC,"Luck +15%, Crit Chance +3% per level.",突变幸运度 +15%，暴击几率 +3%（每级）。
+SKILL_VDJ_DESC,"Luck +15%, Crit Chance +3%.",突变幸运度 +15%，暴击几率 +3%。
 SKILL_VDJ_BIO,Biochem: RAG recombinase-mediated DNA cleavage generates vast antigen receptor repertoires through somatic hypermutation.,生物机制：RAG 重组酶介导体细胞高频超突变，产生极其庞大的特异性受体库，提升突变幸运与命中弱点几率。
 SKILL_ENDOTOXIN_NAME,Endotoxin Barrier,内毒素脱敏耐受
-SKILL_ENDOTOXIN_DESC,"Armor +3, Knockback Resistance +20% per level.",护甲 +3，受击击退抗性 +20%（每级）。
+SKILL_ENDOTOXIN_DESC,"Armor +3, Knockback Resistance +20%.",护甲 +3，受击击退抗性 +20%。
 SKILL_ENDOTOXIN_BIO,Biochem: Down-regulation of TLR4-MD2 inflammatory cascade prevents hyper-inflammatory paralysis and preserves cell locomotion.,生物机制：下调 TLR4-MD2 脂多糖受体过敏通路，避免过激炎症致瘫，维持碰撞刚性与操控机动。
 SKILL_HEMATOPOIETIC_NAME,Hematopoietic Reserve,造血干细胞储备
-SKILL_HEMATOPOIETIC_DESC,"Max HP +10% per level, grants Revival +1 upon reaching Lv.3.",最大生命值 +10%（每级），升级至 Lv.3 时获得一次原地满血重生机会。
+SKILL_HEMATOPOIETIC_DESC,"Max HP +10%, grants Revival +1.",最大生命值 +10%，获得一次原地满血重生机会。
 SKILL_HEMATOPOIETIC_BIO,Biochem: Pluripotent hematopoietic stem cells in bone marrow niches trigger emergency clonal replenishment upon leukocyte lysis.,生物机制：保留多能造血干细胞种子，在白血球发生不可逆裂解破损时触发紧急克隆增殖，实现原地满血重生。
