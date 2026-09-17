@@ -25,8 +25,10 @@ public partial class TestAchievementSystem : SceneTree
 
     public override bool _Process(double delta)
     {
-        switch (_phase)
+        try
         {
+            switch (_phase)
+            {
             case 0:
                 // --- Step 1: Initial State (Only Macrophage unlocked, others locked) ---
                 AchievementManager.ResetAll();
@@ -179,6 +181,13 @@ public partial class TestAchievementSystem : SceneTree
                 AchievementManager.ResetAll();
                 Quit(0);
                 return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr("[TEST FAILED]: " + ex.ToString());
+            Quit(1);
+            return true;
         }
 
         return false;

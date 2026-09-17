@@ -18,14 +18,23 @@ public partial class Hud : CanvasLayer
     public Label? AchBannerIcon { get; set; }
     public Tween? AchTween { get; set; }
 
+    public Label? LevelLabel { get; set; }
     public Label? TitleLabel { get; set; }
+    public Label? TimerLabel { get; set; }
     public Label? MapLabel { get; set; }
+    public Label? HpTitleLabel { get; set; }
     public ProgressBar? HpBar { get; set; }
     public Label? HpLabel { get; set; }
-    public ProgressBar? AtpBar { get; set; }
-    public Label? AtpLabel { get; set; }
+    public Label? ExpTitleLabel { get; set; }
+    public ProgressBar? ExpBar { get; set; }
+    public Label? ExpLabel { get; set; }
     public Label? SizeLabel { get; set; }
     public Label? CountLabel { get; set; }
+    public Label? SpeedLabel { get; set; }
+
+    // Backward compatibility aliases
+    public ProgressBar? AtpBar { get => ExpBar; set { } }
+    public Label? AtpLabel { get => ExpLabel; set { } }
 
     public PanelContainer? BurstPanel { get; set; }
     public Label? BurstLabel { get; set; }
@@ -59,11 +68,16 @@ public partial class Hud : CanvasLayer
     // Cached last stats for re-rendering upon language change
     public float LastHealth { get; set; } = 100.0f;
     public float LastMaxHealth { get; set; } = 100.0f;
+    public float LastCurrentExp { get; set; } = 0.0f;
+    public float LastExpToNext { get; set; } = 30.0f;
+    public int LastLevel { get; set; } = 1;
     public float LastSatiety { get; set; } = 0.0f;
     public float LastMaxSatiety { get; set; } = 100.0f;
     public float LastRadiusRatio { get; set; } = 1.0f;
     public int LastDigestedCount { get; set; } = 0;
+    public float LastSpeed { get; set; } = 230.0f;
     public float LastBurstTimeLeft { get; set; } = 0.0f;
+    public float SurvivalTime { get; set; } = 0.0f;
 
     public Node2D? PlayerRef { get; set; } = null;
     public UpgradeModal? CellUpgradeModal { get; set; } = null;
@@ -75,14 +89,28 @@ public partial class Hud : CanvasLayer
     {
         ProcessMode = ProcessModeEnum.Always;
 
-        TitleLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/TitleLabel");
+        LevelLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/LevelBadge/LevelLabel");
+        TitleLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/TitleLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/TitleLabel");
+        TimerLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/TimerLabel");
         MapLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/MapLabel");
+
+        HpTitleLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPTopHBox/HPTitleLabel");
         HpBar = GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPBar");
-        HpLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPLabel");
-        AtpBar = GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPBar");
-        AtpLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPLabel");
-        SizeLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/SizeLabel");
-        CountLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/CountLabel");
+        HpLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPTopHBox/HPLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPLabel");
+
+        ExpTitleLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPTitleLabel");
+        ExpBar = GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPBar")
+            ?? GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPBar");
+        ExpLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPLabel");
+
+        SizeLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/SizeLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/SizeLabel");
+        CountLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/CountLabel")
+            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/CountLabel");
+        SpeedLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/SpeedLabel");
 
         BurstPanel = GetNodeOrNull<PanelContainer>("BurstContainer");
         BurstLabel = GetNodeOrNull<Label>("BurstContainer/VBox/BurstLabel");
@@ -149,6 +177,17 @@ public partial class Hud : CanvasLayer
 
     public override void _Process(double delta)
     {
+        if (!GetTree().Paused)
+        {
+            SurvivalTime += (float)delta;
+            int minutes = (int)(SurvivalTime / 60.0f);
+            int seconds = (int)(SurvivalTime % 60.0f);
+            if (TimerLabel != null)
+            {
+                TimerLabel.Text = $"⏱️ {minutes:D2}:{seconds:D2}";
+            }
+        }
+
         UpdateSkillSlots();
     }
 
@@ -159,13 +198,18 @@ public partial class Hud : CanvasLayer
         var mapInfo = GameManager.GetMapInfo(GameManager.SelectedMap);
         if (mapInfo.TryGetValue("name", out var mapName) && MapLabel != null)
         {
-            MapLabel.Text = Tr("HUD_BATTLEFIELD") + mapName.AsString();
+            MapLabel.Text = "📍 " + Tr("HUD_BATTLEFIELD") + mapName.AsString();
         }
 
-        if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP"), (int)LastHealth, (int)LastMaxHealth);
-        if (AtpLabel != null) AtpLabel.Text = TextFormatter.Format(Tr("HUD_ATP"), (int)((LastSatiety / Mathf.Max(1.0f, LastMaxSatiety)) * 100.0f));
-        if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_SIZE"), LastRadiusRatio);
-        if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_DIGESTED"), LastDigestedCount);
+        if (LevelLabel != null) LevelLabel.Text = TextFormatter.Format(Tr("HUD_LEVEL"), LastLevel);
+        if (HpTitleLabel != null) HpTitleLabel.Text = Tr("HUD_HP_TITLE");
+        if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)LastHealth, (int)LastMaxHealth);
+        if (ExpTitleLabel != null) ExpTitleLabel.Text = Tr("HUD_EXP_TITLE");
+        UpdateExpDisplay();
+
+        if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), LastDigestedCount);
+        if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), LastRadiusRatio);
+        if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
         if (SkillTitleLbl != null) SkillTitleLbl.Text = Tr("SKILL_BAR_DUAL_TITLE");
 
         if (BurstPanel != null && BurstPanel.Visible && BurstLabel != null)
@@ -186,6 +230,24 @@ public partial class Hud : CanvasLayer
         }
 
         UpdateSkillSlots();
+    }
+
+    public void UpdateExpDisplay()
+    {
+        if (ExpBar != null)
+        {
+            ExpBar.MaxValue = Mathf.Max(1.0f, LastExpToNext);
+            ExpBar.Value = LastCurrentExp;
+        }
+        int percent = (int)((LastCurrentExp / Mathf.Max(1.0f, LastExpToNext)) * 100.0f);
+        if (ExpLabel != null)
+        {
+            ExpLabel.Text = TextFormatter.Format(Tr("HUD_EXP_VAL"), (int)LastCurrentExp, (int)LastExpToNext, percent);
+        }
+        if (LevelLabel != null)
+        {
+            LevelLabel.Text = TextFormatter.Format(Tr("HUD_LEVEL"), LastLevel);
+        }
     }
 
     public void UpdateSkillSlots()
@@ -528,6 +590,27 @@ public partial class Hud : CanvasLayer
             bc.BurstStateChanged += (a, t, m) => OnPlayerBurstStateChanged(a, t, m);
             bc.PathogenDigested += (p, atp) => OnPathogenDigested(p, atp);
             bc.LevelUp += (lvl) => OnPlayerLevelUp((int)lvl);
+            bc.ExpChanged += (cur, max, lvl) => OnPlayerExpChanged(cur, max, lvl);
+
+            LastHealth = bc.Health;
+            LastMaxHealth = bc.Stats != null ? bc.Stats.GetStat("max_health") : bc.MaxHealth;
+            LastCurrentExp = bc.CurrentExp;
+            LastExpToNext = bc.ExpToNextLevel;
+            LastLevel = bc.CurrentLevel;
+            LastSpeed = bc.CurrentSpeed > 0 ? bc.CurrentSpeed : bc.BaseSpeed;
+            LastRadiusRatio = bc.CurrentRadius / Mathf.Max(1.0f, bc.BaseRadius);
+            LastDigestedCount = bc.DigestedCount;
+
+            if (HpBar != null)
+            {
+                HpBar.MaxValue = LastMaxHealth;
+                HpBar.Value = LastHealth;
+            }
+            if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)LastHealth, (int)LastMaxHealth);
+            UpdateExpDisplay();
+            if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), LastRadiusRatio);
+            if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), LastDigestedCount);
+            if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
         }
         else
         {
@@ -550,9 +633,22 @@ public partial class Hud : CanvasLayer
                 player.Connect("LevelUp", Callable.From((int lvl) => OnPlayerLevelUp(lvl)));
             else if (player.HasSignal("level_up"))
                 player.Connect("level_up", Callable.From((int lvl) => OnPlayerLevelUp(lvl)));
+
+            if (player.HasSignal("ExpChanged"))
+                player.Connect("ExpChanged", Callable.From((float c, float m, int l) => OnPlayerExpChanged(c, m, l)));
+            else if (player.HasSignal("exp_changed"))
+                player.Connect("exp_changed", Callable.From((float c, float m, int l) => OnPlayerExpChanged(c, m, l)));
         }
 
         UpdateSkillSlots();
+    }
+
+    private void OnPlayerExpChanged(float currentExp, float expToNext, int level)
+    {
+        LastCurrentExp = currentExp;
+        LastExpToNext = expToNext;
+        LastLevel = level;
+        UpdateExpDisplay();
     }
 
     private void OnPlayerStatsChanged(float health, float maxHealth, float satiety, float maxSatiety, float radiusRatio)
@@ -563,27 +659,31 @@ public partial class Hud : CanvasLayer
         LastMaxSatiety = maxSatiety;
         LastRadiusRatio = radiusRatio;
 
+        if (PlayerRef is BaseCell bc)
+        {
+            LastSpeed = bc.CurrentSpeed;
+        }
+
         if (HpBar != null)
         {
             HpBar.MaxValue = maxHealth;
             HpBar.Value = health;
         }
-        if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP"), (int)health, (int)maxHealth);
+        if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)health, (int)maxHealth);
 
-        if (AtpBar != null)
-        {
-            AtpBar.MaxValue = maxSatiety;
-            AtpBar.Value = satiety;
-        }
-        if (AtpLabel != null) AtpLabel.Text = TextFormatter.Format(Tr("HUD_ATP"), (int)((satiety / maxSatiety) * 100.0f));
-
-        if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_SIZE"), radiusRatio);
+        if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), radiusRatio);
+        if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
     }
 
     private void OnPlayerBurstStateChanged(bool isActive, float timeLeft, float maxTime)
     {
         if (BurstPanel != null) BurstPanel.Visible = isActive;
         LastBurstTimeLeft = timeLeft;
+        if (PlayerRef is BaseCell bc)
+        {
+            LastSpeed = bc.CurrentSpeed;
+            if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
+        }
         if (isActive)
         {
             if (BurstBar != null)
@@ -604,13 +704,15 @@ public partial class Hud : CanvasLayer
             if (digProp.VariantType == Variant.Type.Int)
             {
                 LastDigestedCount = digProp.AsInt32();
-                if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_DIGESTED"), LastDigestedCount);
+                if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), LastDigestedCount);
             }
         }
     }
 
-    private void OnPlayerLevelUp(int _newLevel)
+    private void OnPlayerLevelUp(int newLevel)
     {
+        LastLevel = newLevel;
+        UpdateExpDisplay();
         if (CellUpgradeModal != null && GodotObject.IsInstanceValid(CellUpgradeModal) && PlayerRef != null)
         {
             CellUpgradeModal.OpenUpgradeModal(PlayerRef);

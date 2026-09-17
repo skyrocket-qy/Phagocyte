@@ -12,7 +12,30 @@ public partial class AchievementManager : Node
     [Signal]
     public delegate void AchievementUnlockedEventHandler(string achId, Godot.Collections.Dictionary achData);
 
-    private const string SavePath = "user://achievements.json";
+    private static string _savePath = "";
+    public static string SavePath
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(_savePath))
+            {
+                using var probe = FileAccess.Open("user://.probe", FileAccess.ModeFlags.Write);
+                if (probe != null)
+                {
+                    probe.Close();
+                    DirAccess.RemoveAbsolute("user://.probe");
+                    _savePath = "user://achievements.json";
+                }
+                else
+                {
+                    _savePath = "res://.user_data/achievements.json";
+                    DirAccess.MakeDirRecursiveAbsolute("res://.user_data");
+                }
+            }
+            return _savePath;
+        }
+        set => _savePath = value;
+    }
 
     public static AchievementManager Instance { get; private set; } = null;
     private static System.Collections.Generic.List<Callable> _listeners = new System.Collections.Generic.List<Callable>();

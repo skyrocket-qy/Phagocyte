@@ -32,33 +32,61 @@ content_margin_top = 10.0
 content_margin_right = 14.0
 content_margin_bottom = 10.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
-bg_color = Color(0.08, 0.12, 0.16, 0.8)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-content_margin_left = 12.0
-content_margin_top = 10.0
-content_margin_right = 12.0
-content_margin_bottom = 10.0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_glass"]
+bg_color = Color(0.04, 0.08, 0.14, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.22, 0.52, 0.72, 0.55)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0.0, 0.35, 0.55, 0.18)
+shadow_size = 10
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_badge"]
+bg_color = Color(0.1, 0.25, 0.42, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.82, 1, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
-bg_color = Color(0.2, 0.8, 0.4, 0.9)
+bg_color = Color(0.2, 0.85, 0.45, 0.95)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
-bg_color = Color(0.12, 0.16, 0.2, 0.7)
+bg_color = Color(0.06, 0.1, 0.15, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.16, 0.28, 0.38, 0.5)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_atp_fill"]
-bg_color = Color(0.18, 0.72, 0.95, 0.9)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_exp_fill"]
+bg_color = Color(0.18, 0.78, 0.98, 0.95)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -144,75 +172,142 @@ layer = 10
 script = ExtResource("1_hud")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-offset_left = 20.0
-offset_top = 20.0
-offset_right = 350.0
-offset_bottom = 210.0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 388.0
+offset_bottom = 222.0
 
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_glass")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 7
 
-[node name="TitleLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
+[node name="HeaderHBox" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_constants/separation = 8
+
+[node name="LevelBadge" type="PanelContainer" parent="MarginContainer/PanelContainer/VBoxContainer/HeaderHBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_level_badge")
+
+[node name="LevelLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/LevelBadge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "Lv. 1"
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/HeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 14
 text = "巨噬细胞 (Macrophage) - 状态"
+
+[node name="TimerLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/HeaderHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 0.95, 0.9)
+theme_override_font_sizes/font_size = 12
+text = "⏱️ 00:00"
 
 [node name="MapLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.75, 0.3, 1)
-theme_override_font_sizes/font_size = 12
-text = "战场：表皮裂口 (Acute Wound)"
+theme_override_colors/font_color = Color(0.95, 0.78, 0.35, 0.95)
+theme_override_font_sizes/font_size = 11
+text = "📍 战场：表皮裂口 (Acute Wound)"
 
 [node name="HPContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="HPLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/HPContainer"]
+[node name="HPTopHBox" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer/HPContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "生命值 (HP): 100 / 100"
+
+[node name="HPTitleLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPTopHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+text = "❤️ 生命值 (HP)"
+
+[node name="HPLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPTopHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.8, 0.95, 0.85, 1)
+theme_override_font_sizes/font_size = 11
+text = "100 / 100"
+horizontal_alignment = 2
 
 [node name="HPBar" type="ProgressBar" parent="MarginContainer/PanelContainer/VBoxContainer/HPContainer"]
-custom_minimum_size = Vector2(0, 12)
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 value = 100.0
 show_percentage = false
 
-[node name="ATPContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
+[node name="EXPContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="ATPLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/ATPContainer"]
+[node name="EXPTopHBox" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer/EXPContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = "饱食能量 (ATP): 0%"
 
-[node name="ATPBar" type="ProgressBar" parent="MarginContainer/PanelContainer/VBoxContainer/ATPContainer"]
-custom_minimum_size = Vector2(0, 12)
+[node name="EXPTitleLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "🧬 免疫经验 (EXP)"
+
+[node name="EXPLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.75, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "0 / 30 (0%)"
+horizontal_alignment = 2
+
+[node name="EXPBar" type="ProgressBar" parent="MarginContainer/PanelContainer/VBoxContainer/EXPContainer"]
+custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_atp_fill")
+theme_override_styles/fill = SubResource("StyleBoxFlat_exp_fill")
 show_percentage = false
 
-[node name="SizeLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
+[node name="FooterHBox" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
-theme_override_font_sizes/font_size = 12
-text = "细胞半径扩展: 1.0x"
+theme_override_constants/separation = 8
 
-[node name="CountLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
+[node name="CountLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/FooterHBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.85, 0.4, 1)
-theme_override_font_sizes/font_size = 12
-text = "已吞噬病原体: 0"
+theme_override_colors/font_color = Color(0.95, 0.85, 0.45, 1)
+theme_override_font_sizes/font_size = 11
+text = "🦠 已消灭: 0"
+
+[node name="Sep1" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/FooterHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.55, 0.65, 0.6)
+theme_override_font_sizes/font_size = 11
+text = "•"
+
+[node name="SizeLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/FooterHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.85, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+text = "🔬 视野: 1.0x"
+
+[node name="Sep2" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/FooterHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.55, 0.65, 0.6)
+theme_override_font_sizes/font_size = 11
+text = "•"
+
+[node name="SpeedLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/FooterHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.9, 0.75, 1)
+theme_override_font_sizes/font_size = 11
+text = "💨 移速: 230"
 
 [node name="BurstContainer" type="PanelContainer" parent="."]
 anchors_preset = 5

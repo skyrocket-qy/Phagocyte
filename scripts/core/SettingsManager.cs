@@ -12,7 +12,30 @@ public partial class SettingsManager : Node
     [Signal]
     public delegate void SettingsChangedEventHandler();
 
-    private const string SavePath = "user://settings.json";
+    private static string _savePath = "";
+    public static string SavePath
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(_savePath))
+            {
+                using var probe = FileAccess.Open("user://.probe", FileAccess.ModeFlags.Write);
+                if (probe != null)
+                {
+                    probe.Close();
+                    DirAccess.RemoveAbsolute("user://.probe");
+                    _savePath = "user://settings.json";
+                }
+                else
+                {
+                    _savePath = "res://.user_data/settings.json";
+                    DirAccess.MakeDirRecursiveAbsolute("res://.user_data");
+                }
+            }
+            return _savePath;
+        }
+        set => _savePath = value;
+    }
 
     public static SettingsManager Instance = null;
 
