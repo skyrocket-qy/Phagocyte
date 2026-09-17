@@ -45,10 +45,6 @@ public partial class Hud : CanvasLayer
     public Label? BuffTag { get; set; }
     public PanelContainer? SkillContainer { get; set; }
 
-    public PanelContainer? BurstPanel { get; set; }
-    public Label? BurstLabel { get; set; }
-    public ProgressBar? BurstBar { get; set; }
-
     public PanelContainer? PauseModal { get; set; }
     public Label? PauseTitle { get; set; }
     public Button? ResumeBtn { get; set; }
@@ -80,12 +76,9 @@ public partial class Hud : CanvasLayer
     public float LastCurrentExp { get; set; } = 0.0f;
     public float LastExpToNext { get; set; } = 30.0f;
     public int LastLevel { get; set; } = 1;
-    public float LastSatiety { get; set; } = 0.0f;
-    public float LastMaxSatiety { get; set; } = 100.0f;
     public float LastRadiusRatio { get; set; } = 1.0f;
     public int LastDigestedCount { get; set; } = 0;
     public float LastSpeed { get; set; } = 230.0f;
-    public float LastBurstTimeLeft { get; set; } = 0.0f;
     public float SurvivalTime { get; set; } = 0.0f;
 
     public Node2D? PlayerRef { get; set; } = null;
@@ -137,10 +130,6 @@ public partial class Hud : CanvasLayer
             ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/CountLabel");
         SpeedLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/SpeedLabel");
 
-        BurstPanel = GetNodeOrNull<PanelContainer>("BurstContainer");
-        BurstLabel = GetNodeOrNull<Label>("BurstContainer/VBox/BurstLabel");
-        BurstBar = GetNodeOrNull<ProgressBar>("BurstContainer/VBox/BurstBar");
-
         PauseModal = GetNodeOrNull<PanelContainer>("PauseModal");
         PauseTitle = GetNodeOrNull<Label>("PauseModal/VBox/Title");
         ResumeBtn = GetNodeOrNull<Button>("PauseModal/VBox/ResumeButton");
@@ -163,7 +152,6 @@ public partial class Hud : CanvasLayer
         TooltipDesc = GetNodeOrNull<Label>("SkillTooltip/VBox/TooltipDesc");
         TooltipBio = GetNodeOrNull<Label>("SkillTooltip/VBox/TooltipBio");
 
-        if (BurstPanel != null) BurstPanel.Visible = false;
         if (PauseModal != null) PauseModal.Visible = false;
 
         if (HasNode("UpgradeModal"))
@@ -248,13 +236,7 @@ public partial class Hud : CanvasLayer
     {
         if (BuffTag == null) return;
 
-        if (LastBurstTimeLeft > 0.0f)
-        {
-            BuffTag.Visible = true;
-            BuffTag.Text = TextFormatter.Format(Tr("HUD_BURST_BUFF"), LastBurstTimeLeft);
-            BuffTag.Modulate = new Color(1.0f, 0.85f, 0.25f, 0.95f);
-        }
-        else if (PlayerRef is BaseCell bc && bc.TbBurnTimer > 0.0f)
+        if (PlayerRef is BaseCell bc && bc.TbBurnTimer > 0.0f)
         {
             BuffTag.Visible = true;
             BuffTag.Text = TextFormatter.Format(Tr("HUD_TB_DEBUFF"), bc.TbBurnTimer);
@@ -300,11 +282,6 @@ public partial class Hud : CanvasLayer
         if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), LastRadiusRatio);
         if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
         if (SkillTitleLbl != null) SkillTitleLbl.Text = Tr("SKILL_BAR_DUAL_TITLE");
-
-        if (BurstPanel != null && BurstPanel.Visible && BurstLabel != null)
-        {
-            BurstLabel.Text = TextFormatter.Format(Tr("HUD_BURST_ALERT"), LastBurstTimeLeft);
-        }
 
         UpdateBuffStatus();
 
@@ -682,8 +659,7 @@ public partial class Hud : CanvasLayer
         PlayerRef = player;
         if (player is BaseCell bc)
         {
-            bc.StatsChanged += (h, mh, s, ms, r) => OnPlayerStatsChanged(h, mh, s, ms, r);
-            bc.BurstStateChanged += (a, t, m) => OnPlayerBurstStateChanged(a, t, m);
+            bc.StatsChanged += (h, mh, r) => OnPlayerStatsChanged(h, mh, r);
             bc.PathogenDigested += (p, atp) => OnPathogenDigested(p, atp);
             bc.LevelUp += (lvl) => OnPlayerLevelUp((int)lvl);
             bc.ExpChanged += (cur, max, lvl) => OnPlayerExpChanged(cur, max, lvl);
@@ -712,14 +688,9 @@ public partial class Hud : CanvasLayer
         else
         {
             if (player.HasSignal("StatsChanged"))
-                player.Connect("StatsChanged", Callable.From((float h, float mh, float s, float ms, float r) => OnPlayerStatsChanged(h, mh, s, ms, r)));
+                player.Connect("StatsChanged", Callable.From((float h, float mh, float r) => OnPlayerStatsChanged(h, mh, r)));
             else if (player.HasSignal("stats_changed"))
-                player.Connect("stats_changed", Callable.From((float h, float mh, float s, float ms, float r) => OnPlayerStatsChanged(h, mh, s, ms, r)));
-
-            if (player.HasSignal("BurstStateChanged"))
-                player.Connect("BurstStateChanged", Callable.From((bool a, float t, float m) => OnPlayerBurstStateChanged(a, t, m)));
-            else if (player.HasSignal("burst_state_changed"))
-                player.Connect("burst_state_changed", Callable.From((bool a, float t, float m) => OnPlayerBurstStateChanged(a, t, m)));
+                player.Connect("stats_changed", Callable.From((float h, float mh, float r) => OnPlayerStatsChanged(h, mh, r)));
 
             if (player.HasSignal("PathogenDigested"))
                 player.Connect("PathogenDigested", Callable.From((Node2D p, float atp) => OnPathogenDigested(p, atp)));
@@ -749,12 +720,10 @@ public partial class Hud : CanvasLayer
         UpdateExpDisplay();
     }
 
-    private void OnPlayerStatsChanged(float health, float maxHealth, float satiety, float maxSatiety, float radiusRatio)
+    private void OnPlayerStatsChanged(float health, float maxHealth, float radiusRatio)
     {
         LastHealth = health;
         LastMaxHealth = maxHealth;
-        LastSatiety = satiety;
-        LastMaxSatiety = maxSatiety;
         LastRadiusRatio = radiusRatio;
 
         if (PlayerRef is BaseCell bc)
@@ -771,27 +740,6 @@ public partial class Hud : CanvasLayer
 
         if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), radiusRatio);
         if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
-    }
-
-    private void OnPlayerBurstStateChanged(bool isActive, float timeLeft, float maxTime)
-    {
-        if (BurstPanel != null) BurstPanel.Visible = isActive;
-        LastBurstTimeLeft = timeLeft;
-        if (PlayerRef is BaseCell bc)
-        {
-            LastSpeed = bc.CurrentSpeed;
-            if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
-        }
-        if (isActive)
-        {
-            if (BurstBar != null)
-            {
-                BurstBar.MaxValue = maxTime;
-                BurstBar.Value = timeLeft;
-            }
-            if (BurstLabel != null) BurstLabel.Text = TextFormatter.Format(Tr("HUD_BURST_ALERT"), timeLeft);
-        }
-        UpdateBuffStatus();
     }
 
     private void OnPathogenDigested(Node2D _enemy, float _atp)

@@ -51,7 +51,7 @@ public partial class TestAllCells : SceneTree
                     var slot0 = baseCell.CellSkillManager!.GetActiveSlot(0);
                     AssertThat(slot0).IsNotNull();
 
-                    // Verify cell-specific starting weapon and stats
+                    // Verify cell-specific starting weapon and base body stats
                     switch (cid)
                     {
                         case "macrophage":
@@ -63,32 +63,32 @@ public partial class TestAllCells : SceneTree
                             AssertThat(slot0!.SkillId).IsEqual("perforin_lance");
                             AssertThat(baseCell.MaxHealth).IsEqual(75.0f);
                             AssertThat(baseCell.BaseSpeed).IsEqual(280.0f);
-                            AssertThat(baseCell.Stats!.GetStat("crit_chance")).IsEqualApprox(0.15f, 0.001f);
                             break;
                         case "neutrophil":
                             AssertThat(slot0!.SkillId).IsEqual("complement_cascade");
                             AssertThat(baseCell.MaxHealth).IsEqual(90.0f);
-                            AssertThat(baseCell.Stats!.GetStat("might")).IsEqualApprox(1.15f, 0.001f);
+                            AssertThat(baseCell.BaseSpeed).IsEqual(240.0f);
                             break;
                         case "b_cell":
                             AssertThat(slot0!.SkillId).IsEqual("antibody_salvo");
                             AssertThat(baseCell.MaxHealth).IsEqual(85.0f);
-                            AssertThat(baseCell.Stats!.GetStat("cooldown_reduction")).IsEqualApprox(0.15f, 0.001f);
+                            AssertThat(baseCell.BaseSpeed).IsEqual(220.0f);
                             break;
                         case "dendritic":
                             AssertThat(slot0!.SkillId).IsEqual("pseudopod_lunge");
                             AssertThat(baseCell.MaxHealth).IsEqual(95.0f);
-                            AssertThat(baseCell.Stats!.GetStat("magnet")).IsEqualApprox(1.50f, 0.001f);
+                            AssertThat(baseCell.BaseSpeed).IsEqual(215.0f);
                             break;
                     }
 
-                    // Test Burst trigger
-                    AssertThat(baseCell.IsBurst).IsFalse();
-                    baseCell.TriggerBurst();
-                    AssertThat(baseCell.IsBurst).IsTrue();
-                    AssertThat(baseCell.CurrentSpeed).IsGreater(baseCell.BaseSpeed * 2.0f);
+                    // Cells share the same neutral stat baseline (no innate passive bonuses)
+                    AssertThat(baseCell.Stats!.GetStat("might")).IsEqualApprox(1.0f, 0.001f);
+                    AssertThat(baseCell.Stats!.GetStat("cooldown_reduction")).IsEqualApprox(0.0f, 0.001f);
+                    AssertThat(baseCell.Stats!.GetStat("crit_chance")).IsEqualApprox(0.05f, 0.001f);
+                    AssertThat(baseCell.Stats!.GetStat("magnet")).IsEqualApprox(150.0f, 0.001f);
+                    AssertThat(baseCell.Stats!.GetStat("health_regen")).IsEqualApprox(0.0f, 0.001f);
 
-                    GD.Print($"[PASS] Verified '{cid}': Stats, 32-Vertex Morphology, Nucleus, Slot 0 Weapon, Burst.");
+                    GD.Print($"[PASS] Verified '{cid}': Base Stats, 32-Vertex Morphology, Nucleus, Slot 0 Weapon, Neutral Passives.");
                     baseCell.QueueFree();
                 }
 

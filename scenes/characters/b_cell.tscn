@@ -6,13 +6,6 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_wall"]
 radius = 22.0
 
-[sub_resource type="Curve" id="Curve_particles"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -1.0, 0.0, 0, 0]
-point_count = 2
-
-[sub_resource type="Gradient" id="Gradient_particles"]
-colors = PackedColorArray(0.4, 0.8, 1, 0.9, 0.1, 0.3, 0.9, 0)
-
 [node name="BCell" type="CharacterBody2D"]
 collision_layer = 1
 collision_mask = 4
@@ -39,22 +32,6 @@ collision_layer = 1
 collision_mask = 2
 
 [node name="EngulfCollider" type="CollisionPolygon2D" parent="EngulfArea"]
-
-[node name="BurstParticles" type="CPUParticles2D" parent="."]
-emitting = false
-amount = 40
-lifetime = 0.7
-emission_shape = 1
-emission_sphere_radius = 55.0
-direction = Vector2(0, 0)
-spread = 180.0
-gravity = Vector2(0, 0)
-initial_velocity_min = 40.0
-initial_velocity_max = 110.0
-scale_amount_min = 3.0
-scale_amount_max = 6.0
-scale_amount_curve = SubResource("Curve_particles")
-color_ramp = SubResource("Gradient_particles")
 
 [node name="SkillManager" type="Node2D" parent="."]
 script = ExtResource("2_skills")

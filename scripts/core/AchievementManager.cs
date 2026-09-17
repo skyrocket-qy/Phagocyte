@@ -62,15 +62,15 @@ public partial class AchievementManager : Node
             { "target_value", 20.0f },
             { "stat_key", "digested" }
         }},
-        { "ach_trigger_burst", new Godot.Collections.Dictionary {
-            { "id", "ach_trigger_burst" },
-            { "title_key", "ACH_TRIGGER_BURST_TITLE" },
-            { "desc_key", "ACH_TRIGGER_BURST_DESC" },
-            { "reward_key", "ACH_TRIGGER_BURST_REWARD" },
+        { "ach_devour_50", new Godot.Collections.Dictionary {
+            { "id", "ach_devour_50" },
+            { "title_key", "ACH_DEVOUR_50_TITLE" },
+            { "desc_key", "ACH_DEVOUR_50_DESC" },
+            { "reward_key", "ACH_DEVOUR_50_REWARD" },
             { "reward_cell", "neutrophil" },
-            { "icon", "💥" },
-            { "target_value", 1.0f },
-            { "stat_key", "burst" }
+            { "icon", "🌪️" },
+            { "target_value", 50.0f },
+            { "stat_key", "digested" }
         }},
         { "ach_reach_level_5", new Godot.Collections.Dictionary {
             { "id", "ach_reach_level_5" },
@@ -118,7 +118,6 @@ public partial class AchievementManager : Node
     public static Godot.Collections.Dictionary ProgressData = new Godot.Collections.Dictionary
     {
         { "digested", 0.0f },
-        { "burst", 0.0f },
         { "level", 1.0f },
         { "survival_time", 0.0f },
         { "radius_ratio", 1.0f },
@@ -214,11 +213,8 @@ public partial class AchievementManager : Node
                     Unlock("ach_first_digestion");
                 if (ProgressData["digested"].AsSingle() >= 20.0f)
                     Unlock("ach_engulf_20");
-                break;
-
-            case "burst_activated":
-                ProgressData["burst"] = 1.0f;
-                Unlock("ach_trigger_burst");
+                if (ProgressData["digested"].AsSingle() >= 50.0f)
+                    Unlock("ach_devour_50");
                 break;
 
             case "level_up":
@@ -372,6 +368,14 @@ public partial class AchievementManager : Node
                     ProgressData[k] = pd[k].AsSingle();
                 }
             }
+
+            // Legacy migration: the retired "Metabolic Storm" burst achievement
+            // is superseded by the 50-devoured survivor goal for the same reward.
+            if (UnlockedIds.ContainsKey("ach_trigger_burst") && UnlockedIds["ach_trigger_burst"].AsBool()
+                && !UnlockedIds.ContainsKey("ach_devour_50"))
+            {
+                UnlockedIds["ach_devour_50"] = true;
+            }
         }
 
         SyncUnlockedClasses();
@@ -411,7 +415,6 @@ public partial class AchievementManager : Node
         ProgressData = new Godot.Collections.Dictionary
         {
             { "digested", 0.0f },
-            { "burst", 0.0f },
             { "level", 1.0f },
             { "survival_time", 0.0f },
             { "radius_ratio", 1.0f },

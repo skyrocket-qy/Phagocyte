@@ -23,8 +23,8 @@
 
 ```mermaid
 graph TD
-    A["走位與誘捕 (Navigating & Luring)<br>利用動態偽足邊界包裹病原體"] --> B["接觸吞噬與儲能 (Phagocytosis & ATP)<br>病原體入體消化，體積動態膨脹"]
-    B --> C["抗原採樣與過載 (Antigen Sampling & Burst)<br>達閾值觸發呼吸爆發或全自動技能齊射"]
+    A["走位與誘捕 (Navigating & Luring)<br>利用動態偽足邊界包裹病原體"] --> B["接觸吞噬與儲能 (Phagocytosis & EXP)<br>病原體入體消化，轉化為免疫經驗"]
+    B --> C["抗原採樣與過載 (Antigen Sampling & Burst)<br>達閾值觸發全自動技能齊射"]
     C --> D["表觀遺傳質變 (Epigenetic Mutations)<br>局內三選一：升級主動5/被動5與超武二合一融合"]
     D --> E["病理波次結算 (Wave Clear & Differentiation)<br>獲得遺傳代碼，點亮造血幹細胞天賦星盤"]
     E --> A
@@ -77,7 +77,7 @@ graph TD
 #### 體積動態聯動公式
 
 定義全域即時體積縮放係數 $\alpha$：
-$$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area} \times \left(1.0 + \frac{\text{Satiety}}{\text{MaxSatiety}} \times 1.5\right)$$
+$$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 
 - **投射物與 AoE 縮放**：所有技能判定範圍直接隨 $\alpha$ 等比擴大。大細胞發射的酸霧是覆蓋半屏的巨浪，小細胞發射的則是細針穿透束。
 - **表面發射點數量（Emission Points）**：周長 $C = 2\pi R_{\text{current}} \propto \alpha$。隨體積增大，多發射源技能（如抗體齊射）自動獲得彈道發射點加成。
@@ -166,7 +166,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area} \times
 | **1. 穿孔素長矛<br>(Perforin Lance)** | 膜上穿孔素成孔 | `might`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近精英射出高初速螺旋光束。`amount` 增加連發數，`pierce` 增加貫穿人數。 |
 | **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解反應 | `might`, `area`, `cooldown_reduction`, `duration`, `knockback` | 在隨機周遭地面生成生化光環，`area` 擴大地雷半徑，延遲 2 秒引發強烈擊退爆破。 |
 | **3. Y 型抗體齊射<br>(Antibody Salvo)** | 游離特異性抗體分泌 | `might`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發尋航 Y 型飛彈，`amount` 直接增加飛彈發射數量。 |
-| **4. 活性氧射流<br>(ROS Spray)** | 呼吸爆發釋放 $\text{H}_2\text{O}_2$ | `might`, `area`, `duration`, `cooldown_reduction` | 朝游動方向噴射高壓錐形酸霧，`area` 擴大噴射錐形面積，造成 DoT 溶解破甲。 |
+| **4. 活性氧射流<br>(ROS Spray)** | NADPH 氧化酶釋放 $\text{H}_2\text{O}_2$ | `might`, `area`, `duration`, `cooldown_reduction` | 朝游動方向噴射高壓錐形酸霧，`area` 擴大噴射錐形面積，造成 DoT 溶解破甲。 |
 | **5. 偽足猛擊<br>(Pseudopod Lunge)** | 微絲聚合瞬間彈射 | `might`, `area`, `amount`, `knockback`, `cooldown_reduction` | 向外猛烈彈射阿米巴抓手，`area` 增加抓手伸長距離，`amount` 增加多向抓手數量。 |
 
 ---
@@ -357,9 +357,8 @@ func update_all_skills(delta: float) -> void:
 - [ ] 搭建通用白血球底盤節點 (`Player.tscn`)，物理半徑統一標準化 `base_radius = 24.0`
 - [ ] 實現 `CellMorphController` 與 `FastNoiseLite` 動態頂點變形深拷貝至 `CollisionPolygon2D`
 
-### Phase 2: 飽食循環與戰鬥手感 (Combat & Satiety Loop)
-- [ ] 實現吞噬病原體入體轉化為 ATP 經驗與飽食度計量
-- [ ] 實現飽食度滿 100%「呼吸爆發（Respiratory Burst）」狀態（移速加成、全域酸性力場）
+### Phase 2: 吞噬循環與戰鬥手感 (Combat & Phagocytosis Loop)
+- [ ] 實現吞噬病原體入體轉化為免疫經驗（EXP）計量
 - [ ] 實現按住空白鍵「脫水穿梭（Squeeze Mode）」避險機制（體積壓縮 40%，關閉吞噬，移速提升）
 - [ ] 實現局內三選一升級抽取介面（主動 5 / 被動 5 / 質變突變卡）
 

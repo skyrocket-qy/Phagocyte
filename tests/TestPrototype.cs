@@ -49,13 +49,11 @@ public partial class TestPrototype : SceneTree
 
         // 2. Check initial stats
         AssertThat(player.Health).IsEqual(100.0f);
-        AssertThat(player.Satiety).IsEqual(0.0f);
         AssertThat(player.CurrentRadius).IsEqual(player.BaseRadius);
         GD.Print("[PASS] Macrophage initial stats verified.");
 
-        // 3. Test Ingestion Loop
-        float initialHp = 80.0f;
-        player.Health = initialHp;
+        // 3. Test Ingestion Loop (pure EXP feedback)
+        float initialExp = player.CurrentExp;
 
         var staphScene = GD.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
         var staph = staphScene.Instantiate<StaphEnemy>();
@@ -65,24 +63,16 @@ public partial class TestPrototype : SceneTree
         // Simulate engulfment
         player.ConsumePathogen(staph);
 
-        AssertThat(player.Satiety).IsGreater(0.0f);
-        AssertThat(player.Health).IsGreater(initialHp);
+        AssertThat(player.CurrentExp).IsGreater(initialExp);
         AssertThat(player.DigestedCount).IsEqual(1);
-        GD.Print("[PASS] Pathogen engulfment, satiety accumulation, and passive healing verified.");
+        GD.Print("[PASS] Pathogen engulfment grants EXP and increments digestion count.");
 
-        // 4. Test Satiety Growth (up to 2.5x)
-        player.Satiety = 100.0f;
+        // 4. Test Area Mutation Radius Growth
+        player.Stats!.SetBase("area", 2.0f);
         player.UpdatePseudopodDeformation(0.016f);
         float expansionRatio = player.CurrentRadius / player.BaseRadius;
-        AssertThat(expansionRatio).IsGreaterEqual(2.4f);
-        GD.Print($"[PASS] Dynamic cell radius expansion (approx 2.5x) verified: {expansionRatio:F2}x");
-
-        // 5. Test Respiratory Burst
-        player.TriggerRespiratoryBurst();
-        AssertThat(player.IsRespiratoryBurst).IsTrue();
-        AssertThat(player.CurrentSpeed).IsGreater(player.BaseSpeed * 2.4f);
-        AssertThat(player.AcidicAura!.Monitoring).IsTrue();
-        GD.Print("[PASS] Respiratory Burst (+150% speed, acidic aura) verified.");
+        AssertThat(expansionRatio).IsEqualApprox(2.0f, 0.05f);
+        GD.Print($"[PASS] Area mutation radius expansion verified: {expansionRatio:F2}x");
 
         GD.Print("--- ALL PROTOTYPE VERIFICATION TESTS PASSED SUCCESSFULLY! ---");
         Quit(0);

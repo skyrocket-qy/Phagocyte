@@ -30,8 +30,6 @@ public partial class MainMenu : Control
     public Label? ClassNameLbl { get; set; }
     public Label? ClassRoleLbl { get; set; }
     public Label? ClassTraitLbl { get; set; }
-    public Label? ClassPassiveLbl { get; set; }
-    public Label? ClassBurstLbl { get; set; }
     public Label? ClassStatusLbl { get; set; }
     public Button? ClassConfirmBtn { get; set; }
     public Button? ClassBackBtn { get; set; }
@@ -77,8 +75,6 @@ public partial class MainMenu : Control
         ClassNameLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassNameLabel");
         ClassRoleLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassRoleLabel");
         ClassTraitLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassTraitLabel");
-        ClassPassiveLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassPassiveLabel");
-        ClassBurstLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassBurstLabel");
         ClassStatusLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatusLabel");
         ClassConfirmBtn = GetNodeOrNull<Button>("ClassView/Buttons/ConfirmButton");
         ClassBackBtn = GetNodeOrNull<Button>("ClassView/Buttons/BackButton");
@@ -213,8 +209,6 @@ public partial class MainMenu : Control
         if (ClassNameLbl != null) ClassNameLbl.Text = data["name"].AsString();
         if (ClassRoleLbl != null) ClassRoleLbl.Text = Tr("LABEL_ROLE") + data["role"].AsString();
         if (ClassTraitLbl != null) ClassTraitLbl.Text = Tr("LABEL_TRAIT") + data["trait"].AsString();
-        if (ClassPassiveLbl != null) ClassPassiveLbl.Text = Tr("LABEL_PASSIVE") + data["passive"].AsString();
-        if (ClassBurstLbl != null) ClassBurstLbl.Text = Tr("LABEL_BURST") + data["burst"].AsString();
 
         bool unlocked = data["unlocked"].AsBool();
         if (ClassStatusLbl != null)

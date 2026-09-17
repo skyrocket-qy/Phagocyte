@@ -24,7 +24,7 @@ public partial class SettingsModal : PanelContainer
     public Label? CtrlMoveLbl { get; set; }
     public Label? CtrlPauseLbl { get; set; }
     public Label? CtrlPhagoLbl { get; set; }
-    public Label? CtrlBurstLbl { get; set; }
+
 
     public HSlider? MasterSlider { get; set; }
     public Label? MasterValLbl { get; set; }
@@ -65,7 +65,6 @@ public partial class SettingsModal : PanelContainer
         CtrlMoveLbl = GetNodeOrNull<Label>("VBox/Content/ControlsPanel/MoveRow/DescLabel");
         CtrlPauseLbl = GetNodeOrNull<Label>("VBox/Content/ControlsPanel/PauseRow/DescLabel");
         CtrlPhagoLbl = GetNodeOrNull<Label>("VBox/Content/ControlsPanel/PhagoRow/DescLabel");
-        CtrlBurstLbl = GetNodeOrNull<Label>("VBox/Content/ControlsPanel/BurstRow/DescLabel");
 
         MasterSlider = GetNodeOrNull<HSlider>("VBox/Content/AudioPanel/MasterRow/Slider");
         MasterValLbl = GetNodeOrNull<Label>("VBox/Content/AudioPanel/MasterRow/ValLabel");
@@ -226,7 +225,6 @@ public partial class SettingsModal : PanelContainer
         if (CtrlMoveLbl != null) CtrlMoveLbl.Text = Tr("CONTROLS_MOVE_DESC");
         if (CtrlPauseLbl != null) CtrlPauseLbl.Text = Tr("CONTROLS_PAUSE_DESC");
         if (CtrlPhagoLbl != null) CtrlPhagoLbl.Text = Tr("CONTROLS_PHAGO_DESC");
-        if (CtrlBurstLbl != null) CtrlBurstLbl.Text = Tr("CONTROLS_BURST_DESC");
 
         if (MasterTitleLbl != null) MasterTitleLbl.Text = Tr("SETTINGS_MASTER_VOL");
         if (SfxTitleLbl != null) SfxTitleLbl.Text = Tr("SETTINGS_SFX_VOL");

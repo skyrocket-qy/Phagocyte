@@ -8,14 +8,12 @@ namespace Phagocyte.Player;
 /// Killer T-Cell (CTL / CD8+)
 /// High-Speed Assassin / Perforation.
 /// Compact micro-trembling spherical body with a massive circular nucleus
-/// occupying ~80% of cell volume. High base speed & critical strike affinity.
+/// occupying ~80% of cell volume.
 /// </summary>
 public partial class CtlCell : BaseCell
 {
     public static readonly Color ColorNormal = new(0.85f, 0.32f, 0.45f, 0.45f);
-    public static readonly Color ColorBurst = new(1.0f, 0.45f, 0.25f, 0.75f);
     public static readonly Color MembraneNormal = new(0.95f, 0.55f, 0.68f, 0.80f);
-    public static readonly Color MembraneBurst = new(1.0f, 0.85f, 0.45f, 0.95f);
 
     public override void SetupCellIdentity()
     {
@@ -32,14 +30,6 @@ public partial class CtlCell : BaseCell
             Frequency = 2.4f,
             FractalOctaves = 1
         };
-
-        // Critical Strike & Agility innate bonuses
-        if (Stats != null)
-        {
-            Stats.SetBase("crit_chance", 0.15f);
-            Stats.SetBase("crit_damage", 1.75f);
-            Stats.SetBase("might", 1.10f);
-        }
     }
 
     public override void SetupNucleusShape()
@@ -66,36 +56,6 @@ public partial class CtlCell : BaseCell
         {
             var perforin = new PerforinLanceSkill();
             CellSkillManager.EquipActive(perforin, 0);
-        }
-    }
-
-    public override float GetBurstMoveSpeed(float baseSp)
-    {
-        return baseSp * 2.2f;
-    }
-
-    public override void ApplyBurstVisuals(bool active)
-    {
-        if (active)
-        {
-            DeformationSpeed = 10.0f;
-            if (Cytoplasm != null) Cytoplasm.Color = ColorBurst;
-            if (Membrane != null) Membrane.DefaultColor = MembraneBurst;
-        }
-        else
-        {
-            DeformationSpeed = 7.2f;
-            if (Cytoplasm != null) Cytoplasm.Color = ColorNormal;
-            if (Membrane != null) Membrane.DefaultColor = MembraneNormal;
-        }
-    }
-
-    public override void OnPathogenConsumed(Node2D enemy, float atp)
-    {
-        // Perforation execution: chance to trigger instant apoptosis
-        if (IsBurst && enemy != null && GodotObject.IsInstanceValid(enemy) && enemy.HasMethod("take_damage"))
-        {
-            enemy.Call("take_damage", 60.0f);
         }
     }
 }

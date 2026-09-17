@@ -270,7 +270,7 @@ public partial class CodexModal : PanelContainer
 
         if (DetailBio != null)
         {
-            DetailBio.Text = Tr("CODEX_HEADER_PASSIVE") + "\n" + d["passive"].AsString() + "\n\n" + Tr("CODEX_HEADER_BURST") + "\n" + d["burst"].AsString();
+            DetailBio.Text = "";
         }
     }
 

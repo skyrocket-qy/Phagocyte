@@ -165,24 +165,6 @@ theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
 theme_override_font_sizes/font_size = 13
 text = "自動包裹吞噬入侵病原體（恢復生命值與飽食能量）。"
 
-[node name="BurstRow" type="HBoxContainer" parent="VBox/Content/ControlsPanel"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="KeyLabel" type="Label" parent="VBox/Content/ControlsPanel/BurstRow"]
-custom_minimum_size = Vector2(130, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
-theme_override_font_sizes/font_size = 14
-text = "100% 飽食度"
-
-[node name="DescLabel" type="Label" parent="VBox/Content/ControlsPanel/BurstRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
-theme_override_font_sizes/font_size = 13
-text = "觸發終極爆發形態，大幅加速並釋放強酸腐蝕力場。"
-
 [node name="AudioPanel" type="VBoxContainer" parent="VBox/Content"]
 visible = false
 layout_mode = 2

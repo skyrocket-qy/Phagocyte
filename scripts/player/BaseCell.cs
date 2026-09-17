@@ -10,15 +10,12 @@ namespace Phagocyte.Player;
 /// <summary>
 /// Base class for all Immune Defense Cells in Project: Phagocyte.
 /// Encapsulates universal stats, physics movement, 32-vertex organic deformation,
-/// satiety accumulation, digestion, experience progression, and ultimate burst states.
+/// digestion, and experience progression.
 /// </summary>
 public partial class BaseCell : CharacterBody2D
 {
     [Signal]
-    public delegate void StatsChangedEventHandler(float health, float maxHealth, float satiety, float maxSatiety, float radiusRatio);
-
-    [Signal]
-    public delegate void BurstStateChangedEventHandler(bool isActive, float timeLeft, float maxTime);
+    public delegate void StatsChangedEventHandler(float health, float maxHealth, float radiusRatio);
 
     [Signal]
     public delegate void PathogenDigestedEventHandler(Node2D pathogen, float atpGained);
@@ -40,9 +37,6 @@ public partial class BaseCell : CharacterBody2D
     [Export] public float BaseRadius { get; set; } = 48.0f;
     public float CurrentRadius { get; set; } = 48.0f;
 
-    [Export] public float MaxSatiety { get; set; } = 100.0f;
-    public float Satiety { get; set; } = 0.0f;
-
     public float Health { get; set; } = 100.0f;
     public float CurrentSpeed { get; set; } = 230.0f;
 
@@ -54,11 +48,6 @@ public partial class BaseCell : CharacterBody2D
     [Export] public int SmoothSubdivisions { get; set; } = 4; // 32 * 4 = 128 high-density smooth points
     public FastNoiseLite? Noise { get; set; }
     public float NoiseTime { get; set; } = 0.0f;
-
-    // Ultimate Burst
-    public bool IsBurst { get; set; } = false;
-    public float BurstTimer { get; set; } = 0.0f;
-    [Export] public float BurstDuration { get; set; } = 6.0f;
 
     // Digestion tracking
     public int DigestedCount { get; set; } = 0;
@@ -82,7 +71,6 @@ public partial class BaseCell : CharacterBody2D
     public Polygon2D? Nucleus { get; set; }
     public CollisionPolygon2D? EngulfCollider { get; set; }
     public Area2D? EngulfArea { get; set; }
-    public CpuParticles2D? BurstParticles { get; set; }
     public SkillManager? CellSkillManager { get; set; }
 
     public CellStats? Stats { get; set; }
@@ -236,7 +224,6 @@ public partial class BaseCell : CharacterBody2D
         Nucleus = GetNodeOrNull<Polygon2D>("Nucleus");
         EngulfCollider = GetNodeOrNull<CollisionPolygon2D>("EngulfArea/EngulfCollider");
         EngulfArea = GetNodeOrNull<Area2D>("EngulfArea");
-        BurstParticles = GetNodeOrNull<CpuParticles2D>("BurstParticles");
         CellSkillManager = GetNodeOrNull<SkillManager>("SkillManager");
 
         // Ensure CellStats container node is initialized
@@ -264,11 +251,6 @@ public partial class BaseCell : CharacterBody2D
         if (EngulfArea != null)
         {
             EngulfArea.AreaEntered += OnEngulfAreaEntered;
-        }
-
-        if (BurstParticles != null)
-        {
-            BurstParticles.Emitting = false;
         }
 
         SetupGranuleCanvas();
@@ -318,7 +300,6 @@ public partial class BaseCell : CharacterBody2D
 
         HandleRegen(dt);
         HandleMovement(dt);
-        HandleBurst(dt);
         UpdatePseudopodDeformation(dt);
 
         if (CellSkillManager != null)
@@ -481,10 +462,6 @@ public partial class BaseCell : CharacterBody2D
         }
 
         float targetSpeed = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
-        if (IsBurst)
-        {
-            targetSpeed = GetBurstMoveSpeed(targetSpeed);
-        }
         if (SlowTimer > 0.0f)
         {
             targetSpeed *= SlowFactor;
@@ -507,26 +484,14 @@ public partial class BaseCell : CharacterBody2D
         MoveAndSlide();
     }
 
-    public virtual float GetBurstMoveSpeed(float baseSp)
-    {
-        return baseSp * 2.5f;
-    }
-
     public virtual void UpdatePseudopodDeformation(float delta)
     {
         NoiseTime += delta * DeformationSpeed;
 
-        float expansionRatio = 1.0f + (Satiety / Mathf.Max(1.0f, MaxSatiety)) * 1.5f;
         float areaScale = Stats != null ? Stats.GetStat("area") : 1.0f;
 
-        float curR = BaseRadius * expansionRatio * areaScale;
-        CurrentDeformationMag = BaseDeformationMag * expansionRatio * areaScale;
-
-        if (IsBurst)
-        {
-            curR *= 1.15f;
-            CurrentDeformationMag *= 1.35f;
-        }
+        float curR = BaseRadius * areaScale;
+        CurrentDeformationMag = BaseDeformationMag * areaScale;
 
         CurrentRadius = curR;
 
@@ -714,13 +679,6 @@ public partial class BaseCell : CharacterBody2D
         NucleusVelocity += accel * delta;
         NucleusOffset += NucleusVelocity * delta;
         Nucleus.Position = NucleusOffset;
-
-        float nScale = 1.0f + (Satiety / Mathf.Max(1.0f, MaxSatiety)) * 0.8f;
-        Nucleus.Scale = new Vector2(nScale, nScale);
-        if (Nucleus.Material is ShaderMaterial nMat)
-        {
-            nMat.SetShaderParameter("radius", 18.0f * nScale);
-        }
     }
 
     private void OnEngulfAreaEntered(Area2D area)
@@ -769,15 +727,6 @@ public partial class BaseCell : CharacterBody2D
 
         DigestedCount += 1;
 
-        if (!IsBurst)
-        {
-            Satiety = Mathf.Clamp(Satiety + atp, 0.0f, MaxSatiety);
-            if (Satiety >= MaxSatiety)
-            {
-                TriggerBurst();
-            }
-        }
-
         OnPathogenConsumed(enemy, atp);
 
         float growthMult = Stats != null ? Stats.GetStat("growth") : 1.0f;
@@ -804,56 +753,6 @@ public partial class BaseCell : CharacterBody2D
             EmitSignal(SignalName.LevelUp, CurrentLevel);
         }
         EmitSignal(SignalName.ExpChanged, CurrentExp, ExpToNextLevel, CurrentLevel);
-    }
-
-    public void TriggerBurst()
-    {
-        if (IsBurst)
-            return;
-        IsBurst = true;
-        BurstTimer = BurstDuration;
-        float sp = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
-        CurrentSpeed = GetBurstMoveSpeed(sp);
-        if (BurstParticles != null)
-        {
-            BurstParticles.Emitting = true;
-        }
-        ApplyBurstVisuals(true);
-        EmitSignal(SignalName.BurstStateChanged, true, BurstTimer, BurstDuration);
-    }
-
-    private void HandleBurst(float delta)
-    {
-        if (!IsBurst)
-            return;
-        BurstTimer -= delta;
-        Satiety = Mathf.Clamp((BurstTimer / BurstDuration) * MaxSatiety, 0.0f, MaxSatiety);
-        EmitSignal(SignalName.BurstStateChanged, true, Mathf.Max(0.0f, BurstTimer), BurstDuration);
-        EmitStatsSignal();
-
-        if (BurstTimer <= 0.0f)
-        {
-            EndBurst();
-        }
-    }
-
-    private void EndBurst()
-    {
-        IsBurst = false;
-        BurstTimer = 0.0f;
-        Satiety = 0.0f;
-        CurrentSpeed = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
-        if (BurstParticles != null)
-        {
-            BurstParticles.Emitting = false;
-        }
-        ApplyBurstVisuals(false);
-        EmitSignal(SignalName.BurstStateChanged, false, 0.0f, BurstDuration);
-        EmitStatsSignal();
-    }
-
-    public virtual void ApplyBurstVisuals(bool active)
-    {
     }
 
     public void Heal(float amount)
@@ -940,7 +839,6 @@ public partial class BaseCell : CharacterBody2D
 
     public void DrainAtp(float amount)
     {
-        Satiety = Mathf.Max(0.0f, Satiety - amount);
         CurrentExp = Mathf.Max(0.0f, CurrentExp - amount);
         EmitStatsSignal();
         EmitSignal(SignalName.ExpChanged, CurrentExp, ExpToNextLevel, CurrentLevel);
@@ -950,6 +848,6 @@ public partial class BaseCell : CharacterBody2D
     {
         float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
         float ratio = CurrentRadius / BaseRadius;
-        EmitSignal(SignalName.StatsChanged, Health, maxHp, Satiety, MaxSatiety, ratio);
+        EmitSignal(SignalName.StatsChanged, Health, maxHp, ratio);
     }
 }

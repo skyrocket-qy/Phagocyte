@@ -7,26 +7,13 @@ namespace Phagocyte.Player;
 /// <summary>
 /// Macrophage (巨噬細胞)
 /// Heavy Melee Tank / Phagocytosis sentinel.
-/// Features amoeboid organic pseudopods, kidney-shaped nucleus,
-/// 0.5% max HP passive recovery per digestion, and Respiratory Burst with Acidic Aura.
+/// Features amoeboid organic pseudopods and a kidney-shaped nucleus.
 /// </summary>
 public partial class Macrophage : BaseCell
 {
-    public Area2D? AcidicAura { get; set; }
-    public CollisionShape2D? AuraCollider { get; set; }
-
     // Cytoplasm coloring (Deep Transparent Aqueous Glass + Deep Violet Chromatin Nucleus)
     public static readonly Color ColorNormal = new(0.18f, 0.32f, 0.52f, 0.22f);
-    public static readonly Color ColorBurst = new(0.95f, 0.65f, 0.20f, 0.40f);
     public static readonly Color MembraneNormal = new(0.80f, 0.92f, 1.0f, 0.60f);
-    public static readonly Color MembraneBurst = new(1.0f, 0.92f, 0.50f, 0.95f);
-
-    // Backward-compatibility alias for tests and HUD
-    public bool IsRespiratoryBurst
-    {
-        get => IsBurst;
-        set => IsBurst = value;
-    }
 
     public override void SetupCellIdentity()
     {
@@ -43,15 +30,6 @@ public partial class Macrophage : BaseCell
             Frequency = 0.65f,
             FractalOctaves = 2
         };
-
-        AcidicAura = GetNodeOrNull<Area2D>("AcidicAura");
-        AuraCollider = GetNodeOrNull<CollisionShape2D>("AcidicAura/AuraCollider");
-
-        if (AcidicAura != null)
-        {
-            AcidicAura.AreaEntered += OnAcidicAuraEntered;
-            AcidicAura.Monitoring = false;
-        }
     }
 
     public override void SetupNucleusShape()
@@ -81,48 +59,6 @@ public partial class Macrophage : BaseCell
         {
             var ros = new RosTorrentSkill();
             CellSkillManager.EquipActive(ros, 0);
-        }
-    }
-
-    public override void OnPathogenConsumed(Node2D enemy, float atp)
-    {
-        // Macrophage Inherent Trait: Heals 0.5% max HP per digested pathogen
-        float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
-        Heal(maxHp * 0.005f);
-    }
-
-    public void TriggerRespiratoryBurst()
-    {
-        TriggerBurst();
-    }
-
-    public override void ApplyBurstVisuals(bool active)
-    {
-        if (active)
-        {
-            DeformationSpeed = 6.0f;
-            if (Cytoplasm != null) Cytoplasm.Color = ColorBurst;
-            if (Membrane != null) Membrane.DefaultColor = MembraneBurst;
-            if (AcidicAura != null) AcidicAura.Monitoring = true;
-        }
-        else
-        {
-            DeformationSpeed = 3.6f;
-            if (Cytoplasm != null) Cytoplasm.Color = ColorNormal;
-            if (Membrane != null) Membrane.DefaultColor = MembraneNormal;
-            if (AcidicAura != null) AcidicAura.Monitoring = false;
-        }
-    }
-
-    private void OnAcidicAuraEntered(Area2D area)
-    {
-        if (IsBurst)
-        {
-            var enemy = area.GetParent();
-            if (enemy != null && enemy.HasMethod("be_engulfed"))
-            {
-                ConsumePathogen((Node2D)enemy);
-            }
         }
     }
 }

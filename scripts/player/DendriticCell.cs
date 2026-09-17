@@ -8,14 +8,11 @@ namespace Phagocyte.Player;
 /// Dendritic Cell (樹突狀細胞)
 /// Tactical Commander / Antigen Summoner.
 /// Star-shaped sea-anemone body with long branching dendritic tree extensions.
-/// Specializes in Magnet pickup radius (+50%) and Growth (+25%).
 /// </summary>
 public partial class DendriticCell : BaseCell
 {
     public static readonly Color ColorNormal = new(0.40f, 0.78f, 0.60f, 0.38f);
-    public static readonly Color ColorBurst = new(0.60f, 0.95f, 0.50f, 0.75f);
     public static readonly Color MembraneNormal = new(0.60f, 0.90f, 0.75f, 0.75f);
-    public static readonly Color MembraneBurst = new(0.80f, 0.98f, 0.65f, 0.95f);
 
     public override void SetupCellIdentity()
     {
@@ -32,12 +29,6 @@ public partial class DendriticCell : BaseCell
             Frequency = 0.5f,
             FractalOctaves = 2
         };
-
-        if (Stats != null)
-        {
-            Stats.SetBase("magnet", 1.50f);
-            Stats.SetBase("growth", 1.25f);
-        }
     }
 
     public override void SetupNucleusShape()
@@ -75,17 +66,10 @@ public partial class DendriticCell : BaseCell
     {
         NoiseTime += delta * DeformationSpeed;
 
-        float expansionRatio = 1.0f + (Satiety / Mathf.Max(1.0f, MaxSatiety)) * 1.5f;
         float areaScale = Stats != null ? Stats.GetStat("area") : 1.0f;
 
-        float curR = BaseRadius * expansionRatio * areaScale;
-        CurrentDeformationMag = BaseDeformationMag * expansionRatio * areaScale;
-
-        if (IsBurst)
-        {
-            curR *= 1.20f;
-            CurrentDeformationMag *= 1.45f;
-        }
+        float curR = BaseRadius * areaScale;
+        CurrentDeformationMag = BaseDeformationMag * areaScale;
 
         CurrentRadius = curR;
 
@@ -166,29 +150,5 @@ public partial class DendriticCell : BaseCell
         NucleusVelocity += accel * delta;
         NucleusOffset += NucleusVelocity * delta;
         Nucleus.Position = NucleusOffset;
-
-        float nScale = 1.0f + (Satiety / Mathf.Max(1.0f, MaxSatiety)) * 0.8f;
-        Nucleus.Scale = new Vector2(nScale, nScale);
-    }
-
-    public override float GetBurstMoveSpeed(float baseSp)
-    {
-        return baseSp * 2.2f;
-    }
-
-    public override void ApplyBurstVisuals(bool active)
-    {
-        if (active)
-        {
-            DeformationSpeed = 5.0f;
-            if (Cytoplasm != null) Cytoplasm.Color = ColorBurst;
-            if (Membrane != null) Membrane.DefaultColor = MembraneBurst;
-        }
-        else
-        {
-            DeformationSpeed = 2.8f;
-            if (Cytoplasm != null) Cytoplasm.Color = ColorNormal;
-            if (Membrane != null) Membrane.DefaultColor = MembraneNormal;
-        }
     }
 }

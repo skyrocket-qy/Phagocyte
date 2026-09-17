@@ -157,17 +157,14 @@ public partial class TestSurvivorHudUx : SceneTree
         AssertThat(headerHBox?.Visible ?? true).IsFalse();
         AssertThat(footerHBox?.Visible ?? true).IsFalse();
 
-        hud.LastBurstTimeLeft = 0.0f;
         hud.UpdateLocalizedTexts();
         AssertThat(hud.BuffTag!.Visible).IsFalse();
 
-        // Trigger Burst
-        player.TriggerBurst();
-        hud.ConnectPlayer(player);
-        hud.LastBurstTimeLeft = 6.0f;
+        // Apply a Slow debuff
+        player.ApplySlow(3.0f, 0.5f);
         hud._Process(0.016);
         AssertThat(hud.BuffTag.Visible).IsTrue();
-        AssertThat(hud.BuffTag.Text.Contains("⚡")).IsTrue();
+        AssertThat(hud.BuffTag.Text.Contains("🐌")).IsTrue();
         GD.Print("[PASS] 6. Frameless Buff-only monitor verified (Hidden when calm, pops up on active Buff/Debuff).");
 
         GD.Print("==================================================================");

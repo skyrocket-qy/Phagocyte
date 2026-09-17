@@ -89,18 +89,12 @@ public partial class Main : Node2D
                 AchievementManager.RecordEvent("pathogen_digested", bc.DigestedCount);
             };
 
-            bc.BurstStateChanged += (isActive, timeLeft, maxTime) =>
-            {
-                if (isActive)
-                    AchievementManager.RecordEvent("burst_activated");
-            };
-
             bc.LevelUp += (lvl) =>
             {
                 AchievementManager.RecordEvent("level_up", lvl);
             };
 
-            bc.StatsChanged += (health, maxHealth, satiety, maxSatiety, radiusRatio) =>
+            bc.StatsChanged += (health, maxHealth, radiusRatio) =>
             {
                 AchievementManager.RecordEvent("radius_ratio", radiusRatio);
             };
@@ -115,14 +109,6 @@ public partial class Main : Node2D
                     AchievementManager.RecordEvent("pathogen_digested", digVal.VariantType == Variant.Type.Int ? digVal.AsInt32() : 0);
                 }));
             }
-            if (Player.HasSignal("burst_state_changed"))
-            {
-                Player.Connect("burst_state_changed", Callable.From((bool isActive, float _t, float _m) =>
-                {
-                    if (isActive)
-                        AchievementManager.RecordEvent("burst_activated");
-                }));
-            }
             if (Player.HasSignal("level_up"))
             {
                 Player.Connect("level_up", Callable.From((int lvl) =>
@@ -132,7 +118,7 @@ public partial class Main : Node2D
             }
             if (Player.HasSignal("stats_changed"))
             {
-                Player.Connect("stats_changed", Callable.From((float _h, float _mh, float _s, float _ms, float rr) =>
+                Player.Connect("stats_changed", Callable.From((float _h, float _mh, float rr) =>
                 {
                     AchievementManager.RecordEvent("radius_ratio", rr);
                 }));

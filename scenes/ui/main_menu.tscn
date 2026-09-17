@@ -270,18 +270,6 @@ theme_override_font_sizes/font_size = 14
 text = "变形特性：顶点位移幅度极大，伪足延伸速度快"
 autowrap_mode = 3
 
-[node name="ClassPassiveLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "固有被动：巨噬本能：吞噬范围 +40%；每消化一只病原体恢复 0.5% 最大生命值。"
-autowrap_mode = 3
-
-[node name="ClassBurstLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "终极技能：呼吸爆发：饱食度满时移速 +150%，释放高压酸性腐蚀力场 6 秒。"
-autowrap_mode = 3
-
 [node name="Buttons" type="HBoxContainer" parent="ClassView"]
 layout_mode = 1
 anchors_preset = 7

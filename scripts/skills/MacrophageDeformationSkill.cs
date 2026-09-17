@@ -59,36 +59,21 @@ public partial class MacrophageDeformationSkill : BaseSkill
 
         _noiseTime += delta * defSpeed;
 
-        float satiety = 0.0f;
-        var hostSatiety = Host.Get("satiety");
-        if (hostSatiety.VariantType == Variant.Type.Float)
-            satiety = (float)hostSatiety;
-
-        float maxSatiety = 100.0f;
-        var hostMaxSatiety = Host.Get("max_satiety");
-        if (hostMaxSatiety.VariantType == Variant.Type.Float)
-            maxSatiety = (float)hostMaxSatiety;
-
         float baseR = 63.0f;
         var hostBaseR = Host.Get("base_radius");
         if (hostBaseR.VariantType == Variant.Type.Float)
             baseR = (float)hostBaseR;
 
-        bool isBurst = false;
-        var hostIsBurst = Host.Get("is_respiratory_burst");
-        if (hostIsBurst.VariantType == Variant.Type.Bool)
-            isBurst = (bool)hostIsBurst;
-
-        // Satiety radius expansion (1.0x to 2.5x)
-        float expansionRatio = 1.0f + (satiety / Mathf.Max(1.0f, maxSatiety)) * 1.5f;
-        float curR = baseR * expansionRatio;
-        CurrentDeformationMag = BaseDeformationMag * expansionRatio;
-
-        if (isBurst)
+        float areaScale = 1.0f;
+        if (Host.HasNode("CellStats"))
         {
-            curR *= 1.15f;
-            CurrentDeformationMag *= 1.35f;
+            var stats = Host.GetNodeOrNull<Node>("CellStats");
+            if (stats != null && stats.HasMethod("GetStat"))
+                areaScale = (float)stats.Call("GetStat", "area");
         }
+
+        float curR = baseR * areaScale;
+        CurrentDeformationMag = BaseDeformationMag * areaScale;
 
         Host.Set("current_radius", curR);
 
@@ -154,23 +139,10 @@ public partial class MacrophageDeformationSkill : BaseSkill
         if (hostTargetOffset.VariantType == Variant.Type.Vector2)
             targetOffset = (Vector2)hostTargetOffset;
 
-        float satiety = 0.0f;
-        var hostSatiety = Host.Get("satiety");
-        if (hostSatiety.VariantType == Variant.Type.Float)
-            satiety = (float)hostSatiety;
-
-        float maxSatiety = 100.0f;
-        var hostMaxSatiety = Host.Get("max_satiety");
-        if (hostMaxSatiety.VariantType == Variant.Type.Float)
-            maxSatiety = (float)hostMaxSatiety;
-
         nucleusOffset = nucleusOffset.Lerp(targetOffset, 8.0f * delta);
         Host.Set("nucleus_offset", nucleusOffset);
 
         var nucleusNode = Host.GetNode<Node2D>("Nucleus");
         nucleusNode.Position = nucleusOffset;
-
-        float nScale = 1.0f + (satiety / Mathf.Max(1.0f, maxSatiety)) * 0.8f;
-        nucleusNode.Scale = new Vector2(nScale, nScale);
     }
 }

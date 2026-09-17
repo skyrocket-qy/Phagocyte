@@ -108,47 +108,12 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
-bg_color = Color(0.06, 0.1, 0.15, 0.85)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.16, 0.28, 0.38, 0.5)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_exp_fill"]
 bg_color = Color(0.18, 0.78, 0.98, 0.95)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_burst"]
-bg_color = Color(0.85, 0.55, 0.05, 0.9)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.9, 0.3, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-content_margin_left = 16.0
-content_margin_top = 8.0
-content_margin_right = 16.0
-content_margin_bottom = 8.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_burst_fill"]
-bg_color = Color(1, 0.95, 0.3, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause"]
 bg_color = Color(0.06, 0.09, 0.14, 0.95)
@@ -365,38 +330,6 @@ layout_mode = 2
 [node name="CountLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/LegacyBars"]
 layout_mode = 2
 text = "0"
-
-[node name="BurstContainer" type="PanelContainer" parent="."]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -220.0
-offset_top = 48.0
-offset_right = 220.0
-offset_bottom = 118.0
-grow_horizontal = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_burst")
-
-[node name="VBox" type="VBoxContainer" parent="BurstContainer"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="BurstLabel" type="Label" parent="BurstContainer/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 14
-text = "⚡ 呼吸爆发 (Respiratory Burst) 剩余 6.0s ⚡
-移速 +150% | 酸性腐蚀力场生效中"
-horizontal_alignment = 1
-
-[node name="BurstBar" type="ProgressBar" parent="BurstContainer/VBox"]
-custom_minimum_size = Vector2(0, 8)
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_burst_fill")
-max_value = 6.0
-value = 6.0
-show_percentage = false
 
 [node name="SkillContainer" type="PanelContainer" parent="."]
 anchors_preset = 7

@@ -7,15 +7,12 @@ namespace Phagocyte.Player;
 /// <summary>
 /// Neutrophil (嗜中性球)
 /// Kamikaze Demolition / Holdout.
-/// Features jittery granular outer membrane, distinctive multi-lobed segmented nucleus (3-4 lobes),
-/// Might +15%, and Degranulation Storm burst.
+/// Features jittery granular outer membrane and a distinctive multi-lobed segmented nucleus (3-4 lobes).
 /// </summary>
 public partial class NeutrophilCell : BaseCell
 {
     public static readonly Color ColorNormal = new(0.86f, 0.88f, 0.94f, 0.40f);
-    public static readonly Color ColorBurst = new(1.0f, 0.92f, 0.55f, 0.75f);
     public static readonly Color MembraneNormal = new(0.92f, 0.95f, 1.0f, 0.80f);
-    public static readonly Color MembraneBurst = new(1.0f, 0.98f, 0.75f, 0.95f);
 
     public override void SetupCellIdentity()
     {
@@ -32,12 +29,6 @@ public partial class NeutrophilCell : BaseCell
             Frequency = 1.8f,
             FractalOctaves = 2
         };
-
-        if (Stats != null)
-        {
-            Stats.SetBase("might", 1.15f);
-            Stats.SetBase("health_regen", 0.5f);
-        }
     }
 
     public override void SetupNucleusShape()
@@ -67,27 +58,6 @@ public partial class NeutrophilCell : BaseCell
         {
             var comp = new ComplementCascadeSkill();
             CellSkillManager.EquipActive(comp, 0);
-        }
-    }
-
-    public override float GetBurstMoveSpeed(float baseSp)
-    {
-        return baseSp * 2.3f;
-    }
-
-    public override void ApplyBurstVisuals(bool active)
-    {
-        if (active)
-        {
-            DeformationSpeed = 8.0f;
-            if (Cytoplasm != null) Cytoplasm.Color = ColorBurst;
-            if (Membrane != null) Membrane.DefaultColor = MembraneBurst;
-        }
-        else
-        {
-            DeformationSpeed = 5.0f;
-            if (Cytoplasm != null) Cytoplasm.Color = ColorNormal;
-            if (Membrane != null) Membrane.DefaultColor = MembraneNormal;
         }
     }
 }

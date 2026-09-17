@@ -8,14 +8,11 @@ namespace Phagocyte.Player;
 /// B-Lymphocyte (B-Cell / 漿細胞)
 /// Ranged Launch / Guidance.
 /// Spherical cell with clock-face nucleus and surface receptor protrusions.
-/// Specializes in Cooldown Reduction (+15%) and Projectile Speed (+25%).
 /// </summary>
 public partial class BCell : BaseCell
 {
     public static readonly Color ColorNormal = new(0.35f, 0.55f, 0.90f, 0.40f);
-    public static readonly Color ColorBurst = new(0.50f, 0.70f, 1.0f, 0.75f);
     public static readonly Color MembraneNormal = new(0.65f, 0.82f, 1.0f, 0.75f);
-    public static readonly Color MembraneBurst = new(0.85f, 0.95f, 1.0f, 0.95f);
 
     public override void SetupCellIdentity()
     {
@@ -32,12 +29,6 @@ public partial class BCell : BaseCell
             Frequency = 0.9f,
             FractalOctaves = 2
         };
-
-        if (Stats != null)
-        {
-            Stats.SetBase("cooldown_reduction", 0.15f);
-            Stats.SetBase("projectile_speed", 1.25f);
-        }
     }
 
     public override void SetupNucleusShape()
@@ -67,27 +58,6 @@ public partial class BCell : BaseCell
         {
             var salvo = new AntibodySalvoSkill();
             CellSkillManager.EquipActive(salvo, 0);
-        }
-    }
-
-    public override float GetBurstMoveSpeed(float baseSp)
-    {
-        return baseSp * 2.2f;
-    }
-
-    public override void ApplyBurstVisuals(bool active)
-    {
-        if (active)
-        {
-            DeformationSpeed = 6.0f;
-            if (Cytoplasm != null) Cytoplasm.Color = ColorBurst;
-            if (Membrane != null) Membrane.DefaultColor = MembraneBurst;
-        }
-        else
-        {
-            DeformationSpeed = 3.2f;
-            if (Cytoplasm != null) Cytoplasm.Color = ColorNormal;
-            if (Membrane != null) Membrane.DefaultColor = MembraneNormal;
         }
     }
 }

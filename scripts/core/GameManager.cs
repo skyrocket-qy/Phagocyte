@@ -52,8 +52,6 @@ public partial class GameManager : Node
             { "name_key", "CLASS_MACROPHAGE_NAME" },
             { "role_key", "CLASS_MACROPHAGE_ROLE" },
             { "trait_key", "CLASS_MACROPHAGE_TRAIT" },
-            { "passive_key", "CLASS_MACROPHAGE_PASSIVE" },
-            { "burst_key", "CLASS_MACROPHAGE_BURST" },
             { "unlocked", true },
             { "unlock_achievement", "" }
         }},
@@ -61,8 +59,6 @@ public partial class GameManager : Node
             { "name_key", "CLASS_CTL_NAME" },
             { "role_key", "CLASS_CTL_ROLE" },
             { "trait_key", "CLASS_CTL_TRAIT" },
-            { "passive_key", "CLASS_CTL_PASSIVE" },
-            { "burst_key", "CLASS_CTL_BURST" },
             { "unlocked", false },
             { "unlock_achievement", "ach_engulf_20" }
         }},
@@ -70,17 +66,13 @@ public partial class GameManager : Node
             { "name_key", "CLASS_NEUTROPHIL_NAME" },
             { "role_key", "CLASS_NEUTROPHIL_ROLE" },
             { "trait_key", "CLASS_NEUTROPHIL_TRAIT" },
-            { "passive_key", "CLASS_NEUTROPHIL_PASSIVE" },
-            { "burst_key", "CLASS_NEUTROPHIL_BURST" },
             { "unlocked", false },
-            { "unlock_achievement", "ach_trigger_burst" }
+            { "unlock_achievement", "ach_devour_50" }
         }},
         { "b_cell", new Dictionary {
             { "name_key", "CLASS_B_CELL_NAME" },
             { "role_key", "CLASS_B_CELL_ROLE" },
             { "trait_key", "CLASS_B_CELL_TRAIT" },
-            { "passive_key", "CLASS_B_CELL_PASSIVE" },
-            { "burst_key", "CLASS_B_CELL_BURST" },
             { "unlocked", false },
             { "unlock_achievement", "ach_reach_level_5" }
         }},
@@ -88,8 +80,6 @@ public partial class GameManager : Node
             { "name_key", "CLASS_DENDRITIC_NAME" },
             { "role_key", "CLASS_DENDRITIC_ROLE" },
             { "trait_key", "CLASS_DENDRITIC_TRAIT" },
-            { "passive_key", "CLASS_DENDRITIC_PASSIVE" },
-            { "burst_key", "CLASS_DENDRITIC_BURST" },
             { "unlocked", false },
             { "unlock_achievement", "ach_survive_180s" }
         }}
@@ -249,29 +239,6 @@ public partial class GameManager : Node
             { "cooldown", 6.0f },
             { "max_level", 5 }
         }},
-        { "phagocytic_instinct", new Dictionary {
-            { "id", "phagocytic_instinct" },
-            { "name_key", "SKILL_INSTINCT_NAME" },
-            { "desc_key", "SKILL_INSTINCT_DESC" },
-            { "bio_key", "SKILL_INSTINCT_BIO" },
-            { "icon", "🩸" },
-            { "type", "passive" },
-            { "class_id", "" },
-            { "cooldown", 0.0f },
-            { "max_level", 5 }
-        }},
-        { "chemotaxis_guidance", new Dictionary {
-            { "id", "chemotaxis_guidance" },
-            { "name_key", "SKILL_CHEMOTAXIS_NAME" },
-            { "desc_key", "SKILL_CHEMOTAXIS_DESC" },
-            { "bio_key", "SKILL_CHEMOTAXIS_BIO" },
-            { "icon", "🧭" },
-            { "type", "passive" },
-            { "class_id", "" },
-            { "cooldown", 0.0f },
-            { "max_level", 5 }
-        }},
-
         // --- 16 Active Weapons ---
         { "ros_torrent", new Dictionary {
             { "id", "ros_torrent" },
@@ -840,8 +807,6 @@ public partial class GameManager : Node
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },
             { "role", TranslationServer.Translate(d["role_key"].AsString()) },
             { "trait", TranslationServer.Translate(d["trait_key"].AsString()) },
-            { "passive", TranslationServer.Translate(d["passive_key"].AsString()) },
-            { "burst", TranslationServer.Translate(d["burst_key"].AsString()) },
             { "unlocked", d["unlocked"] },
             { "unlock_achievement", d.TryGetValue("unlock_achievement", out Variant val) ? val : "" }
         };

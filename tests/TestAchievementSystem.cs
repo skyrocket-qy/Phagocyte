@@ -89,11 +89,11 @@ public partial class TestAchievementSystem : SceneTree
                 AssertThat(sawPerforin).IsTrue();
                 GD.Print("[PASS] Step 3a: Engulf 20 unlocks CTL and adds Perforin Lance to upgrade pool.");
 
-                // Test 3b: Burst Activated -> Unlocks Neutrophil
-                AchievementManager.RecordEvent("burst_activated");
-                AssertThat(AchievementManager.IsUnlocked("ach_trigger_burst")).IsTrue();
+                // Test 3b: Devour 50 -> Unlocks Neutrophil
+                AchievementManager.RecordEvent("pathogen_digested", 50);
+                AssertThat(AchievementManager.IsUnlocked("ach_devour_50")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsTrue();
-                GD.Print("[PASS] Step 3b: Burst activation unlocks Neutrophil.");
+                GD.Print("[PASS] Step 3b: Devouring 50 pathogens unlocks Neutrophil.");
 
                 // Test 3c: Level 5 -> Unlocks B-Cell
                 AchievementManager.RecordEvent("level_up", 5);
@@ -116,7 +116,7 @@ public partial class TestAchievementSystem : SceneTree
                 AchievementManager.LoadFromDisk();
 
                 AssertThat(AchievementManager.IsUnlocked("ach_engulf_20")).IsTrue();
-                AssertThat(AchievementManager.IsUnlocked("ach_trigger_burst")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("ach_devour_50")).IsTrue();
                 AssertThat(AchievementManager.IsUnlocked("ach_reach_level_5")).IsTrue();
                 AssertThat(AchievementManager.IsUnlocked("ach_survive_180s")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("ctl")).IsTrue();
