@@ -39,10 +39,14 @@ public partial class MainMenu : Control
     // Map View Controls
     public Label? MapHeaderLbl { get; set; }
     public VBoxContainer? MapListContainer { get; set; }
+    public Label? OrganBadgeLbl { get; set; }
+    public Label? DifficultyLbl { get; set; }
     public Label? MapNameLbl { get; set; }
+    public Label? MapSubtitleLbl { get; set; }
     public Label? MapEnvLbl { get; set; }
     public Label? MapMechLbl { get; set; }
     public Label? MapThreatLbl { get; set; }
+    public HoloBodyScanner? HoloScanner { get; set; }
     public Button? DeployBtn { get; set; }
     public Button? MapBackBtn { get; set; }
 
@@ -81,12 +85,22 @@ public partial class MainMenu : Control
 
         MapHeaderLbl = GetNodeOrNull<Label>("MapView/HeaderLabel");
         MapListContainer = GetNodeOrNull<VBoxContainer>("MapView/HBox/MapList");
-        MapNameLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapNameLabel");
+        OrganBadgeLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TopHBox/OrganBadge");
+        DifficultyLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TopHBox/DifficultyLabel");
+        MapNameLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TitleVBox/MapNameLabel")
+            ?? GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapNameLabel");
+        MapSubtitleLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TitleVBox/MapSubtitleLabel");
         MapEnvLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapEnvLabel");
         MapMechLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapMechLabel");
         MapThreatLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapThreatLabel");
+        HoloScanner = GetNodeOrNull<HoloBodyScanner>("MapView/HBox/HoloBodyScanner");
         DeployBtn = GetNodeOrNull<Button>("MapView/Buttons/DeployButton");
         MapBackBtn = GetNodeOrNull<Button>("MapView/Buttons/BackButton");
+
+        if (HoloScanner != null)
+        {
+            HoloScanner.OrganSelected += (string mapKey) => SelectMap(mapKey);
+        }
 
         if (TitleView != null)
             SwitchToView(TitleView);
@@ -254,12 +268,18 @@ public partial class MainMenu : Control
         {
             string key = keyVar.AsString();
             var data = GameManager.GetMapInfo(key);
+            string icon = data.TryGetValue("organ_icon", out var icVal) ? icVal.AsString() : "🌐";
+            string name = data.TryGetValue("name", out var nmVal) ? nmVal.AsString() : key;
+            int diff = data.TryGetValue("difficulty", out var dfVal) ? dfVal.AsInt32() : 1;
+            string stars = new string('★', diff) + new string('☆', 5 - diff);
+
             var btn = new Button
             {
-                CustomMinimumSize = new Vector2(280, 52),
+                CustomMinimumSize = new Vector2(250, 52),
                 Alignment = HorizontalAlignment.Left,
-                Text = " 🌐 " + data["name"].AsString()
+                Text = $" {icon} {name}\n   {stars}"
             };
+            btn.Name = $"MapBtn_{key}";
             string localKey = key;
             btn.Pressed += () => SelectMap(localKey);
             MapListContainer.AddChild(btn);
@@ -270,10 +290,68 @@ public partial class MainMenu : Control
     {
         ActiveMapKey = key;
         var data = GameManager.GetMapInfo(key);
-        if (MapNameLbl != null) MapNameLbl.Text = data["name"].AsString();
-        if (MapEnvLbl != null) MapEnvLbl.Text = Tr("LABEL_ENV") + data["environment"].AsString();
-        if (MapMechLbl != null) MapMechLbl.Text = Tr("LABEL_MECH") + data["mechanic"].AsString();
-        if (MapThreatLbl != null) MapThreatLbl.Text = Tr("LABEL_THREAT") + data["threat"].AsString();
+
+        string organ = data.TryGetValue("organ", out var ogVal) ? ogVal.AsString() : "";
+        string icon = data.TryGetValue("organ_icon", out var icVal) ? icVal.AsString() : "🌐";
+        string name = data.TryGetValue("name", out var nmVal) ? nmVal.AsString() : key;
+        string subtitle = data.TryGetValue("subtitle", out var stVal) ? stVal.AsString() : "";
+        int diff = data.TryGetValue("difficulty", out var dfVal) ? dfVal.AsInt32() : 1;
+        string stars = new string('★', diff) + new string('☆', 5 - diff);
+        Color col = data.TryGetValue("color_code", out var ccVal) ? ccVal.AsColor() : new Color(0.9f, 0.75f, 0.3f);
+
+        if (OrganBadgeLbl != null)
+        {
+            OrganBadgeLbl.Text = $"[ {icon} {Tr("LABEL_HOST_REGION")}{organ} ]";
+            OrganBadgeLbl.Modulate = col;
+        }
+
+        if (DifficultyLbl != null)
+        {
+            DifficultyLbl.Text = $"{Tr("LABEL_DIFFICULTY")}{stars}";
+        }
+
+        if (MapNameLbl != null)
+        {
+            MapNameLbl.Text = name;
+            MapNameLbl.Modulate = col;
+        }
+
+        if (MapSubtitleLbl != null)
+        {
+            MapSubtitleLbl.Text = subtitle;
+        }
+
+        if (MapEnvLbl != null)
+        {
+            MapEnvLbl.Text = $"🔬 {Tr("LABEL_ECO_SLICE")}{data["environment"].AsString()}";
+        }
+
+        if (MapMechLbl != null)
+        {
+            MapMechLbl.Text = $"🌊 {Tr("LABEL_FLUID_MECH")}{data["mechanic"].AsString()}";
+        }
+
+        if (MapThreatLbl != null)
+        {
+            MapThreatLbl.Text = $"☣️ {Tr("LABEL_KEY_THREATS")}{data["threat"].AsString()}";
+        }
+
+        if (HoloScanner != null)
+        {
+            HoloScanner.SelectOrgan(key);
+        }
+
+        if (MapListContainer != null)
+        {
+            foreach (var child in MapListContainer.GetChildren())
+            {
+                if (child is Button b)
+                {
+                    bool isCur = b.Name == $"MapBtn_{key}";
+                    b.Modulate = isCur ? new Color(1.2f, 1.2f, 1.2f, 1.0f) : new Color(0.75f, 0.85f, 0.95f, 0.75f);
+                }
+            }
+        }
     }
 
     private void OnDeployPressed()

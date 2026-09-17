@@ -793,7 +793,9 @@ public partial class BaseCell : CharacterBody2D
 
     public void AddExp(float amount)
     {
-        CurrentExp += amount;
+        float growth = Stats != null ? Stats.GetStat("growth") : 1.0f;
+        float finalExp = amount * Mathf.Max(0.1f, growth);
+        CurrentExp += finalExp;
         while (CurrentExp >= ExpToNextLevel)
         {
             CurrentExp -= ExpToNextLevel;
@@ -869,9 +871,24 @@ public partial class BaseCell : CharacterBody2D
         float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
         Health = Mathf.Clamp(Health - finalDmg, 0.0f, maxHp);
 
+        // Check fatal damage & revival
+        if (Health <= 0.0f && Stats != null && Stats.GetStat("revival") >= 1.0f)
+        {
+            Stats.AddModifier("revival", -1.0f, 0.0f);
+            Health = maxHp;
+            if (Cytoplasm != null)
+            {
+                if (_hitFlashTween != null && _hitFlashTween.IsValid())
+                    _hitFlashTween.Kill();
+                _hitFlashTween = CreateTween();
+                Cytoplasm.Modulate = new Color(3.0f, 3.0f, 3.0f, 1.0f);
+                _hitFlashTween.TweenProperty(Cytoplasm, "modulate", new Color(1.0f, 1.0f, 1.0f, 1.0f), 0.4);
+            }
+        }
+
         _underCellArcBar?.NotifyDamageOrState();
 
-        if (Cytoplasm != null && finalDmg > 0.1f)
+        if (Cytoplasm != null && finalDmg > 0.1f && Health > 0.0f)
         {
             if (_hitFlashTween != null && _hitFlashTween.IsValid())
                 _hitFlashTween.Kill();
@@ -881,6 +898,12 @@ public partial class BaseCell : CharacterBody2D
         }
 
         EmitStatsSignal();
+    }
+
+    public void ApplyImpulse(Vector2 impulse)
+    {
+        float resist = Stats != null ? Stats.GetStat("knockback_resist") : 0.0f;
+        Velocity += impulse * (1.0f - Mathf.Clamp(resist, 0.0f, 0.9f));
     }
 
     private void OnStatChanged(string statName, float val)

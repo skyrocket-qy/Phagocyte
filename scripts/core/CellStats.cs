@@ -24,12 +24,13 @@ public partial class CellStats : Node
     public Stat CritChance { get; private set; } = new(0.05f);
     public Stat CritDamage { get; private set; } = new(2.0f);
 
-    // Survival & Defense Stats (5)
+    // Survival & Defense Stats (6)
     public Stat MaxHealth { get; private set; } = new(100.0f);
     public Stat HealthRegen { get; private set; } = new(0.0f);
     public Stat Armor { get; private set; } = new(0.0f);
     public Stat MoveSpeed { get; private set; } = new(230.0f);
     public Stat Revival { get; private set; } = new(0.0f);
+    public Stat KnockbackResist { get; private set; } = new(0.0f);
 
     // Utility & Meta Stats (4)
     public Stat Magnet { get; private set; } = new(150.0f);
@@ -70,6 +71,7 @@ public partial class CellStats : Node
             ["armor"] = Armor,
             ["move_speed"] = MoveSpeed,
             ["revival"] = Revival,
+            ["knockback_resist"] = KnockbackResist,
 
             ["magnet"] = Magnet,
             ["growth"] = Growth,
@@ -98,6 +100,8 @@ public partial class CellStats : Node
             return Mathf.Clamp(val, 0.0f, 0.75f); // Cap CDR at 75%
         else if (statName == "crit_chance")
             return Mathf.Clamp(val, 0.0f, 1.0f); // Crit chance capped at 100%
+        else if (statName == "knockback_resist")
+            return Mathf.Clamp(val, 0.0f, 0.90f); // Cap knockback resist at 90%
         else if (statName is "move_speed" or "max_health" or "magnet")
             return Mathf.Max(0.0f, val);
 

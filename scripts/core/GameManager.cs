@@ -95,23 +95,97 @@ public partial class GameManager : Node
         }}
     };
 
-    // Map Metadata referencing translation keys
+    // Map Metadata referencing translation keys and holographic scanner positioning
     public static readonly Dictionary MapData = new Dictionary
     {
         { "acute_wound", new Dictionary {
+            { "id", "acute_wound" },
+            { "organ_key", "ORGAN_SKIN" },
+            { "organ_icon", "🩹" },
             { "name_key", "MAP_WOUND_NAME" },
+            { "subtitle_key", "MAP_WOUND_SUBTITLE" },
             { "env_key", "MAP_WOUND_ENV" },
             { "mech_key", "MAP_WOUND_MECH" },
             { "threat_key", "MAP_WOUND_THREAT" },
+            { "difficulty", 1 },
+            { "color_code", new Color("#e63946") },
+            { "scanner_pos", new Vector2(0.26f, 0.48f) },
             { "bg_color", new Color(0.05f, 0.08f, 0.12f, 1.0f) },
+            { "bg_color_deep", new Color(0.04f, 0.05f, 0.09f, 1.0f) },
+            { "bg_color_accent", new Color(0.14f, 0.04f, 0.08f, 1.0f) },
+            { "fiber_color", new Color(0.22f, 0.18f, 0.32f, 0.35f) },
             { "unlocked", true }
         }},
         { "alveolar_space", new Dictionary {
+            { "id", "alveolar_space" },
+            { "organ_key", "ORGAN_LUNGS" },
+            { "organ_icon", "🫁" },
             { "name_key", "MAP_ALVEOLAR_NAME" },
+            { "subtitle_key", "MAP_ALVEOLAR_SUBTITLE" },
             { "env_key", "MAP_ALVEOLAR_ENV" },
             { "mech_key", "MAP_ALVEOLAR_MECH" },
             { "threat_key", "MAP_ALVEOLAR_THREAT" },
+            { "difficulty", 2 },
+            { "color_code", new Color("#2a9d8f") },
+            { "scanner_pos", new Vector2(0.50f, 0.28f) },
             { "bg_color", new Color(0.04f, 0.11f, 0.13f, 1.0f) },
+            { "bg_color_deep", new Color(0.02f, 0.06f, 0.10f, 1.0f) },
+            { "bg_color_accent", new Color(0.04f, 0.12f, 0.16f, 1.0f) },
+            { "fiber_color", new Color(0.2f, 0.5f, 0.65f, 0.35f) },
+            { "unlocked", true }
+        }},
+        { "hepatic_sinusoid", new Dictionary {
+            { "id", "hepatic_sinusoid" },
+            { "organ_key", "ORGAN_LIVER" },
+            { "organ_icon", "🫀" },
+            { "name_key", "MAP_HEPATIC_NAME" },
+            { "subtitle_key", "MAP_HEPATIC_SUBTITLE" },
+            { "env_key", "MAP_HEPATIC_ENV" },
+            { "mech_key", "MAP_HEPATIC_MECH" },
+            { "threat_key", "MAP_HEPATIC_THREAT" },
+            { "difficulty", 3 },
+            { "color_code", new Color("#e76f51") },
+            { "scanner_pos", new Vector2(0.42f, 0.38f) },
+            { "bg_color", new Color(0.05f, 0.03f, 0.02f, 1.0f) },
+            { "bg_color_deep", new Color(0.05f, 0.03f, 0.02f, 1.0f) },
+            { "bg_color_accent", new Color(0.18f, 0.09f, 0.04f, 1.0f) },
+            { "fiber_color", new Color(0.55f, 0.40f, 0.15f, 0.35f) },
+            { "unlocked", true }
+        }},
+        { "gastric_lumen", new Dictionary {
+            { "id", "gastric_lumen" },
+            { "organ_key", "ORGAN_STOMACH" },
+            { "organ_icon", "🌋" },
+            { "name_key", "MAP_GASTRIC_NAME" },
+            { "subtitle_key", "MAP_GASTRIC_SUBTITLE" },
+            { "env_key", "MAP_GASTRIC_ENV" },
+            { "mech_key", "MAP_GASTRIC_MECH" },
+            { "threat_key", "MAP_GASTRIC_THREAT" },
+            { "difficulty", 4 },
+            { "color_code", new Color("#f4a261") },
+            { "scanner_pos", new Vector2(0.58f, 0.40f) },
+            { "bg_color", new Color(0.06f, 0.04f, 0.01f, 1.0f) },
+            { "bg_color_deep", new Color(0.06f, 0.04f, 0.01f, 1.0f) },
+            { "bg_color_accent", new Color(0.17f, 0.12f, 0.02f, 1.0f) },
+            { "fiber_color", new Color(0.60f, 0.50f, 0.10f, 0.35f) },
+            { "unlocked", true }
+        }},
+        { "blood_brain_barrier", new Dictionary {
+            { "id", "blood_brain_barrier" },
+            { "organ_key", "ORGAN_BRAIN" },
+            { "organ_icon", "🧠" },
+            { "name_key", "MAP_BBB_NAME" },
+            { "subtitle_key", "MAP_BBB_SUBTITLE" },
+            { "env_key", "MAP_BBB_ENV" },
+            { "mech_key", "MAP_BBB_MECH" },
+            { "threat_key", "MAP_BBB_THREAT" },
+            { "difficulty", 5 },
+            { "color_code", new Color("#9d4edd") },
+            { "scanner_pos", new Vector2(0.50f, 0.11f) },
+            { "bg_color", new Color(0.03f, 0.02f, 0.07f, 1.0f) },
+            { "bg_color_deep", new Color(0.03f, 0.02f, 0.07f, 1.0f) },
+            { "bg_color_accent", new Color(0.08f, 0.04f, 0.15f, 1.0f) },
+            { "fiber_color", new Color(0.35f, 0.25f, 0.65f, 0.40f) },
             { "unlocked", true }
         }}
     };
@@ -119,6 +193,7 @@ public partial class GameManager : Node
     // Skill Catalog for Manual and Tooltips
     public static readonly Dictionary SkillCatalog = new Dictionary
     {
+        // --- Innate & Legacy Cells ---
         { "macrophage_pseudopods", new Dictionary {
             { "id", "macrophage_pseudopods" },
             { "name_key", "SKILL_DEFORM_NAME" },
@@ -128,50 +203,6 @@ public partial class GameManager : Node
             { "type", "innate" },
             { "class_id", "macrophage" },
             { "cooldown", 0.0f },
-            { "max_level", 5 }
-        }},
-        { "ros_torrent", new Dictionary {
-            { "id", "ros_torrent" },
-            { "name_key", "SKILL_ROS_NAME" },
-            { "desc_key", "SKILL_ROS_DESC" },
-            { "bio_key", "SKILL_ROS_BIO" },
-            { "icon", "💨" },
-            { "type", "active" },
-            { "class_id", "" },
-            { "cooldown", 3.2f },
-            { "max_level", 5 }
-        }},
-        { "complement_cascade", new Dictionary {
-            { "id", "complement_cascade" },
-            { "name_key", "SKILL_COMPLEMENT_NAME" },
-            { "desc_key", "SKILL_COMPLEMENT_DESC" },
-            { "bio_key", "SKILL_COMPLEMENT_BIO" },
-            { "icon", "💥" },
-            { "type", "active" },
-            { "class_id", "" },
-            { "cooldown", 5.0f },
-            { "max_level", 5 }
-        }},
-        { "lysosomal_overload", new Dictionary {
-            { "id", "lysosomal_overload" },
-            { "name_key", "SKILL_LYSOSOME_NAME" },
-            { "desc_key", "SKILL_LYSOSOME_DESC" },
-            { "bio_key", "SKILL_LYSOSOME_BIO" },
-            { "icon", "🧪" },
-            { "type", "active" },
-            { "class_id", "" },
-            { "cooldown", 4.5f },
-            { "max_level", 5 }
-        }},
-        { "interferon_pulse", new Dictionary {
-            { "id", "interferon_pulse" },
-            { "name_key", "SKILL_INTERFERON_NAME" },
-            { "desc_key", "SKILL_INTERFERON_DESC" },
-            { "bio_key", "SKILL_INTERFERON_BIO" },
-            { "icon", "📡" },
-            { "type", "active" },
-            { "class_id", "" },
-            { "cooldown", 6.0f },
             { "max_level", 5 }
         }},
         { "perforin_injection", new Dictionary {
@@ -196,6 +227,28 @@ public partial class GameManager : Node
             { "cooldown", 8.0f },
             { "max_level", 5 }
         }},
+        { "lysosomal_overload", new Dictionary {
+            { "id", "lysosomal_overload" },
+            { "name_key", "SKILL_LYSOSOME_NAME" },
+            { "desc_key", "SKILL_LYSOSOME_DESC" },
+            { "bio_key", "SKILL_LYSOSOME_BIO" },
+            { "icon", "🧪" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 4.5f },
+            { "max_level", 5 }
+        }},
+        { "interferon_pulse", new Dictionary {
+            { "id", "interferon_pulse" },
+            { "name_key", "SKILL_INTERFERON_NAME" },
+            { "desc_key", "SKILL_INTERFERON_DESC" },
+            { "bio_key", "SKILL_INTERFERON_BIO" },
+            { "icon", "📡" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 6.0f },
+            { "max_level", 5 }
+        }},
         { "phagocytic_instinct", new Dictionary {
             { "id", "phagocytic_instinct" },
             { "name_key", "SKILL_INSTINCT_NAME" },
@@ -213,6 +266,329 @@ public partial class GameManager : Node
             { "desc_key", "SKILL_CHEMOTAXIS_DESC" },
             { "bio_key", "SKILL_CHEMOTAXIS_BIO" },
             { "icon", "🧭" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+
+        // --- 16 Active Weapons ---
+        { "ros_torrent", new Dictionary {
+            { "id", "ros_torrent" },
+            { "name_key", "SKILL_ROS_NAME" },
+            { "desc_key", "SKILL_ROS_DESC" },
+            { "bio_key", "SKILL_ROS_BIO" },
+            { "icon", "💨" },
+            { "type", "active" },
+            { "class_id", "macrophage" },
+            { "cooldown", 3.2f },
+            { "max_level", 5 }
+        }},
+        { "perforin_lance", new Dictionary {
+            { "id", "perforin_lance" },
+            { "name_key", "SKILL_PERFORIN_NAME" },
+            { "desc_key", "SKILL_PERFORIN_DESC" },
+            { "bio_key", "SKILL_PERFORIN_BIO" },
+            { "icon", "🗡️" },
+            { "type", "active" },
+            { "class_id", "ctl" },
+            { "cooldown", 2.8f },
+            { "max_level", 5 }
+        }},
+        { "complement_cascade", new Dictionary {
+            { "id", "complement_cascade" },
+            { "name_key", "SKILL_COMPLEMENT_NAME" },
+            { "desc_key", "SKILL_COMPLEMENT_DESC" },
+            { "bio_key", "SKILL_COMPLEMENT_BIO" },
+            { "icon", "💥" },
+            { "type", "active" },
+            { "class_id", "neutrophil" },
+            { "cooldown", 5.0f },
+            { "max_level", 5 }
+        }},
+        { "antibody_salvo", new Dictionary {
+            { "id", "antibody_salvo" },
+            { "name_key", "SKILL_ANTIBODY_NAME" },
+            { "desc_key", "SKILL_ANTIBODY_DESC" },
+            { "bio_key", "SKILL_ANTIBODY_BIO" },
+            { "icon", "🏹" },
+            { "type", "active" },
+            { "class_id", "b_cell" },
+            { "cooldown", 4.0f },
+            { "max_level", 5 }
+        }},
+        { "pseudopod_lunge", new Dictionary {
+            { "id", "pseudopod_lunge" },
+            { "name_key", "SKILL_LUNGE_NAME" },
+            { "desc_key", "SKILL_LUNGE_DESC" },
+            { "bio_key", "SKILL_LUNGE_BIO" },
+            { "icon", "🥊" },
+            { "type", "active" },
+            { "class_id", "dendritic" },
+            { "cooldown", 2.5f },
+            { "max_level", 5 }
+        }},
+        { "nitric_oxide_halo", new Dictionary {
+            { "id", "nitric_oxide_halo" },
+            { "name_key", "SKILL_NO_NAME" },
+            { "desc_key", "SKILL_NO_DESC" },
+            { "bio_key", "SKILL_NO_BIO" },
+            { "icon", "⭕" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 0.25f },
+            { "max_level", 5 }
+        }},
+        { "nuclease_blades", new Dictionary {
+            { "id", "nuclease_blades" },
+            { "name_key", "SKILL_NUCLEASE_NAME" },
+            { "desc_key", "SKILL_NUCLEASE_DESC" },
+            { "bio_key", "SKILL_NUCLEASE_BIO" },
+            { "icon", "⛓️" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 4.5f },
+            { "max_level", 5 }
+        }},
+        { "granzyme_detonation", new Dictionary {
+            { "id", "granzyme_detonation" },
+            { "name_key", "SKILL_GRANZYME_NAME" },
+            { "desc_key", "SKILL_GRANZYME_DESC" },
+            { "bio_key", "SKILL_GRANZYME_BIO" },
+            { "icon", "🧬" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 3.5f },
+            { "max_level", 5 }
+        }},
+        { "interferon_wave", new Dictionary {
+            { "id", "interferon_wave" },
+            { "name_key", "SKILL_INTERFERON_NAME" },
+            { "desc_key", "SKILL_INTERFERON_DESC" },
+            { "bio_key", "SKILL_INTERFERON_BIO" },
+            { "icon", "🌊" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 6.0f },
+            { "max_level", 5 }
+        }},
+        { "lysozyme_ricochet", new Dictionary {
+            { "id", "lysozyme_ricochet" },
+            { "name_key", "SKILL_LYSOZYME_NAME" },
+            { "desc_key", "SKILL_LYSOZYME_DESC" },
+            { "bio_key", "SKILL_LYSOZYME_BIO" },
+            { "icon", "🧪" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 3.8f },
+            { "max_level", 5 }
+        }},
+        { "phagolysosome_vent", new Dictionary {
+            { "id", "phagolysosome_vent" },
+            { "name_key", "SKILL_PHAGO_VENT_NAME" },
+            { "desc_key", "SKILL_PHAGO_VENT_DESC" },
+            { "bio_key", "SKILL_PHAGO_VENT_BIO" },
+            { "icon", "🛢️" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 2.0f },
+            { "max_level", 5 }
+        }},
+        { "pro_inflammatory_arc", new Dictionary {
+            { "id", "pro_inflammatory_arc" },
+            { "name_key", "SKILL_PRO_INFLAM_NAME" },
+            { "desc_key", "SKILL_PRO_INFLAM_DESC" },
+            { "bio_key", "SKILL_PRO_INFLAM_BIO" },
+            { "icon", "⚡" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 3.0f },
+            { "max_level", 5 }
+        }},
+        { "exosome_singularity", new Dictionary {
+            { "id", "exosome_singularity" },
+            { "name_key", "SKILL_EXOSOME_NAME" },
+            { "desc_key", "SKILL_EXOSOME_DESC" },
+            { "bio_key", "SKILL_EXOSOME_BIO" },
+            { "icon", "🧲" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 5.5f },
+            { "max_level", 5 }
+        }},
+        { "defensin_barbs", new Dictionary {
+            { "id", "defensin_barbs" },
+            { "name_key", "SKILL_DEFENSIN_NAME" },
+            { "desc_key", "SKILL_DEFENSIN_DESC" },
+            { "bio_key", "SKILL_DEFENSIN_BIO" },
+            { "icon", "🛡️" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 3.0f },
+            { "max_level", 5 }
+        }},
+        { "mhc_tracer_beam", new Dictionary {
+            { "id", "mhc_tracer_beam" },
+            { "name_key", "SKILL_MHC_TRACER_NAME" },
+            { "desc_key", "SKILL_MHC_TRACER_DESC" },
+            { "bio_key", "SKILL_MHC_TRACER_BIO" },
+            { "icon", "🎯" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 4.0f },
+            { "max_level", 5 }
+        }},
+        { "histamine_surge", new Dictionary {
+            { "id", "histamine_surge" },
+            { "name_key", "SKILL_HISTAMINE_NAME" },
+            { "desc_key", "SKILL_HISTAMINE_DESC" },
+            { "bio_key", "SKILL_HISTAMINE_BIO" },
+            { "icon", "💉" },
+            { "type", "active" },
+            { "class_id", "" },
+            { "cooldown", 4.8f },
+            { "max_level", 5 }
+        }},
+
+        // --- 13 Passive Traits ---
+        { "passive_actin", new Dictionary {
+            { "id", "passive_actin" },
+            { "name_key", "SKILL_ACTIN_NAME" },
+            { "desc_key", "SKILL_ACTIN_DESC" },
+            { "bio_key", "SKILL_ACTIN_BIO" },
+            { "icon", "🧬" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_lysosome", new Dictionary {
+            { "id", "passive_lysosome" },
+            { "name_key", "SKILL_LYSOSOME_NAME" },
+            { "desc_key", "SKILL_LYSOSOME_DESC" },
+            { "bio_key", "SKILL_LYSOSOME_BIO" },
+            { "icon", "🧪" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_mitochondria", new Dictionary {
+            { "id", "passive_mitochondria" },
+            { "name_key", "SKILL_MITOCHONDRIA_NAME" },
+            { "desc_key", "SKILL_MITOCHONDRIA_DESC" },
+            { "bio_key", "SKILL_MITOCHONDRIA_BIO" },
+            { "icon", "⚡" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_opsonin", new Dictionary {
+            { "id", "passive_opsonin" },
+            { "name_key", "SKILL_OPSONIN_NAME" },
+            { "desc_key", "SKILL_OPSONIN_DESC" },
+            { "bio_key", "SKILL_OPSONIN_BIO" },
+            { "icon", "🎯" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_chemokine", new Dictionary {
+            { "id", "passive_chemokine" },
+            { "name_key", "SKILL_CHEMOKINE_NAME" },
+            { "desc_key", "SKILL_CHEMOKINE_DESC" },
+            { "bio_key", "SKILL_CHEMOKINE_BIO" },
+            { "icon", "🧲" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_bilayer", new Dictionary {
+            { "id", "passive_bilayer" },
+            { "name_key", "SKILL_BILAYER_NAME" },
+            { "desc_key", "SKILL_BILAYER_DESC" },
+            { "bio_key", "SKILL_BILAYER_BIO" },
+            { "icon", "🛡️" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_autophagy", new Dictionary {
+            { "id", "passive_autophagy" },
+            { "name_key", "SKILL_AUTOPHAGY_NAME" },
+            { "desc_key", "SKILL_AUTOPHAGY_DESC" },
+            { "bio_key", "SKILL_AUTOPHAGY_BIO" },
+            { "icon", "🔄" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_glycolysis", new Dictionary {
+            { "id", "passive_glycolysis" },
+            { "name_key", "SKILL_GLYCOLYSIS_NAME" },
+            { "desc_key", "SKILL_GLYCOLYSIS_DESC" },
+            { "bio_key", "SKILL_GLYCOLYSIS_BIO" },
+            { "icon", "🍬" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_kinesin", new Dictionary {
+            { "id", "passive_kinesin" },
+            { "name_key", "SKILL_KINESIN_NAME" },
+            { "desc_key", "SKILL_KINESIN_DESC" },
+            { "bio_key", "SKILL_KINESIN_BIO" },
+            { "icon", "🛤️" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_longevity", new Dictionary {
+            { "id", "passive_longevity" },
+            { "name_key", "SKILL_LONGEVITY_NAME" },
+            { "desc_key", "SKILL_LONGEVITY_DESC" },
+            { "bio_key", "SKILL_LONGEVITY_BIO" },
+            { "icon", "⏳" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_vdj", new Dictionary {
+            { "id", "passive_vdj" },
+            { "name_key", "SKILL_VDJ_NAME" },
+            { "desc_key", "SKILL_VDJ_DESC" },
+            { "bio_key", "SKILL_VDJ_BIO" },
+            { "icon", "🎲" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_endotoxin", new Dictionary {
+            { "id", "passive_endotoxin" },
+            { "name_key", "SKILL_ENDOTOXIN_NAME" },
+            { "desc_key", "SKILL_ENDOTOXIN_DESC" },
+            { "bio_key", "SKILL_ENDOTOXIN_BIO" },
+            { "icon", "🧱" },
+            { "type", "passive" },
+            { "class_id", "" },
+            { "cooldown", 0.0f },
+            { "max_level", 5 }
+        }},
+        { "passive_hematopoietic", new Dictionary {
+            { "id", "passive_hematopoietic" },
+            { "name_key", "SKILL_HEMATOPOIETIC_NAME" },
+            { "desc_key", "SKILL_HEMATOPOIETIC_DESC" },
+            { "bio_key", "SKILL_HEMATOPOIETIC_BIO" },
+            { "icon", "🩸" },
             { "type", "passive" },
             { "class_id", "" },
             { "cooldown", 0.0f },
@@ -479,11 +855,21 @@ public partial class GameManager : Node
         }
         var d = (Dictionary)MapData[key];
         return new Dictionary {
+            { "id", key },
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },
+            { "subtitle", d.ContainsKey("subtitle_key") ? TranslationServer.Translate(d["subtitle_key"].AsString()) : "" },
+            { "organ", d.ContainsKey("organ_key") ? TranslationServer.Translate(d["organ_key"].AsString()) : "" },
+            { "organ_icon", d.ContainsKey("organ_icon") ? d["organ_icon"] : "🌐" },
             { "environment", TranslationServer.Translate(d["env_key"].AsString()) },
             { "mechanic", TranslationServer.Translate(d["mech_key"].AsString()) },
             { "threat", TranslationServer.Translate(d["threat_key"].AsString()) },
+            { "difficulty", d.ContainsKey("difficulty") ? d["difficulty"] : 1 },
+            { "color_code", d.ContainsKey("color_code") ? d["color_code"] : new Color(0.3f, 0.6f, 0.9f) },
+            { "scanner_pos", d.ContainsKey("scanner_pos") ? d["scanner_pos"] : new Vector2(0.5f, 0.5f) },
             { "bg_color", d["bg_color"] },
+            { "bg_color_deep", d.ContainsKey("bg_color_deep") ? d["bg_color_deep"] : d["bg_color"] },
+            { "bg_color_accent", d.ContainsKey("bg_color_accent") ? d["bg_color_accent"] : d["bg_color"] },
+            { "fiber_color", d.ContainsKey("fiber_color") ? d["fiber_color"] : new Color(0.2f, 0.3f, 0.4f, 0.35f) },
             { "unlocked", d["unlocked"] }
         };
     }

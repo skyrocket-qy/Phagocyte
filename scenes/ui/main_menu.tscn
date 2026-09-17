@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/ui/MainMenu.cs" id="1_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/codex_modal.tscn" id="2_codex"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_modal.tscn" id="3_settings"]
+[ext_resource type="Script" path="res://scripts/ui/HoloBodyScanner.cs" id="4_scanner"]
 
 [sub_resource type="Curve" id="Curve_menu_ambient"]
 _data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.5, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -342,51 +343,86 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -480.0
-offset_top = -200.0
-offset_right = 480.0
-offset_bottom = 170.0
+offset_left = -590.0
+offset_top = -225.0
+offset_right = 590.0
+offset_bottom = 205.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 28
+theme_override_constants/separation = 20
 
 [node name="MapList" type="VBoxContainer" parent="MapView/HBox"]
-custom_minimum_size = Vector2(280, 0)
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 10
 
 [node name="DetailPanel" type="PanelContainer" parent="MapView/HBox"]
+custom_minimum_size = Vector2(460, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="VBox" type="VBoxContainer" parent="MapView/HBox/DetailPanel"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 
-[node name="MapNameLabel" type="Label" parent="MapView/HBox/DetailPanel/VBox"]
+[node name="TopHBox" type="HBoxContainer" parent="MapView/HBox/DetailPanel/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.75, 0.3, 1)
+theme_override_constants/separation = 10
+
+[node name="OrganBadge" type="Label" parent="MapView/HBox/DetailPanel/VBox/TopHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ 🫀 宿主区域：肝脏 (Liver) ]"
+
+[node name="DifficultyLabel" type="Label" parent="MapView/HBox/DetailPanel/VBox/TopHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "★★★☆☆"
+horizontal_alignment = 2
+
+[node name="TitleVBox" type="VBoxContainer" parent="MapView/HBox/DetailPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="MapNameLabel" type="Label" parent="MapView/HBox/DetailPanel/VBox/TitleVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.4, 1)
 theme_override_font_sizes/font_size = 22
-text = "表皮裂口 (Acute Wound)"
+text = "肝血窦腔室"
+
+[node name="MapSubtitleLabel" type="Label" parent="MapView/HBox/DetailPanel/VBox/TitleVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 13
+text = "Hepatic Sinusoid Lumen"
 
 [node name="MapEnvLabel" type="Label" parent="MapView/HBox/DetailPanel/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "环境：微血管破裂，体液渗出区"
+theme_override_font_sizes/font_size = 13
+text = "🔬 生态切片：解毒代谢网络与门静脉微腔"
+autowrap_mode = 3
 
 [node name="MapMechLabel" type="Label" parent="MapView/HBox/DetailPanel/VBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "病理机制：微血管破裂，周期性产生指向伤口外缘的强大组织液吸力；地面微血管网造成流体阻力。"
+theme_override_font_sizes/font_size = 13
+text = "🌊 战场环境机制：慢速血窦滞流（移速 -15%）；驻扎 3 处固定库佛巨砲主动捕捉敌体；P450 周期排毒脉冲清除有害池。"
 autowrap_mode = 3
 
 [node name="MapThreatLabel" type="Label" parent="MapView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.5, 0.5, 1)
-theme_override_font_sizes/font_size = 14
-text = "威胁病原体：金黄色葡萄球菌 (Staph) 抱团侵袭"
+theme_override_font_sizes/font_size = 13
+text = "☣️ 典型病原威胁：门静脉内毒素波次 (LPS) 与乙型肝炎病毒 (HBV)"
 autowrap_mode = 3
+
+[node name="HoloBodyScanner" type="Control" parent="MapView/HBox"]
+custom_minimum_size = Vector2(430, 420)
+layout_mode = 2
+script = ExtResource("4_scanner")
 
 [node name="Buttons" type="HBoxContainer" parent="MapView"]
 layout_mode = 1

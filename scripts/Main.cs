@@ -156,28 +156,22 @@ public partial class Main : Node2D
 
     private void ConfigureMapEnvironment()
     {
-        if (MapId == "alveolar_space")
+        var mapInfo = GameManager.GetMapInfo(MapId);
+        Color deep = mapInfo.TryGetValue("bg_color_deep", out var dVal) ? dVal.AsColor() : new Color(0.04f, 0.05f, 0.09f, 1.0f);
+        Color accent = mapInfo.TryGetValue("bg_color_accent", out var aVal) ? aVal.AsColor() : new Color(0.14f, 0.04f, 0.08f, 1.0f);
+        Color fiber = mapInfo.TryGetValue("fiber_color", out var fVal) ? fVal.AsColor() : new Color(0.22f, 0.18f, 0.32f, 0.35f);
+        Color border = mapInfo.TryGetValue("color_code", out var cVal) ? cVal.AsColor() : new Color(0.35f, 0.45f, 0.6f, 0.65f);
+
+        if (ArenaBg != null && ArenaBg.Material is ShaderMaterial sm)
         {
-            if (ArenaBg != null && ArenaBg.Material is ShaderMaterial sm)
-            {
-                sm.SetShaderParameter("bg_color_deep", new Color(0.02f, 0.06f, 0.10f, 1.0f));
-                sm.SetShaderParameter("bg_color_accent", new Color(0.04f, 0.12f, 0.16f, 1.0f));
-                sm.SetShaderParameter("fiber_color", new Color(0.2f, 0.5f, 0.65f, 0.35f));
-            }
-            if (ArenaBorders != null)
-                ArenaBorders.DefaultColor = new Color(0.2f, 0.65f, 0.7f, 0.7f);
+            sm.SetShaderParameter("bg_color_deep", deep);
+            sm.SetShaderParameter("bg_color_accent", accent);
+            sm.SetShaderParameter("fiber_color", fiber);
         }
-        else
+
+        if (ArenaBorders != null)
         {
-            // acute_wound default
-            if (ArenaBg != null && ArenaBg.Material is ShaderMaterial sm)
-            {
-                sm.SetShaderParameter("bg_color_deep", new Color(0.04f, 0.05f, 0.09f, 1.0f));
-                sm.SetShaderParameter("bg_color_accent", new Color(0.14f, 0.04f, 0.08f, 1.0f));
-                sm.SetShaderParameter("fiber_color", new Color(0.22f, 0.18f, 0.32f, 0.35f));
-            }
-            if (ArenaBorders != null)
-                ArenaBorders.DefaultColor = new Color(0.35f, 0.45f, 0.6f, 0.65f);
+            ArenaBorders.DefaultColor = border;
         }
     }
 
@@ -205,10 +199,10 @@ public partial class Main : Node2D
 
         if (MapId == "alveolar_space")
         {
-            // SPEC Section 5: Periodic breathing airflow thrust in lung alveoli
+            // SPEC Section 5: Periodic respiratory breathing airflow thrust in lung alveoli
             float breathForce = Mathf.Sin(EnvironmentTime * 1.2f) * 28.0f;
             var breathVec = new Vector2(breathForce, Mathf.Sin(EnvironmentTime * 0.6f) * 12.0f);
-            // Gently pushes all free pathogens and player with fluid current
+            // Gently pushes all free pathogens with fluid current
             foreach (var child in EnemyContainer.GetChildren())
             {
                 if (child is Node2D enemy)
@@ -232,6 +226,53 @@ public partial class Main : Node2D
                     if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
                         continue;
                     enemy.Position += suctionVec * delta * 0.4f;
+                }
+            }
+        }
+        else if (MapId == "hepatic_sinusoid")
+        {
+            // Hepatic sinusoid slow flow drag: gentle steady drift
+            var flowVec = new Vector2(10.0f, Mathf.Sin(EnvironmentTime * 0.8f) * 6.0f);
+            foreach (var child in EnemyContainer.GetChildren())
+            {
+                if (child is Node2D enemy)
+                {
+                    var eaten = enemy.Get("is_being_eaten");
+                    if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
+                        continue;
+                    enemy.Position += flowVec * delta * 0.35f;
+                }
+            }
+        }
+        else if (MapId == "gastric_lumen")
+        {
+            // Gastric mucosa acid churn: periodic lateral wave
+            float churnForce = Mathf.Sin(EnvironmentTime * 2.0f) * 20.0f;
+            var churnVec = new Vector2(churnForce, Mathf.Cos(EnvironmentTime * 1.5f) * 10.0f);
+            foreach (var child in EnemyContainer.GetChildren())
+            {
+                if (child is Node2D enemy)
+                {
+                    var eaten = enemy.Get("is_being_eaten");
+                    if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
+                        continue;
+                    enemy.Position += churnVec * delta * 0.4f;
+                }
+            }
+        }
+        else if (MapId == "blood_brain_barrier")
+        {
+            // High-frequency synaptic micro-vibrations
+            float pulse = Mathf.Sin(EnvironmentTime * 5.0f) * 8.0f;
+            var microVec = new Vector2(pulse, Mathf.Cos(EnvironmentTime * 4.0f) * 8.0f);
+            foreach (var child in EnemyContainer.GetChildren())
+            {
+                if (child is Node2D enemy)
+                {
+                    var eaten = enemy.Get("is_being_eaten");
+                    if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
+                        continue;
+                    enemy.Position += microVec * delta * 0.25f;
                 }
             }
         }

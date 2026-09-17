@@ -96,22 +96,40 @@ public partial class TestMenuFlow : SceneTree
         AssertThat(GameManager.SelectedClass).IsEqual("macrophage");
         GD.Print("[PASS] Transition to MapView with GameManager.selected_class = 'macrophage' verified.");
 
-        // 4. Test Map Selection
-        menu.SelectMap("alveolar_space");
-        AssertThat(menu.ActiveMapKey).IsEqual("alveolar_space");
-        GD.Print("[PASS] Map selection (Alveolar Space) verified.");
+        // 4. Test Map Selection & 5 Organ Battlefields
+        AssertThat(GameManager.MapData.Count).IsEqual(5);
+        AssertThat(menu.HoloScanner).IsNotNull();
+        GD.Print("[PASS] GameManager.MapData has 5 maps and HoloScanner is initialized.");
+
+        string[] allMaps = { "acute_wound", "alveolar_space", "hepatic_sinusoid", "gastric_lumen", "blood_brain_barrier" };
+        foreach (var mapKey in allMaps)
+        {
+            menu.SelectMap(mapKey);
+            AssertThat(menu.ActiveMapKey).IsEqual(mapKey);
+            AssertThat(menu.HoloScanner!.ActiveMapKey).IsEqual(mapKey);
+            var info = GameManager.GetMapInfo(mapKey);
+            AssertThat(info["name"].AsString()).IsNotEmpty();
+            AssertThat(info["organ"].AsString()).IsNotEmpty();
+            AssertThat((int)info["difficulty"] >= 1 && (int)info["difficulty"] <= 5).IsTrue();
+        }
+        GD.Print("[PASS] All 5 organ battlefields selectable with synchronized HoloBodyScanner.");
+
+        // Test scanner signal selection
+        menu.HoloScanner!.EmitSignal(HoloBodyScanner.SignalName.OrganSelected, "hepatic_sinusoid");
+        AssertThat(menu.ActiveMapKey).IsEqual("hepatic_sinusoid");
+        GD.Print("[PASS] HoloBodyScanner interactive OrganSelected signal correctly switches map.");
 
         // 5. Test Main Scene loading with selected map
         menu.QueueFree();
 
-        GameManager.SelectedMap = "alveolar_space";
+        GameManager.SelectedMap = "hepatic_sinusoid";
         var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
         AssertThat(mainScene).IsNotNull();
         var main = mainScene!.Instantiate<Main>();
         Root.AddChild(main);
 
-        AssertThat(main.MapId).IsEqual("alveolar_space");
-        GD.Print("[PASS] Main arena successfully configured with alveolar_space environment.");
+        AssertThat(main.MapId).IsEqual("hepatic_sinusoid");
+        GD.Print("[PASS] Main arena successfully configured with hepatic_sinusoid environment.");
 
         main.QueueFree();
         AchievementManager.ResetAll();
