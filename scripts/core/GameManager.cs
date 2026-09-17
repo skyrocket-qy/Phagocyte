@@ -431,8 +431,8 @@ public partial class GameManager : Node
         }},
         { "passive_lysosome", new Dictionary {
             { "id", "passive_lysosome" },
-            { "name_key", "SKILL_LYSOSOME_NAME" },
-            { "desc_key", "SKILL_LYSOSOME_DESC" },
+            { "name_key", "TREE_NODE_LYSOSOME_NAME" },
+            { "desc_key", "TREE_NODE_LYSOSOME_DESC" },
             { "bio_key", "SKILL_LYSOSOME_BIO" },
             { "icon", "🧪" },
             { "type", "passive" },

@@ -15,8 +15,8 @@ public partial class PassiveLysosomePriming : BaseSkill
     public PassiveLysosomePriming()
     {
         SkillId = "passive_lysosome";
-        NameKey = "SKILL_LYSOSOME_NAME";
-        DescKey = "SKILL_LYSOSOME_DESC";
+        NameKey = "TREE_NODE_LYSOSOME_NAME";
+        DescKey = "TREE_NODE_LYSOSOME_DESC";
         BioKey = "SKILL_LYSOSOME_BIO";
         IconSymbol = "🧪";
         IsInnate = false;

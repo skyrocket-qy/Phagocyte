@@ -9,6 +9,7 @@ public partial class MainMenu : Control
     // Views
     public Control? TitleView { get; set; }
     public Control? ClassView { get; set; }
+    public Control? PassiveView { get; set; }
     public Control? MapView { get; set; }
     public CodexModal? CellCodexModal { get; set; }
     public SettingsModal? CellSettingsModal { get; set; }
@@ -34,6 +35,20 @@ public partial class MainMenu : Control
     public Button? ClassConfirmBtn { get; set; }
     public Button? ClassBackBtn { get; set; }
 
+    // Passive Tree View Controls
+    public Label? PassiveHeaderLbl { get; set; }
+    public Label? TreeClassLbl { get; set; }
+    public Label? TreeLevelLbl { get; set; }
+    public Label? TreePointsLbl { get; set; }
+    public PassiveTreeView? TreeCanvas { get; set; }
+    public Label? TreeStatusLbl { get; set; }
+    public Button? PassiveBackBtn { get; set; }
+    public Button? PassiveResetBtn { get; set; }
+    public Button? PassiveConfirmBtn { get; set; }
+    public Button? TreeZoomOutBtn { get; set; }
+    public Button? TreeZoomInBtn { get; set; }
+    public Button? TreeFitBtn { get; set; }
+
     // Map View Controls
     public Label? MapHeaderLbl { get; set; }
     public VBoxContainer? MapListContainer { get; set; }
@@ -49,6 +64,8 @@ public partial class MainMenu : Control
     public Button? MapBackBtn { get; set; }
 
     public string ActiveClassKey { get; set; } = "macrophage";
+    public string ActiveTreeClassKey { get; set; } = "macrophage";
+    public string ActiveTreeNodeId { get; set; } = "";
     public string ActiveMapKey { get; set; } = "acute_wound";
 
     private Callable _langCallback;
@@ -57,6 +74,7 @@ public partial class MainMenu : Control
     {
         TitleView = GetNodeOrNull<Control>("TitleView");
         ClassView = GetNodeOrNull<Control>("ClassView");
+        PassiveView = GetNodeOrNull<Control>("PassiveView");
         MapView = GetNodeOrNull<Control>("MapView");
         CellCodexModal = GetNodeOrNull<CodexModal>("CodexModal");
         CellSettingsModal = GetNodeOrNull<SettingsModal>("SettingsModal");
@@ -78,6 +96,19 @@ public partial class MainMenu : Control
         ClassStatusLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatusLabel");
         ClassConfirmBtn = GetNodeOrNull<Button>("ClassView/Buttons/ConfirmButton");
         ClassBackBtn = GetNodeOrNull<Button>("ClassView/Buttons/BackButton");
+
+        PassiveHeaderLbl = GetNodeOrNull<Label>("PassiveView/HeaderLabel");
+        TreeClassLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreeClassLabel");
+        TreeLevelLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreeLevelLabel");
+        TreePointsLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreePointsLabel");
+        TreeCanvas = GetNodeOrNull<PassiveTreeView>("PassiveView/ContentHBox/TreeView");
+        TreeStatusLbl = GetNodeOrNull<Label>("PassiveView/TreeStatusLabel");
+        PassiveBackBtn = GetNodeOrNull<Button>("PassiveView/Buttons/BackButton");
+        PassiveResetBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ResetButton");
+        PassiveConfirmBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ConfirmButton");
+        TreeZoomOutBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ZoomOutButton");
+        TreeZoomInBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ZoomInButton");
+        TreeFitBtn = GetNodeOrNull<Button>("PassiveView/Buttons/FitButton");
 
         MapHeaderLbl = GetNodeOrNull<Label>("MapView/HeaderLabel");
         MapListContainer = GetNodeOrNull<VBoxContainer>("MapView/HBox/MapList");
@@ -125,8 +156,27 @@ public partial class MainMenu : Control
         if (ClassConfirmBtn != null)
             ClassConfirmBtn.Pressed += OnClassConfirmPressed;
 
+        if (TreeCanvas != null)
+        {
+            TreeCanvas.TreeNodeActivated += OnTreeNodeActivated;
+            TreeCanvas.TreeNodeHovered += OnTreeNodeHovered;
+            TreeCanvas.TreeNodeRefundRequested += OnTreeNodeRefundRequested;
+        }
+        if (PassiveBackBtn != null)
+            PassiveBackBtn.Pressed += () => { if (ClassView != null) SwitchToView(ClassView); };
+        if (PassiveResetBtn != null)
+            PassiveResetBtn.Pressed += OnTreeResetPressed;
+        if (PassiveConfirmBtn != null)
+            PassiveConfirmBtn.Pressed += OnPassiveConfirmPressed;
+        if (TreeZoomOutBtn != null)
+            TreeZoomOutBtn.Pressed += () => TreeCanvas?.ZoomStep(1.0f / 1.2f);
+        if (TreeZoomInBtn != null)
+            TreeZoomInBtn.Pressed += () => TreeCanvas?.ZoomStep(1.2f);
+        if (TreeFitBtn != null)
+            TreeFitBtn.Pressed += () => TreeCanvas?.FitTree();
+
         if (MapBackBtn != null)
-            MapBackBtn.Pressed += () => { if (ClassView != null) SwitchToView(ClassView); };
+            MapBackBtn.Pressed += () => { if (PassiveView != null) { SelectPassiveBuild(ActiveTreeClassKey); SwitchToView(PassiveView); } };
         if (DeployBtn != null)
             DeployBtn.Pressed += OnDeployPressed;
 
@@ -158,13 +208,22 @@ public partial class MainMenu : Control
         if (ClassHeaderLbl != null) ClassHeaderLbl.Text = Tr("HEADER_SELECT_CLASS");
         if (ClassBackBtn != null) ClassBackBtn.Text = Tr("BTN_BACK_TITLE");
 
+        if (PassiveHeaderLbl != null) PassiveHeaderLbl.Text = Tr("HEADER_SELECT_PASSIVE");
+        if (PassiveBackBtn != null) PassiveBackBtn.Text = Tr("BTN_BACK_CLASS");
+        if (PassiveResetBtn != null) PassiveResetBtn.Text = Tr("TREE_RESET");
+        if (PassiveConfirmBtn != null) PassiveConfirmBtn.Text = Tr("BTN_CONFIRM_MAP");
+        if (TreeZoomOutBtn != null) TreeZoomOutBtn.Text = Tr("TREE_ZOOM_OUT");
+        if (TreeZoomInBtn != null) TreeZoomInBtn.Text = Tr("TREE_ZOOM_IN");
+        if (TreeFitBtn != null) TreeFitBtn.Text = Tr("TREE_FIT_VIEW");
+
         if (MapHeaderLbl != null) MapHeaderLbl.Text = Tr("HEADER_SELECT_MAP");
-        if (MapBackBtn != null) MapBackBtn.Text = Tr("BTN_BACK_CLASS");
+        if (MapBackBtn != null) MapBackBtn.Text = Tr("BTN_BACK_PASSIVE");
         if (DeployBtn != null) DeployBtn.Text = Tr("BTN_DEPLOY");
 
         SetupClassButtons();
         SetupMapButtons();
         SelectClass(ActiveClassKey);
+        RefreshPassiveView();
         SelectMap(ActiveMapKey);
     }
 
@@ -172,6 +231,7 @@ public partial class MainMenu : Control
     {
         if (TitleView != null) TitleView.Visible = targetView == TitleView;
         if (ClassView != null) ClassView.Visible = targetView == ClassView;
+        if (PassiveView != null) PassiveView.Visible = targetView == PassiveView;
         if (MapView != null) MapView.Visible = targetView == MapView;
     }
 
@@ -228,7 +288,7 @@ public partial class MainMenu : Control
         if (ClassConfirmBtn != null)
         {
             ClassConfirmBtn.Disabled = !unlocked;
-            ClassConfirmBtn.Text = unlocked ? Tr("BTN_CONFIRM_CLASS") : Tr("BTN_CONFIRM_CLASS_LOCKED");
+            ClassConfirmBtn.Text = unlocked ? Tr("BTN_CONFIRM_PASSIVE") : Tr("BTN_CONFIRM_CLASS_LOCKED");
         }
     }
 
@@ -242,9 +302,100 @@ public partial class MainMenu : Control
     public void OnClassConfirmPressed()
     {
         GameManager.SelectedClass = ActiveClassKey;
+        ActiveTreeNodeId = "";
+        SelectPassiveBuild(ActiveClassKey);
+        if (PassiveView != null)
+            SwitchToView(PassiveView);
+    }
+
+    public void SelectPassiveBuild(string classKey)
+    {
+        ActiveTreeClassKey = string.IsNullOrEmpty(classKey) ? ActiveClassKey : classKey;
+        string startNode = PassiveTreeManager.GetStartNode(ActiveTreeClassKey);
+        if (!PassiveTreeManager.IsKnownNode(ActiveTreeNodeId))
+            ActiveTreeNodeId = startNode;
+
+        RefreshPassiveView();
+    }
+
+    public void RefreshPassiveView()
+    {
+        var classInfo = GameManager.GetClassInfo(ActiveTreeClassKey);
+        string className = classInfo.TryGetValue("name", out var nameVal) ? nameVal.AsString() : ActiveTreeClassKey;
+        int level = PassiveTreeManager.GetCellLevel(ActiveTreeClassKey);
+        int available = PassiveTreeManager.GetPointsAvailable(ActiveTreeClassKey);
+        int spent = PassiveTreeManager.GetSpentPoints(ActiveTreeClassKey);
+
+        TreeCanvas?.Render(ActiveTreeClassKey);
+        if (TreeClassLbl != null) TreeClassLbl.Text = className;
+        if (TreeLevelLbl != null) TreeLevelLbl.Text = TextFormatter.Format(Tr("TREE_LEVEL"), level);
+        if (TreePointsLbl != null) TreePointsLbl.Text = TextFormatter.Format(Tr("TREE_POINTS"), available, spent);
+        UpdateTreeStatus();
+    }
+
+    public void OnTreeNodeActivated(string nodeId)
+    {
+        ActiveTreeNodeId = nodeId;
+        TreeCanvas?.SelectNode(nodeId);
+        PassiveTreeManager.Purchase(ActiveTreeClassKey, nodeId);
+        RefreshPassiveView();
+    }
+
+    public void OnTreeNodeHovered(string nodeId)
+    {
+        if (PassiveTreeManager.IsKnownNode(nodeId))
+            ActiveTreeNodeId = nodeId;
+        UpdateTreeStatus();
+    }
+
+    public void OnTreeNodeRefundRequested(string nodeId)
+    {
+        if (string.IsNullOrEmpty(nodeId))
+            return;
+        ActiveTreeNodeId = nodeId;
+        TreeCanvas?.SelectNode(nodeId);
+        PassiveTreeManager.RefundNode(ActiveTreeClassKey, nodeId);
+        RefreshPassiveView();
+    }
+
+    public void OnTreeResetPressed()
+    {
+        PassiveTreeManager.ResetAllocation(ActiveTreeClassKey);
+        ActiveTreeNodeId = PassiveTreeManager.GetStartNode(ActiveTreeClassKey);
+        RefreshPassiveView();
+    }
+
+    public void OnPassiveConfirmPressed()
+    {
+        GameManager.SelectedClass = ActiveTreeClassKey;
         if (MapView != null)
             SwitchToView(MapView);
         SelectMap(ActiveMapKey);
+    }
+
+    private void UpdateTreeStatus()
+    {
+        if (TreeStatusLbl == null)
+            return;
+
+        if (!PassiveTreeManager.TryGetNode(ActiveTreeNodeId, out var node))
+        {
+            TreeStatusLbl.Text = Tr("TREE_SELECT_NODE");
+            return;
+        }
+
+        int stacks = PassiveTreeManager.GetNodeStacks(ActiveTreeClassKey, node.Id);
+        string status = PassiveTreeManager.GetNodeName(node.Id)
+            + " • " + TextFormatter.Format(Tr("TREE_NODE_STACKS"), stacks, node.MaxStacks);
+        if (stacks >= node.MaxStacks)
+            status += " • " + Tr("TREE_MAXED");
+        else if (PassiveTreeManager.CanPurchase(ActiveTreeClassKey, node.Id))
+            status += " • " + Tr("TREE_PURCHASE_HINT");
+        else if (PassiveTreeManager.GetPointsAvailable(ActiveTreeClassKey) < node.PointCost)
+            status += " • " + Tr("TREE_NO_POINTS");
+        else
+            status += " • " + Tr("TREE_LOCKED");
+        TreeStatusLbl.Text = status;
     }
 
     public void SetupMapButtons()

@@ -61,6 +61,7 @@ public partial class Main : Node2D
         if (Player != null)
         {
             Player.AddToGroup("player");
+            ApplyTreeLoadout();
             if (HudNode != null)
             {
                 HudNode.ConnectPlayer(Player);
@@ -75,6 +76,35 @@ public partial class Main : Node2D
 
         // Initial pathogen wave
         SpawnInitialWave(35);
+    }
+
+    private void ApplyTreeLoadout()
+    {
+        if (Player is not BaseCell bc)
+            return;
+
+        string classId = GameManager.SelectedClass;
+        foreach (var node in PassiveTreeManager.Nodes)
+        {
+            int stacks = PassiveTreeManager.GetNodeStacks(classId, node.Id);
+            if (stacks <= 0)
+                continue;
+
+            var skill = PassiveTreeManager.CreateStackedSkill(node.Id, stacks);
+            if (skill == null)
+                continue;
+
+            skill.Name = "TreeLoadout_" + node.Id;
+            bc.AddChild(skill);
+            skill.Setup(bc, -1);
+        }
+    }
+
+    private void RecordTreeLevel(int level)
+    {
+        string classId = GameManager.SelectedClass;
+        if (GameManager.ClassData.ContainsKey(classId))
+            PassiveTreeManager.RecordRunLevel(classId, level);
     }
 
     private void ConnectAchievementEvents()
@@ -92,6 +122,7 @@ public partial class Main : Node2D
             bc.LevelUp += (lvl) =>
             {
                 AchievementManager.RecordEvent("level_up", lvl);
+                RecordTreeLevel(lvl);
             };
 
             bc.StatsChanged += (health, maxHealth, radiusRatio) =>
@@ -114,6 +145,7 @@ public partial class Main : Node2D
                 Player.Connect("level_up", Callable.From((int lvl) =>
                 {
                     AchievementManager.RecordEvent("level_up", lvl);
+                    RecordTreeLevel(lvl);
                 }));
             }
             if (Player.HasSignal("stats_changed"))

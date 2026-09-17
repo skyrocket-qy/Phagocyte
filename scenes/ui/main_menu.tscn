@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/codex_modal.tscn" id="2_codex"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_modal.tscn" id="3_settings"]
 [ext_resource type="Script" path="res://scripts/ui/HoloBodyScanner.cs" id="4_scanner"]
+[ext_resource type="Script" path="res://scripts/ui/PassiveTreeView.cs" id="5_tree"]
 
 [sub_resource type="Curve" id="Curve_menu_ambient"]
 _data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.5, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -297,7 +298,162 @@ custom_minimum_size = Vector2(240, 46)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 16
+text = "下一步：被动树"
+
+[node name="PassiveView" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HeaderLabel" type="Label" parent="PassiveView"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 32.0
+offset_right = 300.0
+offset_bottom = 72.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "选择被动树"
+horizontal_alignment = 1
+
+[node name="InfoHBox" type="HBoxContainer" parent="PassiveView"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -460.0
+offset_top = 78.0
+offset_right = 460.0
+offset_bottom = 104.0
+grow_horizontal = 2
+theme_override_constants/separation = 24
+
+[node name="TreeClassLabel" type="Label" parent="PassiveView/InfoHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 15
+text = "巨噬细胞 (Macrophage)"
+
+[node name="TreeLevelLabel" type="Label" parent="PassiveView/InfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "天赋等级：1"
+
+[node name="TreePointsLabel" type="Label" parent="PassiveView/InfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
+theme_override_font_sizes/font_size = 14
+text = "被动点数：0"
+horizontal_alignment = 2
+
+[node name="ContentHBox" type="HBoxContainer" parent="PassiveView"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -590.0
+offset_top = -205.0
+offset_right = 590.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="TreeView" type="Control" parent="PassiveView/ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+clip_contents = true
+script = ExtResource("5_tree")
+
+[node name="TreeStatusLabel" type="Label" parent="PassiveView"]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -560.0
+offset_top = -152.0
+offset_right = 560.0
+offset_bottom = -112.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.78, 0.86, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+text = "選擇一個天賦節點以查看詳情。"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="PassiveView"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -530.0
+offset_top = -100.0
+offset_right = 530.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 16
+
+[node name="BackButton" type="Button" parent="PassiveView/Buttons"]
+custom_minimum_size = Vector2(170, 46)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 16
+text = "返回选择细胞"
+
+[node name="ResetButton" type="Button" parent="PassiveView/Buttons"]
+custom_minimum_size = Vector2(150, 46)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 16
+text = "重置天赋树"
+
+[node name="ConfirmButton" type="Button" parent="PassiveView/Buttons"]
+custom_minimum_size = Vector2(220, 46)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 16
 text = "下一步：选择病理战场"
+
+[node name="ZoomOutButton" type="Button" parent="PassiveView/Buttons"]
+custom_minimum_size = Vector2(100, 46)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 16
+text = "缩小"
+
+[node name="ZoomInButton" type="Button" parent="PassiveView/Buttons"]
+custom_minimum_size = Vector2(100, 46)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 16
+text = "放大"
+
+[node name="FitButton" type="Button" parent="PassiveView/Buttons"]
+custom_minimum_size = Vector2(120, 46)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 16
+text = "显示全树"
 
 [node name="MapView" type="Control" parent="."]
 visible = false

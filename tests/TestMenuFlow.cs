@@ -48,8 +48,9 @@ public partial class TestMenuFlow : SceneTree
         // 1. Test Title View initial state
         AssertThat(menu.TitleView != null && menu.TitleView.Visible).IsTrue();
         AssertThat(menu.ClassView != null && menu.ClassView.Visible).IsFalse();
+        AssertThat(menu.PassiveView != null && menu.PassiveView.Visible).IsFalse();
         AssertThat(menu.MapView != null && menu.MapView.Visible).IsFalse();
-        GD.Print("[PASS] TitleView initially visible, class and map views hidden.");
+        GD.Print("[PASS] TitleView initially visible; class, tree, and map views hidden.");
 
         // 2. Test Transition to Class Selection
         menu.OnStartPressed();
@@ -88,13 +89,20 @@ public partial class TestMenuFlow : SceneTree
         }
         GD.Print("[PASS] All 5 immune defense cells selectable and confirmed unlocked via achievements.");
 
-        // Re-select Macrophage and proceed
+        // Re-select Macrophage and proceed through the passive tree
         menu.SelectClass("macrophage");
         menu.OnClassConfirmPressed();
         AssertThat(menu.ClassView.Visible).IsFalse();
-        AssertThat(menu.MapView != null && menu.MapView.Visible).IsTrue();
+        AssertThat(menu.PassiveView != null && menu.PassiveView.Visible).IsTrue();
+        AssertThat(menu.MapView != null && menu.MapView.Visible).IsFalse();
         AssertThat(GameManager.SelectedClass).IsEqual("macrophage");
-        GD.Print("[PASS] Transition to MapView with GameManager.selected_class = 'macrophage' verified.");
+        AssertThat(menu.ActiveTreeClassKey).IsEqual("macrophage");
+        GD.Print("[PASS] Transition to PassiveView with GameManager.selected_class = 'macrophage' verified.");
+
+        menu.OnPassiveConfirmPressed();
+        AssertThat(menu.PassiveView.Visible).IsFalse();
+        AssertThat(menu.MapView != null && menu.MapView.Visible).IsTrue();
+        GD.Print("[PASS] Transition from PassiveView to MapView verified.");
 
         // 4. Test Map Selection & 5 Organ Battlefields
         AssertThat(GameManager.MapData.Count).IsEqual(5);

@@ -35,7 +35,7 @@ public partial class UpgradeManager : RefCounted
     public static Array<Dictionary> PassiveCatalog = new Array<Dictionary>()
     {
         new Dictionary { { "id", "passive_actin" }, { "name", "SKILL_ACTIN_NAME" }, { "desc", "SKILL_ACTIN_DESC" }, { "icon", "🧬" }, { "class_type", typeof(PassiveActinPolymerization).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_lysosome" }, { "name", "SKILL_LYSOSOME_NAME" }, { "desc", "SKILL_LYSOSOME_DESC" }, { "icon", "🧪" }, { "class_type", typeof(PassiveLysosomePriming).AssemblyQualifiedName } },
+        new Dictionary { { "id", "passive_lysosome" }, { "name", "TREE_NODE_LYSOSOME_NAME" }, { "desc", "TREE_NODE_LYSOSOME_DESC" }, { "icon", "🧪" }, { "class_type", typeof(PassiveLysosomePriming).AssemblyQualifiedName } },
         new Dictionary { { "id", "passive_mitochondria" }, { "name", "SKILL_MITOCHONDRIA_NAME" }, { "desc", "SKILL_MITOCHONDRIA_DESC" }, { "icon", "⚡" }, { "class_type", typeof(PassiveMitochondrialOverclock).AssemblyQualifiedName } },
         new Dictionary { { "id", "passive_opsonin" }, { "name", "SKILL_OPSONIN_NAME" }, { "desc", "SKILL_OPSONIN_DESC" }, { "icon", "🎯" }, { "class_type", typeof(PassiveOpsoninAffinity).AssemblyQualifiedName } },
         new Dictionary { { "id", "passive_chemokine" }, { "name", "SKILL_CHEMOKINE_NAME" }, { "desc", "SKILL_CHEMOKINE_DESC" }, { "icon", "🧲" }, { "class_type", typeof(PassiveChemokineReceptors).AssemblyQualifiedName } },
@@ -152,10 +152,11 @@ public partial class UpgradeManager : RefCounted
         // New Passives if slots available (< 5)
         if (passiveCount < SkillManager.MaxPassiveSlots)
         {
+            var treeOwned = PassiveTreeManager.GetAllocation(GameManager.SelectedClass);
             foreach (var item in PassiveCatalog)
             {
                 string id = item["id"].AsString();
-                if (!equippedPassiveIds.Contains(id))
+                if (!equippedPassiveIds.Contains(id) && !treeOwned.ContainsKey(id))
                 {
                     candidates.Add(new Dictionary
                     {

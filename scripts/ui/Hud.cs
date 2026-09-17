@@ -1,6 +1,7 @@
 using Godot;
 using Godot.Collections;
 using System;
+using System.Text;
 using Phagocyte.Core;
 using Phagocyte.Player;
 using Phagocyte.Skills;
@@ -67,6 +68,9 @@ public partial class Hud : CanvasLayer
     public Label? TooltipStats { get; set; }
     public Label? TooltipDesc { get; set; }
     public Label? TooltipBio { get; set; }
+
+    public PanelContainer? TreeOverlayPanel { get; set; }
+    public RichTextLabel? TreeOverlayText { get; set; }
 
     public int HoveredSlotIdx { get; set; } = -1;
 
@@ -172,6 +176,7 @@ public partial class Hud : CanvasLayer
 
         SetupSlotHoverSignals();
         SetupAchievementBanner();
+        SetupTreeOverlay();
 
         _achUnlockCallback = Callable.From((string a, Dictionary b) => OnAchievementUnlocked(a, b));
         AchievementManager.AddUnlockListener(_achUnlockCallback);
@@ -284,6 +289,7 @@ public partial class Hud : CanvasLayer
         if (SkillTitleLbl != null) SkillTitleLbl.Text = Tr("SKILL_BAR_DUAL_TITLE");
 
         UpdateBuffStatus();
+        RefreshTreeOverlay();
 
         if (PauseTitle != null) PauseTitle.Text = Tr("PAUSE_TITLE");
         if (ResumeBtn != null) ResumeBtn.Text = Tr("PAUSE_RESUME");
@@ -618,6 +624,12 @@ public partial class Hud : CanvasLayer
 
     public override void _Input(InputEvent @event)
     {
+        if (@event.IsActionPressed("toggle_tree") || (@event is InputEventKey treeKey && treeKey.Pressed && treeKey.Keycode == Key.C))
+        {
+            ToggleTreeOverlay();
+            return;
+        }
+
         if (@event.IsActionPressed("toggle_pause") || (@event is InputEventKey keyEvent && keyEvent.Pressed && keyEvent.Keycode == Key.Escape))
         {
             if (CellSettingsModal != null && CellSettingsModal.Visible)
@@ -710,6 +722,7 @@ public partial class Hud : CanvasLayer
 
         UpdateBuffStatus();
         UpdateSkillSlots();
+        RefreshTreeOverlay();
     }
 
     private void OnPlayerExpChanged(float currentExp, float expToNext, int level)
@@ -718,6 +731,7 @@ public partial class Hud : CanvasLayer
         LastExpToNext = expToNext;
         LastLevel = level;
         UpdateExpDisplay();
+        RefreshTreeOverlay();
     }
 
     private void OnPlayerStatsChanged(float health, float maxHealth, float radiusRatio)
@@ -740,6 +754,7 @@ public partial class Hud : CanvasLayer
 
         if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), radiusRatio);
         if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
+        RefreshTreeOverlay();
     }
 
     private void OnPathogenDigested(Node2D _enemy, float _atp)
@@ -765,6 +780,139 @@ public partial class Hud : CanvasLayer
         {
             CellUpgradeModal.OpenUpgradeModal(PlayerRef);
         }
+    }
+
+    public bool IsTreeOverlayVisible => TreeOverlayPanel?.Visible ?? false;
+
+    public void ToggleTreeOverlay()
+    {
+        if (TreeOverlayPanel == null)
+            return;
+
+        bool show = !TreeOverlayPanel.Visible;
+        if (show)
+            RefreshTreeOverlay();
+        TreeOverlayPanel.Visible = show;
+    }
+
+    public void RefreshTreeOverlay()
+    {
+        if (TreeOverlayPanel == null || TreeOverlayText == null)
+            return;
+
+        string classId = GameManager.SelectedClass;
+        var classInfo = GameManager.GetClassInfo(classId);
+        string className = classInfo.TryGetValue("name", out var nameVal) ? nameVal.AsString() : classId;
+        var allocation = PassiveTreeManager.GetAllocation(classId);
+        var text = new StringBuilder();
+
+        text.AppendLine("[b]" + Tr("TREE_OVERLAY_TITLE") + "[/b]");
+        text.AppendLine(className);
+        text.AppendLine(TextFormatter.Format(Tr("TREE_OVERLAY_LEVEL"), PassiveTreeManager.GetCellLevel(classId), LastLevel));
+        text.AppendLine(TextFormatter.Format(Tr("TREE_POINTS"), PassiveTreeManager.GetPointsAvailable(classId), PassiveTreeManager.GetSpentPoints(classId)));
+        text.AppendLine();
+
+        if (allocation.Count == 0)
+        {
+            text.AppendLine(Tr("TREE_OVERLAY_EMPTY"));
+        }
+        else
+        {
+            foreach (var node in PassiveTreeManager.Nodes)
+            {
+                if (!allocation.TryGetValue(node.Id, out int stacks))
+                    continue;
+
+                string icon = PassiveTreeManager.GetNodeIcon(node.Id);
+                string nodeName = PassiveTreeManager.GetNodeName(node.Id);
+                text.AppendLine(icon + " " + nodeName + " " + TextFormatter.Format(Tr("TREE_NODE_STACKS"), stacks, PassiveTreeManager.GetMaxStacks(node.Id)));
+                string description = PassiveTreeManager.GetNodeDescription(node.Id);
+                if (!string.IsNullOrEmpty(description))
+                {
+                    foreach (string line in description.Split("\n"))
+                        text.AppendLine("  " + line);
+                }
+            }
+        }
+
+        text.AppendLine();
+        text.AppendLine("[b]" + Tr("TREE_OVERLAY_STATS") + "[/b]");
+        if (PlayerRef is BaseCell bc && bc.Stats != null)
+        {
+            string[] statKeys =
+            {
+                "max_health", "health_regen", "armor", "move_speed", "revival", "knockback_resist",
+                "might", "area", "cooldown_reduction", "projectile_speed", "duration", "amount",
+                "pierce", "knockback", "crit_chance", "crit_damage",
+                "magnet", "growth", "luck", "curse"
+            };
+            foreach (string statKey in statKeys)
+                text.AppendLine(PassiveTreeManager.GetStatLabel(statKey) + ": " + FormatTreeStat(statKey, bc.Stats.GetStat(statKey)));
+        }
+        else
+        {
+            text.AppendLine(Tr("TREE_OVERLAY_NO_PLAYER"));
+        }
+        text.AppendLine();
+        text.AppendLine(Tr("TREE_OVERLAY_HINT"));
+
+        TreeOverlayText.Text = text.ToString();
+    }
+
+    private static string FormatTreeStat(string statKey, float value)
+    {
+        return statKey switch
+        {
+            "max_health" or "health_regen" or "move_speed" or "magnet" => $"{value:F1}",
+            "amount" or "pierce" or "revival" or "armor" => $"{value:F0}",
+            _ => $"{value:F2}"
+        };
+    }
+
+    private void SetupTreeOverlay()
+    {
+        TreeOverlayPanel = new PanelContainer
+        {
+            Name = "TreeOverlayPanel",
+            Visible = false,
+            MouseFilter = Control.MouseFilterEnum.Ignore,
+            CustomMinimumSize = new Vector2(400, 480),
+            AnchorLeft = 1.0f,
+            AnchorRight = 1.0f,
+            AnchorTop = 0.0f,
+            AnchorBottom = 0.0f,
+            OffsetLeft = -420.0f,
+            OffsetRight = -20.0f,
+            OffsetTop = 80.0f,
+            OffsetBottom = 620.0f
+        };
+
+        var style = new StyleBoxFlat
+        {
+            BgColor = new Color(0.05f, 0.08f, 0.13f, 0.95f),
+            BorderColor = new Color(0.45f, 0.85f, 0.65f, 0.9f),
+            ContentMarginLeft = 16.0f,
+            ContentMarginRight = 16.0f,
+            ContentMarginTop = 12.0f,
+            ContentMarginBottom = 12.0f
+        };
+        style.SetBorderWidthAll(2);
+        style.SetCornerRadiusAll(10);
+        TreeOverlayPanel.AddThemeStyleboxOverride("panel", style);
+
+        TreeOverlayText = new RichTextLabel
+        {
+            Name = "TreeOverlayText",
+            BbcodeEnabled = true,
+            ScrollActive = true,
+            AutowrapMode = TextServer.AutowrapMode.WordSmart,
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
+        TreeOverlayText.AddThemeFontSizeOverride("normal_font_size", 13);
+        TreeOverlayText.AddThemeFontSizeOverride("bold_font_size", 14);
+        TreeOverlayPanel.AddChild(TreeOverlayText);
+        AddChild(TreeOverlayPanel);
+        RefreshTreeOverlay();
     }
 
     private void SetupAchievementBanner()
