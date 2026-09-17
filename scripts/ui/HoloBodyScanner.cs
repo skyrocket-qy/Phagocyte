@@ -1,14 +1,16 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using Phagocyte.Core;
 
 namespace Phagocyte.UI;
 
 /// <summary>
 /// Holographic Host Body Scanner (全息透視人體掃描儀)
-/// Interactive procedural 2D medical diagnostic interface for map selection.
-/// Features a cybernetic vector body silhouette, oscillating scanline,
-/// interactive organ hotspots, and dynamic callout lead lines to the detail card.
+/// High-precision 2D layered medical diagnostic interface for map selection.
+/// Features high-fidelity transparent cybernetic human body, additive-blended
+/// anatomical organ overlays with breathing pulse tweens, laser scanline,
+/// target reticles, and dynamic HUD callout lead lines to the detail card.
 /// </summary>
 public partial class HoloBodyScanner : Control
 {
@@ -28,18 +30,153 @@ public partial class HoloBodyScanner : Control
     // Hotspot screen radius for mouse interaction
     private const float HotspotRadius = 26.0f;
 
+    // Child display nodes
+    private Control? _bodyContainer;
+    private TextureRect? _baseTextureRect;
+    private readonly Dictionary<string, TextureRect> _overlayRects = new();
+    private readonly Dictionary<string, float> _fadeAlphas = new()
+    {
+        { "acute_wound", 0.0f },
+        { "alveolar_space", 0.0f },
+        { "hepatic_sinusoid", 0.0f },
+        { "gastric_lumen", 0.0f },
+        { "blood_brain_barrier", 0.0f }
+    };
+
+    // Internal HUD overlay control to render on top of textures
+    private partial class HoloHudOverlay : Control
+    {
+        public HoloBodyScanner? Scanner { get; set; }
+
+        public override void _Draw()
+        {
+            Scanner?.RenderHud(this);
+        }
+    }
+
+    private HoloHudOverlay? _hudOverlay;
+
     public override void _Ready()
     {
-        CustomMinimumSize = new Vector2(460, 460);
+        CustomMinimumSize = new Vector2(430, 420);
         MouseFilter = MouseFilterEnum.Stop;
+
+        SetupLayers();
+        UpdateLayout();
+    }
+
+    private void SetupLayers()
+    {
+        // 1. Container for Body Base & Organ Overlays
+        _bodyContainer = new Control
+        {
+            Name = "BodyContainer",
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        AddChild(_bodyContainer);
+
+        // 2. High-precision base transparent human silhouette texture
+        var baseTex = GD.Load<Texture2D>("res://assets/sprites/ui/hologram/holo_body_base.png");
+        _baseTextureRect = new TextureRect
+        {
+            Name = "BaseBody",
+            Texture = baseTex,
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.Scale,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        _bodyContainer.AddChild(_baseTextureRect);
+
+        // 3. Additive blended anatomical organ overlays
+        var overlayConfigs = new (string key, string path)[]
+        {
+            ("acute_wound", "res://assets/sprites/ui/hologram/skin_wound_highlight.png"),
+            ("alveolar_space", "res://assets/sprites/ui/hologram/lungs_highlight.png"),
+            ("hepatic_sinusoid", "res://assets/sprites/ui/hologram/liver_highlight.png"),
+            ("gastric_lumen", "res://assets/sprites/ui/hologram/stomach_highlight.png"),
+            ("blood_brain_barrier", "res://assets/sprites/ui/hologram/brain_highlight.png")
+        };
+
+        foreach (var (key, path) in overlayConfigs)
+        {
+            var tex = GD.Load<Texture2D>(path);
+            var addMat = new CanvasItemMaterial
+            {
+                BlendMode = CanvasItemMaterial.BlendModeEnum.Add
+            };
+
+            var overlayRect = new TextureRect
+            {
+                Name = $"Overlay_{key}",
+                Texture = tex,
+                Material = addMat,
+                ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+                StretchMode = TextureRect.StretchModeEnum.Scale,
+                MouseFilter = MouseFilterEnum.Ignore,
+                Modulate = new Color(1, 1, 1, 0)
+            };
+
+            _bodyContainer.AddChild(overlayRect);
+            _overlayRects[key] = overlayRect;
+        }
+
+        // Set initial alpha for active organ
+        if (_fadeAlphas.ContainsKey(ActiveMapKey))
+        {
+            _fadeAlphas[ActiveMapKey] = 1.0f;
+            if (_overlayRects.TryGetValue(ActiveMapKey, out var activeRect))
+            {
+                activeRect.Modulate = new Color(1, 1, 1, 1);
+            }
+        }
+
+        // 4. HUD overlay for scanline, targeting reticle, lead lines, telemetry
+        _hudOverlay = new HoloHudOverlay
+        {
+            Name = "HudOverlay",
+            Scanner = this,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        AddChild(_hudOverlay);
+    }
+
+    public override void _Notification(int what)
+    {
+        if (what == NotificationResized)
+        {
+            UpdateLayout();
+        }
+    }
+
+    private void UpdateLayout()
+    {
+        if (_bodyContainer == null || _baseTextureRect == null || _hudOverlay == null)
+            return;
+
+        var bodyRect = GetBodyRect();
+        _bodyContainer.Position = bodyRect.Position;
+        _bodyContainer.Size = bodyRect.Size;
+
+        _baseTextureRect.Position = Vector2.Zero;
+        _baseTextureRect.Size = bodyRect.Size;
+
+        foreach (var overlay in _overlayRects.Values)
+        {
+            overlay.Position = Vector2.Zero;
+            overlay.Size = bodyRect.Size;
+        }
+
+        _hudOverlay.Position = Vector2.Zero;
+        _hudOverlay.Size = Size;
     }
 
     public override void _Process(double delta)
     {
-        _time += (float)delta;
+        float dt = (float)delta;
+        _time += dt;
 
-        // Scanline movement
-        _scanYRatio += _scanDirection * (float)delta * 0.35f;
+        // Scanline oscillation
+        _scanYRatio += _scanDirection * dt * 0.35f;
         if (_scanYRatio > 0.95f)
         {
             _scanYRatio = 0.95f;
@@ -51,7 +188,27 @@ public partial class HoloBodyScanner : Control
             _scanDirection = 1.0f;
         }
 
+        // Organ overlay breathing pulse (oscillates between 0.72 and 1.00)
+        float pulse = 0.86f + 0.14f * Mathf.Sin(_time * 3.8f);
+
+        foreach (var kvp in _overlayRects)
+        {
+            string key = kvp.Key;
+            var rect = kvp.Value;
+            bool isActive = (key == ActiveMapKey);
+            bool isHovered = (key == HoveredMapKey);
+
+            float targetAlpha = isActive ? 1.0f : (isHovered ? 0.35f : 0.0f);
+            float currentAlpha = _fadeAlphas.TryGetValue(key, out var fa) ? fa : 0.0f;
+            currentAlpha = Mathf.MoveToward(currentAlpha, targetAlpha, dt * 4.5f);
+            _fadeAlphas[key] = currentAlpha;
+
+            float finalAlpha = currentAlpha * (isActive ? pulse : 1.0f);
+            rect.Modulate = new Color(1.0f, 1.0f, 1.0f, finalAlpha);
+        }
+
         QueueRedraw();
+        _hudOverlay?.QueueRedraw();
     }
 
     public void SelectOrgan(string mapKey)
@@ -60,6 +217,7 @@ public partial class HoloBodyScanner : Control
         {
             ActiveMapKey = mapKey;
             QueueRedraw();
+            _hudOverlay?.QueueRedraw();
         }
     }
 
@@ -77,6 +235,7 @@ public partial class HoloBodyScanner : Control
                     EmitSignal(SignalName.OrganHovered, foundKey);
                 }
                 QueueRedraw();
+                _hudOverlay?.QueueRedraw();
             }
         }
         else if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
@@ -87,6 +246,7 @@ public partial class HoloBodyScanner : Control
                 ActiveMapKey = clickedKey;
                 EmitSignal(SignalName.OrganSelected, clickedKey);
                 QueueRedraw();
+                _hudOverlay?.QueueRedraw();
                 AcceptEvent();
             }
         }
@@ -112,46 +272,52 @@ public partial class HoloBodyScanner : Control
         return null;
     }
 
-    private Rect2 GetBodyRect()
+    public Rect2 GetBodyRect()
     {
-        // Centralized rectangular viewport for the anatomical body silhouette
-        float marginX = 70.0f;
-        float marginTop = 45.0f;
-        float marginBottom = 65.0f;
-        return new Rect2(
-            marginX,
-            marginTop,
-            Size.X - marginX * 2.0f,
-            Size.Y - marginTop - marginBottom
-        );
+        // 640x1000 texture aspect ratio is 0.64
+        const float textureAspect = 640.0f / 1000.0f;
+        float availH = Mathf.Max(100.0f, Size.Y - 76.0f);
+        float availW = Mathf.Max(60.0f, Size.X - 40.0f);
+
+        float targetH = availH;
+        float targetW = targetH * textureAspect;
+        if (targetW > availW)
+        {
+            targetW = availW;
+            targetH = targetW / textureAspect;
+        }
+
+        float posX = (Size.X - targetW) * 0.5f;
+        float posY = 36.0f + (availH - targetH) * 0.5f;
+
+        return new Rect2(posX, posY, targetW, targetH);
     }
 
     public override void _Draw()
     {
-        var size = Size;
+        // Draw background glass chamber container
+        DrawScannerBackground(Size);
+    }
+
+    public void RenderHud(Control canvas)
+    {
         var bodyRect = GetBodyRect();
 
-        // 1. Background Grid & Framing
-        DrawScannerBackground(size);
+        // 1. Oscillating Laser Scanline
+        DrawScanline(canvas, bodyRect);
 
-        // 2. Holographic Anatomical Body Silhouette
-        DrawHolographicBody(bodyRect);
+        // 2. Interactive Organ Hotspots, Reticles & Callout Lines
+        DrawOrganHotspots(canvas, bodyRect);
 
-        // 3. Oscillating Laser Scanline
-        DrawScanline(bodyRect);
-
-        // 4. Interactive Organ Hotspots & Callout Lines
-        DrawOrganHotspots(bodyRect);
-
-        // 5. Medical Diagnostic Telemetry
-        DrawDiagnosticTelemetry(size);
+        // 3. Medical Diagnostic Telemetry
+        DrawDiagnosticTelemetry(canvas, Size);
     }
 
     private void DrawScannerBackground(Vector2 size)
     {
-        // Semi-transparent deep cybernetic glass background
-        DrawRect(new Rect2(Vector2.Zero, size), new Color(0.02f, 0.04f, 0.08f, 0.70f), true);
-        DrawRect(new Rect2(Vector2.Zero, size), new Color(0.15f, 0.40f, 0.70f, 0.40f), false, 1.5f);
+        // Semi-transparent deep cybernetic glass chamber
+        DrawRect(new Rect2(Vector2.Zero, size), new Color(0.02f, 0.04f, 0.08f, 0.72f), true);
+        DrawRect(new Rect2(Vector2.Zero, size), new Color(0.15f, 0.40f, 0.70f, 0.45f), false, 1.5f);
 
         // Corner framing brackets
         float bLen = 16.0f;
@@ -167,7 +333,7 @@ public partial class HoloBodyScanner : Control
         DrawLine(new Vector2(0, size.Y), new Vector2(0, size.Y - bLen), bColor, 2.5f);
         // Bottom-Right
         DrawLine(new Vector2(size.X, size.Y), new Vector2(size.X - bLen, size.Y), bColor, 2.5f);
-        DrawLine(new Vector2(size.X, size.Y), new Vector2(size.X, size.Y - bLen), bColor, 2.5f);
+        DrawLine(new Vector2(size.X, size.Y), new Vector2(size.X, bLen), bColor, 2.5f);
 
         // Subtle horizontal coordinate raster lines
         Color gridColor = new Color(0.12f, 0.32f, 0.55f, 0.12f);
@@ -177,108 +343,24 @@ public partial class HoloBodyScanner : Control
         }
     }
 
-    private void DrawHolographicBody(Rect2 b)
-    {
-        float cx = b.Position.X + b.Size.X * 0.5f;
-        float cy = b.Position.Y;
-        float h = b.Size.Y;
-        float w = b.Size.X;
-
-        Color bodyFill = new Color(0.08f, 0.28f, 0.52f, 0.22f);
-        Color bodyLine = new Color(0.25f, 0.65f, 0.95f, 0.65f);
-        Color boneLine = new Color(0.40f, 0.85f, 1.0f, 0.35f);
-
-        // Head Ellipse
-        Vector2 headCenter = new Vector2(cx, cy + h * 0.10f);
-        Vector2 headRadius = new Vector2(w * 0.11f, h * 0.085f);
-        DrawCircle(headCenter, headRadius.X, bodyFill);
-        DrawArc(headCenter, headRadius.X, 0, Mathf.Tau, 36, bodyLine, 1.5f);
-
-        // Neck
-        Vector2 neckTop = headCenter + new Vector2(0, headRadius.Y * 0.7f);
-        Vector2 neckBot = new Vector2(cx, cy + h * 0.20f);
-        DrawLine(neckTop + new Vector2(-10, 0), neckBot + new Vector2(-12, 0), bodyLine, 1.5f);
-        DrawLine(neckTop + new Vector2(10, 0), neckBot + new Vector2(12, 0), bodyLine, 1.5f);
-
-        // Torso / Ribcage
-        Vector2 leftShoulder = new Vector2(cx - w * 0.32f, cy + h * 0.22f);
-        Vector2 rightShoulder = new Vector2(cx + w * 0.32f, cy + h * 0.22f);
-        Vector2 leftChest = new Vector2(cx - w * 0.26f, cy + h * 0.34f);
-        Vector2 rightChest = new Vector2(cx + w * 0.26f, cy + h * 0.34f);
-        Vector2 leftWaist = new Vector2(cx - w * 0.19f, cy + h * 0.46f);
-        Vector2 rightWaist = new Vector2(cx + w * 0.19f, cy + h * 0.46f);
-        Vector2 leftPelvis = new Vector2(cx - w * 0.23f, cy + h * 0.56f);
-        Vector2 rightPelvis = new Vector2(cx + w * 0.23f, cy + h * 0.56f);
-        Vector2 groin = new Vector2(cx, cy + h * 0.59f);
-
-        // Torso outline
-        Vector2[] torsoPts = new[]
-        {
-            neckBot + new Vector2(-12, 0),
-            leftShoulder, leftChest, leftWaist, leftPelvis, groin,
-            rightPelvis, rightWaist, rightChest, rightShoulder,
-            neckBot + new Vector2(12, 0)
-        };
-        DrawPolygon(torsoPts, new[] { bodyFill });
-        DrawPolyline(torsoPts, bodyLine, 1.5f);
-
-        // Arms
-        Vector2 leftElbow = new Vector2(cx - w * 0.36f, cy + h * 0.38f);
-        Vector2 leftWrist = new Vector2(cx - w * 0.39f, cy + h * 0.52f);
-        Vector2 rightElbow = new Vector2(cx + w * 0.36f, cy + h * 0.38f);
-        Vector2 rightWrist = new Vector2(cx + w * 0.39f, cy + h * 0.52f);
-
-        DrawLine(leftShoulder, leftElbow, bodyLine, 1.5f);
-        DrawLine(leftElbow, leftWrist, bodyLine, 1.5f);
-        DrawLine(rightShoulder, rightElbow, bodyLine, 1.5f);
-        DrawLine(rightElbow, rightWrist, bodyLine, 1.5f);
-
-        // Spine / Central Neural Conduit
-        DrawLine(neckBot, groin, boneLine, 2.0f);
-        for (float sy = cy + h * 0.23f; sy < cy + h * 0.54f; sy += 16.0f)
-        {
-            DrawLine(new Vector2(cx - 8, sy), new Vector2(cx + 8, sy), boneLine, 1.0f);
-        }
-
-        // Rib arches
-        float[] ribRatios = { 0.27f, 0.31f, 0.35f };
-        foreach (var r in ribRatios)
-        {
-            float ry = cy + h * r;
-            float rw = w * (0.22f - (r - 0.27f) * 0.3f);
-            DrawArc(new Vector2(cx, ry), rw, -0.3f, 3.44f, 16, boneLine, 1.0f);
-        }
-
-        // Legs
-        Vector2 leftKnee = new Vector2(cx - w * 0.17f, cy + h * 0.77f);
-        Vector2 rightKnee = new Vector2(cx + w * 0.17f, cy + h * 0.77f);
-        Vector2 leftAnkle = new Vector2(cx - w * 0.15f, cy + h * 0.95f);
-        Vector2 rightAnkle = new Vector2(cx + w * 0.15f, cy + h * 0.95f);
-
-        DrawLine(leftPelvis, leftKnee, bodyLine, 1.5f);
-        DrawLine(leftKnee, leftAnkle, bodyLine, 1.5f);
-        DrawLine(rightPelvis, rightKnee, bodyLine, 1.5f);
-        DrawLine(rightKnee, rightAnkle, bodyLine, 1.5f);
-    }
-
-    private void DrawScanline(Rect2 b)
+    private void DrawScanline(Control canvas, Rect2 b)
     {
         float sy = b.Position.Y + b.Size.Y * _scanYRatio;
         Color scanColor = new Color(0.2f, 0.95f, 1.0f, 0.75f);
         Color glowColor = new Color(0.1f, 0.75f, 0.9f, 0.18f);
 
         // Glow band
-        DrawRect(new Rect2(b.Position.X - 20, sy - 4, b.Size.X + 40, 8), glowColor, true);
+        canvas.DrawRect(new Rect2(b.Position.X - 20, sy - 4, b.Size.X + 40, 8), glowColor, true);
         // Sharp scan beam
-        DrawLine(new Vector2(b.Position.X - 30, sy), new Vector2(b.Position.X + b.Size.X + 30, sy), scanColor, 1.5f);
+        canvas.DrawLine(new Vector2(b.Position.X - 30, sy), new Vector2(b.Position.X + b.Size.X + 30, sy), scanColor, 1.5f);
     }
 
-    private void DrawOrganHotspots(Rect2 bodyRect)
+    private void DrawOrganHotspots(Control canvas, Rect2 bodyRect)
     {
         Vector2 activePos = Vector2.Zero;
         Color activeColor = new Color("#2a9d8f");
 
-        // First pass: Draw inactive & hovered nodes
+        // First pass: Draw interactive hotspot indicators (subtle when inactive, invisible solid circle when active so overlay shines)
         foreach (var keyVar in GameManager.MapData.Keys)
         {
             string key = keyVar.AsString();
@@ -295,68 +377,69 @@ public partial class HoloBodyScanner : Control
                 activePos = screenPos;
                 activeColor = nodeColor;
             }
-
-            // Outer ring
-            float pulse = Mathf.Sin(_time * 4.0f + normPos.Y * 10.0f) * 2.0f;
-            float r = isActive ? 16.0f + pulse : (isHovered ? 14.0f : 10.0f);
-
-            // Node core
-            DrawCircle(screenPos, r, new Color(nodeColor.R, nodeColor.G, nodeColor.B, isActive ? 0.35f : 0.18f));
-            DrawArc(screenPos, r, 0, Mathf.Tau, 24, nodeColor, isActive ? 2.5f : 1.2f);
-
-            if (isHovered && !isActive)
+            else
             {
-                DrawArc(screenPos, r + 4.0f, 0, Mathf.Tau, 16, new Color(1, 1, 1, 0.6f), 1.0f);
-            }
+                // Inactive nodes: subtle tech ring with center micro-pip
+                float r = isHovered ? 13.0f : 8.5f;
+                float ringAlpha = isHovered ? 0.85f : 0.35f;
+                Color ringColor = new Color(nodeColor.R, nodeColor.G, nodeColor.B, ringAlpha);
 
-            // Small center dot
-            DrawCircle(screenPos, 3.5f, nodeColor);
+                canvas.DrawArc(screenPos, r, 0, Mathf.Tau, 20, ringColor, isHovered ? 1.8f : 1.0f);
+                canvas.DrawCircle(screenPos, 2.5f, ringColor);
+
+                if (isHovered)
+                {
+                    canvas.DrawArc(screenPos, r + 4.0f, 0, Mathf.Tau, 16, new Color(1, 1, 1, 0.5f), 1.0f);
+                }
+            }
         }
 
         // Second pass: Draw active hotspot high-tech targeting reticle and callout line
         if (activePos != Vector2.Zero)
         {
-            // Target Crosshair corners
-            float reticleSize = 24.0f;
-            float cLen = 6.0f;
-            Color retColor = new Color(activeColor.R, activeColor.G, activeColor.B, 0.90f);
+            // Target Crosshair corners around the glowing organ
+            float reticleSize = 26.0f;
+            float cLen = 7.0f;
+            Color retColor = new Color(activeColor.R, activeColor.G, activeColor.B, 0.95f);
 
-            // [ + ] corners around active organ
-            DrawLine(activePos + new Vector2(-reticleSize, -reticleSize), activePos + new Vector2(-reticleSize + cLen, -reticleSize), retColor, 2.0f);
-            DrawLine(activePos + new Vector2(-reticleSize, -reticleSize), activePos + new Vector2(-reticleSize, -reticleSize + cLen), retColor, 2.0f);
+            // [ + ] corners framing active organ
+            canvas.DrawLine(activePos + new Vector2(-reticleSize, -reticleSize), activePos + new Vector2(-reticleSize + cLen, -reticleSize), retColor, 2.0f);
+            canvas.DrawLine(activePos + new Vector2(-reticleSize, -reticleSize), activePos + new Vector2(-reticleSize, -reticleSize + cLen), retColor, 2.0f);
 
-            DrawLine(activePos + new Vector2(reticleSize, -reticleSize), activePos + new Vector2(reticleSize - cLen, -reticleSize), retColor, 2.0f);
-            DrawLine(activePos + new Vector2(reticleSize, -reticleSize), activePos + new Vector2(reticleSize, -reticleSize + cLen), retColor, 2.0f);
+            canvas.DrawLine(activePos + new Vector2(reticleSize, -reticleSize), activePos + new Vector2(reticleSize - cLen, -reticleSize), retColor, 2.0f);
+            canvas.DrawLine(activePos + new Vector2(reticleSize, -reticleSize), activePos + new Vector2(reticleSize, -reticleSize + cLen), retColor, 2.0f);
 
-            DrawLine(activePos + new Vector2(-reticleSize, reticleSize), activePos + new Vector2(-reticleSize + cLen, reticleSize), retColor, 2.0f);
-            DrawLine(activePos + new Vector2(-reticleSize, reticleSize), activePos + new Vector2(-reticleSize, reticleSize - cLen), retColor, 2.0f);
+            canvas.DrawLine(activePos + new Vector2(-reticleSize, reticleSize), activePos + new Vector2(-reticleSize + cLen, reticleSize), retColor, 2.0f);
+            canvas.DrawLine(activePos + new Vector2(-reticleSize, reticleSize), activePos + new Vector2(-reticleSize, reticleSize - cLen), retColor, 2.0f);
 
-            DrawLine(activePos + new Vector2(reticleSize, reticleSize), activePos + new Vector2(reticleSize - cLen, reticleSize), retColor, 2.0f);
-            DrawLine(activePos + new Vector2(reticleSize, reticleSize), activePos + new Vector2(reticleSize, reticleSize - cLen), retColor, 2.0f);
+            canvas.DrawLine(activePos + new Vector2(reticleSize, reticleSize), activePos + new Vector2(reticleSize - cLen, reticleSize), retColor, 2.0f);
+            canvas.DrawLine(activePos + new Vector2(reticleSize, reticleSize), activePos + new Vector2(reticleSize, -reticleSize + cLen), retColor, 2.0f);
 
-            // Expanding sonar ring
-            float expandingR = (Mathf.PosMod(_time * 30.0f, 40.0f));
-            float expandAlpha = 1.0f - (expandingR / 40.0f);
-            DrawArc(activePos, expandingR, 0, Mathf.Tau, 32, new Color(retColor.R, retColor.G, retColor.B, expandAlpha * 0.7f), 1.5f);
+            // Expanding sonar ring around organ
+            float expandingR = (Mathf.PosMod(_time * 28.0f, 44.0f));
+            float expandAlpha = 1.0f - (expandingR / 44.0f);
+            canvas.DrawArc(activePos, expandingR, 0, Mathf.Tau, 36, new Color(retColor.R, retColor.G, retColor.B, expandAlpha * 0.70f), 1.5f);
 
-            // Callout Lead Line connecting Organ -> Left edge (targeting DetailPanel)
-            Vector2 elbowPos = new Vector2(bodyRect.Position.X - 25.0f, activePos.Y);
+            // Callout Lead Line originating cleanly from left bracket of reticle
+            Vector2 startPos = activePos + new Vector2(-reticleSize - 2.0f, 0.0f);
+            Vector2 elbowPos = new Vector2(bodyRect.Position.X - 22.0f, activePos.Y);
             Vector2 exitPos = new Vector2(0.0f, activePos.Y);
 
             // Dynamic segmented lead line
-            DrawLine(activePos, elbowPos, retColor, 2.0f);
-            DrawLine(elbowPos, exitPos, retColor, 2.0f);
+            canvas.DrawLine(startPos, elbowPos, retColor, 2.0f);
+            canvas.DrawLine(elbowPos, exitPos, retColor, 2.0f);
 
             // Lead line terminal indicator nodes
-            DrawCircle(elbowPos, 3.5f, retColor);
-            DrawCircle(exitPos + new Vector2(4, 0), 4.0f, new Color(1, 1, 1, 0.9f));
+            canvas.DrawCircle(startPos, 3.0f, retColor);
+            canvas.DrawCircle(elbowPos, 3.5f, retColor);
+            canvas.DrawCircle(exitPos + new Vector2(4, 0), 4.5f, new Color(1, 1, 1, 0.95f));
         }
     }
 
-    private void DrawDiagnosticTelemetry(Vector2 size)
+    private void DrawDiagnosticTelemetry(Control canvas, Vector2 size)
     {
         // Top medical telemetry bar
-        DrawString(
+        canvas.DrawString(
             ThemeDB.FallbackFont,
             new Vector2(16, 26),
             "HOST BIO-SCAN // VASCULAR NETWORK",
@@ -366,7 +449,7 @@ public partial class HoloBodyScanner : Control
             new Color(0.4f, 0.75f, 0.95f, 0.85f)
         );
 
-        DrawString(
+        canvas.DrawString(
             ThemeDB.FallbackFont,
             new Vector2(size.X - 120, 26),
             "FREQ 440MHz",
@@ -389,7 +472,7 @@ public partial class HoloBodyScanner : Control
             string line1 = $"► TARGET: {organ} · {name}";
             string line2 = $"LOC: {subtitle} | INFECTION SEVERITY: HIGH";
 
-            DrawString(
+            canvas.DrawString(
                 ThemeDB.FallbackFont,
                 new Vector2(16, size.Y - 26),
                 line1,
@@ -399,7 +482,7 @@ public partial class HoloBodyScanner : Control
                 c
             );
 
-            DrawString(
+            canvas.DrawString(
                 ThemeDB.FallbackFont,
                 new Vector2(16, size.Y - 10),
                 line2,
