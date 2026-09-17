@@ -34,12 +34,21 @@ TREE_COST,Cost: %d point(s),消耗：%d 点
 TREE_ZOOM_OUT,Zoom Out,缩小
 TREE_ZOOM_IN,Zoom In,放大
 TREE_FIT_VIEW,Fit Tree,显示全树
-TREE_BRANCH_PRECISION,Precision Constellation,精准星群
-TREE_BRANCH_SENSES,Senses Constellation,感知星群
-TREE_BRANCH_MOTILITY,Motility Constellation,机动星群
-TREE_BRANCH_BALLISTICS,Ballistics Constellation,弹道星群
-TREE_BRANCH_VITALITY,Vitality Constellation,生命星群
-TREE_BRANCH_CORE,Core Constellation,核心星群
+TREE_BRANCH_PRECISION,Polarized Effector Region,极化纤毛区域
+TREE_BRANCH_SENSES,Antigen Sensing Hub,抗原感知中枢
+TREE_BRANCH_MOTILITY,Granule Activation Region,颗粒活化区域
+TREE_BRANCH_BALLISTICS,Endoplasmic Factory,内质网工厂
+TREE_BRANCH_VITALITY,Monocyte Giantization Region,单核巨化区域
+TREE_BRANCH_CORE,Hematopoietic Core,造血核心区
+TREE_RING_NUCLEUS,Nucleus Ring · R0-R1,核区 · R0-R1
+TREE_RING_CYTOPLASM,Cytoplasmic Matrix · R2-R3,胞质基质 · R2-R3
+TREE_RING_MEMBRANE,Membrane Cortex · R4-R5,胞膜皮层 · R4-R5
+TREE_ATROPHY_STATUS,Autophagic atrophy,自噬退化
+TREE_ATROPHY_LOCKED,Autophagic atrophy: commit points to this lineage or refund elsewhere to restore it.,自噬退化：投资此谱系或返还其他点数即可恢复。
+TREE_NODE_HSC_NAME,Pluripotent HSC,全能造血干细胞
+TREE_NUCLEUS_DESC,"The shared hematopoietic stem cell chassis. All five lineage portals radiate from this nucleus.",共享的造血干细胞底盘。五大谱系门户皆由核心向外辐射分化。
+TREE_NUCLEUS_INNATE,Innate · always active,先天核心 · 永久生效
+TREE_NUCLEUS_ACTIVE,The nucleus is always active.,核心永久生效。
 STAT_MIGHT,Might,伤害
 STAT_AREA,Area,范围
 STAT_COOLDOWN_REDUCTION,Cooldown Reduction,冷却缩减

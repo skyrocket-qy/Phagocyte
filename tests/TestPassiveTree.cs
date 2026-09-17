@@ -34,6 +34,7 @@ public partial class TestPassiveTree : SceneTree
             {
                 case 0:
                     TestTreeEconomyAndPersistence();
+                    TestPolarLayoutAndAutophagy();
                     TestStackedSkillModifiers();
                     SetupMenu();
                     _phase = 1;
@@ -89,9 +90,10 @@ public partial class TestPassiveTree : SceneTree
             starts.Add(start);
         }
         AssertThat(starts.Count).IsEqual(5);
+        AssertThat(starts.Contains(PassiveTreeManager.NucleusNodeId)).IsFalse();
         GD.Print("[PASS] All five cells begin at distinct nodes on one shared tree.");
 
-        AssertThat(PassiveTreeManager.Nodes.Length).IsGreaterEqual(51);
+        AssertThat(PassiveTreeManager.Nodes.Length).IsGreaterEqual(52);
         var nodeIds = new List<string>();
         int tradeoffCount = 0;
         int comboCount = 0;
@@ -104,12 +106,13 @@ public partial class TestPassiveTree : SceneTree
         };
         foreach (var node in PassiveTreeManager.Nodes)
         {
+            bool isNucleus = PassiveTreeManager.IsNucleus(node.Id);
             AssertThat(nodeIds.Contains(node.Id)).IsFalse();
             nodeIds.Add(node.Id);
             if (!rarities.Contains(node.Rarity))
                 rarities.Add(node.Rarity);
             AssertThat(PassiveTreeManager.GetMaxStacks(node.Id) >= 1).IsTrue();
-            AssertThat(PassiveTreeManager.GetPointCost(node.Id) >= 1).IsTrue();
+            AssertThat(PassiveTreeManager.GetPointCost(node.Id) >= 0).IsTrue();
             AssertThat(PassiveTreeManager.GetNeighbors(node.Id).Count).IsGreaterEqual(1);
 
             bool positive = false;
@@ -125,7 +128,8 @@ public partial class TestPassiveTree : SceneTree
                 else
                     negative = true;
             }
-            AssertThat(effects >= 1).IsTrue();
+            if (!isNucleus)
+                AssertThat(effects >= 1).IsTrue();
             if (effects >= 2)
                 comboCount++;
             if (positive && negative)
@@ -141,7 +145,14 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(PassiveTreeManager.GetPointCost("tree_assassins_mandate")).IsEqual(2);
         AssertThat(PassiveTreeManager.GetPointCost("tree_adaptive_overdrive")).IsEqual(3);
         AssertThat(PassiveTreeManager.GetPointCost("tree_omnipotent_cytoplasm")).IsEqual(5);
-        GD.Print("[PASS] The shared tree has 51 validated nodes with rarities, combinations, and trade-offs.");
+        GD.Print("[PASS] The shared tree has 52 validated nodes with rarities, combinations, and trade-offs.");
+
+        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", PassiveTreeManager.NucleusNodeId)).IsEqual(1);
+        AssertThat(PassiveTreeManager.GetPointCost(PassiveTreeManager.NucleusNodeId)).IsEqual(0);
+        AssertThat(PassiveTreeManager.GetNeighbors(PassiveTreeManager.NucleusNodeId).Count).IsEqual(9);
+        AssertThat(PassiveTreeManager.RefundNode("macrophage", PassiveTreeManager.NucleusNodeId)).IsFalse();
+        AssertThat(PassiveTreeManager.GetSpentPoints("macrophage")).IsEqual(0);
+        GD.Print("[PASS] The innate HSC nucleus is always active and never consumes points.");
 
         string prevLang = GameManager.CurrentLanguage;
         GameManager.SetLanguage("en");
@@ -160,14 +171,19 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(3);
 
         AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_lysosome")).IsTrue();
-        AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_actin")).IsFalse();
-        AssertThat(PassiveTreeManager.GetNeighbors("passive_lysosome").Contains("passive_actin")).IsFalse();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_thick_cytoplasm")).IsTrue();
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(1);
         AssertThat(PassiveTreeManager.RefundNode("macrophage", "passive_lysosome")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_lysosomal_appetite")).IsTrue();
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(1);
         GD.Print("[PASS] Points, start anchors, and adjacency purchases behave correctly.");
+
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_actin")).IsTrue();
+        AssertThat(PassiveTreeManager.GetBranchInvestment("macrophage", "motility")).IsEqual(1);
+        AssertThat(PassiveTreeManager.GetBranchInvestment("macrophage", "vitality")).IsEqual(2);
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_cytoskeletal_drift")).IsFalse();
+        AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(0);
+        GD.Print("[PASS] The living nucleus lets any lineage portal be opened from the start.");
 
         AssertThat(PassiveTreeManager.RecordRunLevel("ctl", 5)).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("ctl", "passive_opsonin")).IsTrue();
@@ -196,6 +212,69 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_hematopoietic")).IsFalse();
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(0);
         GD.Print("[PASS] Tree levels and presets persist across reloads.");
+    }
+
+    private static void TestPolarLayoutAndAutophagy()
+    {
+        PassiveTreeManager.ResetAll();
+
+        int ringOne = 0;
+        foreach (var node in PassiveTreeManager.Nodes)
+        {
+            AssertThat(node.Ring).IsGreaterEqual(0);
+            AssertThat(node.Ring).IsLessEqual(5);
+            AssertThat(node.Position.DistanceTo(PassiveTreeManager.WorldCenter))
+                .IsEqualApprox(PassiveTreeManager.GetRingRadius(node.Ring), 0.5f);
+            if (node.Ring == 1)
+                ringOne++;
+            if (!PassiveTreeManager.IsNucleus(node.Id) && node.Branch != "core")
+            {
+                float baseAngle = PassiveTreeManager.BranchBaseAngles[node.Branch];
+                float angle = Mathf.RadToDeg((node.Position - PassiveTreeManager.WorldCenter).Angle());
+                float delta = Mathf.Abs(Mathf.Wrap(angle - baseAngle, -180.0f, 180.0f));
+                AssertThat(delta).IsLessEqual(31.0f);
+            }
+        }
+        AssertThat(ringOne).IsEqual(9);
+        GD.Print("[PASS] Every node sits on a polar ring inside its lineage sector.");
+
+        AssertThat(PassiveTreeManager.RecordRunLevel("dendritic", 25)).IsTrue();
+        for (int i = 0; i < 4; i++)
+            AssertThat(PassiveTreeManager.Purchase("dendritic", "passive_chemokine")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_far_sense")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_antigen_harvest")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_scavenger_field")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_lucky_mutation")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_patient_observer")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_swarm_cartography")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_risk_assessment")).IsTrue();
+        AssertThat(PassiveTreeManager.GetSpentPoints("dendritic")).IsEqual(12);
+        AssertThat(PassiveTreeManager.GetAtrophyThreshold("dendritic")).IsEqual(2);
+        GD.Print("[PASS] Committing twelve points raises autophagic pressure to the second ring.");
+
+        var atrophic = PassiveTreeManager.GetAtrophicNodes("dendritic");
+        AssertThat(atrophic.Contains(PassiveTreeManager.NucleusNodeId)).IsFalse();
+        AssertThat(atrophic.Contains("passive_chemokine")).IsFalse();
+        AssertThat(atrophic.Contains("tree_thick_cytoplasm")).IsTrue();
+        AssertThat(atrophic.Contains("tree_bulwark_metabolism")).IsTrue();
+        AssertThat(atrophic.Contains("tree_rolling_thunder")).IsTrue();
+        AssertThat(PassiveTreeManager.GetNodeAtrophy("dendritic", "tree_thick_cytoplasm")).IsEqual(1);
+        AssertThat(PassiveTreeManager.GetNodeAtrophy("dendritic", "tree_bulwark_metabolism")).IsEqual(2);
+        AssertThat(PassiveTreeManager.IsAtrophic("dendritic", "tree_rolling_thunder")).IsTrue();
+        AssertThat(PassiveTreeManager.CanPurchase("dendritic", "tree_thick_cytoplasm")).IsFalse();
+        string prevLang = GameManager.CurrentLanguage;
+        GameManager.SetLanguage("en");
+        AssertThat(PassiveTreeManager.GetNodeName(PassiveTreeManager.NucleusNodeId).Contains("HSC")).IsTrue();
+        AssertThat(PassiveTreeManager.GetNodeTooltipText("dendritic", "tree_thick_cytoplasm").Contains("atrophy")).IsTrue();
+        AssertThat(PassiveTreeManager.GetNodeTooltipText("dendritic", PassiveTreeManager.NucleusNodeId).Contains("Innate")).IsTrue();
+        GameManager.SetLanguage(prevLang);
+        GD.Print("[PASS] Uncommitted lineages autophagocytose from the membrane inward.");
+
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "passive_lysosome")).IsTrue();
+        AssertThat(PassiveTreeManager.IsAtrophic("dendritic", "tree_thick_cytoplasm")).IsFalse();
+        AssertThat(PassiveTreeManager.CanPurchase("dendritic", "tree_thick_cytoplasm")).IsTrue();
+        AssertThat(PassiveTreeManager.GetBranchInvestment("dendritic", "vitality")).IsEqual(1);
+        GD.Print("[PASS] Opening a lineage portal restores its silenced nodes.");
     }
 
     private static void TestStackedSkillModifiers()
@@ -252,11 +331,16 @@ public partial class TestPassiveTree : SceneTree
         _menu.SelectPassiveBuild("macrophage");
         AssertThat(_menu.TreeLevelLbl!.Text.Contains("4")).IsTrue();
         AssertThat(_menu.TreeCanvas!.RenderedNodeCount).IsEqual(PassiveTreeManager.Nodes.Length);
-        AssertThat(PassiveTreeView.HitTestWorldPosition(new Vector2(1950, 950))).IsEqual("passive_lysosome");
+        AssertThat(PassiveTreeManager.TryGetNode("passive_lysosome", out var lysosomeNode)).IsTrue();
+        AssertThat(PassiveTreeView.HitTestWorldPosition(lysosomeNode.Position)).IsEqual("passive_lysosome");
+        AssertThat(PassiveTreeView.HitTestWorldPosition(PassiveTreeManager.WorldCenter)).IsEqual(PassiveTreeManager.NucleusNodeId);
         AssertThat(PassiveTreeView.HitTestWorldPosition(new Vector2(-1000, -1000))).IsNull();
         var startButton = _menu.TreeCanvas.GetNodeOrNull<Button>("ZoomRoot/TreeNode_passive_lysosome");
         AssertThat(startButton).IsNotNull();
         AssertThat(startButton!.Text.Contains("🧪")).IsTrue();
+        var nucleusButton = _menu.TreeCanvas.GetNodeOrNull<Button>("ZoomRoot/TreeNode_" + PassiveTreeManager.NucleusNodeId);
+        AssertThat(nucleusButton).IsNotNull();
+        AssertThat(nucleusButton!.Text.Contains("🧫")).IsTrue();
 
         _menu.OnTreeNodeActivated("passive_lysosome");
         AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(1);

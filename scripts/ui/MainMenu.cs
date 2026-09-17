@@ -389,6 +389,8 @@ public partial class MainMenu : Control
             + " • " + TextFormatter.Format(Tr("TREE_NODE_STACKS"), stacks, node.MaxStacks);
         if (stacks >= node.MaxStacks)
             status += " • " + Tr("TREE_MAXED");
+        else if (PassiveTreeManager.IsAtrophic(ActiveTreeClassKey, node.Id))
+            status += " • " + Tr("TREE_ATROPHY_STATUS");
         else if (PassiveTreeManager.CanPurchase(ActiveTreeClassKey, node.Id))
             status += " • " + Tr("TREE_PURCHASE_HINT");
         else if (PassiveTreeManager.GetPointsAvailable(ActiveTreeClassKey) < node.PointCost)
