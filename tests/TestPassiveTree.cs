@@ -143,10 +143,13 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(PassiveTreeManager.GetPointCost("tree_omnipotent_cytoplasm")).IsEqual(5);
         GD.Print("[PASS] The shared tree has 51 validated nodes with rarities, combinations, and trade-offs.");
 
+        string prevLang = GameManager.CurrentLanguage;
+        GameManager.SetLanguage("en");
         var treeLysosome = GameManager.GetSkillInfo("passive_lysosome");
         var activeLysosome = GameManager.GetSkillInfo("lysosomal_overload");
         AssertThat(treeLysosome["name"].AsString().Contains("Priming")).IsTrue();
         AssertThat(activeLysosome["name"].AsString().Contains("Overload")).IsTrue();
+        GameManager.SetLanguage(prevLang);
         GD.Print("[PASS] Tree and active lysosome displays use their distinct names.");
 
         AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(1);
@@ -274,10 +277,12 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(tooltip.Contains("-7% Max Health")).IsTrue();
         GD.Print("[PASS] Hover tooltips expose rarity, cost, combinations, and trade-offs.");
 
+        float zoomBefore = _menu.TreeCanvas.ZoomLevel;
         _menu.TreeCanvas.ZoomStep(1.2f);
-        AssertThat(_menu.TreeCanvas.ZoomLevel).IsGreater(0.8f);
+        AssertThat(_menu.TreeCanvas.ZoomLevel).IsGreater(zoomBefore);
         _menu.TreeCanvas.FitTree();
         AssertThat(_menu.TreeCanvas.ZoomLevel).IsGreater(0.2f);
+        AssertThat(_menu.TreeCanvas.ZoomLevel).IsLessEqual(1.75f);
 
         _menu.OnTreeNodeRefundRequested("passive_lysosome");
         AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(0);

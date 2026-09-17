@@ -264,7 +264,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.85, 0.94, 1, 1)
 theme_override_font_sizes/font_size = 13
-text = "巨噬细胞 (Macrophage) - 状态"
+text = "巨噬细胞 - 状态"
 
 [node name="MapLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
 visible = false

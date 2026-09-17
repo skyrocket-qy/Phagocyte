@@ -28,7 +28,6 @@ public partial class PassiveTreeView : Control
 
     private const float MinZoom = 0.22f;
     private const float MaxZoom = 1.75f;
-    private const float DefaultZoom = 0.80f;
     private const float WorldWidth = 4000.0f;
     private const float WorldHeight = 3000.0f;
 
@@ -51,8 +50,9 @@ public partial class PassiveTreeView : Control
     private readonly Dictionary<string, Button> _buttons = new();
 
     private Vector2 _camera = Vector2.Zero;
-    private float _zoom = DefaultZoom;
+    private float _zoom = 0.80f;
     private string _cameraClass = "";
+    private bool _needsFit;
     private float _time;
     private Vector2 _mousePosition = Vector2.Zero;
     private bool _mouseInside;
@@ -153,6 +153,8 @@ public partial class PassiveTreeView : Control
             return;
 
         _time += (float)delta;
+        if (_needsFit)
+            FitTree();
         UpdateHoverFromMouse();
         QueueRedraw();
         _graphLayer?.QueueRedraw();
@@ -235,28 +237,18 @@ public partial class PassiveTreeView : Control
         _graphLayer?.QueueRedraw();
     }
 
-    public void FocusStart()
-    {
-        string start = PassiveTreeManager.GetStartNode(TreeClassKey);
-        if (PassiveTreeManager.TryGetNode(start, out var node))
-        {
-            _camera = node.Position;
-            _zoom = DefaultZoom;
-            ClampCamera();
-            UpdateTransform();
-        }
-    }
-
-    public void FitTree()
+    public bool FitTree()
     {
         Rect2 bounds = GetTreeBounds();
         if (Size.X <= 0.0f || Size.Y <= 0.0f || bounds.Size.X <= 0.0f || bounds.Size.Y <= 0.0f)
-            return;
+            return false;
 
         _zoom = Mathf.Clamp(Mathf.Min(Size.X / bounds.Size.X, Size.Y / bounds.Size.Y), MinZoom, MaxZoom);
         _camera = bounds.GetCenter();
+        _needsFit = false;
         ClampCamera();
         UpdateTransform();
+        return true;
     }
 
     public void ZoomStep(float factor)
@@ -412,10 +404,8 @@ public partial class PassiveTreeView : Control
             return;
 
         _cameraClass = TreeClassKey;
-        string start = PassiveTreeManager.GetStartNode(TreeClassKey);
-        if (PassiveTreeManager.TryGetNode(start, out var node))
-            _camera = node.Position;
-        _zoom = DefaultZoom;
+        if (!FitTree())
+            _needsFit = true;
     }
 
     private void UpdateTransform()

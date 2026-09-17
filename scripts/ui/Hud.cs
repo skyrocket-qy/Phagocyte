@@ -611,7 +611,7 @@ public partial class Hud : CanvasLayer
             }
             if (TooltipStats != null)
             {
-                TooltipStats.Text = slotIdx >= 5 ? "🧬 被动特质槽 (Passive Slot)" : Tr("SKILL_BAR_TITLE");
+                TooltipStats.Text = slotIdx >= 5 ? "🧬 被动特质槽" : Tr("SKILL_BAR_TITLE");
             }
             if (TooltipDesc != null) TooltipDesc.Text = Tr("TOOLTIP_EMPTY_DESC");
             if (TooltipBio != null)

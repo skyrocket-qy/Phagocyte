@@ -253,7 +253,7 @@ theme_override_constants/separation = 14
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
 theme_override_font_sizes/font_size = 22
-text = "巨噬细胞 (Macrophage)"
+text = "巨噬细胞"
 
 [node name="ClassStatusLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
 layout_mode = 2
@@ -316,12 +316,12 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -300.0
-offset_top = 32.0
+offset_top = 8.0
 offset_right = 300.0
-offset_bottom = 72.0
+offset_bottom = 38.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 20
 text = "选择被动树"
 horizontal_alignment = 1
 
@@ -331,29 +331,29 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -460.0
-offset_top = 78.0
+offset_top = 42.0
 offset_right = 460.0
-offset_bottom = 104.0
+offset_bottom = 64.0
 grow_horizontal = 2
 theme_override_constants/separation = 24
 
 [node name="TreeClassLabel" type="Label" parent="PassiveView/InfoHBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
-theme_override_font_sizes/font_size = 15
-text = "巨噬细胞 (Macrophage)"
+theme_override_font_sizes/font_size = 13
+text = "巨噬细胞"
 
 [node name="TreeLevelLabel" type="Label" parent="PassiveView/InfoHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 12
 text = "天赋等级：1"
 
 [node name="TreePointsLabel" type="Label" parent="PassiveView/InfoHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 12
 text = "被动点数：0"
 horizontal_alignment = 2
 
@@ -365,9 +365,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -590.0
-offset_top = -205.0
+offset_top = -290.0
 offset_right = 590.0
-offset_bottom = 180.0
+offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
@@ -387,13 +387,13 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -560.0
-offset_top = -152.0
+offset_top = -106.0
 offset_right = 560.0
-offset_bottom = -112.0
+offset_bottom = -84.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(0.78, 0.86, 0.95, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 12
 text = "選擇一個天賦節點以查看詳情。"
 horizontal_alignment = 1
 autowrap_mode = 3
@@ -405,54 +405,54 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -530.0
-offset_top = -100.0
-offset_right = 530.0
-offset_bottom = -50.0
+offset_left = -400.0
+offset_top = -76.0
+offset_right = 400.0
+offset_bottom = -40.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 
 [node name="BackButton" type="Button" parent="PassiveView/Buttons"]
-custom_minimum_size = Vector2(170, 46)
+custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 13
 text = "返回选择细胞"
 
 [node name="ResetButton" type="Button" parent="PassiveView/Buttons"]
-custom_minimum_size = Vector2(150, 46)
+custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 13
 text = "重置天赋树"
 
 [node name="ConfirmButton" type="Button" parent="PassiveView/Buttons"]
-custom_minimum_size = Vector2(220, 46)
+custom_minimum_size = Vector2(190, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 13
 text = "下一步：选择病理战场"
 
 [node name="ZoomOutButton" type="Button" parent="PassiveView/Buttons"]
-custom_minimum_size = Vector2(100, 46)
+custom_minimum_size = Vector2(80, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 13
 text = "缩小"
 
 [node name="ZoomInButton" type="Button" parent="PassiveView/Buttons"]
-custom_minimum_size = Vector2(100, 46)
+custom_minimum_size = Vector2(80, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 13
 text = "放大"
 
 [node name="FitButton" type="Button" parent="PassiveView/Buttons"]
-custom_minimum_size = Vector2(120, 46)
+custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 13
 text = "显示全树"
 
 [node name="MapView" type="Control" parent="."]
