@@ -368,6 +368,20 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(_menu.TreeCanvas.ZoomLevel).IsGreater(0.2f);
         AssertThat(_menu.TreeCanvas.ZoomLevel).IsLessEqual(1.75f);
 
+        var treeView = _menu.TreeCanvas;
+        Vector2 cameraBeforeStep = treeView.CameraPosition;
+        treeView.ZoomStep(1.1f);
+        AssertThat(treeView.CameraPosition.DistanceTo(cameraBeforeStep)).IsLess(0.01f);
+
+        Vector2 probe = treeView.Size * 0.5f + new Vector2(60.0f, -40.0f);
+        treeView.ZoomAt(probe, treeView.ZoomLevel * 1.25f);
+        Vector2 cameraAfterFirst = treeView.CameraPosition;
+        float zoomAfterFirst = treeView.ZoomLevel;
+        treeView.ZoomAt(probe, zoomAfterFirst);
+        AssertThat(treeView.CameraPosition.DistanceTo(cameraAfterFirst)).IsLess(0.01f);
+        AssertThat(treeView.ZoomLevel).IsEqual(zoomAfterFirst);
+        GD.Print("[PASS] Camera stays anchored across zoom steps (no drift or jitter feedback).");
+
         _menu.OnTreeNodeRefundRequested("passive_lysosome");
         AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(0);
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(3);

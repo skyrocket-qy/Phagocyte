@@ -69,8 +69,15 @@ public partial class PassiveTreeView : Control
     private Vector2 _panStartMouse = Vector2.Zero;
     private Vector2 _panStartCamera = Vector2.Zero;
     private bool _panMoved;
-    private Vector2 _springPosition = Vector2.Zero;
-    private Vector2 _springVelocity = Vector2.Zero;
+    private Vector2 _rootPosition = Vector2.Zero;
+    private Vector2 _cameraVelocity = Vector2.Zero;
+    private Vector2 _lastCamera = Vector2.Zero;
+    private bool _cameraInitialized;
+    private bool _nodeDragging;
+    private string _nodeDragId = "";
+    private Vector2 _nodePressPosition = Vector2.Zero;
+    private bool _nodeDragMoved;
+    private Vector2[]?[] _edgeRoutes = System.Array.Empty<Vector2[]?>();
 
     private partial class TreeGraphLayer : Control
     {
@@ -175,7 +182,7 @@ public partial class PassiveTreeView : Control
     public override void _Notification(int what)
     {
         if (what == NotificationResized)
-            UpdateTransform(true);
+            UpdateTransform();
     }
 
     public override void _Process(double delta)
@@ -186,8 +193,13 @@ public partial class PassiveTreeView : Control
         _time += (float)delta;
         if (_needsFit)
             FitTree();
+        if (_nodeDragging && !Input.IsMouseButtonPressed(MouseButton.Left))
+        {
+            _nodeDragging = false;
+            _nodeDragId = "";
+        }
+        UpdateCameraVelocity((float)delta);
         UpdateHoverFromMouse();
-        UpdateSpring((float)delta);
         UpdateButtonPositions();
         QueueRedraw();
         _graphLayer?.QueueRedraw();
@@ -228,7 +240,7 @@ public partial class PassiveTreeView : Control
         if (!string.IsNullOrEmpty(HoveredNodeId) && !PassiveTreeManager.IsKnownNode(HoveredNodeId))
             SetHoveredNode("");
 
-        UpdateTransform(true);
+        UpdateTransform();
         UpdateButtonPositions();
         UpdateTooltipText();
         QueueRedraw();
@@ -279,9 +291,11 @@ public partial class PassiveTreeView : Control
 
         _zoom = Mathf.Clamp(Mathf.Min(Size.X / bounds.Size.X, Size.Y / bounds.Size.Y), MinZoom, MaxZoom);
         _camera = bounds.GetCenter();
+        _cameraVelocity = Vector2.Zero;
+        _lastCamera = _camera;
         _needsFit = false;
         ClampCamera();
-        UpdateTransform(true);
+        UpdateTransform();
         return true;
     }
 
@@ -429,7 +443,29 @@ public partial class PassiveTreeView : Control
 
         _mouseInside = true;
         _mousePosition = local;
-        SetHoveredNode(HitTestWorldPosition(ScreenToWorld(local)) ?? "");
+        SetHoveredNode(HitTestVisualPosition(ScreenToWorld(local)) ?? "");
+    }
+
+    private string? HitTestVisualPosition(Vector2 worldPosition)
+    {
+        string? bestId = null;
+        float bestScore = float.MaxValue;
+        foreach (var node in PassiveTreeManager.Nodes)
+        {
+            float hitRadius = GetNodeRadius(node) + 22.0f;
+            Vector2 position = PassiveTreeManager.IsNucleus(node.Id) ? node.Position : VisualPosition(node);
+            float distance = worldPosition.DistanceTo(position);
+            if (distance > hitRadius)
+                continue;
+
+            float score = distance / hitRadius;
+            if (score < bestScore)
+            {
+                bestScore = score;
+                bestId = node.Id;
+            }
+        }
+        return bestId;
     }
 
     private void EnsureCameraForClass()
@@ -447,33 +483,31 @@ public partial class PassiveTreeView : Control
         return Size * 0.5f - _camera * _zoom;
     }
 
-    private void UpdateSpring(float delta)
+    private void UpdateCameraVelocity(float delta)
     {
-        if (_zoomRoot == null || Size.X <= 0.0f || Size.Y <= 0.0f)
-            return;
-
-        float step = Mathf.Min(delta, 0.05f);
-        Vector2 target = TransformTarget();
-        const float stiffness = 120.0f;
-        const float damping = 16.0f;
-        _springVelocity += (target - _springPosition) * (stiffness * step);
-        _springVelocity *= Mathf.Max(0.0f, 1.0f - damping * step);
-        _springPosition += _springVelocity * step;
-        _zoomRoot.Position = _springPosition;
+        float step = Mathf.Max(delta, 0.0001f);
+        if (!_cameraInitialized)
+        {
+            _lastCamera = _camera;
+            _cameraInitialized = true;
+        }
+        Vector2 instantaneous = (_camera - _lastCamera) / step;
+        _lastCamera = _camera;
+        _cameraVelocity = _cameraVelocity.Lerp(instantaneous, Mathf.Min(1.0f, 12.0f * step));
+        if (_cameraVelocity.Length() > 900.0f)
+            _cameraVelocity = _cameraVelocity.Normalized() * 900.0f;
+        if (_cameraVelocity.LengthSquared() < 0.01f)
+            _cameraVelocity = Vector2.Zero;
     }
 
-    private void UpdateTransform(bool snap = false)
+    private void UpdateTransform()
     {
         if (_zoomRoot == null || Size.X <= 0.0f || Size.Y <= 0.0f)
             return;
 
         ClampCamera();
-        if (snap)
-        {
-            _springPosition = TransformTarget();
-            _springVelocity = Vector2.Zero;
-            _zoomRoot.Position = _springPosition;
-        }
+        _rootPosition = TransformTarget();
+        _zoomRoot.Position = _rootPosition;
         _zoomRoot.Scale = new Vector2(_zoom, _zoom);
     }
 
@@ -494,7 +528,7 @@ public partial class PassiveTreeView : Control
     {
         if (_zoomRoot == null)
             return viewPosition;
-        return (viewPosition - _springPosition) / _zoom;
+        return (viewPosition - _rootPosition) / _zoom;
     }
 
     private void ClampCamera()
@@ -555,7 +589,6 @@ public partial class PassiveTreeView : Control
         button.AddThemeColorOverride("font_outline_color", new Color(0, 0, 0, 0.9f));
 
         string localId = node.Id;
-        button.Pressed += () => ActivateNode(localId);
         button.GuiInput += (@event) => OnNodeGuiInput(button, localId, @event);
         button.MouseEntered += () => SetHoveredNode(localId);
         button.MouseExited += () => SetHoveredNode("");
@@ -564,10 +597,54 @@ public partial class PassiveTreeView : Control
 
     private void OnNodeGuiInput(Button button, string nodeId, InputEvent @event)
     {
-        if (@event is InputEventMouseButton mouse && mouse.Pressed && mouse.ButtonIndex == MouseButton.Right)
+        if (@event is InputEventMouseButton mouse)
         {
+            if (mouse.ButtonIndex == MouseButton.Right)
+            {
+                if (mouse.Pressed)
+                {
+                    button.AcceptEvent();
+                    RefundNode(nodeId);
+                }
+                return;
+            }
+
+            if (mouse.ButtonIndex != MouseButton.Left)
+                return;
+
+            if (mouse.Pressed)
+            {
+                _nodeDragging = true;
+                _nodeDragId = nodeId;
+                _nodePressPosition = GetLocalMousePosition();
+                _panStartMouse = _nodePressPosition;
+                _panStartCamera = _camera;
+                _nodeDragMoved = false;
+            }
+            else
+            {
+                bool clicked = _nodeDragging && !_nodeDragMoved && _nodeDragId == nodeId;
+                _nodeDragging = false;
+                _nodeDragId = "";
+                if (clicked)
+                    ActivateNode(nodeId);
+            }
             button.AcceptEvent();
-            RefundNode(nodeId);
+            return;
+        }
+
+        if (@event is InputEventMouseMotion && _nodeDragging)
+        {
+            Vector2 local = GetLocalMousePosition();
+            if ((local - _nodePressPosition).Length() > 6.0f)
+                _nodeDragMoved = true;
+            if (_nodeDragMoved)
+            {
+                _camera = _panStartCamera - (local - _panStartMouse) / _zoom;
+                ClampCamera();
+                UpdateTransform();
+            }
+            button.AcceptEvent();
         }
     }
 
@@ -625,7 +702,7 @@ public partial class PassiveTreeView : Control
         if (Size.X <= 0.0f || Size.Y <= 0.0f)
             return;
 
-        Vector2 center = _springPosition + PassiveTreeManager.WorldCenter * _zoom;
+        Vector2 center = _rootPosition + PassiveTreeManager.WorldCenter * _zoom;
         if (_glowTexture != null)
         {
             float glowRadius = Mathf.Max(Size.X, Size.Y) * 1.05f;
@@ -633,7 +710,7 @@ public partial class PassiveTreeView : Control
         }
 
         var random = new RandomNumberGenerator { Seed = 90210 };
-        Vector2 parallax = (_springPosition - Size * 0.5f) * 0.06f;
+        Vector2 parallax = (_rootPosition - Size * 0.5f) * 0.06f;
         for (int i = 0; i < 120; i++)
         {
             Vector2 basePosition = new Vector2(random.Randf() * Size.X, random.Randf() * Size.Y);
@@ -660,7 +737,7 @@ public partial class PassiveTreeView : Control
                 continue;
 
             Vector2 world = Polar(SectorOuterRadius + 104.0f, baseAngle);
-            Vector2 screen = _springPosition + world * _zoom;
+            Vector2 screen = _rootPosition + world * _zoom;
             if (screen.X < 60.0f || screen.Y < 20.0f || screen.X > Size.X - 60.0f || screen.Y > Size.Y - 20.0f)
                 continue;
 
@@ -795,6 +872,7 @@ public partial class PassiveTreeView : Control
 
     private void DrawEdges(Control layer, Godot.Collections.Dictionary<string, int> owned, string start, HashSet<string> atrophic)
     {
+        EnsureEdgeRoutes();
         for (int i = 0; i < PassiveTreeManager.Edges.Length; i++)
         {
             var edge = PassiveTreeManager.Edges[i];
@@ -803,7 +881,7 @@ public partial class PassiveTreeView : Control
 
             Vector2 from = VisualPosition(fromNode);
             Vector2 to = VisualPosition(toNode);
-            if (from == to)
+            if (from.DistanceSquaredTo(to) < 1.0f)
                 continue;
 
             bool fromActive = owned.ContainsKey(edge.From) || edge.From == start;
@@ -816,7 +894,7 @@ public partial class PassiveTreeView : Control
                 ? new Color(NecrosisColor.R, NecrosisColor.G, NecrosisColor.B, 0.30f)
                 : GetEdgeColor(edge.From, edge.To, lit, highlighted);
             float width = (lit ? 4.4f : 2.0f) + (highlighted ? 1.4f : 0.0f);
-            var points = CurvePoints(from, to, i);
+            var points = ShiftRoute(_edgeRoutes[i], fromNode, from, toNode, to);
 
             if (starving)
             {
@@ -836,11 +914,123 @@ public partial class PassiveTreeView : Control
             if (lit)
             {
                 float travel = Mathf.PosMod(_time * 0.22f + i * 0.137f, 1.0f);
-                layer.DrawCircle(BezierPoint(from, CurveControl(from, to, i), to, travel), 4.2f, Colors.White);
+                layer.DrawCircle(PointAlong(points, travel), 4.2f, Colors.White);
                 float echo = Mathf.PosMod(travel + 0.22f, 1.0f);
-                layer.DrawCircle(BezierPoint(from, CurveControl(from, to, i), to, echo), 2.6f, new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.55f));
+                layer.DrawCircle(PointAlong(points, echo), 2.6f, new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.55f));
             }
         }
+    }
+
+    private static Vector2[] ShiftRoute(Vector2[]? route, PassiveTreeManager.TreeNode fromNode, Vector2 from, PassiveTreeManager.TreeNode toNode, Vector2 to)
+    {
+        if (route == null || route.Length < 2)
+            return new[] { from, to };
+
+        var points = new Vector2[route.Length];
+        Vector2 shiftFrom = from - fromNode.Position;
+        Vector2 shiftTo = to - toNode.Position;
+        int last = route.Length - 1;
+        for (int k = 0; k < route.Length; k++)
+            points[k] = route[k] + shiftFrom.Lerp(shiftTo, k / (float)last);
+        points[0] = from;
+        points[last] = to;
+        return points;
+    }
+
+    private static Vector2 PointAlong(Vector2[] points, float t)
+    {
+        if (points.Length < 2)
+            return points.Length == 1 ? points[0] : Vector2.Zero;
+
+        float scaled = Mathf.Clamp(t, 0.0f, 1.0f) * (points.Length - 1);
+        int index = Mathf.Min((int)scaled, points.Length - 2);
+        float local = scaled - index;
+        return points[index].Lerp(points[index + 1], local);
+    }
+
+    /// <summary>
+    /// Routes every microtubule once: straight radial lines are kept when clear,
+    /// otherwise the strand bows onto a polar arc that slides around other vesicles.
+    /// Routes depend only on static node positions, so they are cached.
+    /// </summary>
+    private void EnsureEdgeRoutes()
+    {
+        if (_edgeRoutes.Length == PassiveTreeManager.Edges.Length)
+            return;
+
+        _edgeRoutes = new Vector2[]?[PassiveTreeManager.Edges.Length];
+        for (int i = 0; i < PassiveTreeManager.Edges.Length; i++)
+        {
+            var edge = PassiveTreeManager.Edges[i];
+            if (!PassiveTreeManager.TryGetNode(edge.From, out var from) || !PassiveTreeManager.TryGetNode(edge.To, out var to))
+                continue;
+            _edgeRoutes[i] = BuildEdgeRoute(from, to);
+        }
+    }
+
+    private static Vector2[] BuildEdgeRoute(PassiveTreeManager.TreeNode from, PassiveTreeManager.TreeNode to)
+    {
+        var straight = PolarRoute(from.Position, to.Position, 0.0f);
+        float straightClearance = RouteClearance(straight, from.Id, to.Id);
+        if (straightClearance >= 4.0f)
+            return straight;
+
+        Vector2[] best = straight;
+        float bestClearance = straightClearance;
+        foreach (float offset in new[] { 16.0f, -16.0f, 30.0f, -30.0f, 46.0f, -46.0f, 64.0f, -64.0f })
+        {
+            var candidate = PolarRoute(from.Position, to.Position, offset);
+            float clearance = RouteClearance(candidate, from.Id, to.Id);
+            if (clearance > bestClearance + 0.5f)
+            {
+                bestClearance = clearance;
+                best = candidate;
+            }
+        }
+        return best;
+    }
+
+    private static Vector2[] PolarRoute(Vector2 from, Vector2 to, float offset)
+    {
+        const int samples = 24;
+        Vector2 center = PassiveTreeManager.WorldCenter;
+        Vector2 relativeFrom = from - center;
+        Vector2 relativeTo = to - center;
+        float radius0 = relativeFrom.Length();
+        float radius1 = relativeTo.Length();
+        float angle0 = relativeFrom.Angle();
+        float deltaAngle = Mathf.Wrap(relativeTo.Angle() - angle0, -Mathf.Pi, Mathf.Pi);
+
+        var points = new Vector2[samples + 1];
+        for (int i = 0; i <= samples; i++)
+        {
+            float t = i / (float)samples;
+            float eased = t * t * (3.0f - 2.0f * t);
+            float radius = Mathf.Lerp(radius0, radius1, eased);
+            float angle = angle0 + deltaAngle * eased
+                + offset * Mathf.Sin(Mathf.Pi * t) / Mathf.Max(90.0f, radius);
+            points[i] = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
+        }
+        points[0] = from;
+        points[samples] = to;
+        return points;
+    }
+
+    private static float RouteClearance(Vector2[] points, string fromId, string toId)
+    {
+        float clearance = float.MaxValue;
+        foreach (var node in PassiveTreeManager.Nodes)
+        {
+            if (node.Id == fromId || node.Id == toId)
+                continue;
+
+            float required = GetNodeRadius(node) + 18.0f;
+            float nearest = float.MaxValue;
+            for (int i = 1; i < points.Length; i += 2)
+                nearest = Mathf.Min(nearest, node.Position.DistanceTo(points[i]));
+            clearance = Mathf.Min(clearance, nearest - required);
+        }
+        return clearance;
     }
 
     private void DrawNodes(Control layer, Godot.Collections.Dictionary<string, int> owned, string start, HashSet<string> atrophic)
@@ -975,8 +1165,8 @@ public partial class PassiveTreeView : Control
             return Vector2.Zero;
 
         float seed = Hash(node.Id) * 12.0f;
-        float amplitude = 1.6f + node.Ring * 1.15f;
-        float speed = 0.32f + Hash(node.Id + "s") * 0.22f;
+        float amplitude = 0.7f + node.Ring * 0.45f;
+        float speed = 0.26f + Hash(node.Id + "s") * 0.18f;
         return new Vector2(
             Mathf.Sin(time * speed + seed * 7.1f) + 0.35f * Mathf.Sin(time * speed * 2.3f + seed),
             Mathf.Cos(time * speed * 0.83f + seed * 3.7f) + 0.35f * Mathf.Cos(time * speed * 1.9f + seed * 1.7f)) * amplitude;
@@ -984,7 +1174,8 @@ public partial class PassiveTreeView : Control
 
     private Vector2 VisualPosition(PassiveTreeManager.TreeNode node)
     {
-        return node.Position + DriftOffset(node, _time);
+        Vector2 lag = _cameraVelocity * (0.010f + 0.0022f * node.Ring);
+        return node.Position + DriftOffset(node, _time) + lag.LimitLength(10.0f);
     }
 
     private static Vector2[] NodeShape(PassiveTreeManager.TreeNode node, float radius, float wobblePhase)
@@ -1048,43 +1239,6 @@ public partial class PassiveTreeView : Control
             shape[i] = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
         }
         return shape;
-    }
-
-    private static Vector2[] CurvePoints(Vector2 from, Vector2 to, int index)
-    {
-        Vector2 control = CurveControl(from, to, index);
-        var points = new Vector2[19];
-        for (int i = 0; i <= 18; i++)
-            points[i] = BezierPoint(from, control, to, i / 18.0f);
-        return points;
-    }
-
-    private static Vector2 CurveControl(Vector2 from, Vector2 to, int index)
-    {
-        Vector2 delta = to - from;
-        float length = delta.Length();
-        if (length <= 1.0f)
-            return (from + to) * 0.5f;
-
-        Vector2 normal = (delta / length).Rotated(Mathf.Pi * 0.5f);
-        float bend = Mathf.Min(140.0f, length * 0.13f) * (index % 2 == 0 ? 1.0f : -1.0f);
-        Vector2 middle = (from + to) * 0.5f;
-
-        Vector2 center = PassiveTreeManager.WorldCenter;
-        float centerDistance = middle.DistanceTo(center);
-        if (length > 520.0f && centerDistance < 320.0f)
-        {
-            Vector2 away = middle - center;
-            away = away.Length() < 1.0f ? normal : away.Normalized();
-            middle += away * (320.0f - centerDistance);
-        }
-        return middle + normal * bend;
-    }
-
-    private static Vector2 BezierPoint(Vector2 from, Vector2 control, Vector2 to, float t)
-    {
-        float u = 1.0f - t;
-        return u * u * from + 2.0f * u * t * control + t * t * to;
     }
 
     private static Color GetRarityColor(PassiveTreeManager.TreeRarity rarity)
