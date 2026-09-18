@@ -21,6 +21,7 @@ public partial class PrionFragment : BaseEnemy
         AtpValue = 18.0f;
         BaseScore = 5;
         FloatSpeed = 50.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
     protected override float GetCollisionRadius() => 12.0f;

@@ -23,6 +23,7 @@ public partial class FluDriftEnemy : BaseEnemy
         AtpValue = 26.0f;
         BaseScore = 100;
         FloatSpeed = 42.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
         IsElite = true;
     }
 

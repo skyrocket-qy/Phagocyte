@@ -1,15 +1,22 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Helicobacter pylori (幽門螺旋桿菌)
 /// Helical corkscrew morphology drilling with alkaline urease shield neutralizing acid damage.
+/// Tissue invader: ignores the player and latches onto host tissue, ulcerating it over time.
 /// </summary>
 public partial class HpyloriEnemy : BaseEnemy
 {
+    public const float UlcerPulseInterval = 3.0f;
+
+    public int UlcerationPulses { get; private set; }
+
     private float _spinAngle = 0.0f;
+    private float _ulcerTimer = 1.0f;
 
     public HpyloriEnemy()
     {
@@ -21,6 +28,7 @@ public partial class HpyloriEnemy : BaseEnemy
         BaseScore = 35;
         FloatSpeed = 58.0f;
         Armor = 1.0f;
+        ThreatMode = EnemyThreatMode.Invader;
     }
 
     protected override float GetCollisionRadius() => 14.0f;
@@ -29,6 +37,44 @@ public partial class HpyloriEnemy : BaseEnemy
     {
         _spinAngle += dt * 12.0f;
         Rotation += dt * 3.0f;
+
+        // Latched to host tissue: ulcerate the anchor site
+        if (EnemySteering.IsInvaderLatched(this))
+        {
+            _ulcerTimer -= dt;
+            if (_ulcerTimer <= 0.0f)
+            {
+                _ulcerTimer = UlcerPulseInterval;
+                EmitUlcerationPulse();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Secretes a short-lived VacA acid lesion at the latched tissue site.
+    /// </summary>
+    public void EmitUlcerationPulse()
+    {
+        var parent = GetParent();
+        if (parent == null)
+            return;
+
+        var lesion = new BioHazardArea
+        {
+            GlobalPosition = GlobalPosition,
+            Duration = 4.0f,
+            Radius = 46.0f,
+            Damage = 4.0f,
+            TickInterval = 0.6f,
+            SlowFactor = 0.6f,
+            SlowsTarget = true,
+            DealsDamage = true,
+            CoreColor = new Color(0.55f, 0.75f, 0.20f, 0.30f),
+            RimColor = new Color(0.75f, 0.95f, 0.35f, 0.60f)
+        };
+        parent.AddChild(lesion);
+
+        UlcerationPulses++;
     }
 
     public override void _Draw()

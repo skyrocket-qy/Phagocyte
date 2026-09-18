@@ -60,6 +60,7 @@ public partial class StreptococcusChainLord : SubBossEnemy
         Armor = 3.0f;
         IsElite = true;
         IsBoss = true;
+        ThreatMode = EnemyThreatMode.Interceptor;
     }
 
     protected override float GetCollisionRadius() => 26.0f;
@@ -80,11 +81,12 @@ public partial class StreptococcusChainLord : SubBossEnemy
 
         var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
         Vector2 heading = WanderDir;
-        if (player != null && GodotObject.IsInstanceValid(player))
+        if (player != null && GodotObject.IsInstanceValid(player) && !player.IsDead)
         {
-            Vector2 toPlayer = player.GlobalPosition - GlobalPosition;
-            if (toPlayer.LengthSquared() > 0.001f)
-                heading = toPlayer.Normalized();
+            // Flanking interception: cut off the player's travel vector instead of tailing.
+            Vector2 intercept = EnemySteering.AimAtIntercept(this, player.GlobalPosition, player.Velocity);
+            if (intercept.LengthSquared() > 0.001f)
+                heading = intercept;
         }
 
         float speed = FloatSpeed * SlowFactor;

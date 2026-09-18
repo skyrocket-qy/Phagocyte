@@ -73,6 +73,7 @@ public partial class Main : Node2D
     public override void _Ready()
     {
         StaphScene ??= DefaultStaphScene;
+        EnemySteering.ConfigureArena(ArenaSize);
 
         Player = GetNodeOrNull<CharacterBody2D>("Macrophage");
         HudNode = GetNodeOrNull<Hud>("HUD");

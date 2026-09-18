@@ -19,6 +19,7 @@ public partial class AnthraxBacillus : BaseEnemy
         AtpValue = 22.0f;
         BaseScore = 100;
         FloatSpeed = 70.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
     protected override float GetCollisionRadius() => 14.0f;
@@ -33,8 +34,8 @@ public partial class AnthraxBacillus : BaseEnemy
         var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
         if (player != null && GodotObject.IsInstanceValid(player))
         {
+            // Chasing is handled by EnemySteering; keep facing for the toxin telegraph.
             Vector2 toPlayer = (player.GlobalPosition - GlobalPosition).Normalized();
-            Velocity = Velocity.Lerp(toPlayer * FloatSpeed, 2.5f * dt);
             Rotation = toPlayer.Angle();
 
             _toxinTimer -= dt;

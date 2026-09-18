@@ -26,6 +26,7 @@ public partial class EColiEnemy : BaseEnemy
         AtpValue = 15.0f;
         BaseScore = 15;
         FloatSpeed = 45.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
     protected override float GetCollisionRadius() => 15.0f;

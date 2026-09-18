@@ -33,6 +33,7 @@ public partial class MalignantCellEnemy : BaseEnemy
         AtpValue = 48.0f;
         BaseScore = 100;
         FloatSpeed = 26.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
         Armor = 3.0f;
         IsElite = true;
     }

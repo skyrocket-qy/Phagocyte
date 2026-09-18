@@ -158,6 +158,7 @@ public partial class MrsaEnragedElite : BaseEnemy
         AtpValue = 40.0f;
         BaseScore = 35;
         FloatSpeed = 72.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
         Armor = 4.0f;
         IsElite = true;
     }

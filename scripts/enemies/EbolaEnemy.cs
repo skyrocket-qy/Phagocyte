@@ -24,6 +24,7 @@ public partial class EbolaEnemy : BaseEnemy
         AtpValue = 24.0f;
         BaseScore = 35;
         FloatSpeed = 38.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
     protected override float GetCollisionRadius() => 16.0f;

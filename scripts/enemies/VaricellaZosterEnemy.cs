@@ -43,13 +43,7 @@ public partial class VaricellaZosterEnemy : BaseEnemy
         }
         else
         {
-            // Aggressive chase towards player
-            var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
-            if (player != null && GodotObject.IsInstanceValid(player))
-            {
-                Vector2 toPlayer = (player.GlobalPosition - GlobalPosition).Normalized();
-                Velocity = Velocity.Lerp(toPlayer * 85.0f, 3.0f * dt);
-            }
+            // Aggressive chase is handled by EnemySteering (ChemoChaser after awakening).
         }
     }
 
@@ -59,6 +53,7 @@ public partial class VaricellaZosterEnemy : BaseEnemy
             return;
         _isAwakened = true;
         FloatSpeed = 85.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
 
         // Flash into visible existence
         Modulate = Colors.Red * 2.0f;

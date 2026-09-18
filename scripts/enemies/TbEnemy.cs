@@ -19,6 +19,7 @@ public partial class TbEnemy : BaseEnemy
         AtpValue = 18.0f;
         BaseScore = 100;
         FloatSpeed = 30.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
         Armor = 2.0f; // Mycolic wax absorbs damage
     }
 

@@ -23,6 +23,7 @@ public partial class PrionEnemy : BaseEnemy
         AtpValue = 60.0f;
         BaseScore = 100;
         FloatSpeed = 30.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
         IsBoss = true;
     }
 

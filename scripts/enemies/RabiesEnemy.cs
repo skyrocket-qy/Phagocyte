@@ -23,6 +23,7 @@ public partial class RabiesEnemy : BaseEnemy
         AtpValue = 16.0f;
         BaseScore = 35;
         FloatSpeed = 65.0f;
+        ThreatMode = EnemyThreatMode.Interceptor;
     }
 
     protected override float GetCollisionRadius() => 13.0f;

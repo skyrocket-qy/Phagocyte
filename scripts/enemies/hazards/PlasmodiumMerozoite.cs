@@ -19,18 +19,15 @@ public partial class PlasmodiumMerozoite : BaseEnemy
         AtpValue = 4.0f;
         BaseScore = 5;
         FloatSpeed = 85.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
     protected override float GetCollisionRadius() => 7.0f;
 
     protected override void CustomPhysicsProcess(float dt)
     {
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
-        if (player != null && GodotObject.IsInstanceValid(player))
-        {
-            Vector2 toPlayer = (player.GlobalPosition - GlobalPosition).Normalized();
-            Velocity = Velocity.Lerp(toPlayer * FloatSpeed, 3.0f * dt);
-        }
+        // Chasing is handled by EnemySteering; merozoites just keep swarming visuals.
+        QueueRedraw();
     }
 
     public override void _Draw()

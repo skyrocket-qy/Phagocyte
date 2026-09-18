@@ -21,6 +21,7 @@ public partial class HivEnemy : BaseEnemy
         AtpValue = 14.0f;
         BaseScore = 35;
         FloatSpeed = 48.0f;
+        ThreatMode = EnemyThreatMode.Interceptor;
     }
 
     protected override float GetCollisionRadius() => 14.0f;
@@ -32,11 +33,7 @@ public partial class HivEnemy : BaseEnemy
 
         if (player != null && GodotObject.IsInstanceValid(player))
         {
-            // Direct homing toward player core
-            Vector2 toPlayer = (player.GlobalPosition - GlobalPosition).Normalized();
-            Velocity = Velocity.Lerp(toPlayer * FloatSpeed, 2.5f * dt);
-
-            // Check contact with player core
+            // Interception steering is handled by EnemySteering; here only the ATP siphon.
             if (_siphonCooldown <= 0.0f && GlobalPosition.DistanceTo(player.GlobalPosition) < (player.CurrentRadius + 8.0f))
             {
                 _siphonCooldown = 1.5f;

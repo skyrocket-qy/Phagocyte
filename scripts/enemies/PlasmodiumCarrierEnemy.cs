@@ -20,6 +20,7 @@ public partial class PlasmodiumCarrierEnemy : BaseEnemy
         AtpValue = 28.0f;
         BaseScore = 15;
         FloatSpeed = 25.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
     protected override float GetCollisionRadius() => 18.0f;

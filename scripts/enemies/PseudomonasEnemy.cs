@@ -20,6 +20,7 @@ public partial class PseudomonasEnemy : BaseEnemy
         AtpValue = 14.0f;
         BaseScore = 35;
         FloatSpeed = 42.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
     protected override float GetCollisionRadius() => 15.0f;

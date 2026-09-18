@@ -29,6 +29,9 @@ public abstract partial class BaseEnemy : Node2D
     [Export] public bool IsElite { get; set; } = false;
     [Export] public bool IsBoss { get; set; } = false;
 
+    /// <summary>Tactical threat intent driving steering (see docs/pathogen.md).</summary>
+    [Export] public EnemyThreatMode ThreatMode { get; set; } = EnemyThreatMode.Drifter;
+
     public bool IsBeingEaten { get; set; } = false;
     public virtual bool CanBeEngulfed => FibrinShield <= 0;
 
@@ -36,6 +39,15 @@ public abstract partial class BaseEnemy : Node2D
     public float DriftTimer { get; set; } = 0.0f;
     public Vector2 WanderDir { get; set; } = Vector2.Zero;
     public float BreatheTimer { get; set; } = 0.0f;
+
+    // Threat steering tuning
+    public float SteeringPhase { get; set; } = 0.0f;
+    public Vector2 SteeringAnchor { get; set; } = Vector2.Zero;
+    public float SteeringOrbitSign { get; set; } = 1.0f;
+    protected virtual bool UseGenericSteering => true;
+    protected virtual float SteeringTurnRate => 2.6f;
+    public virtual float SteeringPreferredRange => 260.0f;
+    public virtual float SteeringLatchRange => 40.0f;
 
     // Status debuffs & Components
     public float SlowTimer { get; set; } = 0.0f;
@@ -65,6 +77,8 @@ public abstract partial class BaseEnemy : Node2D
         DriftTimer = GD.Randf() * 5.0f;
         BreatheTimer = GD.Randf() * 10.0f;
         WanderDir = Vector2.FromAngle(GD.Randf() * Mathf.Tau);
+        SteeringPhase = GD.Randf() * 10.0f;
+        SteeringOrbitSign = GD.Randf() < 0.5f ? -1.0f : 1.0f;
 
         Ailments = GetNodeOrNull<AilmentController>("AilmentController");
         if (Ailments == null)
@@ -146,6 +160,7 @@ public abstract partial class BaseEnemy : Node2D
     protected virtual void HandleBrownianDrift(float dt)
     {
         DriftTimer += dt;
+        SteeringPhase += dt;
         if (DriftTimer > 2.5f)
         {
             DriftTimer = 0.0f;
@@ -161,7 +176,25 @@ public abstract partial class BaseEnemy : Node2D
         {
             currentSpeed *= BossPhase.CurrentSpeedMult;
         }
-        Velocity = Velocity.Lerp(WanderDir * currentSpeed, 2.0f * dt);
+
+        Vector2 steering = UseGenericSteering ? EnemySteering.GetDirection(this, dt) : Vector2.Zero;
+        if (ThreatMode == EnemyThreatMode.Invader && steering.LengthSquared() <= 0.0001f)
+        {
+            // Latched tissue invader: hold position while ulcerating the anchor site.
+            Velocity = Vector2.Zero;
+            return;
+        }
+
+        if (steering.LengthSquared() > 0.0001f)
+        {
+            Vector2 desired = steering.Normalized() * currentSpeed;
+            Velocity = Velocity.Lerp(desired, Mathf.Clamp(SteeringTurnRate * dt, 0.0f, 1.0f));
+        }
+        else
+        {
+            Velocity = Velocity.Lerp(WanderDir * currentSpeed, 2.0f * dt);
+        }
+
         Position += Velocity * dt;
     }
 

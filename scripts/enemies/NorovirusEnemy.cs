@@ -18,6 +18,7 @@ public partial class NorovirusEnemy : BaseEnemy
         AtpValue = 3.5f;
         BaseScore = 5;
         FloatSpeed = 50.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
     protected override float GetCollisionRadius() => 7.0f;

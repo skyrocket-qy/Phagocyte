@@ -18,6 +18,7 @@ public partial class AspergillusEnemy : BaseEnemy
         AtpValue = 22.0f;
         BaseScore = 15;
         FloatSpeed = 28.0f;
+        ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
     protected override float GetCollisionRadius() => 17.0f;

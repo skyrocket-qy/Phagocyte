@@ -22,9 +22,13 @@ public partial class TetanusEnemy : BaseEnemy
         AtpValue = 20.0f;
         BaseScore = 35;
         FloatSpeed = 35.0f;
+        ThreatMode = EnemyThreatMode.Standoff;
     }
 
     protected override float GetCollisionRadius() => 15.0f;
+
+    // Tetanus keeps its bespoke 350-500px firing band instead of the generic orbit.
+    protected override bool UseGenericSteering => false;
 
     protected override void CustomPhysicsProcess(float dt)
     {

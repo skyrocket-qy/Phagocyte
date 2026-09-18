@@ -138,6 +138,18 @@
   - 炭疽芽孢二階段破殼復甦機制 (`anthrax_spore` 受到 50% 傷害後破殼化為狂暴桿菌)。
   - 白色念珠菌接近玩家時本體定格伸展 $150\text{px}$ 尖銳假菌絲穿刺。
   - 異變癌細胞存活超過 20 秒自主週期複製分裂出半血子細胞。
+- [x] **[P1] 四模式威脅意圖 AI 轉向架構 (Threat-Intent Steering)**：
+  - 廢除病原體無意義的純隨機遊蕩：`EnemyThreatMode` ＋ `EnemySteering` 統一路由四種戰術意圖。
+  - 趨化追獵型 (ChemoChaser)：基礎怪潮直撲細胞，帶個體化航向抖動防止直線肉球化。
+  - 預判包抄型 (Interceptor)：計算玩家移動向量，提前 100～200px 攔截，懲罰單向放風箏。
+  - 風箏定距型 (Standoff)：S 病毒維持 ~280px 環繞並發射刺突微粒（`EnemyPellet`，軟上限 120）；破傷風保留原有 350～500px 脈衝砲台。
+  - 侵蝕宿主型 (Invader)：幽門螺旋桿菌無視玩家，游向 6 處宿主組織錨點（`EnemySteering` 組織錨點），定植後每 3 秒噴發 VacA 酸蝕病灶。
+  - **影響檔案**：`scripts/enemies/EnemyThreatMode.cs`, `scripts/enemies/EnemySteering.cs`, `scripts/enemies/hazards/EnemyPellet.cs`, `scripts/enemies/BaseEnemy.cs`, `scripts/Main.cs`
+- [ ] **[P2] 中立環境實體與宿主潰爛系統 (Neutral Matter & Host Ulceration)**：
+  - 衰老紅血球 (`SenescentRBC`)：順流漂移的中立掩體，阻擋敵方微粒；需玩家主動吞噬才計擊殺與掉落 ATP（避免割草刷分漏洞）。
+  - 休眠毒素囊泡 (`DormantToxinVesicle`)：漂流微觀地雷，任何實體撞擊即範圍引爆。
+  - 宿主潰爛計量 (`UlcerationLevel`)：侵蝕宿主型累積酸蝕後惡化全圖環境，並讓侵蝕型改以紅血球為優先目標。
+  - **影響檔案**：新增 `scripts/enemies/hazards/SenescentRBC.cs`, `DormantToxinVesicle.cs`, `scripts/Main.cs`
 
 ---
 
