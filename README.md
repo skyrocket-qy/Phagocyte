@@ -27,7 +27,8 @@
 - 📋 **[專案總綱 Master GDD / PRD (spec.md)](file:///Users/zelin/project/Phagocyte/docs/spec.md)**
 - 💡 **[生物擬真與遊戲化設計哲學 (real.md)](file:///Users/zelin/project/Phagocyte/docs/real.md)**
 - 🧬 **[五大白血球形態學與底盤系統 (cell.md)](file:///Users/zelin/project/Phagocyte/docs/cell.md)**
-- ⚔️ **[技能系統、通用屬性與超武體系 (skill.md)](file:///Users/zelin/project/Phagocyte/docs/skill.md)**
+- 📐 **[全域通用 Stat 數值系統規格書 (stat.md)](file:///Users/zelin/project/Phagocyte/docs/stat.md)**
+- ⚔️ **[技能系統、超武體系與微操 (skill.md)](file:///Users/zelin/project/Phagocyte/docs/skill.md)**
 - 🩹 **[關卡病理環境、流體力學與波次導演 (map.md)](file:///Users/zelin/project/Phagocyte/docs/map.md)**
 - 🦠 **[病原體圖鑑與免疫對抗機制 (pathogen.md)](file:///Users/zelin/project/Phagocyte/docs/pathogen.md)**
 - 🕸️ **[造血幹細胞正交天賦星盤 (passivetree.md)](file:///Users/zelin/project/Phagocyte/docs/passivetree.md)**

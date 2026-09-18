@@ -97,12 +97,12 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
                     └────────────┬────────────┘
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
-【通用戰鬥屬性 (Combat)】     【通用生存屬性 (Defense)】   【通用輔助與機制 (Utility)】
-· Might (力量/傷害倍率)       · Max Health (最大生命)    · Magnet (拾取半徑)
-· Area (範圍/體積)           · Health Regen (生命自癒)  · Growth (經驗/ATP加成)
-· Cooldown Reduction (CDR)  · Armor (減傷/護甲)       · Luck (抗原幸運度)
-· Projectile Speed (彈道速度)· Move Speed (移動速度)    · Curse (環境感染難度)
-· Duration (持續時間)        · Revival (復甦次數)
+【通用戰鬥屬性 (Combat - 10項)】 【通用生存屬性 (Defense - 5項)】 【通用輔助與機制 (Utility - 1項)】
+· Might (力量/傷害倍率)          · Max Health (最大生命)        · Magnet (拾取半徑)
+· Area (範圍/體積)              · Health Regen (生命自癒)
+· Cooldown Reduction (CDR)     · Armor (減傷/護甲)
+· Projectile Speed (彈道速度)   · Move Speed (移動速度)
+· Duration (持續時間)           · Revival (復甦次數)
 · Amount (額外數量)
 · Pierce (穿透次數)
 · Knockback (擊退力道)
@@ -139,9 +139,6 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
 | :--- | :--- | :--- | :--- |
 | `magnet` | **趨化引力 (拾取)** | `150.0` (px) | 自動吸附周遭經驗光點（ATP）與抗原碎片的有效半徑。 |
-| `growth` | **代謝產能 (經驗)** | `1.0` (100%) | 獲取 ATP 免疫經驗值時的百分比增益乘數。 |
-| `luck` | **抗原幸運度** | `1.0` (100%) | 提升精英怪物掉落率、局內升級三選一出現高階質變卡與超武的權重。 |
-| `curse` | **感染烈度 (難度)** | `1.0` (100%) | 增加敵人刷新密度、跑速與血量，同時等比提升通關結算獎勵。 |
 
 ---
 
@@ -156,7 +153,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 ├────────────────────────────────────────────────────────┤
 │ 被動特質槽位 (Passive Organelles x5) - 提供純通用 Stat 加成│
 │ [1: 溶酶體酵素] [2: 肌動蛋白] [3: 調理素]   [4: 線粒體]   [5: 趨化受體] │
-│   (Might+Regen)  (Area+Speed)  (Crit+Dmg)     (CDR+Dur)   (Magnet+Luck) │
+│   (Might+Regen)  (Area+Speed)  (Crit+Dmg)     (CDR+Dur)   (Magnet+Speed)│
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -182,7 +179,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | **2. 肌動蛋白微絲 (Actin Polymerization)** | 骨架微絲定向聚合 | `area +12%` / `move_speed +6%`（全技能範圍放大與走位加速） |
 | **3. 調理素親和 (Opsonin Affinity)** | 特異性識別受體增生 | `crit_chance +5%` / `crit_damage +25%`（全傷害暴擊率與暴擊倍率飆升） |
 | **4. 線粒體超頻 (Mitochondrial Overclock)**| 三羧酸循環產能倍增 | `cooldown_reduction +8%` / `duration +10%`（全技能開火加速與留場延長） |
-| **5. 趨化因子受體 (Chemokine Receptors)** | 表面化學天線陣列 | `magnet +15%` / `luck +10%`（自動吸附範圍擴大與稀有掉落提升） |
+| **5. 趨化因子受體 (Chemokine Receptors)** | 表面化學天線陣列 | `magnet +25%` / `move_speed +6%`（自動吸附範圍擴大與趨化游動加速） |
 
 ---
 
@@ -231,7 +228,7 @@ graph LR
   - 殺手 T 起點中心（右側）：側重 `move_speed`（移速）、`crit_chance`（暴擊率）、`pierce`（穿透）。
   - 嗜中性球起點中心（左側）：側重 `might`（傷害強度）、`knockback`（擊退）、`health_regen`（生命自癒）。
   - B 細胞起點中心（右下）：側重 `amount`（彈道數）、`projectile_speed`（彈速）、`cooldown_reduction`（CDR）。
-  - 樹突狀起點中心（正上）：側重 `magnet`（拾取半徑）、`luck`（幸運度）、`growth`（經驗代謝效率）。
+  - 樹突狀起點中心（正上）：側重 `magnet`（拾取半徑）、`duration`（狀態與光環持續時間）、`cooldown_reduction`（冷卻縮減）、`area`（感知與效果範圍）。
 - **細胞專屬曼哈頓環層**：以出戰細胞之起點中心為原點，$L_{\text{cell}} = |col - col_{\text{start}}| + |row - row_{\text{start}}|$。
   - $L = 0$：該細胞之專屬起點中心（先天生效、消耗 0 點）。
   - $L = 1 \sim 2$：專屬核心代謝環與初階通用屬性。
@@ -346,9 +343,6 @@ var move_speed: Stat = Stat.new(230.0)
 var revival: Stat = Stat.new(0.0)
 
 var magnet: Stat = Stat.new(150.0)
-var growth: Stat = Stat.new(1.0)
-var luck: Stat = Stat.new(1.0)
-var curse: Stat = Stat.new(1.0)
 ```
 
 ### 主動技能調用通用 Stat 規範

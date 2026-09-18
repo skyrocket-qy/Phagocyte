@@ -54,7 +54,7 @@ var record = new Godot.Collections.Dictionary
     { "class_id", classId },          // 出戰細胞 ("macrophage", "ctl", 等)
     { "map_id", mapId },              // 戰鬥器官 ("acute_wound", 等)
     { "survival_time", survivalTime },// 存活時間 (秒)
-    { "level", level },                // 終末代謝等級
+    { "level", level },                // 終末細胞等級 (Cell Level)
     { "kills", kills },                // 總擊殺數 (Total Kills: 包含遠程技能擊殺 + 肉身吞噬)
     { "engulfed", engulfed },          // 肉身吞噬數 (Direct Engulfed: 僅統計偽足/細胞膜直接生吞)
     { "kpm", kpm },                    // 擊殺通量 (Kills Per Minute = kills / (survivalTime / 60))
@@ -102,7 +102,7 @@ $$\text{Final Score} = \left[ (\text{Survival Seconds} \times 10) + \text{Kill S
 - **通關中和加成（Clear Bonus）**：擊殺 15:00 終末 Boss 達成特異性中和成功，額外獲得 $+10,000$ 分。
 
 #### 📊 通關實例分數對比表（同為 15:00 Hard 通關）
-| 戰術風格 | 總擊殺量 (Kills) | 擊殺累積 Base 分數 | 代謝等級 | 擊殺通量 (KPM) | 最終結算積分 | 臨床評級 |
+| 戰術風格 | 總擊殺量 (Kills) | 擊殺累積 Base 分數 | 細胞等級 | 擊殺通量 (KPM) | 最終結算積分 | 臨床評級 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **消極走位苟活型** | 950 隻 (雜菌為主) | 16,500 分 | Lv.22 | 63.3 | **41,550 分** | **Rank B** |
 | **平衡標準發育型** | 2,800 隻 (含精英) | 58,000 分 | Lv.42 | 186.7 | **106,800 分** | **Rank A** |

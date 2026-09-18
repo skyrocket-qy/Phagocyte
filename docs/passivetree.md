@@ -17,7 +17,7 @@ flowchart TD
         HUB_CTL["【殺手 T 起點中心】<br>(CTL Hub · 右側)<br>移速 Speed / 暴擊 Crit / 穿透 Pierce"]
         HUB_NEU["【嗜中性球起點中心】<br>(Neutrophil Hub · 左側)<br>傷害 Might / 擊退 Knock / 自癒 Regen"]
         HUB_B["【B 細胞起點中心】<br>(B-Cell Hub · 右下方)<br>彈道數 Amount / 彈速 ProjSpd / CDR"]
-        HUB_DC["【樹突狀起點中心】<br>(Dendritic Hub · 正上方)<br>拾取 Magnet / 幸運 Luck / 經驗 Growth"]
+        HUB_DC["【樹突狀起點中心】<br>(Dendritic Hub · 正上方)<br>拾取 Magnet / 持續 Duration / 冷卻 CDR"]
     end
 
     subgraph CentralHighway [中央微管聯通主幹網絡 (Inter-Hub Microtubules)]
@@ -100,7 +100,7 @@ flowchart TD
 ### 4.5 樹突狀細胞起點中心 (Dendritic Starting Hub)
 - **色調**：電離紫與微光金綠螢光。
 - **位置**：星盤正上方。
-- **專精純屬性**：`magnet`（ATP 拾取半徑）、`luck`（幸運值）、`growth`（經驗代謝效率）、`duration`（狀態持續時間）。
+- **專精純屬性**：`magnet`（ATP 拾取半徑）、`duration`（狀態與光環持續時間）、`cooldown_reduction`（技能冷卻縮減）、`area`（感知與效果範圍）。
 
 ---
 
