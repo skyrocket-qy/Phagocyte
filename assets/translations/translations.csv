@@ -61,9 +61,12 @@ STAT_MAX_HEALTH,Max Health,最大生命
 STAT_HEALTH_REGEN,Health Regen,生命回复
 STAT_ARMOR,Armor,护甲
 STAT_MOVE_SPEED,Move Speed,移动速度
+STAT_EVASION,Fluid Evasion,流体闪避
+STAT_BLOCK,Glycocalyx Block,糖萼格挡
+STAT_LIFE_STEAL,Receptor Leech,受体汲取
+STAT_MAGNET,Chemotaxis Magnet,趋化吸附
 STAT_REVIVAL,Revival,复活
 STAT_KNOCKBACK_RESIST,Knockback Resistance,击退抗性
-STAT_MAGNET,Magnet,吸附
 STAT_GROWTH,Growth,成长
 STAT_LUCK,Luck,幸运
 STAT_CURSE,Curse,诅咒
