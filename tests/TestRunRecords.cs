@@ -116,7 +116,8 @@ public partial class TestRunRecords : SceneTree
 
         RunRecordManager.RecordRun(
             RunRecordManager.ResultVictory, "macrophage", "acute_wound",
-            300.0f, 7, 42, 3, new[] { "perforin_lance", "ros_torrent" });
+            920.0f, 7, 42, 3, new[] { "perforin_lance", "ros_torrent" },
+            bossNeutralized: true);
         RunRecordManager.RecordRun(
             RunRecordManager.ResultDefeat, "ctl", "alveolar_space",
             123.5f, 4, 11, 1, Array.Empty<string>());
@@ -124,11 +125,20 @@ public partial class TestRunRecords : SceneTree
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(2);
         // Newest run is stored first
         AssertThat(RunRecordManager.Records[0]["result"].AsString()).IsEqual(RunRecordManager.ResultDefeat);
+        AssertThat(RunRecordManager.Records[0]["cause"].AsString()).IsEqual(RunRecordManager.CauseMembraneRupture);
+        AssertThat(RunRecordManager.Records[0]["victory_criteria"].AsGodotDictionary()["met"].AsBool()).IsFalse();
         AssertThat(RunRecordManager.Records[0]["class_id"].AsString()).IsEqual("ctl");
         AssertThat(RunRecordManager.Records[1]["active_skills"].AsGodotArray().Count).IsEqual(2);
+        AssertThat(RunRecordManager.Records[1]["cause"].AsString()).IsEqual(RunRecordManager.CauseSpecificNeutralization);
+        AssertThat(RunRecordManager.Records[1]["victory_criteria"].AsGodotDictionary()["met"].AsBool()).IsTrue();
         AssertThat(RunRecordManager.GetVictoryCount()).IsEqual(1);
-        AssertThat(RunRecordManager.GetBestSurvivalTime()).IsEqualApprox(300.0f, 0.01f);
-        AssertThat(RunRecordManager.GetFastestVictory()).IsEqualApprox(300.0f, 0.01f);
+        AssertThat(RunRecordManager.GetBestSurvivalTime()).IsEqualApprox(920.0f, 0.01f);
+        AssertThat(RunRecordManager.GetFastestVictory()).IsEqualApprox(920.0f, 0.01f);
+
+        // Victory criteria (docs/record.md): 15:00 survival AND boss neutralization
+        AssertThat(RunRecordManager.IsVictoryCriteriaMet(900.0f, true)).IsTrue();
+        AssertThat(RunRecordManager.IsVictoryCriteriaMet(899.0f, true)).IsFalse();
+        AssertThat(RunRecordManager.IsVictoryCriteriaMet(1200.0f, false)).IsFalse();
 
         AssertThat(RunRecordManager.FormatTime(0.0f)).IsEqual("00:00");
         AssertThat(RunRecordManager.FormatTime(65.4f)).IsEqual("01:05");
@@ -151,13 +161,20 @@ public partial class TestRunRecords : SceneTree
         AssertThat(RunRecordManager.Records[0]["survival_time"].AsSingle()).IsEqualApprox(
             RunRecordManager.MaxRecords + 4, 0.01f);
 
+        // An unearned victory claim is downgraded to defeat by the manager guard
+        var rejected = RunRecordManager.RecordRun(
+            RunRecordManager.ResultVictory, "macrophage", "acute_wound",
+            300.0f, 7, 42, 3, Array.Empty<string>());
+        AssertThat(rejected["result"].AsString()).IsEqual(RunRecordManager.ResultDefeat);
+        AssertThat(rejected["victory_criteria"].AsGodotDictionary()["met"].AsBool()).IsFalse();
+
         GD.Print("[PASS] Run record CRUD, statistics, formatting, persistence and trimming verified.");
 
         // Leave a small clean history for the UI phase
         RunRecordManager.ClearRecords();
         RunRecordManager.RecordRun(
             RunRecordManager.ResultVictory, "macrophage", "acute_wound",
-            300.0f, 7, 42, 3, new[] { "perforin_lance" });
+            920.0f, 7, 42, 3, new[] { "perforin_lance" }, bossNeutralized: true);
         RunRecordManager.RecordRun(
             RunRecordManager.ResultDefeat, "b_cell", "hepatic_sinusoid",
             95.0f, 3, 8, 1, Array.Empty<string>());
@@ -225,8 +242,15 @@ public partial class TestRunRecords : SceneTree
 
         // The physics tick observed the goal being reached and settled the run.
         AssertThat(_main!.RunEnded).IsTrue();
+        AssertThat(_main.TerminalBossNeutralized).IsTrue();
         AssertThat(RunRecordManager.Records[0]["result"].AsString()).IsEqual(RunRecordManager.ResultVictory);
+        AssertThat(RunRecordManager.Records[0]["cause"].AsString()).IsEqual(RunRecordManager.CauseSpecificNeutralization);
         AssertThat(RunRecordManager.Records[0]["class_id"].AsString()).IsEqual(GameManager.SelectedClass);
+
+        var criteria = RunRecordManager.Records[0]["victory_criteria"].AsGodotDictionary();
+        AssertThat(criteria["met"].AsBool()).IsTrue();
+        AssertThat(criteria["survived_full_time"].AsBool()).IsTrue();
+        AssertThat(criteria["boss_neutralized"].AsBool()).IsTrue();
 
         var modal = _main.GetNodeOrNull<RunRecordsModal>("UIOverlay/RunRecordsModal");
         AssertThat(modal).IsNotNull();
@@ -257,6 +281,8 @@ public partial class TestRunRecords : SceneTree
         AssertThat(main2.RunEnded).IsTrue();
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(before + 1);
         AssertThat(RunRecordManager.Records[0]["result"].AsString()).IsEqual(RunRecordManager.ResultDefeat);
+        AssertThat(RunRecordManager.Records[0]["cause"].AsString()).IsEqual(RunRecordManager.CauseMembraneRupture);
+        AssertThat(RunRecordManager.Records[0]["victory_criteria"].AsGodotDictionary()["met"].AsBool()).IsFalse();
 
         var modal = main2.GetNodeOrNull<RunRecordsModal>("UIOverlay/RunRecordsModal");
         AssertThat(modal).IsNotNull();

@@ -221,7 +221,7 @@ public partial class Main : Node2D
                 AchievementManager.RecordEvent("radius_ratio", radiusRatio);
             };
 
-            bc.Died += () => EndRun(false);
+            bc.Died += () => EndRun(false, RunRecordManager.CauseMembraneRupture);
         }
         else
         {
