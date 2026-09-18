@@ -97,14 +97,14 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
                     └────────────┬────────────┘
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
-【通用戰鬥屬性 (Combat - 10項)】 【通用生存屬性 (Defense - 6項)】 【通用輔助與機制 (Utility - 1項)】
+【通用戰鬥屬性 (Combat - 10項)】 【通用生存屬性 (Defense - 7項)】 【通用輔助與機制 (Utility - 1項)】
 · Might (力量/傷害倍率)          · Max Health (最大生命)        · Magnet (拾取半徑)
 · Area (範圍/體積)              · Health Regen (生命自癒)
 · Cooldown Reduction (CDR)     · Armor (減傷/護甲)
 · Projectile Speed (彈道速度)   · Move Speed (移動速度)
 · Duration (持續時間)           · Evasion (流體閃避率)
 · Amount (額外數量)             · Block (糖萼格擋率)
-· Pierce (穿透次數)
+· Pierce (穿透次數)             · Life Steal (受體汲取/吸血)
 · Knockback (擊退力道)
 · Crit Chance (暴擊機率)
 · Crit Damage (暴擊倍率)
@@ -135,6 +135,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | `move_speed` | **移動速度** | `230.0` (px/s) | 玩家細胞在常態巡航下的基礎遊動速度。 |
 | `evasion` | **流體閃避率** | `0.0` (0%) | 胞膜阿米巴流體變形完全免傷機率（硬上限 `0.60` 即 60%）。受擊第一順位判定。 |
 | `block` | **糖萼格擋率** | `0.0` (0%) | 細胞表面緻密糖萼屏障偏轉阻絕傷害機率（硬上限 `0.75` 即 75%）。受擊第二順位判定。 |
+| `life_steal` | **受體汲取 / 命中吸血** | `0.0` (0%) | 任何傷害來源命中敵人時觸發自體修復的機率（觸發時固定回復 1 點 HP，硬上限 `0.20` 即 20%）。 |
 
 #### 3. 通用輔助與機制屬性（Utility & Economy）
 | 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
@@ -228,7 +229,7 @@ graph LR
   - 巨噬起點中心（左上）：側重 `area`（體積/範圍）、`max_health`（血上限）、`armor`（膜剛性減傷）、`block`（糖萼格擋率）。
   - 殺手 T 起點中心（右側）：側重 `move_speed`（移速）、`crit_chance`（暴擊率）、`pierce`（穿透）、`evasion`（流體閃避率）。
   - 嗜中性球起點中心（左側）：側重 `might`（傷害強度）、`knockback`（擊退）、`health_regen`（生命自癒）。
-  - B 細胞起點中心（右下）：側重 `amount`（彈道數）、`projectile_speed`（彈速）、`cooldown_reduction`（CDR）。
+  - B 細胞起點中心（右下）：側重 `amount`（彈道數）、`projectile_speed`（彈速）、`cooldown_reduction`（CDR）、`life_steal`（受體汲取/吸血）。
   - 樹突狀起點中心（正上）：側重 `magnet`（拾取半徑）、`duration`（狀態與光環持續時間）、`cooldown_reduction`（冷卻縮減）、`area`（感知與效果範圍）。
 - **細胞專屬曼哈頓環層**：以出戰細胞之起點中心為原點，$L_{\text{cell}} = |col - col_{\text{start}}| + |row - row_{\text{start}}|$。
   - $L = 0$：該細胞之專屬起點中心（先天生效、消耗 0 點）。
@@ -343,6 +344,7 @@ var armor: Stat = Stat.new(0.0)
 var move_speed: Stat = Stat.new(230.0)
 var evasion: Stat = Stat.new(0.0)
 var block: Stat = Stat.new(0.0)
+var life_steal: Stat = Stat.new(0.0)
 
 var magnet: Stat = Stat.new(150.0)
 ```

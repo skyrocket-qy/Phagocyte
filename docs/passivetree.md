@@ -16,7 +16,7 @@ flowchart TD
         HUB_MAC["【巨噬起點中心】<br>(Macrophage Hub · 左上方)<br>體積 Area / 生命 HP / 護甲 Armor / 格擋 Block"]
         HUB_CTL["【殺手 T 起點中心】<br>(CTL Hub · 右側)<br>移速 Speed / 暴擊 Crit / 穿透 Pierce / 閃避 Evasion"]
         HUB_NEU["【嗜中性球起點中心】<br>(Neutrophil Hub · 左側)<br>傷害 Might / 擊退 Knock / 自癒 Regen"]
-        HUB_B["【B 細胞起點中心】<br>(B-Cell Hub · 右下方)<br>彈道數 Amount / 彈速 ProjSpd / CDR"]
+        HUB_B["【B 細胞起點中心】<br>(B-Cell Hub · 右下方)<br>彈道數 Amount / 彈速 ProjSpd / CDR / 汲取 LifeSteal"]
         HUB_DC["【樹突狀起點中心】<br>(Dendritic Hub · 正上方)<br>拾取 Magnet / 持續 Duration / 冷卻 CDR"]
     end
 
@@ -59,7 +59,7 @@ flowchart TD
 > - 🚫 **嚴禁屬性聯動轉化**（例如：「每 100 點生命增加 5% 傷害」、「將護甲折算為暴擊率」等一律不採用）。
 > - ✅ **嚴格採用標準雙軌基礎加成**：
 >   - **純固定值 (Flat)**：如 `max_health +15`、`armor +2`、`amount +1`、`pierce +1`。
->   - **純百分比 (Simple Percent)**：如 `might +5%`、`move_speed +5%`、`area +6%`、`cooldown_reduction +4%`、`evasion +3%`、`block +4%`。
+>   - **純百分比 (Simple Percent)**：如 `might +5%`、`move_speed +5%`、`area +6%`、`cooldown_reduction +4%`、`evasion +3%`、`block +4%`、`life_steal +1%`。
 > - 最終通用公式純粹透明：$\text{FinalStat} = (\text{Base} + \text{FlatBonus}) \times (1.0 + \text{PercentBonus})$。
 
 ### 節點稀有度分級表
@@ -95,7 +95,7 @@ flowchart TD
 ### 4.4 B 淋巴細胞起點中心 (B-Cell Starting Hub)
 - **色調**：深靛藍與電離紫螢光。
 - **位置**：星盤右下方。
-- **專精純屬性**：`amount`（投射物發射數量）、`projectile_speed`（投射物速度）、`cooldown_reduction`（技能冷卻縮減）。
+- **專精純屬性**：`amount`（投射物發射數量）、`projectile_speed`（投射物速度）、`cooldown_reduction`（技能冷卻縮減）、`life_steal`（受體汲取/命中吸血）。
 
 ### 4.5 樹突狀細胞起點中心 (Dendritic Starting Hub)
 - **色調**：電離紫與微光金綠螢光。
