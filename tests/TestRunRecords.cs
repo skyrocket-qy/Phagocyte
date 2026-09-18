@@ -212,14 +212,18 @@ public partial class TestRunRecords : SceneTree
 
         GD.Print("[PASS] Run record CRUD, statistics, formatting, persistence and trimming verified.");
 
-        // Leave a small clean history for the UI phase
+        // Leave a small clean history for the UI phase:
+        // 2 victories (macrophage 920s = 19,900 pts is the best, ctl 910s = 19,400 pts) + 1 defeat
         RunRecordManager.ClearRecords();
         RunRecordManager.RecordRun(
             RunRecordManager.ResultVictory, "macrophage", "acute_wound",
-            920.0f, 7, 42, 3, new[] { "perforin_lance" }, bossNeutralized: true);
+            920.0f, 7, 42, 3, new[] { "perforin_lance" }, bossNeutralized: true, kills: 2200);
         RunRecordManager.RecordRun(
             RunRecordManager.ResultDefeat, "b_cell", "hepatic_sinusoid",
             95.0f, 3, 8, 1, Array.Empty<string>());
+        RunRecordManager.RecordRun(
+            RunRecordManager.ResultVictory, "ctl", "alveolar_space",
+            910.0f, 3, 15, 1, Array.Empty<string>(), bossNeutralized: true, kills: 300);
     }
 
     private void PhaseHistoryModal()
@@ -228,17 +232,50 @@ public partial class TestRunRecords : SceneTree
         var menu = menuScene.Instantiate<MainMenu>();
         Root.AddChild(menu);
 
-        AssertThat(menu.RecordsModal).IsNotNull();
-        AssertThat(menu.RecordsModal!.Visible).IsFalse();
+        var modal = menu.RecordsModal;
+        AssertThat(modal).IsNotNull();
+        AssertThat(modal!.Visible).IsFalse();
 
-        menu.RecordsModal.OpenHistory();
-        AssertThat(menu.RecordsModal.Visible).IsTrue();
-        AssertThat(menu.RecordsModal.SettlementMode).IsFalse();
-        AssertThat(menu.RecordsModal.HistoryList).IsNotNull();
-        AssertThat(menu.RecordsModal.HistoryList!.GetChildCount()).IsEqual(RunRecordManager.GetRunCount());
+        modal.OpenHistory();
+        AssertThat(modal.Visible).IsTrue();
+        AssertThat(modal.SettlementMode).IsFalse();
+
+        // Dual-tab classification: Victories / Defeats (docs/record.md §5)
+        AssertThat(modal.HistoryTabs).IsNotNull();
+        AssertThat(modal.HistoryTabs!.TabCount).IsEqual(2);
+        AssertThat(modal.HistoryTabs.CurrentTab).IsEqual(0);
+
+        // Victories tab: highest-score chart pinned first (19,900 > 19,400)
+        AssertThat(modal.HistoryList).IsNotNull();
+        AssertThat(modal.HistoryList!.GetChildCount()).IsEqual(2);
+        AssertThat(modal.PinnedBest).IsNotNull();
+        AssertThat(modal.PinnedBest!["class_id"].AsString()).IsEqual("macrophage");
+        AssertThat(modal.PinnedBest!["score"].AsInt32()).IsEqual(19900);
+
+        // One-click switch to the defeats tab re-filters the archive
+        modal.SetHistoryTab(1);
+        AssertThat(modal.HistoryList!.GetChildCount()).IsEqual(1);
+        AssertThat(modal.PinnedBest!["result"].AsString()).IsEqual(RunRecordManager.ResultDefeat);
+
+        // Tactical review: selecting a chart renders its full clinical metrics
+        modal.SelectRecord(modal.PinnedBest!);
+        AssertThat(modal.SelectedRecord).IsNotNull();
+        AssertThat(modal.SummaryBox!.Visible).IsTrue();
+        AssertThat(modal.SummaryBox!.GetChildCount()).IsGreater(5);
+
+        // Switching tabs clears the review selection
+        modal.SetHistoryTab(0);
+        AssertThat(modal.SelectedRecord).IsNull();
+
+        // Settlement mode owns the summary area; history selection is locked
+        modal.OpenSettlement(RunRecordManager.Records[0]);
+        AssertThat(modal.SettlementMode).IsTrue();
+        modal.SelectRecord(RunRecordManager.Records[1]);
+        AssertThat(modal.SelectedRecord).IsNull();
+        AssertThat(modal.SummaryBox!.Visible).IsTrue();
 
         menu.QueueFree();
-        GD.Print("[PASS] Menu history modal renders every stored run.");
+        GD.Print("[PASS] History tabs, pinned best chart and clinical review panel verified.");
     }
 
     private void PhaseDeathAndRevival()

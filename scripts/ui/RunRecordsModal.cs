@@ -21,12 +21,21 @@ public partial class RunRecordsModal : PanelContainer
     public VBoxContainer? SummaryBox { get; set; }
     public Label? HistoryHeader { get; set; }
     public VBoxContainer? HistoryList { get; set; }
+    public ScrollContainer? HistoryScroll { get; set; }
+    public TabBar? HistoryTabs { get; set; }
     public Button? ClearBtn { get; set; }
     public Button? RetryBtn { get; set; }
     public Button? MenuBtn { get; set; }
 
     public bool SettlementMode { get; private set; } = false;
 
+    /// <summary>History chart selected for tactical review (null when none).</summary>
+    public Dictionary? SelectedRecord { get; private set; } = null;
+
+    /// <summary>Highest-score chart of the currently displayed tab, pinned on top.</summary>
+    public Dictionary? PinnedBest { get; private set; } = null;
+
+    private VBoxContainer? _rootBox = null;
     private Dictionary? _record = null;
     private bool _clearArmed = false;
     private Callable _langCallback;
@@ -41,10 +50,14 @@ public partial class RunRecordsModal : PanelContainer
         BannerLabel = GetNodeOrNull<Label>("VBox/Banner");
         SummaryBox = GetNodeOrNull<VBoxContainer>("VBox/SummaryBox");
         HistoryHeader = GetNodeOrNull<Label>("VBox/HistoryHeader");
+        HistoryScroll = GetNodeOrNull<ScrollContainer>("VBox/Scroll");
         HistoryList = GetNodeOrNull<VBoxContainer>("VBox/Scroll/HistoryList");
         ClearBtn = GetNodeOrNull<Button>("VBox/Buttons/ClearButton");
         RetryBtn = GetNodeOrNull<Button>("VBox/Buttons/RetryButton");
         MenuBtn = GetNodeOrNull<Button>("VBox/Buttons/MenuButton");
+        _rootBox = GetNodeOrNull<VBoxContainer>("VBox");
+
+        SetupHistoryTabs();
 
         if (CloseBtn != null)
             CloseBtn.Pressed += Close;
@@ -61,6 +74,21 @@ public partial class RunRecordsModal : PanelContainer
         UpdateLocalizedTexts();
     }
 
+    private void SetupHistoryTabs()
+    {
+        if (_rootBox == null || HistoryTabs != null)
+            return;
+
+        HistoryTabs = new TabBar { Name = "HistoryTabs" };
+        HistoryTabs.AddTab("Victories");
+        HistoryTabs.AddTab("Defeats");
+        HistoryTabs.TabChanged += OnHistoryTabChanged;
+
+        _rootBox.AddChild(HistoryTabs);
+        if (HistoryHeader != null)
+            _rootBox.MoveChild(HistoryTabs, HistoryHeader.GetIndex());
+    }
+
     public override void _ExitTree()
     {
         GameManager.RemoveLanguageListener(_langCallback);
@@ -70,6 +98,7 @@ public partial class RunRecordsModal : PanelContainer
     {
         _record = record;
         SettlementMode = true;
+        SelectedRecord = null;
         _clearArmed = false;
         Visible = true;
         UpdateLocalizedTexts();
@@ -79,9 +108,44 @@ public partial class RunRecordsModal : PanelContainer
     {
         _record = null;
         SettlementMode = false;
+        SelectedRecord = null;
         _clearArmed = false;
+        if (HistoryTabs != null)
+            HistoryTabs.CurrentTab = 0;
         Visible = true;
         UpdateLocalizedTexts();
+    }
+
+    /// <summary>
+    /// Tactical review (docs/record.md §5): show the full clinical chart of a
+    /// stored run. Ignored while the settlement panel owns the summary area.
+    /// </summary>
+    public void SelectRecord(Dictionary record)
+    {
+        if (SettlementMode || record == null)
+            return;
+
+        SelectedRecord = record;
+        RefreshSummary();
+        RenderHistory();
+        if (HistoryScroll != null)
+            HistoryScroll.ScrollVertical = 0;
+    }
+
+    /// <summary>Switch classification tab (0 = victories, 1 = defeats) and re-render.</summary>
+    public void SetHistoryTab(int index)
+    {
+        if (HistoryTabs != null && index >= 0 && index < HistoryTabs.TabCount)
+            HistoryTabs.CurrentTab = index;
+
+        SelectedRecord = null;
+        RefreshSummary();
+        RenderHistory();
+    }
+
+    private void OnHistoryTabChanged(long tab)
+    {
+        SetHistoryTab((int)tab);
     }
 
     public void Close()
@@ -98,6 +162,12 @@ public partial class RunRecordsModal : PanelContainer
         if (CloseBtn != null) CloseBtn.Text = "✕";
         if (RetryBtn != null) RetryBtn.Text = Tr("RECORDS_RETRY");
         if (MenuBtn != null) MenuBtn.Text = Tr("RECORDS_MENU");
+
+        if (HistoryTabs != null)
+        {
+            HistoryTabs.SetTabTitle(0, Tr("RECORDS_TAB_VICTORIES"));
+            HistoryTabs.SetTabTitle(1, Tr("RECORDS_TAB_DEFEATS"));
+        }
 
         if (HistoryHeader != null)
         {
@@ -134,10 +204,23 @@ public partial class RunRecordsModal : PanelContainer
             child.QueueFree();
         }
 
-        if (!SettlementMode || _record == null)
+        var detail = SettlementMode ? _record : SelectedRecord;
+
+        if (detail == null)
         {
             if (BannerLabel != null)
-                BannerLabel.Visible = false;
+            {
+                if (!SettlementMode)
+                {
+                    BannerLabel.Visible = true;
+                    BannerLabel.Text = Tr("RECORDS_DETAIL_HINT");
+                    BannerLabel.Modulate = new Color(0.55f, 0.65f, 0.75f);
+                }
+                else
+                {
+                    BannerLabel.Visible = false;
+                }
+            }
             SummaryBox.Visible = false;
             return;
         }
@@ -145,33 +228,36 @@ public partial class RunRecordsModal : PanelContainer
         if (BannerLabel != null)
         {
             BannerLabel.Visible = true;
-            bool victory = _record.GetValueOrDefault("result", "").AsString() == RunRecordManager.ResultVictory;
-            BannerLabel.Text = victory ? Tr("RECORDS_SETTLEMENT_VICTORY") : Tr("RECORDS_SETTLEMENT_DEFEAT");
-            BannerLabel.Modulate = victory ? new Color(0.45f, 1.0f, 0.55f) : new Color(1.0f, 0.45f, 0.45f);
+            bool detailVictory = detail.GetValueOrDefault("result", "").AsString() == RunRecordManager.ResultVictory;
+            BannerLabel.Text = detailVictory ? Tr("RECORDS_SETTLEMENT_VICTORY") : Tr("RECORDS_SETTLEMENT_DEFEAT");
+            BannerLabel.Modulate = detailVictory ? new Color(0.45f, 1.0f, 0.55f) : new Color(1.0f, 0.45f, 0.45f);
         }
 
         SummaryBox.Visible = true;
-        string classId = _record.GetValueOrDefault("class_id", "").AsString();
-        string mapId = _record.GetValueOrDefault("map_id", "").AsString();
-        string rank = GetRank(_record);
+        string classId = detail.GetValueOrDefault("class_id", "").AsString();
+        string mapId = detail.GetValueOrDefault("map_id", "").AsString();
+        string rank = GetRank(detail);
 
         AddSummaryRow("RECORDS_RANK",
             string.IsNullOrEmpty(rank) ? "-" : GetRankLabel(rank),
             string.IsNullOrEmpty(rank) ? null : GetRankColor(rank));
         AddSummaryRow("RECORDS_CLASS", GetClassName(classId));
         AddSummaryRow("RECORDS_MAP", GetMapName(mapId));
-        AddSummaryRow("RECORDS_DIFFICULTY", GetDifficultyName(_record.GetValueOrDefault("difficulty", RunRecordManager.DifficultyNormal).AsString()));
-        AddSummaryRow("RECORDS_TIME", RunRecordManager.FormatTime(_record.GetValueOrDefault("survival_time", 0.0f).AsSingle()));
-        AddSummaryRow("RECORDS_LEVEL", _record.GetValueOrDefault("level", 1).AsInt32().ToString());
-        AddSummaryRow("RECORDS_KILLS", _record.GetValueOrDefault("kills", 0).AsInt32().ToString());
-        AddSummaryRow("RECORDS_KPM", $"{_record.GetValueOrDefault("kpm", 0.0f).AsSingle():F1}");
-        AddSummaryRow("RECORDS_DIGESTED", _record.GetValueOrDefault("digested", 0).AsInt32().ToString());
-        AddSummaryRow("RECORDS_KILL_SCORE", _record.GetValueOrDefault("kill_score", 0).AsInt32().ToString());
-        AddSummaryRow("RECORDS_SCORE", _record.GetValueOrDefault("score", 0).AsInt32().ToString());
-        AddSummaryRow("RECORDS_POINTS", _record.GetValueOrDefault("points_spent", 0).AsInt32().ToString());
-        AddSummaryRow("RECORDS_SKILLS", GetSkillNames(_record.GetValueOrDefault("active_skills", new Array<string>())));
+        AddSummaryRow("RECORDS_DIFFICULTY", GetDifficultyName(detail.GetValueOrDefault("difficulty", RunRecordManager.DifficultyNormal).AsString()));
+        AddSummaryRow("RECORDS_TIME", RunRecordManager.FormatTime(detail.GetValueOrDefault("survival_time", 0.0f).AsSingle()));
+        AddSummaryRow("RECORDS_DATE", RunRecordManager.FormatTimestamp(detail.GetValueOrDefault("timestamp", 0.0).AsDouble()));
+        if (detail.ContainsKey("cause"))
+            AddSummaryRow("RECORDS_CAUSE", GetCauseName(detail.GetValueOrDefault("cause", "").AsString()));
+        AddSummaryRow("RECORDS_LEVEL", detail.GetValueOrDefault("level", 1).AsInt32().ToString());
+        AddSummaryRow("RECORDS_KILLS", detail.GetValueOrDefault("kills", 0).AsInt32().ToString());
+        AddSummaryRow("RECORDS_KPM", $"{detail.GetValueOrDefault("kpm", 0.0f).AsSingle():F1}");
+        AddSummaryRow("RECORDS_DIGESTED", detail.GetValueOrDefault("digested", 0).AsInt32().ToString());
+        AddSummaryRow("RECORDS_KILL_SCORE", detail.GetValueOrDefault("kill_score", 0).AsInt32().ToString());
+        AddSummaryRow("RECORDS_SCORE", detail.GetValueOrDefault("score", 0).AsInt32().ToString());
+        AddSummaryRow("RECORDS_POINTS", detail.GetValueOrDefault("points_spent", 0).AsInt32().ToString());
+        AddSummaryRow("RECORDS_SKILLS", GetSkillNames(detail.GetValueOrDefault("active_skills", new Array<string>())));
 
-        if (_record.TryGetValue("telemetry", out var telVal) && telVal.VariantType == Variant.Type.Dictionary)
+        if (detail.TryGetValue("telemetry", out var telVal) && telVal.VariantType == Variant.Type.Dictionary)
         {
             var tel = telVal.AsGodotDictionary();
             float dmgDealt = tel.TryGetValue("total_damage_dealt", out var dd) ? dd.AsSingle() : 0.0f;
@@ -225,34 +311,78 @@ public partial class RunRecordsModal : PanelContainer
             child.QueueFree();
         }
 
+        PinnedBest = null;
+
         var records = RunRecordManager.GetAll();
         if (records.Count == 0)
         {
-            var empty = new Label
-            {
-                Text = Tr("RECORDS_EMPTY"),
-                Modulate = new Color(0.7f, 0.7f, 0.7f)
-            };
-            HistoryList.AddChild(empty);
+            HistoryList.AddChild(CreateEmptyLabel("RECORDS_EMPTY"));
             return;
         }
 
+        bool wantVictory = HistoryTabs == null || HistoryTabs.CurrentTab == 0;
+        var filtered = new List<Dictionary>();
         foreach (var rec in records)
         {
-            HistoryList.AddChild(CreateHistoryRow(rec));
+            bool victory = rec.GetValueOrDefault("result", "").AsString() == RunRecordManager.ResultVictory;
+            if (victory == wantVictory)
+                filtered.Add(rec);
+        }
+
+        if (filtered.Count == 0)
+        {
+            HistoryList.AddChild(CreateEmptyLabel(wantVictory ? "RECORDS_EMPTY_VICTORIES" : "RECORDS_EMPTY_DEFEATS"));
+            return;
+        }
+
+        // Highest-score chart of this classification is pinned on top (docs/record.md §5)
+        foreach (var rec in filtered)
+        {
+            if (PinnedBest == null || ScoreOf(rec) > ScoreOf(PinnedBest))
+                PinnedBest = rec;
+        }
+
+        HistoryList.AddChild(CreateHistoryRow(PinnedBest!, isBest: true));
+        foreach (var rec in filtered)
+        {
+            if (ReferenceEquals(rec, PinnedBest))
+                continue;
+            HistoryList.AddChild(CreateHistoryRow(rec, isBest: false));
         }
     }
 
-    private Control CreateHistoryRow(Dictionary rec)
+    private Label CreateEmptyLabel(string key)
+    {
+        return new Label
+        {
+            Text = Tr(key),
+            Modulate = new Color(0.7f, 0.7f, 0.7f)
+        };
+    }
+
+    private int ScoreOf(Dictionary rec)
+    {
+        return rec.GetValueOrDefault("score", 0).AsInt32();
+    }
+
+    private Control CreateHistoryRow(Dictionary rec, bool isBest)
     {
         bool victory = rec.GetValueOrDefault("result", "").AsString() == RunRecordManager.ResultVictory;
         string classId = rec.GetValueOrDefault("class_id", "").AsString();
         string mapId = rec.GetValueOrDefault("map_id", "").AsString();
+        bool selected = !SettlementMode && ReferenceEquals(rec, SelectedRecord);
 
-        var row = new PanelContainer();
+        var row = new PanelContainer
+        {
+            MouseFilter = MouseFilterEnum.Stop,
+            MouseDefaultCursorShape = CursorShape.PointingHand
+        };
+
         var style = new StyleBoxFlat
         {
-            BgColor = victory ? new Color(0.08f, 0.18f, 0.12f, 0.7f) : new Color(0.18f, 0.08f, 0.1f, 0.7f),
+            BgColor = isBest
+                ? new Color(0.16f, 0.14f, 0.05f, 0.85f)
+                : victory ? new Color(0.08f, 0.18f, 0.12f, 0.7f) : new Color(0.18f, 0.08f, 0.1f, 0.7f),
             CornerRadiusTopLeft = 6,
             CornerRadiusTopRight = 6,
             CornerRadiusBottomLeft = 6,
@@ -262,7 +392,29 @@ public partial class RunRecordsModal : PanelContainer
             ContentMarginTop = 8,
             ContentMarginBottom = 8
         };
+        if (isBest)
+        {
+            style.BorderWidthLeft = 2;
+            style.BorderWidthTop = 2;
+            style.BorderWidthRight = 2;
+            style.BorderWidthBottom = 2;
+            style.BorderColor = new Color(1.0f, 0.84f, 0.35f, 0.9f);
+        }
+        if (selected)
+        {
+            style.BorderWidthLeft = 2;
+            style.BorderWidthTop = 2;
+            style.BorderWidthRight = 2;
+            style.BorderWidthBottom = 2;
+            style.BorderColor = new Color(0.35f, 0.8f, 1.0f);
+        }
         row.AddThemeStyleboxOverride("panel", style);
+
+        row.GuiInput += (InputEvent @event) =>
+        {
+            if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
+                SelectRecord(rec);
+        };
 
         var vbox = new VBoxContainer();
         vbox.AddThemeConstantOverride("separation", 2);
@@ -291,6 +443,17 @@ public partial class RunRecordsModal : PanelContainer
         var meta = new HBoxContainer();
         meta.AddThemeConstantOverride("separation", 8);
 
+        if (isBest)
+        {
+            var bestTag = new Label
+            {
+                Text = Tr("RECORDS_BEST_TAG"),
+                Modulate = new Color(1.0f, 0.84f, 0.35f),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            meta.AddChild(bestTag);
+        }
+
         string rank = GetRank(rec);
         var rankLabel = new Label
         {
@@ -315,6 +478,17 @@ public partial class RunRecordsModal : PanelContainer
 
         row.AddChild(vbox);
         return row;
+    }
+
+    private string GetCauseName(string cause)
+    {
+        return cause switch
+        {
+            RunRecordManager.CauseSpecificNeutralization => Tr("CAUSE_SPECIFIC_NEUTRALIZATION"),
+            RunRecordManager.CauseMembraneRupture => Tr("CAUSE_MEMBRANE_RUPTURE"),
+            RunRecordManager.CauseSystemFailure => Tr("CAUSE_SYSTEM_FAILURE"),
+            _ => cause
+        };
     }
 
     private static string GetRank(Dictionary rec)
@@ -385,6 +559,7 @@ public partial class RunRecordsModal : PanelContainer
         }
 
         RunRecordManager.ClearRecords();
+        SelectedRecord = null;
         UpdateLocalizedTexts();
     }
 

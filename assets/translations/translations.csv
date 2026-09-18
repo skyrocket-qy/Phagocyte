@@ -506,3 +506,14 @@ RANK_A_TITLE,Efficient Scavenger · Exceptional Compensation,高效清道夫 · 
 RANK_B_TITLE,Local Defense Line · Stably Contained,局部防線 · 穩定受控
 RANK_C_TITLE,Stress Compensation · Acute Phase,應激代償 · 急性相
 RANK_D_TITLE,Membrane Lysis · Early Rout,膜溶解 · 早期潰敗
+RECORDS_TAB_VICTORIES,Neutralization Charts,治癒中和病歷
+RECORDS_TAB_DEFEATS,SIRS Mortality Charts,潰敗陣亡病歷
+RECORDS_BEST_TAG,★ BEST,★ 最高分
+RECORDS_EMPTY_VICTORIES,No neutralization charts recorded yet.,尚無治癒中和病歷。
+RECORDS_EMPTY_DEFEATS,No SIRS mortality charts recorded yet.,尚無潰敗陣亡病歷。
+RECORDS_DETAIL_HINT,Select any medical chart below to review its full clinical metrics.,點選下方任一病歷以檢視完整臨床指標。
+RECORDS_CAUSE,Clinical Diagnosis,臨床診斷
+RECORDS_DATE,Recorded At,結算時間
+CAUSE_SPECIFIC_NEUTRALIZATION,Antigen-specific immunity fully established,抗原特異性免疫完全建立
+CAUSE_MEMBRANE_RUPTURE,SIRS · Septic shock · MODS,敗血性休克 · 多重器官衰竭
+CAUSE_SYSTEM_FAILURE,Run aborted (system failure),系統性中止（內容異常）
