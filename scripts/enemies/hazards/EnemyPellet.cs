@@ -68,9 +68,36 @@ public partial class EnemyPellet : Area2D
             return;
         }
 
+        if (BlockedByNeutralMatter())
+        {
+            QueueFree();
+            return;
+        }
+
         Position += Direction * Speed * dt;
         Rotation = Direction.Angle();
         QueueRedraw();
+    }
+
+    /// <summary>
+    /// Senescent RBCs and toxin vesicles act as drifting cover and absorb enemy pellets.
+    /// </summary>
+    private bool BlockedByNeutralMatter()
+    {
+        var neutrals = GetTree().GetNodesInGroup("neutral_matter");
+        if (neutrals.Count == 0)
+            return false;
+
+        const float blockRadiusSq = 26.0f * 26.0f;
+        foreach (var node in neutrals)
+        {
+            if (node is Node2D neutral && GodotObject.IsInstanceValid(neutral)
+                && GlobalPosition.DistanceSquaredTo(neutral.GlobalPosition) <= blockRadiusSq)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void OnBodyEntered(Node2D body)

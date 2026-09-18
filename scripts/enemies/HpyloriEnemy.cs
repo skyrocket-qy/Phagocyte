@@ -59,6 +59,18 @@ public partial class HpyloriEnemy : BaseEnemy
         if (parent == null)
             return;
 
+        HostUlceration.RegisterPulse();
+
+        // Accumulated acid dissolves senescent RBCs at the ulceration site
+        foreach (var node in GetTree().GetNodesInGroup("senescent_rbc"))
+        {
+            if (node is SenescentRBC rbc && GodotObject.IsInstanceValid(rbc)
+                && GlobalPosition.DistanceTo(rbc.GlobalPosition) <= 64.0f)
+            {
+                rbc.Dissolve();
+            }
+        }
+
         var lesion = new BioHazardArea
         {
             GlobalPosition = GlobalPosition,

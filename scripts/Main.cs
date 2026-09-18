@@ -59,6 +59,16 @@ public partial class Main : Node2D
 
     private bool _terminalPhaseStarted = false;
 
+    // Neutral environment matter & host ulceration (Section 4.3)
+    public const int MaxSenescentRbc = 12;
+    public const int MaxToxinVesicles = 10;
+    public const float NeutralSpawnInterval = 6.0f;
+
+    public int UlcerationPulses => HostUlceration.Pulses;
+
+    private float _neutralSpawnTimer = NeutralSpawnInterval;
+    private float _ulcerHazardTimer = 12.0f;
+
     public CharacterBody2D? Player { get; set; }
     public Hud? HudNode { get; set; }
     public Node2D? EnemyContainer { get; set; }
@@ -74,6 +84,7 @@ public partial class Main : Node2D
     {
         StaphScene ??= DefaultStaphScene;
         EnemySteering.ConfigureArena(ArenaSize);
+        HostUlceration.Reset();
 
         Player = GetNodeOrNull<CharacterBody2D>("Macrophage");
         HudNode = GetNodeOrNull<Hud>("HUD");
@@ -142,6 +153,9 @@ public partial class Main : Node2D
 
         // Initial pathogen wave
         SpawnInitialWave(35);
+
+        // Neutral environment matter (senescent RBCs + dormant toxin vesicles)
+        SeedNeutralMatter();
 
         AudioManager.Instance?.PlayBgm("battle_bgm", 0.6f);
     }
@@ -283,6 +297,8 @@ public partial class Main : Node2D
 
         // Map mechanics
         ProcessMapMechanics(dt);
+        ProcessNeutralMatter(dt);
+        ProcessHostUlceration(dt);
 
         if (BossLockdownActive)
         {
@@ -291,6 +307,106 @@ public partial class Main : Node2D
         }
 
         ProcessDynamicBackfill();
+    }
+
+    /// <summary>
+    /// Maintains the drifting neutral matter population (cover RBCs + toxin mines).
+    /// Neutrals are not BaseEnemy nodes, so they never consume screen-cap slots.
+    /// </summary>
+    private void ProcessNeutralMatter(float dt)
+    {
+        if (EnemyContainer == null || Player == null)
+            return;
+
+        _neutralSpawnTimer -= dt;
+        if (_neutralSpawnTimer > 0.0f)
+            return;
+
+        _neutralSpawnTimer = NeutralSpawnInterval;
+
+        if (CountGroup("senescent_rbc") < MaxSenescentRbc)
+            SpawnSenescentRbc();
+        if (CountGroup("toxin_vesicle") < MaxToxinVesicles)
+            SpawnToxinVesicle();
+    }
+
+    private void SeedNeutralMatter()
+    {
+        for (int i = 0; i < 4; i++)
+            SpawnSenescentRbc();
+        for (int i = 0; i < 3; i++)
+            SpawnToxinVesicle();
+    }
+
+    private void SpawnSenescentRbc()
+    {
+        if (EnemyContainer == null || Player == null)
+            return;
+
+        var rbc = new SenescentRBC
+        {
+            GlobalPosition = GetNeutralSpawnPoint()
+        };
+        EnemyContainer.AddChild(rbc);
+    }
+
+    private void SpawnToxinVesicle()
+    {
+        if (EnemyContainer == null || Player == null)
+            return;
+
+        var vesicle = new DormantToxinVesicle
+        {
+            GlobalPosition = GetNeutralSpawnPoint()
+        };
+        EnemyContainer.AddChild(vesicle);
+    }
+
+    private Vector2 GetNeutralSpawnPoint()
+    {
+        Vector2 viewSize = GetVisibleWorldSize();
+        float margin = (float)GD.RandRange(100.0, 220.0);
+        return PathogenSpawner.GetOffscreenSpawnPoint(Player!.GlobalPosition, ArenaSize, viewSize, margin);
+    }
+
+    /// <summary>
+    /// Host ulceration (docs/map.md): accumulated invader acid degrades the arena by
+    /// spawning ambient acid mist near the battle as the ulceration level rises.
+    /// </summary>
+    private void ProcessHostUlceration(float dt)
+    {
+        if (EnemyContainer == null || Player == null)
+            return;
+
+        if (HostUlceration.Pulses < HostUlceration.EnvironmentThreshold)
+            return;
+
+        _ulcerHazardTimer -= dt;
+        if (_ulcerHazardTimer > 0.0f)
+            return;
+
+        _ulcerHazardTimer = HostUlceration.Pulses >= HostUlceration.SevereThreshold ? 6.0f : 12.0f;
+
+        Vector2 offset = Vector2.FromAngle(GD.Randf() * Mathf.Tau) * (float)GD.RandRange(160.0, 360.0);
+        var mist = new BioHazardArea
+        {
+            GlobalPosition = Player.GlobalPosition + offset,
+            Duration = 6.0f,
+            Radius = 70.0f,
+            Damage = 5.0f,
+            TickInterval = 0.6f,
+            SlowFactor = 0.7f,
+            SlowsTarget = true,
+            DealsDamage = true,
+            CoreColor = new Color(0.45f, 0.22f, 0.12f, 0.30f),
+            RimColor = new Color(0.85f, 0.45f, 0.20f, 0.60f)
+        };
+        EnemyContainer.AddChild(mist);
+    }
+
+    private int CountGroup(string group)
+    {
+        return GetTree().GetNodesInGroup(group).Count;
     }
 
     /// <summary>
@@ -657,5 +773,29 @@ public partial class Main : Node2D
         var staph = StaphScene.Instantiate<Node2D>();
         staph.GlobalPosition = spawnPos;
         EnemyContainer.AddChild(staph);
+    }
+}
+
+/// <summary>
+/// Run-scoped host ulceration meter. Tissue invaders (H. pylori) accumulate acid
+/// damage; crossing thresholds degrades the whole arena and retargets invaders
+/// onto red blood cells.
+/// </summary>
+public static class HostUlceration
+{
+    public const int RbcPreferenceThreshold = 3;
+    public const int EnvironmentThreshold = 4;
+    public const int SevereThreshold = 8;
+
+    public static int Pulses { get; private set; }
+
+    public static void RegisterPulse()
+    {
+        Pulses++;
+    }
+
+    public static void Reset()
+    {
+        Pulses = 0;
     }
 }

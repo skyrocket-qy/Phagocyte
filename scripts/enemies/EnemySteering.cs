@@ -136,10 +136,24 @@ public static class EnemySteering
 
     /// <summary>
     /// Tissue invader: ignores the player and drives at the nearest host-tissue anchor.
+    /// Once host ulceration accumulates, invaders switch priority to red blood cells.
     /// Returns Zero once latched so the invader can ulcerate in place.
     /// </summary>
     public static Vector2 InvadeTissue(BaseEnemy enemy)
     {
+        if (HostUlceration.Pulses >= HostUlceration.RbcPreferenceThreshold)
+        {
+            Node2D? rbc = FindNearestNeutral(enemy, "senescent_rbc");
+            if (rbc != null)
+            {
+                Vector2 toRbc = rbc.GlobalPosition - enemy.GlobalPosition;
+                enemy.SteeringAnchor = rbc.GlobalPosition;
+                if (toRbc.Length() <= Mathf.Max(8.0f, enemy.SteeringLatchRange))
+                    return Vector2.Zero;
+                return toRbc.Normalized();
+            }
+        }
+
         Vector2 anchor = GetNearestTissueAnchor(enemy.GlobalPosition);
         enemy.SteeringAnchor = anchor;
 
@@ -148,6 +162,28 @@ public static class EnemySteering
             return Vector2.Zero;
 
         return toAnchor.Normalized();
+    }
+
+    private static Node2D? FindNearestNeutral(Node owner, string group)
+    {
+        Node2D? best = null;
+        float bestDistance = float.MaxValue;
+        Vector2 from = owner is Node2D origin ? origin.GlobalPosition : Vector2.Zero;
+
+        foreach (var node in owner.GetTree().GetNodesInGroup(group))
+        {
+            if (node is Node2D neutral && GodotObject.IsInstanceValid(neutral))
+            {
+                float distance = from.DistanceSquaredTo(neutral.GlobalPosition);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    best = neutral;
+                }
+            }
+        }
+
+        return best;
     }
 
     /// <summary>True when an invader reached its anchor and is ulcerating in place.</summary>
