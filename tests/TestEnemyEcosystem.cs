@@ -243,7 +243,7 @@ public partial class TestEnemyEcosystem : SceneTree
         PathogenSpawner.SpawnWave(spawnerContainer, player, new Vector2(4800, 4800), 10.0f, 2);
         AssertThat(spawnerContainer.GetChildCount() > 0).IsTrue();
 
-        // Phase 4 (200s - Boss phase)
+        // Phase 2 (200s - local inflammation escalation)
         PathogenSpawner.SpawnWave(spawnerContainer, player, new Vector2(4800, 4800), 200.0f, 1);
         AssertThat(spawnerContainer.GetChildCount() > 1).IsTrue();
         GD.Print("[PASS] Test 12: PathogenSpawner wave director multi-phase biological escalation verified.");

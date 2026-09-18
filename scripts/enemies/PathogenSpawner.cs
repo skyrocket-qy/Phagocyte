@@ -1,37 +1,61 @@
 using Godot;
 using System;
-using System.Collections.Generic;
+using Phagocyte.Combat;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Pathogen Spawner & Wave Director.
-/// Controls pathological enemy wave escalation based on survival time and pathology stages.
+/// Drives the 15:00 standard infection timeline with a 3-minute escalation loop:
+///   00:00-03:00 colonization  -> 03:00 elite raid
+///   03:00-06:00 local inflammation -> 06:00 first swarm + elite pincer
+///   06:00-09:00 tissue infiltration -> 09:00 sub-boss showdown
+///   09:00-12:00 systemic spread -> 12:00 extreme swarm
+///   12:00-15:00 terminal crisis -> 15:00 terminal boss lockdown
 /// </summary>
 public static class PathogenSpawner
 {
-    private static readonly string[] Phase1Pool = new[]
+    /// <summary>Length of one escalation phase (03:00).</summary>
+    public const float EscalationInterval = 180.0f;
+
+    /// <summary>Standard run duration (15:00).</summary>
+    public const float StandardRunDuration = 900.0f;
+
+    public const int PhaseCount = 5;
+
+    private static readonly string[] Phase1Pool =
     {
         "staph", "staph", "norovirus", "e_coli", "s_virus"
     };
 
-    private static readonly string[] Phase2Pool = new[]
+    private static readonly string[] Phase2Pool =
     {
         "staph", "e_coli", "norovirus", "s_virus",
         "pseudomonas", "tb", "h_pylori", "rabies", "candida", "plasmodium"
     };
 
-    private static readonly string[] Phase3Pool = new[]
+    private static readonly string[] Phase3Pool =
     {
         "pseudomonas", "tb", "h_pylori", "rabies", "candida", "plasmodium",
         "flu_drift", "tetanus", "anthrax_spore", "varicella_zoster", "aspergillus", "toxoplasma", "hiv", "ebola"
     };
 
-    private static readonly string[] Phase4Pool = new[]
+    private static readonly string[] Phase4Pool =
     {
         "flu_drift", "tetanus", "anthrax_spore", "varicella_zoster", "aspergillus", "toxoplasma", "hiv", "ebola",
         "malignant_cell", "prion"
+    };
+
+    private static readonly string[] Phase5Pool =
+    {
+        "malignant_cell", "prion", "ebola", "hiv",
+        "anthrax_spore", "toxoplasma", "flu_drift", "aspergillus"
+    };
+
+    private static readonly string[] SwarmPool =
+    {
+        "norovirus", "norovirus", "staph", "s_virus"
     };
 
     public static BaseEnemy? CreatePathogen(string pathogenId)
@@ -62,65 +86,269 @@ public static class PathogenSpawner
         };
     }
 
+    /// <summary>
+    /// Resolves the timeline phase index (0..4) for a given survival time.
+    /// </summary>
+    public static int GetPhaseIndex(float gameTime)
+    {
+        if (gameTime < EscalationInterval)
+            return 0;
+        if (gameTime < EscalationInterval * 2.0f)
+            return 1;
+        if (gameTime < EscalationInterval * 3.0f)
+            return 2;
+        if (gameTime < EscalationInterval * 4.0f)
+            return 3;
+        return 4;
+    }
+
+    public static string[] GetPhasePool(int phaseIndex)
+    {
+        return Mathf.Clamp(phaseIndex, 0, PhaseCount - 1) switch
+        {
+            0 => Phase1Pool,
+            1 => Phase2Pool,
+            2 => Phase3Pool,
+            3 => Phase4Pool,
+            _ => Phase5Pool
+        };
+    }
+
+    public static string GetPhaseNameKey(int phaseIndex)
+    {
+        return Mathf.Clamp(phaseIndex, 0, PhaseCount - 1) switch
+        {
+            0 => "WAVE_PHASE_COLONIZATION",
+            1 => "WAVE_PHASE_INFLAMMATION",
+            2 => "WAVE_PHASE_INFILTRATION",
+            3 => "WAVE_PHASE_DISSEMINATION",
+            _ => "WAVE_PHASE_TERMINAL"
+        };
+    }
+
+    /// <summary>
+    /// Standard phase pool wave used by the periodic population maintenance.
+    /// </summary>
     public static void SpawnWave(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, float gameTime, int count = 1)
     {
         if (enemyContainer == null || player == null)
             return;
 
-        string[] pool = gameTime switch
-        {
-            < 30.0f => Phase1Pool,
-            < 90.0f => Phase2Pool,
-            < 180.0f => Phase3Pool,
-            _ => Phase4Pool
-        };
-
+        string[] pool = GetPhasePool(GetPhaseIndex(gameTime));
         for (int i = 0; i < count; i++)
         {
             string chosenId = pool[(int)GD.RandRange(0, pool.Length - 1)];
-
-            if (chosenId == "staph")
-            {
-                // Cluster spawn (3 cocci)
-                Vector2 center = GetSpawnPoint(player.GlobalPosition, arenaSize, (float)GD.RandRange(450, 950));
-                for (int s = 0; s < 3; s++)
-                {
-                    var staph = new StaphEnemy
-                    {
-                        GlobalPosition = center + new Vector2((float)GD.RandRange(-30, 30), (float)GD.RandRange(-30, 30)),
-                        FibrinShield = 1
-                    };
-                    enemyContainer.AddChild(staph);
-                }
-            }
-            else if (chosenId == "norovirus")
-            {
-                // Micro-swarm (10 units)
-                Vector2 center = GetSpawnPoint(player.GlobalPosition, arenaSize, (float)GD.RandRange(450, 950));
-                for (int n = 0; n < 10; n++)
-                {
-                    var noro = new NorovirusEnemy
-                    {
-                        GlobalPosition = center + new Vector2((float)GD.RandRange(-50, 50), (float)GD.RandRange(-50, 50))
-                    };
-                    enemyContainer.AddChild(noro);
-                }
-            }
-            else
-            {
-                var enemy = CreatePathogen(chosenId);
-                if (enemy != null)
-                {
-                    enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, (float)GD.RandRange(450, 1000));
-                    enemyContainer.AddChild(enemy);
-                }
-            }
+            SpawnSingle(enemyContainer, player, arenaSize, chosenId, 450.0f, 1000.0f);
         }
+    }
+
+    /// <summary>
+    /// 03:00 / 06:00 escalation elite. Heavier, shielded and worth bonus ATP.
+    /// </summary>
+    public static BaseEnemy? SpawnElite(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, float gameTime, int tier = 1, float spawnAngle = -1.0f)
+    {
+        if (enemyContainer == null || player == null)
+            return null;
+
+        string[] pool = GetPhasePool(GetPhaseIndex(gameTime));
+        string chosenId = pool[(int)GD.RandRange(0, pool.Length - 1)];
+        var enemy = CreatePathogen(chosenId);
+        if (enemy == null)
+            return null;
+
+        ApplyEliteBoost(enemy, tier);
+
+        enemy.GlobalPosition = spawnAngle >= 0.0f
+            ? GetPointAtAngle(player.GlobalPosition, arenaSize, spawnAngle, 560.0f)
+            : GetSpawnPoint(player.GlobalPosition, arenaSize, (float)GD.RandRange(520.0f, 820.0f));
+
+        enemyContainer.AddChild(enemy);
+        return enemy;
+    }
+
+    /// <summary>
+    /// 06:00 / 12:00 swarm tide burst. Returns the number of spawned units.
+    /// </summary>
+    public static int SpawnSwarm(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, float gameTime, int clusters)
+    {
+        if (enemyContainer == null || player == null)
+            return 0;
+
+        int spawned = 0;
+        for (int i = 0; i < clusters; i++)
+        {
+            string chosenId = SwarmPool[(int)GD.RandRange(0, SwarmPool.Length - 1)];
+            spawned += SpawnSingle(enemyContainer, player, arenaSize, chosenId, 420.0f, 900.0f);
+        }
+        return spawned;
+    }
+
+    /// <summary>
+    /// 09:00 secondary lord. Guaranteed superweapon chest drop is routed by Main.
+    /// </summary>
+    public static BaseEnemy? SpawnSubBoss(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string mapId)
+    {
+        if (enemyContainer == null || player == null)
+            return null;
+
+        var enemy = CreatePathogen(GetSubBossId(mapId));
+        if (enemy == null)
+            return null;
+
+        ApplySubBossBoost(enemy);
+        AttachBossPhases(enemy, 120.0f);
+
+        enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, 520.0f);
+        enemyContainer.AddChild(enemy);
+        return enemy;
+    }
+
+    /// <summary>
+    /// 15:00 terminal primary pathogen boss for the lockdown showdown.
+    /// </summary>
+    public static BaseEnemy? SpawnTerminalBoss(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string mapId)
+    {
+        if (enemyContainer == null || player == null)
+            return null;
+
+        var enemy = CreatePathogen(GetTerminalBossId(mapId));
+        if (enemy == null)
+            return null;
+
+        ApplyTerminalBossBoost(enemy);
+        AttachBossPhases(enemy, 150.0f);
+
+        enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, 460.0f);
+        enemyContainer.AddChild(enemy);
+        return enemy;
+    }
+
+    private static int SpawnSingle(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string chosenId, float minDist, float maxDist)
+    {
+        float dist = (float)GD.RandRange(minDist, maxDist);
+
+        if (chosenId == "staph")
+        {
+            // Cluster spawn (3 cocci)
+            Vector2 center = GetSpawnPoint(player.GlobalPosition, arenaSize, dist);
+            for (int s = 0; s < 3; s++)
+            {
+                var staph = new StaphEnemy
+                {
+                    GlobalPosition = center + new Vector2((float)GD.RandRange(-30, 30), (float)GD.RandRange(-30, 30)),
+                    FibrinShield = 1
+                };
+                enemyContainer.AddChild(staph);
+            }
+            return 3;
+        }
+
+        if (chosenId == "norovirus")
+        {
+            // Micro-swarm (10 units)
+            Vector2 center = GetSpawnPoint(player.GlobalPosition, arenaSize, dist);
+            for (int n = 0; n < 10; n++)
+            {
+                var noro = new NorovirusEnemy
+                {
+                    GlobalPosition = center + new Vector2((float)GD.RandRange(-50, 50), (float)GD.RandRange(-50, 50))
+                };
+                enemyContainer.AddChild(noro);
+            }
+            return 10;
+        }
+
+        var enemy = CreatePathogen(chosenId);
+        if (enemy == null)
+            return 0;
+
+        enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, dist);
+        enemyContainer.AddChild(enemy);
+        return 1;
+    }
+
+    private static void ApplyEliteBoost(BaseEnemy enemy, int tier)
+    {
+        float hpMult = 1.0f + 0.6f * tier;
+        enemy.MaxHealth *= hpMult;
+        enemy.Armor += 1.0f * tier;
+        enemy.AtpValue *= 2.0f + tier;
+        enemy.IsElite = true;
+        enemy.Scale *= 1.0f + 0.12f * tier;
+    }
+
+    private static void ApplySubBossBoost(BaseEnemy enemy)
+    {
+        enemy.MaxHealth *= 6.0f;
+        enemy.Armor += 3.0f;
+        enemy.FloatSpeed *= 0.85f;
+        enemy.AtpValue *= 8.0f;
+        enemy.IsElite = true;
+        enemy.IsBoss = true;
+        enemy.Scale *= 1.6f;
+    }
+
+    private static void ApplyTerminalBossBoost(BaseEnemy enemy)
+    {
+        enemy.MaxHealth *= 25.0f;
+        enemy.Armor += 6.0f;
+        enemy.FloatSpeed *= 0.8f;
+        enemy.AtpValue *= 40.0f;
+        enemy.IsElite = true;
+        enemy.IsBoss = true;
+        enemy.Scale *= 2.2f;
+    }
+
+    private static void AttachBossPhases(BaseEnemy enemy, float hardEnrageSeconds)
+    {
+        var phases = new BossPhaseComponent
+        {
+            Name = "BossPhaseComponent",
+            BossId = enemy.EnemyId,
+            HardEnrageSeconds = hardEnrageSeconds
+        };
+        phases.SetupDefaultPhases();
+        enemy.AddChild(phases);
+    }
+
+    private static string GetSubBossId(string mapId)
+    {
+        return mapId switch
+        {
+            "alveolar_space" => "flu_drift",
+            "hepatic_sinusoid" => "tb",
+            "gastric_lumen" => "h_pylori",
+            "blood_brain_barrier" => "toxoplasma",
+            _ => "staph"
+        };
+    }
+
+    private static string GetTerminalBossId(string mapId)
+    {
+        return mapId switch
+        {
+            "alveolar_space" => "flu_drift",
+            "hepatic_sinusoid" => "tb",
+            "gastric_lumen" => "h_pylori",
+            "blood_brain_barrier" => "prion",
+            _ => "staph"
+        };
     }
 
     private static Vector2 GetSpawnPoint(Vector2 playerPos, Vector2 arenaSize, float dist)
     {
         float angle = GD.Randf() * Mathf.Tau;
+        Vector2 pos = playerPos + Vector2.FromAngle(angle) * dist;
+
+        float halfW = (arenaSize.X * 0.5f) - 80.0f;
+        float halfH = (arenaSize.Y * 0.5f) - 80.0f;
+        pos.X = Mathf.Clamp(pos.X, -halfW, halfW);
+        pos.Y = Mathf.Clamp(pos.Y, -halfH, halfH);
+        return pos;
+    }
+
+    private static Vector2 GetPointAtAngle(Vector2 playerPos, Vector2 arenaSize, float angle, float dist)
+    {
         Vector2 pos = playerPos + Vector2.FromAngle(angle) * dist;
 
         float halfW = (arenaSize.X * 0.5f) - 80.0f;

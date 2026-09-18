@@ -451,3 +451,8 @@ RECORDS_VICTORY_TAG,VICTORY,通關
 RECORDS_DEFEAT_TAG,DEFEAT,陣亡
 RECORDS_TOTAL_DMG,Combat Damage,戰鬥輸出
 RECORDS_DEFENSE_PROCS,Immune Mitigations,免疫化解與吸血
+WAVE_PHASE_COLONIZATION,Colonization Phase,侵入定植期
+WAVE_PHASE_INFLAMMATION,Local Inflammation Phase,局部炎症期
+WAVE_PHASE_INFILTRATION,Tissue Infiltration Phase,组织浸润期
+WAVE_PHASE_DISSEMINATION,Systemic Dissemination Phase,全身播散期
+WAVE_PHASE_TERMINAL,Terminal Crisis Phase,终末危象期

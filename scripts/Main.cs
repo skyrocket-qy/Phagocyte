@@ -18,9 +18,21 @@ public partial class Main : Node2D
     [Export] public PackedScene? StaphScene { get; set; }
     [Export] public int MaxPathogens { get; set; } = 50;
     [Export] public Vector2 ArenaSize { get; set; } = new(4800.0f, 4800.0f);
-    [Export] public float RunGoalSeconds { get; set; } = 300.0f;
+    [Export] public float RunGoalSeconds { get; set; } = PathogenSpawner.StandardRunDuration;
 
     public bool RunEnded { get; private set; } = false;
+
+    // Wave Director state (3-minute escalation loop)
+    public bool EliteRaidTriggered { get; private set; } = false;
+    public bool FirstSwarmTriggered { get; private set; } = false;
+    public bool SubBossTriggered { get; private set; } = false;
+    public bool ExtremeSwarmTriggered { get; private set; } = false;
+    public bool BossLockdownActive { get; private set; } = false;
+    public bool SubBossRewardGranted { get; private set; } = false;
+    public BaseEnemy? SubBoss { get; private set; }
+    public BaseEnemy? TerminalBoss { get; private set; }
+
+    private bool _terminalPhaseStarted = false;
 
     public CharacterBody2D? Player { get; set; }
     public Hud? HudNode { get; set; }
@@ -236,20 +248,179 @@ public partial class Main : Node2D
         EnvironmentTime += dt;
         AchievementManager.RecordEvent("survival_time", EnvironmentTime);
 
-        if (!RunEnded && RunGoalSeconds > 0.0f && EnvironmentTime >= RunGoalSeconds)
-        {
-            EndRun(true);
+        if (RunEnded)
             return;
-        }
+
+        ProcessWaveDirector();
 
         // Map mechanics
         ProcessMapMechanics(dt);
+
+        if (BossLockdownActive)
+        {
+            CheckTerminalBossState();
+            return;
+        }
 
         SpawnTimer += dt;
         if (SpawnTimer >= 1.5f)
         {
             SpawnTimer = 0.0f;
             MaintainPopulation();
+        }
+    }
+
+    /// <summary>
+    /// 3-minute escalation loop: 03:00 elite raid, 06:00 swarm + elite pincer,
+    /// 09:00 sub-boss showdown, 12:00 extreme swarm, 15:00 terminal boss lockdown.
+    /// </summary>
+    private void ProcessWaveDirector()
+    {
+        if (!EliteRaidTriggered && EnvironmentTime >= PathogenSpawner.EscalationInterval)
+        {
+            EliteRaidTriggered = true;
+            TriggerEliteRaid();
+        }
+
+        if (!FirstSwarmTriggered && EnvironmentTime >= PathogenSpawner.EscalationInterval * 2.0f)
+        {
+            FirstSwarmTriggered = true;
+            TriggerFirstSwarm();
+        }
+
+        if (!SubBossTriggered && EnvironmentTime >= PathogenSpawner.EscalationInterval * 3.0f)
+        {
+            SubBossTriggered = true;
+            TriggerSubBossEncounter();
+        }
+
+        if (!ExtremeSwarmTriggered && EnvironmentTime >= PathogenSpawner.EscalationInterval * 4.0f)
+        {
+            ExtremeSwarmTriggered = true;
+            TriggerExtremeSwarm();
+        }
+
+        if (!_terminalPhaseStarted && EnvironmentTime >= RunGoalSeconds)
+        {
+            _terminalPhaseStarted = true;
+            EnterBossLockdown();
+        }
+    }
+
+    private void TriggerEliteRaid()
+    {
+        if (EnemyContainer == null || Player == null)
+            return;
+
+        // Single mechanic elite: pure positioning check.
+        PathogenSpawner.SpawnElite(EnemyContainer, Player, ArenaSize, EnvironmentTime, 1);
+        AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
+        GD.Print("[WaveDirector] 03:00 Elite raid incoming.");
+    }
+
+    private void TriggerFirstSwarm()
+    {
+        if (EnemyContainer == null || Player == null)
+            return;
+
+        // Elite pincer from both flanks plus a small swarm tide.
+        PathogenSpawner.SpawnElite(EnemyContainer, Player, ArenaSize, EnvironmentTime, 1, 0.0f);
+        PathogenSpawner.SpawnElite(EnemyContainer, Player, ArenaSize, EnvironmentTime, 1, Mathf.Pi);
+        PathogenSpawner.SpawnSwarm(EnemyContainer, Player, ArenaSize, EnvironmentTime, 6);
+        AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
+        GD.Print("[WaveDirector] 06:00 First swarm tide + double elite pincer.");
+    }
+
+    private void TriggerSubBossEncounter()
+    {
+        if (EnemyContainer == null || Player == null)
+            return;
+
+        SubBoss = PathogenSpawner.SpawnSubBoss(EnemyContainer, Player, ArenaSize, MapId);
+        if (SubBoss != null)
+        {
+            SubBoss.EnemyDied += OnSubBossDefeated;
+            SubBoss.Digested += OnSubBossDefeated;
+        }
+
+        AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
+        GD.Print("[WaveDirector] 09:00 Sub-boss showdown started.");
+    }
+
+    private void TriggerExtremeSwarm()
+    {
+        if (EnemyContainer == null || Player == null)
+            return;
+
+        PathogenSpawner.SpawnSwarm(EnemyContainer, Player, ArenaSize, EnvironmentTime, 12);
+        PathogenSpawner.SpawnElite(EnemyContainer, Player, ArenaSize, EnvironmentTime, 2);
+        AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
+        GD.Print("[WaveDirector] 12:00 Extreme swarm + mixed forces.");
+    }
+
+    private void EnterBossLockdown()
+    {
+        BossLockdownActive = true;
+        SpawnTimer = 0.0f;
+
+        if (EnemyContainer == null || Player == null)
+        {
+            EndRun(true);
+            return;
+        }
+
+        TerminalBoss = PathogenSpawner.SpawnTerminalBoss(EnemyContainer, Player, ArenaSize, MapId);
+        if (TerminalBoss == null)
+        {
+            // No boss entity available for this map: keep the run clearable.
+            EndRun(true);
+            return;
+        }
+
+        TerminalBoss.EnemyDied += OnTerminalBossDefeated;
+        TerminalBoss.Digested += OnTerminalBossDefeated;
+        AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
+        GD.Print("[WaveDirector] 15:00 Terminal boss lockdown! Specific neutralization required.");
+    }
+
+    private void OnSubBossDefeated(BaseEnemy boss)
+    {
+        if (SubBossRewardGranted)
+            return;
+        SubBossRewardGranted = true;
+
+        AudioManager.Instance?.PlaySfx("wave_complete");
+
+        // Guaranteed superweapon chest: the epigenetic evolution system is not
+        // online yet, so the reward is currently a guaranteed level-up draft.
+        if (Player is BaseCell cell)
+        {
+            float missing = Mathf.Max(0.0f, cell.ExpToNextLevel - cell.CurrentExp);
+            if (missing > 0.0f)
+                cell.AddExp(missing);
+        }
+
+        GD.Print("[WaveDirector] Sub-boss neutralized. Guaranteed evolution reward granted.");
+    }
+
+    private void OnTerminalBossDefeated(BaseEnemy boss)
+    {
+        if (RunEnded)
+            return;
+
+        GD.Print("[WaveDirector] Terminal boss neutralized. Specific neutralization complete.");
+        EndRun(true);
+    }
+
+    private void CheckTerminalBossState()
+    {
+        if (TerminalBoss == null)
+            return;
+
+        if (!GodotObject.IsInstanceValid(TerminalBoss) || TerminalBoss.IsQueuedForDeletion())
+        {
+            TerminalBoss = null;
+            EndRun(true);
         }
     }
 

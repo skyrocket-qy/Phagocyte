@@ -63,12 +63,25 @@ public partial class TestRunRecords : SceneTree
                     _phaseFrames++;
                     if (_phaseFrames < 3)
                         return false;
-                    PhaseVictorySettlement();
+
+                    // 15:00 lockdown spawns the terminal boss; victory requires killing it.
+                    AssertThat(_main!.BossLockdownActive).IsTrue();
+                    AssertThat(_main.TerminalBoss).IsNotNull();
+                    _main.TerminalBoss!.TakeDamage(9999999.0f);
                     _phase++;
                     _phaseFrames = 0;
                     break;
 
                 case 5:
+                    _phaseFrames++;
+                    if (_phaseFrames < 2)
+                        return false;
+                    PhaseVictorySettlement();
+                    _phase++;
+                    _phaseFrames = 0;
+                    break;
+
+                case 6:
                     _phaseFrames++;
                     if (_phaseFrames < 3)
                         return false;
@@ -202,7 +215,7 @@ public partial class TestRunRecords : SceneTree
         AssertThat(_main.RunGoalSeconds).IsGreater(0.0f);
         AssertThat(_main.RunEnded).IsFalse();
 
-        // Push survival time to the brink so the next physics tick clears the run.
+        // Push survival time to the brink so the next physics tick enters the 15:00 boss lockdown.
         _main.EnvironmentTime = _main.RunGoalSeconds - 0.01f;
     }
 
@@ -226,7 +239,7 @@ public partial class TestRunRecords : SceneTree
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(countAfterVictory);
 
         Paused = false;
-        GD.Print("[PASS] Survival goal settlement records a victory, shows the modal and locks the result.");
+        GD.Print("[PASS] Terminal boss neutralization settles a victory, shows the modal and locks the result.");
     }
 
     private void PhaseDefeatSettlement()
