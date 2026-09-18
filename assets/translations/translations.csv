@@ -525,3 +525,22 @@ OVERDRIVE_ALERT_TERMINAL,Terminal overdrive: exponential scaling · composite or
 OVERDRIVE_RAID_TITLE,⚠ Multi-Boss Incursion,⚠ 連環 Boss 突襲
 OVERDRIVE_RAID_TWIN_FMT,Twin primary pathogens: %s,雙生原發 Boss 突襲：%s
 OVERDRIVE_RAID_TRIPLE_FMT,Triple primary pathogen siege: %s,三聯原發 Boss 群體圍攻：%s
+ENDLESS_SETUP_TITLE,Pathological Overload Afflictions,病理過載詞綴
+ENDLESS_SETUP_HINT,Select negative afflictions before deployment — each adds its bonus to the settlement score multiplier (up to +175%).,出擊前自選負面詞綴——每項詞綴的積分加成累加計算（最高 +175%）。
+ENDLESS_SETUP_TOTAL,Total Score Multiplier,總積分倍率
+BTN_ENDLESS_CONFIRM,🌌 Launch Endless Overdrive,🌌 啟動無盡過載
+BTN_ENDLESS_CANCEL,Cancel,取消
+AFFLICTION_FEBRILE_NAME,Febrile Convulsion,高熱驚厥
+AFFLICTION_FEBRILE_DESC,Take 2% of max HP as environmental burn every 5 seconds.,每 5 秒承受最大生命 2% 的環境灼傷。
+AFFLICTION_ENDOTOXEMIA_NAME,Endotoxemia,內毒素血症
+AFFLICTION_ENDOTOXEMIA_DESC,All pathogen damage taken +50%.,受到的一切病原體碰撞傷害 +50%。
+AFFLICTION_AUTOPHAGY_NAME,Autophagic Failure,自噬衰竭
+AFFLICTION_AUTOPHAGY_DESC,Global health_regen is forced to zero.,全域 health_regen 強制歸零（無法自然回血）。
+AFFLICTION_MICROTUBULE_NAME,Microtubule Sclerosis,微管硬化
+AFFLICTION_MICROTUBULE_DESC,Squeeze Mode (dehydration dash) disabled.,禁用脫水穿梭避險模式（Squeeze Mode）。
+AFFLICTION_DRIFT_NAME,Antigenic Drift,抗原全漂移
+AFFLICTION_DRIFT_DESC,All pathogen vulnerability marks reset every 20 seconds.,全場病原體每 20 秒強制重置一次特異性易傷標記。
+AFFLICTION_VISCOSITY_NAME,Extreme Viscosity,極限黏滯
+AFFLICTION_VISCOSITY_DESC,Base move speed -25%.,基礎移速 -25%。
+RECORDS_AFFLICTION_MULT,Affliction Multiplier,詞綴積分倍率
+RECORDS_AFFLICTIONS,Afflictions,病理過載詞綴

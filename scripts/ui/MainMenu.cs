@@ -14,6 +14,7 @@ public partial class MainMenu : Control
     public CodexModal? CellCodexModal { get; set; }
     public SettingsModal? CellSettingsModal { get; set; }
     public RunRecordsModal? RecordsModal { get; set; }
+    public EndgameSetupModal? EndlessSetupModal { get; set; }
 
     // Language Switcher
     public Button? LangBtn { get; set; }
@@ -143,10 +144,23 @@ public partial class MainMenu : Control
                 CustomMinimumSize = new Vector2(230, 40)
             };
             EndlessBtn.AddThemeColorOverride("font_color", new Color(1.0f, 0.78f, 0.35f));
-            EndlessBtn.Pressed += OnEndlessPressed;
+            EndlessBtn.Pressed += () =>
+            {
+                if (!GameManager.IsMapUnlocked(ActiveMapKey))
+                {
+                    SelectMap(ActiveMapKey);
+                    return;
+                }
+                GameManager.SelectedMap = ActiveMapKey;
+                EndlessSetupModal?.OpenSetup();
+            };
             deployRow.AddChild(EndlessBtn);
             deployRow.MoveChild(EndlessBtn, DeployBtn.GetIndex() + 1);
         }
+
+        // Pre-run affliction setup for the endless overdrive (docs/endgame.md §4).
+        EndlessSetupModal = new EndgameSetupModal { Name = "EndgameSetupModal" };
+        AddChild(EndlessSetupModal);
 
         // Lock status readout injected under the threat rows (MapData-driven)
         if (MapThreatLbl != null && MapThreatLbl.GetParent() is Control detailPanel)
@@ -597,18 +611,5 @@ public partial class MainMenu : Control
         bool endlessReady = GameManager.IsEndlessAvailable();
         EndlessBtn.Disabled = !endlessReady || IsActiveMapLocked;
         EndlessBtn.TooltipText = endlessReady ? "" : Tr("ENDLESS_LOCKED_HINT");
-    }
-
-    private void OnEndlessPressed()
-    {
-        if (!GameManager.IsMapUnlocked(ActiveMapKey))
-        {
-            SelectMap(ActiveMapKey);
-            return;
-        }
-
-        GameManager.SelectedMap = ActiveMapKey;
-        if (!GameManager.StartEndlessGame(GetTree()))
-            SelectMap(ActiveMapKey); // still locked: refresh the requirement readout
     }
 }

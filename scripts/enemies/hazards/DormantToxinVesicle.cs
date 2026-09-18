@@ -155,7 +155,7 @@ public partial class DormantToxinVesicle : Node2D
             if (player != null && GodotObject.IsInstanceValid(player) && !player.IsDead
                 && GlobalPosition.DistanceTo(player.GlobalPosition) <= BlastRadius)
             {
-                player.TakeDamage(PlayerBlastDamage);
+                player.TakeEnvironmentalDamage(PlayerBlastDamage);
             }
 
             foreach (var node in GetTree().GetNodesInGroup("pathogens"))

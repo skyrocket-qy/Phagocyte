@@ -1,5 +1,7 @@
 using Godot;
 using Godot.Collections;
+using System.Collections.Generic;
+using Phagocyte.Endgame;
 
 namespace Phagocyte.Core;
 
@@ -940,21 +942,27 @@ public partial class GameManager : Node
     public static void StartGame(SceneTree tree)
     {
         EndlessMode = false;
+        AfflictionManager.Clear();
         tree.Paused = false;
         tree.ChangeSceneToFile("res://scenes/main.tscn");
     }
 
     /// <summary>
     /// Launch an Endless Overdrive run on the selected organ. Returns false
-    /// (without changing scenes) while the mode is still locked.
+    /// (without changing scenes) while the mode is still locked. Pass the
+    /// affliction ids to activate (docs/endgame.md §4); null preserves the
+    /// current AfflictionManager selection.
     /// </summary>
-    public static bool StartEndlessGame(SceneTree tree)
+    public static bool StartEndlessGame(SceneTree tree, IEnumerable<string>? afflictions = null)
     {
         if (!IsEndlessAvailable())
         {
             GD.PushWarning("[GameManager] Endless Cytokine Storm is still locked (clear any organ on Hard first).");
             return false;
         }
+
+        if (afflictions != null)
+            AfflictionManager.SetSelection(afflictions);
 
         SelectedDifficulty = RunRecordManager.DifficultyHard;
         EndlessMode = true;

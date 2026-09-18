@@ -115,6 +115,15 @@ public partial class AilmentController : Node
         _accumulatedVisualDot = 0f;
     }
 
+    /// <summary>
+    /// Antigenic drift (docs/endgame.md §4): strips the specific-vulnerability
+    /// mark (opsonization) while leaving all other ailments untouched.
+    /// </summary>
+    public void ClearOpsonization()
+    {
+        _opsonizationTimer = 0.0f;
+    }
+
     public override void _PhysicsProcess(double delta)
     {
         float dt = (float)delta;

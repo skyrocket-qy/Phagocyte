@@ -3,6 +3,7 @@ using Godot.Collections;
 using System;
 using System.Collections.Generic;
 using Phagocyte.Core;
+using Phagocyte.Endgame;
 
 namespace Phagocyte.UI;
 
@@ -254,6 +255,16 @@ public partial class RunRecordsModal : PanelContainer
         AddSummaryRow("RECORDS_DIGESTED", detail.GetValueOrDefault("digested", 0).AsInt32().ToString());
         AddSummaryRow("RECORDS_KILL_SCORE", detail.GetValueOrDefault("kill_score", 0).AsInt32().ToString());
         AddSummaryRow("RECORDS_SCORE", detail.GetValueOrDefault("score", 0).AsInt32().ToString());
+
+        float afflictionMultiplier = detail.GetValueOrDefault("affliction_multiplier", 1.0f).AsSingle();
+        if (afflictionMultiplier > 1.0f)
+            AddSummaryRow("RECORDS_AFFLICTION_MULT", $"×{afflictionMultiplier:F2}");
+        if (detail.TryGetValue("afflictions", out var affVal) && affVal.VariantType == Variant.Type.Array
+            && affVal.AsGodotArray().Count > 0)
+        {
+            AddSummaryRow("RECORDS_AFFLICTIONS", GetAfflictionNames(affVal));
+        }
+
         AddSummaryRow("RECORDS_POINTS", detail.GetValueOrDefault("points_spent", 0).AsInt32().ToString());
         AddSummaryRow("RECORDS_SKILLS", GetSkillNames(detail.GetValueOrDefault("active_skills", new Array<string>())));
 
@@ -478,6 +489,22 @@ public partial class RunRecordsModal : PanelContainer
 
         row.AddChild(vbox);
         return row;
+    }
+
+    private string GetAfflictionNames(Variant afflictionsVariant)
+    {
+        if (afflictionsVariant.VariantType != Variant.Type.Array)
+            return "-";
+
+        var names = new List<string>();
+        foreach (var idVar in afflictionsVariant.AsGodotArray())
+        {
+            var def = AfflictionManager.GetDefinition(idVar.AsString());
+            if (def != null)
+                names.Add($"{def.Icon} {Tr(def.NameKey)}");
+        }
+
+        return names.Count > 0 ? string.Join(" · ", names) : "-";
     }
 
     private string GetCauseName(string cause)

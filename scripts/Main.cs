@@ -1,12 +1,14 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Phagocyte.Core;
 using Phagocyte.Player;
 using Phagocyte.Skills;
 using Phagocyte.UI;
 using Phagocyte.Enemies;
 using Phagocyte.Combat;
+using Phagocyte.Endgame;
 
 namespace Phagocyte;
 
@@ -145,6 +147,10 @@ public partial class Main : Node2D
     /// <summary>Alive boss-incursion count (GDScript-friendly scalar view).</summary>
     public int RaidBossCount => _raidBosses.Count;
 
+    // --- Pathological Overload Afflictions (docs/endgame.md §4) ---
+    private float _febrileBurnTimer = AfflictionManager.FebrileBurnInterval;
+    private float _antigenicDriftTimer = AfflictionManager.AntigenicDriftInterval;
+
     public override void _Ready()
     {
         StaphScene ??= DefaultStaphScene;
@@ -182,6 +188,7 @@ public partial class Main : Node2D
         {
             Player.AddToGroup("player");
             ApplyTreeLoadout();
+            ApplyAfflictionLoadout();
             if (HudNode != null)
             {
                 HudNode.GoalSeconds = RunGoalSeconds;
@@ -366,6 +373,7 @@ public partial class Main : Node2D
         // Map mechanics
         ProcessMapMechanics(dt);
         ProcessOverdriveEnvironment(dt);
+        ProcessAfflictions(dt);
         ProcessNeutralMatter(dt);
         ProcessHostUlceration(dt);
 
@@ -785,6 +793,62 @@ public partial class Main : Node2D
     ///   4) 24:00+ gastric acid tide shrinks the safe zone;
     ///   5) 27:00+ terminal composite: shear storm and acid tide coexist.
     /// </summary>
+    /// <summary>
+    /// Applies run-start affliction effects (docs/endgame.md §4). The febrile and
+    /// drift effects are periodic and handled by ProcessAfflictions.
+    /// </summary>
+    private void ApplyAfflictionLoadout()
+    {
+        if (!IsEndlessRun || Player is not BaseCell cell || cell.Stats == null)
+            return;
+
+        float speedPenalty = AfflictionManager.MoveSpeedPercentPenalty;
+        if (speedPenalty < 0.0f)
+        {
+            cell.Stats.AddModifier("move_speed", 0.0f, speedPenalty);
+            GD.Print($"[Affliction] Extreme viscosity: move speed {speedPenalty * 100.0f:F0}%.");
+        }
+    }
+
+    /// <summary>
+    /// Pathological Overload Afflictions periodic effects (docs/endgame.md §4):
+    /// febrile burn every 5s, antigenic drift strip every 20s.
+    /// </summary>
+    private void ProcessAfflictions(float delta)
+    {
+        if (!IsEndlessRun || Player == null || AfflictionManager.SelectedIds.Count == 0)
+            return;
+
+        if (AfflictionManager.IsActive(AfflictionManager.FebrileConvulsion))
+        {
+            _febrileBurnTimer -= delta;
+            if (_febrileBurnTimer <= 0.0f)
+            {
+                _febrileBurnTimer = AfflictionManager.FebrileBurnInterval;
+                if (Player is BaseCell fevrile && fevrile.Stats != null)
+                {
+                    float burn = fevrile.Stats.GetStat("max_health") * AfflictionManager.FebrileBurnHealthFraction;
+                    fevrile.TakeEnvironmentalDamage(burn);
+                }
+            }
+        }
+
+        if (AfflictionManager.IsActive(AfflictionManager.AntigenicDrift))
+        {
+            _antigenicDriftTimer -= delta;
+            if (_antigenicDriftTimer <= 0.0f)
+            {
+                _antigenicDriftTimer = AfflictionManager.AntigenicDriftInterval;
+                foreach (var enemy in BaseEnemy.ActiveEnemies)
+                {
+                    if (GodotObject.IsInstanceValid(enemy))
+                        enemy.Ailments?.ClearOpsonization();
+                }
+                GD.Print("[Affliction] Antigenic drift: vulnerability marks reset.");
+            }
+        }
+    }
+
     private void ProcessOverdriveEnvironment(float delta)
     {
         if (!IsEndlessRun)
@@ -883,7 +947,7 @@ public partial class Main : Node2D
                     _acidTickAccumulator -= 1.0f;
                     if (Player is BaseCell burned)
                     {
-                        burned.TakeDamage(6.0f);
+                        burned.TakeEnvironmentalDamage(6.0f);
                         burned.ApplySlow(1.2f, 0.6f);
                     }
                 }
@@ -1119,6 +1183,11 @@ public partial class Main : Node2D
 
         RunTelemetryManager.Instance?.EndRun();
 
+        float afflictionMultiplier = IsEndlessRun ? AfflictionManager.ScoreMultiplier : 1.0f;
+        string[] afflictionIds = IsEndlessRun
+            ? AfflictionManager.SelectedIds.ToArray()
+            : Array.Empty<string>();
+
         var record = RunRecordManager.RecordRun(
             victory ? RunRecordManager.ResultVictory : RunRecordManager.ResultDefeat,
             classId,
@@ -1133,7 +1202,9 @@ public partial class Main : Node2D
             kills,
             killScore,
             RunDifficulty,
-            IsEndlessRun);
+            IsEndlessRun,
+            afflictionMultiplier,
+            afflictionIds);
 
         if (RunTelemetryManager.Instance != null)
         {

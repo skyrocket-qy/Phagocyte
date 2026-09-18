@@ -65,7 +65,7 @@ public partial class BioHazardArea : Node2D
         {
             if (DealsDamage && Damage > 0.0f)
             {
-                player.TakeDamage(Damage);
+                player.TakeEnvironmentalDamage(Damage);
             }
 
             if (SlowsTarget)

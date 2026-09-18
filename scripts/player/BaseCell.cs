@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Phagocyte.Core;
+using Phagocyte.Endgame;
 using Phagocyte.Skills;
 using Phagocyte.Enemies;
 using Phagocyte.UI;
@@ -452,7 +453,7 @@ public partial class BaseCell : CharacterBody2D
 
     private void HandleRegen(float delta)
     {
-        if (Stats != null)
+        if (Stats != null && !AfflictionManager.BlocksHealthRegen)
         {
             float regen = Stats.GetStat("health_regen");
             if (regen > 0.0f)
@@ -784,7 +785,25 @@ public partial class BaseCell : CharacterBody2D
         EmitStatsSignal();
     }
 
+    /// <summary>
+    /// Pathogen damage. Endotoxemia (docs/endgame.md §4) amplifies everything
+    /// that is not explicitly environmental.
+    /// </summary>
     public void TakeDamage(float amount)
+    {
+        ApplyDamage(amount * AfflictionManager.IncomingDamageMultiplier);
+    }
+
+    /// <summary>
+    /// Environmental damage (acid tide, fibrin/toxin hazards, febrile burn):
+    /// bypasses the endotoxemia pathogen-damage amplification.
+    /// </summary>
+    public void TakeEnvironmentalDamage(float amount)
+    {
+        ApplyDamage(amount);
+    }
+
+    private void ApplyDamage(float amount)
     {
         if (IsDead)
             return;

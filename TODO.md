@@ -242,7 +242,7 @@
   - **影響檔案**：`scripts/enemies/PathogenSpawner.cs`, `scripts/Main.cs`
 - [x] **[P1] 連環雙生 / 三聯 Boss 突襲**：
   - 每 3 分鐘整點隨機跨地圖抽取 2 隻原發 Boss 同場突襲；30:00+ 遭遇 3 隻原發 Boss 群體圍攻。
-- [ ] **[P1] 6 大自選病理過載詞綴系統 (Pathological Afflictions)**：
+- [x] **[P1] 6 大自選病理過載詞綴系統 (Pathological Afflictions)**：
   - 入場前自選負面詞綴，疊加結算積分倍率：
     - 【高熱驚厥】：每 5 秒承受最大生命 2% 灼傷（積分 $+25\%$）。
     - 【內毒素血症】：受碰撞傷害 $+50\%$（積分 $+30\%$）。

@@ -105,12 +105,14 @@ public partial class RunRecordManager : Node
 
     /// <summary>
     /// Pathological score (docs/record.md §4.2):
-    /// (survival × 10 + kill score + level × 100) × difficulty multiplier + clear bonus.
+    /// (survival × 10 + kill score + level × 100) × difficulty multiplier
+    /// × affliction multiplier + clear bonus. Endless afflictions stack up to ×2.75.
     /// </summary>
-    public static int ComputeScore(string result, string difficulty, float survivalTime, int killScore, int level)
+    public static int ComputeScore(string result, string difficulty, float survivalTime, int killScore, int level, float afflictionMultiplier = 1.0f)
     {
         float multiplier = difficulty == DifficultyHard ? HardDifficultyMultiplier : 1.0f;
-        float total = (survivalTime * SurvivalScorePerSecond + Mathf.Max(0, killScore) + level * LevelScoreBonus) * multiplier;
+        float total = (survivalTime * SurvivalScorePerSecond + Mathf.Max(0, killScore) + level * LevelScoreBonus)
+                      * multiplier * Mathf.Max(1.0f, afflictionMultiplier);
         if (result == ResultVictory)
             total += ClearBonus;
         return Mathf.RoundToInt(total);
@@ -162,7 +164,9 @@ public partial class RunRecordManager : Node
         int kills = 0,
         int killScore = 0,
         string difficulty = DifficultyNormal,
-        bool endless = false)
+        bool endless = false,
+        float afflictionMultiplier = 1.0f,
+        string[]? afflictions = null)
     {
         var skills = new Array<string>();
         if (activeSkillIds != null)
@@ -173,6 +177,19 @@ public partial class RunRecordManager : Node
                     skills.Add(id);
             }
         }
+
+        var afflictionList = new Array<string>();
+        if (afflictions != null)
+        {
+            foreach (string id in afflictions)
+            {
+                if (!string.IsNullOrEmpty(id))
+                    afflictionList.Add(id);
+            }
+        }
+
+        if (afflictionMultiplier < 1.0f)
+            afflictionMultiplier = 1.0f;
 
         bool survivedFullTime = survivalTime >= StandardClearSeconds - 0.01f;
         // Endless overdrive has no clear settlement: the standard criteria are
@@ -196,7 +213,7 @@ public partial class RunRecordManager : Node
 
         float kpm = ComputeKpm(kills, survivalTime);
         string rank = ComputeRank(result, difficulty, survivalTime, kills);
-        int score = ComputeScore(result, difficulty, survivalTime, killScore, level);
+        int score = ComputeScore(result, difficulty, survivalTime, killScore, level, afflictionMultiplier);
 
         var record = new Dictionary
         {
@@ -206,6 +223,8 @@ public partial class RunRecordManager : Node
             { "map_id", mapId },
             { "difficulty", difficulty },
             { "endless", endless },
+            { "afflictions", afflictionList },
+            { "affliction_multiplier", afflictionMultiplier },
             { "survival_time", survivalTime },
             { "level", level },
             { "kills", kills },
