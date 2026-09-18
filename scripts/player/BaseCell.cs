@@ -58,6 +58,19 @@ public partial class BaseCell : CharacterBody2D
     // Digestion tracking
     public int DigestedCount { get; set; } = 0;
 
+    // --- Squeeze Mode micro-control (docs/skill.md §6) ---
+    /// <summary>Cell radius factor while dehydrated/squeezing (α → 0.6α).</summary>
+    public const float SqueezeRadiusFactor = 0.6f;
+
+    /// <summary>Move speed bonus while squeezing (+25%).</summary>
+    public const float SqueezeSpeedBonus = 0.25f;
+
+    /// <summary>True while the player holds the squeeze input (disabled by Microtubule Sclerosis).</summary>
+    public bool IsSqueezing { get; private set; } = false;
+
+    /// <summary>Set on the first real HP loss — drives the Squeeze tutorial cue.</summary>
+    public bool HasTakenDamage { get; private set; } = false;
+
     // Inertial Nucleus offset
     public Vector2 NucleusOffset { get; set; } = Vector2.Zero;
     public Vector2 NucleusTargetOffset { get; set; } = Vector2.Zero;
@@ -161,12 +174,22 @@ public partial class BaseCell : CharacterBody2D
             }
 
             DisplayAlpha = Mathf.MoveToward(DisplayAlpha, TargetAlpha, dt * 4.0f);
-            Visible = DisplayAlpha > 0.01f;
+            Visible = DisplayAlpha > 0.01f || (Host != null && GodotObject.IsInstanceValid(Host) && Host.IsSqueezing);
             QueueRedraw();
         }
 
         public override void _Draw()
         {
+            // Squeeze Mode: pale-cyan tension glow around the compressed membrane
+            // (docs/skill.md §6 / tutorial.md cue 3).
+            if (Host != null && Host.IsSqueezing && GodotObject.IsInstanceValid(Host))
+            {
+                float squeezeRadius = Host.CurrentRadius + 9.0f;
+                float tension = 0.55f + 0.25f * Mathf.Sin(PulsePhase * 1.6f);
+                DrawArc(Vector2.Zero, squeezeRadius, 0.0f, Mathf.Tau, 48,
+                    new Color(0.45f, 1.0f, 0.92f, tension), 2.4f, true);
+            }
+
             if (Host == null || DisplayAlpha <= 0.01f)
                 return;
 
@@ -312,6 +335,7 @@ public partial class BaseCell : CharacterBody2D
         }
 
         HandleRegen(dt);
+        UpdateSqueezeState();
         HandleMovement(dt);
         UpdatePseudopodDeformation(dt);
 
@@ -466,7 +490,6 @@ public partial class BaseCell : CharacterBody2D
     private void HandleMovement(float delta)
     {
         Vector2 inputVec = Vector2.Zero;
-
         if (StunTimer <= 0.0f)
         {
             if (Input.IsActionPressed("move_left") || Input.IsKeyPressed(Key.A) || Input.IsKeyPressed(Key.Left))
@@ -489,6 +512,10 @@ public partial class BaseCell : CharacterBody2D
         {
             targetSpeed *= SlowFactor;
         }
+        if (IsSqueezing)
+        {
+            targetSpeed *= 1.0f + SqueezeSpeedBonus;
+        }
 
         CurrentSpeed = targetSpeed;
 
@@ -507,13 +534,39 @@ public partial class BaseCell : CharacterBody2D
         MoveAndSlide();
     }
 
+    /// <summary>
+    /// Evaluates the Squeeze Mode input (hold Space / L2). Microtubule Sclerosis
+    /// (docs/endgame.md §4) hard-disables the mode.
+    /// </summary>
+    private void UpdateSqueezeState()
+    {
+        IsSqueezing = !AfflictionManager.SqueezeModeDisabled && IsSqueezeInputPressed();
+    }
+
+    private static bool IsSqueezeInputPressed()
+    {
+        if (Input.IsActionPressed("squeeze_mode"))
+            return true;
+
+        if (Input.IsKeyPressed(Key.Space))
+            return true;
+
+        foreach (int device in Input.GetConnectedJoypads())
+        {
+            if (Input.GetJoyAxis(device, JoyAxis.TriggerLeft) > 0.5f)
+                return true;
+        }
+
+        return false;
+    }
+
     public virtual void UpdatePseudopodDeformation(float delta)
     {
         NoiseTime += delta * DeformationSpeed;
 
         float areaScale = Stats != null ? Stats.GetStat("area") : 1.0f;
 
-        float curR = BaseRadius * areaScale;
+        float curR = BaseRadius * areaScale * (IsSqueezing ? SqueezeRadiusFactor : 1.0f);
         CurrentDeformationMag = BaseDeformationMag * areaScale;
 
         CurrentRadius = curR;
@@ -718,6 +771,10 @@ public partial class BaseCell : CharacterBody2D
         if (enemy == null || enemy.IsQueuedForDeletion())
             return;
 
+        // Squeeze Mode disables active engulfment (docs/skill.md §6).
+        if (IsSqueezing)
+            return;
+
         if (enemy is BaseEnemy be && !be.CanBeEngulfed)
         {
             be.OnEngulfAttemptFailed(this);
@@ -833,6 +890,7 @@ public partial class BaseCell : CharacterBody2D
         // Stage 4: HP Loss & Death check
         float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
         Health = Mathf.Clamp(Health - finalDmg, 0.0f, maxHp);
+        HasTakenDamage = true;
 
         if (Health <= 0.0f)
         {

@@ -550,3 +550,6 @@ RECORDS_CHRONIC_DIAGNOSIS,Chronic severe infection · irreversible systemic CRS,
 RECORDS_CHRONIC_TAG,CHRONIC OVERDRIVE,慢性過載
 RANK_SSS_TITLE,Overdrive Myth,超載神話
 RANK_EX_TITLE,Transcendent Existence,破格存在
+HUD_SQUEEZE_HINT,Hold [Space] to Squeeze,按住 [Space] 脫水穿梭
+HUD_SQUEEZE_HINT_PAD,Hold [L2] to Squeeze,按住 [L2] 脫水穿梭
+BADGE_CATALYST,Superweapon Catalyst,超武催化劑

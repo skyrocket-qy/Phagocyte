@@ -134,6 +134,12 @@ public partial class Main : Node2D
     /// <summary>Shrinking acid-tide safe radius (0 = tide not active; player must stay inside).</summary>
     public float AcidSafeRadius { get; private set; } = 0.0f;
 
+    /// <summary>
+    /// World-space fluid field vector currently acting on the arena (map current
+    /// + overdrive shear). Drives the tutorial fluid-ripple cues (docs/tutorial.md §2 cue 5).
+    /// </summary>
+    public Vector2 CurrentFluidVector { get; private set; } = Vector2.Zero;
+
     private Line2D? _acidRing = null;
     private float _drawnAcidRadius = -1.0f;
 
@@ -228,6 +234,9 @@ public partial class Main : Node2D
 
         // Initial pathogen wave
         SpawnInitialWave(35);
+
+        // Tutorial cue 1 (docs/tutorial.md §2): dormant micro-staph targets ahead
+        SpawnTutorialGuides();
 
         // Neutral environment matter (senescent RBCs + dormant toxin vesicles)
         SeedNeutralMatter();
@@ -703,11 +712,14 @@ public partial class Main : Node2D
         if (EnemyContainer == null)
             return;
 
+        CurrentFluidVector = Vector2.Zero;
+
         if (MapId == "alveolar_space")
         {
             // SPEC Section 5: Periodic respiratory breathing airflow thrust in lung alveoli
             float breathForce = Mathf.Sin(EnvironmentTime * 1.2f) * 28.0f;
             var breathVec = new Vector2(breathForce, Mathf.Sin(EnvironmentTime * 0.6f) * 12.0f);
+            CurrentFluidVector = breathVec * 0.6f;
             // Gently pushes all free pathogens with fluid current
             foreach (var child in EnemyContainer.GetChildren())
             {
@@ -724,6 +736,7 @@ public partial class Main : Node2D
         {
             // SPEC Section 5: Directional tissue fluid suction towards wound tear
             var suctionVec = new Vector2(16.0f, 10.0f);
+            CurrentFluidVector = suctionVec * 0.4f;
             foreach (var child in EnemyContainer.GetChildren())
             {
                 if (child is Node2D enemy)
@@ -739,6 +752,7 @@ public partial class Main : Node2D
         {
             // Hepatic sinusoid slow flow drag: gentle steady drift
             var flowVec = new Vector2(10.0f, Mathf.Sin(EnvironmentTime * 0.8f) * 6.0f);
+            CurrentFluidVector = flowVec * 0.35f;
             foreach (var child in EnemyContainer.GetChildren())
             {
                 if (child is Node2D enemy)
@@ -755,6 +769,7 @@ public partial class Main : Node2D
             // Gastric mucosa acid churn: periodic lateral wave
             float churnForce = Mathf.Sin(EnvironmentTime * 2.0f) * 20.0f;
             var churnVec = new Vector2(churnForce, Mathf.Cos(EnvironmentTime * 1.5f) * 10.0f);
+            CurrentFluidVector = churnVec * 0.4f;
             foreach (var child in EnemyContainer.GetChildren())
             {
                 if (child is Node2D enemy)
@@ -771,6 +786,7 @@ public partial class Main : Node2D
             // High-frequency synaptic micro-vibrations
             float pulse = Mathf.Sin(EnvironmentTime * 5.0f) * 8.0f;
             var microVec = new Vector2(pulse, Mathf.Cos(EnvironmentTime * 4.0f) * 8.0f);
+            CurrentFluidVector = microVec * 0.25f;
             foreach (var child in EnemyContainer.GetChildren())
             {
                 if (child is Node2D enemy)
@@ -883,6 +899,7 @@ public partial class Main : Node2D
             var shearVec = new Vector2(
                 Mathf.Sin(EnvironmentTime * 1.6f) * strength,
                 Mathf.Cos(EnvironmentTime * 1.1f) * strength * 0.5f);
+            CurrentFluidVector += shearVec * 0.7f;
 
             foreach (var child in EnemyContainer.GetChildren())
             {
@@ -1120,6 +1137,27 @@ public partial class Main : Node2D
         if (Player == null || EnemyContainer == null)
             return;
         PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, count);
+    }
+
+    /// <summary>
+    /// Tutorial cue 1 (docs/tutorial.md §2): two dormant micro-staphylococci
+    /// spawn 150px directly ahead so the opening seconds teach direct engulfment.
+    /// </summary>
+    private void SpawnTutorialGuides()
+    {
+        if (EnemyContainer == null || Player == null || StaphScene == null)
+            return;
+
+        for (int i = 0; i < 2; i++)
+        {
+            var guide = StaphScene.Instantiate<BaseEnemy>();
+            guide.GlobalPosition = Player.GlobalPosition + new Vector2(150.0f, i == 0 ? -28.0f : 28.0f);
+            guide.FibrinShield = 0;
+            guide.MaxHealth = Mathf.Min(guide.MaxHealth, 8.0f);
+            guide.Scale = new Vector2(0.8f, 0.8f);
+            EnemyContainer.AddChild(guide);
+            guide.ApplyStun(9999.0f); // dormant teaching target
+        }
     }
 
     /// <summary>

@@ -943,6 +943,7 @@ public partial class GameManager : Node
     {
         EndlessMode = false;
         AfflictionManager.Clear();
+        Engine.TimeScale = 1.0;
         tree.Paused = false;
         tree.ChangeSceneToFile("res://scenes/main.tscn");
     }
@@ -966,6 +967,7 @@ public partial class GameManager : Node
 
         SelectedDifficulty = RunRecordManager.DifficultyHard;
         EndlessMode = true;
+        Engine.TimeScale = 1.0;
         tree.Paused = false;
         tree.ChangeSceneToFile("res://scenes/main.tscn");
         return true;
@@ -973,12 +975,14 @@ public partial class GameManager : Node
 
     public static void GoToMenu(SceneTree tree)
     {
+        Engine.TimeScale = 1.0;
         tree.Paused = false;
         tree.ChangeSceneToFile("res://scenes/ui/main_menu.tscn");
     }
 
     public static void RestartGame(SceneTree tree)
     {
+        Engine.TimeScale = 1.0;
         tree.Paused = false;
         tree.ReloadCurrentScene();
     }

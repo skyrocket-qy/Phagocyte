@@ -261,7 +261,7 @@
 ## 🧭 模組九：新手非侵入微引導與顯微鏡 UI/UX (Onboarding & Intuitive UI/UX)
 > **對應規格**：[`docs/tutorial.md`](file:///Users/zelin/project/Phagocyte/docs/tutorial.md)
 
-- [ ] **[P1] 前 3 分鐘 5 大核心微引導 (Non-Intrusive Micro-Cues)**：
+- [x] **[P1] 前 3 分鐘 5 大核心微引導 (Non-Intrusive Micro-Cues)**：
   - 1. **移動與吞噬引導**：開局前 5 秒細胞周邊浮現微弱 `[WASD]` 呼吸圈，正前方 150px 刷新 2 隻靜止微型葡萄球菌。
   - 2. **初次升級引導**：吞噬第 3 隻怪升級時，平滑進入 0.5s 慢動作（Bullet Time）最後定格切入三選一。
   - 3. **脫水穿梭避險引導**：首次受傷或周圍怪物 $>15$ 隻時，頭頂彈出極簡懸浮提示：`按住 [Space] 脫水穿梭`。

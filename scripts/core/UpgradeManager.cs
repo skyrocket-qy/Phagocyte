@@ -50,6 +50,70 @@ public partial class UpgradeManager : RefCounted
     };
 
     /// <summary>
+    /// Superweapon catalyst pairs (docs/skill.md §5): a maxed active + its
+    /// paired passive fuse into the corresponding epigenetic evolution.
+    /// </summary>
+    public const int CatalystActiveLevel = 5;
+
+    public static readonly System.Collections.Generic.Dictionary<string, string> CatalystPairs = new()
+    {
+        { "perforin_lance", "passive_lysosome" },
+        { "complement_cascade", "passive_actin" },
+        { "antibody_salvo", "passive_opsonin" },
+        { "ros_torrent", "passive_mitochondria" },
+        { "pseudopod_lunge", "passive_chemokine" }
+    };
+
+    /// <summary>
+    /// True when <paramref name="passiveId"/> is the catalyst partner of an
+    /// equipped active skill already at Lv.5 (docs/skill.md §5 / tutorial cue 4).
+    /// </summary>
+    public static bool IsCatalystReady(Node2D player, string passiveId, out string activeId)
+    {
+        activeId = "";
+        if (player == null || !GodotObject.IsInstanceValid(player) || string.IsNullOrEmpty(passiveId))
+            return false;
+
+        foreach (var pair in CatalystPairs)
+        {
+            if (pair.Value == passiveId)
+            {
+                activeId = pair.Key;
+                break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(activeId))
+            return false;
+
+        var sm = player.GetNodeOrNull<SkillManager>("SkillManager");
+        if (sm == null)
+            return false;
+
+        foreach (var skill in sm.ActiveSlots)
+        {
+            if (skill != null && GodotObject.IsInstanceValid(skill)
+                && skill.SkillId == activeId && skill.Level >= CatalystActiveLevel)
+            {
+                return true;
+            }
+        }
+
+        activeId = "";
+        return false;
+    }
+
+    /// <summary>Tags a passive candidate with the golden catalyst resonance flag.</summary>
+    private static void ApplyCatalystFlag(Node2D player, Dictionary candidate, string passiveId)
+    {
+        if (IsCatalystReady(player, passiveId, out string activeId))
+        {
+            candidate["catalyst"] = true;
+            candidate["catalyst_active"] = activeId;
+        }
+    }
+
+    /// <summary>
     /// Generates 3 distinct randomized upgrade cards for the player
     /// </summary>
     public static Array<Dictionary> GenerateChoices(Node2D player, int count = 3)
@@ -104,7 +168,7 @@ public partial class UpgradeManager : RefCounted
                 equippedPassiveIds.Add(skill.SkillId);
                 if (skill.Level < skill.MaxLevel)
                 {
-                    candidates.Add(new Dictionary
+                    var passiveCandidate = new Dictionary
                     {
                         { "type", "upgrade_passive" },
                         { "id", skill.SkillId },
@@ -114,7 +178,9 @@ public partial class UpgradeManager : RefCounted
                         { "badge", "UPGRADE" },
                         { "desc", !string.IsNullOrEmpty(skill.DescKey) ? skill.DescKey : $"Upgrade to Lv.{skill.Level + 1}" },
                         { "skill_ref", skill }
-                    });
+                    };
+                    ApplyCatalystFlag(player, passiveCandidate, skill.SkillId);
+                    candidates.Add(passiveCandidate);
                 }
             }
         }
@@ -158,7 +224,7 @@ public partial class UpgradeManager : RefCounted
                 string id = item["id"].AsString();
                 if (!equippedPassiveIds.Contains(id) && !treeOwned.ContainsKey(id))
                 {
-                    candidates.Add(new Dictionary
+                    var newPassiveCandidate = new Dictionary
                     {
                         { "type", "new_passive" },
                         { "id", item["id"] },
@@ -168,7 +234,9 @@ public partial class UpgradeManager : RefCounted
                         { "badge", "NEW PASSIVE" },
                         { "desc", item["desc"] },
                         { "skill_class", item["class_type"] }
-                    });
+                    };
+                    ApplyCatalystFlag(player, newPassiveCandidate, id);
+                    candidates.Add(newPassiveCandidate);
                 }
             }
         }

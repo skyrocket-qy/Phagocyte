@@ -181,6 +181,10 @@ public partial class TestLevelUpModal : SceneTree
         AssertThat(hud.CellUpgradeModal!.Visible).IsFalse();
         AssertThat(Paused).IsFalse();
 
+        // The first level-up normally plays the 0.5s bullet-time cue (docs/tutorial.md §2);
+        // this runtime check exercises the draft flow directly.
+        hud.SkipLevelUpBulletTime = true;
+
         // Initial level checks
         AssertThat(player.CurrentLevel).IsEqual(1);
         AssertThat(player.CurrentExp).IsEqual(0.0f);
@@ -189,6 +193,7 @@ public partial class TestLevelUpModal : SceneTree
         player.AddExp(35.0f);
 
         AssertThat(player.CurrentLevel).IsEqual(2);
+        AssertThat(hud.FirstLevelUpCuePlayed).IsTrue();
         AssertThat(hud.CellUpgradeModal.Visible).IsTrue();
         AssertThat(Paused).IsTrue();
 

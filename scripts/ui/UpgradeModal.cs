@@ -70,7 +70,13 @@ public partial class UpgradeModal : Control
         if (_playerRef == null || !GodotObject.IsInstanceValid(_playerRef))
             return;
 
-        _currentChoices = UpgradeManager.GenerateChoices(_playerRef, 3);
+        ShowChoices(UpgradeManager.GenerateChoices(_playerRef, 3));
+    }
+
+    /// <summary>Displays an explicit set of cards (catalyst cue testing / scripted drafts).</summary>
+    public void ShowChoices(Array<Dictionary> choices)
+    {
+        _currentChoices = choices;
         if (_currentChoices.Count == 0)
             return;
 
@@ -143,11 +149,60 @@ public partial class UpgradeModal : Control
                     string descKey = choice.TryGetValue("desc", out var dVal) ? dVal.AsString() : "";
                     descLbl.Text = Tr(descKey);
                 }
+
+                // Cue 4 (docs/tutorial.md §2): maxed active + paired passive shows
+                // the golden catalyst resonance aura and corner tag.
+                bool isCatalyst = choice.TryGetValue("catalyst", out var catVal) && catVal.AsBool();
+                ApplyCatalystAura(card, badgeLbl, isCatalyst);
             }
             else
             {
                 card.Visible = false;
             }
+        }
+    }
+
+    private void ApplyCatalystAura(Control card, Label? badgeLbl, bool isCatalyst)
+    {
+        var aura = card.GetNodeOrNull<Panel>("CatalystAura");
+        if (aura == null)
+        {
+            aura = new Panel
+            {
+                Name = "CatalystAura",
+                MouseFilter = MouseFilterEnum.Ignore,
+                Visible = false
+            };
+            aura.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+            aura.AddThemeStyleboxOverride("panel", new StyleBoxFlat
+            {
+                BgColor = new Color(0.0f, 0.0f, 0.0f, 0.0f),
+                BorderColor = new Color(1.0f, 0.85f, 0.35f, 0.95f),
+                BorderWidthLeft = 2,
+                BorderWidthTop = 2,
+                BorderWidthRight = 2,
+                BorderWidthBottom = 2,
+                CornerRadiusTopLeft = 8,
+                CornerRadiusTopRight = 8,
+                CornerRadiusBottomLeft = 8,
+                CornerRadiusBottomRight = 8
+            });
+            card.AddChild(aura);
+        }
+
+        aura.Visible = isCatalyst;
+        if (isCatalyst)
+        {
+            card.Modulate = new Color(1.0f, 0.95f, 0.72f);
+            if (badgeLbl != null)
+            {
+                badgeLbl.Text = "[ ⚡ " + Tr("BADGE_CATALYST") + " ]";
+                badgeLbl.Modulate = new Color(1.0f, 0.86f, 0.38f);
+            }
+        }
+        else
+        {
+            card.Modulate = Colors.White;
         }
     }
 
