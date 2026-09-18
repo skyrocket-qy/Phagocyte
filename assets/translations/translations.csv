@@ -468,3 +468,21 @@ PATHOGEN_SYNCYTIAL_NAME,Syncytial Mega-Capsid,融合性合胞体病毒复合体
 PATHOGEN_MACROSCHIZONT_NAME,Plasmodium Macro-Schizont,恶性疟原虫裂殖复合体
 PATHOGEN_BIOFILM_CORE_NAME,H. pylori Biofilm Core,幽门螺杆菌生物膜母核
 PATHOGEN_AMYLOID_NAME,PrPsc Amyloid Aggregate,错误折叠朊病毒晶体
+ACH_WOUND_CLEAR_TITLE,Wound Closure: Local Homeostasis,创口闭合：局部稳态
+ACH_WOUND_CLEAR_DESC,Clear Subcutaneous Wound on Normal difficulty.,通关地图 01「皮下创口」Normal 难度。
+ACH_WOUND_CLEAR_REWARD,Unlocks Alveolar Gas Cavity (Normal) and Wound Hard (Acute Crisis).,解锁【肺泡气体微腔】Normal 与【创口 Hard 急性危象】。
+ACH_ALVEOLAR_CLEAR_TITLE,Clear Airways: Blood-Air Barrier,呼吸畅通：气血屏障
+ACH_ALVEOLAR_CLEAR_DESC,Clear Alveolar Cavity on Normal difficulty.,通关地图 02「肺泡微腔」Normal 难度。
+ACH_ALVEOLAR_CLEAR_REWARD,Unlocks Hepatic Sinusoid (Normal) and Alveolar Hard (ARDS).,解锁【肝血窦微循环】Normal 与【肺泡 Hard 急性危象】。
+ACH_HEPATIC_CLEAR_TITLE,Portal Scavenger: Detox Stronghold,门脉清道夫：解毒重镇
+ACH_HEPATIC_CLEAR_DESC,Clear Hepatic Sinusoid on Normal difficulty.,通关地图 03「肝血窦」Normal 难度。
+ACH_HEPATIC_CLEAR_REWARD,Unlocks Gastric Lumen (Normal) and Hepatic Hard (Acute Liver Failure).,解锁【胃腔极酸黏膜】Normal 与【肝血窦 Hard 急性危象】。
+ACH_GASTRIC_CLEAR_TITLE,Acid Barrier: Mucosal Reconstruction,抗酸壁垒：黏膜重构
+ACH_GASTRIC_CLEAR_DESC,Clear Gastric Lumen on Normal difficulty.,通关地图 04「胃黏膜」Normal 难度。
+ACH_GASTRIC_CLEAR_REWARD,Unlocks Blood-Brain Barrier (Normal) and Gastric Hard (Acute Perforation).,解锁【血脑屏障】Normal 与【胃黏膜 Hard 急性危象】。
+ACH_BBB_CLEAR_TITLE,Final Fortress: Neural Purge,终极要塞：神经净化
+ACH_BBB_CLEAR_DESC,Clear Blood-Brain Barrier on Normal difficulty.,通关地图 05「血脑屏障」Normal 难度。
+ACH_BBB_CLEAR_REWARD,Unlocks Blood-Brain Barrier Hard and grants +2 talent points.,解锁【血脑屏障 Hard 急性危象】并奖励微管天赋点 +2。
+ACH_WOUND_HARD_CLEAR_TITLE,Wound Scavenger: Sepsis Terminus,创口清道夫：脓毒终结
+ACH_WOUND_HARD_CLEAR_DESC,Clear Subcutaneous Wound on Hard (Acute Crisis) difficulty.,通关地图 01「皮下创口」Hard 急性危象难度。
+ACH_WOUND_HARD_CLEAR_REWARD,Unlocks the Endless Cytokine Storm endgame mode.,解锁【终局无尽细胞因子风暴模式】。

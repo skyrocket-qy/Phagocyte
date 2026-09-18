@@ -104,7 +104,8 @@ public partial class GameManager : Node
             { "bg_color_deep", new Color(0.04f, 0.05f, 0.09f, 1.0f) },
             { "bg_color_accent", new Color(0.14f, 0.04f, 0.08f, 1.0f) },
             { "fiber_color", new Color(0.22f, 0.18f, 0.32f, 0.35f) },
-            { "unlocked", true }
+            { "unlocked", true },
+            { "hard_unlocked", false }
         }},
         { "alveolar_space", new Dictionary {
             { "id", "alveolar_space" },
@@ -122,7 +123,8 @@ public partial class GameManager : Node
             { "bg_color_deep", new Color(0.02f, 0.06f, 0.10f, 1.0f) },
             { "bg_color_accent", new Color(0.04f, 0.12f, 0.16f, 1.0f) },
             { "fiber_color", new Color(0.2f, 0.5f, 0.65f, 0.35f) },
-            { "unlocked", true }
+            { "unlocked", false },
+            { "hard_unlocked", false }
         }},
         { "hepatic_sinusoid", new Dictionary {
             { "id", "hepatic_sinusoid" },
@@ -140,7 +142,8 @@ public partial class GameManager : Node
             { "bg_color_deep", new Color(0.05f, 0.03f, 0.02f, 1.0f) },
             { "bg_color_accent", new Color(0.18f, 0.09f, 0.04f, 1.0f) },
             { "fiber_color", new Color(0.55f, 0.40f, 0.15f, 0.35f) },
-            { "unlocked", true }
+            { "unlocked", false },
+            { "hard_unlocked", false }
         }},
         { "gastric_lumen", new Dictionary {
             { "id", "gastric_lumen" },
@@ -158,7 +161,8 @@ public partial class GameManager : Node
             { "bg_color_deep", new Color(0.06f, 0.04f, 0.01f, 1.0f) },
             { "bg_color_accent", new Color(0.17f, 0.12f, 0.02f, 1.0f) },
             { "fiber_color", new Color(0.60f, 0.50f, 0.10f, 0.35f) },
-            { "unlocked", true }
+            { "unlocked", false },
+            { "hard_unlocked", false }
         }},
         { "blood_brain_barrier", new Dictionary {
             { "id", "blood_brain_barrier" },
@@ -176,7 +180,8 @@ public partial class GameManager : Node
             { "bg_color_deep", new Color(0.03f, 0.02f, 0.07f, 1.0f) },
             { "bg_color_accent", new Color(0.08f, 0.04f, 0.15f, 1.0f) },
             { "fiber_color", new Color(0.35f, 0.25f, 0.65f, 0.40f) },
-            { "unlocked", true }
+            { "unlocked", false },
+            { "hard_unlocked", false }
         }}
     };
 
@@ -813,8 +818,57 @@ public partial class GameManager : Node
             { "bg_color_deep", d.ContainsKey("bg_color_deep") ? d["bg_color_deep"] : d["bg_color"] },
             { "bg_color_accent", d.ContainsKey("bg_color_accent") ? d["bg_color_accent"] : d["bg_color"] },
             { "fiber_color", d.ContainsKey("fiber_color") ? d["fiber_color"] : new Color(0.2f, 0.3f, 0.4f, 0.35f) },
-            { "unlocked", d["unlocked"] }
+            { "unlocked", d["unlocked"] },
+            { "hard_unlocked", d.ContainsKey("hard_unlocked") && d["hard_unlocked"].AsBool() }
         };
+    }
+
+    // --- Organ map unlock chain (docs/achievement.md) ---
+
+    public static void UnlockMap(string mapId)
+    {
+        if (MapData.ContainsKey(mapId))
+        {
+            var d = (Dictionary)MapData[mapId];
+            d["unlocked"] = true;
+        }
+    }
+
+    public static void UnlockMapHard(string mapId)
+    {
+        if (MapData.ContainsKey(mapId))
+        {
+            var d = (Dictionary)MapData[mapId];
+            d["hard_unlocked"] = true;
+        }
+    }
+
+    public static bool IsMapUnlocked(string mapId)
+    {
+        return MapData.ContainsKey(mapId) && ((Dictionary)MapData[mapId])["unlocked"].AsBool();
+    }
+
+    public static bool IsMapHardUnlocked(string mapId)
+    {
+        return MapData.ContainsKey(mapId)
+            && ((Dictionary)MapData[mapId]).TryGetValue("hard_unlocked", out var val)
+            && val.AsBool();
+    }
+
+    /// <summary>
+    /// Restores the baseline lock state: only acute_wound (Normal) is available,
+    /// every other organ map and every Hard difficulty starts locked.
+    /// The achievement chain re-applies earned unlocks afterwards.
+    /// </summary>
+    public static void ResetMapUnlocks()
+    {
+        foreach (var keyVar in MapData.Keys)
+        {
+            string mapId = keyVar.AsString();
+            var d = (Dictionary)MapData[mapId];
+            d["unlocked"] = mapId == "acute_wound";
+            d["hard_unlocked"] = false;
+        }
     }
 
     public static Dictionary GetSkillInfo(string key)

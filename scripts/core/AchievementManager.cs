@@ -111,6 +111,91 @@ public partial class AchievementManager : Node
             { "icon", "🛡️" },
             { "target_value", 3.0f },
             { "stat_key", "active_skills" }
+        }},
+
+        // --- Organ map clear chain (docs/achievement.md §2 / docs/map.md §2) ---
+        { "ach_wound_clear", new Godot.Collections.Dictionary {
+            { "id", "ach_wound_clear" },
+            { "title_key", "ACH_WOUND_CLEAR_TITLE" },
+            { "desc_key", "ACH_WOUND_CLEAR_DESC" },
+            { "reward_key", "ACH_WOUND_CLEAR_REWARD" },
+            { "reward_cell", "" },
+            { "icon", "🩹" },
+            { "target_value", 1.0f },
+            { "stat_key", "map_clear_acute_wound" },
+            { "map_id", "acute_wound" },
+            { "difficulty", "normal" },
+            { "unlock_map", "alveolar_space" },
+            { "unlock_hard_map", "acute_wound" }
+        }},
+        { "ach_alveolar_clear", new Godot.Collections.Dictionary {
+            { "id", "ach_alveolar_clear" },
+            { "title_key", "ACH_ALVEOLAR_CLEAR_TITLE" },
+            { "desc_key", "ACH_ALVEOLAR_CLEAR_DESC" },
+            { "reward_key", "ACH_ALVEOLAR_CLEAR_REWARD" },
+            { "reward_cell", "" },
+            { "icon", "🫁" },
+            { "target_value", 1.0f },
+            { "stat_key", "map_clear_alveolar_space" },
+            { "map_id", "alveolar_space" },
+            { "difficulty", "normal" },
+            { "unlock_map", "hepatic_sinusoid" },
+            { "unlock_hard_map", "alveolar_space" }
+        }},
+        { "ach_hepatic_clear", new Godot.Collections.Dictionary {
+            { "id", "ach_hepatic_clear" },
+            { "title_key", "ACH_HEPATIC_CLEAR_TITLE" },
+            { "desc_key", "ACH_HEPATIC_CLEAR_DESC" },
+            { "reward_key", "ACH_HEPATIC_CLEAR_REWARD" },
+            { "reward_cell", "" },
+            { "icon", "🫀" },
+            { "target_value", 1.0f },
+            { "stat_key", "map_clear_hepatic_sinusoid" },
+            { "map_id", "hepatic_sinusoid" },
+            { "difficulty", "normal" },
+            { "unlock_map", "gastric_lumen" },
+            { "unlock_hard_map", "hepatic_sinusoid" }
+        }},
+        { "ach_gastric_clear", new Godot.Collections.Dictionary {
+            { "id", "ach_gastric_clear" },
+            { "title_key", "ACH_GASTRIC_CLEAR_TITLE" },
+            { "desc_key", "ACH_GASTRIC_CLEAR_DESC" },
+            { "reward_key", "ACH_GASTRIC_CLEAR_REWARD" },
+            { "reward_cell", "" },
+            { "icon", "🌋" },
+            { "target_value", 1.0f },
+            { "stat_key", "map_clear_gastric_lumen" },
+            { "map_id", "gastric_lumen" },
+            { "difficulty", "normal" },
+            { "unlock_map", "blood_brain_barrier" },
+            { "unlock_hard_map", "gastric_lumen" }
+        }},
+        { "ach_bbb_clear", new Godot.Collections.Dictionary {
+            { "id", "ach_bbb_clear" },
+            { "title_key", "ACH_BBB_CLEAR_TITLE" },
+            { "desc_key", "ACH_BBB_CLEAR_DESC" },
+            { "reward_key", "ACH_BBB_CLEAR_REWARD" },
+            { "reward_cell", "" },
+            { "icon", "🧠" },
+            { "target_value", 1.0f },
+            { "stat_key", "map_clear_blood_brain_barrier" },
+            { "map_id", "blood_brain_barrier" },
+            { "difficulty", "normal" },
+            { "unlock_hard_map", "blood_brain_barrier" },
+            { "talent_points", 2 }
+        }},
+        { "ach_wound_hard_clear", new Godot.Collections.Dictionary {
+            { "id", "ach_wound_hard_clear" },
+            { "title_key", "ACH_WOUND_HARD_CLEAR_TITLE" },
+            { "desc_key", "ACH_WOUND_HARD_CLEAR_DESC" },
+            { "reward_key", "ACH_WOUND_HARD_CLEAR_REWARD" },
+            { "reward_cell", "" },
+            { "icon", "☣️" },
+            { "target_value", 1.0f },
+            { "stat_key", "map_clear_acute_wound_hard" },
+            { "map_id", "acute_wound" },
+            { "difficulty", "hard" },
+            { "unlock_endless", true }
         }}
     };
 
@@ -180,6 +265,10 @@ public partial class AchievementManager : Node
             GameManager.UnlockClass(rewardC);
         }
 
+        // Apply organ-map unlock chain rewards (maps, Hard modes, talent points)
+        ApplyMapRewards(data);
+        SyncMapUnlocks();
+
         SaveToDisk();
 
         var info = GetAchievementInfo(achId);
@@ -244,6 +333,78 @@ public partial class AchievementManager : Node
                 if (ProgressData["active_skills"].AsSingle() >= 3.0f)
                     Unlock("ach_full_arsenal");
                 break;
+        }
+    }
+
+    /// <summary>
+    /// Reports a cleared organ map run and unlocks the matching difficulty
+    /// achievement from the catalog (docs/achievement.md unlock chain).
+    /// </summary>
+    public static void RecordMapClear(string mapId, bool hard = false)
+    {
+        if (string.IsNullOrEmpty(mapId))
+            return;
+
+        foreach (string achId in Achievements.Keys)
+        {
+            var ach = Achievements[achId].AsGodotDictionary();
+            if (ach.GetValueOrDefault("map_id", "").AsString() != mapId)
+                continue;
+
+            bool isHardAchievement = ach.GetValueOrDefault("difficulty", "normal").AsString() == "hard";
+            if (isHardAchievement != hard)
+                continue;
+
+            string statKey = ach.GetValueOrDefault("stat_key", achId).AsString();
+            ProgressData[statKey] = 1.0f;
+            Unlock(achId);
+        }
+    }
+
+    /// <summary>
+    /// True once the terminal Hard clear has unlocked the Endless Cytokine Storm mode.
+    /// </summary>
+    public static bool IsEndlessUnlocked()
+    {
+        return IsUnlocked("ach_wound_hard_clear");
+    }
+
+    private static void ApplyMapRewards(Godot.Collections.Dictionary achievementData)
+    {
+        string nextMap = achievementData.GetValueOrDefault("unlock_map", "").AsString();
+        if (!string.IsNullOrEmpty(nextMap))
+            GameManager.UnlockMap(nextMap);
+
+        string hardMap = achievementData.GetValueOrDefault("unlock_hard_map", "").AsString();
+        if (!string.IsNullOrEmpty(hardMap))
+            GameManager.UnlockMapHard(hardMap);
+
+        int talentPoints = achievementData.GetValueOrDefault("talent_points", 0).AsInt32();
+        if (talentPoints > 0)
+            PassiveTreeManager.AddBonusPoints(talentPoints);
+    }
+
+    /// <summary>
+    /// Rebuilds GameManager.MapData lock state from the persisted achievement chain.
+    /// Baseline: acute_wound Normal only; everything else must be earned.
+    /// </summary>
+    private static void SyncMapUnlocks()
+    {
+        GameManager.ResetMapUnlocks();
+
+        foreach (string achId in Achievements.Keys)
+        {
+            if (!IsUnlocked(achId))
+                continue;
+
+            var raw = Achievements[achId].AsGodotDictionary();
+            string nextMap = raw.GetValueOrDefault("unlock_map", "").AsString();
+            if (!string.IsNullOrEmpty(nextMap))
+                GameManager.UnlockMap(nextMap);
+
+            string hardMap = raw.GetValueOrDefault("unlock_hard_map", "").AsString();
+            if (!string.IsNullOrEmpty(hardMap))
+                GameManager.UnlockMapHard(hardMap);
         }
     }
 
@@ -339,6 +500,7 @@ public partial class AchievementManager : Node
         if (!FileAccess.FileExists(SavePath))
         {
             SyncUnlockedClasses();
+            SyncMapUnlocks();
             return;
         }
 
@@ -346,6 +508,7 @@ public partial class AchievementManager : Node
         if (file == null)
         {
             SyncUnlockedClasses();
+            SyncMapUnlocks();
             return;
         }
 
@@ -379,6 +542,7 @@ public partial class AchievementManager : Node
         }
 
         SyncUnlockedClasses();
+        SyncMapUnlocks();
     }
 
     /// <summary>
@@ -421,7 +585,8 @@ public partial class AchievementManager : Node
             { "active_skills", 1.0f }
         };
         SyncUnlockedClasses();
-        
+        SyncMapUnlocks();
+
         if (FileAccess.FileExists(SavePath))
         {
             DirAccess.RemoveAbsolute(SavePath);

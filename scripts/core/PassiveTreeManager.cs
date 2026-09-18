@@ -441,6 +441,22 @@ public static class PassiveTreeManager
     public static Dictionary<string, int> CellLevels = new();
     public static Dictionary<string, Dictionary<string, int>> Allocations = new();
 
+    /// <summary>
+    /// Extra talent points awarded by meta progression (achievement map clears, etc.).
+    /// Shared across every cell so organ-clear rewards always have a spendable home.
+    /// </summary>
+    public static int BonusPoints { get; private set; } = 0;
+
+    public static void AddBonusPoints(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        EnsureLoaded();
+        BonusPoints += amount;
+        SaveToDisk();
+    }
+
     private static bool _loaded;
 
     public static void EnsureLoaded()
@@ -652,7 +668,7 @@ public static class PassiveTreeManager
 
     public static int GetPointsAvailable(string cellId)
     {
-        return Math.Max(0, GetCellLevel(cellId) - BaseCellLevel - GetSpentPoints(cellId));
+        return Math.Max(0, GetCellLevel(cellId) - BaseCellLevel - GetSpentPoints(cellId)) + BonusPoints;
     }
 
     public static System.Collections.Generic.List<string> GetNeighbors(string nodeId)
@@ -782,7 +798,8 @@ public static class PassiveTreeManager
         var payload = new Dictionary
         {
             { "cell_levels", levels },
-            { "allocations", allocations }
+            { "allocations", allocations },
+            { "bonus_points", BonusPoints }
         };
 
         using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
@@ -805,6 +822,12 @@ public static class PassiveTreeManager
             return;
 
         var data = json.Data.AsGodotDictionary();
+
+        if (data.TryGetValue("bonus_points", out var bonusVal))
+        {
+            BonusPoints = Math.Max(0, bonusVal.AsInt32());
+        }
+
         if (data.TryGetValue("cell_levels", out var levelsVal) && levelsVal.VariantType == Variant.Type.Dictionary)
         {
             var levels = levelsVal.AsGodotDictionary();
@@ -853,6 +876,7 @@ public static class PassiveTreeManager
     {
         CellLevels.Clear();
         Allocations.Clear();
+        BonusPoints = 0;
         _loaded = false;
         EnsureLoaded();
     }
@@ -861,6 +885,7 @@ public static class PassiveTreeManager
     {
         CellLevels.Clear();
         Allocations.Clear();
+        BonusPoints = 0;
         _loaded = true;
         if (FileAccess.FileExists(SavePath))
             DirAccess.RemoveAbsolute(SavePath);

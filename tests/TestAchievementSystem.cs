@@ -21,6 +21,11 @@ public partial class TestAchievementSystem : SceneTree
         GD.Print("==================================================================");
         GD.Print(">>> STARTING ACHIEVEMENT & IMMUNE CELL PROGRESSION TEST <<<");
         GD.Print("==================================================================");
+
+        // Isolate passive-tree reward persistence from the player's real save
+        PassiveTreeManager.SavePath = "user://test_achievement_tree.json";
+        if (FileAccess.FileExists(PassiveTreeManager.SavePath))
+            DirAccess.RemoveAbsolute(PassiveTreeManager.SavePath);
     }
 
     public override bool _Process(double delta)
@@ -39,7 +44,16 @@ public partial class TestAchievementSystem : SceneTree
                 AssertThat(GameManager.IsClassUnlocked("b_cell")).IsFalse();
                 AssertThat(GameManager.IsClassUnlocked("dendritic")).IsFalse();
 
-                GD.Print("[PASS] Step 1: Default state strictly enforces only Macrophage unlocked.");
+                // Only the tutorial organ map is unlocked; other maps and all Hard modes are locked
+                AssertThat(GameManager.IsMapUnlocked("acute_wound")).IsTrue();
+                AssertThat(GameManager.IsMapUnlocked("alveolar_space")).IsFalse();
+                AssertThat(GameManager.IsMapUnlocked("hepatic_sinusoid")).IsFalse();
+                AssertThat(GameManager.IsMapUnlocked("gastric_lumen")).IsFalse();
+                AssertThat(GameManager.IsMapUnlocked("blood_brain_barrier")).IsFalse();
+                AssertThat(GameManager.IsMapHardUnlocked("acute_wound")).IsFalse();
+                AssertThat(GameManager.IsMapHardUnlocked("alveolar_space")).IsFalse();
+
+                GD.Print("[PASS] Step 1: Default state strictly enforces only Macrophage and Acute Wound unlocked.");
 
                 // --- Step 2: Skill Locking in UpgradeManager Choice Pool ---
                 var mockPlayer = new CharacterBody2D();
@@ -125,6 +139,46 @@ public partial class TestAchievementSystem : SceneTree
                 AssertThat(GameManager.IsClassUnlocked("dendritic")).IsTrue();
                 GD.Print("[PASS] Step 4: Full disk persistence (user://achievements.json) verified.");
 
+                // --- Step 4b: Organ Map Unlock Chain (docs/achievement.md §2) ---
+                AchievementManager.RecordMapClear("acute_wound");
+                AssertThat(AchievementManager.IsUnlocked("ach_wound_clear")).IsTrue();
+                AssertThat(GameManager.IsMapUnlocked("alveolar_space")).IsTrue();
+                AssertThat(GameManager.IsMapHardUnlocked("acute_wound")).IsTrue();
+
+                AchievementManager.RecordMapClear("alveolar_space");
+                AssertThat(AchievementManager.IsUnlocked("ach_alveolar_clear")).IsTrue();
+                AssertThat(GameManager.IsMapUnlocked("hepatic_sinusoid")).IsTrue();
+                AssertThat(GameManager.IsMapHardUnlocked("alveolar_space")).IsTrue();
+
+                AchievementManager.RecordMapClear("hepatic_sinusoid");
+                AssertThat(GameManager.IsMapUnlocked("gastric_lumen")).IsTrue();
+                AssertThat(GameManager.IsMapHardUnlocked("hepatic_sinusoid")).IsTrue();
+
+                AchievementManager.RecordMapClear("gastric_lumen");
+                AssertThat(GameManager.IsMapUnlocked("blood_brain_barrier")).IsTrue();
+                AssertThat(GameManager.IsMapHardUnlocked("gastric_lumen")).IsTrue();
+
+                int bonusBefore = PassiveTreeManager.BonusPoints;
+                AchievementManager.RecordMapClear("blood_brain_barrier");
+                AssertThat(AchievementManager.IsUnlocked("ach_bbb_clear")).IsTrue();
+                AssertThat(GameManager.IsMapHardUnlocked("blood_brain_barrier")).IsTrue();
+                AssertThat(PassiveTreeManager.BonusPoints).IsEqual(bonusBefore + 2);
+
+                AssertThat(AchievementManager.IsEndlessUnlocked()).IsFalse();
+                AchievementManager.RecordMapClear("acute_wound", true);
+                AssertThat(AchievementManager.IsUnlocked("ach_wound_hard_clear")).IsTrue();
+                AssertThat(AchievementManager.IsEndlessUnlocked()).IsTrue();
+
+                // Map lock state is derived from the achievement save and survives a reload
+                AchievementManager.SaveToDisk();
+                GameManager.ResetMapUnlocks();
+                AssertThat(GameManager.IsMapUnlocked("alveolar_space")).IsFalse();
+                AchievementManager.LoadFromDisk();
+                AssertThat(GameManager.IsMapUnlocked("alveolar_space")).IsTrue();
+                AssertThat(GameManager.IsMapHardUnlocked("blood_brain_barrier")).IsTrue();
+
+                GD.Print("[PASS] Step 4b: Organ map unlock chain, +2 talent points and Endless unlock verified.");
+
                 // --- Step 5: Codex Modal Tab 4 (Achievements) UI ---
                 var codexScene = GD.Load<PackedScene>("res://scenes/ui/codex_modal.tscn");
                 AssertThat(codexScene).IsNotNull();
@@ -179,6 +233,7 @@ public partial class TestAchievementSystem : SceneTree
 
                 _menuInstance.QueueFree();
                 AchievementManager.ResetAll();
+                CleanupTestSave();
                 Quit(0);
                 return true;
             }
@@ -186,10 +241,18 @@ public partial class TestAchievementSystem : SceneTree
         catch (Exception ex)
         {
             GD.PrintErr("[TEST FAILED]: " + ex.ToString());
+            CleanupTestSave();
             Quit(1);
             return true;
         }
 
         return false;
+    }
+
+    private static void CleanupTestSave()
+    {
+        if (FileAccess.FileExists(PassiveTreeManager.SavePath))
+            DirAccess.RemoveAbsolute(PassiveTreeManager.SavePath);
+        PassiveTreeManager.SavePath = "";
     }
 }

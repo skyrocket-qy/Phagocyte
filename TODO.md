@@ -176,7 +176,7 @@
 
 - [x] **成就管理器與持久化**：`AchievementManager.cs` 支援解鎖事件廣播與 `user://achievements.json` 本地存儲。
 - [x] **遊戲內浮窗通知**：`AchievementToast.cs` 微觀螢光解鎖彈窗。
-- [ ] **[P0] 器官地圖成就解鎖鏈與預設鎖定狀態實作**：
+- [x] **[P0] 器官地圖成就解鎖鏈與預設鎖定狀態實作**：
   - **修正 `GameManager.MapData`**：除初始地圖 `acute_wound` 預設解鎖外，**其餘 4 張地圖預設全部鎖定 (`unlocked: false`)**。
   - **落實成就解鎖鏈條**：
     - `ach_wound_clear`（通關創口 Normal）：解鎖【肺泡氣體微腔】Normal ＋ 創口 Hard。

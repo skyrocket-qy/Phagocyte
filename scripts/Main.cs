@@ -77,6 +77,12 @@ public partial class Main : Node2D
     public ColorRect? ArenaBg { get; set; }
     public Line2D? ArenaBorders { get; set; }
 
+    /// <summary>Whether the current organ map is unlocked in the achievement chain.</summary>
+    public bool CurrentMapUnlocked => GameManager.IsMapUnlocked(MapId);
+
+    /// <summary>Whether the current organ map's Hard (Acute Crisis) mode is unlocked.</summary>
+    public bool CurrentMapHardUnlocked => GameManager.IsMapHardUnlocked(MapId);
+
     public float EnvironmentTime { get; set; } = 0.0f;
     public string MapId { get; set; } = "acute_wound";
 
@@ -704,6 +710,7 @@ public partial class Main : Node2D
         {
             AudioManager.Instance?.PlayBgm("victory", 0.3f);
             AudioManager.Instance?.PlaySfx("wave_complete");
+            AchievementManager.RecordMapClear(MapId);
         }
         else
         {
