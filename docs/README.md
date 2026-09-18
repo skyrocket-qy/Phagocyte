@@ -44,7 +44,7 @@ graph TD
 
     subgraph WorldSystems [戰場環境與威脅]
         MAP["map.md<br>5 大器官組織關卡<br>(流體力學 · 雙軌難度)"]
-        PATH["pathogen.md<br>20+ 種真實病原體 AI<br>(抗原逃逸 · 破膜克制)"]
+        PATH["pathogen.md<br>20+ 種真實病原體 AI<br>(差異化屬性 · 行為模式)"]
     end
 
     subgraph MetaSystems [局外循環與持久化]
@@ -81,7 +81,7 @@ graph TD
 
 ### 🦠 關卡與病原體
 - **[map.md](file:///Users/zelin/project/Phagocyte/docs/map.md)**：詳解 5 大微觀人體器官切片（皮下創口、肺泡微腔、肝血竇、胃黏膜、血腦屏障）的專屬流體力學、15 分鐘波次導演與「殺越快生越快」同屏動態回補系統。
-- **[pathogen.md](file:///Users/zelin/project/Phagocyte/docs/pathogen.md)**：百科全書式的病原體圖鑑，涵蓋細菌、病毒、真菌、寄生蟲、朊病毒與惡性腫瘤等 20 餘種真實微生物的 AI 行為與克制途徑。
+- **[pathogen.md](file:///Users/zelin/project/Phagocyte/docs/pathogen.md)**：百科全書式的病原體圖鑑，涵蓋細菌、病毒、真菌、寄生蟲、朊病毒與惡性腫瘤等 20 餘種真實微生物的純屬性矩陣與 AI 運動學行為。
 
 ### 🏆 局外養成與結算
 - **[achievement.md](file:///Users/zelin/project/Phagocyte/docs/achievement.md)**：規範角色與器官地圖解鎖鏈、固有技能解鎖、廣譜生化武器投放，以及與 Steamworks Achievements API 的無縫對接。
