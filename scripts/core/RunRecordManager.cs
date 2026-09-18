@@ -161,7 +161,8 @@ public partial class RunRecordManager : Node
         string cause = "",
         int kills = 0,
         int killScore = 0,
-        string difficulty = DifficultyNormal)
+        string difficulty = DifficultyNormal,
+        bool endless = false)
     {
         var skills = new Array<string>();
         if (activeSkillIds != null)
@@ -174,7 +175,9 @@ public partial class RunRecordManager : Node
         }
 
         bool survivedFullTime = survivalTime >= StandardClearSeconds - 0.01f;
-        bool criteriaMet = IsVictoryCriteriaMet(survivalTime, bossNeutralized);
+        // Endless overdrive has no clear settlement: the standard criteria are
+        // recorded as raw facts but can never be "met" into a victory.
+        bool criteriaMet = !endless && IsVictoryCriteriaMet(survivalTime, bossNeutralized);
 
         if (result == ResultVictory && !criteriaMet)
         {
@@ -202,6 +205,7 @@ public partial class RunRecordManager : Node
             { "class_id", classId },
             { "map_id", mapId },
             { "difficulty", difficulty },
+            { "endless", endless },
             { "survival_time", survivalTime },
             { "level", level },
             { "kills", kills },

@@ -31,6 +31,77 @@ public static class PathogenSpawner
     /// <summary>Extreme swarm event on-screen active pathogen cap.</summary>
     public const int MaxActiveSwarm = 450;
 
+    // --- Endless Overdrive escalation (docs/endgame.md §3.2 / §3.4) ---
+    /// <summary>Endless overdrive begins once the standard 15:00 timeline is crossed.</summary>
+    public const float OverdriveStartSeconds = 900.0f;
+
+    /// <summary>Length of one overdrive ladder cycle (03:00).</summary>
+    public const float OverdriveCycleSeconds = 180.0f;
+
+    /// <summary>Endless mode on-screen active pathogen cap.</summary>
+    public const int MaxActiveEndless = 500;
+
+    /// <summary>Number of discrete ladder cycles (15:00-27:00) before the terminal exponential tier.</summary>
+    public const int OverdriveCycleCount = 4;
+
+    // Ladder bonuses per cycle 1..4; cycle 5+ (27:00) scales exponentially on top.
+    private static readonly float[] OverdriveHealthBonus = { 0.50f, 1.20f, 2.20f, 3.60f };
+    private static readonly float[] OverdriveSpeedBonus = { 0.15f, 0.30f, 0.50f, 0.70f };
+
+    private static bool _overdriveEnabled = false;
+
+    /// <summary>True while the running scene is an endless overdrive run.</summary>
+    public static bool OverdriveEnabled => _overdriveEnabled;
+
+    /// <summary>Called by Main per scene: endless runs enable ladder scaling on every spawn.</summary>
+    public static void ConfigureOverdrive(bool enabled)
+    {
+        _overdriveEnabled = enabled;
+    }
+
+    /// <summary>Ladder cycle: 0 = standard timeline, 1 = 15:00-18:00, 2 = 18:00-21:00, ...</summary>
+    public static int GetOverdriveCycle(float gameTime)
+    {
+        if (gameTime < OverdriveStartSeconds)
+            return 0;
+        return 1 + (int)((gameTime - OverdriveStartSeconds) / OverdriveCycleSeconds);
+    }
+
+    public static float GetOverdriveHealthMultiplier(float gameTime)
+    {
+        int cycle = GetOverdriveCycle(gameTime);
+        if (cycle <= 0)
+            return 1.0f;
+        if (cycle <= OverdriveHealthBonus.Length)
+            return 1.0f + OverdriveHealthBonus[cycle - 1];
+
+        // 27:00+ terminal overdrive: exponential, uncapped growth on top of the +360% tier.
+        int extraCycles = cycle - OverdriveHealthBonus.Length;
+        return (1.0f + OverdriveHealthBonus[^1]) * Mathf.Pow(2.0f, extraCycles);
+    }
+
+    public static float GetOverdriveSpeedMultiplier(float gameTime)
+    {
+        int cycle = GetOverdriveCycle(gameTime);
+        if (cycle <= 0)
+            return 1.0f;
+        float bonus = cycle <= OverdriveSpeedBonus.Length ? OverdriveSpeedBonus[cycle - 1] : 1.00f; // capped at +100%
+        return 1.0f + bonus;
+    }
+
+    /// <summary>
+    /// Applies the endless ladder to a freshly created pathogen. Must run before
+    /// the enemy enters the tree (_Ready copies MaxHealth -> CurrentHealth).
+    /// </summary>
+    public static void ApplyOverdriveScaling(BaseEnemy enemy, float gameTime)
+    {
+        if (!_overdriveEnabled || enemy == null)
+            return;
+
+        enemy.MaxHealth *= GetOverdriveHealthMultiplier(gameTime);
+        enemy.FloatSpeed *= GetOverdriveSpeedMultiplier(gameTime);
+    }
+
     /// <summary>Duration of the 06:00 / 12:00 swarm window using the raised cap.</summary>
     public const float SwarmWindowSeconds = 30.0f;
 
@@ -172,7 +243,7 @@ public static class PathogenSpawner
         for (int i = 0; i < count; i++)
         {
             string chosenId = pool[(int)GD.RandRange(0, pool.Length - 1)];
-            SpawnSingle(enemyContainer, player, arenaSize, chosenId, 450.0f, 1000.0f);
+            SpawnSingle(enemyContainer, player, arenaSize, chosenId, 450.0f, 1000.0f, gameTime);
         }
     }
 
@@ -191,6 +262,7 @@ public static class PathogenSpawner
             return null;
 
         ApplyEliteBoost(enemy, tier);
+        ApplyOverdriveScaling(enemy, gameTime);
 
         enemy.GlobalPosition = spawnAngle >= 0.0f
             ? GetPointAtAngle(player.GlobalPosition, arenaSize, spawnAngle, 560.0f)
@@ -212,7 +284,7 @@ public static class PathogenSpawner
         for (int i = 0; i < clusters; i++)
         {
             string chosenId = SwarmPool[(int)GD.RandRange(0, SwarmPool.Length - 1)];
-            spawned += SpawnSingle(enemyContainer, player, arenaSize, chosenId, 420.0f, 900.0f);
+            spawned += SpawnSingle(enemyContainer, player, arenaSize, chosenId, 420.0f, 900.0f, gameTime);
         }
         return spawned;
     }
@@ -220,7 +292,7 @@ public static class PathogenSpawner
     /// <summary>
     /// 09:00 secondary lord. Guaranteed superweapon chest drop is routed by Main.
     /// </summary>
-    public static BaseEnemy? SpawnSubBoss(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string mapId)
+    public static BaseEnemy? SpawnSubBoss(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string mapId, float gameTime = 0.0f)
     {
         if (enemyContainer == null || player == null)
             return null;
@@ -230,6 +302,7 @@ public static class PathogenSpawner
             return null;
 
         AttachBossPhases(enemy, 120.0f);
+        ApplyOverdriveScaling(enemy, gameTime);
 
         enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, 520.0f);
         enemyContainer.AddChild(enemy);
@@ -254,7 +327,7 @@ public static class PathogenSpawner
     /// <summary>
     /// 15:00 terminal primary pathogen boss for the lockdown showdown.
     /// </summary>
-    public static BaseEnemy? SpawnTerminalBoss(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string mapId)
+    public static BaseEnemy? SpawnTerminalBoss(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string mapId, float gameTime = 0.0f)
     {
         if (enemyContainer == null || player == null)
             return null;
@@ -264,6 +337,7 @@ public static class PathogenSpawner
             return null;
 
         AttachBossPhases(enemy, 150.0f);
+        ApplyOverdriveScaling(enemy, gameTime);
 
         enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, 460.0f);
         enemyContainer.AddChild(enemy);
@@ -304,6 +378,8 @@ public static class PathogenSpawner
             var enemy = CreatePathogen(chosenId);
             if (enemy == null)
                 continue;
+
+            ApplyOverdriveScaling(enemy, gameTime);
 
             float margin = (float)GD.RandRange(BackfillMarginMin, BackfillMarginMax);
             enemy.GlobalPosition = GetOffscreenSpawnPoint(player.GlobalPosition, arenaSize, viewWorldSize, margin);
@@ -360,7 +436,7 @@ public static class PathogenSpawner
         return pos;
     }
 
-    private static int SpawnSingle(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string chosenId, float minDist, float maxDist)
+    private static int SpawnSingle(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string chosenId, float minDist, float maxDist, float gameTime = 0.0f)
     {
         float dist = (float)GD.RandRange(minDist, maxDist);
 
@@ -375,6 +451,7 @@ public static class PathogenSpawner
                     GlobalPosition = center + new Vector2((float)GD.RandRange(-30, 30), (float)GD.RandRange(-30, 30)),
                     FibrinShield = 1
                 };
+                ApplyOverdriveScaling(staph, gameTime);
                 enemyContainer.AddChild(staph);
             }
             return 3;
@@ -390,6 +467,7 @@ public static class PathogenSpawner
                 {
                     GlobalPosition = center + new Vector2((float)GD.RandRange(-50, 50), (float)GD.RandRange(-50, 50))
                 };
+                ApplyOverdriveScaling(noro, gameTime);
                 enemyContainer.AddChild(noro);
             }
             return 10;
@@ -399,6 +477,7 @@ public static class PathogenSpawner
         if (enemy == null)
             return 0;
 
+        ApplyOverdriveScaling(enemy, gameTime);
         enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, dist);
         enemyContainer.AddChild(enemy);
         return 1;

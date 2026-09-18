@@ -64,6 +64,7 @@ public partial class MainMenu : Control
     public Label? MapLockStatusLbl { get; set; }
     public HoloBodyScanner? HoloScanner { get; set; }
     public Button? DeployBtn { get; set; }
+    public Button? EndlessBtn { get; set; }
     public Button? MapBackBtn { get; set; }
 
     public string ActiveClassKey { get; set; } = "macrophage";
@@ -131,6 +132,21 @@ public partial class MainMenu : Control
         HoloScanner = GetNodeOrNull<HoloBodyScanner>("MapView/HBox/HoloBodyScanner");
         DeployBtn = GetNodeOrNull<Button>("MapView/Buttons/DeployButton");
         MapBackBtn = GetNodeOrNull<Button>("MapView/Buttons/BackButton");
+
+        // Endless Cytokine Storm entry (docs/endgame.md §2), injected beside Deploy.
+        // Stays locked until any organ has been cleared on Hard.
+        if (DeployBtn != null && DeployBtn.GetParent() is Container deployRow)
+        {
+            EndlessBtn = new Button
+            {
+                Name = "EndlessButton",
+                CustomMinimumSize = new Vector2(230, 40)
+            };
+            EndlessBtn.AddThemeColorOverride("font_color", new Color(1.0f, 0.78f, 0.35f));
+            EndlessBtn.Pressed += OnEndlessPressed;
+            deployRow.AddChild(EndlessBtn);
+            deployRow.MoveChild(EndlessBtn, DeployBtn.GetIndex() + 1);
+        }
 
         // Lock status readout injected under the threat rows (MapData-driven)
         if (MapThreatLbl != null && MapThreatLbl.GetParent() is Control detailPanel)
@@ -249,6 +265,11 @@ public partial class MainMenu : Control
         if (MapHeaderLbl != null) MapHeaderLbl.Text = Tr("HEADER_SELECT_MAP");
         if (MapBackBtn != null) MapBackBtn.Text = Tr("BTN_BACK_PASSIVE");
         if (DeployBtn != null) DeployBtn.Text = Tr("BTN_DEPLOY");
+        if (EndlessBtn != null)
+        {
+            EndlessBtn.Text = Tr("BTN_ENDLESS");
+            UpdateEndlessAvailability();
+        }
 
         SetupClassButtons();
         SetupMapButtons();
@@ -533,6 +554,8 @@ public partial class MainMenu : Control
             DeployBtn.TooltipText = unlocked ? "" : Tr("MAP_LOCKED_DEPLOY");
         }
 
+        UpdateEndlessAvailability();
+
         if (MapListContainer != null)
         {
             foreach (var child in MapListContainer.GetChildren())
@@ -560,5 +583,32 @@ public partial class MainMenu : Control
 
         GameManager.SelectedMap = ActiveMapKey;
         GameManager.StartGame(GetTree());
+    }
+
+    /// <summary>
+    /// Endless availability readout: requires the Hard clear achievement
+    /// (ach_wound_hard_clear) and an unlocked organ.
+    /// </summary>
+    private void UpdateEndlessAvailability()
+    {
+        if (EndlessBtn == null)
+            return;
+
+        bool endlessReady = GameManager.IsEndlessAvailable();
+        EndlessBtn.Disabled = !endlessReady || IsActiveMapLocked;
+        EndlessBtn.TooltipText = endlessReady ? "" : Tr("ENDLESS_LOCKED_HINT");
+    }
+
+    private void OnEndlessPressed()
+    {
+        if (!GameManager.IsMapUnlocked(ActiveMapKey))
+        {
+            SelectMap(ActiveMapKey);
+            return;
+        }
+
+        GameManager.SelectedMap = ActiveMapKey;
+        if (!GameManager.StartEndlessGame(GetTree()))
+            SelectMap(ActiveMapKey); // still locked: refresh the requirement readout
     }
 }

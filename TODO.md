@@ -232,11 +232,11 @@
 ## ♾️ 模組八：終局無盡細胞因子風暴模式 (End Game: Endless Cytokine Storm)
 > **對應規格**：[`docs/endgame.md`](file:///Users/zelin/project/Phagocyte/docs/endgame.md)
 
-- [ ] **[P1] 無盡模式入口與解鎖流程**：
+- [x] **[P1] 無盡模式入口與解鎖流程**：
   - 通關任意器官地圖 Hard 難度（成就 `ach_wound_hard_clear`）後開放無盡模式入口。
   - 跨過 15:00 不強制結算，計時器轉為燃燒暗金螢光色繼續推進。
   - **影響檔案**：`scripts/core/GameManager.cs`, `scripts/Main.cs`
-- [ ] **[P1] 3 分鐘指數級過載階梯與同屏 500 隻怪物上限**：
+- [x] **[P1] 3 分鐘指數級過載階梯與同屏 500 隻怪物上限**：
   - 每 3 分鐘難度指數暴增（15~18分 +50% HP/+15% Spd, 18~21分 +120%/+30%, 21~24分 +220%/+50%, 24~27分 +360%/+70%, 27分+ 複合環境）。
   - 無盡同屏怪物上限擴展至 **500 隻**（`MAX_ACTIVE_ENDLESS = 500`）。
   - **影響檔案**：`scripts/enemies/PathogenSpawner.cs`, `scripts/Main.cs`

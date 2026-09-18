@@ -11,6 +11,12 @@ public partial class GameManager : Node
     public static string SelectedDifficulty = RunRecordManager.DifficultyNormal;
     public static string CurrentLanguage = "zh_CN";
 
+    /// <summary>
+    /// True while the current run is the Endless Cytokine Storm mode (docs/endgame.md).
+    /// Reset by a normal deploy; survives a retry so endless runs can be replayed.
+    /// </summary>
+    public static bool EndlessMode = false;
+
     [Signal]
     public delegate void LanguageChangedEventHandler(string locale);
 
@@ -922,10 +928,39 @@ public partial class GameManager : Node
         };
     }
 
+    /// <summary>
+    /// Endless Cytokine Storm entry (docs/endgame.md §2): unlocked by clearing any
+    /// organ map on Hard (achievement ach_wound_hard_clear).
+    /// </summary>
+    public static bool IsEndlessAvailable()
+    {
+        return AchievementManager.IsEndlessUnlocked();
+    }
+
     public static void StartGame(SceneTree tree)
     {
+        EndlessMode = false;
         tree.Paused = false;
         tree.ChangeSceneToFile("res://scenes/main.tscn");
+    }
+
+    /// <summary>
+    /// Launch an Endless Overdrive run on the selected organ. Returns false
+    /// (without changing scenes) while the mode is still locked.
+    /// </summary>
+    public static bool StartEndlessGame(SceneTree tree)
+    {
+        if (!IsEndlessAvailable())
+        {
+            GD.PushWarning("[GameManager] Endless Cytokine Storm is still locked (clear any organ on Hard first).");
+            return false;
+        }
+
+        SelectedDifficulty = RunRecordManager.DifficultyHard;
+        EndlessMode = true;
+        tree.Paused = false;
+        tree.ChangeSceneToFile("res://scenes/main.tscn");
+        return true;
     }
 
     public static void GoToMenu(SceneTree tree)

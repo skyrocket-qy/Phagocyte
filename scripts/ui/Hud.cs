@@ -87,6 +87,13 @@ public partial class Hud : CanvasLayer
 
     // Survival goal shown next to the timer (0 hides it).
     public float GoalSeconds { get; set; } = 0.0f;
+
+    /// <summary>
+    /// Endless overdrive: once the standard goal is crossed the timer turns into a
+    /// burning dark-gold fluorescence and counts on without a cap (docs/endgame.md §3.1).
+    /// </summary>
+    public bool EndlessMode { get; set; } = false;
+
     // Blocks tree/pause hotkeys once the settlement screen is up.
     public bool PauseInputSuppressed { get; set; } = false;
 
@@ -198,6 +205,14 @@ public partial class Hud : CanvasLayer
         GameManager.RemoveLanguageListener(_langCallback);
     }
 
+    /// <summary>Burning dark-gold fluorescence used by the endless overdrive timer.</summary>
+    private static Color BurningGoldFluorescence(float time)
+    {
+        float flicker = 0.85f + 0.15f * Mathf.Sin(time * 6.0f);
+        float ember = 0.75f + 0.25f * Mathf.Sin(time * 2.3f + 1.7f);
+        return new Color(1.0f * flicker, (0.52f + 0.16f * ember) * flicker, 0.06f, 1.0f);
+    }
+
     public override void _Process(double delta)
     {
         if (!GetTree().Paused)
@@ -208,13 +223,24 @@ public partial class Hud : CanvasLayer
             if (TimerLabel != null)
             {
                 string timerText = $"⏱️ {minutes:D2}:{seconds:D2}";
+                bool overdrive = EndlessMode && GoalSeconds > 0.0f && SurvivalTime >= GoalSeconds;
                 if (GoalSeconds > 0.0f)
                 {
-                    int goalMinutes = (int)(GoalSeconds / 60.0f);
-                    int goalSeconds = (int)(GoalSeconds % 60.0f);
-                    timerText += $" / {goalMinutes:D2}:{goalSeconds:D2}";
+                    if (overdrive)
+                    {
+                        timerText += " / ∞";
+                    }
+                    else
+                    {
+                        int goalMinutes = (int)(GoalSeconds / 60.0f);
+                        int goalSeconds = (int)(GoalSeconds % 60.0f);
+                        timerText += $" / {goalMinutes:D2}:{goalSeconds:D2}";
+                    }
                 }
                 TimerLabel.Text = timerText;
+                TimerLabel.Modulate = overdrive
+                    ? BurningGoldFluorescence(SurvivalTime)
+                    : Colors.White;
             }
         }
 
@@ -999,13 +1025,16 @@ public partial class Hud : CanvasLayer
         AddChild(AchievementBanner);
     }
 
+    /// <summary>Endless overdrive tier alert reusing the achievement toast (docs/endgame.md §3.2).</summary>
+    public void ShowOverdriveAlert(string title, string desc)
+    {
+        PlayToastBanner("☣️", title, desc, new Color(1.0f, 0.72f, 0.25f));
+    }
+
     private void OnAchievementUnlocked(string _achId, Dictionary achInfo)
     {
-        if (AchievementBanner == null)
-            return;
-
-        if (AchBannerIcon != null) AchBannerIcon.Text = achInfo.TryGetValue("icon", out var icVal) ? icVal.AsString() : "🏆";
-        if (AchBannerTitle != null) AchBannerTitle.Text = Tr("TOAST_ACH_UNLOCKED") + " " + (achInfo.TryGetValue("title", out var ttVal) ? ttVal.AsString() : "");
+        string icon = achInfo.TryGetValue("icon", out var icVal) ? icVal.AsString() : "🏆";
+        string title = Tr("TOAST_ACH_UNLOCKED") + " " + (achInfo.TryGetValue("title", out var ttVal) ? ttVal.AsString() : "");
 
         string subText = achInfo.TryGetValue("desc", out var dsVal) ? dsVal.AsString() : "";
         string rewardCell = achInfo.TryGetValue("reward_cell", out var rcVal) ? rcVal.AsString() : "";
@@ -1022,7 +1051,21 @@ public partial class Hud : CanvasLayer
             subText = reward;
         }
 
-        if (AchBannerDesc != null) AchBannerDesc.Text = subText;
+        PlayToastBanner(icon, title, subText, null);
+    }
+
+    private void PlayToastBanner(string icon, string title, string desc, Color? titleColor)
+    {
+        if (AchievementBanner == null)
+            return;
+
+        if (AchBannerIcon != null) AchBannerIcon.Text = icon;
+        if (AchBannerTitle != null)
+        {
+            AchBannerTitle.Text = title;
+            AchBannerTitle.Modulate = titleColor ?? Colors.White;
+        }
+        if (AchBannerDesc != null) AchBannerDesc.Text = desc;
 
         AchievementBanner.Visible = true;
         AchievementBanner.Modulate = new Color(1, 1, 1, 0.0f);

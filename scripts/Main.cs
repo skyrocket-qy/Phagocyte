@@ -24,7 +24,17 @@ public partial class Main : Node2D
     public bool RunEnded { get; private set; } = false;
 
     // Kill-Driven Dynamic Backfill (Section 4.2)
-    public int ActiveScreenCap => SwarmWindowTimer > 0.0f ? ScreenCapSwarm : ScreenCapNormal;
+    public int ActiveScreenCap
+    {
+        get
+        {
+            // Endless overdrive raises the on-screen cap to 500 (docs/endgame.md §3.4).
+            if (IsEndlessRun && EnvironmentTime >= PathogenSpawner.OverdriveStartSeconds)
+                return PathogenSpawner.MaxActiveEndless;
+
+            return SwarmWindowTimer > 0.0f ? ScreenCapSwarm : ScreenCapNormal;
+        }
+    }
     public float SwarmWindowTimer { get; private set; } = 0.0f;
 
     /// <summary>
@@ -95,11 +105,42 @@ public partial class Main : Node2D
     /// <summary>Whether this run is fought on the Hard (Acute Crisis) tier.</summary>
     public bool IsHardRun => RunDifficulty == RunRecordManager.DifficultyHard;
 
+    /// <summary>
+    /// Endless Cytokine Storm run (docs/endgame.md §3.1): the 15:00 goal does
+    /// not settle the run — the uncapped timeline keeps escalating until the
+    /// membrane ruptures.
+    /// </summary>
+    public bool IsEndlessRun { get; private set; } = GameManager.EndlessMode;
+
+    // --- Endless overdrive ladder & environment anomalies (docs/endgame.md §3.2) ---
+    private float _fibrinNetTimer = 0.0f;
+    private float _armorBreakCooldown = 0.0f;
+    private float _armorBreakTimer = 0.0f;
+    private float _armorBreakAmount = 0.0f;
+    private float _acidTickAccumulator = 0.0f;
+    private int _announcedOverdriveCycle = 0;
+
+    /// <summary>Current 3-minute overdrive cycle (0 outside endless / before 15:00).</summary>
+    public int OverdriveCycle => IsEndlessRun ? PathogenSpawner.GetOverdriveCycle(EnvironmentTime) : 0;
+
+    /// <summary>Ladder HP multiplier applied to pathogens spawned right now.</summary>
+    public float OverdriveHealthMultiplier => PathogenSpawner.GetOverdriveHealthMultiplier(EnvironmentTime);
+
+    /// <summary>Ladder speed multiplier applied to pathogens spawned right now.</summary>
+    public float OverdriveSpeedMultiplier => PathogenSpawner.GetOverdriveSpeedMultiplier(EnvironmentTime);
+
+    /// <summary>Shrinking acid-tide safe radius (0 = tide not active; player must stay inside).</summary>
+    public float AcidSafeRadius { get; private set; } = 0.0f;
+
+    private Line2D? _acidRing = null;
+    private float _drawnAcidRadius = -1.0f;
+
     public override void _Ready()
     {
         StaphScene ??= DefaultStaphScene;
         EnemySteering.ConfigureArena(ArenaSize);
         HostUlceration.Reset();
+        PathogenSpawner.ConfigureOverdrive(IsEndlessRun);
 
         Player = GetNodeOrNull<CharacterBody2D>("Macrophage");
         HudNode = GetNodeOrNull<Hud>("HUD");
@@ -108,6 +149,7 @@ public partial class Main : Node2D
 
         ArenaBg = GetNodeOrNull<ColorRect>("Background/ArenaBG");
         ArenaBorders = GetNodeOrNull<Line2D>("Background/ArenaBorders");
+        SetupAcidTideRing();
 
         if (!string.IsNullOrEmpty(GameManager.SelectedClass) && GameManager.SelectedClass != "macrophage")
         {
@@ -133,6 +175,7 @@ public partial class Main : Node2D
             if (HudNode != null)
             {
                 HudNode.GoalSeconds = RunGoalSeconds;
+                HudNode.EndlessMode = IsEndlessRun;
                 HudNode.ConnectPlayer(Player);
             }
 
@@ -312,6 +355,7 @@ public partial class Main : Node2D
 
         // Map mechanics
         ProcessMapMechanics(dt);
+        ProcessOverdriveEnvironment(dt);
         ProcessNeutralMatter(dt);
         ProcessHostUlceration(dt);
 
@@ -524,7 +568,7 @@ public partial class Main : Node2D
         if (EnemyContainer == null || Player == null)
             return;
 
-        SubBoss = PathogenSpawner.SpawnSubBoss(EnemyContainer, Player, ArenaSize, MapId);
+        SubBoss = PathogenSpawner.SpawnSubBoss(EnemyContainer, Player, ArenaSize, MapId, EnvironmentTime);
         if (SubBoss != null)
         {
             SubBoss.EnemyDied += OnSubBossDefeated;
@@ -557,7 +601,7 @@ public partial class Main : Node2D
             return;
         }
 
-        TerminalBoss = PathogenSpawner.SpawnTerminalBoss(EnemyContainer, Player, ArenaSize, MapId);
+        TerminalBoss = PathogenSpawner.SpawnTerminalBoss(EnemyContainer, Player, ArenaSize, MapId, EnvironmentTime);
         if (TerminalBoss == null)
         {
             // No boss entity available for this map: the clear condition cannot be met.
@@ -597,6 +641,18 @@ public partial class Main : Node2D
             return;
 
         TerminalBossNeutralized = true;
+
+        if (IsEndlessRun)
+        {
+            // Endless overdrive (docs/endgame.md §3.1): the 15:00 clear does not
+            // settle the run — the uncapped timeline keeps escalating.
+            TerminalBoss = null;
+            BossLockdownActive = false;
+            AudioManager.Instance?.PlaySfx("wave_complete");
+            GD.Print("[WaveDirector] Terminal boss neutralized. Endless overdrive continues past 15:00.");
+            return;
+        }
+
         GD.Print("[WaveDirector] Terminal boss neutralized. Specific neutralization complete.");
         EndRun(true, RunRecordManager.CauseSpecificNeutralization);
     }
@@ -608,8 +664,17 @@ public partial class Main : Node2D
 
         if (!GodotObject.IsInstanceValid(TerminalBoss) || TerminalBoss.IsQueuedForDeletion())
         {
-            // The boss vanished without a confirmed kill: the clear criterion is not met.
             TerminalBoss = null;
+
+            if (IsEndlessRun)
+            {
+                // No clear criterion to protect in endless mode: release the lockdown.
+                BossLockdownActive = false;
+                GD.PushWarning("[WaveDirector] Terminal boss vanished in endless mode; lockdown released.");
+                return;
+            }
+
+            // The boss vanished without a confirmed kill: the clear criterion is not met.
             GD.PushWarning("[WaveDirector] Terminal boss vanished without a kill; settling as defeat.");
             EndRun(false, RunRecordManager.CauseSystemFailure);
         }
@@ -701,6 +766,214 @@ public partial class Main : Node2D
         }
     }
 
+    /// <summary>
+    /// Endless overdrive environment ladder (docs/endgame.md §3.2). Effects are
+    /// cumulative per 3-minute cycle:
+    ///   1) 15:00+ tissue-fluid suction intensifies + fibrin nets congeal;
+    ///   2) 18:00+ respiratory shear storm thrust;
+    ///   3) 21:00+ bile-acid surge strips all armor for 3s periodically;
+    ///   4) 24:00+ gastric acid tide shrinks the safe zone;
+    ///   5) 27:00+ terminal composite: shear storm and acid tide coexist.
+    /// </summary>
+    private void ProcessOverdriveEnvironment(float delta)
+    {
+        if (!IsEndlessRun)
+            return;
+
+        int cycle = OverdriveCycle;
+        if (cycle <= 0)
+            return;
+
+        if (cycle > _announcedOverdriveCycle)
+        {
+            _announcedOverdriveCycle = cycle;
+            AnnounceOverdriveCycle(cycle);
+        }
+
+        // Cycle 1+: fibrin nets (slow-only webs) congeal across the battlefield.
+        _fibrinNetTimer -= delta;
+        if (_fibrinNetTimer <= 0.0f)
+        {
+            _fibrinNetTimer = 4.5f;
+            SpawnFibrinNet();
+        }
+
+        // Cycle 2+: respiratory shear storm drives periodic violent thrust.
+        if (cycle >= 2 && EnemyContainer != null)
+        {
+            float strength = 34.0f + 18.0f * Mathf.Min(cycle, 5);
+            var shearVec = new Vector2(
+                Mathf.Sin(EnvironmentTime * 1.6f) * strength,
+                Mathf.Cos(EnvironmentTime * 1.1f) * strength * 0.5f);
+
+            foreach (var child in EnemyContainer.GetChildren())
+            {
+                if (child is not Node2D enemy)
+                    continue;
+                var eaten = enemy.Get("is_being_eaten");
+                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
+                    continue;
+                enemy.Position += shearVec * delta * 0.7f;
+            }
+
+            if (Player is BaseCell host)
+                host.ApplyImpulse(shearVec * delta * 0.35f);
+        }
+
+        // Cycle 3+: bile-acid surge strips the whole arena's armor for 3 seconds.
+        if (cycle >= 3)
+        {
+            if (_armorBreakTimer > 0.0f)
+            {
+                _armorBreakTimer -= delta;
+                if (_armorBreakTimer <= 0.0f && _armorBreakAmount > 0.0f)
+                {
+                    if (Player is BaseCell restored)
+                        restored.Stats?.AddModifier("armor", _armorBreakAmount, 0.0f);
+                    _armorBreakAmount = 0.0f;
+                }
+            }
+            else
+            {
+                _armorBreakCooldown -= delta;
+                if (_armorBreakCooldown <= 0.0f)
+                {
+                    _armorBreakCooldown = 15.0f;
+                    if (Player is BaseCell cell && cell.Stats != null)
+                    {
+                        _armorBreakAmount = Mathf.Max(0.0f, cell.Stats.GetStat("armor"));
+                        if (_armorBreakAmount > 0.0f)
+                        {
+                            cell.Stats.AddModifier("armor", -_armorBreakAmount, 0.0f);
+                            _armorBreakTimer = 3.0f;
+                            GD.Print("[Overdrive] Bile-acid surge: armor stripped for 3s.");
+                        }
+                    }
+                }
+            }
+        }
+
+        // Cycle 4+: gastric acid tide floods the arena; the safe zone shrinks.
+        if (cycle >= 4)
+        {
+            float tideStart = PathogenSpawner.OverdriveStartSeconds + 3.0f * PathogenSpawner.OverdriveCycleSeconds;
+            float progress = Mathf.Clamp((EnvironmentTime - tideStart) / PathogenSpawner.OverdriveCycleSeconds, 0.0f, 1.0f);
+            AcidSafeRadius = Mathf.Lerp(2300.0f, 850.0f, progress);
+            UpdateAcidTideRing();
+
+            if (Player != null && Player.GlobalPosition.Length() > AcidSafeRadius)
+            {
+                _acidTickAccumulator += delta;
+                if (_acidTickAccumulator >= 1.0f)
+                {
+                    _acidTickAccumulator -= 1.0f;
+                    if (Player is BaseCell burned)
+                    {
+                        burned.TakeDamage(6.0f);
+                        burned.ApplySlow(1.2f, 0.6f);
+                    }
+                }
+            }
+            else
+            {
+                _acidTickAccumulator = 0.0f;
+            }
+        }
+    }
+
+    /// <summary>Builds the acid-tide boundary ring on the arena background layer.</summary>
+    private void SetupAcidTideRing()
+    {
+        var ringParent = ArenaBorders?.GetParent();
+        if (ringParent == null)
+            return;
+
+        _acidRing = new Line2D
+        {
+            Name = "AcidTideRing",
+            Closed = true,
+            Width = 6.0f,
+            DefaultColor = new Color(0.78f, 0.88f, 0.25f, 0.55f),
+            Visible = false
+        };
+        ringParent.AddChild(_acidRing);
+    }
+
+    private void UpdateAcidTideRing()
+    {
+        if (_acidRing == null)
+            return;
+
+        if (AcidSafeRadius <= 0.0f)
+        {
+            _acidRing.Visible = false;
+            _drawnAcidRadius = -1.0f;
+            return;
+        }
+
+        if (Mathf.Abs(_drawnAcidRadius - AcidSafeRadius) < 1.0f)
+            return;
+
+        _drawnAcidRadius = AcidSafeRadius;
+        const int segments = 96;
+        var points = new Vector2[segments];
+        for (int i = 0; i < segments; i++)
+        {
+            float angle = Mathf.Tau * i / segments;
+            points[i] = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * AcidSafeRadius;
+        }
+        _acidRing.Points = points;
+        _acidRing.Visible = true;
+    }
+
+    private void SpawnFibrinNet()
+    {
+        if (EnemyContainer == null || Player == null)
+            return;
+
+        float angle = GD.Randf() * Mathf.Tau;
+        float dist = (float)GD.RandRange(220.0, 620.0);
+        var pos = Player.GlobalPosition + Vector2.FromAngle(angle) * dist;
+        float halfW = (ArenaSize.X * 0.5f) - 120.0f;
+        float halfH = (ArenaSize.Y * 0.5f) - 120.0f;
+        pos.X = Mathf.Clamp(pos.X, -halfW, halfW);
+        pos.Y = Mathf.Clamp(pos.Y, -halfH, halfH);
+
+        var net = new BioHazardArea
+        {
+            Name = "FibrinNet",
+            Duration = 9.0f,
+            Radius = 90.0f,
+            SlowFactor = 0.45f,
+            SlowsTarget = true,
+            DealsDamage = false,
+            CoreColor = new Color(0.72f, 0.68f, 0.55f, 0.28f),
+            RimColor = new Color(0.88f, 0.84f, 0.68f, 0.55f),
+            GlobalPosition = pos
+        };
+        EnemyContainer.AddChild(net);
+    }
+
+    private void AnnounceOverdriveCycle(int cycle)
+    {
+        string title = Tr("OVERDRIVE_ALERT_TITLE");
+        string desc;
+        if (cycle > PathogenSpawner.OverdriveCycleCount)
+        {
+            desc = Tr("OVERDRIVE_ALERT_TERMINAL");
+        }
+        else
+        {
+            int hpPct = Mathf.RoundToInt((OverdriveHealthMultiplier - 1.0f) * 100.0f);
+            int spdPct = Mathf.RoundToInt((OverdriveSpeedMultiplier - 1.0f) * 100.0f);
+            desc = TextFormatter.Format(Tr("OVERDRIVE_ALERT_FMT"), hpPct, spdPct, cycle);
+        }
+
+        HudNode?.ShowOverdriveAlert(title, desc);
+        AudioManager.Instance?.PlaySfx("wave_complete", -3.0f);
+        GD.Print($"[Overdrive] Cycle {cycle} engaged: HP ×{OverdriveHealthMultiplier:F2}, Speed ×{OverdriveSpeedMultiplier:F2}.");
+    }
+
     private void SpawnInitialWave(int count)
     {
         if (Player == null || EnemyContainer == null)
@@ -717,6 +990,12 @@ public partial class Main : Node2D
     {
         if (RunEnded)
             return;
+
+        if (victory && IsEndlessRun)
+        {
+            GD.PushWarning("[Main] Endless overdrive runs can only settle as defeat (membrane rupture).");
+            return;
+        }
 
         if (victory && !RunRecordManager.IsVictoryCriteriaMet(EnvironmentTime, TerminalBossNeutralized))
         {
@@ -776,7 +1055,8 @@ public partial class Main : Node2D
             cause,
             kills,
             killScore,
-            RunDifficulty);
+            RunDifficulty,
+            IsEndlessRun);
 
         if (RunTelemetryManager.Instance != null)
         {

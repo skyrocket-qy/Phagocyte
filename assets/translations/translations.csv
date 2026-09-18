@@ -517,3 +517,8 @@ RECORDS_DATE,Recorded At,結算時間
 CAUSE_SPECIFIC_NEUTRALIZATION,Antigen-specific immunity fully established,抗原特異性免疫完全建立
 CAUSE_MEMBRANE_RUPTURE,SIRS · Septic shock · MODS,敗血性休克 · 多重器官衰竭
 CAUSE_SYSTEM_FAILURE,Run aborted (system failure),系統性中止（內容異常）
+BTN_ENDLESS,🌌 Endless Cytokine Storm,🌌 無盡細胞因子風暴
+ENDLESS_LOCKED_HINT,Clear any organ on Hard difficulty to unlock Endless Overdrive.,通關任意器官地圖的 Hard 難度以解鎖無盡過載模式。
+OVERDRIVE_ALERT_TITLE,⚠ Cytokine Storm Overload,⚠ 細胞因子風暴過載
+OVERDRIVE_ALERT_FMT,Pathogen HP +%d%% · Speed +%d%% (Cycle %d),病原體血量 +%d%% · 移速 +%d%%（第 %d 波）
+OVERDRIVE_ALERT_TERMINAL,Terminal overdrive: exponential scaling · composite organ environment,終末過載：指數級無上限增長 · 雙器官複合環境
