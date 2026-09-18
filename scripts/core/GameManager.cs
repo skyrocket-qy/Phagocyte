@@ -8,6 +8,7 @@ public partial class GameManager : Node
     // Runtime Player Selections
     public static string SelectedClass = "macrophage";
     public static string SelectedMap = "acute_wound";
+    public static string SelectedDifficulty = RunRecordManager.DifficultyNormal;
     public static string CurrentLanguage = "zh_CN";
 
     [Signal]

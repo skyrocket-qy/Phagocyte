@@ -20,6 +20,12 @@ public partial class RunTelemetryManager : Node
     public int BlockedCount { get; private set; } = 0;
     public float LifeStealHealed { get; private set; } = 0.0f;
 
+    /// <summary>Total pathogens killed this run (ranged kills + engulfed kills).</summary>
+    public int KillCount { get; private set; } = 0;
+
+    /// <summary>Accumulated fixed base score of every killed pathogen (docs/record.md §4.1).</summary>
+    public int KillScore { get; private set; } = 0;
+
     public Dictionary<string, float> SkillDamageMap { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     public override void _Ready()
@@ -45,6 +51,8 @@ public partial class RunTelemetryManager : Node
         EvadedCount = 0;
         BlockedCount = 0;
         LifeStealHealed = 0.0f;
+        KillCount = 0;
+        KillScore = 0;
         SkillDamageMap.Clear();
     }
 
@@ -91,6 +99,17 @@ public partial class RunTelemetryManager : Node
         LifeStealHealed += amount;
     }
 
+    /// <summary>
+    /// Log a pathogen kill. Score is the enemy's fixed base score
+    /// (0 for farming-neutral hazards such as senescent RBCs).
+    /// </summary>
+    public void RecordKill(int baseScore)
+    {
+        if (!IsRunActive) return;
+        KillCount++;
+        KillScore += Math.Max(0, baseScore);
+    }
+
     public List<(string SkillId, float Damage, float Pct)> GetTopSkills(int count = 4)
     {
         float total = TotalDamageDealt > 0.0f ? TotalDamageDealt : 1.0f;
@@ -109,7 +128,9 @@ public partial class RunTelemetryManager : Node
             { "total_damage_taken", TotalDamageTaken },
             { "evaded_count", EvadedCount },
             { "blocked_count", BlockedCount },
-            { "lifesteal_healed", LifeStealHealed }
+            { "lifesteal_healed", LifeStealHealed },
+            { "kills", KillCount },
+            { "kill_score", KillScore }
         };
 
         var skillDict = new Godot.Collections.Dictionary();

@@ -89,6 +89,12 @@ public partial class Main : Node2D
     public float EnvironmentTime { get; set; } = 0.0f;
     public string MapId { get; set; } = "acute_wound";
 
+    /// <summary>Run difficulty tier ("normal" / "hard"); Hard is the Acute Crisis mode.</summary>
+    public string RunDifficulty { get; set; } = GameManager.SelectedDifficulty;
+
+    /// <summary>Whether this run is fought on the Hard (Acute Crisis) tier.</summary>
+    public bool IsHardRun => RunDifficulty == RunRecordManager.DifficultyHard;
+
     public override void _Ready()
     {
         StaphScene ??= DefaultStaphScene;
@@ -725,7 +731,7 @@ public partial class Main : Node2D
         {
             AudioManager.Instance?.PlayBgm("victory", 0.3f);
             AudioManager.Instance?.PlaySfx("wave_complete");
-            AchievementManager.RecordMapClear(MapId);
+            AchievementManager.RecordMapClear(MapId, IsHardRun);
         }
         else
         {
@@ -752,6 +758,9 @@ public partial class Main : Node2D
             }
         }
 
+        int kills = RunTelemetryManager.Instance?.KillCount ?? 0;
+        int killScore = RunTelemetryManager.Instance?.KillScore ?? 0;
+
         RunTelemetryManager.Instance?.EndRun();
 
         var record = RunRecordManager.RecordRun(
@@ -764,7 +773,10 @@ public partial class Main : Node2D
             PassiveTreeManager.GetSpentPoints(classId),
             skillIds.ToArray(),
             TerminalBossNeutralized,
-            cause);
+            cause,
+            kills,
+            killScore,
+            RunDifficulty);
 
         if (RunTelemetryManager.Instance != null)
         {

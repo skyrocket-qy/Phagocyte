@@ -91,12 +91,16 @@ public partial class TestNewSystemsBundle : SceneTree
         tele.RecordBlocked();
         tele.RecordBlocked();
         tele.RecordLifeSteal(3.0f);
+        tele.RecordKill(15);
+        tele.RecordKill(100);
 
         AssertThat(tele.TotalDamageDealt).IsEqual(250.0f);
         AssertThat(tele.TotalDamageTaken).IsEqual(65.0f);
         AssertThat(tele.EvadedCount).IsEqual(2);
         AssertThat(tele.BlockedCount).IsEqual(3);
         AssertThat(tele.LifeStealHealed).IsEqual(3.0f);
+        AssertThat(tele.KillCount).IsEqual(2);
+        AssertThat(tele.KillScore).IsEqual(115);
 
         var topSkills = tele.GetTopSkills(3);
         AssertThat(topSkills.Count).IsEqual(3);
@@ -108,6 +112,8 @@ public partial class TestNewSystemsBundle : SceneTree
         AssertThat(dict.ContainsKey("total_damage_dealt")).IsTrue();
         AssertThat(dict.ContainsKey("evaded_count")).IsTrue();
         AssertThat(dict.ContainsKey("skills")).IsTrue();
+        AssertThat(dict.ContainsKey("kills")).IsTrue();
+        AssertThat(dict["kills"].AsInt32()).IsEqual(2);
         GD.Print("[PASS] Step 2: RunTelemetryManager DPS ranking, defense proc logging and serialization verified.");
         tele.QueueFree();
 

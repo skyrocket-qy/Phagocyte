@@ -117,10 +117,10 @@ public partial class TestRunRecords : SceneTree
         RunRecordManager.RecordRun(
             RunRecordManager.ResultVictory, "macrophage", "acute_wound",
             920.0f, 7, 42, 3, new[] { "perforin_lance", "ros_torrent" },
-            bossNeutralized: true);
+            bossNeutralized: true, kills: 2200);
         RunRecordManager.RecordRun(
             RunRecordManager.ResultDefeat, "ctl", "alveolar_space",
-            123.5f, 4, 11, 1, Array.Empty<string>());
+            123.5f, 4, 11, 1, Array.Empty<string>(), kills: 80);
 
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(2);
         // Newest run is stored first
@@ -128,9 +128,17 @@ public partial class TestRunRecords : SceneTree
         AssertThat(RunRecordManager.Records[0]["cause"].AsString()).IsEqual(RunRecordManager.CauseMembraneRupture);
         AssertThat(RunRecordManager.Records[0]["victory_criteria"].AsGodotDictionary()["met"].AsBool()).IsFalse();
         AssertThat(RunRecordManager.Records[0]["class_id"].AsString()).IsEqual("ctl");
+        AssertThat(RunRecordManager.Records[0]["kills"].AsInt32()).IsEqual(80);
+        AssertThat(RunRecordManager.Records[0]["rank"].AsString()).IsEqual(RunRecordManager.RankD);
         AssertThat(RunRecordManager.Records[1]["active_skills"].AsGodotArray().Count).IsEqual(2);
         AssertThat(RunRecordManager.Records[1]["cause"].AsString()).IsEqual(RunRecordManager.CauseSpecificNeutralization);
         AssertThat(RunRecordManager.Records[1]["victory_criteria"].AsGodotDictionary()["met"].AsBool()).IsTrue();
+        AssertThat(RunRecordManager.Records[1]["kills"].AsInt32()).IsEqual(2200);
+        AssertThat(RunRecordManager.Records[1]["difficulty"].AsString()).IsEqual(RunRecordManager.DifficultyNormal);
+        AssertThat(RunRecordManager.Records[1]["rank"].AsString()).IsEqual(RunRecordManager.RankA);
+        AssertThat(RunRecordManager.Records[1]["kpm"].AsSingle()).IsEqualApprox(143.48f, 0.1f);
+        // (920s × 10 + 0 kill score + Lv7 × 100) × 1.0 + 10,000 clear bonus
+        AssertThat(RunRecordManager.Records[1]["score"].AsInt32()).IsEqual(19900);
         AssertThat(RunRecordManager.GetVictoryCount()).IsEqual(1);
         AssertThat(RunRecordManager.GetBestSurvivalTime()).IsEqualApprox(920.0f, 0.01f);
         AssertThat(RunRecordManager.GetFastestVictory()).IsEqualApprox(920.0f, 0.01f);
@@ -139,6 +147,40 @@ public partial class TestRunRecords : SceneTree
         AssertThat(RunRecordManager.IsVictoryCriteriaMet(900.0f, true)).IsTrue();
         AssertThat(RunRecordManager.IsVictoryCriteriaMet(899.0f, true)).IsFalse();
         AssertThat(RunRecordManager.IsVictoryCriteriaMet(1200.0f, false)).IsFalse();
+
+        // Clinical grading (docs/record.md §4.3)
+        AssertThat(RunRecordManager.ComputeKpm(3500, 900.0f)).IsEqualApprox(233.33f, 0.1f);
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultVictory, RunRecordManager.DifficultyHard, 900.0f, 3500))
+            .IsEqual(RunRecordManager.RankS);
+        // Hard clear but KPM below the S gate falls back to A
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultVictory, RunRecordManager.DifficultyHard, 900.0f, 3400))
+            .IsEqual(RunRecordManager.RankA);
+        // A flawless normal clear can never claim S (Hard-only grade)
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultVictory, RunRecordManager.DifficultyNormal, 900.0f, 3600))
+            .IsEqual(RunRecordManager.RankA);
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultDefeat, RunRecordManager.DifficultyNormal, 601.0f, 800))
+            .IsEqual(RunRecordManager.RankB);
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultDefeat, RunRecordManager.DifficultyNormal, 241.0f, 300))
+            .IsEqual(RunRecordManager.RankC);
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultDefeat, RunRecordManager.DifficultyNormal, 239.0f, 500))
+            .IsEqual(RunRecordManager.RankD);
+
+        // Pathological score: (survival × 10 + kill score + level × 100) × difficulty + clear bonus
+        AssertThat(RunRecordManager.ComputeScore(
+            RunRecordManager.ResultVictory, RunRecordManager.DifficultyNormal, 900.0f, 50000, 40))
+            .IsEqual(73000);
+        AssertThat(RunRecordManager.ComputeScore(
+            RunRecordManager.ResultVictory, RunRecordManager.DifficultyHard, 900.0f, 50000, 40))
+            .IsEqual(104500);
+        AssertThat(RunRecordManager.ComputeScore(
+            RunRecordManager.ResultDefeat, RunRecordManager.DifficultyNormal, 300.0f, 1200, 10))
+            .IsEqual(5200);
 
         AssertThat(RunRecordManager.FormatTime(0.0f)).IsEqual("00:00");
         AssertThat(RunRecordManager.FormatTime(65.4f)).IsEqual("01:05");
@@ -252,6 +294,13 @@ public partial class TestRunRecords : SceneTree
         AssertThat(criteria["survived_full_time"].AsBool()).IsTrue();
         AssertThat(criteria["boss_neutralized"].AsBool()).IsTrue();
 
+        // Kill telemetry feeds the record and its clinical grade
+        AssertThat(RunRecordManager.Records[0]["kills"].AsInt32()).IsGreater(0);
+        AssertThat(RunRecordManager.Records[0]["kill_score"].AsInt32()).IsGreater(2999);
+        AssertThat(RunRecordManager.Records[0]["kpm"].AsSingle()).IsGreater(0.0f);
+        AssertThat(RunRecordManager.Records[0].ContainsKey("rank")).IsTrue();
+        AssertThat(RunRecordManager.Records[0]["difficulty"].AsString()).IsEqual(RunRecordManager.DifficultyNormal);
+
         var modal = _main.GetNodeOrNull<RunRecordsModal>("UIOverlay/RunRecordsModal");
         AssertThat(modal).IsNotNull();
         AssertThat(modal!.Visible).IsTrue();
@@ -283,6 +332,8 @@ public partial class TestRunRecords : SceneTree
         AssertThat(RunRecordManager.Records[0]["result"].AsString()).IsEqual(RunRecordManager.ResultDefeat);
         AssertThat(RunRecordManager.Records[0]["cause"].AsString()).IsEqual(RunRecordManager.CauseMembraneRupture);
         AssertThat(RunRecordManager.Records[0]["victory_criteria"].AsGodotDictionary()["met"].AsBool()).IsFalse();
+        AssertThat(RunRecordManager.Records[0]["rank"].AsString()).IsEqual(RunRecordManager.RankD);
+        AssertThat(RunRecordManager.Records[0]["kills"].AsInt32()).IsEqual(0);
 
         var modal = main2.GetNodeOrNull<RunRecordsModal>("UIOverlay/RunRecordsModal");
         AssertThat(modal).IsNotNull();

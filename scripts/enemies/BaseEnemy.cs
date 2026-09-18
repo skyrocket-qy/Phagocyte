@@ -355,6 +355,7 @@ public abstract partial class BaseEnemy : Node2D
         AudioManager.Instance?.PlayEnemyDeath();
         VfxManager.Instance?.Play(VfxType.CytoplasmSplatter, GlobalPosition);
         AchievementManager.RecordEvent("pathogen_killed", EnemyId);
+        RunTelemetryManager.Instance?.RecordKill(BaseScore);
         EmitSignal(SignalName.EnemyDied, this);
         QueueFree();
     }

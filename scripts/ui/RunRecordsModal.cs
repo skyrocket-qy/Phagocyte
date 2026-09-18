@@ -153,12 +153,21 @@ public partial class RunRecordsModal : PanelContainer
         SummaryBox.Visible = true;
         string classId = _record.GetValueOrDefault("class_id", "").AsString();
         string mapId = _record.GetValueOrDefault("map_id", "").AsString();
+        string rank = GetRank(_record);
 
+        AddSummaryRow("RECORDS_RANK",
+            string.IsNullOrEmpty(rank) ? "-" : GetRankLabel(rank),
+            string.IsNullOrEmpty(rank) ? null : GetRankColor(rank));
         AddSummaryRow("RECORDS_CLASS", GetClassName(classId));
         AddSummaryRow("RECORDS_MAP", GetMapName(mapId));
+        AddSummaryRow("RECORDS_DIFFICULTY", GetDifficultyName(_record.GetValueOrDefault("difficulty", RunRecordManager.DifficultyNormal).AsString()));
         AddSummaryRow("RECORDS_TIME", RunRecordManager.FormatTime(_record.GetValueOrDefault("survival_time", 0.0f).AsSingle()));
         AddSummaryRow("RECORDS_LEVEL", _record.GetValueOrDefault("level", 1).AsInt32().ToString());
+        AddSummaryRow("RECORDS_KILLS", _record.GetValueOrDefault("kills", 0).AsInt32().ToString());
+        AddSummaryRow("RECORDS_KPM", $"{_record.GetValueOrDefault("kpm", 0.0f).AsSingle():F1}");
         AddSummaryRow("RECORDS_DIGESTED", _record.GetValueOrDefault("digested", 0).AsInt32().ToString());
+        AddSummaryRow("RECORDS_KILL_SCORE", _record.GetValueOrDefault("kill_score", 0).AsInt32().ToString());
+        AddSummaryRow("RECORDS_SCORE", _record.GetValueOrDefault("score", 0).AsInt32().ToString());
         AddSummaryRow("RECORDS_POINTS", _record.GetValueOrDefault("points_spent", 0).AsInt32().ToString());
         AddSummaryRow("RECORDS_SKILLS", GetSkillNames(_record.GetValueOrDefault("active_skills", new Array<string>())));
 
@@ -176,7 +185,7 @@ public partial class RunRecordsModal : PanelContainer
         }
     }
 
-    private void AddSummaryRow(string labelKey, string value)
+    private void AddSummaryRow(string labelKey, string value, Color? valueColor = null)
     {
         if (SummaryBox == null)
             return;
@@ -198,6 +207,8 @@ public partial class RunRecordsModal : PanelContainer
             SizeFlagsHorizontal = SizeFlags.ExpandFill,
             AutowrapMode = TextServer.AutowrapMode.WordSmart
         };
+        if (valueColor.HasValue)
+            valueLabel.Modulate = valueColor.Value;
         row.AddChild(valueLabel);
 
         SummaryBox.AddChild(row);
@@ -277,8 +288,61 @@ public partial class RunRecordsModal : PanelContainer
         };
         vbox.AddChild(second);
 
+        var meta = new HBoxContainer();
+        meta.AddThemeConstantOverride("separation", 8);
+
+        string rank = GetRank(rec);
+        var rankLabel = new Label
+        {
+            Text = string.IsNullOrEmpty(rank) ? "◆ --" : $"◆ {rank}",
+            Modulate = GetRankColor(rank),
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        meta.AddChild(rankLabel);
+
+        int kills = rec.GetValueOrDefault("kills", 0).AsInt32();
+        float kpm = rec.GetValueOrDefault("kpm", 0.0f).AsSingle();
+        int score = rec.GetValueOrDefault("score", 0).AsInt32();
+        var stats = new Label
+        {
+            Text = $"🎯 {kills}  ·  {kpm:F0} KPM  ·  Σ {score}  ·  {GetDifficultyName(rec.GetValueOrDefault("difficulty", RunRecordManager.DifficultyNormal).AsString())}",
+            Modulate = new Color(0.6f, 0.7f, 0.8f),
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        meta.AddChild(stats);
+
+        vbox.AddChild(meta);
+
         row.AddChild(vbox);
         return row;
+    }
+
+    private static string GetRank(Dictionary rec)
+    {
+        return rec.GetValueOrDefault("rank", "").AsString();
+    }
+
+    private string GetRankLabel(string rank)
+    {
+        return $"{rank} · {Tr($"RANK_{rank}_TITLE")}";
+    }
+
+    private string GetDifficultyName(string difficulty)
+    {
+        return Tr(difficulty == RunRecordManager.DifficultyHard ? "DIFFICULTY_HARD" : "DIFFICULTY_NORMAL");
+    }
+
+    private static Color GetRankColor(string rank)
+    {
+        return rank switch
+        {
+            RunRecordManager.RankS => new Color(1.0f, 0.84f, 0.35f),
+            RunRecordManager.RankA => new Color(0.45f, 0.95f, 1.0f),
+            RunRecordManager.RankB => new Color(0.55f, 1.0f, 0.6f),
+            RunRecordManager.RankC => new Color(1.0f, 0.75f, 0.4f),
+            RunRecordManager.RankD => new Color(1.0f, 0.5f, 0.5f),
+            _ => new Color(0.6f, 0.6f, 0.65f)
+        };
     }
 
     private static string GetClassName(string classId)

@@ -493,3 +493,16 @@ ACH_FIRST_EVOLUTION_TITLE,First Epigenetic Fusion,首次表观融合
 ACH_FIRST_EVOLUTION_DESC,Fuse any one ultimate epigenetic evolution for the first time.,首次合成任意 1 组终极表观遗传超武。
 ACH_PRION_CLEARED_TITLE,Protein Scavenger: Crystal Shatter,蛋白清道夫：晶体粉碎
 ACH_PRION_CLEARED_DESC,Crush and digest one misfolded prion crystal.,击碎并消化 1 颗错误折叠朊病毒晶体。
+RECORDS_RANK,Clinical Grade,臨床評級
+RECORDS_KILLS,Pathogens Killed,總擊殺數
+RECORDS_KPM,Kill Flux (KPM),擊殺通量 (KPM)
+RECORDS_KILL_SCORE,Kill Score,擊殺基礎分
+RECORDS_SCORE,Pathological Score,生化結算積分
+RECORDS_DIFFICULTY,Difficulty,難度
+DIFFICULTY_NORMAL,Normal,普通
+DIFFICULTY_HARD,Hard · Acute Crisis,困難 · 急性危象
+RANK_S_TITLE,Microscopic Sovereign · Immune Myth,微觀主宰 · 免疫神話
+RANK_A_TITLE,Efficient Scavenger · Exceptional Compensation,高效清道夫 · 卓越代償
+RANK_B_TITLE,Local Defense Line · Stably Contained,局部防線 · 穩定受控
+RANK_C_TITLE,Stress Compensation · Acute Phase,應激代償 · 急性相
+RANK_D_TITLE,Membrane Lysis · Early Rout,膜溶解 · 早期潰敗

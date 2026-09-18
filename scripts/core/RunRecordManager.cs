@@ -50,6 +50,72 @@ public partial class RunRecordManager : Node
     public const string CauseMembraneRupture = "membrane_rupture";               // SIRS / 敗血性休克陣亡
     public const string CauseSystemFailure = "system_failure";                   // Content/setup failure fallback
 
+    // Difficulty tiers for scoring / ranking (docs/record.md §4.2)
+    public const string DifficultyNormal = "normal";
+    public const string DifficultyHard = "hard";
+
+    // Clinical grades (docs/record.md §4.3)
+    public const string RankS = "S";
+    public const string RankA = "A";
+    public const string RankB = "B";
+    public const string RankC = "C";
+    public const string RankD = "D";
+
+    // Pathological score weights (docs/record.md §4.2)
+    public const float SurvivalScorePerSecond = 10.0f;
+    public const int LevelScoreBonus = 100;
+    public const int ClearBonus = 10000;
+    public const float HardDifficultyMultiplier = 1.5f;
+
+    /// <summary>Kill flux: pathogens killed per minute of survival.</summary>
+    public static float ComputeKpm(int kills, float survivalTime)
+    {
+        if (survivalTime <= 0.01f)
+            return 0.0f;
+        return kills / (survivalTime / 60.0f);
+    }
+
+    /// <summary>
+    /// Clinical grade (docs/record.md §4.3), evaluated top-down:
+    /// S = Hard clear with ≥3,500 kills and KPM ≥230;
+    /// A = Normal clear or Hard survival past 12:00 with ≥2,000 kills and KPM ≥130;
+    /// B = survival past 08:00 with ≥800 kills; C = past 04:00 with ≥300 kills; D otherwise.
+    /// </summary>
+    public static string ComputeRank(string result, string difficulty, float survivalTime, int kills)
+    {
+        bool hard = difficulty == DifficultyHard;
+        bool victory = result == ResultVictory;
+        float kpm = ComputeKpm(kills, survivalTime);
+
+        if (victory && hard && kills >= 3500 && kpm >= 230.0f)
+            return RankS;
+
+        bool rankATimeGate = (victory && !hard) || (hard && survivalTime > 720.0f);
+        if (rankATimeGate && kills >= 2000 && kpm >= 130.0f)
+            return RankA;
+
+        if (survivalTime > 480.0f && kills >= 800)
+            return RankB;
+
+        if (survivalTime > 240.0f && kills >= 300)
+            return RankC;
+
+        return RankD;
+    }
+
+    /// <summary>
+    /// Pathological score (docs/record.md §4.2):
+    /// (survival × 10 + kill score + level × 100) × difficulty multiplier + clear bonus.
+    /// </summary>
+    public static int ComputeScore(string result, string difficulty, float survivalTime, int killScore, int level)
+    {
+        float multiplier = difficulty == DifficultyHard ? HardDifficultyMultiplier : 1.0f;
+        float total = (survivalTime * SurvivalScorePerSecond + Mathf.Max(0, killScore) + level * LevelScoreBonus) * multiplier;
+        if (result == ResultVictory)
+            total += ClearBonus;
+        return Mathf.RoundToInt(total);
+    }
+
     public static RunRecordManager Instance { get; private set; } = null;
 
     public static Array<Dictionary> Records { get; private set; } = new Array<Dictionary>();
@@ -78,6 +144,8 @@ public partial class RunRecordManager : Node
     /// Append a finished run to the front of the history and persist it.
     /// Victory records are only accepted when the canonical criteria are met;
     /// an unearned victory claim is downgraded to a defeat with a warning.
+    /// Kills, KPM, clinical grade and pathological score are derived here so
+    /// every stored record stays internally consistent.
     /// Returns the stored record.
     /// </summary>
     public static Dictionary RecordRun(
@@ -90,7 +158,10 @@ public partial class RunRecordManager : Node
         int pointsSpent,
         string[] activeSkillIds,
         bool bossNeutralized = false,
-        string cause = "")
+        string cause = "",
+        int kills = 0,
+        int killScore = 0,
+        string difficulty = DifficultyNormal)
     {
         var skills = new Array<string>();
         if (activeSkillIds != null)
@@ -117,15 +188,28 @@ public partial class RunRecordManager : Node
             cause = result == ResultVictory ? CauseSpecificNeutralization : CauseSystemFailure;
         }
 
+        if (string.IsNullOrEmpty(difficulty))
+            difficulty = DifficultyNormal;
+
+        float kpm = ComputeKpm(kills, survivalTime);
+        string rank = ComputeRank(result, difficulty, survivalTime, kills);
+        int score = ComputeScore(result, difficulty, survivalTime, killScore, level);
+
         var record = new Dictionary
         {
             { "result", result },
             { "cause", cause },
             { "class_id", classId },
             { "map_id", mapId },
+            { "difficulty", difficulty },
             { "survival_time", survivalTime },
             { "level", level },
+            { "kills", kills },
             { "digested", digested },
+            { "kpm", kpm },
+            { "kill_score", killScore },
+            { "score", score },
+            { "rank", rank },
             { "points_spent", pointsSpent },
             { "active_skills", skills },
             { "victory_criteria", new Dictionary
