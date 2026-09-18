@@ -486,3 +486,6 @@ ACH_BBB_CLEAR_REWARD,Unlocks Blood-Brain Barrier Hard and grants +2 talent point
 ACH_WOUND_HARD_CLEAR_TITLE,Wound Scavenger: Sepsis Terminus,创口清道夫：脓毒终结
 ACH_WOUND_HARD_CLEAR_DESC,Clear Subcutaneous Wound on Hard (Acute Crisis) difficulty.,通关地图 01「皮下创口」Hard 急性危象难度。
 ACH_WOUND_HARD_CLEAR_REWARD,Unlocks the Endless Cytokine Storm endgame mode.,解锁【终局无尽细胞因子风暴模式】。
+MAP_LOCKED_HINT,UNLOCK REQUIRED,未解锁
+MAP_LOCKED_DEPLOY,This organ has not been unlocked yet. Clear the prerequisite map first.,此器官尚未解锁，请先通关前置地图。
+SCANNER_TARGET_LOCKED,TARGET LOCKED,目标未解锁

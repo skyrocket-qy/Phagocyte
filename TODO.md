@@ -186,7 +186,7 @@
     - `ach_bbb_clear`（通關血腦屏障 Normal）：解鎖血腦屏障 Hard ＋ 微管天賦點 $+2$。
     - `ach_wound_hard_clear`（通關創口 Hard）：解鎖【終局無盡細胞因子風暴模式】。
   - **影響檔案**：`scripts/core/GameManager.cs`, `scripts/core/AchievementManager.cs`
-- [ ] **[P0] 全息人體掃描儀與選關介面鎖定態 UI**：
+- [x] **[P0] 全息人體掃描儀與選關介面鎖定態 UI**：
   - 在 `HoloBodyScanner.cs` 中增加未解鎖器官的暗化濾鏡、鎖頭圖示與未解鎖 HUD 提示。
   - 在 `MainMenu.cs` 選關面板中，鎖定地圖顯示前置解鎖成就要求，禁用「出戰 (Deploy)」按鈕。
   - **影響檔案**：`scripts/ui/HoloBodyScanner.cs`, `scripts/ui/MainMenu.cs`

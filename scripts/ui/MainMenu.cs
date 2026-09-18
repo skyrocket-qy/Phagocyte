@@ -61,6 +61,7 @@ public partial class MainMenu : Control
     public Label? MapEnvLbl { get; set; }
     public Label? MapMechLbl { get; set; }
     public Label? MapThreatLbl { get; set; }
+    public Label? MapLockStatusLbl { get; set; }
     public HoloBodyScanner? HoloScanner { get; set; }
     public Button? DeployBtn { get; set; }
     public Button? MapBackBtn { get; set; }
@@ -69,6 +70,9 @@ public partial class MainMenu : Control
     public string ActiveTreeClassKey { get; set; } = "macrophage";
     public string ActiveTreeNodeId { get; set; } = "";
     public string ActiveMapKey { get; set; } = "acute_wound";
+
+    /// <summary>True when the currently inspected organ map is still locked.</summary>
+    public bool IsActiveMapLocked => !GameManager.IsMapUnlocked(ActiveMapKey);
 
     private Callable _langCallback;
 
@@ -127,6 +131,21 @@ public partial class MainMenu : Control
         HoloScanner = GetNodeOrNull<HoloBodyScanner>("MapView/HBox/HoloBodyScanner");
         DeployBtn = GetNodeOrNull<Button>("MapView/Buttons/DeployButton");
         MapBackBtn = GetNodeOrNull<Button>("MapView/Buttons/BackButton");
+
+        // Lock status readout injected under the threat rows (MapData-driven)
+        if (MapThreatLbl != null && MapThreatLbl.GetParent() is Control detailPanel)
+        {
+            MapLockStatusLbl = new Label
+            {
+                Name = "MapLockStatusLabel",
+                Visible = false,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                CustomMinimumSize = new Vector2(0, 36)
+            };
+            MapLockStatusLbl.AddThemeColorOverride("font_color", new Color(1.0f, 0.45f, 0.4f));
+            MapLockStatusLbl.AddThemeFontSizeOverride("font_size", 13);
+            detailPanel.AddChild(MapLockStatusLbl);
+        }
 
         if (HoloScanner != null)
         {
@@ -423,16 +442,21 @@ public partial class MainMenu : Control
             var data = GameManager.GetMapInfo(key);
             string icon = data.TryGetValue("organ_icon", out var icVal) ? icVal.AsString() : "🌐";
             string name = data.TryGetValue("name", out var nmVal) ? nmVal.AsString() : key;
-            int diff = data.TryGetValue("difficulty", out var dfVal) ? dfVal.AsInt32() : 1;
+            int diff = data.TryGetValue("difficulty", out var diffVal) ? diffVal.AsInt32() : 1;
             string stars = new string('★', diff) + new string('☆', 5 - diff);
+            bool unlocked = GameManager.IsMapUnlocked(key);
 
             var btn = new Button
             {
                 CustomMinimumSize = new Vector2(250, 52),
                 Alignment = HorizontalAlignment.Left,
-                Text = $" {icon} {name}\n   {stars}"
+                Text = unlocked
+                    ? $" {icon} {name}\n   {stars}"
+                    : $" 🔒 {icon} {name}\n   {stars}"
             };
             btn.Name = $"MapBtn_{key}";
+            btn.SetMeta("map_locked", !unlocked);
+            btn.Modulate = unlocked ? Colors.White : new Color(0.65f, 0.66f, 0.72f, 0.85f);
             string localKey = key;
             btn.Pressed += () => SelectMap(localKey);
             MapListContainer.AddChild(btn);
@@ -494,6 +518,21 @@ public partial class MainMenu : Control
             HoloScanner.SelectOrgan(key);
         }
 
+        bool unlocked = GameManager.IsMapUnlocked(key);
+        if (MapLockStatusLbl != null)
+        {
+            MapLockStatusLbl.Visible = !unlocked;
+            MapLockStatusLbl.Text = unlocked
+                ? ""
+                : $"🔒 {Tr("MAP_LOCKED_HINT")}\n{AchievementManager.GetMapUnlockRequirementText(key)}";
+        }
+
+        if (DeployBtn != null)
+        {
+            DeployBtn.Disabled = !unlocked;
+            DeployBtn.TooltipText = unlocked ? "" : Tr("MAP_LOCKED_DEPLOY");
+        }
+
         if (MapListContainer != null)
         {
             foreach (var child in MapListContainer.GetChildren())
@@ -501,7 +540,10 @@ public partial class MainMenu : Control
                 if (child is Button b)
                 {
                     bool isCur = b.Name == $"MapBtn_{key}";
-                    b.Modulate = isCur ? new Color(1.2f, 1.2f, 1.2f, 1.0f) : new Color(0.75f, 0.85f, 0.95f, 0.75f);
+                    bool lockedBtn = b.HasMeta("map_locked") && b.GetMeta("map_locked").AsBool();
+                    b.Modulate = isCur
+                        ? (lockedBtn ? new Color(1.1f, 0.75f, 0.75f, 1.0f) : new Color(1.2f, 1.2f, 1.2f, 1.0f))
+                        : (lockedBtn ? new Color(0.6f, 0.62f, 0.7f, 0.8f) : new Color(0.75f, 0.85f, 0.95f, 0.75f));
                 }
             }
         }
@@ -509,6 +551,13 @@ public partial class MainMenu : Control
 
     private void OnDeployPressed()
     {
+        if (!GameManager.IsMapUnlocked(ActiveMapKey))
+        {
+            // Locked organ: refresh the requirement readout instead of deploying
+            SelectMap(ActiveMapKey);
+            return;
+        }
+
         GameManager.SelectedMap = ActiveMapKey;
         GameManager.StartGame(GetTree());
     }

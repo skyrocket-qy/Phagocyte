@@ -475,6 +475,43 @@ public partial class AchievementManager : Node
     }
 
     /// <summary>
+    /// Helper: Get unlock condition text for a locked organ map
+    /// (the prerequisite achievement that unlocks its Normal variant).
+    /// </summary>
+    public static string GetMapUnlockRequirementText(string mapId)
+    {
+        foreach (string achId in Achievements.Keys)
+        {
+            var ach = Achievements[achId].AsGodotDictionary();
+            if (ach.GetValueOrDefault("unlock_map", "").AsString() == mapId)
+            {
+                string title = TranslationServer.Translate(ach["title_key"].AsString());
+                string desc = TranslationServer.Translate(ach["desc_key"].AsString());
+                return string.Format("{0}🏆 {1} ({2})", TranslationServer.Translate("LABEL_UNLOCK_REQ"), title, desc);
+            }
+        }
+
+        if (GameManager.IsMapHardUnlocked(mapId))
+            return TranslationServer.Translate("STATUS_UNLOCKED");
+
+        return TranslationServer.Translate("STATUS_LOCKED");
+    }
+
+    /// <summary>
+    /// Helper: Get the prerequisite achievement id that unlocks an organ map, or "".
+    /// </summary>
+    public static string GetMapUnlockAchievementId(string mapId)
+    {
+        foreach (string achId in Achievements.Keys)
+        {
+            var ach = Achievements[achId].AsGodotDictionary();
+            if (ach.GetValueOrDefault("unlock_map", "").AsString() == mapId)
+                return achId;
+        }
+        return "";
+    }
+
+    /// <summary>
     /// Save achievement state to disk
     /// </summary>
     public static void SaveToDisk()

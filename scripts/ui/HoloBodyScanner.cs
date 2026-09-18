@@ -197,13 +197,17 @@ public partial class HoloBodyScanner : Control
             var rect = kvp.Value;
             bool isActive = (key == ActiveMapKey);
             bool isHovered = (key == HoveredMapKey);
+            bool isLocked = !GameManager.IsMapUnlocked(key);
 
-            float targetAlpha = isActive ? 1.0f : (isHovered ? 0.35f : 0.0f);
+            // Locked organs render with a heavy dimmed filter instead of the healthy glow
+            float activeAlpha = isLocked ? 0.16f : 1.0f;
+            float hoverAlpha = isLocked ? 0.08f : 0.35f;
+            float targetAlpha = isActive ? activeAlpha : (isHovered ? hoverAlpha : 0.0f);
             float currentAlpha = _fadeAlphas.TryGetValue(key, out var fa) ? fa : 0.0f;
             currentAlpha = Mathf.MoveToward(currentAlpha, targetAlpha, dt * 4.5f);
             _fadeAlphas[key] = currentAlpha;
 
-            float finalAlpha = currentAlpha * (isActive ? pulse : 1.0f);
+            float finalAlpha = currentAlpha * (isActive && !isLocked ? pulse : 1.0f);
             rect.Modulate = new Color(1.0f, 1.0f, 1.0f, finalAlpha);
         }
 
@@ -219,6 +223,12 @@ public partial class HoloBodyScanner : Control
             QueueRedraw();
             _hudOverlay?.QueueRedraw();
         }
+    }
+
+    /// <summary>True when the given organ map is still locked by the achievement chain.</summary>
+    public static bool IsOrganLocked(string mapKey)
+    {
+        return !GameManager.IsMapUnlocked(mapKey);
     }
 
     public override void _GuiInput(InputEvent @event)
@@ -359,6 +369,7 @@ public partial class HoloBodyScanner : Control
     {
         Vector2 activePos = Vector2.Zero;
         Color activeColor = new Color("#2a9d8f");
+        bool activeLocked = false;
 
         // First pass: Draw interactive hotspot indicators (subtle when inactive, invisible solid circle when active so overlay shines)
         foreach (var keyVar in GameManager.MapData.Keys)
@@ -371,23 +382,33 @@ public partial class HoloBodyScanner : Control
 
             bool isActive = key == ActiveMapKey;
             bool isHovered = key == HoveredMapKey;
+            bool isLocked = !GameManager.IsMapUnlocked(key);
 
             if (isActive)
             {
                 activePos = screenPos;
-                activeColor = nodeColor;
+                activeColor = isLocked ? new Color(0.95f, 0.35f, 0.35f) : nodeColor;
+                activeLocked = isLocked;
             }
             else
             {
                 // Inactive nodes: subtle tech ring with center micro-pip
                 float r = isHovered ? 13.0f : 8.5f;
-                float ringAlpha = isHovered ? 0.85f : 0.35f;
-                Color ringColor = new Color(nodeColor.R, nodeColor.G, nodeColor.B, ringAlpha);
+                float ringAlpha = isLocked ? (isHovered ? 0.75f : 0.26f) : (isHovered ? 0.85f : 0.35f);
+                Color ringColor = isLocked
+                    ? new Color(0.62f, 0.66f, 0.74f, ringAlpha)
+                    : new Color(nodeColor.R, nodeColor.G, nodeColor.B, ringAlpha);
 
                 canvas.DrawArc(screenPos, r, 0, Mathf.Tau, 20, ringColor, isHovered ? 1.8f : 1.0f);
                 canvas.DrawCircle(screenPos, 2.5f, ringColor);
 
-                if (isHovered)
+                if (isLocked)
+                {
+                    // Darkening filter + padlock overlay for locked organs
+                    canvas.DrawCircle(screenPos, r + 10.0f, new Color(0.02f, 0.03f, 0.06f, isHovered ? 0.48f : 0.32f));
+                    DrawPadlock(canvas, screenPos, 0.9f, new Color(0.88f, 0.90f, 0.96f, 0.9f));
+                }
+                else if (isHovered)
                 {
                     canvas.DrawArc(screenPos, r + 4.0f, 0, Mathf.Tau, 16, new Color(1, 1, 1, 0.5f), 1.0f);
                 }
@@ -415,10 +436,19 @@ public partial class HoloBodyScanner : Control
             canvas.DrawLine(activePos + new Vector2(reticleSize, reticleSize), activePos + new Vector2(reticleSize - cLen, reticleSize), retColor, 2.0f);
             canvas.DrawLine(activePos + new Vector2(reticleSize, reticleSize), activePos + new Vector2(reticleSize, -reticleSize + cLen), retColor, 2.0f);
 
-            // Expanding sonar ring around organ
-            float expandingR = (Mathf.PosMod(_time * 28.0f, 44.0f));
-            float expandAlpha = 1.0f - (expandingR / 44.0f);
-            canvas.DrawArc(activePos, expandingR, 0, Mathf.Tau, 36, new Color(retColor.R, retColor.G, retColor.B, expandAlpha * 0.70f), 1.5f);
+            if (activeLocked)
+            {
+                // Locked target: dim disk + prominent padlock instead of a healthy pulse
+                canvas.DrawCircle(activePos, 34.0f, new Color(0.02f, 0.03f, 0.06f, 0.5f));
+                DrawPadlock(canvas, activePos, 1.35f, new Color(1.0f, 0.55f, 0.55f, 0.95f));
+            }
+            else
+            {
+                // Expanding sonar ring around organ
+                float expandingR = (Mathf.PosMod(_time * 28.0f, 44.0f));
+                float expandAlpha = 1.0f - (expandingR / 44.0f);
+                canvas.DrawArc(activePos, expandingR, 0, Mathf.Tau, 36, new Color(retColor.R, retColor.G, retColor.B, expandAlpha * 0.70f), 1.5f);
+            }
 
             // Callout Lead Line originating cleanly from left bracket of reticle
             Vector2 startPos = activePos + new Vector2(-reticleSize - 2.0f, 0.0f);
@@ -434,6 +464,30 @@ public partial class HoloBodyScanner : Control
             canvas.DrawCircle(elbowPos, 3.5f, retColor);
             canvas.DrawCircle(exitPos + new Vector2(4, 0), 4.5f, new Color(1, 1, 1, 0.95f));
         }
+    }
+
+    /// <summary>
+    /// Vector padlock glyph (fallback fonts cannot be trusted with emoji).
+    /// </summary>
+    private static void DrawPadlock(Control canvas, Vector2 center, float scale, Color color)
+    {
+        float bodyW = 13.0f * scale;
+        float bodyH = 10.0f * scale;
+        var bodyRect = new Rect2(center.X - bodyW * 0.5f, center.Y - bodyH * 0.5f + 2.5f * scale, bodyW, bodyH);
+
+        canvas.DrawRect(bodyRect, color, true);
+        canvas.DrawRect(new Rect2(bodyRect.Position.X + 2.0f * scale, bodyRect.Position.Y + 3.0f * scale, 2.0f * scale, 4.0f * scale),
+            new Color(0.02f, 0.03f, 0.06f, 0.9f), true);
+
+        float shackleRadius = bodyW * 0.32f;
+        canvas.DrawArc(
+            new Vector2(center.X, bodyRect.Position.Y),
+            shackleRadius,
+            Mathf.Pi,
+            Mathf.Tau,
+            14,
+            color,
+            2.2f * scale);
     }
 
     private void DrawDiagnosticTelemetry(Control canvas, Vector2 size)
@@ -469,28 +523,50 @@ public partial class HoloBodyScanner : Control
             string subtitle = data.TryGetValue("subtitle_key", out var skVal) ? TranslationServer.Translate(skVal.AsString()) : "";
             Color c = data.TryGetValue("color_code", out var ccVal) ? ccVal.AsColor() : new Color(0.3f, 0.8f, 1.0f);
 
-            string line1 = $"► TARGET: {organ} · {name}";
-            string line2 = $"LOC: {subtitle} | INFECTION SEVERITY: HIGH";
+            bool locked = !GameManager.IsMapUnlocked(activeKey);
+            Font hudFont = canvas.GetThemeFont("font", "Label") ?? ThemeDB.FallbackFont;
+
+            string line1 = locked
+                ? $"► {Tr("SCANNER_TARGET_LOCKED")}: {organ} · {name}"
+                : $"► TARGET: {organ} · {name}";
+            Color line1Color = locked ? new Color(1.0f, 0.45f, 0.4f, 0.95f) : c;
 
             canvas.DrawString(
-                ThemeDB.FallbackFont,
+                hudFont,
                 new Vector2(16, size.Y - 26),
                 line1,
                 HorizontalAlignment.Left,
                 -1,
                 12,
-                c
+                line1Color
             );
 
-            canvas.DrawString(
-                ThemeDB.FallbackFont,
-                new Vector2(16, size.Y - 10),
-                line2,
-                HorizontalAlignment.Left,
-                -1,
-                11,
-                new Color(0.7f, 0.8f, 0.9f, 0.65f)
-            );
+            if (locked)
+            {
+                // Prerequisite achievement requirement readout
+                canvas.DrawMultilineString(
+                    hudFont,
+                    new Vector2(16, size.Y - 12),
+                    AchievementManager.GetMapUnlockRequirementText(activeKey),
+                    HorizontalAlignment.Left,
+                    size.X - 32.0f,
+                    11,
+                    2,
+                    new Color(1.0f, 0.72f, 0.35f, 0.95f)
+                );
+            }
+            else
+            {
+                canvas.DrawString(
+                    hudFont,
+                    new Vector2(16, size.Y - 10),
+                    $"LOC: {subtitle} | INFECTION SEVERITY: HIGH",
+                    HorizontalAlignment.Left,
+                    -1,
+                    11,
+                    new Color(0.7f, 0.8f, 0.9f, 0.65f)
+                );
+            }
         }
     }
 }
