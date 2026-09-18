@@ -345,6 +345,30 @@ public static class PathogenSpawner
     }
 
     /// <summary>
+    /// Endless multi-boss incursion (docs/endgame.md §3.3): a terminal primary
+    /// boss from another organ is drawn onto the current battlefield.
+    /// </summary>
+    public static BaseEnemy? SpawnRaidBoss(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string mapId, float gameTime, float spawnAngle = -1.0f)
+    {
+        if (enemyContainer == null || player == null)
+            return null;
+
+        var enemy = CreateTerminalBoss(mapId);
+        if (enemy == null)
+            return null;
+
+        AttachBossPhases(enemy, 150.0f);
+        ApplyOverdriveScaling(enemy, gameTime);
+
+        enemy.GlobalPosition = spawnAngle >= 0.0f
+            ? GetPointAtAngle(player.GlobalPosition, arenaSize, spawnAngle, 620.0f)
+            : GetSpawnPoint(player.GlobalPosition, arenaSize, 620.0f);
+
+        enemyContainer.AddChild(enemy);
+        return enemy;
+    }
+
+    /// <summary>
     /// Instantiates the map-specific 15:00 terminal boss entity.
     /// </summary>
     public static BaseEnemy? CreateTerminalBoss(string mapId)

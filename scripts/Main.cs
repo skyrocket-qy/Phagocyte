@@ -135,6 +135,16 @@ public partial class Main : Node2D
     private Line2D? _acidRing = null;
     private float _drawnAcidRadius = -1.0f;
 
+    // --- Endless multi-boss incursions (docs/endgame.md §3.3) ---
+    private readonly List<BaseEnemy> _raidBosses = new();
+    private int _nextRaidCycle = 2; // first incursion at 18:00 (cycle 2)
+
+    /// <summary>Alive multi-boss incursion bosses drawn from other organs.</summary>
+    public IReadOnlyList<BaseEnemy> RaidBosses => _raidBosses;
+
+    /// <summary>Alive boss-incursion count (GDScript-friendly scalar view).</summary>
+    public int RaidBossCount => _raidBosses.Count;
+
     public override void _Ready()
     {
         StaphScene ??= DefaultStaphScene;
@@ -790,6 +800,10 @@ public partial class Main : Node2D
             AnnounceOverdriveCycle(cycle);
         }
 
+        // Every 3-minute cycle from 18:00: cross-organ boss incursion.
+        if (cycle >= 2)
+            ProcessBossRaids(cycle);
+
         // Cycle 1+: fibrin nets (slow-only webs) congeal across the battlefield.
         _fibrinNetTimer -= delta;
         if (_fibrinNetTimer <= 0.0f)
@@ -924,6 +938,69 @@ public partial class Main : Node2D
         }
         _acidRing.Points = points;
         _acidRing.Visible = true;
+    }
+
+    /// <summary>
+    /// Multi-boss incursion (docs/endgame.md §3.3): every 3-minute overdrive
+    /// cycle from 18:00 draws two terminal bosses from other organs onto the
+    /// field; from 30:00 the siege escalates to a triple-boss assault.
+    /// </summary>
+    private void ProcessBossRaids(int cycle)
+    {
+        _raidBosses.RemoveAll(b => !GodotObject.IsInstanceValid(b) || b.IsQueuedForDeletion());
+
+        if (cycle < _nextRaidCycle || EnemyContainer == null || Player == null)
+            return;
+
+        _nextRaidCycle = cycle + 1;
+
+        bool tripleSiege = EnvironmentTime >= 1800.0f; // 30:00+ terminal siege
+        int count = tripleSiege ? 3 : 2;
+
+        var candidates = new List<string>();
+        foreach (var keyVar in GameManager.MapData.Keys)
+        {
+            string candidateMap = keyVar.AsString();
+            if (candidateMap != MapId)
+                candidates.Add(candidateMap);
+        }
+
+        // Fisher-Yates shuffle: random cross-organ draw without duplicates.
+        for (int i = candidates.Count - 1; i > 0; i--)
+        {
+            int j = (int)GD.RandRange(0, i);
+            (candidates[i], candidates[j]) = (candidates[j], candidates[i]);
+        }
+
+        var bossNames = new List<string>();
+        for (int i = 0; i < count && i < candidates.Count; i++)
+        {
+            float angle = Mathf.Tau * i / count + (float)GD.RandRange(-0.4, 0.4);
+            var boss = PathogenSpawner.SpawnRaidBoss(EnemyContainer, Player, ArenaSize, candidates[i], EnvironmentTime, angle);
+            if (boss == null)
+                continue;
+
+            boss.EnemyDied += OnRaidBossDefeated;
+            _raidBosses.Add(boss);
+            bossNames.Add(Tr(boss.DisplayNameKey));
+        }
+
+        if (bossNames.Count > 0)
+        {
+            string title = Tr("OVERDRIVE_RAID_TITLE");
+            string desc = TextFormatter.Format(
+                Tr(tripleSiege ? "OVERDRIVE_RAID_TRIPLE_FMT" : "OVERDRIVE_RAID_TWIN_FMT"),
+                string.Join(" · ", bossNames));
+            HudNode?.ShowOverdriveAlert(title, desc);
+            GD.Print($"[Overdrive] Boss incursion ×{bossNames.Count}: {string.Join(", ", bossNames)}");
+        }
+    }
+
+    private void OnRaidBossDefeated(BaseEnemy boss)
+    {
+        _raidBosses.Remove(boss);
+        AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
+        GD.Print($"[Overdrive] Raid boss neutralized: {boss.EnemyId}.");
     }
 
     private void SpawnFibrinNet()

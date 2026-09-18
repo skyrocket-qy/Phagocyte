@@ -1,7 +1,9 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using GdUnit4;
 using static GdUnit4.Assertions;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Enemies;
 using Phagocyte.Player;
@@ -192,6 +194,25 @@ public partial class TestEndlessMode : SceneTree
         AssertThat(main.OverdriveHealthMultiplier).IsEqualApprox(2.2f, 0.001f);
         AssertThat(main.OverdriveSpeedMultiplier).IsEqualApprox(1.30f, 0.001f);
 
+        // 18:00 twin-boss incursion: 2 distinct bosses drawn from other organs
+        AssertThat(main.RaidBosses.Count).IsEqual(2);
+        string raidIdA = main.RaidBosses[0].EnemyId;
+        string raidIdB = main.RaidBosses[1].EnemyId;
+        AssertThat(raidIdA == raidIdB).IsFalse();
+        AssertThat(raidIdA == "mrsa_super_colony").IsFalse(); // own organ boss is never drawn
+        AssertThat(raidIdB == "mrsa_super_colony").IsFalse();
+        AssertThat(main.RaidBosses[0].GetNodeOrNull<BossPhaseComponent>("BossPhaseComponent")).IsNotNull();
+
+        // Same cycle must not trigger a duplicate incursion
+        main._PhysicsProcess(0.02f);
+        AssertThat(main.RaidBosses.Count).IsEqual(2);
+
+        // Clear the field so the later siege count is deterministic
+        var twinSnapshot = new List<BaseEnemy>(main.RaidBosses);
+        foreach (var raidBoss in twinSnapshot)
+            raidBoss.TakeDamage(9999999.0f);
+        AssertThat(main.RaidBosses.Count).IsEqual(0);
+
         // 24:00 flood tide: safe radius starts shrinking and burns outside the zone
         main.EnvironmentTime = 1440.1f;
         main._PhysicsProcess(0.02f);
@@ -205,6 +226,18 @@ public partial class TestEndlessMode : SceneTree
         main._PhysicsProcess(1.2f); // one full acid tick outside the safe zone
         AssertThat(player.Health).IsLess(hpBeforeTide);
         player.GlobalPosition = Vector2.Zero;
+
+        // 30:00+ terminal siege escalates to a triple-boss assault
+        var preSiege = new List<BaseEnemy>(main.RaidBosses);
+        foreach (var raidBoss in preSiege)
+            raidBoss.TakeDamage(9999999.0f);
+        AssertThat(main.RaidBosses.Count).IsEqual(0);
+
+        main.EnvironmentTime = 1800.1f;
+        main._PhysicsProcess(0.02f);
+        AssertThat(main.RaidBosses.Count).IsEqual(3);
+        AssertThat(main.RaidBosses[0].EnemyId == main.RaidBosses[1].EnemyId).IsFalse();
+        AssertThat(main.RaidBosses[1].EnemyId == main.RaidBosses[2].EnemyId).IsFalse();
 
         // Guard: an endless run can never settle as a victory
         main.EndRun(true, RunRecordManager.CauseSpecificNeutralization);
