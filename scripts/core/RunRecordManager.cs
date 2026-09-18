@@ -61,6 +61,17 @@ public partial class RunRecordManager : Node
     public const string RankC = "C";
     public const string RankD = "D";
 
+    // Endless overdrive grades (docs/endgame.md §5.1)
+    public const string RankSSS = "SSS"; // 超載神話
+    public const string RankEX = "EX";   // 破格存在
+
+    /// <summary>Endless grade thresholds (docs/endgame.md §5.1).</summary>
+    public const float SSSSurvivalSeconds = 1800.0f; // 30:00 triple-siege survival
+    public const int SSSKills = 5000;
+    public const float EXSurvivalSeconds = 2400.0f;  // 40:00 terminal compensation
+    public const int EXKills = 8000;
+    public const float EXAfflictionMultiplier = 2.5f; // ≥ +150% overload
+
     // Pathological score weights (docs/record.md §4.2)
     public const float SurvivalScorePerSecond = 10.0f;
     public const int LevelScoreBonus = 100;
@@ -80,9 +91,27 @@ public partial class RunRecordManager : Node
     /// S = Hard clear with ≥3,500 kills and KPM ≥230;
     /// A = Normal clear or Hard survival past 12:00 with ≥2,000 kills and KPM ≥130;
     /// B = survival past 08:00 with ≥800 kills; C = past 04:00 with ≥300 kills; D otherwise.
+    /// Endless overdrive (docs/endgame.md §5.1) opens the two apex grades on top:
+    /// EX = 40:00 + 8,000 kills + ≥×2.5 affliction overload;
+    /// SSS = 30:00 + 5,000 kills with at least one affliction.
     /// </summary>
-    public static string ComputeRank(string result, string difficulty, float survivalTime, int kills)
+    public static string ComputeRank(
+        string result,
+        string difficulty,
+        float survivalTime,
+        int kills,
+        bool endless = false,
+        float afflictionMultiplier = 1.0f)
     {
+        if (endless)
+        {
+            if (survivalTime >= EXSurvivalSeconds && kills >= EXKills && afflictionMultiplier >= EXAfflictionMultiplier)
+                return RankEX;
+
+            if (survivalTime >= SSSSurvivalSeconds && kills >= SSSKills && afflictionMultiplier > 1.0f)
+                return RankSSS;
+        }
+
         bool hard = difficulty == DifficultyHard;
         bool victory = result == ResultVictory;
         float kpm = ComputeKpm(kills, survivalTime);
@@ -212,7 +241,7 @@ public partial class RunRecordManager : Node
             difficulty = DifficultyNormal;
 
         float kpm = ComputeKpm(kills, survivalTime);
-        string rank = ComputeRank(result, difficulty, survivalTime, kills);
+        string rank = ComputeRank(result, difficulty, survivalTime, kills, endless, afflictionMultiplier);
         int score = ComputeScore(result, difficulty, survivalTime, killScore, level, afflictionMultiplier);
 
         var record = new Dictionary
@@ -300,6 +329,32 @@ public partial class RunRecordManager : Node
             float t = rec.GetValueOrDefault("survival_time", 0.0f).AsSingle();
             if (best < 0.0f || t < best)
                 best = t;
+        }
+        return best;
+    }
+
+    /// <summary>Longest endless overdrive survival on record (0 when none) — local leaderboard seed.</summary>
+    public static float GetBestEndlessSurvivalTime()
+    {
+        float best = 0.0f;
+        foreach (var rec in Records)
+        {
+            if (!rec.GetValueOrDefault("endless", false).AsBool())
+                continue;
+            best = Mathf.Max(best, rec.GetValueOrDefault("survival_time", 0.0f).AsSingle());
+        }
+        return best;
+    }
+
+    /// <summary>Highest pathological score among endless runs (0 when none).</summary>
+    public static int GetBestEndlessScore()
+    {
+        int best = 0;
+        foreach (var rec in Records)
+        {
+            if (!rec.GetValueOrDefault("endless", false).AsBool())
+                continue;
+            best = Mathf.Max(best, rec.GetValueOrDefault("score", 0).AsInt32());
         }
         return best;
     }

@@ -544,3 +544,9 @@ AFFLICTION_VISCOSITY_NAME,Extreme Viscosity,極限黏滯
 AFFLICTION_VISCOSITY_DESC,Base move speed -25%.,基礎移速 -25%。
 RECORDS_AFFLICTION_MULT,Affliction Multiplier,詞綴積分倍率
 RECORDS_AFFLICTIONS,Afflictions,病理過載詞綴
+RECORDS_SETTLEMENT_CHRONIC,🌡 Chronic Pathology Chart — Cytokine Storm Termination,🌡 終末慢性病歷 — 細胞因子風暴終末代償
+RECORDS_CHRONIC_HEADER,Chronic Pathology Chart,終末慢性病歷單
+RECORDS_CHRONIC_DIAGNOSIS,Chronic severe infection · irreversible systemic CRS,慢性重症感染 · 不可逆全身性細胞因子風暴
+RECORDS_CHRONIC_TAG,CHRONIC OVERDRIVE,慢性過載
+RANK_SSS_TITLE,Overdrive Myth,超載神話
+RANK_EX_TITLE,Transcendent Existence,破格存在

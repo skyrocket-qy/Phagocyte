@@ -230,18 +230,33 @@ public partial class RunRecordsModal : PanelContainer
         {
             BannerLabel.Visible = true;
             bool detailVictory = detail.GetValueOrDefault("result", "").AsString() == RunRecordManager.ResultVictory;
-            BannerLabel.Text = detailVictory ? Tr("RECORDS_SETTLEMENT_VICTORY") : Tr("RECORDS_SETTLEMENT_DEFEAT");
-            BannerLabel.Modulate = detailVictory ? new Color(0.45f, 1.0f, 0.55f) : new Color(1.0f, 0.45f, 0.45f);
+            bool chronic = detail.GetValueOrDefault("endless", false).AsBool();
+            if (chronic)
+            {
+                // Golden holographic chronic chart (docs/endgame.md §5.1)
+                BannerLabel.Text = Tr("RECORDS_SETTLEMENT_CHRONIC");
+                BannerLabel.Modulate = new Color(1.0f, 0.82f, 0.35f);
+            }
+            else
+            {
+                BannerLabel.Text = detailVictory ? Tr("RECORDS_SETTLEMENT_VICTORY") : Tr("RECORDS_SETTLEMENT_DEFEAT");
+                BannerLabel.Modulate = detailVictory ? new Color(0.45f, 1.0f, 0.55f) : new Color(1.0f, 0.45f, 0.45f);
+            }
         }
 
         SummaryBox.Visible = true;
         string classId = detail.GetValueOrDefault("class_id", "").AsString();
         string mapId = detail.GetValueOrDefault("map_id", "").AsString();
         string rank = GetRank(detail);
+        bool chronicChart = detail.GetValueOrDefault("endless", false).AsBool();
 
         AddSummaryRow("RECORDS_RANK",
             string.IsNullOrEmpty(rank) ? "-" : GetRankLabel(rank),
             string.IsNullOrEmpty(rank) ? null : GetRankColor(rank));
+        if (chronicChart)
+        {
+            AddSummaryRow("RECORDS_CHRONIC_HEADER", Tr("RECORDS_CHRONIC_DIAGNOSIS"), new Color(1.0f, 0.85f, 0.45f));
+        }
         AddSummaryRow("RECORDS_CLASS", GetClassName(classId));
         AddSummaryRow("RECORDS_MAP", GetMapName(mapId));
         AddSummaryRow("RECORDS_DIFFICULTY", GetDifficultyName(detail.GetValueOrDefault("difficulty", RunRecordManager.DifficultyNormal).AsString()));
@@ -379,6 +394,7 @@ public partial class RunRecordsModal : PanelContainer
     private Control CreateHistoryRow(Dictionary rec, bool isBest)
     {
         bool victory = rec.GetValueOrDefault("result", "").AsString() == RunRecordManager.ResultVictory;
+        bool chronic = rec.GetValueOrDefault("endless", false).AsBool();
         string classId = rec.GetValueOrDefault("class_id", "").AsString();
         string mapId = rec.GetValueOrDefault("map_id", "").AsString();
         bool selected = !SettlementMode && ReferenceEquals(rec, SelectedRecord);
@@ -393,7 +409,9 @@ public partial class RunRecordsModal : PanelContainer
         {
             BgColor = isBest
                 ? new Color(0.16f, 0.14f, 0.05f, 0.85f)
-                : victory ? new Color(0.08f, 0.18f, 0.12f, 0.7f) : new Color(0.18f, 0.08f, 0.1f, 0.7f),
+                : chronic
+                    ? new Color(0.15f, 0.12f, 0.04f, 0.78f)
+                    : victory ? new Color(0.08f, 0.18f, 0.12f, 0.7f) : new Color(0.18f, 0.08f, 0.1f, 0.7f),
             CornerRadiusTopLeft = 6,
             CornerRadiusTopRight = 6,
             CornerRadiusBottomLeft = 6,
@@ -403,13 +421,15 @@ public partial class RunRecordsModal : PanelContainer
             ContentMarginTop = 8,
             ContentMarginBottom = 8
         };
-        if (isBest)
+        if (isBest || chronic)
         {
             style.BorderWidthLeft = 2;
             style.BorderWidthTop = 2;
             style.BorderWidthRight = 2;
             style.BorderWidthBottom = 2;
-            style.BorderColor = new Color(1.0f, 0.84f, 0.35f, 0.9f);
+            style.BorderColor = isBest
+                ? new Color(1.0f, 0.84f, 0.35f, 0.9f)
+                : new Color(0.95f, 0.75f, 0.3f, 0.65f);
         }
         if (selected)
         {
@@ -434,14 +454,16 @@ public partial class RunRecordsModal : PanelContainer
         {
             Text = string.Format(
                 "{0} {1}\n⏱ {2}  ·  Lv.{3}  ·  🦠 {4}  ·  {5}",
-                victory ? "✅" : "☠️",
-                Tr(victory ? "RECORDS_VICTORY_TAG" : "RECORDS_DEFEAT_TAG"),
+                chronic ? "🌡️" : victory ? "✅" : "☠️",
+                chronic ? Tr("RECORDS_CHRONIC_TAG") : Tr(victory ? "RECORDS_VICTORY_TAG" : "RECORDS_DEFEAT_TAG"),
                 RunRecordManager.FormatTime(rec.GetValueOrDefault("survival_time", 0.0f).AsSingle()),
                 rec.GetValueOrDefault("level", 1).AsInt32(),
                 rec.GetValueOrDefault("digested", 0).AsInt32(),
                 RunRecordManager.FormatTimestamp(rec.GetValueOrDefault("timestamp", 0.0).AsDouble())),
             VerticalAlignment = VerticalAlignment.Center
         };
+        if (chronic)
+            label.Modulate = new Color(1.0f, 0.88f, 0.55f);
         vbox.AddChild(label);
 
         var second = new Label
@@ -537,6 +559,8 @@ public partial class RunRecordsModal : PanelContainer
     {
         return rank switch
         {
+            RunRecordManager.RankEX => new Color(0.8f, 0.95f, 1.0f),
+            RunRecordManager.RankSSS => new Color(1.0f, 0.9f, 0.5f),
             RunRecordManager.RankS => new Color(1.0f, 0.84f, 0.35f),
             RunRecordManager.RankA => new Color(0.45f, 0.95f, 1.0f),
             RunRecordManager.RankB => new Color(0.55f, 1.0f, 0.6f),

@@ -1211,6 +1211,16 @@ public partial class Main : Node2D
             record["telemetry"] = RunTelemetryManager.Instance.GetTelemetryDictionary();
         }
 
+        // Steam global leaderboards: reserved upload for endless overdrive runs
+        // (docs/endgame.md §5.3). No-op without the SDK; the local record above
+        // remains the offline fallback.
+        if (IsEndlessRun)
+        {
+            SteamBridge.SubmitEndlessLeaderboard(
+                Mathf.RoundToInt(EnvironmentTime),
+                record.GetValueOrDefault("score", 0).AsInt32());
+        }
+
         if (HudNode != null)
         {
             HudNode.PauseInputSuppressed = true;

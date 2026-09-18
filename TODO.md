@@ -251,7 +251,7 @@
     - 【抗原全漂移】：每 20 秒重置特異性易傷標記（積分 $+20\%$）。
     - 【極限黏滯】：基礎移速 $-25\%$（積分 $+25\%$）。
   - **影響檔案**：新增 `scripts/endgame/AfflictionManager.cs`, `scripts/ui/EndgameSetupModal.cs`
-- [ ] **[P2] 終末慢性病歷單與 Rank SSS / Rank EX**：
+- [x] **[P2] 終末慢性病歷單與 Rank SSS / Rank EX**：
   - 專屬金色全息病歷，記錄詞綴清單、存活時長、超武配裝與 KPM。
   - 開放最高評級 Rank SSS 與 Rank EX。
   - 預留 Steamworks 全球天梯榜對接。

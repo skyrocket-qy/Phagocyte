@@ -7,6 +7,7 @@ using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Enemies;
 using Phagocyte.Player;
+using Phagocyte.UI;
 
 namespace Phagocyte.Tests;
 
@@ -62,6 +63,10 @@ public partial class TestEndlessMode : SceneTree
                 return false;
             case 3:
                 RunEndlessRunIntegrationTests();
+                _phase++;
+                return false;
+            case 4:
+                RunChronicChartTests();
                 _phase++;
                 return false;
             default:
@@ -255,6 +260,70 @@ public partial class TestEndlessMode : SceneTree
         AssertThat(RunRecordManager.Records[0]["victory_criteria"].AsGodotDictionary()["met"].AsBool()).IsFalse();
 
         GD.Print("[PASS] Endless overdrive survives 15:00 and only settles on membrane rupture.");
+    }
+
+    private void RunChronicChartTests()
+    {
+        // Apex endless grades (docs/endgame.md §5.1)
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultDefeat, RunRecordManager.DifficultyHard, 1800.0f, 5000, true, 1.25f))
+            .IsEqual(RunRecordManager.RankSSS);
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultDefeat, RunRecordManager.DifficultyHard, 2400.0f, 8000, true, 2.5f))
+            .IsEqual(RunRecordManager.RankEX);
+
+        // Below the apex thresholds the standard ladder still applies
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultDefeat, RunRecordManager.DifficultyHard, 1799.0f, 5000, true, 1.25f))
+            .IsEqual(RunRecordManager.RankA);
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultDefeat, RunRecordManager.DifficultyHard, 1800.0f, 5000, true, 1.0f))
+            .IsEqual(RunRecordManager.RankA);
+        AssertThat(RunRecordManager.ComputeRank(
+            RunRecordManager.ResultDefeat, RunRecordManager.DifficultyHard, 2400.0f, 8000, true, 2.49f))
+            .IsEqual(RunRecordManager.RankSSS);
+
+        // The stored chronic record carries the SSS grade and the full loadout
+        var chronic = RunRecordManager.RecordRun(
+            RunRecordManager.ResultDefeat, "ctl", "blood_brain_barrier",
+            1900.0f, 45, 600, 12, new[] { "perforin_lance", "antibody_salvo" },
+            difficulty: RunRecordManager.DifficultyHard,
+            endless: true,
+            afflictionMultiplier: 1.65f,
+            afflictions: new[] { "febrile_convulsion", "endotoxemia", "extreme_viscosity" },
+            kills: 5600,
+            killScore: 90000);
+        AssertThat(chronic["rank"].AsString()).IsEqual(RunRecordManager.RankSSS);
+        AssertThat(chronic["endless"].AsBool()).IsTrue();
+        AssertThat(chronic["kills"].AsInt32()).IsEqual(5600);
+        AssertThat(chronic["kpm"].AsSingle()).IsGreater(170.0f);
+        AssertThat(chronic["active_skills"].AsGodotArray().Count).IsEqual(2);
+        AssertThat(chronic["digested"].AsInt32()).IsEqual(600);
+
+        // Local leaderboard seeds (reserved Steam boards' offline fallback)
+        AssertThat(RunRecordManager.GetBestEndlessSurvivalTime()).IsEqualApprox(1900.0f, 0.01f);
+        AssertThat(RunRecordManager.GetBestEndlessScore()).IsEqual(chronic["score"].AsInt32());
+        SteamBridge.SubmitEndlessLeaderboard(1900, chronic["score"].AsInt32());
+        AssertThat(SteamBridge.EndlessSurvivalLeaderboardId).IsEqual("ENDLESS_SURVIVAL_SECONDS");
+        AssertThat(SteamBridge.EndlessScoreLeaderboardId).IsEqual("ENDLESS_PATHOLOGICAL_SCORE");
+        AssertThat(SteamBridge.GetLocalBestSurvivalSeconds()).IsEqualApprox(1900.0f, 0.01f);
+
+        // Golden chronic chart: settlement banner switches to the chronic diagnosis
+        var menuScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+        var menu = menuScene.Instantiate<MainMenu>();
+        Root.AddChild(menu);
+        var modal = menu.RecordsModal;
+        AssertThat(modal).IsNotNull();
+
+        modal!.OpenSettlement(chronic);
+        AssertThat(modal.SettlementMode).IsTrue();
+        AssertThat(modal.BannerLabel).IsNotNull();
+        AssertThat(modal.BannerLabel!.Text).IsEqual(modal.Tr("RECORDS_SETTLEMENT_CHRONIC"));
+        AssertThat(modal.SummaryBox!.GetChildCount()).IsGreater(10);
+        AssertThat(modal.HistoryList!.GetChildCount()).IsGreater(0);
+
+        menu.QueueFree();
+        GD.Print("[PASS] Rank SSS/EX thresholds, chronic chart data and reserved leaderboard seeds verified.");
     }
 
     private void Cleanup()

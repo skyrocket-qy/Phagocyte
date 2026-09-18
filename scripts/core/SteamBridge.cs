@@ -109,4 +109,53 @@ public static class SteamBridge
     {
         return string.IsNullOrEmpty(achId) ? "" : achId.ToUpperInvariant();
     }
+
+    // --- Steam global leaderboards (docs/endgame.md §5.3, reserved) ---
+
+    /// <summary>Reserved leaderboard id: endless overdrive survival seconds.</summary>
+    public const string EndlessSurvivalLeaderboardId = "ENDLESS_SURVIVAL_SECONDS";
+
+    /// <summary>Reserved leaderboard id: endless pathological score.</summary>
+    public const string EndlessScoreLeaderboardId = "ENDLESS_PATHOLOGICAL_SCORE";
+
+    /// <summary>
+    /// Reserved upload hook for a finished endless run. No-op without the SDK;
+    /// when <c>USE_STEAMWORKS</c> is enabled, wire
+    /// SteamUserStats.FindOrCreateLeaderboard + UploadLeaderboardScore (KeepBest)
+    /// for both boards here.
+    /// </summary>
+    public static void SubmitEndlessLeaderboard(int survivalSeconds, int score)
+    {
+#if USE_STEAMWORKS
+        if (!IsAvailable)
+            return;
+
+        try
+        {
+            // TODO(Steamworks): SteamUserStats.FindOrCreateLeaderboard(EndlessSurvivalLeaderboardId, ...);
+            // TODO(Steamworks): SteamUserStats.UploadLeaderboardScore(survivalBoard, ELeaderboardUploadScoreMethod.KeepBest, survivalSeconds, null, 0);
+            // TODO(Steamworks): SteamUserStats.FindOrCreateLeaderboard(EndlessScoreLeaderboardId, ...);
+            // TODO(Steamworks): SteamUserStats.UploadLeaderboardScore(scoreBoard, ELeaderboardUploadScoreMethod.KeepBest, score, null, 0);
+        }
+        catch (Exception ex)
+        {
+            GD.PushWarning($"SteamBridge: leaderboard upload failed ({ex.Message}).");
+        }
+#endif
+    }
+
+    /// <summary>
+    /// Offline fallback for the reserved global board: the local record seed that
+    /// a future Steam download will be merged against.
+    /// </summary>
+    public static float GetLocalBestSurvivalSeconds()
+    {
+        return RunRecordManager.GetBestEndlessSurvivalTime();
+    }
+
+    /// <summary>Offline fallback for the reserved global score board.</summary>
+    public static int GetLocalBestScore()
+    {
+        return RunRecordManager.GetBestEndlessScore();
+    }
 }
