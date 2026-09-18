@@ -21,7 +21,8 @@ docs/
 ├── achievement.md    # 成就、里程碑與局外解鎖系統（角色解鎖鏈、固有技能、Steamworks 整合）
 ├── record.md         # 臨床病歷單結算、歷史記錄與衝榜系統（SIRS 陣亡 vs 中和通關、評級 S/A/B/C/D）
 ├── tutorial.md       # 新手引導與直覺 UI/UX（見形知意、非侵入微引導、漸進式揭露）
-└── endgame.md        # 終局無盡細胞因子風暴模式（突破15分鐘、病理過載詞綴、雙生Boss、全球天梯榜）
+├── endgame.md        # 終局無盡細胞因子風暴模式（突破15分鐘、病理過載詞綴、雙生Boss、全球天梯榜）
+└── feedback.md       # 臨床異常反饋、Bug 診斷快照與數值平衡遙測（F8一鍵回報、確定性種子、平衡KPI、GM工具）
 ```
 
 ---
@@ -49,6 +50,7 @@ graph TD
     subgraph MetaSystems [局外循環與持久化]
         ACH["achievement.md<br>成就與局外解鎖系統<br>(細胞 / 地圖 / 技能 / Steam)"]
         REC["record.md<br>臨床病歷單結算與歷史衝榜<br>(Rank S-D 評級)"]
+        DIAG["feedback.md<br>臨床異常診斷與平衡遙測<br>(F8 快照 · KPI 監控 · GM 工具)"]
     end
 
     PHIL --> CELL & SKILL & MAP
@@ -61,6 +63,7 @@ graph TD
     REC -->|解鎖進度回饋| ACH
     ACH -->|發放天賦點| TREE
     ACH -->|解鎖新細胞 / 地圖 / 技能| CELL & MAP & SKILL
+    CELL & SKILL & PATH & MAP -.->|戰鬥異常快照 / 遙測| DIAG
 ```
 
 ---
@@ -77,16 +80,19 @@ graph TD
 - **[passivetree.md](file:///Users/zelin/project/Phagocyte/docs/passivetree.md)**：融合 DBD 血網與 PoE 星盤靈感的 90 度正交微管棋盤系統，詳解曼哈頓層級、四階節點稀有度（含 Rare 負面代償）與五大分化譜系。
 
 ### 🦠 關卡與病原體
-- **[map.md](file:///Users/zelin/project/Phagocyte/docs/map.md)**：詳解 5 大微觀人體器官切片（皮下創口、肺泡微腔、肝血竇、胃黏膜、血腦屏障）的專屬流體力學與 15 分鐘波次導演排程。
+- **[map.md](file:///Users/zelin/project/Phagocyte/docs/map.md)**：詳解 5 大微觀人體器官切片（皮下創口、肺泡微腔、肝血竇、胃黏膜、血腦屏障）的專屬流體力學、15 分鐘波次導演與「殺越快生越快」同屏動態回補系統。
 - **[pathogen.md](file:///Users/zelin/project/Phagocyte/docs/pathogen.md)**：百科全書式的病原體圖鑑，涵蓋細菌、病毒、真菌、寄生蟲、朊病毒與惡性腫瘤等 20 餘種真實微生物的 AI 行為與克制途徑。
 
 ### 🏆 局外養成與結算
 - **[achievement.md](file:///Users/zelin/project/Phagocyte/docs/achievement.md)**：規範角色與器官地圖解鎖鏈、固有技能解鎖、廣譜生化武器投放，以及與 Steamworks Achievements API 的無縫對接。
-- **[record.md](file:///Users/zelin/project/Phagocyte/docs/record.md)**：將每局結算包裝為臨床病理報告單，定義「特異性中和成功」與「SIRS 敗血陣亡」判準，以及 Rank S～D 的臨床衝榜評級模型。
+- **[record.md](file:///Users/zelin/project/Phagocyte/docs/record.md)**：將每局結算包裝為臨床病理報告單，定義「特異性中和成功」與「SIRS 敗血陣亡」判準，以及依據 KPM 吞噬通量劃分的 Rank S～D 評級模型。
 
 ### 🧭 引導與介面體驗
 - **[tutorial.md](file:///Users/zelin/project/Phagocyte/docs/tutorial.md)**：堅持「見形知意、非侵入式微引導」的 UX 規範，梳理 5 項核心微觀物理與機制教學，以及病歷單與星盤的自然銜接。
 
 ### ♾️ 終局模式 (End Game)
 - **[endgame.md](file:///Users/zelin/project/Phagocyte/docs/endgame.md)**：規範通關後的「全身細胞因子風暴無盡模式」，涵蓋無上限時間軸、3 分鐘指數級過載、雙生 Boss 突襲與病理負面詞綴系統（Afflictions）。
+
+### 🛠️ 診斷、反饋與平衡 (Diagnostics & Balance)
+- **[feedback.md](file:///Users/zelin/project/Phagocyte/docs/feedback.md)**：設計「顯微鏡臨床異常報告系統」，支援戰鬥中 F8 一鍵捕獲確定性 RNG 種子與現場快照、單局匿名數據遙測（技能選取率、猝死熱點、致命傷害排行）以及研發專用 GM 控制台。
 

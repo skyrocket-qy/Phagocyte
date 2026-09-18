@@ -35,6 +35,7 @@
 - 📊 **[臨床病歷單結算、歷史記錄與衝榜 (record.md)](file:///Users/zelin/project/Phagocyte/docs/record.md)**
 - 🧭 **[新手引導與直覺 UI/UX 規範 (tutorial.md)](file:///Users/zelin/project/Phagocyte/docs/tutorial.md)**
 - ♾️ **[終局無盡細胞因子風暴模式 (endgame.md)](file:///Users/zelin/project/Phagocyte/docs/endgame.md)**
+- 🛠️ **[臨床異常反饋、Bug 診斷與數值遙測 (feedback.md)](file:///Users/zelin/project/Phagocyte/docs/feedback.md)**
 
 ---
 
