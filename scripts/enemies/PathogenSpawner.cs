@@ -101,6 +101,18 @@ public static class PathogenSpawner
             "plasmodium" => new PlasmodiumCarrierEnemy(),
             "toxoplasma" => new ToxoplasmaEnemy(),
             "prion" => new PrionEnemy(),
+            "streptococcus_chain_lord" => new StreptococcusChainLord(),
+            "flu_drift_cyclone" => new FluDriftCyclone(),
+            "tb_granuloma_behemoth" => new TbGranulomaBehemoth(),
+            "vaca_secretor" => new VacASecretor(),
+            "toxoplasma_mega_cyst" => new ToxoplasmaMegaCyst(),
+            "tachyzoite" => new Tachyzoite(),
+            "mrsa_super_colony" => new MrsASuperColony(),
+            "mrsa_enraged_elite" => new MrsaEnragedElite(),
+            "syncytial_mega_capsid" => new SyncytialMegaCapsid(),
+            "plasmodium_macro_schizont" => new PlasmodiumMacroSchizont(),
+            "hpylori_biofilm_core" => new HpyloriBiofilmCore(),
+            "prpsc_amyloid_aggregate" => new PrpscAmyloidAggregate(),
             _ => new StaphEnemy()
         };
     }
@@ -210,16 +222,30 @@ public static class PathogenSpawner
         if (enemyContainer == null || player == null)
             return null;
 
-        var enemy = CreatePathogen(GetSubBossId(mapId));
+        var enemy = CreateSubBoss(mapId);
         if (enemy == null)
             return null;
 
-        ApplySubBossBoost(enemy);
         AttachBossPhases(enemy, 120.0f);
 
         enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, 520.0f);
         enemyContainer.AddChild(enemy);
         return enemy;
+    }
+
+    /// <summary>
+    /// Instantiates the map-specific 09:00 sub-boss entity.
+    /// </summary>
+    public static BaseEnemy? CreateSubBoss(string mapId)
+    {
+        return mapId switch
+        {
+            "alveolar_space" => new FluDriftCyclone(),
+            "hepatic_sinusoid" => new TbGranulomaBehemoth(),
+            "gastric_lumen" => new VacASecretor(),
+            "blood_brain_barrier" => new ToxoplasmaMegaCyst(),
+            _ => new StreptococcusChainLord()
+        };
     }
 
     /// <summary>
@@ -230,16 +256,30 @@ public static class PathogenSpawner
         if (enemyContainer == null || player == null)
             return null;
 
-        var enemy = CreatePathogen(GetTerminalBossId(mapId));
+        var enemy = CreateTerminalBoss(mapId);
         if (enemy == null)
             return null;
 
-        ApplyTerminalBossBoost(enemy);
         AttachBossPhases(enemy, 150.0f);
 
         enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, 460.0f);
         enemyContainer.AddChild(enemy);
         return enemy;
+    }
+
+    /// <summary>
+    /// Instantiates the map-specific 15:00 terminal boss entity.
+    /// </summary>
+    public static BaseEnemy? CreateTerminalBoss(string mapId)
+    {
+        return mapId switch
+        {
+            "alveolar_space" => new SyncytialMegaCapsid(),
+            "hepatic_sinusoid" => new PlasmodiumMacroSchizont(),
+            "gastric_lumen" => new HpyloriBiofilmCore(),
+            "blood_brain_barrier" => new PrpscAmyloidAggregate(),
+            _ => new MrsASuperColony()
+        };
     }
 
     /// <summary>
@@ -371,28 +411,6 @@ public static class PathogenSpawner
         enemy.Scale *= 1.0f + 0.12f * tier;
     }
 
-    private static void ApplySubBossBoost(BaseEnemy enemy)
-    {
-        enemy.MaxHealth *= 6.0f;
-        enemy.Armor += 3.0f;
-        enemy.FloatSpeed *= 0.85f;
-        enemy.AtpValue *= 8.0f;
-        enemy.IsElite = true;
-        enemy.IsBoss = true;
-        enemy.Scale *= 1.6f;
-    }
-
-    private static void ApplyTerminalBossBoost(BaseEnemy enemy)
-    {
-        enemy.MaxHealth *= 25.0f;
-        enemy.Armor += 6.0f;
-        enemy.FloatSpeed *= 0.8f;
-        enemy.AtpValue *= 40.0f;
-        enemy.IsElite = true;
-        enemy.IsBoss = true;
-        enemy.Scale *= 2.2f;
-    }
-
     private static void AttachBossPhases(BaseEnemy enemy, float hardEnrageSeconds)
     {
         var phases = new BossPhaseComponent
@@ -403,30 +421,6 @@ public static class PathogenSpawner
         };
         phases.SetupDefaultPhases();
         enemy.AddChild(phases);
-    }
-
-    private static string GetSubBossId(string mapId)
-    {
-        return mapId switch
-        {
-            "alveolar_space" => "flu_drift",
-            "hepatic_sinusoid" => "tb",
-            "gastric_lumen" => "h_pylori",
-            "blood_brain_barrier" => "toxoplasma",
-            _ => "staph"
-        };
-    }
-
-    private static string GetTerminalBossId(string mapId)
-    {
-        return mapId switch
-        {
-            "alveolar_space" => "flu_drift",
-            "hepatic_sinusoid" => "tb",
-            "gastric_lumen" => "h_pylori",
-            "blood_brain_barrier" => "prion",
-            _ => "staph"
-        };
     }
 
     private static Vector2 GetSpawnPoint(Vector2 playerPos, Vector2 arenaSize, float dist)

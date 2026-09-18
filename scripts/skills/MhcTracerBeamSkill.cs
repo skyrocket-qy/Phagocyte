@@ -79,8 +79,8 @@ public partial class MhcTracerBeamSkill : BaseSkill
                 if (_currentTarget.HasMethod("take_damage"))
                     _currentTarget.Call("take_damage", dmg);
 
-                // Apply vulnerability tag
-                _currentTarget.Set("mhc_marked", true);
+                // Apply vulnerability tag (metadata flag, clearable by antigenic drift)
+                _currentTarget.SetMeta("mhc_marked", true);
 
                 if (_tracer != null)
                 {

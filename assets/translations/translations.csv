@@ -456,3 +456,15 @@ WAVE_PHASE_INFLAMMATION,Local Inflammation Phase,局部炎症期
 WAVE_PHASE_INFILTRATION,Tissue Infiltration Phase,组织浸润期
 WAVE_PHASE_DISSEMINATION,Systemic Dissemination Phase,全身播散期
 WAVE_PHASE_TERMINAL,Terminal Crisis Phase,终末危象期
+PATHOGEN_CHAINLORD_NAME,Streptococcus Chain-Lord,化脓性链球菌巨噬长链
+PATHOGEN_FLUDUST_CYCLONE_NAME,Flu-Drift Cyclone,甲型变异流感暴风核心
+PATHOGEN_TB_BEHEMOTH_NAME,TB Granuloma Behemoth,结核肉芽肿巨核
+PATHOGEN_VACA_NAME,VacA Secretor,空泡毒素分泌原体
+PATHOGEN_MEGACYST_NAME,Toxoplasma Mega-Cyst,刚地弓形虫巨型假包囊
+PATHOGEN_TACHYZOITE_NAME,Tachyzoite,速殖子
+PATHOGEN_MRSA_NAME,MRSA Super-Colony,耐甲氧西林金葡菌母体
+PATHOGEN_MRSA_ELITE_NAME,Enraged MRSA Elite,暴怒子精英
+PATHOGEN_SYNCYTIAL_NAME,Syncytial Mega-Capsid,融合性合胞体病毒复合体
+PATHOGEN_MACROSCHIZONT_NAME,Plasmodium Macro-Schizont,恶性疟原虫裂殖复合体
+PATHOGEN_BIOFILM_CORE_NAME,H. pylori Biofilm Core,幽门螺杆菌生物膜母核
+PATHOGEN_AMYLOID_NAME,PrPsc Amyloid Aggregate,错误折叠朊病毒晶体

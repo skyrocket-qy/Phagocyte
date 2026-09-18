@@ -40,6 +40,11 @@ public partial class BossPhaseComponent : Node
     public float HardEnrageDamageMult { get; set; } = 1.6f;
     public float HardEnrageSpeedMult { get; set; } = 1.4f;
 
+    // Ground danger telegraph tuning (terminal bosses scale these up)
+    public float TelegraphDamage { get; set; } = 20.0f;
+    public float TelegraphEnrageBonus { get; set; } = 15.0f;
+    public float TelegraphScale { get; set; } = 1.0f;
+
     public List<BossPhaseDef> Phases { get; } = new();
 
     private float _fightTimer = 0.0f;
@@ -199,15 +204,18 @@ public partial class BossPhaseComponent : Node
         Vector2 dir = (player.GlobalPosition - _parentEntity.GlobalPosition).Normalized();
         if (dir == Vector2.Zero) dir = Vector2.Right;
 
+        float scale = Mathf.Max(0.1f, TelegraphScale);
+        float damage = (TelegraphDamage + (IsHardEnraged ? TelegraphEnrageBonus : 0.0f)) * scale;
+
         var telegraph = new TelegraphedAttack
         {
             Shape = shape,
-            LineLength = 320.0f,
-            LineWidth = 48.0f,
-            Radius = shape == TelegraphAttackShape.MultiCircle ? 42.0f : 64.0f,
+            LineLength = 320.0f * scale,
+            LineWidth = 48.0f * scale,
+            Radius = (shape == TelegraphAttackShape.MultiCircle ? 42.0f : 64.0f) * scale,
             TargetDirection = dir,
             TelegraphDuration = IsEnraged ? 1.0f : 1.4f,
-            Damage = IsHardEnraged ? 35.0f : 20.0f,
+            Damage = damage,
             GlobalPosition = shape == TelegraphAttackShape.Line ? _parentEntity.GlobalPosition : player.GlobalPosition
         };
 

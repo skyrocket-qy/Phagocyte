@@ -110,19 +110,19 @@
 
 - [x] **20 種微生物基礎實體類與危害組件**：涵蓋細菌、病毒、真菌、原蟲寄生蟲、朊病毒、異變惡性細胞 6 大門類。
 - [x] **無硬編碼特殊克制原則**：全病原體繼承 `BaseEnemy.cs`，依賴純屬性矩陣與通用狀態機。
-- [ ] **[P0] 5 大地圖 09:00 次級領主 (Sub-Boss) 實體實作**：
-  - [ ] 地圖 1：**化膿性鏈球菌巨噬長鏈 (Streptococcus Chain-Lord)**：超長蛇形游動穿刺，多節段碰撞判定。
-  - [ ] 地圖 2：**甲型變異流感暴風核心 (Flu-Drift Cyclone)**：每 30 秒全屏抗原漂移，重置靶向暴擊標記。
-  - [ ] 地圖 3：**結核肉芽腫巨核 (TB Granuloma Behemoth)**：緻密蠟質外壁高額減傷，死亡留下乾酪樣阻礙障礙。
-  - [ ] 地圖 4：**空泡毒素 VacA 分泌原體**：移動留下大面積擴散強酸黏液池。
-  - [ ] 地圖 5：**剛地弓形蟲巨型假包囊 (Toxoplasma Mega-Cyst)**：瀕死時向正交四向彈射高初速速殖子。
+- [x] **[P0] 5 大地圖 09:00 次級領主 (Sub-Boss) 實體實作**：
+  - [x] 地圖 1：**化膿性鏈球菌巨噬長鏈 (Streptococcus Chain-Lord)**：超長蛇形游動穿刺，多節段碰撞判定。
+  - [x] 地圖 2：**甲型變異流感暴風核心 (Flu-Drift Cyclone)**：每 30 秒全屏抗原漂移，重置靶向暴擊標記。
+  - [x] 地圖 3：**結核肉芽腫巨核 (TB Granuloma Behemoth)**：緻密蠟質外壁高額減傷，死亡留下乾酪樣阻礙障礙。
+  - [x] 地圖 4：**空泡毒素 VacA 分泌原體**：移動留下大面積擴散強酸黏液池。
+  - [x] 地圖 5：**剛地弓形蟲巨型假包囊 (Toxoplasma Mega-Cyst)**：瀕死時向正交四向彈射高初速速殖子。
   - **影響檔案**：新增 `scripts/enemies/bosses/SubBosses.cs`
-- [ ] **[P0] 5 大地圖 15:00 終末原發 Boss (Terminal Boss) 鎖屏決戰實體**：
-  - [ ] 地圖 1：**耐甲氧西林金葡菌母體 (MRSA Super-Colony)**：巨大耐藥性包囊，破膜後分裂為 4 隻暴怒子精英。
-  - [ ] 地圖 2：**融合性合胞體病毒複合體 (Syncytial Mega-Capsid)**：全屏肺泡牽引纖毛限制走位縮圈。
-  - [ ] 地圖 3：**惡性瘧原蟲裂殖複合體 (Plasmodium Macro-Schizont)**：定時吞噬周邊紅血球回血，破裂爆發大量裂殖子。
-  - [ ] 地圖 4：**幽門螺桿菌生物膜母核 (H. pylori Biofilm Core)**：螺旋毒素風暴與永久強酸爛泥。
-  - [ ] 地圖 5：**錯誤折疊朊病毒晶體 (PrPsc Amyloid Aggregate)**：極高護甲結晶外殼，需破膜擊碎。
+- [x] **[P0] 5 大地圖 15:00 終末原發 Boss (Terminal Boss) 鎖屏決戰實體**：
+  - [x] 地圖 1：**耐甲氧西林金葡菌母體 (MRSA Super-Colony)**：巨大耐藥性包囊，破膜後分裂為 4 隻暴怒子精英。
+  - [x] 地圖 2：**融合性合胞體病毒複合體 (Syncytial Mega-Capsid)**：全屏肺泡牽引纖毛限制走位縮圈。
+  - [x] 地圖 3：**惡性瘧原蟲裂殖複合體 (Plasmodium Macro-Schizont)**：定時吞噬周邊紅血球回血，破裂爆發大量裂殖子。
+  - [x] 地圖 4：**幽門螺桿菌生物膜母核 (H. pylori Biofilm Core)**：螺旋毒素風暴與永久強酸爛泥。
+  - [x] 地圖 5：**錯誤折疊朊病毒晶體 (PrPsc Amyloid Aggregate)**：極高護甲結晶外殼，需破膜擊碎。
   - 整合 `BossPhaseComponent.cs` 多階段血量轉換、狂暴倒數與地面危險預警 (`TelegraphedAttack`)。
   - **影響檔案**：新增 `scripts/enemies/bosses/TerminalBosses.cs`, `scripts/combat/BossPhaseComponent.cs`
 - [ ] **[P1] 病原體固定基礎積分 (BaseScore) 注入** (`docs/record.md`)：
