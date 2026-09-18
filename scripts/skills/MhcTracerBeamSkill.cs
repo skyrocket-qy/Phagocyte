@@ -25,7 +25,7 @@ public partial class MhcTracerBeamSkill : BaseSkill
         DescKey = "SKILL_MHC_TRACER_DESC";
         BioKey = "SKILL_MHC_TRACER_BIO";
         IconSymbol = "🎯";
-        IsInnate = false;
+        IsInnate = true;
         IsPassive = false;
         Cooldown = 4.0f;
         CooldownTimer = 1.0f;

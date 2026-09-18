@@ -246,6 +246,7 @@ public partial class BaseCell : CharacterBody2D
 
         Stats.SetBase("max_health", MaxHealth);
         Stats.SetBase("move_speed", BaseSpeed);
+        ApplyClassBaseStats();
         Health = Stats.GetStat("max_health");
         CurrentSpeed = Stats.GetStat("move_speed");
         CurrentRadius = BaseRadius * Stats.GetStat("area");
@@ -436,6 +437,16 @@ public partial class BaseCell : CharacterBody2D
     }
 
     public virtual void SetupInitialSkills()
+    {
+    }
+
+    /// <summary>
+    /// Applies the class-specific base stat matrix from docs/cell.md §3.
+    /// Called after max_health / move_speed are seeded from the exported fields
+    /// and before Health / CurrentRadius are derived, so the calibrated values
+    /// (armor, area, crit, regen, ...) are the true Lv.1 baseline.
+    /// </summary>
+    public virtual void ApplyClassBaseStats()
     {
     }
 

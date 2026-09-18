@@ -183,7 +183,7 @@ public partial class GameManager : Node
     // Skill Catalog for Manual and Tooltips
     public static readonly Dictionary SkillCatalog = new Dictionary
     {
-        // --- Innate & Legacy Cells ---
+        // --- Innate Morphology Skill ---
         { "macrophage_pseudopods", new Dictionary {
             { "id", "macrophage_pseudopods" },
             { "name_key", "SKILL_DEFORM_NAME" },
@@ -193,28 +193,6 @@ public partial class GameManager : Node
             { "type", "innate" },
             { "class_id", "macrophage" },
             { "cooldown", 0.0f },
-            { "max_level", 5 }
-        }},
-        { "perforin_injection", new Dictionary {
-            { "id", "perforin_injection" },
-            { "name_key", "SKILL_PERFORIN_NAME" },
-            { "desc_key", "SKILL_PERFORIN_DESC" },
-            { "bio_key", "SKILL_PERFORIN_BIO" },
-            { "icon", "🗡️" },
-            { "type", "innate" },
-            { "class_id", "ctl" },
-            { "cooldown", 0.0f },
-            { "max_level", 5 }
-        }},
-        { "net_trap", new Dictionary {
-            { "id", "net_trap" },
-            { "name_key", "SKILL_NET_NAME" },
-            { "desc_key", "SKILL_NET_DESC" },
-            { "bio_key", "SKILL_NET_BIO" },
-            { "icon", "🕸️" },
-            { "type", "innate" },
-            { "class_id", "neutrophil" },
-            { "cooldown", 8.0f },
             { "max_level", 5 }
         }},
         { "lysosomal_overload", new Dictionary {
@@ -257,7 +235,7 @@ public partial class GameManager : Node
             { "desc_key", "SKILL_PERFORIN_DESC" },
             { "bio_key", "SKILL_PERFORIN_BIO" },
             { "icon", "🗡️" },
-            { "type", "active" },
+            { "type", "innate" },
             { "class_id", "ctl" },
             { "cooldown", 2.8f },
             { "max_level", 5 }
@@ -279,7 +257,7 @@ public partial class GameManager : Node
             { "desc_key", "SKILL_ANTIBODY_DESC" },
             { "bio_key", "SKILL_ANTIBODY_BIO" },
             { "icon", "🏹" },
-            { "type", "active" },
+            { "type", "innate" },
             { "class_id", "b_cell" },
             { "cooldown", 4.0f },
             { "max_level", 5 }
@@ -323,8 +301,8 @@ public partial class GameManager : Node
             { "desc_key", "SKILL_GRANZYME_DESC" },
             { "bio_key", "SKILL_GRANZYME_BIO" },
             { "icon", "🧬" },
-            { "type", "active" },
-            { "class_id", "" },
+            { "type", "innate" },
+            { "class_id", "neutrophil" },
             { "cooldown", 3.5f },
             { "max_level", 5 }
         }},
@@ -400,8 +378,8 @@ public partial class GameManager : Node
             { "desc_key", "SKILL_MHC_TRACER_DESC" },
             { "bio_key", "SKILL_MHC_TRACER_BIO" },
             { "icon", "🎯" },
-            { "type", "active" },
-            { "class_id", "" },
+            { "type", "innate" },
+            { "class_id", "dendritic" },
             { "cooldown", 4.0f },
             { "max_level", 5 }
         }},

@@ -16,8 +16,8 @@ public partial class NeutrophilCell : BaseCell
 
     public override void SetupCellIdentity()
     {
-        MaxHealth = 90.0f;
-        BaseSpeed = 240.0f;
+        MaxHealth = 100.0f;
+        BaseSpeed = 230.0f;
         BaseRadius = 46.0f;
         BaseDeformationMag = 14.0f;
         DeformationSpeed = 5.0f;
@@ -52,12 +52,23 @@ public partial class NeutrophilCell : BaseCell
         }
     }
 
+    public override void ApplyClassBaseStats()
+    {
+        if (Stats == null)
+            return;
+
+        Stats.SetBase("armor", 5.0f);
+        Stats.SetBase("might", 1.2f);
+        Stats.SetBase("knockback", 1.4f);
+        Stats.SetBase("health_regen", 0.5f);
+    }
+
     public override void SetupInitialSkills()
     {
         if (CellSkillManager != null)
         {
-            var comp = new ComplementCascadeSkill();
-            CellSkillManager.EquipActive(comp, 0);
+            var granzyme = new GranzymeDetonationSkill();
+            CellSkillManager.EquipActive(granzyme, 0);
         }
     }
 }

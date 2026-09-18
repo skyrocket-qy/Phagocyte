@@ -185,7 +185,7 @@ public partial class TestRunRecords : SceneTree
 
         var survivor = cellScene.Instantiate<Macrophage>();
         Root.AddChild(survivor);
-        survivor.Stats!.AddModifier("armor", 50.0f, 0.0f); // 50% DR: 50 / (50 + 50) = 0.5
+        survivor.Stats!.AddModifier("armor", 40.0f, 0.0f); // Macrophage base 10 + 40 = 50; 50 / (50 + 50) = 0.5 DR
         float hpBefore = survivor.Health;
         survivor.TakeDamage(20.0f);
         float hpLost = hpBefore - survivor.Health;

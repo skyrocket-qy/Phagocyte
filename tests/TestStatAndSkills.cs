@@ -177,8 +177,9 @@ public partial class TestStatAndSkills : SceneTree
         AssertThat(sm!.ActiveSlots.Count).IsEqual(5);
         AssertThat(sm.PassiveSlots.Count).IsEqual(5);
 
-        var slot0Active = sm.GetActiveSlot(0);
-        AssertThat(slot0Active is RosTorrentSkill).IsTrue();
+        // Macrophage innate 微絲變形 occupies passive slot 0; active slots start empty
+        AssertThat(sm.GetActiveSlot(0)).IsNull();
+        AssertThat(sm.GetPassiveSlot(0) is MacrophageDeformationSkill).IsTrue();
 
         // Verify Macrophage movement speed bound to CellStats
         AssertThat(player.CurrentSpeed).IsEqual(player.Stats!.GetStat("move_speed"));

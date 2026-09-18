@@ -47,48 +47,86 @@ public partial class TestAllCells : SceneTree
                     AssertThat(baseCell.EngulfCollider!.Polygon.Length).IsEqual(32);
                     AssertThat(baseCell.Nucleus!.Polygon.Length).IsGreaterEqual(16);
 
-                    // Check Slot 0 active weapon
-                    var slot0 = baseCell.CellSkillManager!.GetActiveSlot(0);
-                    AssertThat(slot0).IsNotNull();
+                    // Verify class-exclusive innate skill binding (docs/cell.md §2)
+                    var sm = baseCell.CellSkillManager!;
+                    var slot0 = sm.GetActiveSlot(0);
 
-                    // Verify cell-specific starting weapon and base body stats
                     switch (cid)
                     {
                         case "macrophage":
-                            AssertThat(slot0!.SkillId).IsEqual("ros_torrent");
+                            AssertThat(slot0).IsNull();
+                            AssertThat(sm.GetPassiveSlot(0)).IsNotNull();
+                            AssertThat(sm.GetPassiveSlot(0)!.SkillId).IsEqual("macrophage_pseudopods");
+                            AssertThat(sm.GetPassiveSlot(0)!.IsInnate).IsTrue();
+                            AssertThat(baseCell.MaxHealth).IsEqual(140.0f);
+                            AssertThat(baseCell.BaseSpeed).IsEqual(210.0f);
+                            break;
+                        case "ctl":
+                            AssertThat(slot0).IsNotNull();
+                            AssertThat(slot0!.SkillId).IsEqual("perforin_lance");
+                            AssertThat(slot0!.IsInnate).IsTrue();
+                            AssertThat(baseCell.MaxHealth).IsEqual(90.0f);
+                            AssertThat(baseCell.BaseSpeed).IsEqual(260.0f);
+                            break;
+                        case "neutrophil":
+                            AssertThat(slot0).IsNotNull();
+                            AssertThat(slot0!.SkillId).IsEqual("granzyme_detonation");
+                            AssertThat(slot0!.IsInnate).IsTrue();
                             AssertThat(baseCell.MaxHealth).IsEqual(100.0f);
                             AssertThat(baseCell.BaseSpeed).IsEqual(230.0f);
                             break;
-                        case "ctl":
-                            AssertThat(slot0!.SkillId).IsEqual("perforin_lance");
-                            AssertThat(baseCell.MaxHealth).IsEqual(75.0f);
-                            AssertThat(baseCell.BaseSpeed).IsEqual(280.0f);
-                            break;
-                        case "neutrophil":
-                            AssertThat(slot0!.SkillId).IsEqual("complement_cascade");
-                            AssertThat(baseCell.MaxHealth).IsEqual(90.0f);
-                            AssertThat(baseCell.BaseSpeed).IsEqual(240.0f);
-                            break;
                         case "b_cell":
+                            AssertThat(slot0).IsNotNull();
                             AssertThat(slot0!.SkillId).IsEqual("antibody_salvo");
-                            AssertThat(baseCell.MaxHealth).IsEqual(85.0f);
+                            AssertThat(slot0!.IsInnate).IsTrue();
+                            AssertThat(baseCell.MaxHealth).IsEqual(95.0f);
                             AssertThat(baseCell.BaseSpeed).IsEqual(220.0f);
                             break;
                         case "dendritic":
-                            AssertThat(slot0!.SkillId).IsEqual("pseudopod_lunge");
-                            AssertThat(baseCell.MaxHealth).IsEqual(95.0f);
-                            AssertThat(baseCell.BaseSpeed).IsEqual(215.0f);
+                            AssertThat(slot0).IsNotNull();
+                            AssertThat(slot0!.SkillId).IsEqual("mhc_tracer_beam");
+                            AssertThat(slot0!.IsInnate).IsTrue();
+                            AssertThat(baseCell.MaxHealth).IsEqual(110.0f);
+                            AssertThat(baseCell.BaseSpeed).IsEqual(225.0f);
                             break;
                     }
 
-                    // Cells share the same neutral stat baseline (no innate passive bonuses)
-                    AssertThat(baseCell.Stats!.GetStat("might")).IsEqualApprox(1.0f, 0.001f);
-                    AssertThat(baseCell.Stats!.GetStat("cooldown_reduction")).IsEqualApprox(0.0f, 0.001f);
-                    AssertThat(baseCell.Stats!.GetStat("crit_chance")).IsEqualApprox(0.05f, 0.001f);
-                    AssertThat(baseCell.Stats!.GetStat("magnet")).IsEqualApprox(150.0f, 0.001f);
-                    AssertThat(baseCell.Stats!.GetStat("health_regen")).IsEqualApprox(0.0f, 0.001f);
+                    // Verify class-specific Lv.1 base stat matrix (docs/cell.md §3)
+                    switch (cid)
+                    {
+                        case "macrophage":
+                            AssertThat(baseCell.Stats!.GetStat("armor")).IsEqualApprox(10.0f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("area")).IsEqualApprox(1.25f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("might")).IsEqualApprox(1.0f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("block")).IsEqualApprox(0.08f, 0.001f);
+                            break;
+                        case "ctl":
+                            AssertThat(baseCell.Stats!.GetStat("armor")).IsEqualApprox(0.0f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("crit_chance")).IsEqualApprox(0.15f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("evasion")).IsEqualApprox(0.10f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("pierce")).IsEqualApprox(1.0f, 0.001f);
+                            break;
+                        case "neutrophil":
+                            AssertThat(baseCell.Stats!.GetStat("armor")).IsEqualApprox(5.0f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("might")).IsEqualApprox(1.2f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("knockback")).IsEqualApprox(1.4f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("health_regen")).IsEqualApprox(0.5f, 0.001f);
+                            break;
+                        case "b_cell":
+                            AssertThat(baseCell.Stats!.GetStat("armor")).IsEqualApprox(0.0f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("projectile_speed")).IsEqualApprox(1.3f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("cooldown_reduction")).IsEqualApprox(0.10f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("amount")).IsEqualApprox(1.0f, 0.001f);
+                            break;
+                        case "dendritic":
+                            AssertThat(baseCell.Stats!.GetStat("armor")).IsEqualApprox(2.0f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("magnet")).IsEqualApprox(260.0f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("duration")).IsEqualApprox(1.2f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("cooldown_reduction")).IsEqualApprox(0.10f, 0.001f);
+                            break;
+                    }
 
-                    GD.Print($"[PASS] Verified '{cid}': Base Stats, 32-Vertex Morphology, Nucleus, Slot 0 Weapon, Neutral Passives.");
+                    GD.Print($"[PASS] Verified '{cid}': Base Stats, 32-Vertex Morphology, Nucleus, Innate Binding, Calibrated Stat Matrix.");
                     baseCell.QueueFree();
                 }
 

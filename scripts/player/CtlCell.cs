@@ -17,8 +17,8 @@ public partial class CtlCell : BaseCell
 
     public override void SetupCellIdentity()
     {
-        MaxHealth = 75.0f;
-        BaseSpeed = 280.0f;
+        MaxHealth = 90.0f;
+        BaseSpeed = 260.0f;
         BaseRadius = 42.0f;
         BaseDeformationMag = 6.0f;
         DeformationSpeed = 7.2f;
@@ -48,6 +48,17 @@ public partial class CtlCell : BaseCell
             Nucleus.Polygon = nPts;
             Nucleus.Color = new Color(0.48f, 0.12f, 0.32f, 0.92f);
         }
+    }
+
+    public override void ApplyClassBaseStats()
+    {
+        if (Stats == null)
+            return;
+
+        Stats.SetBase("armor", 0.0f);
+        Stats.SetBase("crit_chance", 0.15f);
+        Stats.SetBase("evasion", 0.10f);
+        Stats.SetBase("pierce", 1.0f);
     }
 
     public override void SetupInitialSkills()

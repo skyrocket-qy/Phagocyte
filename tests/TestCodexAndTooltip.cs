@@ -1,6 +1,8 @@
 using Godot;
 using System;
 using Phagocyte.Core;
+using Phagocyte.Player;
+using Phagocyte.Skills;
 using Phagocyte.UI;
 using GdUnit4;
 using static GdUnit4.Assertions;
@@ -65,6 +67,12 @@ public partial class TestCodexAndTooltip : SceneTree
         var skillTooltip = hud.SkillTooltip;
         AssertThat(skillTooltip).IsNotNull();
 
+        // Macrophage starts with the innate passive in slot 0; draft a ranged weapon to test the active tooltip
+        var player = main.GetNodeOrNull<BaseCell>("Macrophage");
+        AssertThat(player).IsNotNull();
+        AssertThat(player!.CellSkillManager!.EquipActive(new RosTorrentSkill(), 0)).IsTrue();
+        hud.UpdateSkillSlots();
+
         var slotsContainer = hud.SlotsContainer;
         AssertThat(slotsContainer != null && slotsContainer.GetChildCount() >= 6).IsTrue();
 
@@ -80,6 +88,15 @@ public partial class TestCodexAndTooltip : SceneTree
         AssertThat(tBadge.Contains("主动") || tBadge.Contains("ACTIVE")).IsTrue();
         AssertThat(hud.TooltipStats?.Text.Contains("3.2") ?? false).IsTrue();
         GD.Print($"[PASS] Slot 0 Active Weapon Tooltip verified: '{tIcon} {tTitle}' ({tBadge})");
+
+        // Test Hover Slot 5 (Innate Passive 微絲變形)
+        var card5 = slotsContainer!.GetChild<Control>(5);
+        hud.OnSlotMouseEntered(5, card5);
+        AssertThat(skillTooltip.Visible).IsTrue();
+        AssertThat(hud.TooltipIcon?.Text).IsEqual("🦠");
+        var innateBadge = hud.TooltipBadge?.Text ?? "";
+        AssertThat(innateBadge.Contains("固有") || innateBadge.Contains("INNATE")).IsTrue();
+        GD.Print($"[PASS] Slot 5 Innate Passive Tooltip verified: '{hud.TooltipIcon?.Text} {hud.TooltipTitle?.Text}' ({innateBadge})");
 
         // Test Hover Slot 1 (Empty Slot)
         var card1 = slotsContainer.GetChild<Control>(1);

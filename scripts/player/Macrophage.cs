@@ -17,8 +17,8 @@ public partial class Macrophage : BaseCell
 
     public override void SetupCellIdentity()
     {
-        MaxHealth = 100.0f;
-        BaseSpeed = 230.0f;
+        MaxHealth = 140.0f;
+        BaseSpeed = 210.0f;
         BaseRadius = 48.0f;
         BaseDeformationMag = 28.0f;
         DeformationSpeed = 3.6f;
@@ -53,12 +53,23 @@ public partial class Macrophage : BaseCell
         }
     }
 
+    public override void ApplyClassBaseStats()
+    {
+        if (Stats == null)
+            return;
+
+        Stats.SetBase("armor", 10.0f);
+        Stats.SetBase("area", 1.25f);
+        Stats.SetBase("might", 1.0f);
+        Stats.SetBase("block", 0.08f);
+    }
+
     public override void SetupInitialSkills()
     {
         if (CellSkillManager != null)
         {
-            var ros = new RosTorrentSkill();
-            CellSkillManager.EquipActive(ros, 0);
+            var pseudopods = new MacrophageDeformationSkill();
+            CellSkillManager.EquipPassive(pseudopods, 0);
         }
     }
 }

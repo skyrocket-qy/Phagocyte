@@ -20,14 +20,14 @@ public partial class UpgradeManager : RefCounted
         new Dictionary { { "id", "pseudopod_lunge" }, { "name", "SKILL_LUNGE_NAME" }, { "desc", "SKILL_LUNGE_DESC" }, { "icon", "🥊" }, { "class_type", typeof(PseudopodLungeSkill).AssemblyQualifiedName }, { "class_id", "dendritic" } },
         new Dictionary { { "id", "nitric_oxide_halo" }, { "name", "SKILL_NO_NAME" }, { "desc", "SKILL_NO_DESC" }, { "icon", "⭕" }, { "class_type", typeof(NitricOxideHaloSkill).AssemblyQualifiedName } },
         new Dictionary { { "id", "nuclease_blades" }, { "name", "SKILL_NUCLEASE_NAME" }, { "desc", "SKILL_NUCLEASE_DESC" }, { "icon", "⛓️" }, { "class_type", typeof(NucleaseBladesSkill).AssemblyQualifiedName } },
-        new Dictionary { { "id", "granzyme_detonation" }, { "name", "SKILL_GRANZYME_NAME" }, { "desc", "SKILL_GRANZYME_DESC" }, { "icon", "🧬" }, { "class_type", typeof(GranzymeDetonationSkill).AssemblyQualifiedName } },
+        new Dictionary { { "id", "granzyme_detonation" }, { "name", "SKILL_GRANZYME_NAME" }, { "desc", "SKILL_GRANZYME_DESC" }, { "icon", "🧬" }, { "class_type", typeof(GranzymeDetonationSkill).AssemblyQualifiedName }, { "class_id", "neutrophil" } },
         new Dictionary { { "id", "interferon_wave" }, { "name", "SKILL_INTERFERON_NAME" }, { "desc", "SKILL_INTERFERON_DESC" }, { "icon", "🌊" }, { "class_type", typeof(InterferonWaveSkill).AssemblyQualifiedName } },
         new Dictionary { { "id", "lysozyme_ricochet" }, { "name", "SKILL_LYSOZYME_NAME" }, { "desc", "SKILL_LYSOZYME_DESC" }, { "icon", "🧪" }, { "class_type", typeof(LysozymeRicochetSkill).AssemblyQualifiedName } },
         new Dictionary { { "id", "phagolysosome_vent" }, { "name", "SKILL_PHAGO_VENT_NAME" }, { "desc", "SKILL_PHAGO_VENT_DESC" }, { "icon", "🛢️" }, { "class_type", typeof(PhagolysosomeVentSkill).AssemblyQualifiedName } },
         new Dictionary { { "id", "pro_inflammatory_arc" }, { "name", "SKILL_PRO_INFLAM_NAME" }, { "desc", "SKILL_PRO_INFLAM_DESC" }, { "icon", "⚡" }, { "class_type", typeof(ProInflammatoryArcSkill).AssemblyQualifiedName } },
         new Dictionary { { "id", "exosome_singularity" }, { "name", "SKILL_EXOSOME_NAME" }, { "desc", "SKILL_EXOSOME_DESC" }, { "icon", "🧲" }, { "class_type", typeof(ExosomeSingularitySkill).AssemblyQualifiedName } },
         new Dictionary { { "id", "defensin_barbs" }, { "name", "SKILL_DEFENSIN_NAME" }, { "desc", "SKILL_DEFENSIN_DESC" }, { "icon", "🛡️" }, { "class_type", typeof(DefensinBarbsSkill).AssemblyQualifiedName } },
-        new Dictionary { { "id", "mhc_tracer_beam" }, { "name", "SKILL_MHC_TRACER_NAME" }, { "desc", "SKILL_MHC_TRACER_DESC" }, { "icon", "🎯" }, { "class_type", typeof(MhcTracerBeamSkill).AssemblyQualifiedName } },
+        new Dictionary { { "id", "mhc_tracer_beam" }, { "name", "SKILL_MHC_TRACER_NAME" }, { "desc", "SKILL_MHC_TRACER_DESC" }, { "icon", "🎯" }, { "class_type", typeof(MhcTracerBeamSkill).AssemblyQualifiedName }, { "class_id", "dendritic" } },
         new Dictionary { { "id", "histamine_surge" }, { "name", "SKILL_HISTAMINE_NAME" }, { "desc", "SKILL_HISTAMINE_DESC" }, { "icon", "💉" }, { "class_type", typeof(HistamineSurgeSkill).AssemblyQualifiedName } }
     };
 

@@ -21,7 +21,7 @@ public partial class PerforinLanceSkill : BaseSkill
         DescKey = "SKILL_PERFORIN_DESC";
         BioKey = "SKILL_PERFORIN_BIO";
         IconSymbol = "🗡️";
-        IsInnate = false;
+        IsInnate = true;
         IsPassive = false;
         Cooldown = 2.8f;
         CooldownTimer = 0.5f;

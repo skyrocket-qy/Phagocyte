@@ -453,7 +453,8 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(_main!.Player is BaseCell).IsTrue();
         var player = (BaseCell)_main.Player!;
 
-        AssertThat(player.Stats!.GetStat("crit_chance")).IsEqualApprox(0.12f, 0.001f);
+        // CTL base 15% + Opsonin Lv.1 5% + Precise Edge 2% = 22%
+        AssertThat(player.Stats!.GetStat("crit_chance")).IsEqualApprox(0.22f, 0.001f);
         AssertThat(player.CellSkillManager!.GetPassiveSlot(0)).IsNull();
         GD.Print("[PASS] A saved tree preset modifies the run without using passive slots.");
 
@@ -461,7 +462,7 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(hud).IsNotNull();
         hud!.ToggleTreeOverlay();
         AssertThat(hud.IsTreeOverlayVisible).IsTrue();
-        AssertThat(hud.TreeOverlayText!.Text.Contains("12.0%") || hud.TreeOverlayText!.Text.Contains("0.12")).IsTrue();
+        AssertThat(hud.TreeOverlayText!.Text.Contains("22.0%") || hud.TreeOverlayText!.Text.Contains("0.22")).IsTrue();
         AssertThat(InputMap.HasAction("toggle_tree")).IsTrue();
         GD.Print("[PASS] The in-game overlay exposes the active tree build and current stats.");
 

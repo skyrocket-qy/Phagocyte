@@ -16,7 +16,7 @@ public partial class BCell : BaseCell
 
     public override void SetupCellIdentity()
     {
-        MaxHealth = 85.0f;
+        MaxHealth = 95.0f;
         BaseSpeed = 220.0f;
         BaseRadius = 44.0f;
         BaseDeformationMag = 7.0f;
@@ -50,6 +50,17 @@ public partial class BCell : BaseCell
             Nucleus.Polygon = nPts;
             Nucleus.Color = new Color(0.18f, 0.20f, 0.55f, 0.92f);
         }
+    }
+
+    public override void ApplyClassBaseStats()
+    {
+        if (Stats == null)
+            return;
+
+        Stats.SetBase("armor", 0.0f);
+        Stats.SetBase("projectile_speed", 1.3f);
+        Stats.SetBase("cooldown_reduction", 0.10f);
+        Stats.SetBase("amount", 1.0f);
     }
 
     public override void SetupInitialSkills()

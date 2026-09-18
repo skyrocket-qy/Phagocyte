@@ -47,9 +47,9 @@ public partial class TestPrototype : SceneTree
         AssertThat(player.EngulfCollider!.Polygon.Length).IsEqual(32);
         GD.Print($"[PASS] Initial smooth {player.Cytoplasm!.Polygon.Length}-vertex pseudopod deformation & 32-vertex collision sync verified.");
 
-        // 2. Check initial stats
-        AssertThat(player.Health).IsEqual(100.0f);
-        AssertThat(player.CurrentRadius).IsEqual(player.BaseRadius);
+        // 2. Check initial stats (calibrated matrix: HP 140, Area 1.25)
+        AssertThat(player.Health).IsEqual(140.0f);
+        AssertThat(player.CurrentRadius).IsEqualApprox(player.BaseRadius * 1.25f, 0.01f);
         GD.Print("[PASS] Macrophage initial stats verified.");
 
         // 3. Test Ingestion Loop (pure EXP feedback)

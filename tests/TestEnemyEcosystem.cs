@@ -194,6 +194,7 @@ public partial class TestEnemyEcosystem : SceneTree
         AssertThat(candida.CanBeEngulfed).IsFalse();
 
         float pHealth = player.Health;
+        player.Stats!.SetBase("block", 0.0f); // Zero innate Block so the hyphae puncture lands deterministically
         candida.OnEngulfAttemptFailed(player);
         AssertThat(player.Health < pHealth).IsTrue();
         GD.Print("[PASS] Test 9: Candida albicans hyphae sprouting & membrane puncture rejection verified.");

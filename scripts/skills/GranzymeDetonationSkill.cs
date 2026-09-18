@@ -21,7 +21,7 @@ public partial class GranzymeDetonationSkill : BaseSkill
         DescKey = "SKILL_GRANZYME_DESC";
         BioKey = "SKILL_GRANZYME_BIO";
         IconSymbol = "🧬";
-        IsInnate = false;
+        IsInnate = true;
         IsPassive = false;
         Cooldown = 3.5f;
         CooldownTimer = 1.5f;

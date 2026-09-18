@@ -83,11 +83,11 @@ public partial class TestSurvivorHudUx : SceneTree
         AssertThat(arcBar).IsNotNull();
 
         // Health at 100% -> Arc bar is calm / invisible
-        AssertThat(player.Health).IsEqual(100.0f);
+        AssertThat(player.Health).IsEqual(140.0f);
 
-        // Take damage -> Arc bar triggered & hit flash
+        // Take damage -> Arc bar triggered & hit flash (Armor 10 => 10/60 DR)
         player.TakeDamage(20.0f);
-        AssertThat(player.Health).IsEqual(80.0f);
+        AssertThat(player.Health).IsEqualApprox(140.0f - 20.0f * (1.0f - 10.0f / 60.0f), 0.01f);
         GD.Print("[PASS] 3. Under-cell dynamic arc health bar and hit strobe flash verified.");
 
         // =====================================================================
@@ -105,15 +105,15 @@ public partial class TestSurvivorHudUx : SceneTree
         // Drop player health to 20% (<30%)
         player.Health = 20.0f;
         hud.LastHealth = 20.0f;
-        hud.LastMaxHealth = 100.0f;
+        hud.LastMaxHealth = 140.0f;
         hud._Process(0.016);
         float critIntensity = vignetteMat.GetShaderParameter("pulse_intensity").AsSingle();
         AssertThat(critIntensity > 0.0f).IsTrue();
         GD.Print($"[PASS] 4. Critical HP full-screen red vignette heartbeat pulse verified (Intensity={critIntensity:F2} > 0).");
 
         // Restore health -> pulse ceases
-        player.Health = 100.0f;
-        hud.LastHealth = 100.0f;
+        player.Health = 140.0f;
+        hud.LastHealth = 140.0f;
         hud._Process(0.016);
         AssertThat(vignetteMat.GetShaderParameter("pulse_intensity").AsSingle()).IsEqual(0.0f);
 

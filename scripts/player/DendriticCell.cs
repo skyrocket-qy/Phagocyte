@@ -16,8 +16,8 @@ public partial class DendriticCell : BaseCell
 
     public override void SetupCellIdentity()
     {
-        MaxHealth = 95.0f;
-        BaseSpeed = 215.0f;
+        MaxHealth = 110.0f;
+        BaseSpeed = 225.0f;
         BaseRadius = 45.0f;
         BaseDeformationMag = 28.0f;
         DeformationSpeed = 2.8f;
@@ -50,12 +50,23 @@ public partial class DendriticCell : BaseCell
         }
     }
 
+    public override void ApplyClassBaseStats()
+    {
+        if (Stats == null)
+            return;
+
+        Stats.SetBase("armor", 2.0f);
+        Stats.SetBase("magnet", 260.0f);
+        Stats.SetBase("duration", 1.2f);
+        Stats.SetBase("cooldown_reduction", 0.10f);
+    }
+
     public override void SetupInitialSkills()
     {
         if (CellSkillManager != null)
         {
-            var lunge = new PseudopodLungeSkill();
-            CellSkillManager.EquipActive(lunge, 0);
+            var tracer = new MhcTracerBeamSkill();
+            CellSkillManager.EquipActive(tracer, 0);
         }
     }
 

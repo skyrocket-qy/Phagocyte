@@ -23,7 +23,7 @@ public partial class AntibodySalvoSkill : BaseSkill
         DescKey = "SKILL_ANTIBODY_DESC";
         BioKey = "SKILL_ANTIBODY_BIO";
         IconSymbol = "🏹";
-        IsInnate = false;
+        IsInnate = true;
         IsPassive = false;
         Cooldown = 3.5f;
         CooldownTimer = 2.0f;

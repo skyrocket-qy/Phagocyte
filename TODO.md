@@ -29,26 +29,14 @@
 - [x] **微絲微管底盤基礎類**：`BaseCell.cs` 封裝移動、生命、細胞核、吞噬與經驗升級訊號。
 - [x] **動態多邊形變形**：`FastNoiseLite` 在極座標系驅動 32 頂點位移，並逐幀即時烘焙至 `CollisionPolygon2D`。
 - [x] **四階段漏斗式受擊管線**：流體閃避 (Evasion) $\to$ 糖萼格擋 (Block) $\to$ 護甲減傷 (Armor DR) $\to$ 生命扣減 (HP Loss)。
-- [ ] **[P0] 脫水穿梭避險模式 (Squeeze Mode)**：
-  - **規格機制**：長按 `Space`（鍵盤）或 `L2`（手把），體現白血球擠過血管內皮間隙的變形穿梭（Diapedesis）。
-  - **數值效果**：
-    - 即時體積係數壓縮 40%（$\alpha \to 0.6 \alpha$），大幅縮小碰撞判定截面。
-    - 移動速度提升 $+25\%$。
-    - **暫時關閉主動吞噬**（`is_squeezing = true`，關閉 `EngulfArea` 判定，無法透過肉身碰撞消化病原體）。
-  - **視覺表現**：細胞邊界泛出淡青色緊繃光澤，頂點抖動振幅收縮。
-  - **影響檔案**：`scripts/player/BaseCell.cs`, `shaders/cytoplasm_gel.gdshader`
-- [ ] **[P1] 底盤半徑統一標準化**：
-  - 規格明訂所有白血球在 Lv.1 時初始受擊與碰撞半徑統一為 `base_radius = 24.0`（直徑 48px），消弭前期走位手感偏差。
-  - 目前程式碼中 `BaseRadius` 設為 48.0，且各細胞子類覆蓋了不同半徑（巨噬 48, CTL 42 等），需重構為標準化初始值，純由 `stats.area` 進行動態等比縮放。
-  - **影響檔案**：`scripts/player/BaseCell.cs`, `scripts/player/*.cs`
-- [ ] **[P1] 五大白血球初始屬性矩陣校準** (`docs/cell.md` 第 3 節)：
+- [x] **[P1] 五大白血球初始屬性矩陣校準** (`docs/cell.md` 第 3 節)：
   - **巨噬細胞 (Macrophage)**：HP 140 ｜ Armor 10 ｜ Speed 210 ｜ Area 1.25 ｜ Might 1.0 ｜ Block 8%
   - **殺手 T 細胞 (CTL)**：HP 90 ｜ Armor 0 ｜ Speed 260 ｜ Crit 15% ｜ Evasion 10% ｜ Pierce +1
   - **嗜中性球 (Neutrophil)**：HP 100 ｜ Armor 5 ｜ Speed 230 ｜ Might 1.2 ｜ Knockback 1.4 ｜ Regen 0.5
   - **B 淋巴細胞 (B-Cell)**：HP 95 ｜ Armor 0 ｜ Speed 220 ｜ ProjSpeed 1.3 ｜ CDR 10% ｜ Amount +1
   - **樹突狀細胞 (Dendritic)**：HP 110 ｜ Armor 2 ｜ Speed 225 ｜ Magnet 260 ｜ Duration 1.2 ｜ CDR 10%
   - **影響檔案**：`scripts/player/Macrophage.cs`, `CtlCell.cs`, `NeutrophilCell.cs`, `BCell.cs`, `DendriticCell.cs`
-- [ ] **[P1] 白血球專屬固有技能 (Innate Skills) 校對與綁定**：
+- [x] **[P1] 白血球專屬固有技能 (Innate Skills) 校對與綁定**：
   - 巨噬細胞：更正為固有技能【微絲變形】(`MacrophageDeformationSkill`，目前誤配為 RosTorrent)。
   - 殺手 T：固有技能【穿孔素長矛】(`PerforinLanceSkill`)。
   - 嗜中性球：固有技能【顆粒酶殉爆】(`GranzymeDetonationSkill`)。
