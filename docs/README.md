@@ -20,7 +20,8 @@ docs/
 ├── passivetree.md    # 造血幹細胞正交天賦星盤（DBD血網轉化、90度正交微管、四階稀有度、五大分化譜系）
 ├── achievement.md    # 成就、里程碑與局外解鎖系統（角色解鎖鏈、固有技能、Steamworks 整合）
 ├── record.md         # 臨床病歷單結算、歷史記錄與衝榜系統（SIRS 陣亡 vs 中和通關、評級 S/A/B/C/D）
-└── tutorial.md       # 新手引導與直覺 UI/UX（見形知意、非侵入微引導、漸進式揭露）
+├── tutorial.md       # 新手引導與直覺 UI/UX（見形知意、非侵入微引導、漸進式揭露）
+└── endgame.md        # 終局無盡細胞因子風暴模式（突破15分鐘、病理過載詞綴、雙生Boss、全球天梯榜）
 ```
 
 ---
@@ -85,4 +86,7 @@ graph TD
 
 ### 🧭 引導與介面體驗
 - **[tutorial.md](file:///Users/zelin/project/Phagocyte/docs/tutorial.md)**：堅持「見形知意、非侵入式微引導」的 UX 規範，梳理 5 項核心微觀物理與機制教學，以及病歷單與星盤的自然銜接。
+
+### ♾️ 終局模式 (End Game)
+- **[endgame.md](file:///Users/zelin/project/Phagocyte/docs/endgame.md)**：規範通關後的「全身細胞因子風暴無盡模式」，涵蓋無上限時間軸、3 分鐘指數級過載、雙生 Boss 突襲與病理負面詞綴系統（Afflictions）。
 

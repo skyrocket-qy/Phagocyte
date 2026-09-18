@@ -34,6 +34,12 @@ flowchart TD
 - **病歷評價**：白血球胞膜解體，炎症因子風暴失控，宿主局部組織大面積壞死。
 - **挫敗感緩衝**：雖然單局中止，但本次戰鬥吞噬積累的經驗仍會計入成就進度條，轉化為後續局外解鎖的推力。
 
+### 2.3 終局結算：無盡細胞因子風暴過載 (Endless Overdrive Termination)
+- **觸發條件**：在【無盡模式】下存活超過 15:00 直至生命膜破裂。
+- **臨床診斷**：`【慢性重症感染 · 全身細胞因子風暴終末代償】`。
+- **病歷評價**：宿主進入不可逆多器官過熱狀態，白血球抵禦至最後一刻，評級開放 **Rank SSS（超載神話）** 與 **Rank EX（破格存在）**。
+- **紀錄擴充**：額外記錄所加裝的【病理過載詞綴清單（Afflictions）】與詞綴加成總分。
+
 ---
 
 ## 3. 病歷單數據結構與持久化 (`RunRecordManager.cs`)
@@ -50,6 +56,7 @@ var record = new Godot.Collections.Dictionary
     { "survival_time", survivalTime },// 存活時間 (秒)
     { "level", level },                // 終末代謝等級
     { "digested", digested },          // 吞噬並消化的病原體總數
+    { "kpm", kpm },                    // 吞噬通量 (Kills Per Minute = digested / (survivalTime / 60))
     { "points_spent", pointsSpent },  // 戰鬥時已投入的天賦點總數
     { "active_skills", skills },      // 終末裝備的主動生化技能清單
     { "timestamp", timestamp }         // 結算時間戳 (Unix Time)
@@ -63,20 +70,45 @@ var record = new Godot.Collections.Dictionary
 
 ## 4. 臨床生化評級與衝榜機制 (Leaderboard & Scoring)
 
-為了激勵硬核肉鴿玩家挑戰極限吞噬效率與衝榜，遊戲引入了**臨床生化評級模型（Clinical Performance Grade）**：
+### 4.1 核心設計原則：打破「通關分數同質化」
 
-### 4.1 綜合評分公式 (Pathological Score)
-$$\text{Score} = (\text{Survival Seconds} \times 10) + (\text{Digested Count} \times 25) + (\text{Level} \times 100) \times \text{Difficulty Multiplier}$$
-- *難度倍率*：Normal 難度 $\times 1.0$，Hard 急性危象 $\times 1.5$。
-- *通關加成*：若達成「特異性中和成功」，額外獲得 $+5,000$ 點臨床治癒獎勵分。
+在傳統同類遊戲中，15 分鐘存活的固定波次設計會導致所有通關玩家的擊殺數與通關得分千篇一律。
+《Phagocyte》透過**「同屏怪物上限 ＋ 殺得越快重生越快（Kill-Driven Dynamic Backfill）」**機制，讓玩家的**輸出爆發力（DPS）**與**吞噬通量（KPM）**直接轉化為實際擊殺數量：
 
-### 4.2 臨床評級劃分標準
-| 評級 (Grade) | 稱號名稱 | 達成標準 |
+- **極限超武 Build**：秒怪如割草，同屏名額秒釋放秒回補，15 分鐘可吞噬 **5,000～8,000+ 隻**。
+- **消極苟活 Build**：無輸出只靠位移躲怪，同屏怪物常駐滿額不再生成，15 分鐘僅能吞噬 **800～1,200 隻**。
+
+兩者在相同的 15:00 通關時間下，**最終積分差距可達 5～8 倍以上**，極大豐富了 Build 驗證與排行榜競爭維度！
+
+---
+
+### 4.2 綜合評分公式 (Pathological Score)
+
+$$\text{Score} = \left[ (\text{Survival Seconds} \times 10) + (\text{Digested Count} \times 30) + (\text{KPM} \times 50) + (\text{Level} \times 150) \right] \times \text{Difficulty Multiplier} + \text{Clear Bonus}$$
+
+- **吞噬加權**：吞噬總數（$\times 30$）與每分鐘吞噬率 $\text{KPM}$（$\times 50$）佔據分數最大權重。
+- **難度倍率（Difficulty Multiplier）**：Normal 難度 $\times 1.0$；Hard 急性危象 $\times 1.5$；無盡模式詞綴疊加最高 $\times 2.75$。
+- **通關中和加成（Clear Bonus）**：擊殺 15:00 終末 Boss 達成特異性中和成功，額外獲得 $+10,000$ 分。
+
+#### 📊 通關實例分數對比表（同為 15:00 Hard 通關）
+| 戰術風格 | 吞噬總數 | 代謝等級 | 吞噬通量 (KPM) | 最終結算積分 | 臨床評級 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **消極苟活防守型** | 950 隻 | Lv.22 | 63.3 | **55,415 分** | **Rank B** |
+| **平衡標準發育型** | 2,800 隻 | Lv.42 | 186.7 | **156,925 分** | **Rank A** |
+| **極限超武割草型** | 6,200 隻 | Lv.68 | 413.3 | **334,190 分** | **Rank S** |
+
+---
+
+### 4.3 臨床評級劃分標準
+
+臨床評級不僅看是否存活，更嚴格審查**吞噬通量指標**：
+
+| 評級 (Grade) | 稱號名稱 | 達成標準 (必須兼顧存活與吞噬通量) |
 | :--- | :--- | :--- |
-| **Rank S** | **【微觀主宰 · 免疫神話】** | Hard 難度通關，吞噬量 $> 800$，無陣亡。 |
-| **Rank A** | **【高效清道夫 · 卓越代償】** | Normal 通關或 Hard 存活 $> 12:00$，吞噬量 $> 500$。 |
-| **Rank B** | **【局部防線 · 穩定受控】** | 存活 $> 08:00$，吞噬量 $> 300$。 |
-| **Rank C** | **【應激代償 · 急性相】** | 存活 $> 04:00$，吞噬量 $> 100$。 |
+| **Rank S** | **【微觀主宰 · 免疫神話】** | Hard 通關，吞噬總量 $\ge 3,500$（$\text{KPM} \ge 230$），無陣亡。 |
+| **Rank A** | **【高效清道夫 · 卓越代償】** | Normal 通關或 Hard 存活 $> 12:00$，吞噬量 $\ge 2,000$（$\text{KPM} \ge 130$）。 |
+| **Rank B** | **【局部防線 · 穩定受控】** | 存活 $> 08:00$，吞噬量 $\ge 800$。 |
+| **Rank C** | **【應激代償 · 急性相】** | 存活 $> 04:00$，吞噬量 $\ge 300$。 |
 | **Rank D** | **【膜溶解 · 早期潰敗】** | 存活 $< 04:00$，早期被病原體衝垮破膜。 |
 
 ---
