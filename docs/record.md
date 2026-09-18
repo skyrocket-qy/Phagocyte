@@ -55,8 +55,9 @@ var record = new Godot.Collections.Dictionary
     { "map_id", mapId },              // 戰鬥器官 ("acute_wound", 等)
     { "survival_time", survivalTime },// 存活時間 (秒)
     { "level", level },                // 終末代謝等級
-    { "digested", digested },          // 吞噬並消化的病原體總數
-    { "kpm", kpm },                    // 吞噬通量 (Kills Per Minute = digested / (survivalTime / 60))
+    { "kills", kills },                // 總擊殺數 (Total Kills: 包含遠程技能擊殺 + 肉身吞噬)
+    { "engulfed", engulfed },          // 肉身吞噬數 (Direct Engulfed: 僅統計偽足/細胞膜直接生吞)
+    { "kpm", kpm },                    // 擊殺通量 (Kills Per Minute = kills / (survivalTime / 60))
     { "points_spent", pointsSpent },  // 戰鬥時已投入的天賦點總數
     { "active_skills", skills },      // 終末裝備的主動生化技能清單
     { "timestamp", timestamp }         // 結算時間戳 (Unix Time)
@@ -70,45 +71,55 @@ var record = new Godot.Collections.Dictionary
 
 ## 4. 臨床生化評級與衝榜機制 (Leaderboard & Scoring)
 
-### 4.1 核心設計原則：打破「通關分數同質化」
+### 4.1 核心計分原則：直接以擊殺計分，每隻怪具備固定 Base 分數
 
-在傳統同類遊戲中，15 分鐘存活的固定波次設計會導致所有通關玩家的擊殺數與通關得分千篇一律。
-《Phagocyte》透過**「同屏怪物上限 ＋ 殺得越快重生越快（Kill-Driven Dynamic Backfill）」**機制，讓玩家的**輸出爆發力（DPS）**與**吞噬通量（KPM）**直接轉化為實際擊殺數量：
+為了使結算評分直觀、公平且易於理解，遊戲在評分系統上貫徹以下兩項準則：
 
-- **極限超武 Build**：秒怪如割草，同屏名額秒釋放秒回補，15 分鐘可吞噬 **5,000～8,000+ 隻**。
-- **消極苟活 Build**：無輸出只靠位移躲怪，同屏怪物常駐滿額不再生成，15 分鐘僅能吞噬 **800～1,200 隻**。
-
-兩者在相同的 15:00 通關時間下，**最終積分差距可達 5～8 倍以上**，極大豐富了 Build 驗證與排行榜競爭維度！
+1. **直接以擊殺（Kills）為評分依據**：
+   - **吞噬在計分上視同擊殺**：無論玩家是使用遠程技能（抗體、穿孔長矛、酸液噴流等）擊殺病原體，還是利用細胞膜/偽足直接肉身吞噬，**在分數結算上一視同仁，均獲得該病原體對應的固定 Base 分數**！
+   - 避免了複雜的額外加分判定，病歷單上的「肉身吞噬數（`engulfed`）」作為玩家戰術風格與榮譽數據單獨展示，但不產生雙重計分偏頗。
+2. **每種病原體擁有固定的基礎分（Fixed Base Score）**：
+   - 病原體依照其威脅度與生理強度設定固定的 Base 分數：
+     - **微型蜂擁群（Micro Swarm）**：如諾羅病毒、瘧疾裂殖子，每隻 **5 分**。
+     - **標準病原體（Standard）**：如大腸桿菌、冠狀病毒、葡萄球菌，每隻 **15 分**。
+     - **高危 / 敏捷病原體（Dangerous）**：如幽門螺桿菌、狂犬病毒、綠膿桿菌，每隻 **35 分**。
+     - **重裝精英 / 巨型病灶（Elite Tank）**：如結核桿菌、炭疽桿菌、異變癌細胞，每隻 **100 分**。
+     - **次級領主（09:00 Sub-Boss）**：固定 **600 分**。
+     - **終末原發 Boss（15:00 Terminal Boss）**：固定 **3,000 分**。
 
 ---
 
 ### 4.2 綜合評分公式 (Pathological Score)
 
-$$\text{Score} = \left[ (\text{Survival Seconds} \times 10) + (\text{Digested Count} \times 30) + (\text{KPM} \times 50) + (\text{Level} \times 150) \right] \times \text{Difficulty Multiplier} + \text{Clear Bonus}$$
+總擊殺得分即為全場消滅所有病原體的 Base 分數累加：
 
-- **吞噬加權**：吞噬總數（$\times 30$）與每分鐘吞噬率 $\text{KPM}$（$\times 50$）佔據分數最大權重。
+$$\text{Kill Score} = \sum_{\text{Kills}} \text{BaseScore}(\text{pathogen})$$
+
+$$\text{Final Score} = \left[ (\text{Survival Seconds} \times 10) + \text{Kill Score} + (\text{Level} \times 100) \right] \times \text{Difficulty Multiplier} + \text{Clear Bonus}$$
+
+- **殺得越快，分數越高**：因為有「同屏 300 隻上限 ＋ 殺越快重生越快」機制，高爆發 Build 能在 15 分鐘內擊殺 5,000～8,000 隻怪物，獲取的 $\text{Kill Score}$ 是消極苟活玩家（僅殺 800 隻）的數倍之多！
 - **難度倍率（Difficulty Multiplier）**：Normal 難度 $\times 1.0$；Hard 急性危象 $\times 1.5$；無盡模式詞綴疊加最高 $\times 2.75$。
 - **通關中和加成（Clear Bonus）**：擊殺 15:00 終末 Boss 達成特異性中和成功，額外獲得 $+10,000$ 分。
 
 #### 📊 通關實例分數對比表（同為 15:00 Hard 通關）
-| 戰術風格 | 吞噬總數 | 代謝等級 | 吞噬通量 (KPM) | 最終結算積分 | 臨床評級 |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **消極苟活防守型** | 950 隻 | Lv.22 | 63.3 | **55,415 分** | **Rank B** |
-| **平衡標準發育型** | 2,800 隻 | Lv.42 | 186.7 | **156,925 分** | **Rank A** |
-| **極限超武割草型** | 6,200 隻 | Lv.68 | 413.3 | **334,190 分** | **Rank S** |
+| 戰術風格 | 總擊殺量 (Kills) | 擊殺累積 Base 分數 | 代謝等級 | 擊殺通量 (KPM) | 最終結算積分 | 臨床評級 |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **消極走位苟活型** | 950 隻 (雜菌為主) | 16,500 分 | Lv.22 | 63.3 | **41,550 分** | **Rank B** |
+| **平衡標準發育型** | 2,800 隻 (含精英) | 58,000 分 | Lv.42 | 186.7 | **106,800 分** | **Rank A** |
+| **極限超武割草型** | 6,500 隻 (全屏秒殺) | 145,000 分 | Lv.68 | 433.3 | **251,200 分** | **Rank S** |
 
 ---
 
 ### 4.3 臨床評級劃分標準
 
-臨床評級不僅看是否存活，更嚴格審查**吞噬通量指標**：
+臨床評級直接依據**總擊殺量（Total Kills）**與**存活表現**劃分：
 
-| 評級 (Grade) | 稱號名稱 | 達成標準 (必須兼顧存活與吞噬通量) |
+| 評級 (Grade) | 稱號名稱 | 達成標準 |
 | :--- | :--- | :--- |
-| **Rank S** | **【微觀主宰 · 免疫神話】** | Hard 通關，吞噬總量 $\ge 3,500$（$\text{KPM} \ge 230$），無陣亡。 |
-| **Rank A** | **【高效清道夫 · 卓越代償】** | Normal 通關或 Hard 存活 $> 12:00$，吞噬量 $\ge 2,000$（$\text{KPM} \ge 130$）。 |
-| **Rank B** | **【局部防線 · 穩定受控】** | 存活 $> 08:00$，吞噬量 $\ge 800$。 |
-| **Rank C** | **【應激代償 · 急性相】** | 存活 $> 04:00$，吞噬量 $\ge 300$。 |
+| **Rank S** | **【微觀主宰 · 免疫神話】** | Hard 通關，總擊殺量 $\ge 3,500$ 隻（$\text{KPM} \ge 230$），無陣亡。 |
+| **Rank A** | **【高效清道夫 · 卓越代償】** | Normal 通關或 Hard 存活 $> 12:00$，總擊殺量 $\ge 2,000$ 隻（$\text{KPM} \ge 130$）。 |
+| **Rank B** | **【局部防線 · 穩定受控】** | 存活 $> 08:00$，總擊殺量 $\ge 800$ 隻。 |
+| **Rank C** | **【應激代償 · 急性相】** | 存活 $> 04:00$，總擊殺量 $\ge 300$ 隻。 |
 | **Rank D** | **【膜溶解 · 早期潰敗】** | 存活 $< 04:00$，早期被病原體衝垮破膜。 |
 
 ---
