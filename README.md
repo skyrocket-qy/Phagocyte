@@ -33,6 +33,7 @@
 - 🕸️ **[造血幹細胞正交天賦星盤 (passivetree.md)](file:///Users/zelin/project/Phagocyte/docs/passivetree.md)**
 - 🏆 **[成就、里程碑與局外解鎖 (achievement.md)](file:///Users/zelin/project/Phagocyte/docs/achievement.md)**
 - 📊 **[臨床病歷單結算、歷史記錄與衝榜 (record.md)](file:///Users/zelin/project/Phagocyte/docs/record.md)**
+- 🧭 **[新手引導與直覺 UI/UX 規範 (tutorial.md)](file:///Users/zelin/project/Phagocyte/docs/tutorial.md)**
 
 ---
 

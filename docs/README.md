@@ -19,7 +19,8 @@ docs/
 ├── pathogen.md       # 病原體圖鑑與免疫對抗機制（20+種細菌、病毒、真菌、寄生蟲、朊病毒、癌細胞）
 ├── passivetree.md    # 造血幹細胞正交天賦星盤（DBD血網轉化、90度正交微管、四階稀有度、五大分化譜系）
 ├── achievement.md    # 成就、里程碑與局外解鎖系統（角色解鎖鏈、固有技能、Steamworks 整合）
-└── record.md         # 臨床病歷單結算、歷史記錄與衝榜系統（SIRS 陣亡 vs 中和通關、評級 S/A/B/C/D）
+├── record.md         # 臨床病歷單結算、歷史記錄與衝榜系統（SIRS 陣亡 vs 中和通關、評級 S/A/B/C/D）
+└── tutorial.md       # 新手引導與直覺 UI/UX（見形知意、非侵入微引導、漸進式揭露）
 ```
 
 ---
@@ -81,3 +82,7 @@ graph TD
 ### 🏆 局外養成與結算
 - **[achievement.md](file:///Users/zelin/project/Phagocyte/docs/achievement.md)**：規範角色與器官地圖解鎖鏈、固有技能解鎖、廣譜生化武器投放，以及與 Steamworks Achievements API 的無縫對接。
 - **[record.md](file:///Users/zelin/project/Phagocyte/docs/record.md)**：將每局結算包裝為臨床病理報告單，定義「特異性中和成功」與「SIRS 敗血陣亡」判準，以及 Rank S～D 的臨床衝榜評級模型。
+
+### 🧭 引導與介面體驗
+- **[tutorial.md](file:///Users/zelin/project/Phagocyte/docs/tutorial.md)**：堅持「見形知意、非侵入式微引導」的 UX 規範，梳理 5 項核心微觀物理與機制教學，以及病歷單與星盤的自然銜接。
+
