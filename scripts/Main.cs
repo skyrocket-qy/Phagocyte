@@ -57,6 +57,9 @@ public partial class Main : Node2D
     public BaseEnemy? SubBoss { get; private set; }
     public BaseEnemy? TerminalBoss { get; private set; }
 
+    /// <summary>Set only when the terminal primary boss is actually killed (victory criterion).</summary>
+    public bool TerminalBossNeutralized { get; private set; } = false;
+
     private bool _terminalPhaseStarted = false;
 
     // Neutral environment matter & host ulceration (Section 4.3)
@@ -247,7 +250,7 @@ public partial class Main : Node2D
             }
             if (Player.HasSignal("died"))
             {
-                Player.Connect("died", Callable.From(() => EndRun(false)));
+                Player.Connect("died", Callable.From(() => EndRun(false, RunRecordManager.CauseMembraneRupture)));
             }
         }
 
@@ -544,15 +547,15 @@ public partial class Main : Node2D
 
         if (EnemyContainer == null || Player == null)
         {
-            EndRun(true);
+            EndRun(false, RunRecordManager.CauseSystemFailure);
             return;
         }
 
         TerminalBoss = PathogenSpawner.SpawnTerminalBoss(EnemyContainer, Player, ArenaSize, MapId);
         if (TerminalBoss == null)
         {
-            // No boss entity available for this map: keep the run clearable.
-            EndRun(true);
+            // No boss entity available for this map: the clear condition cannot be met.
+            EndRun(false, RunRecordManager.CauseSystemFailure);
             return;
         }
 
@@ -587,8 +590,9 @@ public partial class Main : Node2D
         if (RunEnded)
             return;
 
+        TerminalBossNeutralized = true;
         GD.Print("[WaveDirector] Terminal boss neutralized. Specific neutralization complete.");
-        EndRun(true);
+        EndRun(true, RunRecordManager.CauseSpecificNeutralization);
     }
 
     private void CheckTerminalBossState()
@@ -598,8 +602,10 @@ public partial class Main : Node2D
 
         if (!GodotObject.IsInstanceValid(TerminalBoss) || TerminalBoss.IsQueuedForDeletion())
         {
+            // The boss vanished without a confirmed kill: the clear criterion is not met.
             TerminalBoss = null;
-            EndRun(true);
+            GD.PushWarning("[WaveDirector] Terminal boss vanished without a kill; settling as defeat.");
+            EndRun(false, RunRecordManager.CauseSystemFailure);
         }
     }
 
@@ -697,13 +703,22 @@ public partial class Main : Node2D
     }
 
     /// <summary>
-    /// Ends the run (victory when the survival goal is reached, defeat on death),
-    /// persists the settlement record, and shows the medical record modal.
+    /// Ends the run and persists the settlement record.
+    /// Victory (docs/record.md §3.1): survive to 15:00 AND neutralize the terminal boss.
+    /// Defeat (docs/record.md §3.2): cell membrane integrity reaches zero (SIRS).
     /// </summary>
-    public void EndRun(bool victory)
+    public void EndRun(bool victory, string cause = "")
     {
         if (RunEnded)
             return;
+
+        if (victory && !RunRecordManager.IsVictoryCriteriaMet(EnvironmentTime, TerminalBossNeutralized))
+        {
+            GD.PushWarning($"[Main] Victory rejected: 15:00 survival + terminal boss neutralization required " +
+                           $"(survival={EnvironmentTime:F1}s, boss_neutralized={TerminalBossNeutralized}).");
+            return;
+        }
+
         RunEnded = true;
 
         if (victory)
@@ -716,6 +731,11 @@ public partial class Main : Node2D
         {
             AudioManager.Instance?.PlayBgm("defeat", 0.3f);
             AudioManager.Instance?.PlaySfx("game_over");
+        }
+
+        if (string.IsNullOrEmpty(cause))
+        {
+            cause = victory ? RunRecordManager.CauseSpecificNeutralization : RunRecordManager.CauseMembraneRupture;
         }
 
         var cell = Player as BaseCell;
@@ -742,7 +762,9 @@ public partial class Main : Node2D
             cell?.CurrentLevel ?? 1,
             cell?.DigestedCount ?? 0,
             PassiveTreeManager.GetSpentPoints(classId),
-            skillIds.ToArray());
+            skillIds.ToArray(),
+            TerminalBossNeutralized,
+            cause);
 
         if (RunTelemetryManager.Instance != null)
         {

@@ -5,6 +5,8 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>Phagocyte</RootNamespace>
     <Nullable>enable</Nullable>
+    <!-- Steam integration (reserved): reference Steamworks.NET and uncomment to enable sync -->
+    <!-- <DefineConstants>$(DefineConstants);USE_STEAMWORKS</DefineConstants> -->
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="gdUnit4.api" Version="4.*" />

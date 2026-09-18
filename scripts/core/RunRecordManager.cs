@@ -42,9 +42,26 @@ public partial class RunRecordManager : Node
     public const string ResultVictory = "victory";
     public const string ResultDefeat = "defeat";
 
+    /// <summary>Standard clear requirement: survive the full 15:00 infection timeline.</summary>
+    public const float StandardClearSeconds = 900.0f;
+
+    // Settlement causes (docs/record.md §3)
+    public const string CauseSpecificNeutralization = "specific_neutralization"; // 特異性中和成功
+    public const string CauseMembraneRupture = "membrane_rupture";               // SIRS / 敗血性休克陣亡
+    public const string CauseSystemFailure = "system_failure";                   // Content/setup failure fallback
+
     public static RunRecordManager Instance { get; private set; } = null;
 
     public static Array<Dictionary> Records { get; private set; } = new Array<Dictionary>();
+
+    /// <summary>
+    /// Canonical victory criteria (docs/record.md): survive to 15:00 AND
+    /// successfully neutralize the terminal primary pathogen boss.
+    /// </summary>
+    public static bool IsVictoryCriteriaMet(float survivalTime, bool bossNeutralized)
+    {
+        return bossNeutralized && survivalTime >= StandardClearSeconds - 0.01f;
+    }
 
     public RunRecordManager()
     {
@@ -59,6 +76,8 @@ public partial class RunRecordManager : Node
 
     /// <summary>
     /// Append a finished run to the front of the history and persist it.
+    /// Victory records are only accepted when the canonical criteria are met;
+    /// an unearned victory claim is downgraded to a defeat with a warning.
     /// Returns the stored record.
     /// </summary>
     public static Dictionary RecordRun(
@@ -69,7 +88,9 @@ public partial class RunRecordManager : Node
         int level,
         int digested,
         int pointsSpent,
-        string[] activeSkillIds)
+        string[] activeSkillIds,
+        bool bossNeutralized = false,
+        string cause = "")
     {
         var skills = new Array<string>();
         if (activeSkillIds != null)
@@ -81,9 +102,25 @@ public partial class RunRecordManager : Node
             }
         }
 
+        bool survivedFullTime = survivalTime >= StandardClearSeconds - 0.01f;
+        bool criteriaMet = IsVictoryCriteriaMet(survivalTime, bossNeutralized);
+
+        if (result == ResultVictory && !criteriaMet)
+        {
+            GD.PushWarning($"[RunRecord] Rejected invalid victory on '{mapId}' " +
+                           $"(survival={survivalTime:F1}s, boss_neutralized={bossNeutralized}); recording as defeat.");
+            result = ResultDefeat;
+        }
+
+        if (string.IsNullOrEmpty(cause))
+        {
+            cause = result == ResultVictory ? CauseSpecificNeutralization : CauseSystemFailure;
+        }
+
         var record = new Dictionary
         {
             { "result", result },
+            { "cause", cause },
             { "class_id", classId },
             { "map_id", mapId },
             { "survival_time", survivalTime },
@@ -91,6 +128,13 @@ public partial class RunRecordManager : Node
             { "digested", digested },
             { "points_spent", pointsSpent },
             { "active_skills", skills },
+            { "victory_criteria", new Dictionary
+                {
+                    { "survived_full_time", survivedFullTime },
+                    { "boss_neutralized", bossNeutralized },
+                    { "met", criteriaMet }
+                }
+            },
             { "timestamp", Time.GetUnixTimeFromSystem() }
         };
 

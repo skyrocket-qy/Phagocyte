@@ -239,7 +239,9 @@ public partial class AchievementManager : Node
     public override void _Ready()
     {
         Instance = this;
+        SteamBridge.Initialize();
         LoadFromDisk();
+        SyncWithSteam();
     }
 
     public static void AddUnlockListener(Callable callback)
@@ -292,6 +294,9 @@ public partial class AchievementManager : Node
         SyncMapUnlocks();
 
         SaveToDisk();
+
+        // Steam broadcast (no-op unless USE_STEAMWORKS is compiled in)
+        SteamBridge.PushUnlock(achId);
 
         var info = GetAchievementInfo(achId);
         if (Instance != null && GodotObject.IsInstanceValid(Instance))
@@ -455,6 +460,42 @@ public partial class AchievementManager : Node
             if (!string.IsNullOrEmpty(hardMap))
                 GameManager.UnlockMapHard(hardMap);
         }
+    }
+
+    /// <summary>
+    /// Two-way Steamworks sync (docs/achievement.md §3):
+    ///  1. Offline catch-up: batch-push every locally unlocked achievement.
+    ///  2. Merge remote unlocks missing on this machine (fresh profile / cloud restore).
+    /// Returns the number of remotely merged achievements. No-op without the SDK.
+    /// </summary>
+    public static int SyncWithSteam()
+    {
+        if (!SteamBridge.IsAvailable)
+            return 0;
+
+        var localIds = new System.Collections.Generic.List<string>();
+        foreach (string achId in Achievements.Keys)
+        {
+            if (IsUnlocked(achId))
+                localIds.Add(achId);
+        }
+        SteamBridge.PushUnlocks(localIds);
+
+        int merged = 0;
+        foreach (string achId in SteamBridge.PullUnlocked(GetAllAchievementIds()))
+        {
+            if (Achievements.ContainsKey(achId) && !IsUnlocked(achId) && Unlock(achId))
+                merged++;
+        }
+        return merged;
+    }
+
+    private static System.Collections.Generic.List<string> GetAllAchievementIds()
+    {
+        var ids = new System.Collections.Generic.List<string>();
+        foreach (string achId in Achievements.Keys)
+            ids.Add(achId);
+        return ids;
     }
 
     /// <summary>

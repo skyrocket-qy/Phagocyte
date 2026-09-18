@@ -199,7 +199,7 @@
   - `ach_first_evolution`：首次合成任意 1 組終極表觀遺傳超武。
   - `ach_prion_cleared`：擊碎並消化 1 顆錯誤折疊朊病毒晶體。
   - **影響檔案**：`scripts/core/AchievementManager.cs`
-- [ ] **[P3] Steamworks SDK API 整合預留** (`#if USE_STEAMWORKS` 雙向同步)。
+- [x] **[P3] Steamworks SDK API 整合預留** (`#if USE_STEAMWORKS` 雙向同步)。
 
 ---
 
@@ -213,10 +213,7 @@
   - 失敗判定：細胞膜耐久度歸零（【SIRS / 敗血性休克陣亡】）。
   - **影響檔案**：`scripts/Main.cs`, `scripts/core/RunRecordManager.cs`
 - [ ] **[P0] 臨床生化評分與評級系統實作**：
-  - 統計並記錄：`kills`（總擊殺：遠程＋生吞）、`engulfed`（肉身吞噬數）、`kpm`（擊殺通量）。
-  - 綜合評分公式實作：
-    $$\text{Kill Score} = \sum_{\text{Kills}} \text{BaseScore}(\text{pathogen})$$
-    $$\text{Final Score} = \left[ (\text{Survival Seconds} \times 10) + \text{Kill Score} + (\text{Level} \times 100) \right] \times \text{Difficulty Multiplier} + \text{Clear Bonus}$$
+  - 統計並記錄：`kills`（總擊殺)。
   - 臨床評級標準實作：
     - **Rank S**：Hard 通關，總擊殺量 $\ge 3,500$ 隻（$\text{KPM} \ge 230$），無陣亡。
     - **Rank A**：Normal 通關或 Hard 存活 $> 12:00$，總擊殺量 $\ge 2,000$ 隻（$\text{KPM} \ge 130$）。
