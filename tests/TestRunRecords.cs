@@ -260,7 +260,9 @@ public partial class TestRunRecords : SceneTree
         Paused = false;
         if (_main != null && IsInstanceValid(_main))
         {
-            _main.QueueFree();
+            if (_main.GetParent() != null)
+                _main.GetParent().RemoveChild(_main);
+            _main.Free();
             _main = null;
         }
 

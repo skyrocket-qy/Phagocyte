@@ -782,6 +782,7 @@ public partial class BaseCell : CharacterBody2D
         if (Stats is CellStats cs && cs.RollEvasion())
         {
             DamageNumberSpawner.ShowEvaded(GlobalPosition);
+            RunTelemetryManager.Instance?.RecordEvaded();
             return;
         }
 
@@ -789,6 +790,7 @@ public partial class BaseCell : CharacterBody2D
         if (Stats is CellStats csBlock && csBlock.RollBlock())
         {
             DamageNumberSpawner.ShowBlocked(GlobalPosition);
+            RunTelemetryManager.Instance?.RecordBlocked();
             return;
         }
 
@@ -796,6 +798,7 @@ public partial class BaseCell : CharacterBody2D
         float dr = Stats != null ? Stats.GetDamageReductionRatio() : 0.0f;
         float finalDmg = Mathf.Max(1.0f, amount * (1.0f - dr));
         DamageNumberSpawner.ShowPlayerDamage(GlobalPosition, finalDmg);
+        RunTelemetryManager.Instance?.RecordDamageTaken(finalDmg);
 
         // Stage 4: HP Loss & Death check
         float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
@@ -806,11 +809,13 @@ public partial class BaseCell : CharacterBody2D
             Health = 0.0f;
             IsDead = true;
             AudioManager.Instance?.PlayPlayerDeath();
+            CameraFollow.Instance?.AddTrauma(0.65f);
             EmitSignal(SignalName.Died);
         }
         else
         {
             AudioManager.Instance?.PlayPlayerHit();
+            CameraFollow.Instance?.AddTrauma(finalDmg >= 15.0f ? 0.35f : 0.15f);
         }
 
         _underCellArcBar?.NotifyDamageOrState();

@@ -161,6 +161,19 @@ public partial class RunRecordsModal : PanelContainer
         AddSummaryRow("RECORDS_DIGESTED", _record.GetValueOrDefault("digested", 0).AsInt32().ToString());
         AddSummaryRow("RECORDS_POINTS", _record.GetValueOrDefault("points_spent", 0).AsInt32().ToString());
         AddSummaryRow("RECORDS_SKILLS", GetSkillNames(_record.GetValueOrDefault("active_skills", new Array<string>())));
+
+        if (_record.TryGetValue("telemetry", out var telVal) && telVal.VariantType == Variant.Type.Dictionary)
+        {
+            var tel = telVal.AsGodotDictionary();
+            float dmgDealt = tel.TryGetValue("total_damage_dealt", out var dd) ? dd.AsSingle() : 0.0f;
+            float dmgTaken = tel.TryGetValue("total_damage_taken", out var dt) ? dt.AsSingle() : 0.0f;
+            int evaded = tel.TryGetValue("evaded_count", out var ev) ? ev.AsInt32() : 0;
+            int blocked = tel.TryGetValue("blocked_count", out var bl) ? bl.AsInt32() : 0;
+            float lifeSteal = tel.TryGetValue("lifesteal_healed", out var ls) ? ls.AsSingle() : 0.0f;
+
+            AddSummaryRow("RECORDS_TOTAL_DMG", $"{dmgDealt:F0} (Taken: {dmgTaken:F0})");
+            AddSummaryRow("RECORDS_DEFENSE_PROCS", $"💨 {evaded} Evaded | 🛡️ {blocked} Blocked | 💚 +{lifeSteal:F0} HP");
+        }
     }
 
     private void AddSummaryRow(string labelKey, string value)

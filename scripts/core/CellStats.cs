@@ -24,6 +24,7 @@ public partial class CellStats : Node
     public Stat Knockback { get; private set; } = new(1.0f);
     public Stat CritChance { get; private set; } = new(0.05f);
     public Stat CritDamage { get; private set; } = new(2.0f);
+    public Stat AilmentDamage { get; private set; } = new(1.0f);
 
     // Defense & Survival Stats (7)
     public Stat MaxHealth { get; private set; } = new(100.0f);
@@ -65,6 +66,7 @@ public partial class CellStats : Node
             ["knockback"] = Knockback,
             ["crit_chance"] = CritChance,
             ["crit_damage"] = CritDamage,
+            ["ailment_damage"] = AilmentDamage,
 
             // Defense (7)
             ["max_health"] = MaxHealth,
@@ -103,7 +105,7 @@ public partial class CellStats : Node
             "evasion" => Mathf.Clamp(val, 0.0f, 0.60f),             // Cap Evasion at 60%
             "block" => Mathf.Clamp(val, 0.0f, 0.75f),               // Cap Block at 75%
             "life_steal" => Mathf.Clamp(val, 0.0f, 0.20f),          // Cap Life Steal at 20%
-            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" => Mathf.Max(0.0f, val),
+            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "ailment_damage" => Mathf.Max(0.0f, val),
             "amount" or "pierce" => Mathf.Max(0.0f, val),
             "move_speed" or "max_health" or "magnet" or "armor" => Mathf.Max(0.0f, val),
             _ => val
@@ -189,5 +191,21 @@ public partial class CellStats : Node
     {
         float ls = GetStat("life_steal");
         return ls > 0.0f && GD.Randf() < ls;
+    }
+
+    /// <summary>
+    /// Computes effective ailment damage (DoT) based on Might and AilmentDamage multipliers
+    /// </summary>
+    public float CalculateAilmentDamage(float baseDps)
+    {
+        return Mathf.Max(0.0f, baseDps * GetStat("might") * GetStat("ailment_damage"));
+    }
+
+    /// <summary>
+    /// Computes effective ailment duration based on the universal Duration stat
+    /// </summary>
+    public float CalculateAilmentDuration(float baseDuration)
+    {
+        return Mathf.Max(0.1f, baseDuration * GetStat("duration"));
     }
 }

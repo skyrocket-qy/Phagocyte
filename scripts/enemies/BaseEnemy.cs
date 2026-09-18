@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Player;
 using Phagocyte.UI;
@@ -35,10 +36,12 @@ public abstract partial class BaseEnemy : Node2D
     public Vector2 WanderDir { get; set; } = Vector2.Zero;
     public float BreatheTimer { get; set; } = 0.0f;
 
-    // Status debuffs
+    // Status debuffs & Components
     public float SlowTimer { get; set; } = 0.0f;
     public float SlowFactor { get; set; } = 1.0f;
     public float StunTimer { get; set; } = 0.0f;
+    public AilmentController? Ailments { get; private set; }
+    public BossPhaseComponent? BossPhase { get; private set; }
 
     public Area2D? HitArea { get; set; }
     public CollisionShape2D? EnemyCollisionShape { get; set; }
@@ -61,6 +64,15 @@ public abstract partial class BaseEnemy : Node2D
         DriftTimer = GD.Randf() * 5.0f;
         BreatheTimer = GD.Randf() * 10.0f;
         WanderDir = Vector2.FromAngle(GD.Randf() * Mathf.Tau);
+
+        Ailments = GetNodeOrNull<AilmentController>("AilmentController");
+        if (Ailments == null)
+        {
+            Ailments = new AilmentController { Name = "AilmentController" };
+            AddChild(Ailments);
+        }
+
+        BossPhase = GetNodeOrNull<BossPhaseComponent>("BossPhaseComponent");
 
         EnsureCollisionNodes();
         SetupEnemy();
@@ -140,6 +152,14 @@ public abstract partial class BaseEnemy : Node2D
         }
 
         float currentSpeed = FloatSpeed * SlowFactor;
+        if (Ailments != null && Ailments.IsAgglutinated)
+        {
+            currentSpeed *= Ailments.SpeedMultiplier;
+        }
+        if (BossPhase != null)
+        {
+            currentSpeed *= BossPhase.CurrentSpeedMult;
+        }
         Velocity = Velocity.Lerp(WanderDir * currentSpeed, 2.0f * dt);
         Position += Velocity * dt;
     }
@@ -170,10 +190,23 @@ public abstract partial class BaseEnemy : Node2D
             return;
         }
 
+        if (BossPhase != null)
+        {
+            damage = BossPhase.ApplyDamageReduction(damage);
+        }
+
+        if (Ailments != null && Ailments.IsOpsonized)
+        {
+            damage *= Ailments.OpsonizationMultiplier;
+        }
+
         float effectiveDmg = Mathf.Max(1.0f, damage - Armor);
         CurrentHealth -= effectiveDmg;
 
+        BossPhase?.NotifyHealthChanged(CurrentHealth, MaxHealth);
+
         DamageNumberSpawner.ShowDamage(GlobalPosition, effectiveDmg, isCrit);
+        RunTelemetryManager.Instance?.RecordDamageDealt(source?.Name ?? "direct", effectiveDmg);
 
         // Life steal check on attacker
         if (source is BaseCell playerCell && playerCell.Stats != null)
@@ -182,10 +215,15 @@ public abstract partial class BaseEnemy : Node2D
             {
                 playerCell.Heal(1.0f);
                 DamageNumberSpawner.ShowHeal(playerCell.GlobalPosition, 1.0f);
+                RunTelemetryManager.Instance?.RecordLifeSteal(1.0f);
             }
         }
 
         AudioManager.Instance?.PlayHit(isCrit);
+        if (isCrit)
+        {
+            VfxManager.Instance?.Play(VfxType.BarbImpact, GlobalPosition);
+        }
 
         // Flash modulate
         Modulate = new Color(1.8f, 0.4f, 0.4f, 1.0f);
@@ -199,6 +237,26 @@ public abstract partial class BaseEnemy : Node2D
         else
         {
             QueueRedraw();
+        }
+    }
+
+    public virtual void TakeDoTDamage(float dotDamage)
+    {
+        if (IsBeingEaten || CurrentHealth <= 0.0f)
+            return;
+
+        if (BossPhase != null)
+        {
+            dotDamage = BossPhase.ApplyDamageReduction(dotDamage);
+        }
+
+        CurrentHealth -= dotDamage;
+        RunTelemetryManager.Instance?.RecordDamageDealt("ailment_dot", dotDamage);
+        BossPhase?.NotifyHealthChanged(CurrentHealth, MaxHealth);
+
+        if (CurrentHealth <= 0.0f)
+        {
+            Die(null);
         }
     }
 
@@ -237,6 +295,7 @@ public abstract partial class BaseEnemy : Node2D
         tween.TweenProperty(this, "modulate:a", 0.0f, 0.25);
         tween.Chain().TweenCallback(Callable.From(() =>
         {
+            VfxManager.Instance?.Play(VfxType.LysisBurst, predPos);
             EmitSignal(SignalName.Digested, this);
             QueueFree();
         }));
@@ -260,6 +319,7 @@ public abstract partial class BaseEnemy : Node2D
     public virtual void Die(Node2D? killer)
     {
         AudioManager.Instance?.PlayEnemyDeath();
+        VfxManager.Instance?.Play(VfxType.CytoplasmSplatter, GlobalPosition);
         EmitSignal(SignalName.EnemyDied, this);
         QueueFree();
     }

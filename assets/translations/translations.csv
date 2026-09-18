@@ -57,6 +57,7 @@ STAT_PIERCE,Pierce,穿透
 STAT_KNOCKBACK,Knockback,击退
 STAT_CRIT_CHANCE,Critical Chance,暴击几率
 STAT_CRIT_DAMAGE,Critical Damage,暴击伤害
+STAT_AILMENT_DAMAGE,Ailment Damage,异常伤害
 STAT_MAX_HEALTH,Max Health,最大生命
 STAT_HEALTH_REGEN,Health Regen,生命回复
 STAT_ARMOR,Armor,护甲
@@ -448,3 +449,5 @@ RECORDS_RETRY,Deploy Again,再次出擊
 RECORDS_MENU,Return to Menu,返回主選單
 RECORDS_VICTORY_TAG,VICTORY,通關
 RECORDS_DEFEAT_TAG,DEFEAT,陣亡
+RECORDS_TOTAL_DMG,Combat Damage,戰鬥輸出
+RECORDS_DEFENSE_PROCS,Immune Mitigations,免疫化解與吸血

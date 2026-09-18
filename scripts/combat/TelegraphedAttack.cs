@@ -143,6 +143,7 @@ public partial class TelegraphedAttack : Node2D
             player.Velocity += pushDir * 220.0f;
 
             AudioManager.Instance?.PlayPlayerHit();
+            CameraFollow.Instance?.AddTrauma(0.5f);
         }
     }
 

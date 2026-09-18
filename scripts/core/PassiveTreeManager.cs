@@ -323,6 +323,7 @@ public static class PassiveTreeManager
         { "knockback", "STAT_KNOCKBACK" },
         { "crit_chance", "STAT_CRIT_CHANCE" },
         { "crit_damage", "STAT_CRIT_DAMAGE" },
+        { "ailment_damage", "STAT_AILMENT_DAMAGE" },
         { "max_health", "STAT_MAX_HEALTH" },
         { "health_regen", "STAT_HEALTH_REGEN" },
         { "armor", "STAT_ARMOR" },

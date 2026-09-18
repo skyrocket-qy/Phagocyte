@@ -8,6 +8,13 @@ using System;
 /// </summary>
 public partial class CameraFollow : Camera2D
 {
+    public static CameraFollow? Instance { get; private set; }
+
+    [Export] public float MaxShakeOffset { get; set; } = 22.0f;
+    [Export] public float TraumaDecay { get; set; } = 1.8f;
+
+    private float _trauma = 0.0f;
+
     [Export]
     public Node2D? Target { get; set; }
 
@@ -37,6 +44,7 @@ public partial class CameraFollow : Camera2D
 
     public override void _Ready()
     {
+        Instance = this;
         _currentZoomScale = DefaultZoomScale;
         _targetZoomScale = DefaultZoomScale;
         Zoom = new Vector2(_currentZoomScale, _currentZoomScale);
@@ -55,6 +63,20 @@ public partial class CameraFollow : Camera2D
         {
             SetMapBounds(MapWidth, MapHeight);
         }
+    }
+
+    public override void _ExitTree()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+        base._ExitTree();
+    }
+
+    public void AddTrauma(float amount)
+    {
+        _trauma = Mathf.Clamp(_trauma + amount, 0.0f, 1.0f);
     }
 
     public void SetMapBounds(float width, float height)
@@ -82,6 +104,8 @@ public partial class CameraFollow : Camera2D
 
     public override void _PhysicsProcess(double delta)
     {
+        float dt = (float)delta;
+
         if (Target == null)
         {
             Target = GetTree().GetFirstNodeInGroup("player") as Node2D;
@@ -89,9 +113,23 @@ public partial class CameraFollow : Camera2D
         }
 
         _targetZoomScale = Mathf.Clamp(_targetZoomScale, MinZoomScale, MaxZoomScale);
-        _currentZoomScale = Mathf.Lerp(_currentZoomScale, _targetZoomScale, (float)delta * 10.0f);
+        _currentZoomScale = Mathf.Lerp(_currentZoomScale, _targetZoomScale, dt * 10.0f);
         Zoom = new Vector2(_currentZoomScale, _currentZoomScale);
 
         GlobalPosition = Target.GlobalPosition;
+
+        // Trauma Shake calculation
+        if (_trauma > 0.0f)
+        {
+            float shake = _trauma * _trauma;
+            float offsetX = (float)GD.RandRange(-1.0, 1.0) * MaxShakeOffset * shake;
+            float offsetY = (float)GD.RandRange(-1.0, 1.0) * MaxShakeOffset * shake;
+            Offset = new Vector2(offsetX, offsetY);
+            _trauma = Mathf.Max(0.0f, _trauma - TraumaDecay * dt);
+        }
+        else if (Offset != Vector2.Zero)
+        {
+            Offset = Vector2.Zero;
+        }
     }
 }

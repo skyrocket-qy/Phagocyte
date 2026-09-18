@@ -86,6 +86,19 @@ public partial class Main : Node2D
             }
         }
 
+        if (RunTelemetryManager.Instance == null)
+        {
+            var teleMgr = new RunTelemetryManager { Name = "RunTelemetryManager" };
+            AddChild(teleMgr);
+        }
+        RunTelemetryManager.Instance?.StartRun();
+
+        if (VfxManager.Instance == null)
+        {
+            var vfxMgr = new VfxManager { Name = "VfxManager" };
+            AddChild(vfxMgr);
+        }
+
         // Read map configuration from GM
         MapId = GameManager.SelectedMap;
         ConfigureMapEnvironment();
@@ -381,6 +394,8 @@ public partial class Main : Node2D
             }
         }
 
+        RunTelemetryManager.Instance?.EndRun();
+
         var record = RunRecordManager.RecordRun(
             victory ? RunRecordManager.ResultVictory : RunRecordManager.ResultDefeat,
             classId,
@@ -390,6 +405,11 @@ public partial class Main : Node2D
             cell?.DigestedCount ?? 0,
             PassiveTreeManager.GetSpentPoints(classId),
             skillIds.ToArray());
+
+        if (RunTelemetryManager.Instance != null)
+        {
+            record["telemetry"] = RunTelemetryManager.Instance.GetTelemetryDictionary();
+        }
 
         if (HudNode != null)
         {
