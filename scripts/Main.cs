@@ -16,11 +16,17 @@ public partial class Main : Node2D
     public static PackedScene DefaultStaphScene => _defaultStaphScene ??= GD.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
 
     [Export] public PackedScene? StaphScene { get; set; }
-    [Export] public int MaxPathogens { get; set; } = 50;
+    [Export] public int ScreenCapNormal { get; set; } = PathogenSpawner.MaxActiveNormal;
+    [Export] public int ScreenCapSwarm { get; set; } = PathogenSpawner.MaxActiveSwarm;
     [Export] public Vector2 ArenaSize { get; set; } = new(4800.0f, 4800.0f);
     [Export] public float RunGoalSeconds { get; set; } = PathogenSpawner.StandardRunDuration;
 
     public bool RunEnded { get; private set; } = false;
+
+    // Kill-Driven Dynamic Backfill (Section 4.2)
+    public int ActiveScreenCap => SwarmWindowTimer > 0.0f ? ScreenCapSwarm : ScreenCapNormal;
+    public float SwarmWindowTimer { get; private set; } = 0.0f;
+    public int ActivePathogenCount => EnemyContainer?.GetChildCount() ?? 0;
 
     // Wave Director state (3-minute escalation loop)
     public bool EliteRaidTriggered { get; private set; } = false;
@@ -42,7 +48,6 @@ public partial class Main : Node2D
     public ColorRect? ArenaBg { get; set; }
     public Line2D? ArenaBorders { get; set; }
 
-    public float SpawnTimer { get; set; } = 0.0f;
     public float EnvironmentTime { get; set; } = 0.0f;
     public string MapId { get; set; } = "acute_wound";
 
@@ -253,6 +258,9 @@ public partial class Main : Node2D
 
         ProcessWaveDirector();
 
+        if (SwarmWindowTimer > 0.0f)
+            SwarmWindowTimer = Mathf.Max(0.0f, SwarmWindowTimer - dt);
+
         // Map mechanics
         ProcessMapMechanics(dt);
 
@@ -262,12 +270,41 @@ public partial class Main : Node2D
             return;
         }
 
-        SpawnTimer += dt;
-        if (SpawnTimer >= 1.5f)
+        ProcessDynamicBackfill();
+    }
+
+    /// <summary>
+    /// Kill-Driven Dynamic Backfill (docs/map.md §4.2): every frame, refill the
+    /// deficit between the current screen cap and the active pathogen count,
+    /// spawning just outside the camera view. Kills instantly free slots, so the
+    /// faster the player clears, the faster reinforcements arrive.
+    /// </summary>
+    private void ProcessDynamicBackfill()
+    {
+        if (EnemyContainer == null || Player == null)
+            return;
+
+        int deficit = ActiveScreenCap - ActivePathogenCount;
+        if (deficit <= 0)
+            return;
+
+        int batch = Mathf.Min(deficit, PathogenSpawner.MaxBackfillPerTick);
+        PathogenSpawner.Backfill(EnemyContainer, Player, ArenaSize, GetVisibleWorldSize(), EnvironmentTime, batch);
+    }
+
+    private Vector2 GetVisibleWorldSize()
+    {
+        var viewport = GetViewport();
+        if (viewport == null)
+            return Vector2.Zero;
+
+        Vector2 size = viewport.GetVisibleRect().Size;
+        if (MainCamera != null && MainCamera.Zoom.X > 0.0f && MainCamera.Zoom.Y > 0.0f)
         {
-            SpawnTimer = 0.0f;
-            MaintainPopulation();
+            size.X /= MainCamera.Zoom.X;
+            size.Y /= MainCamera.Zoom.Y;
         }
+        return size;
     }
 
     /// <summary>
@@ -323,10 +360,10 @@ public partial class Main : Node2D
         if (EnemyContainer == null || Player == null)
             return;
 
-        // Elite pincer from both flanks plus a small swarm tide.
+        // Elite pincer from both flanks; backfill raises the screen cap to 450 for the swarm tide.
         PathogenSpawner.SpawnElite(EnemyContainer, Player, ArenaSize, EnvironmentTime, 1, 0.0f);
         PathogenSpawner.SpawnElite(EnemyContainer, Player, ArenaSize, EnvironmentTime, 1, Mathf.Pi);
-        PathogenSpawner.SpawnSwarm(EnemyContainer, Player, ArenaSize, EnvironmentTime, 6);
+        SwarmWindowTimer = PathogenSpawner.SwarmWindowSeconds;
         AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
         GD.Print("[WaveDirector] 06:00 First swarm tide + double elite pincer.");
     }
@@ -352,7 +389,8 @@ public partial class Main : Node2D
         if (EnemyContainer == null || Player == null)
             return;
 
-        PathogenSpawner.SpawnSwarm(EnemyContainer, Player, ArenaSize, EnvironmentTime, 12);
+        // Backfill floods the arena to the 450 swarm cap over the next frames.
+        SwarmWindowTimer = PathogenSpawner.SwarmWindowSeconds;
         PathogenSpawner.SpawnElite(EnemyContainer, Player, ArenaSize, EnvironmentTime, 2);
         AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
         GD.Print("[WaveDirector] 12:00 Extreme swarm + mixed forces.");
@@ -361,7 +399,6 @@ public partial class Main : Node2D
     private void EnterBossLockdown()
     {
         BossLockdownActive = true;
-        SpawnTimer = 0.0f;
 
         if (EnemyContainer == null || Player == null)
         {
@@ -515,19 +552,6 @@ public partial class Main : Node2D
         if (Player == null || EnemyContainer == null)
             return;
         PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, count);
-    }
-
-    private void MaintainPopulation()
-    {
-        if (EnemyContainer == null || Player == null)
-            return;
-
-        int currentCount = EnemyContainer.GetChildCount();
-        if (currentCount < MaxPathogens)
-        {
-            int spawnBatch = Mathf.Min(3, MaxPathogens - currentCount);
-            PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, spawnBatch);
-        }
     }
 
     /// <summary>

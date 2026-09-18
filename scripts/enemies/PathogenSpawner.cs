@@ -24,6 +24,25 @@ public static class PathogenSpawner
 
     public const int PhaseCount = 5;
 
+    // --- Screen Active Cap & Kill-Driven Dynamic Backfill ---
+    /// <summary>Normal wave on-screen active pathogen cap.</summary>
+    public const int MaxActiveNormal = 300;
+
+    /// <summary>Extreme swarm event on-screen active pathogen cap.</summary>
+    public const int MaxActiveSwarm = 450;
+
+    /// <summary>Duration of the 06:00 / 12:00 swarm window using the raised cap.</summary>
+    public const float SwarmWindowSeconds = 30.0f;
+
+    /// <summary>Maximum backfill spawns per poll to avoid frame spikes.</summary>
+    public const int MaxBackfillPerTick = 24;
+
+    /// <summary>Minimum distance outside the camera view for backfill spawns.</summary>
+    public const float BackfillMarginMin = 150.0f;
+
+    /// <summary>Maximum distance outside the camera view for backfill spawns.</summary>
+    public const float BackfillMarginMax = 250.0f;
+
     private static readonly string[] Phase1Pool =
     {
         "staph", "staph", "norovirus", "e_coli", "s_virus"
@@ -223,6 +242,81 @@ public static class PathogenSpawner
         return enemy;
     }
 
+    /// <summary>
+    /// Kill-driven dynamic backfill: spawns exactly <paramref name="amount"/> single
+    /// pathogens just outside the camera view (150-250px past the visible edge) so
+    /// the active population instantly refills after kills or engulfment.
+    /// </summary>
+    public static int Backfill(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, Vector2 viewWorldSize, float gameTime, int amount)
+    {
+        if (enemyContainer == null || player == null || amount <= 0)
+            return 0;
+
+        string[] pool = GetPhasePool(GetPhaseIndex(gameTime));
+        int spawned = 0;
+
+        for (int i = 0; i < amount; i++)
+        {
+            string chosenId = pool[(int)GD.RandRange(0, pool.Length - 1)];
+            var enemy = CreatePathogen(chosenId);
+            if (enemy == null)
+                continue;
+
+            float margin = (float)GD.RandRange(BackfillMarginMin, BackfillMarginMax);
+            enemy.GlobalPosition = GetOffscreenSpawnPoint(player.GlobalPosition, arenaSize, viewWorldSize, margin);
+            enemyContainer.AddChild(enemy);
+            spawned++;
+        }
+
+        return spawned;
+    }
+
+    /// <summary>
+    /// Picks a point on the camera view boundary expanded by <paramref name="margin"/>px.
+    /// Falls back to a fixed radius when the visible size is unknown.
+    /// </summary>
+    public static Vector2 GetOffscreenSpawnPoint(Vector2 center, Vector2 arenaSize, Vector2 viewWorldSize, float margin)
+    {
+        if (viewWorldSize.X <= 1.0f || viewWorldSize.Y <= 1.0f)
+            return GetSpawnPoint(center, arenaSize, 700.0f + margin);
+
+        Vector2 half = viewWorldSize * 0.5f + new Vector2(margin, margin);
+        Vector2 offset = RandomEdgeOffset(half);
+
+        Vector2 candidate = center + offset;
+        Vector2 clamped = ClampToArena(candidate, arenaSize);
+
+        // Near the arena border the outward edge can be clamped back on screen:
+        // mirror the offset to the opposite edge so the spawn stays out of view.
+        if (candidate.DistanceSquaredTo(clamped) > 1.0f)
+        {
+            clamped = ClampToArena(center - offset, arenaSize);
+        }
+
+        return clamped;
+    }
+
+    private static Vector2 RandomEdgeOffset(Vector2 half)
+    {
+        float t = GD.Randf();
+        return (int)GD.RandRange(0, 3) switch
+        {
+            0 => new Vector2(Mathf.Lerp(-half.X, half.X, t), -half.Y),
+            1 => new Vector2(half.X, Mathf.Lerp(-half.Y, half.Y, t)),
+            2 => new Vector2(Mathf.Lerp(-half.X, half.X, t), half.Y),
+            _ => new Vector2(-half.X, Mathf.Lerp(-half.Y, half.Y, t))
+        };
+    }
+
+    private static Vector2 ClampToArena(Vector2 pos, Vector2 arenaSize)
+    {
+        float halfW = (arenaSize.X * 0.5f) - 80.0f;
+        float halfH = (arenaSize.Y * 0.5f) - 80.0f;
+        pos.X = Mathf.Clamp(pos.X, -halfW, halfW);
+        pos.Y = Mathf.Clamp(pos.Y, -halfH, halfH);
+        return pos;
+    }
+
     private static int SpawnSingle(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, string chosenId, float minDist, float maxDist)
     {
         float dist = (float)GD.RandRange(minDist, maxDist);
@@ -338,23 +432,11 @@ public static class PathogenSpawner
     private static Vector2 GetSpawnPoint(Vector2 playerPos, Vector2 arenaSize, float dist)
     {
         float angle = GD.Randf() * Mathf.Tau;
-        Vector2 pos = playerPos + Vector2.FromAngle(angle) * dist;
-
-        float halfW = (arenaSize.X * 0.5f) - 80.0f;
-        float halfH = (arenaSize.Y * 0.5f) - 80.0f;
-        pos.X = Mathf.Clamp(pos.X, -halfW, halfW);
-        pos.Y = Mathf.Clamp(pos.Y, -halfH, halfH);
-        return pos;
+        return ClampToArena(playerPos + Vector2.FromAngle(angle) * dist, arenaSize);
     }
 
     private static Vector2 GetPointAtAngle(Vector2 playerPos, Vector2 arenaSize, float angle, float dist)
     {
-        Vector2 pos = playerPos + Vector2.FromAngle(angle) * dist;
-
-        float halfW = (arenaSize.X * 0.5f) - 80.0f;
-        float halfH = (arenaSize.Y * 0.5f) - 80.0f;
-        pos.X = Mathf.Clamp(pos.X, -halfW, halfW);
-        pos.Y = Mathf.Clamp(pos.Y, -halfH, halfH);
-        return pos;
+        return ClampToArena(playerPos + Vector2.FromAngle(angle) * dist, arenaSize);
     }
 }
