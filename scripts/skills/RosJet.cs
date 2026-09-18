@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
 
@@ -8,6 +9,8 @@ public partial class RosJet : Area2D
     public Vector2 Direction { get; set; } = Vector2.Right;
     public float Speed { get; set; } = 520.0f;
     public float Lifetime { get; set; } = 0.9f;
+    public float Damage { get; set; } = 25.0f;
+    public bool IsCrit { get; set; } = false;
     public Node2D? Predator { get; set; } = null;
 
     public override void _Ready()
@@ -47,15 +50,15 @@ public partial class RosJet : Area2D
     private void OnAreaEntered(Area2D area)
     {
         var enemy = area.GetParent();
-        if (enemy != null && enemy.HasMethod("be_engulfed"))
+        if (enemy != null)
         {
-            if (Predator != null && GodotObject.IsInstanceValid(Predator) && Predator.HasMethod("_consume_pathogen"))
+            if (enemy is BaseEnemy be)
             {
-                Predator.Call("_consume_pathogen", enemy);
+                be.TakeDamage(Damage, Predator, IsCrit);
             }
-            else
+            else if (enemy.HasMethod("take_damage"))
             {
-                enemy.Call("be_engulfed", Predator);
+                enemy.Call("take_damage", Damage, Predator, IsCrit);
             }
         }
     }

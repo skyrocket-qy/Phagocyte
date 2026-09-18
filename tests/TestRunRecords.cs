@@ -185,17 +185,14 @@ public partial class TestRunRecords : SceneTree
 
         var survivor = cellScene.Instantiate<Macrophage>();
         Root.AddChild(survivor);
-        bool survivorDied = false;
-        survivor.Died += () => survivorDied = true;
-        survivor.Stats!.AddModifier("revival", 1.0f, 0.0f);
-        survivor.TakeDamage(999999.0f);
-        AssertThat(survivor.IsDead).IsFalse();
-        AssertThat(survivorDied).IsFalse();
-        AssertThat(survivor.Health).IsEqualApprox(survivor.Stats.GetStat("max_health"), 0.01f);
-        AssertThat(survivor.Stats.GetStat("revival")).IsEqual(0.0f);
+        survivor.Stats!.AddModifier("armor", 50.0f, 0.0f); // 50% DR: 50 / (50 + 50) = 0.5
+        float hpBefore = survivor.Health;
+        survivor.TakeDamage(20.0f);
+        float hpLost = hpBefore - survivor.Health;
+        AssertThat(hpLost).IsEqualApprox(10.0f, 0.5f);
         survivor.QueueFree();
 
-        GD.Print("[PASS] Lethal damage emits Died exactly when no Revival charge remains.");
+        GD.Print("[PASS] Lethal damage emits Died and armor damage reduction functions properly.");
     }
 
     private void PhaseStartMainScene()

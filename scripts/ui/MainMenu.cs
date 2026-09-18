@@ -142,6 +142,8 @@ public partial class MainMenu : Control
         if (RecordsModal != null)
             RecordsModal.Visible = false;
 
+        AudioManager.Instance?.PlayBgm("menu");
+
         if (LangBtn != null)
             LangBtn.Pressed += OnLangTogglePressed;
 

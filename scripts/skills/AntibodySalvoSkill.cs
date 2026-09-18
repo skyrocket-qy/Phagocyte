@@ -1,6 +1,8 @@
 using Godot;
 using Godot.Collections;
 using System;
+using Phagocyte.Core;
+using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
 
@@ -37,6 +39,11 @@ public partial class AntibodySalvoSkill : BaseSkill
 
         int amount = GetCalculatedAmount(BaseMissileCount);
         var pathogens = GetNearbyPathogens();
+
+        if (amount > 0)
+        {
+            AudioManager.Instance?.PlayShoot();
+        }
 
         for (int i = 0; i < amount; i++)
         {
@@ -97,9 +104,17 @@ public partial class AntibodySalvoSkill : BaseSkill
                         if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
                             return;
 
-                        if (target.HasMethod("be_engulfed"))
+                        var dmgDict = GetCalculatedDamage(BaseDamage);
+                        float dmg = (float)dmgDict["damage"];
+                        bool isCrit = (bool)dmgDict["is_crit"];
+
+                        if (target is BaseEnemy be)
                         {
-                            target.Call("be_engulfed", Host);
+                            be.TakeDamage(dmg, Host, isCrit);
+                        }
+                        else if (target.HasMethod("take_damage"))
+                        {
+                            target.Call("take_damage", dmg, Host, isCrit);
                         }
                     }
                 };

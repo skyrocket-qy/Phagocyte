@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
 
@@ -52,6 +53,21 @@ public partial class PseudopodLungeSkill : BaseSkill
                 if (Host.GlobalPosition.DistanceTo(n.GlobalPosition) <= reach)
                 {
                     pulled++;
+
+                    // Deal blunt impact damage
+                    var dmgDict = GetCalculatedDamage(BaseDamage);
+                    float dmg = (float)dmgDict["damage"];
+                    bool isCrit = (bool)dmgDict["is_crit"];
+
+                    if (n is BaseEnemy be)
+                    {
+                        be.TakeDamage(dmg, Host, isCrit);
+                    }
+                    else if (n.HasMethod("take_damage"))
+                    {
+                        n.Call("take_damage", dmg, Host, isCrit);
+                    }
+
                     // Pull pathogen rapidly toward player
                     var tween = Host.CreateTween();
                     tween.TweenProperty(n, "global_position", Host.GlobalPosition, 0.15f);

@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using Phagocyte.Core;
+using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
 
@@ -36,6 +38,11 @@ public partial class PerforinLanceSkill : BaseSkill
         Vector2 targetDir = FindTargetDirection();
         int amount = GetCalculatedAmount(1);
         int pierceLimit = GetCalculatedPierce(3);
+
+        if (amount > 0)
+        {
+            AudioManager.Instance?.PlayShoot();
+        }
 
         for (int i = 0; i < amount; i++)
         {
@@ -114,9 +121,17 @@ public partial class PerforinLanceSkill : BaseSkill
                 if (projPoint.DistanceTo(pPos) <= beamWidth)
                 {
                     hitCount++;
-                    if (n.HasMethod("be_engulfed"))
+                    var dmgDict = GetCalculatedDamage(BaseDamage);
+                    float dmg = (float)dmgDict["damage"];
+                    bool isCrit = (bool)dmgDict["is_crit"];
+
+                    if (n is BaseEnemy be)
                     {
-                        n.Call("be_engulfed", Host);
+                        be.TakeDamage(dmg, Host, isCrit);
+                    }
+                    else if (n.HasMethod("take_damage"))
+                    {
+                        n.Call("take_damage", dmg, Host, isCrit);
                     }
                 }
             }

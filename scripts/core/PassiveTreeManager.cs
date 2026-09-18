@@ -151,15 +151,15 @@ public static class PassiveTreeManager
         Micro("tree_far_sense", "senses", 1, 2, "🔭", "TREE_NODE_FAR_SENSE_NAME",
             Fx("magnet", 0.20f, TreeModifierUnit.Percent)),
         Micro("tree_lucky_mutation", "senses", 3, 2, "🍀", "TREE_NODE_LUCKY_MUTATION_NAME",
-            Fx("luck", 0.12f, TreeModifierUnit.Percent)),
+            Fx("evasion", 0.04f, TreeModifierUnit.Percent)),
         Micro("tree_antigen_harvest", "senses", 1, 3, "🌾", "TREE_NODE_ANTIGEN_HARVEST_NAME",
-            Fx("growth", 0.10f, TreeModifierUnit.Percent)),
+            Fx("magnet", 0.15f, TreeModifierUnit.Percent)),
         Micro("tree_patient_observer", "senses", 3, 3, "🦉", "TREE_NODE_PATIENT_OBSERVER_NAME",
             Fx("duration", 0.12f, TreeModifierUnit.Percent)),
         Micro("tree_scavenger_field", "senses", 2, 2, "🗺️", "TREE_NODE_SCAVENGER_FIELD_NAME",
             Fx("magnet", 0.15f, TreeModifierUnit.Percent)),
         Micro("tree_risk_assessment", "senses", 2, 3, "⚖️", "TREE_NODE_RISK_ASSESSMENT_NAME",
-            Fx("luck", 0.10f, TreeModifierUnit.Percent)),
+            Fx("cooldown_reduction", 0.04f, TreeModifierUnit.PercentagePoints)),
         Notable("tree_swarm_cartography", "senses", 4, 2, "📡", "TREE_NODE_SWARM_CARTOGRAPHY_NAME",
             Fx("magnet", 0.40f, TreeModifierUnit.Percent)),
 
@@ -228,7 +228,7 @@ public static class PassiveTreeManager
         Legacy("passive_hematopoietic", "core", 0, 1, "🩸", "SKILL_HEMATOPOIETIC_NAME", "SKILL_HEMATOPOIETIC_DESC", typeof(PassiveHematopoieticReserve)),
         RareNode("tree_immortal_culture", "core", -1, -1, "♾️", "TREE_NODE_IMMORTAL_CULTURE_NAME",
             Fx("health_regen", 2.0f, TreeModifierUnit.Flat),
-            Fx("revival", 1.0f, TreeModifierUnit.Flat)),
+            Fx("life_steal", 0.04f, TreeModifierUnit.Percent)),
         Legacy("passive_longevity", "core", 0, -1, "⏳", "SKILL_LONGEVITY_NAME", "SKILL_LONGEVITY_DESC", typeof(PassiveCytokineLongevity))
     };
 
@@ -327,12 +327,10 @@ public static class PassiveTreeManager
         { "health_regen", "STAT_HEALTH_REGEN" },
         { "armor", "STAT_ARMOR" },
         { "move_speed", "STAT_MOVE_SPEED" },
-        { "revival", "STAT_REVIVAL" },
-        { "knockback_resist", "STAT_KNOCKBACK_RESIST" },
-        { "magnet", "STAT_MAGNET" },
-        { "growth", "STAT_GROWTH" },
-        { "luck", "STAT_LUCK" },
-        { "curse", "STAT_CURSE" }
+        { "evasion", "STAT_EVASION" },
+        { "block", "STAT_BLOCK" },
+        { "life_steal", "STAT_LIFE_STEAL" },
+        { "magnet", "STAT_MAGNET" }
     };
 
     public static string GetRarityName(TreeRarity rarity)

@@ -5,12 +5,12 @@ namespace Phagocyte.Skills;
 
 /// <summary>
 /// Passive Organelle Trait: Aerobic Glycolysis (瓦伯格有氧糖酵解)
-/// Universal Stat Modifiers: Growth (EXP) +12%, Might +4% per level
+/// Universal Stat Modifiers: Move Speed +6%, Might +5% per level
 /// </summary>
 public partial class PassiveAerobicGlycolysis : BaseSkill
 {
-    public const float GrowthPerLevel = 0.12f;
-    public const float MightPerLevel = 0.04f;
+    public const float SpeedPerLevel = 0.06f;
+    public const float MightPerLevel = 0.05f;
 
     public PassiveAerobicGlycolysis()
     {
@@ -30,12 +30,12 @@ public partial class PassiveAerobicGlycolysis : BaseSkill
     {
         if (Stats is CellStats cs)
         {
-            cs.AddModifier("growth", 0.0f, GrowthPerLevel * Level);
+            cs.AddModifier("move_speed", 0.0f, SpeedPerLevel * Level);
             cs.AddModifier("might", 0.0f, MightPerLevel * Level);
         }
         else if (Stats != null && Stats.HasMethod("add_modifier"))
         {
-            Stats.Call("add_modifier", "growth", 0.0f, GrowthPerLevel * Level);
+            Stats.Call("add_modifier", "move_speed", 0.0f, SpeedPerLevel * Level);
             Stats.Call("add_modifier", "might", 0.0f, MightPerLevel * Level);
         }
     }
@@ -44,12 +44,12 @@ public partial class PassiveAerobicGlycolysis : BaseSkill
     {
         if (Stats is CellStats cs)
         {
-            cs.RemoveModifier("growth", 0.0f, GrowthPerLevel * Level);
+            cs.RemoveModifier("move_speed", 0.0f, SpeedPerLevel * Level);
             cs.RemoveModifier("might", 0.0f, MightPerLevel * Level);
         }
         else if (Stats != null && Stats.HasMethod("remove_modifier"))
         {
-            Stats.Call("remove_modifier", "growth", 0.0f, GrowthPerLevel * Level);
+            Stats.Call("remove_modifier", "move_speed", 0.0f, SpeedPerLevel * Level);
             Stats.Call("remove_modifier", "might", 0.0f, MightPerLevel * Level);
         }
     }

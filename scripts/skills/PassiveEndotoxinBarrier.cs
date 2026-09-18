@@ -5,12 +5,12 @@ namespace Phagocyte.Skills;
 
 /// <summary>
 /// Passive Organelle Trait: Endotoxin Barrier (內毒素脫敏耐受)
-/// Universal Stat Modifiers: Armor +3 flat, Knockback Resist +20% per level
+/// Universal Stat Modifiers: Armor +3 flat, Block +4% per level
 /// </summary>
 public partial class PassiveEndotoxinBarrier : BaseSkill
 {
     public const float ArmorPerLevel = 3.0f;
-    public const float KnockbackResistPerLevel = 0.20f;
+    public const float BlockPerLevel = 0.04f;
 
     public PassiveEndotoxinBarrier()
     {
@@ -31,12 +31,12 @@ public partial class PassiveEndotoxinBarrier : BaseSkill
         if (Stats is CellStats cs)
         {
             cs.AddModifier("armor", ArmorPerLevel * Level, 0.0f);
-            cs.AddModifier("knockback_resist", KnockbackResistPerLevel * Level, 0.0f);
+            cs.AddModifier("block", BlockPerLevel * Level, 0.0f);
         }
         else if (Stats != null && Stats.HasMethod("add_modifier"))
         {
             Stats.Call("add_modifier", "armor", ArmorPerLevel * Level, 0.0f);
-            Stats.Call("add_modifier", "knockback_resist", KnockbackResistPerLevel * Level, 0.0f);
+            Stats.Call("add_modifier", "block", BlockPerLevel * Level, 0.0f);
         }
     }
 
@@ -45,12 +45,12 @@ public partial class PassiveEndotoxinBarrier : BaseSkill
         if (Stats is CellStats cs)
         {
             cs.RemoveModifier("armor", ArmorPerLevel * Level, 0.0f);
-            cs.RemoveModifier("knockback_resist", KnockbackResistPerLevel * Level, 0.0f);
+            cs.RemoveModifier("block", BlockPerLevel * Level, 0.0f);
         }
         else if (Stats != null && Stats.HasMethod("remove_modifier"))
         {
             Stats.Call("remove_modifier", "armor", ArmorPerLevel * Level, 0.0f);
-            Stats.Call("remove_modifier", "knockback_resist", KnockbackResistPerLevel * Level, 0.0f);
+            Stats.Call("remove_modifier", "block", BlockPerLevel * Level, 0.0f);
         }
     }
 }

@@ -856,10 +856,10 @@ public partial class Hud : CanvasLayer
         {
             string[] statKeys =
             {
-                "max_health", "health_regen", "armor", "move_speed", "revival", "knockback_resist",
                 "might", "area", "cooldown_reduction", "projectile_speed", "duration", "amount",
                 "pierce", "knockback", "crit_chance", "crit_damage",
-                "magnet", "growth", "luck", "curse"
+                "max_health", "health_regen", "armor", "move_speed", "evasion", "block", "life_steal",
+                "magnet"
             };
             foreach (string statKey in statKeys)
                 text.AppendLine(PassiveTreeManager.GetStatLabel(statKey) + ": " + FormatTreeStat(statKey, bc.Stats.GetStat(statKey)));
@@ -879,7 +879,9 @@ public partial class Hud : CanvasLayer
         return statKey switch
         {
             "max_health" or "health_regen" or "move_speed" or "magnet" => $"{value:F1}",
-            "amount" or "pierce" or "revival" or "armor" => $"{value:F0}",
+            "amount" or "pierce" or "armor" => $"{value:F0}",
+            "cooldown_reduction" or "crit_chance" or "evasion" or "block" or "life_steal" => $"{value * 100.0f:F1}%",
+            "might" or "area" or "projectile_speed" or "duration" or "knockback" or "crit_damage" => $"{value * 100.0f:F0}%",
             _ => $"{value:F2}"
         };
     }

@@ -42,6 +42,29 @@ public partial class DefensinBarbsSkill : BaseSkill
         var dmgData = GetCalculatedDamage(BaseDamage);
         float dmg = (float)dmgData["damage"];
 
+        bool isCrit = (bool)dmgData["is_crit"];
+
+        if (Phagocyte.Combat.ProjectileManager.Instance != null)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                float angle = i * (Mathf.Tau / count);
+                Vector2 dir = Vector2.FromAngle(angle);
+                Phagocyte.Combat.ProjectileManager.Instance.Spawn(
+                    Host.GlobalPosition,
+                    dir,
+                    speed,
+                    dmg,
+                    isCrit,
+                    pierce,
+                    lifetime: 1.6f,
+                    radius: 12.0f,
+                    projType: "defensin_barb"
+                );
+            }
+            return;
+        }
+
         for (int i = 0; i < count; i++)
         {
             float angle = i * (Mathf.Tau / count);

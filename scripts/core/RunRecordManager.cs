@@ -185,10 +185,20 @@ public partial class RunRecordManager : Node
             { "records", Records }
         };
 
-        using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
+        var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
+        if (file == null && SavePath.StartsWith("user://"))
+        {
+            SavePath = "res://.user_data/run_records.json";
+            DirAccess.MakeDirRecursiveAbsolute("res://.user_data");
+            file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
+        }
+
         if (file != null)
         {
-            file.StoreString(Json.Stringify(payload, "\t"));
+            using (file)
+            {
+                file.StoreString(Json.Stringify(payload, "\t"));
+            }
         }
     }
 

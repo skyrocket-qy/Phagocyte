@@ -125,11 +125,11 @@ public partial class TestExpandedSkills : SceneTree
         autophagy.RemovePassiveModifiers();
         AssertThat(cellStats.GetStat("health_regen")).IsEqual(0.0f);
 
-        // 4.3 Aerobic Glycolysis: Growth +12%, Might +4% per level
+        // 4.3 Aerobic Glycolysis: Move Speed +6%, Might +5% per level
         var glycolysis = new PassiveAerobicGlycolysis();
         glycolysis.Setup(dummyHost, 0);
-        AssertThat(cellStats.GetStat("growth")).IsEqualApprox(1.12f, 0.01f);
-        AssertThat(cellStats.GetStat("might")).IsEqualApprox(1.04f, 0.01f);
+        AssertThat(cellStats.GetStat("move_speed")).IsEqualApprox(230.0f * 1.06f, 0.5f);
+        AssertThat(cellStats.GetStat("might")).IsEqualApprox(1.05f, 0.01f);
         glycolysis.RemovePassiveModifiers();
 
         // 4.4 Kinesin Transit: Speed +15%, Pierce +1
@@ -149,57 +149,55 @@ public partial class TestExpandedSkills : SceneTree
         AssertThat(cellStats.GetStat("knockback")).IsEqualApprox(1.10f, 0.01f);
         longevity.RemovePassiveModifiers();
 
-        // 4.6 V(D)J Diversity: Luck +15%, CritChance +3% per level
+        // 4.6 V(D)J Diversity: CritDamage +15%, CritChance +3% per level
         var vdj = new PassiveVdjDiversity();
         vdj.Setup(dummyHost, 0);
-        AssertThat(cellStats.GetStat("luck")).IsEqualApprox(1.15f, 0.01f);
+        AssertThat(cellStats.GetStat("crit_damage")).IsEqualApprox(2.30f, 0.01f);
         AssertThat(cellStats.GetStat("crit_chance")).IsEqualApprox(0.08f, 0.01f);
         vdj.RemovePassiveModifiers();
 
-        // 4.7 Endotoxin Barrier: Armor +3, KnockbackResist +20% per level
+        // 4.7 Endotoxin Barrier: Armor +3, Block +4% per level
         var endotoxin = new PassiveEndotoxinBarrier();
         endotoxin.Setup(dummyHost, 0);
         AssertThat(cellStats.GetStat("armor")).IsEqual(3.0f);
-        AssertThat(cellStats.GetStat("knockback_resist")).IsEqualApprox(0.20f, 0.01f);
+        AssertThat(cellStats.GetStat("block")).IsEqualApprox(0.04f, 0.01f);
         endotoxin.RemovePassiveModifiers();
 
-        // 4.8 Hematopoietic Reserve: MaxHP +10%, Revival +1
+        // 4.8 Hematopoietic Reserve: MaxHP +10%, Block +3%
         var hematopoietic = new PassiveHematopoieticReserve();
         hematopoietic.Setup(dummyHost, 0);
-        AssertThat(cellStats.GetStat("revival")).IsEqual(1.0f);
+        AssertThat(cellStats.GetStat("max_health")).IsEqualApprox(110.0f, 0.1f);
+        AssertThat(cellStats.GetStat("block")).IsEqualApprox(0.03f, 0.01f);
         hematopoietic.RemovePassiveModifiers();
-        AssertThat(cellStats.GetStat("revival")).IsEqual(0.0f);
 
         GD.Print("[PASS] Step 4: All 8 new Passive traits correctly inject, upgrade, and remove modifiers from CellStats.");
 
-        // --- 5. Verify BaseCell Integration (Growth, Revival, KnockbackResist) ---
+        // --- 5. Verify BaseCell Integration (Exp, Impulse, Damage) ---
         var player = new BaseCell();
         var playerStats = new CellStats { Name = "CellStats" };
         player.AddChild(playerStats);
         player.Stats = playerStats;
         Root.AddChild(player);
 
-        // 5.1 Growth scaling in AddExp
-        playerStats.AddModifier("growth", 0.0f, 0.50f); // 1.5x growth
+        // 5.1 AddExp
         float expBefore = player.CurrentExp;
-        player.AddExp(10.0f);
+        player.AddExp(15.0f);
         AssertThat(player.CurrentExp).IsEqualApprox(expBefore + 15.0f, 0.01f);
-        GD.Print("[PASS] Step 5.1: BaseCell AddExp respects growth multiplier.");
+        GD.Print("[PASS] Step 5.1: BaseCell AddExp works correctly.");
 
-        // 5.2 Knockback resistance in ApplyImpulse
-        playerStats.AddModifier("knockback_resist", 0.40f, 0.0f);
+        // 5.2 Armor damping in ApplyImpulse
+        playerStats.AddModifier("armor", 50.0f, 0.0f); // 50% DR
         player.Velocity = Vector2.Zero;
         player.ApplyImpulse(new Vector2(100.0f, 0.0f));
-        AssertThat(player.Velocity.X).IsEqualApprox(60.0f, 0.01f);
-        GD.Print("[PASS] Step 5.2: BaseCell ApplyImpulse respects knockback_resist.");
+        AssertThat(player.Velocity.X).IsEqualApprox(50.0f, 0.5f);
+        GD.Print("[PASS] Step 5.2: BaseCell ApplyImpulse respects armor dampening.");
 
-        // 5.3 Fatal damage & Revival
-        playerStats.AddModifier("revival", 1.0f, 0.0f);
+        // 5.3 Fatal damage
         player.Health = 20.0f;
         player.TakeDamage(100.0f); // Lethal damage
-        AssertThat(player.Health).IsEqual(playerStats.GetStat("max_health"));
-        AssertThat(playerStats.GetStat("revival")).IsEqual(0.0f); // 1 charge consumed
-        GD.Print("[PASS] Step 5.3: BaseCell TakeDamage revives upon fatal damage when Revival >= 1.");
+        AssertThat(player.Health).IsEqual(0.0f);
+        AssertThat(player.IsDead).IsTrue();
+        GD.Print("[PASS] Step 5.3: BaseCell TakeDamage handles fatal damage correctly.");
 
         // --- 6. Verify Level Up Selection Pool with Expanded Skills ---
         var sm2 = new SkillManager { Name = "SkillManager" };

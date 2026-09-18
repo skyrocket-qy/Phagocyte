@@ -4,8 +4,9 @@ using System.Collections.Generic;
 namespace Phagocyte.Core;
 
 /// <summary>
-/// Centralized 16-Universal-Stat Manager for Cells in Phagocyte.
+/// Centralized 18-Universal-Stat Manager for Cells in Phagocyte.
 /// Excludes any skill-specific stats to maintain complete modularity.
+/// Formula: Final = (Base + Flat) * (1 + Pct)
 /// </summary>
 public partial class CellStats : Node
 {
@@ -24,19 +25,17 @@ public partial class CellStats : Node
     public Stat CritChance { get; private set; } = new(0.05f);
     public Stat CritDamage { get; private set; } = new(2.0f);
 
-    // Survival & Defense Stats (6)
+    // Defense & Survival Stats (7)
     public Stat MaxHealth { get; private set; } = new(100.0f);
     public Stat HealthRegen { get; private set; } = new(0.0f);
     public Stat Armor { get; private set; } = new(0.0f);
     public Stat MoveSpeed { get; private set; } = new(230.0f);
-    public Stat Revival { get; private set; } = new(0.0f);
-    public Stat KnockbackResist { get; private set; } = new(0.0f);
+    public Stat Evasion { get; private set; } = new(0.0f);
+    public Stat Block { get; private set; } = new(0.0f);
+    public Stat LifeSteal { get; private set; } = new(0.0f);
 
-    // Utility & Meta Stats (4)
+    // Utility & Meta Stats (1)
     public Stat Magnet { get; private set; } = new(150.0f);
-    public Stat Growth { get; private set; } = new(1.0f);
-    public Stat Luck { get; private set; } = new(1.0f);
-    public Stat Curse { get; private set; } = new(1.0f);
 
     private Dictionary<string, Stat> _statsMap = new();
 
@@ -55,6 +54,7 @@ public partial class CellStats : Node
     {
         _statsMap = new Dictionary<string, Stat>
         {
+            // Combat (10)
             ["might"] = Might,
             ["area"] = Area,
             ["cooldown_reduction"] = CooldownReduction,
@@ -66,17 +66,17 @@ public partial class CellStats : Node
             ["crit_chance"] = CritChance,
             ["crit_damage"] = CritDamage,
 
+            // Defense (7)
             ["max_health"] = MaxHealth,
             ["health_regen"] = HealthRegen,
             ["armor"] = Armor,
             ["move_speed"] = MoveSpeed,
-            ["revival"] = Revival,
-            ["knockback_resist"] = KnockbackResist,
+            ["evasion"] = Evasion,
+            ["block"] = Block,
+            ["life_steal"] = LifeSteal,
 
-            ["magnet"] = Magnet,
-            ["growth"] = Growth,
-            ["luck"] = Luck,
-            ["curse"] = Curse
+            // Utility (1)
+            ["magnet"] = Magnet
         };
     }
 
@@ -90,22 +90,24 @@ public partial class CellStats : Node
         if (!_statsMap.TryGetValue(statName, out var s))
         {
             GD.PushWarning($"CellStats: Stat '{statName}' not found.");
-            return 1.0f;
+            return 0.0f;
         }
 
         float val = s.GetValue();
 
-        // Universal clamps
-        if (statName == "cooldown_reduction")
-            return Mathf.Clamp(val, 0.0f, 0.75f); // Cap CDR at 75%
-        else if (statName == "crit_chance")
-            return Mathf.Clamp(val, 0.0f, 1.0f); // Crit chance capped at 100%
-        else if (statName == "knockback_resist")
-            return Mathf.Clamp(val, 0.0f, 0.90f); // Cap knockback resist at 90%
-        else if (statName is "move_speed" or "max_health" or "magnet")
-            return Mathf.Max(0.0f, val);
-
-        return val;
+        // Universal constraints and caps defined in docs/stat.md
+        return statName switch
+        {
+            "cooldown_reduction" => Mathf.Clamp(val, 0.0f, 0.75f), // Cap CDR at 75%
+            "crit_chance" => Mathf.Clamp(val, 0.0f, 1.0f),         // Cap Crit Chance at 100%
+            "evasion" => Mathf.Clamp(val, 0.0f, 0.60f),             // Cap Evasion at 60%
+            "block" => Mathf.Clamp(val, 0.0f, 0.75f),               // Cap Block at 75%
+            "life_steal" => Mathf.Clamp(val, 0.0f, 0.20f),          // Cap Life Steal at 20%
+            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" => Mathf.Max(0.0f, val),
+            "amount" or "pierce" => Mathf.Max(0.0f, val),
+            "move_speed" or "max_health" or "magnet" or "armor" => Mathf.Max(0.0f, val),
+            _ => val
+        };
     }
 
     public void AddModifier(string statName, float flat, float pct)
@@ -160,5 +162,32 @@ public partial class CellStats : Node
     public bool RollCritical()
     {
         return GD.Randf() < GetStat("crit_chance");
+    }
+
+    /// <summary>
+    /// Rolls for fluid deformation evasion (免傷)
+    /// </summary>
+    public bool RollEvasion()
+    {
+        float ev = GetStat("evasion");
+        return ev > 0.0f && GD.Randf() < ev;
+    }
+
+    /// <summary>
+    /// Rolls for glycocalyx block (格擋)
+    /// </summary>
+    public bool RollBlock()
+    {
+        float blk = GetStat("block");
+        return blk > 0.0f && GD.Randf() < blk;
+    }
+
+    /// <summary>
+    /// Rolls for receptor life steal on hit (吸血回復)
+    /// </summary>
+    public bool RollLifeSteal()
+    {
+        float ls = GetStat("life_steal");
+        return ls > 0.0f && GD.Randf() < ls;
     }
 }

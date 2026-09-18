@@ -35,7 +35,7 @@ public partial class CandidaEnemy : BaseEnemy
             float dist = GlobalPosition.DistanceTo(player.GlobalPosition);
             if (dist < 120.0f && !_hyphaeExtended)
             {
-                ExtendHyphae();
+                ExtendHyphae(player.GlobalPosition);
             }
         }
 
@@ -49,11 +49,36 @@ public partial class CandidaEnemy : BaseEnemy
         }
     }
 
-    public void ExtendHyphae()
+    public void ExtendHyphae(Vector2? targetPos = null)
     {
         _hyphaeExtended = true;
         _hyphaeTimer = 3.5f;
         QueueRedraw();
+
+        Vector2 aim = targetPos ?? (GlobalPosition + Vector2.Right * 100.0f);
+        SpawnHyphaeTelegraph(aim);
+    }
+
+    private void SpawnHyphaeTelegraph(Vector2 targetPos)
+    {
+        var parent = GetParent();
+        if (parent == null) return;
+
+        Vector2 dir = (targetPos - GlobalPosition).Normalized();
+        if (dir == Vector2.Zero) dir = Vector2.Right;
+
+        var attack = new Phagocyte.Combat.TelegraphedAttack
+        {
+            Shape = Phagocyte.Combat.TelegraphAttackShape.Line,
+            GlobalPosition = GlobalPosition,
+            TargetDirection = dir,
+            LineLength = 140.0f,
+            LineWidth = 36.0f,
+            TelegraphDuration = 0.9f,
+            Damage = 18.0f,
+            SourceEnemy = this
+        };
+        parent.AddChild(attack);
     }
 
     public void RetractHyphae()
@@ -65,7 +90,10 @@ public partial class CandidaEnemy : BaseEnemy
     public override void TakeDamage(float damage, Node2D? source = null)
     {
         if (!_hyphaeExtended)
-            ExtendHyphae();
+        {
+            var p = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+            ExtendHyphae(p != null && GodotObject.IsInstanceValid(p) ? p.GlobalPosition : null);
+        }
         base.TakeDamage(damage, source);
     }
 

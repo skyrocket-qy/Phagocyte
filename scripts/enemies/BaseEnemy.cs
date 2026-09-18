@@ -1,5 +1,9 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using Phagocyte.Core;
+using Phagocyte.Player;
+using Phagocyte.UI;
 
 namespace Phagocyte.Enemies;
 
@@ -39,8 +43,19 @@ public abstract partial class BaseEnemy : Node2D
     public Area2D? HitArea { get; set; }
     public CollisionShape2D? EnemyCollisionShape { get; set; }
 
+    public static readonly List<BaseEnemy> ActiveEnemies = new();
+
+    public override void _EnterTree()
+    {
+        base._EnterTree();
+        if (!ActiveEnemies.Contains(this))
+            ActiveEnemies.Add(this);
+    }
+
     public override void _Ready()
     {
+        if (!ActiveEnemies.Contains(this))
+            ActiveEnemies.Add(this);
         AddToGroup("pathogens");
         CurrentHealth = MaxHealth;
         DriftTimer = GD.Randf() * 5.0f;
@@ -135,6 +150,16 @@ public abstract partial class BaseEnemy : Node2D
 
     public virtual void TakeDamage(float damage, Node2D? source = null)
     {
+        TakeDamageInternal(damage, source, false);
+    }
+
+    public virtual void TakeDamage(float damage, Node2D? source, bool isCrit)
+    {
+        TakeDamageInternal(damage, source, isCrit);
+    }
+
+    protected void TakeDamageInternal(float damage, Node2D? source, bool isCrit)
+    {
         if (IsBeingEaten)
             return;
 
@@ -147,6 +172,20 @@ public abstract partial class BaseEnemy : Node2D
 
         float effectiveDmg = Mathf.Max(1.0f, damage - Armor);
         CurrentHealth -= effectiveDmg;
+
+        DamageNumberSpawner.ShowDamage(GlobalPosition, effectiveDmg, isCrit);
+
+        // Life steal check on attacker
+        if (source is BaseCell playerCell && playerCell.Stats != null)
+        {
+            if (playerCell.Stats.RollLifeSteal())
+            {
+                playerCell.Heal(1.0f);
+                DamageNumberSpawner.ShowHeal(playerCell.GlobalPosition, 1.0f);
+            }
+        }
+
+        AudioManager.Instance?.PlayHit(isCrit);
 
         // Flash modulate
         Modulate = new Color(1.8f, 0.4f, 0.4f, 1.0f);
@@ -212,8 +251,15 @@ public abstract partial class BaseEnemy : Node2D
         }
     }
 
+    public override void _ExitTree()
+    {
+        ActiveEnemies.Remove(this);
+        base._ExitTree();
+    }
+
     public virtual void Die(Node2D? killer)
     {
+        AudioManager.Instance?.PlayEnemyDeath();
         EmitSignal(SignalName.EnemyDied, this);
         QueueFree();
     }
@@ -233,4 +279,6 @@ public abstract partial class BaseEnemy : Node2D
     public float GetAtpValue() => AtpValue;
     public float get_atp_value() => AtpValue;
     public void be_engulfed(Node2D? predator) => BeEngulfed(predator);
+    public void take_damage(float damage, Node2D? source = null) => TakeDamage(damage, source, false);
+    public void take_damage(float damage, Node2D? source, bool isCrit) => TakeDamage(damage, source, isCrit);
 }

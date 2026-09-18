@@ -22,6 +22,8 @@ public partial class AnthraxBacillus : BaseEnemy
 
     protected override float GetCollisionRadius() => 14.0f;
 
+    private float _toxinTimer = 2.0f;
+
     protected override void CustomPhysicsProcess(float dt)
     {
         var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
@@ -30,7 +32,31 @@ public partial class AnthraxBacillus : BaseEnemy
             Vector2 toPlayer = (player.GlobalPosition - GlobalPosition).Normalized();
             Velocity = Velocity.Lerp(toPlayer * FloatSpeed, 2.5f * dt);
             Rotation = toPlayer.Angle();
+
+            _toxinTimer -= dt;
+            if (_toxinTimer <= 0.0f)
+            {
+                _toxinTimer = 4.5f;
+                SpawnToxinTelegraph(player.GlobalPosition);
+            }
         }
+    }
+
+    private void SpawnToxinTelegraph(Vector2 targetPos)
+    {
+        var parent = GetParent();
+        if (parent == null) return;
+
+        var attack = new Phagocyte.Combat.TelegraphedAttack
+        {
+            Shape = Phagocyte.Combat.TelegraphAttackShape.Circle,
+            GlobalPosition = targetPos,
+            Radius = 70.0f,
+            TelegraphDuration = 1.1f,
+            Damage = 22.0f,
+            SourceEnemy = this
+        };
+        parent.AddChild(attack);
     }
 
     public override void _Draw()

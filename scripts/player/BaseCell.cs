@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Phagocyte.Core;
 using Phagocyte.Skills;
 using Phagocyte.Enemies;
+using Phagocyte.UI;
 
 namespace Phagocyte.Player;
 
@@ -739,8 +740,8 @@ public partial class BaseCell : CharacterBody2D
 
         OnPathogenConsumed(enemy, atp);
 
-        float growthMult = Stats != null ? Stats.GetStat("growth") : 1.0f;
-        AddExp(atp * growthMult);
+        float finalAtp = atp;
+        AddExp(finalAtp);
 
         EmitSignal(SignalName.PathogenDigested, enemy, atp);
         EmitStatsSignal();
@@ -752,14 +753,13 @@ public partial class BaseCell : CharacterBody2D
 
     public void AddExp(float amount)
     {
-        float growth = Stats != null ? Stats.GetStat("growth") : 1.0f;
-        float finalExp = amount * Mathf.Max(0.1f, growth);
-        CurrentExp += finalExp;
+        CurrentExp += amount;
         while (CurrentExp >= ExpToNextLevel)
         {
             CurrentExp -= ExpToNextLevel;
             CurrentLevel += 1;
             ExpToNextLevel = ExpToNextLevel * 1.35f + 15.0f;
+            AudioManager.Instance?.PlayLevelUp();
             EmitSignal(SignalName.LevelUp, CurrentLevel);
         }
         EmitSignal(SignalName.ExpChanged, CurrentExp, ExpToNextLevel, CurrentLevel);
@@ -778,33 +778,39 @@ public partial class BaseCell : CharacterBody2D
         if (IsDead)
             return;
 
+        // Stage 1: Fluid deformation evasion (閃避判定)
+        if (Stats is CellStats cs && cs.RollEvasion())
+        {
+            DamageNumberSpawner.ShowEvaded(GlobalPosition);
+            return;
+        }
+
+        // Stage 2: Glycocalyx barrier block (格擋判定)
+        if (Stats is CellStats csBlock && csBlock.RollBlock())
+        {
+            DamageNumberSpawner.ShowBlocked(GlobalPosition);
+            return;
+        }
+
+        // Stage 3: Armor damage reduction (護甲減傷)
         float dr = Stats != null ? Stats.GetDamageReductionRatio() : 0.0f;
-        float finalDmg = amount * (1.0f - dr);
+        float finalDmg = Mathf.Max(1.0f, amount * (1.0f - dr));
+        DamageNumberSpawner.ShowPlayerDamage(GlobalPosition, finalDmg);
+
+        // Stage 4: HP Loss & Death check
         float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
         Health = Mathf.Clamp(Health - finalDmg, 0.0f, maxHp);
 
-        // Check fatal damage & revival
         if (Health <= 0.0f)
         {
-            if (Stats != null && Stats.GetStat("revival") >= 1.0f)
-            {
-                Stats.AddModifier("revival", -1.0f, 0.0f);
-                Health = maxHp;
-                if (Cytoplasm != null)
-                {
-                    if (_hitFlashTween != null && _hitFlashTween.IsValid())
-                        _hitFlashTween.Kill();
-                    _hitFlashTween = CreateTween();
-                    Cytoplasm.Modulate = new Color(3.0f, 3.0f, 3.0f, 1.0f);
-                    _hitFlashTween.TweenProperty(Cytoplasm, "modulate", new Color(1.0f, 1.0f, 1.0f, 1.0f), 0.4);
-                }
-            }
-            else
-            {
-                Health = 0.0f;
-                IsDead = true;
-                EmitSignal(SignalName.Died);
-            }
+            Health = 0.0f;
+            IsDead = true;
+            AudioManager.Instance?.PlayPlayerDeath();
+            EmitSignal(SignalName.Died);
+        }
+        else
+        {
+            AudioManager.Instance?.PlayPlayerHit();
         }
 
         _underCellArcBar?.NotifyDamageOrState();
@@ -823,8 +829,8 @@ public partial class BaseCell : CharacterBody2D
 
     public void ApplyImpulse(Vector2 impulse)
     {
-        float resist = Stats != null ? Stats.GetStat("knockback_resist") : 0.0f;
-        Velocity += impulse * (1.0f - Mathf.Clamp(resist, 0.0f, 0.9f));
+        float dr = Stats != null ? Stats.GetDamageReductionRatio() : 0.0f;
+        Velocity += impulse * (1.0f - Mathf.Clamp(dr, 0.0f, 0.75f));
     }
 
     private void OnStatChanged(string statName, float val)

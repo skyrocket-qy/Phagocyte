@@ -21,6 +21,8 @@ GameManager="*res://scripts/core/GameManager.cs"
 AchievementManager="*res://scripts/core/AchievementManager.cs"
 SettingsManager="*res://scripts/core/SettingsManager.cs"
 RunRecordManager="*res://scripts/core/RunRecordManager.cs"
+DamageNumberSpawner="*res://scripts/ui/DamageNumberSpawner.cs"
+AudioManager="*res://scripts/core/AudioManager.cs"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]

@@ -32,12 +32,15 @@ public partial class TestStatAndSkills : SceneTree
         AssertThat(s.GetValue()).IsEqualApprox(20.0f, 0.001f);
         GD.Print("[PASS] Test 1: Stat math calculation (base + flat) * (1 + pct) verified.");
 
-        // --- Test 2: CellStats 16 universal stats & caps ---
+        // --- Test 2: CellStats 18 universal stats & caps ---
         var cs = new CellStats();
         AssertThat(cs.GetStat("might")).IsEqual(1.0f);
         AssertThat(cs.GetStat("area")).IsEqual(1.0f);
         AssertThat(cs.GetStat("cooldown_reduction")).IsEqual(0.0f);
         AssertThat(cs.GetStat("move_speed")).IsEqual(230.0f);
+        AssertThat(cs.GetStat("evasion")).IsEqual(0.0f);
+        AssertThat(cs.GetStat("block")).IsEqual(0.0f);
+        AssertThat(cs.GetStat("life_steal")).IsEqual(0.0f);
 
         // Test CDR clamp at 75%
         cs.AddModifier("cooldown_reduction", 0.90f, 0.0f);
@@ -45,10 +48,22 @@ public partial class TestStatAndSkills : SceneTree
         cs.RemoveModifier("cooldown_reduction", 0.90f, 0.0f);
         AssertThat(cs.GetStat("cooldown_reduction")).IsEqual(0.0f);
 
+        // Test Evasion clamp at 60%
+        cs.AddModifier("evasion", 0.90f, 0.0f);
+        AssertThat(cs.GetStat("evasion")).IsEqual(0.60f);
+
+        // Test Block clamp at 75%
+        cs.AddModifier("block", 0.90f, 0.0f);
+        AssertThat(cs.GetStat("block")).IsEqual(0.75f);
+
+        // Test Life Steal clamp at 20%
+        cs.AddModifier("life_steal", 0.50f, 0.0f);
+        AssertThat(cs.GetStat("life_steal")).IsEqual(0.20f);
+
         // Test Armor percentage formula
         cs.AddModifier("armor", 50.0f, 0.0f);
         AssertThat(cs.GetDamageReductionRatio()).IsEqualApprox(0.50f, 0.001f);
-        GD.Print("[PASS] Test 2: CellStats 16 universal stats, CDR clamping & armor formula verified.");
+        GD.Print("[PASS] Test 2: CellStats 18 universal stats, clamps (CDR, evasion, block, life steal) & armor formula verified.");
 
         // --- Test 3: SkillManager 5 Active + 5 Passive Routing ---
         var sm = new SkillManager();

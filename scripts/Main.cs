@@ -6,6 +6,7 @@ using Phagocyte.Player;
 using Phagocyte.Skills;
 using Phagocyte.UI;
 using Phagocyte.Enemies;
+using Phagocyte.Combat;
 
 namespace Phagocyte;
 
@@ -75,12 +76,24 @@ public partial class Main : Node2D
             ConnectAchievementEvents();
         }
 
+        if (ProjectileManager.Instance == null)
+        {
+            var projMgr = new ProjectileManager { Name = "ProjectileManager" };
+            AddChild(projMgr);
+            if (Player != null)
+            {
+                projMgr.SetHost(Player);
+            }
+        }
+
         // Read map configuration from GM
         MapId = GameManager.SelectedMap;
         ConfigureMapEnvironment();
 
         // Initial pathogen wave
         SpawnInitialWave(35);
+
+        AudioManager.Instance?.PlayBgm("battle_bgm", 0.6f);
     }
 
     private void ApplyTreeLoadout()
@@ -342,6 +355,17 @@ public partial class Main : Node2D
         if (RunEnded)
             return;
         RunEnded = true;
+
+        if (victory)
+        {
+            AudioManager.Instance?.PlayBgm("victory", 0.3f);
+            AudioManager.Instance?.PlaySfx("wave_complete");
+        }
+        else
+        {
+            AudioManager.Instance?.PlayBgm("defeat", 0.3f);
+            AudioManager.Instance?.PlaySfx("game_over");
+        }
 
         var cell = Player as BaseCell;
         string classId = GameManager.SelectedClass;

@@ -5,11 +5,12 @@ namespace Phagocyte.Skills;
 
 /// <summary>
 /// Passive Organelle Trait: Hematopoietic Reserve (造血幹細胞儲備)
-/// Universal Stat Modifiers: Max HP +10% per level, Revival +1
+/// Universal Stat Modifiers: Max HP +10% per level, Block +3% per level
 /// </summary>
 public partial class PassiveHematopoieticReserve : BaseSkill
 {
     public const float HealthPerLevel = 0.10f;
+    public const float BlockPerLevel = 0.03f;
 
     public PassiveHematopoieticReserve()
     {
@@ -30,12 +31,12 @@ public partial class PassiveHematopoieticReserve : BaseSkill
         if (Stats is CellStats cs)
         {
             cs.AddModifier("max_health", 0.0f, HealthPerLevel * Level);
-            cs.AddModifier("revival", 1.0f, 0.0f);
+            cs.AddModifier("block", BlockPerLevel * Level, 0.0f);
         }
         else if (Stats != null && Stats.HasMethod("add_modifier"))
         {
             Stats.Call("add_modifier", "max_health", 0.0f, HealthPerLevel * Level);
-            Stats.Call("add_modifier", "revival", 1.0f, 0.0f);
+            Stats.Call("add_modifier", "block", BlockPerLevel * Level, 0.0f);
         }
     }
 
@@ -44,12 +45,12 @@ public partial class PassiveHematopoieticReserve : BaseSkill
         if (Stats is CellStats cs)
         {
             cs.RemoveModifier("max_health", 0.0f, HealthPerLevel * Level);
-            cs.RemoveModifier("revival", 1.0f, 0.0f);
+            cs.RemoveModifier("block", BlockPerLevel * Level, 0.0f);
         }
         else if (Stats != null && Stats.HasMethod("remove_modifier"))
         {
             Stats.Call("remove_modifier", "max_health", 0.0f, HealthPerLevel * Level);
-            Stats.Call("remove_modifier", "revival", 1.0f, 0.0f);
+            Stats.Call("remove_modifier", "block", BlockPerLevel * Level, 0.0f);
         }
     }
 }

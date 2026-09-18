@@ -5,11 +5,11 @@ namespace Phagocyte.Skills;
 
 /// <summary>
 /// Passive Organelle Trait: V(D)J Diversity (V(D)J 基因重排多樣性)
-/// Universal Stat Modifiers: Luck +15%, Crit Chance +3% per level
+/// Universal Stat Modifiers: Crit Damage +15%, Crit Chance +3% per level
 /// </summary>
 public partial class PassiveVdjDiversity : BaseSkill
 {
-    public const float LuckPerLevel = 0.15f;
+    public const float CritDamagePerLevel = 0.15f;
     public const float CritChancePerLevel = 0.03f;
 
     public PassiveVdjDiversity()
@@ -30,12 +30,12 @@ public partial class PassiveVdjDiversity : BaseSkill
     {
         if (Stats is CellStats cs)
         {
-            cs.AddModifier("luck", 0.0f, LuckPerLevel * Level);
+            cs.AddModifier("crit_damage", 0.0f, CritDamagePerLevel * Level);
             cs.AddModifier("crit_chance", CritChancePerLevel * Level, 0.0f);
         }
         else if (Stats != null && Stats.HasMethod("add_modifier"))
         {
-            Stats.Call("add_modifier", "luck", 0.0f, LuckPerLevel * Level);
+            Stats.Call("add_modifier", "crit_damage", 0.0f, CritDamagePerLevel * Level);
             Stats.Call("add_modifier", "crit_chance", CritChancePerLevel * Level, 0.0f);
         }
     }
@@ -44,12 +44,12 @@ public partial class PassiveVdjDiversity : BaseSkill
     {
         if (Stats is CellStats cs)
         {
-            cs.RemoveModifier("luck", 0.0f, LuckPerLevel * Level);
+            cs.RemoveModifier("crit_damage", 0.0f, CritDamagePerLevel * Level);
             cs.RemoveModifier("crit_chance", CritChancePerLevel * Level, 0.0f);
         }
         else if (Stats != null && Stats.HasMethod("remove_modifier"))
         {
-            Stats.Call("remove_modifier", "luck", 0.0f, LuckPerLevel * Level);
+            Stats.Call("remove_modifier", "crit_damage", 0.0f, CritDamagePerLevel * Level);
             Stats.Call("remove_modifier", "crit_chance", CritChancePerLevel * Level, 0.0f);
         }
     }

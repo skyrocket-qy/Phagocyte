@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
 
@@ -8,6 +9,7 @@ public partial class RosTorrentSkill : BaseSkill
     private static PackedScene? _jetScene;
     public static PackedScene JetScene => _jetScene ??= GD.Load<PackedScene>("res://scenes/skills/ros_jet.tscn");
 
+    [Export] public float BaseDamage { get; set; } = 25.0f;
     [Export] public float AttackRange { get; set; } = 650.0f;
     [Export] public float BaseJetSpeed { get; set; } = 520.0f;
     [Export] public float BaseJetLifetime { get; set; } = 0.9f;
@@ -32,6 +34,8 @@ public partial class RosTorrentSkill : BaseSkill
         base.Trigger();
         if (Host == null || !GodotObject.IsInstanceValid(Host))
             return;
+
+        AudioManager.Instance?.PlayShoot();
 
         Vector2 targetDir = FindTargetDirection();
         int amount = GetCalculatedAmount(1);
@@ -103,11 +107,18 @@ public partial class RosTorrentSkill : BaseSkill
 
         var jet = JetScene.Instantiate<Node2D>();
         Host.GetParent().AddChild(jet);
+
+        var dmgDict = GetCalculatedDamage(BaseDamage);
+        float dmg = (float)dmgDict["damage"];
+        bool isCrit = (bool)dmgDict["is_crit"];
+
         if (jet is RosJet rj)
         {
             rj.Setup(Host, Host.GlobalPosition, dir);
             rj.Speed = speedVal;
             rj.Lifetime = lifeVal;
+            rj.Damage = dmg;
+            rj.IsCrit = isCrit;
             rj.Scale = new Vector2(areaMult, areaMult);
         }
         else
@@ -115,6 +126,8 @@ public partial class RosTorrentSkill : BaseSkill
             jet.Call("setup", Host, Host.GlobalPosition, dir);
             jet.Set("speed", speedVal);
             jet.Set("lifetime", lifeVal);
+            jet.Set("damage", dmg);
+            jet.Set("is_crit", isCrit);
             jet.Scale = new Vector2(areaMult, areaMult);
         }
     }
