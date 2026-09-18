@@ -208,7 +208,7 @@
 
 - [x] **歷史病歷本地持久化**：`RunRecordManager.cs` 支援最新 50 筆記錄循環保存。
 - [x] **病歷單彈窗基礎框架**：`RunRecordsModal.cs` 支援展示基本時長與等級。
-- [ ] **[P0] 勝利與失敗判準校正**：
+- [x] **[P0] 勝利與失敗判準校正**：
   - 勝利判定：在地圖中存活達 15:00 且成功擊殺原發 Boss（【特異性中和成功】）。
   - 失敗判定：細胞膜耐久度歸零（【SIRS / 敗血性休克陣亡】）。
   - **影響檔案**：`scripts/Main.cs`, `scripts/core/RunRecordManager.cs`
