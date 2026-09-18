@@ -410,7 +410,7 @@ func update_all_skills(delta: float) -> void:
 
 ### Phase 4: 5 主動 ＋ 5 被動 ＋ 5 終極超武實作 (Skills & Evolutions)
 - [x] 實作 5 大主動生化技能：穿孔素長矛、補體瀑布、Y 型抗體齊射、活性氧射流、偽足猛擊
-- [ ] 實作外掛細胞器：`PseudopodLimb.tscn` (IK 抓爪)、`ReceptorSpikes.tscn` (受體棘刺)
+- [x] 實作外掛細胞器：`PseudopodLimb.tscn` (IK 抓爪)、`ReceptorSpikes.tscn` (受體棘刺)
 - [x] 實作被動特質（純通用 Stat 增幅，共 13 種）：溶酶體酵素、肌動蛋白微絲、調理素親和、線粒體超頻、趨化因子受體等
 - [ ] 實作終極表觀遺傳超武合成邏輯（主動 ＋ 被動 質變合成尚未實作）
 

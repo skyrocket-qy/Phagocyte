@@ -43,7 +43,7 @@
   - B 細胞：固有技能【Y 型抗體齊射】(`AntibodySalvoSkill`)。
   - 樹突狀細胞：固有技能【MHC 抗原追蹤束】(`MhcTracerBeamSkill`)。
   - **影響檔案**：`scripts/player/*.cs`, `scripts/core/GameManager.cs`
-- [ ] **[P2] 外掛式細胞器 (Modular Organelles)**：
+- [x] **[P2] 外掛式細胞器 (Modular Organelles)**：
   - `scenes/skills/PseudopodLimb.tscn`：基於 2D 骨骼逆向運動學（IK Chain）的阿米巴抓手，彈射抓怪拖回。
   - `scenes/skills/ReceptorSpikes.tscn`：懸浮於細胞膜外圍的環狀旋轉受體陣列，提供接觸反傷與旋轉攔截。
 
