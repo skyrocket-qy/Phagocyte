@@ -97,13 +97,13 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
                     └────────────┬────────────┘
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
-【通用戰鬥屬性 (Combat - 10項)】 【通用生存屬性 (Defense - 5項)】 【通用輔助與機制 (Utility - 1項)】
+【通用戰鬥屬性 (Combat - 10項)】 【通用生存屬性 (Defense - 6項)】 【通用輔助與機制 (Utility - 1項)】
 · Might (力量/傷害倍率)          · Max Health (最大生命)        · Magnet (拾取半徑)
 · Area (範圍/體積)              · Health Regen (生命自癒)
 · Cooldown Reduction (CDR)     · Armor (減傷/護甲)
 · Projectile Speed (彈道速度)   · Move Speed (移動速度)
-· Duration (持續時間)           · Revival (復甦次數)
-· Amount (額外數量)
+· Duration (持續時間)           · Evasion (流體閃避率)
+· Amount (額外數量)             · Block (糖萼格擋率)
 · Pierce (穿透次數)
 · Knockback (擊退力道)
 · Crit Chance (暴擊機率)
@@ -133,7 +133,8 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | `health_regen` | **生命自癒率** | `0.0` (HP/s) | 胞膜每秒自動修復的固定生命值。 |
 | `armor` | **膜剛性 / 護甲** | `0.0` (點) | 通用護甲公式：$\text{減傷率} = \frac{\text{Armor}}{\text{Armor} + 50}$，提供平滑邊際減傷。 |
 | `move_speed` | **移動速度** | `230.0` (px/s) | 玩家細胞在常態巡航下的基礎遊動速度。 |
-| `revival` | **復甦次數** | `0` (次) | 生命歸零時的原地裂變重生次數（回復 $50\%$ 生命並附帶 1 秒清屏無敵震波）。 |
+| `evasion` | **流體閃避率** | `0.0` (0%) | 胞膜阿米巴流體變形完全免傷機率（硬上限 `0.60` 即 60%）。受擊第一順位判定。 |
+| `block` | **糖萼格擋率** | `0.0` (0%) | 細胞表面緻密糖萼屏障偏轉阻絕傷害機率（硬上限 `0.75` 即 75%）。受擊第二順位判定。 |
 
 #### 3. 通用輔助與機制屬性（Utility & Economy）
 | 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
@@ -224,8 +225,8 @@ graph LR
 ```
 
 - **五大獨立起點中心**：
-  - 巨噬起點中心（左上）：側重 `area`（體積/範圍）、`max_health`（血上限）、`armor`（膜剛性減傷）。
-  - 殺手 T 起點中心（右側）：側重 `move_speed`（移速）、`crit_chance`（暴擊率）、`pierce`（穿透）。
+  - 巨噬起點中心（左上）：側重 `area`（體積/範圍）、`max_health`（血上限）、`armor`（膜剛性減傷）、`block`（糖萼格擋率）。
+  - 殺手 T 起點中心（右側）：側重 `move_speed`（移速）、`crit_chance`（暴擊率）、`pierce`（穿透）、`evasion`（流體閃避率）。
   - 嗜中性球起點中心（左側）：側重 `might`（傷害強度）、`knockback`（擊退）、`health_regen`（生命自癒）。
   - B 細胞起點中心（右下）：側重 `amount`（彈道數）、`projectile_speed`（彈速）、`cooldown_reduction`（CDR）。
   - 樹突狀起點中心（正上）：側重 `magnet`（拾取半徑）、`duration`（狀態與光環持續時間）、`cooldown_reduction`（冷卻縮減）、`area`（感知與效果範圍）。
@@ -340,7 +341,8 @@ var max_health: Stat = Stat.new(100.0)
 var health_regen: Stat = Stat.new(0.0)
 var armor: Stat = Stat.new(0.0)
 var move_speed: Stat = Stat.new(230.0)
-var revival: Stat = Stat.new(0.0)
+var evasion: Stat = Stat.new(0.0)
+var block: Stat = Stat.new(0.0)
 
 var magnet: Stat = Stat.new(150.0)
 ```
@@ -439,4 +441,4 @@ func update_all_skills(delta: float) -> void:
 - [x] 細胞核懸浮微幅延遲彈簧物理（Spring Physics）
 - [x] 多層次視差滾動與景深模擬 (DoF)
 - [x] 微觀檔案館（Immunology Codex）圖鑑系統與冷凍電鏡資料
-- [x] 病歷單結算系統（存活達 05:00 觸發抗體中和通關；HP 歸零且無 Revival 觸發 SIRS 陣亡；結算面板含該場數據、通關/陣亡分類與可持久化的歷史病歷）
+- [x] 病歷單結算系統（存活達 05:00 觸發抗體中和通關；HP 歸零觸發 SIRS 膜破裂陣亡；結算面板含該場數據、通關/陣亡分類與可持久化的歷史病歷）

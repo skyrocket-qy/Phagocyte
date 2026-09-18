@@ -10,7 +10,7 @@ Survivor-like 的常規結算介面通常只是簡單的「Game Over」與一串
 flowchart TD
     RunEnd["單局戰鬥結束 (Run Termination)"] --> CheckResult{存活達 15:00 並擊殺 Boss?}
     CheckResult -- 是 --> Vic["【特異性中和成功】(Victory)<br>病原體載量歸零 · 器官機能恢復"]
-    CheckResult -- 否 --> Def["【SIRS / 敗血性休克陣亡】(Defeat)<br>膜破裂且無復甦 · 宿主急性衰竭"]
+    CheckResult -- 否 --> Def["【SIRS / 敗血性休克陣亡】(Defeat)<br>胞膜破裂解體 · 宿主急性衰竭"]
     Vic & Def --> Gen["生成臨床生化檢驗報告 (Medical Record)<br>存活時長 · 吞噬量 · 終末等級 · 技能配裝"]
     Gen --> Rank["計算臨床評級 (Rank S / A / B / C / D)<br>吞噬效率 · 承傷比 · 衝榜積分"]
     Gen --> Persist["持久化至本地歷史病歷庫<br>(user://run_records.json)"]
@@ -29,7 +29,7 @@ flowchart TD
 - **獎勵結算**：發放對應地圖難度首通微管天賦點，解鎖後續器官地圖。
 
 ### 2.2 失敗結算：全身性炎症反應綜合徵 (SIRS / Septic Shock)
-- **觸發條件**：玩家細胞生命值歸零，且剩餘裂變復甦次數 `revival == 0`。
+- **觸發條件**：玩家細胞生命值歸零（胞膜徹底破裂解體）。
 - **臨床診斷**：`【急性呼吸窘迫 / 敗血性休克 / 多器官功能障礙綜合徵 (MODS)】`。
 - **病歷評價**：白血球胞膜解體，炎症因子風暴失控，宿主局部組織大面積壞死。
 - **挫敗感緩衝**：雖然單局中止，但本次戰鬥吞噬積累的經驗仍會計入成就進度條，轉化為後續局外解鎖的推力。

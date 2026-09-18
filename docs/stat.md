@@ -14,13 +14,13 @@
                     └────────────┬────────────┘
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
-【通用戰鬥屬性 (Combat - 10項)】     【通用生存屬性 (Defense - 5項)】   【通用機制屬性 (Utility - 1項)】
+【通用戰鬥屬性 (Combat - 10項)】     【通用生存屬性 (Defense - 6項)】   【通用機制屬性 (Utility - 1項)】
 · Might (傷害倍率)                  · Max Health (最大生命)          · Magnet (趨化拾取半徑)
 · Area (範圍/體積)                  · Health Regen (自癒率)
 · CDR (冷卻縮減)                    · Armor (膜剛性/減傷)
 · Projectile Speed (彈道速度)       · Move Speed (移動速度)
-· Duration (持續時間)               · Revival (裂變復甦次數)
-· Amount (額外發射數量)
+· Duration (持續時間)               · Evasion (流體閃避率)
+· Amount (額外發射數量)             · Block (糖萼格擋率)
 · Pierce (穿透次數)
 · Knockback (擊退力道)
 · Crit Chance (特異性暴擊率)
@@ -85,7 +85,7 @@ public class Stat
 
 ## 3. 全域通用屬性字典規範表 (Universal Stat Dictionary)
 
-所有屬性鍵名統一使用蛇形命名法（Snake_case），並在 `scripts/core/CellStats.cs` 中註冊（共 16 項）：
+所有屬性鍵名統一使用蛇形命名法（Snake_case），並在 `scripts/core/CellStats.cs` 中註冊（共 17 項）：
 
 | 屬性標識 (Key) | 顯示名稱 | 基準預設值 | 類別 | 影響範圍與通用運算規則 |
 | :--- | :--- | :--- | :--- | :--- |
@@ -103,14 +103,15 @@ public class Stat
 | `health_regen` | **生命自癒率** | `0.0` (HP/s) | 生存 | 每秒自動修復的細胞膜生命值。 |
 | `armor` | **膜剛性 / 護甲** | `0.0` (點) | 生存 | 通用邊際減傷公式：$\text{DR} = \frac{\text{Armor}}{\text{Armor} + 50.0}$。 |
 | `move_speed` | **游動速度** | `230.0` (px/s) | 生存/機動 | 玩家細胞常態巡航下的基礎游動速度。 |
-| `revival` | **裂變復甦次數** | `0` (次) | 生存 | 膜破裂時的原地裂變重生次數（回復 50% HP 並觸發 1 秒清屏無敵震波）。 |
+| `evasion` | **流體閃避率** | `0.0` (0%) | 生存/機動 | 胞膜阿米巴流體變形完全免傷機率。硬上限設為 `0.60` (60%)。受擊第一順位判定。 |
+| `block` | **糖萼格擋率** | `0.0` (0%) | 生存/防護 | 表面緻密糖萼屏障偏轉阻絕傷害機率。硬上限設為 `0.75` (75%)。受擊第二順位判定。 |
 | `magnet` | **趨化引力 (拾取)** | `150.0` (px) | 機制 | 自動吸附周邊 ATP 經驗滴與抗原碎片的有效半徑。 |
 
 ---
 
 ## 4. 動態屬性聯動規範
 
-雖然拒絕二次複雜 Scaling，但以下兩項基礎物理屬性具備直接的直覺幾何聯動：
+雖然拒絕二次複雜 Scaling，但以下基礎物理與防禦屬性具備直接的直覺幾何與受擊聯動：
 
 ### 4.1 體積與範圍縮放 (`area` -> 碰撞體與 AoE)
 - **碰撞體等比放大**：細胞多邊形碰撞半徑 $R = R_{\text{base}} \times \text{area}$。
@@ -120,3 +121,16 @@ public class Stat
 ### 4.2 游動速度 (`move_speed` -> 物理位移)
 - 玩家細胞在 `_PhysicsProcess` 中的基礎游動速度向量 $V = \text{InputDirection} \times \text{move_speed}$。
 - 當處於特定器官流體力學（如血流剪切、肺泡氣流）中時，環境流體向量直接與本體速度進行線性向量疊加。
+
+### 4.3 受擊結算管線 (Damage Resolution Pipeline)
+當玩家細胞受到病原體碰撞或飛行物傷害時，遵循四階段漏斗式順序判定：
+
+```mermaid
+flowchart TD
+    Hit["遭受病原體碰撞 / 技能傷害 (Incoming Hit)"] --> EvCheck{"1. 閃避判定 (Evasion Roll)<br>randf() < stats.evasion"}
+    EvCheck -- 成功 --> Evaded["【完全閃避 (EVADED)】<br>受到 0 傷害 · 胞膜流體變形水波紋"]
+    EvCheck -- 失敗 --> BlkCheck{"2. 格擋判定 (Block Roll)<br>randf() < stats.block"}
+    BlkCheck -- 成功 --> Blocked["【完全格擋 (BLOCKED)】<br>受到 0 傷害 · 糖萼屏障晶體偏轉"]
+    BlkCheck -- 失敗 --> ArmorDR["3. 護甲減傷 (Armor DR)<br>Damage * (1 - Armor / (Armor + 50))"]
+    ArmorDR --> HPLoss["4. 扣減生命 (HP Loss)<br>扣除生命耐久 · 若 HP <= 0 胞膜破裂陣亡"]
+```

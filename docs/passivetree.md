@@ -13,8 +13,8 @@
 ```mermaid
 flowchart TD
     subgraph StartingHubs [五大細胞獨立起點中心 (5 Distinct Starting Hubs)]
-        HUB_MAC["【巨噬起點中心】<br>(Macrophage Hub · 左上方)<br>體積 Area / 生命 HP / 護甲 Armor"]
-        HUB_CTL["【殺手 T 起點中心】<br>(CTL Hub · 右側)<br>移速 Speed / 暴擊 Crit / 穿透 Pierce"]
+        HUB_MAC["【巨噬起點中心】<br>(Macrophage Hub · 左上方)<br>體積 Area / 生命 HP / 護甲 Armor / 格擋 Block"]
+        HUB_CTL["【殺手 T 起點中心】<br>(CTL Hub · 右側)<br>移速 Speed / 暴擊 Crit / 穿透 Pierce / 閃避 Evasion"]
         HUB_NEU["【嗜中性球起點中心】<br>(Neutrophil Hub · 左側)<br>傷害 Might / 擊退 Knock / 自癒 Regen"]
         HUB_B["【B 細胞起點中心】<br>(B-Cell Hub · 右下方)<br>彈道數 Amount / 彈速 ProjSpd / CDR"]
         HUB_DC["【樹突狀起點中心】<br>(Dendritic Hub · 正上方)<br>拾取 Magnet / 持續 Duration / 冷卻 CDR"]
@@ -58,8 +58,8 @@ flowchart TD
 > 目前版本階段，天賦屬性設計嚴格遵守**「純粹、直觀、無複合二次縮放（No Scaling / No Cross-Attribute Conversion）」**原則。
 > - 🚫 **嚴禁屬性聯動轉化**（例如：「每 100 點生命增加 5% 傷害」、「將護甲折算為暴擊率」等一律不採用）。
 > - ✅ **嚴格採用標準雙軌基礎加成**：
->   - **純固定值 (Flat)**：如 `max_health +15`、`armor +2`、`amount +1`、`pierce +1`、`revival +1`。
->   - **純百分比 (Simple Percent)**：如 `might +5%`、`move_speed +5%`、`area +6%`、`cooldown_reduction +4%`。
+>   - **純固定值 (Flat)**：如 `max_health +15`、`armor +2`、`amount +1`、`pierce +1`。
+>   - **純百分比 (Simple Percent)**：如 `might +5%`、`move_speed +5%`、`area +6%`、`cooldown_reduction +4%`、`evasion +3%`、`block +4%`。
 > - 最終通用公式純粹透明：$\text{FinalStat} = (\text{Base} + \text{FlatBonus}) \times (1.0 + \text{PercentBonus})$。
 
 ### 節點稀有度分級表
@@ -80,17 +80,17 @@ flowchart TD
 ### 4.1 巨噬細胞起點中心 (Macrophage Starting Hub)
 - **色調**：暗紅褐與暖琥珀螢光。
 - **位置**：星盤左上方。
-- **專精純屬性**：`area`（體積/範圍）、`max_health`（生命上限）、`armor`（膜剛性減傷）、`knockback`（撞擊質量）。
+- **專精純屬性**：`area`（體積/範圍）、`max_health`（生命上限）、`armor`（膜剛性減傷）、`block`（糖萼格擋率）、`knockback`（撞擊質量）。
 
 ### 4.2 殺手 T 細胞起點中心 (CTL Starting Hub)
 - **色調**：冰藍色與銳利青綠螢光。
 - **位置**：星盤右側。
-- **專精純屬性**：`move_speed`（移動速度）、`crit_chance`（暴擊率）、`crit_damage`（暴擊傷害）、`pierce`（彈道穿透數）。
+- **專精純屬性**：`move_speed`（移動速度）、`crit_chance`（暴擊率）、`crit_damage`（暴擊傷害）、`pierce`（彈道穿透數）、`evasion`（流體閃避率）。
 
 ### 4.3 嗜中性球起點中心 (Neutrophil Starting Hub)
 - **色調**：烈焰橙與酸性亮黃螢光。
 - **位置**：星盤左側。
-- **專精純屬性**：`might`（傷害強度）、`knockback`（擊退力量）、`health_regen`（生命自癒）、`revival`（裂變復甦）。
+- **專精純屬性**：`might`（傷害強度）、`knockback`（擊退力量）、`health_regen`（生命自癒）、`armor`（膜剛性護甲）。
 
 ### 4.4 B 淋巴細胞起點中心 (B-Cell Starting Hub)
 - **色調**：深靛藍與電離紫螢光。
