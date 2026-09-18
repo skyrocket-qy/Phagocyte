@@ -343,21 +343,21 @@ TOAST_CELL_UNLOCKED,New Immune Cell Unlocked: %s!,已解锁全新免疫细胞：
 ACH_FIRST_DIGESTION_TITLE,First Phagocytosis,初次吞噬
 ACH_FIRST_DIGESTION_DESC,Engulf and digest your first pathogen.,在微观战场中成功接触包裹并消化第 1 隻病原体。
 ACH_ENGULF_20_TITLE,Phagocytosis Master,吞噬专家
-ACH_ENGULF_20_DESC,Digest 20 pathogens in a single run.,在单次战局中吞噬消化 20 隻入侵病原体。
+ACH_ENGULF_20_DESC,Digest 200 pathogens in a single run.,在单次战局中吞噬消化 200 隻入侵病原体。
 ACH_ENGULF_20_REWARD,Unlocks Killer T-Cell (CTL),解锁免疫细胞：杀手 T 细胞
 ACH_DEVOUR_50_TITLE,Phagocytic Storm,吞噬风暴
-ACH_DEVOUR_50_DESC,Devour 50 pathogens in a single run.,在单次战局中累计吞噬消化 50 隻入侵病原体。
+ACH_DEVOUR_50_DESC,Devour 500 pathogens in a single run.,在单次战局中累计吞噬消化 500 隻入侵病原体。
 ACH_DEVOUR_50_REWARD,Unlocks Neutrophil,解锁免疫细胞：嗜中性球
 ACH_REACH_LEVEL_5_TITLE,Clonal Differentiation,克隆分化
-ACH_REACH_LEVEL_5_DESC,Reach Level 5 in a single combat run.,在单次战斗中吸收充足 ATP 与经验并进化至等级 5。
+ACH_REACH_LEVEL_5_DESC,Reach Level 15 in a single combat run.,在单次战斗中吸收充足 ATP 与经验并进化至等级 15。
 ACH_REACH_LEVEL_5_REWARD,Unlocks B-Lymphocyte (B-Cell),解锁免疫细胞：B 淋巴细胞
 ACH_SURVIVE_180S_TITLE,Sustained Immunity,持久免疫
-ACH_SURVIVE_180S_DESC,Survive in the infected battlefield for 3 minutes (180s).,在剧烈感染的病理微环境中坚持存活超过 180 秒。
+ACH_SURVIVE_180S_DESC,Survive in the infected battlefield for 8 minutes (480s).,在剧烈感染的病理微环境中坚持存活超过 480 秒（8 分钟）。
 ACH_SURVIVE_180S_REWARD,Unlocks Dendritic Cell,解锁免疫细胞：树突状细胞
 ACH_GIANT_VOLUME_TITLE,Giant Phagocyte,多核巨细胞
 ACH_GIANT_VOLUME_DESC,Expand cell volume to 2.0x or greater through Area mutations.,透过范围强化突变使细胞体积膨胀达到原始大小的 2.0 倍以上。
 ACH_FULL_ARSENAL_TITLE,Metabolic Arsenal,基因武装
-ACH_FULL_ARSENAL_DESC,Equip 3 active skills simultaneously in a run.,在单次战局中同时激活装配 3 种主动生化武器。
+ACH_FULL_ARSENAL_DESC,Equip 5 active skills simultaneously in a run.,在单次战局中同时激活装配 5 种主动生化武器。
 SKILL_BAR_DUAL_TITLE,⚔️ Actives (5)  |  🧬 Passives (5),⚔️ 主动武器 (5)  |  🧬 被动特质 (5)
 BTN_SETTINGS,⚙️ Settings,⚙️ 系統設定
 SETTINGS_TITLE,⚙️ System Settings,⚙️ 系統設定
@@ -489,3 +489,7 @@ ACH_WOUND_HARD_CLEAR_REWARD,Unlocks the Endless Cytokine Storm endgame mode.,解
 MAP_LOCKED_HINT,UNLOCK REQUIRED,未解锁
 MAP_LOCKED_DEPLOY,This organ has not been unlocked yet. Clear the prerequisite map first.,此器官尚未解锁，请先通关前置地图。
 SCANNER_TARGET_LOCKED,TARGET LOCKED,目标未解锁
+ACH_FIRST_EVOLUTION_TITLE,First Epigenetic Fusion,首次表观融合
+ACH_FIRST_EVOLUTION_DESC,Fuse any one ultimate epigenetic evolution for the first time.,首次合成任意 1 组终极表观遗传超武。
+ACH_PRION_CLEARED_TITLE,Protein Scavenger: Crystal Shatter,蛋白清道夫：晶体粉碎
+ACH_PRION_CLEARED_DESC,Crush and digest one misfolded prion crystal.,击碎并消化 1 颗错误折叠朊病毒晶体。

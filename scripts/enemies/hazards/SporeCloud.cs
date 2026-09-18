@@ -25,7 +25,9 @@ public partial class SporeCloud : Area2D
 
         _circleShape = new CircleShape2D { Radius = 20.0f };
         _colShape = new CollisionShape2D { Shape = _circleShape };
-        AddChild(_colShape);
+        // Deferred: clouds are spawned from AreaEntered engulf callbacks, where the
+        // physics server is mid-flush and direct child additions are rejected.
+        CallDeferred(Node.MethodName.AddChild, _colShape);
     }
 
     public override void _PhysicsProcess(double delta)

@@ -59,7 +59,7 @@ public partial class AchievementManager : Node
             { "reward_key", "ACH_ENGULF_20_REWARD" },
             { "reward_cell", "ctl" },
             { "icon", "⚡" },
-            { "target_value", 20.0f },
+            { "target_value", 200.0f },
             { "stat_key", "digested" }
         }},
         { "ach_devour_50", new Godot.Collections.Dictionary {
@@ -69,7 +69,7 @@ public partial class AchievementManager : Node
             { "reward_key", "ACH_DEVOUR_50_REWARD" },
             { "reward_cell", "neutrophil" },
             { "icon", "🌪️" },
-            { "target_value", 50.0f },
+            { "target_value", 500.0f },
             { "stat_key", "digested" }
         }},
         { "ach_reach_level_5", new Godot.Collections.Dictionary {
@@ -79,7 +79,7 @@ public partial class AchievementManager : Node
             { "reward_key", "ACH_REACH_LEVEL_5_REWARD" },
             { "reward_cell", "b_cell" },
             { "icon", "🏹" },
-            { "target_value", 5.0f },
+            { "target_value", 15.0f },
             { "stat_key", "level" }
         }},
         { "ach_survive_180s", new Godot.Collections.Dictionary {
@@ -89,7 +89,7 @@ public partial class AchievementManager : Node
             { "reward_key", "ACH_SURVIVE_180S_REWARD" },
             { "reward_cell", "dendritic" },
             { "icon", "📍" },
-            { "target_value", 180.0f },
+            { "target_value", 480.0f },
             { "stat_key", "survival_time" }
         }},
         { "ach_giant_volume", new Godot.Collections.Dictionary {
@@ -109,8 +109,28 @@ public partial class AchievementManager : Node
             { "reward_key", "" },
             { "reward_cell", "" },
             { "icon", "🛡️" },
-            { "target_value", 3.0f },
+            { "target_value", 5.0f },
             { "stat_key", "active_skills" }
+        }},
+        { "ach_first_evolution", new Godot.Collections.Dictionary {
+            { "id", "ach_first_evolution" },
+            { "title_key", "ACH_FIRST_EVOLUTION_TITLE" },
+            { "desc_key", "ACH_FIRST_EVOLUTION_DESC" },
+            { "reward_key", "" },
+            { "reward_cell", "" },
+            { "icon", "🧬" },
+            { "target_value", 1.0f },
+            { "stat_key", "first_evolution" }
+        }},
+        { "ach_prion_cleared", new Godot.Collections.Dictionary {
+            { "id", "ach_prion_cleared" },
+            { "title_key", "ACH_PRION_CLEARED_TITLE" },
+            { "desc_key", "ACH_PRION_CLEARED_DESC" },
+            { "reward_key", "" },
+            { "reward_cell", "" },
+            { "icon", "💎" },
+            { "target_value", 1.0f },
+            { "stat_key", "prion_cleared" }
         }},
 
         // --- Organ map clear chain (docs/achievement.md §2 / docs/map.md §2) ---
@@ -206,7 +226,9 @@ public partial class AchievementManager : Node
         { "level", 1.0f },
         { "survival_time", 0.0f },
         { "radius_ratio", 1.0f },
-        { "active_skills", 1.0f }
+        { "active_skills", 1.0f },
+        { "first_evolution", 0.0f },
+        { "prion_cleared", 0.0f }
     };
 
     public AchievementManager()
@@ -289,7 +311,9 @@ public partial class AchievementManager : Node
     }
 
     /// <summary>
-    /// Record runtime in-game events and evaluate completion conditions
+    /// Record runtime in-game events and evaluate completion conditions.
+    /// Thresholds are read from the achievement catalog so tuning a target_value
+    /// never desynchronizes the tracker.
     /// </summary>
     public static void RecordEvent(string eventName, Variant value = default)
     {
@@ -298,42 +322,67 @@ public partial class AchievementManager : Node
             case "pathogen_digested":
                 float count = value.Obj != null ? value.AsSingle() : (ProgressData.GetValueOrDefault("digested", 0.0f).AsSingle() + 1.0f);
                 ProgressData["digested"] = Mathf.Max(ProgressData.GetValueOrDefault("digested", 0.0f).AsSingle(), count);
-                if (ProgressData["digested"].AsSingle() >= 1.0f)
-                    Unlock("ach_first_digestion");
-                if (ProgressData["digested"].AsSingle() >= 20.0f)
-                    Unlock("ach_engulf_20");
-                if (ProgressData["digested"].AsSingle() >= 50.0f)
-                    Unlock("ach_devour_50");
+                EvaluateThreshold("ach_first_digestion");
+                EvaluateThreshold("ach_engulf_20");
+                EvaluateThreshold("ach_devour_50");
                 break;
 
             case "level_up":
                 float lvl = value.Obj != null ? value.AsSingle() : 1.0f;
                 ProgressData["level"] = Mathf.Max(ProgressData.GetValueOrDefault("level", 1.0f).AsSingle(), lvl);
-                if (ProgressData["level"].AsSingle() >= 5.0f)
-                    Unlock("ach_reach_level_5");
+                EvaluateThreshold("ach_reach_level_5");
                 break;
 
             case "survival_time":
                 float st = value.Obj != null ? value.AsSingle() : 0.0f;
                 ProgressData["survival_time"] = Mathf.Max(ProgressData.GetValueOrDefault("survival_time", 0.0f).AsSingle(), st);
-                if (ProgressData["survival_time"].AsSingle() >= 180.0f)
-                    Unlock("ach_survive_180s");
+                EvaluateThreshold("ach_survive_180s");
                 break;
 
             case "radius_ratio":
                 float rr = value.Obj != null ? value.AsSingle() : 1.0f;
                 ProgressData["radius_ratio"] = Mathf.Max(ProgressData.GetValueOrDefault("radius_ratio", 1.0f).AsSingle(), rr);
-                if (ProgressData["radius_ratio"].AsSingle() >= 2.0f)
-                    Unlock("ach_giant_volume");
+                EvaluateThreshold("ach_giant_volume");
                 break;
 
             case "active_skills_count":
                 float cnt = value.Obj != null ? value.AsSingle() : 1.0f;
                 ProgressData["active_skills"] = Mathf.Max(ProgressData.GetValueOrDefault("active_skills", 1.0f).AsSingle(), cnt);
-                if (ProgressData["active_skills"].AsSingle() >= 3.0f)
-                    Unlock("ach_full_arsenal");
+                EvaluateThreshold("ach_full_arsenal");
+                break;
+
+            case "first_evolution":
+                ProgressData["first_evolution"] = 1.0f;
+                Unlock("ach_first_evolution");
+                break;
+
+            case "pathogen_killed":
+                // PrPsc amyloid crystals (regular prion aggregate or the map-5 terminal boss)
+                string enemyId = value.Obj != null ? value.AsString() : "";
+                if (enemyId == "prion" || enemyId == "prpsc_amyloid_aggregate")
+                {
+                    ProgressData["prion_cleared"] = 1.0f;
+                    Unlock("ach_prion_cleared");
+                }
                 break;
         }
+    }
+
+    /// <summary>
+    /// Unlocks an achievement once its tracked stat reaches the catalog target.
+    /// </summary>
+    private static void EvaluateThreshold(string achId)
+    {
+        if (!Achievements.ContainsKey(achId))
+            return;
+
+        var raw = Achievements[achId].AsGodotDictionary();
+        string statKey = raw.GetValueOrDefault("stat_key", "").AsString();
+        float target = raw.GetValueOrDefault("target_value", 1.0f).AsSingle();
+        float current = ProgressData.GetValueOrDefault(statKey, 0.0f).AsSingle();
+
+        if (current >= target)
+            Unlock(achId);
     }
 
     /// <summary>
@@ -619,7 +668,9 @@ public partial class AchievementManager : Node
             { "level", 1.0f },
             { "survival_time", 0.0f },
             { "radius_ratio", 1.0f },
-            { "active_skills", 1.0f }
+            { "active_skills", 1.0f },
+            { "first_evolution", 0.0f },
+            { "prion_cleared", 0.0f }
         };
         SyncUnlockedClasses();
         SyncMapUnlocks();

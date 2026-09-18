@@ -190,7 +190,7 @@
   - 在 `HoloBodyScanner.cs` 中增加未解鎖器官的暗化濾鏡、鎖頭圖示與未解鎖 HUD 提示。
   - 在 `MainMenu.cs` 選關面板中，鎖定地圖顯示前置解鎖成就要求，禁用「出戰 (Deploy)」按鈕。
   - **影響檔案**：`scripts/ui/HoloBodyScanner.cs`, `scripts/ui/MainMenu.cs`
-- [ ] **[P1] 校準現有角色與技能解鎖成就指標**：
+- [x] **[P1] 校準現有角色與技能解鎖成就指標**：
   - `ach_engulf_20`：單局吞噬修正為 **200 隻**（解鎖殺手 T 細胞及【穿孔素長矛】）。
   - `ach_devour_50`：單局吞噬修正為 **500 隻**（解鎖嗜中性球及【顆粒酶殉爆】）。
   - `ach_reach_level_5`：單局等級修正為 **Lv.15**（解鎖 B 淋巴細胞及【Y 型抗體齊射】）。

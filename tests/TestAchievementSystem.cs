@@ -79,8 +79,19 @@ public partial class TestAchievementSystem : SceneTree
                 GD.Print("[PASS] Step 2: Locked cells' signature skills are completely excluded from upgrade pool.");
 
                 // --- Step 3: Event-Driven Achievement Unlocks & Cell Rewards ---
-                // Test 3a: Digestion 20 -> Unlocks CTL and Perforin Lance
-                AchievementManager.RecordEvent("pathogen_digested", 20);
+                // Calibrated thresholds: sub-threshold values must stay locked
+                AchievementManager.RecordEvent("pathogen_digested", 199);
+                AssertThat(AchievementManager.IsUnlocked("ach_engulf_20")).IsFalse();
+                AchievementManager.RecordEvent("level_up", 14);
+                AssertThat(AchievementManager.IsUnlocked("ach_reach_level_5")).IsFalse();
+                AchievementManager.RecordEvent("survival_time", 479.0f);
+                AssertThat(AchievementManager.IsUnlocked("ach_survive_180s")).IsFalse();
+                AchievementManager.RecordEvent("active_skills_count", 4);
+                AssertThat(AchievementManager.IsUnlocked("ach_full_arsenal")).IsFalse();
+                GD.Print("[PASS] Step 3: Calibrated thresholds reject sub-threshold progress.");
+
+                // Test 3a: Digestion 200 -> Unlocks CTL and Perforin Lance
+                AchievementManager.RecordEvent("pathogen_digested", 200);
                 AssertThat(AchievementManager.IsUnlocked("ach_first_digestion")).IsTrue();
                 AssertThat(AchievementManager.IsUnlocked("ach_engulf_20")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("ctl")).IsTrue();
@@ -103,23 +114,42 @@ public partial class TestAchievementSystem : SceneTree
                 AssertThat(sawPerforin).IsTrue();
                 GD.Print("[PASS] Step 3a: Engulf 20 unlocks CTL and adds Perforin Lance to upgrade pool.");
 
-                // Test 3b: Devour 50 -> Unlocks Neutrophil
-                AchievementManager.RecordEvent("pathogen_digested", 50);
+                // Test 3b: Devour 500 -> Unlocks Neutrophil
+                AchievementManager.RecordEvent("pathogen_digested", 500);
                 AssertThat(AchievementManager.IsUnlocked("ach_devour_50")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsTrue();
-                GD.Print("[PASS] Step 3b: Devouring 50 pathogens unlocks Neutrophil.");
+                GD.Print("[PASS] Step 3b: Devouring 500 pathogens unlocks Neutrophil.");
 
-                // Test 3c: Level 5 -> Unlocks B-Cell
-                AchievementManager.RecordEvent("level_up", 5);
+                // Test 3c: Level 15 -> Unlocks B-Cell
+                AchievementManager.RecordEvent("level_up", 15);
                 AssertThat(AchievementManager.IsUnlocked("ach_reach_level_5")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("b_cell")).IsTrue();
-                GD.Print("[PASS] Step 3c: Level 5 unlocks B-Cell.");
+                GD.Print("[PASS] Step 3c: Level 15 unlocks B-Cell.");
 
-                // Test 3d: Survival 180s -> Unlocks Dendritic Cell
-                AchievementManager.RecordEvent("survival_time", 185.0f);
+                // Test 3d: Survival 480s -> Unlocks Dendritic Cell
+                AchievementManager.RecordEvent("survival_time", 485.0f);
                 AssertThat(AchievementManager.IsUnlocked("ach_survive_180s")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("dendritic")).IsTrue();
-                GD.Print("[PASS] Step 3d: Survival 180s unlocks Dendritic Cell.");
+                GD.Print("[PASS] Step 3d: Survival 480s unlocks Dendritic Cell.");
+
+                // Test 3e: Full 5-active loadout -> Metabolic Arsenal
+                AchievementManager.RecordEvent("active_skills_count", 5);
+                AssertThat(AchievementManager.IsUnlocked("ach_full_arsenal")).IsTrue();
+                GD.Print("[PASS] Step 3e: Five simultaneous active skills unlock Metabolic Arsenal.");
+
+                // Test 3f: First ultimate epigenetic fusion
+                AssertThat(AchievementManager.IsUnlocked("ach_first_evolution")).IsFalse();
+                AchievementManager.RecordEvent("first_evolution");
+                AssertThat(AchievementManager.IsUnlocked("ach_first_evolution")).IsTrue();
+                GD.Print("[PASS] Step 3f: First epigenetic evolution fusion recorded.");
+
+                // Test 3g: PrPsc amyloid crystal shattered (non-prion kills must not count)
+                AssertThat(AchievementManager.IsUnlocked("ach_prion_cleared")).IsFalse();
+                AchievementManager.RecordEvent("pathogen_killed", "tachyzoite");
+                AssertThat(AchievementManager.IsUnlocked("ach_prion_cleared")).IsFalse();
+                AchievementManager.RecordEvent("pathogen_killed", "prpsc_amyloid_aggregate");
+                AssertThat(AchievementManager.IsUnlocked("ach_prion_cleared")).IsTrue();
+                GD.Print("[PASS] Step 3g: Shattering a PrPsc amyloid crystal unlocks Protein Scavenger.");
 
                 mockPlayer.QueueFree();
 
@@ -133,6 +163,9 @@ public partial class TestAchievementSystem : SceneTree
                 AssertThat(AchievementManager.IsUnlocked("ach_devour_50")).IsTrue();
                 AssertThat(AchievementManager.IsUnlocked("ach_reach_level_5")).IsTrue();
                 AssertThat(AchievementManager.IsUnlocked("ach_survive_180s")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("ach_full_arsenal")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("ach_first_evolution")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("ach_prion_cleared")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("ctl")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("b_cell")).IsTrue();
