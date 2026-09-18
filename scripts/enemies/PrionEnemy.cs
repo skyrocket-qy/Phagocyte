@@ -21,6 +21,7 @@ public partial class PrionEnemy : BaseEnemy
         CurrentHealth = 150.0f;
         Armor = 4.0f;
         AtpValue = 60.0f;
+        BaseScore = 100;
         FloatSpeed = 30.0f;
         IsBoss = true;
     }

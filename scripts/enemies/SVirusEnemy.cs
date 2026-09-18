@@ -20,6 +20,7 @@ public partial class SVirusEnemy : BaseEnemy
         MaxHealth = 22.0f;
         CurrentHealth = 22.0f;
         AtpValue = 10.0f;
+        BaseScore = 15;
         FloatSpeed = 38.0f;
     }
 

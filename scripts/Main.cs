@@ -26,7 +26,26 @@ public partial class Main : Node2D
     // Kill-Driven Dynamic Backfill (Section 4.2)
     public int ActiveScreenCap => SwarmWindowTimer > 0.0f ? ScreenCapSwarm : ScreenCapNormal;
     public float SwarmWindowTimer { get; private set; } = 0.0f;
-    public int ActivePathogenCount => EnemyContainer?.GetChildCount() ?? 0;
+
+    /// <summary>
+    /// Live pathogen count only (hazards, telegraphs and FX nodes never consume screen-cap slots).
+    /// </summary>
+    public int ActivePathogenCount
+    {
+        get
+        {
+            if (EnemyContainer == null)
+                return 0;
+
+            int count = 0;
+            foreach (var child in EnemyContainer.GetChildren())
+            {
+                if (child is BaseEnemy)
+                    count++;
+            }
+            return count;
+        }
+    }
 
     // Wave Director state (3-minute escalation loop)
     public bool EliteRaidTriggered { get; private set; } = false;

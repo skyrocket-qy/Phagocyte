@@ -15,6 +15,12 @@ public partial class CandidaEnemy : BaseEnemy
 
     public override bool CanBeEngulfed => !_hyphaeExtended;
 
+    public const float AmbushRange = 200.0f;
+    public const float HyphaeReach = 150.0f;
+    private const float HyphaeChannelTime = 1.6f;
+
+    public bool IsHyphaeExtended => _hyphaeExtended;
+
     public CandidaEnemy()
     {
         EnemyId = "candida";
@@ -22,10 +28,25 @@ public partial class CandidaEnemy : BaseEnemy
         MaxHealth = 45.0f;
         CurrentHealth = 45.0f;
         AtpValue = 24.0f;
+        BaseScore = 35;
         FloatSpeed = 32.0f;
     }
 
     protected override float GetCollisionRadius() => 16.0f;
+
+    /// <summary>
+    /// The yeast body freezes in place while it channels its piercing pseudohyphae.
+    /// </summary>
+    protected override void HandleBrownianDrift(float dt)
+    {
+        if (_hyphaeExtended)
+        {
+            Velocity = Vector2.Zero;
+            return;
+        }
+
+        base.HandleBrownianDrift(dt);
+    }
 
     protected override void CustomPhysicsProcess(float dt)
     {
@@ -33,7 +54,7 @@ public partial class CandidaEnemy : BaseEnemy
         if (player != null && GodotObject.IsInstanceValid(player))
         {
             float dist = GlobalPosition.DistanceTo(player.GlobalPosition);
-            if (dist < 120.0f && !_hyphaeExtended)
+            if (dist < AmbushRange && !_hyphaeExtended)
             {
                 ExtendHyphae(player.GlobalPosition);
             }
@@ -52,10 +73,10 @@ public partial class CandidaEnemy : BaseEnemy
     public void ExtendHyphae(Vector2? targetPos = null)
     {
         _hyphaeExtended = true;
-        _hyphaeTimer = 3.5f;
+        _hyphaeTimer = HyphaeChannelTime;
         QueueRedraw();
 
-        Vector2 aim = targetPos ?? (GlobalPosition + Vector2.Right * 100.0f);
+        Vector2 aim = targetPos ?? (GlobalPosition + Vector2.Right * HyphaeReach);
         SpawnHyphaeTelegraph(aim);
     }
 
@@ -72,8 +93,8 @@ public partial class CandidaEnemy : BaseEnemy
             Shape = Phagocyte.Combat.TelegraphAttackShape.Line,
             GlobalPosition = GlobalPosition,
             TargetDirection = dir,
-            LineLength = 140.0f,
-            LineWidth = 36.0f,
+            LineLength = HyphaeReach,
+            LineWidth = 30.0f,
             TelegraphDuration = 0.9f,
             Damage = 18.0f,
             SourceEnemy = this

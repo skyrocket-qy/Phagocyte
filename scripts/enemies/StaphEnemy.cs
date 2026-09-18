@@ -20,6 +20,7 @@ public partial class StaphEnemy : BaseEnemy
         MaxHealth = 25.0f;
         CurrentHealth = 25.0f;
         AtpValue = 12.0f;
+        BaseScore = 15;
         FloatSpeed = 35.0f;
         FibrinShield = 0; // Default 0 for basic coccus; cluster spawns set FibrinShield = 1
     }

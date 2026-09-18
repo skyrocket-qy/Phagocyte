@@ -23,6 +23,7 @@ public abstract partial class BaseEnemy : Node2D
     [Export] public float Armor { get; set; } = 0.0f;
     [Export] public int FibrinShield { get; set; } = 0;
     [Export] public float AtpValue { get; set; } = 12.0f;
+    [Export] public int BaseScore { get; set; } = 15;
     [Export] public float FloatSpeed { get; set; } = 35.0f;
     [Export] public float DriftFrequency { get; set; } = 1.2f;
     [Export] public bool IsElite { get; set; } = false;
@@ -338,6 +339,8 @@ public abstract partial class BaseEnemy : Node2D
     // Compatibility methods for duck-typing
     public float GetAtpValue() => AtpValue;
     public float get_atp_value() => AtpValue;
+    public int GetBaseScore() => BaseScore;
+    public int get_base_score() => BaseScore;
     public void be_engulfed(Node2D? predator) => BeEngulfed(predator);
     public void take_damage(float damage, Node2D? source = null) => TakeDamage(damage, source, false);
     public void take_damage(float damage, Node2D? source, bool isCrit) => TakeDamage(damage, source, isCrit);

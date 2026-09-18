@@ -12,6 +12,11 @@ namespace Phagocyte.Enemies;
 /// </summary>
 public abstract partial class SubBossEnemy : BaseEnemy
 {
+    protected SubBossEnemy()
+    {
+        BaseScore = 600;
+    }
+
     public override bool CanBeEngulfed => false;
 
     protected virtual float ContactDamage => 16.0f;
@@ -650,6 +655,7 @@ public partial class Tachyzoite : BaseEnemy
         MaxHealth = 8.0f;
         CurrentHealth = 8.0f;
         AtpValue = 3.0f;
+        BaseScore = 5;
         FloatSpeed = 320.0f;
     }
 

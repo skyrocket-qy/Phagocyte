@@ -17,6 +17,7 @@ public partial class TbEnemy : BaseEnemy
         MaxHealth = 35.0f;
         CurrentHealth = 35.0f;
         AtpValue = 18.0f;
+        BaseScore = 100;
         FloatSpeed = 30.0f;
         Armor = 2.0f; // Mycolic wax absorbs damage
     }

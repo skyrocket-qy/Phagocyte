@@ -19,6 +19,7 @@ public partial class HivEnemy : BaseEnemy
         MaxHealth = 24.0f;
         CurrentHealth = 24.0f;
         AtpValue = 14.0f;
+        BaseScore = 35;
         FloatSpeed = 48.0f;
     }
 

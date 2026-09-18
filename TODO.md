@@ -125,7 +125,7 @@
   - [x] 地圖 5：**錯誤折疊朊病毒晶體 (PrPsc Amyloid Aggregate)**：極高護甲結晶外殼，需破膜擊碎。
   - 整合 `BossPhaseComponent.cs` 多階段血量轉換、狂暴倒數與地面危險預警 (`TelegraphedAttack`)。
   - **影響檔案**：新增 `scripts/enemies/bosses/TerminalBosses.cs`, `scripts/combat/BossPhaseComponent.cs`
-- [ ] **[P1] 病原體固定基礎積分 (BaseScore) 注入** (`docs/record.md`)：
+- [x] **[P1] 病原體固定基礎積分 (BaseScore) 注入** (`docs/record.md`)：
   - 在 `BaseEnemy.cs` 中增加 `BaseScore` 屬性：
     - 微型蜂擁群 (諾羅病毒、瘧疾裂殖子)：`5` 分
     - 標準病原體 (大腸桿菌、冠狀病毒、葡萄球菌)：`15` 分
@@ -134,7 +134,7 @@
     - 次級領主 (09:00 Sub-Boss)：`600` 分
     - 終末原發 Boss (15:00 Terminal Boss)：`3,000` 分
   - **影響檔案**：`scripts/enemies/BaseEnemy.cs`, `scripts/enemies/*.cs`
-- [ ] **[P1] 特殊 AI 行為細節精修**：
+- [x] **[P1] 特殊 AI 行為細節精修**：
   - 炭疽芽孢二階段破殼復甦機制 (`anthrax_spore` 受到 50% 傷害後破殼化為狂暴桿菌)。
   - 白色念珠菌接近玩家時本體定格伸展 $150\text{px}$ 尖銳假菌絲穿刺。
   - 異變癌細胞存活超過 20 秒自主週期複製分裂出半血子細胞。

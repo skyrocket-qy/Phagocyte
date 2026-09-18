@@ -20,6 +20,7 @@ public partial class TetanusEnemy : BaseEnemy
         MaxHealth = 30.0f;
         CurrentHealth = 30.0f;
         AtpValue = 20.0f;
+        BaseScore = 35;
         FloatSpeed = 35.0f;
     }
 

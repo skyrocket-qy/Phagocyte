@@ -18,6 +18,7 @@ public partial class PseudomonasEnemy : BaseEnemy
         MaxHealth = 30.0f;
         CurrentHealth = 30.0f;
         AtpValue = 14.0f;
+        BaseScore = 35;
         FloatSpeed = 42.0f;
     }
 

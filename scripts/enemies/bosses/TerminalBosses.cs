@@ -13,6 +13,11 @@ namespace Phagocyte.Enemies;
 /// </summary>
 public abstract partial class TerminalBossEnemy : BaseEnemy
 {
+    protected TerminalBossEnemy()
+    {
+        BaseScore = 3000;
+    }
+
     public override bool CanBeEngulfed => false;
 
     protected virtual float ContactDamage => 26.0f;
@@ -151,6 +156,7 @@ public partial class MrsaEnragedElite : BaseEnemy
         MaxHealth = 140.0f;
         CurrentHealth = 140.0f;
         AtpValue = 40.0f;
+        BaseScore = 35;
         FloatSpeed = 72.0f;
         Armor = 4.0f;
         IsElite = true;

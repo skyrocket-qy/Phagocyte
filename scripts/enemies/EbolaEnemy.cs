@@ -22,6 +22,7 @@ public partial class EbolaEnemy : BaseEnemy
         MaxHealth = 42.0f;
         CurrentHealth = 42.0f;
         AtpValue = 24.0f;
+        BaseScore = 35;
         FloatSpeed = 38.0f;
     }
 

@@ -21,6 +21,7 @@ public partial class FluDriftEnemy : BaseEnemy
         MaxHealth = 65.0f;
         CurrentHealth = 65.0f;
         AtpValue = 26.0f;
+        BaseScore = 100;
         FloatSpeed = 42.0f;
         IsElite = true;
     }

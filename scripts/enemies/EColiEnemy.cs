@@ -24,6 +24,7 @@ public partial class EColiEnemy : BaseEnemy
         MaxHealth = 28.0f;
         CurrentHealth = 28.0f;
         AtpValue = 15.0f;
+        BaseScore = 15;
         FloatSpeed = 45.0f;
     }
 

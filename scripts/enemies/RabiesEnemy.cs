@@ -21,6 +21,7 @@ public partial class RabiesEnemy : BaseEnemy
         MaxHealth = 22.0f;
         CurrentHealth = 22.0f;
         AtpValue = 16.0f;
+        BaseScore = 35;
         FloatSpeed = 65.0f;
     }
 

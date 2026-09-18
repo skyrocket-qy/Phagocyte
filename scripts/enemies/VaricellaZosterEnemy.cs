@@ -19,6 +19,7 @@ public partial class VaricellaZosterEnemy : BaseEnemy
         MaxHealth = 26.0f;
         CurrentHealth = 26.0f;
         AtpValue = 18.0f;
+        BaseScore = 15;
         FloatSpeed = 35.0f;
     }
 

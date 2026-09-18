@@ -18,6 +18,7 @@ public partial class HpyloriEnemy : BaseEnemy
         MaxHealth = 32.0f;
         CurrentHealth = 32.0f;
         AtpValue = 16.0f;
+        BaseScore = 35;
         FloatSpeed = 58.0f;
         Armor = 1.0f;
     }

@@ -17,6 +17,7 @@ public partial class PlasmodiumMerozoite : BaseEnemy
         MaxHealth = 10.0f;
         CurrentHealth = 10.0f;
         AtpValue = 4.0f;
+        BaseScore = 5;
         FloatSpeed = 85.0f;
     }
 

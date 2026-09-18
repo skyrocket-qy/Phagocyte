@@ -16,6 +16,7 @@ public partial class AspergillusEnemy : BaseEnemy
         MaxHealth = 38.0f;
         CurrentHealth = 38.0f;
         AtpValue = 22.0f;
+        BaseScore = 15;
         FloatSpeed = 28.0f;
     }
 

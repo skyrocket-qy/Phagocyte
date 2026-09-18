@@ -21,6 +21,7 @@ public partial class ToxoplasmaEnemy : BaseEnemy
         MaxHealth = 40.0f;
         CurrentHealth = 40.0f;
         AtpValue = 25.0f;
+        BaseScore = 35;
         FloatSpeed = 32.0f;
     }
 

@@ -19,6 +19,7 @@ public partial class PrionFragment : BaseEnemy
         MaxHealth = 25.0f;
         CurrentHealth = 25.0f;
         AtpValue = 18.0f;
+        BaseScore = 5;
         FloatSpeed = 50.0f;
     }
 

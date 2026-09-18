@@ -9,7 +9,20 @@ namespace Phagocyte.Enemies;
 /// </summary>
 public partial class MalignantCellEnemy : BaseEnemy
 {
+    /// <summary>Autonomous mitosis cadence: split once every 20 seconds survived.</summary>
+    public const float MitosisInterval = 20.0f;
+
+    /// <summary>Density gate: stop replicating when this many malignant cells are nearby.</summary>
+    public const int MaxNearbySiblings = 5;
+
+    public const float SplitHealthRatio = 0.5f;
+    public const float SiblingCheckRadius = 450.0f;
+
+    public int SplitCount { get; private set; }
+
     private float _membranePhase = 0.0f;
+    private float _mitosisTimer = 0.0f;
+    private float _splitPulse = 0.0f;
 
     public MalignantCellEnemy()
     {
@@ -18,6 +31,7 @@ public partial class MalignantCellEnemy : BaseEnemy
         MaxHealth = 120.0f;
         CurrentHealth = 120.0f;
         AtpValue = 48.0f;
+        BaseScore = 100;
         FloatSpeed = 26.0f;
         Armor = 3.0f;
         IsElite = true;
@@ -28,7 +42,58 @@ public partial class MalignantCellEnemy : BaseEnemy
     protected override void CustomPhysicsProcess(float dt)
     {
         _membranePhase += dt * 3.5f;
+        _splitPulse = Mathf.Max(0.0f, _splitPulse - dt);
+
+        _mitosisTimer += dt;
+        if (_mitosisTimer >= MitosisInterval)
+        {
+            _mitosisTimer -= MitosisInterval;
+            TryMitosis();
+        }
+
         QueueRedraw();
+    }
+
+    /// <summary>
+    /// Autonomous mitosis: spawns one half-HP daughter cell in place, unless the local
+    /// malignant-cell density is already saturated (contact inhibition of proliferation).
+    /// </summary>
+    public bool TryMitosis()
+    {
+        if (CountNearbySiblings() >= MaxNearbySiblings)
+            return false;
+
+        var parent = GetParent();
+        if (parent == null)
+            return false;
+
+        Vector2 offset = Vector2.FromAngle(GD.Randf() * Mathf.Tau) * (float)GD.RandRange(34.0, 52.0);
+        var daughter = new MalignantCellEnemy
+        {
+            GlobalPosition = GlobalPosition + offset
+        };
+        daughter.MaxHealth = MaxHealth * SplitHealthRatio;
+        daughter.CurrentHealth = daughter.MaxHealth;
+        parent.AddChild(daughter);
+
+        SplitCount++;
+        _splitPulse = 0.45f;
+        QueueRedraw();
+        return true;
+    }
+
+    private int CountNearbySiblings()
+    {
+        int count = 0;
+        foreach (var node in GetTree().GetNodesInGroup("pathogens"))
+        {
+            if (node is MalignantCellEnemy sibling && sibling != this && GodotObject.IsInstanceValid(sibling))
+            {
+                if (GlobalPosition.DistanceTo(sibling.GlobalPosition) <= SiblingCheckRadius)
+                    count++;
+            }
+        }
+        return count;
     }
 
     public override void _Draw()
@@ -69,6 +134,14 @@ public partial class MalignantCellEnemy : BaseEnemy
         {
             DrawCircle(np, 9.0f, nucleusCol);
             DrawCircle(np, 5.5f, chromatinCol);
+        }
+
+        // 3. Mitosis flash ring when a daughter cell is released
+        if (_splitPulse > 0.0f)
+        {
+            float t = 1.0f - (_splitPulse / 0.45f);
+            DrawArc(Vector2.Zero, 32.0f + t * 26.0f, 0.0f, Mathf.Tau, 32,
+                new Color(0.9f, 0.3f, 0.5f, 1.0f - t), 3.5f);
         }
     }
 }

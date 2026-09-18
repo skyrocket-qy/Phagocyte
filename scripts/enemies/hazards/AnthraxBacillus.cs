@@ -17,10 +17,14 @@ public partial class AnthraxBacillus : BaseEnemy
         MaxHealth = 35.0f;
         CurrentHealth = 35.0f;
         AtpValue = 22.0f;
+        BaseScore = 100;
         FloatSpeed = 70.0f;
     }
 
     protected override float GetCollisionRadius() => 14.0f;
+
+    /// <summary>Damage multiplier applied to the toxin telegraph (berserk awakening = 1.5x).</summary>
+    [Export] public float DamageMultiplier { get; set; } = 1.0f;
 
     private float _toxinTimer = 2.0f;
 
@@ -53,7 +57,7 @@ public partial class AnthraxBacillus : BaseEnemy
             GlobalPosition = targetPos,
             Radius = 70.0f,
             TelegraphDuration = 1.1f,
-            Damage = 22.0f,
+            Damage = 22.0f * DamageMultiplier,
             SourceEnemy = this
         };
         parent.AddChild(attack);
