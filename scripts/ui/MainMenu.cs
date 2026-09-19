@@ -66,6 +66,7 @@ public partial class MainMenu : Control
     public HoloBodyScanner? HoloScanner { get; set; }
     public Button? DeployBtn { get; set; }
     public Button? EndlessBtn { get; set; }
+    public OptionButton? DifficultyToggle { get; set; }
     public Button? MapBackBtn { get; set; }
 
     public string ActiveClassKey { get; set; } = "macrophage";
@@ -156,6 +157,22 @@ public partial class MainMenu : Control
             };
             deployRow.AddChild(EndlessBtn);
             deployRow.MoveChild(EndlessBtn, DeployBtn.GetIndex() + 1);
+        }
+
+        // Dual-track difficulty toggle (docs/map.md §2): Normal vs Hard (急性危象),
+        // unlocked per organ by clearing the prerequisite map on Normal.
+        if (DeployBtn != null && DeployBtn.GetParent() is Container difficultyRow)
+        {
+            DifficultyToggle = new OptionButton
+            {
+                Name = "DifficultyToggle",
+                CustomMinimumSize = new Vector2(170, 40)
+            };
+            DifficultyToggle.AddItem("", 0);
+            DifficultyToggle.AddItem("", 1);
+            DifficultyToggle.ItemSelected += OnDifficultySelected;
+            difficultyRow.AddChild(DifficultyToggle);
+            difficultyRow.MoveChild(DifficultyToggle, DeployBtn.GetIndex());
         }
 
         // Pre-run affliction setup for the endless overdrive (docs/endgame.md §4).
@@ -279,6 +296,12 @@ public partial class MainMenu : Control
         if (MapHeaderLbl != null) MapHeaderLbl.Text = Tr("HEADER_SELECT_MAP");
         if (MapBackBtn != null) MapBackBtn.Text = Tr("BTN_BACK_PASSIVE");
         if (DeployBtn != null) DeployBtn.Text = Tr("BTN_DEPLOY");
+        if (DifficultyToggle != null)
+        {
+            DifficultyToggle.SetItemText(0, Tr("DIFFICULTY_NORMAL"));
+            DifficultyToggle.SetItemText(1, Tr("DIFFICULTY_HARD"));
+            RefreshDifficultyToggle();
+        }
         if (EndlessBtn != null)
         {
             EndlessBtn.Text = Tr("BTN_ENDLESS");
@@ -571,6 +594,7 @@ public partial class MainMenu : Control
         }
 
         UpdateEndlessAvailability();
+        RefreshDifficultyToggle();
 
         if (MapListContainer != null)
         {
@@ -598,7 +622,46 @@ public partial class MainMenu : Control
         }
 
         GameManager.SelectedMap = ActiveMapKey;
+        GameManager.SelectedDifficulty = DifficultyToggle != null && DifficultyToggle.Selected == 1
+            ? RunRecordManager.DifficultyHard
+            : RunRecordManager.DifficultyNormal;
         GameManager.StartGame(GetTree());
+    }
+
+    /// <summary>
+    /// Hard (Acute Crisis) is per-organ: selectable only once the prerequisite
+    /// map has been cleared on Normal (docs/map.md §2).
+    /// </summary>
+    private void RefreshDifficultyToggle()
+    {
+        if (DifficultyToggle == null)
+            return;
+
+        bool hardUnlocked = GameManager.IsMapHardUnlocked(ActiveMapKey);
+        DifficultyToggle.SetItemDisabled(1, !hardUnlocked);
+
+        if (!hardUnlocked && GameManager.SelectedDifficulty == RunRecordManager.DifficultyHard)
+            GameManager.SelectedDifficulty = RunRecordManager.DifficultyNormal;
+
+        bool hardSelected = hardUnlocked
+            && GameManager.SelectedDifficulty == RunRecordManager.DifficultyHard;
+        DifficultyToggle.Selected = hardSelected ? 1 : 0;
+        DifficultyToggle.TooltipText = hardUnlocked ? "" : Tr("HARD_LOCKED_HINT");
+    }
+
+    private void OnDifficultySelected(long index)
+    {
+        if (index == 1 && !GameManager.IsMapHardUnlocked(ActiveMapKey))
+        {
+            if (DifficultyToggle != null)
+                DifficultyToggle.Selected = 0;
+            GameManager.SelectedDifficulty = RunRecordManager.DifficultyNormal;
+            return;
+        }
+
+        GameManager.SelectedDifficulty = index == 1
+            ? RunRecordManager.DifficultyHard
+            : RunRecordManager.DifficultyNormal;
     }
 
     /// <summary>

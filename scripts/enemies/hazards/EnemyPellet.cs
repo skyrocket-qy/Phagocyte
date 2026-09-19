@@ -80,7 +80,8 @@ public partial class EnemyPellet : Area2D
     }
 
     /// <summary>
-    /// Senescent RBCs and toxin vesicles act as drifting cover and absorb enemy pellets.
+    /// Senescent RBCs, toxin vesicles and fibrin clots act as drifting cover and
+    /// absorb enemy pellets. Cover nodes may expose a BlockRadius/CollisionRadius.
     /// </summary>
     private bool BlockedByNeutralMatter()
     {
@@ -88,14 +89,26 @@ public partial class EnemyPellet : Area2D
         if (neutrals.Count == 0)
             return false;
 
-        const float blockRadiusSq = 26.0f * 26.0f;
         foreach (var node in neutrals)
         {
-            if (node is Node2D neutral && GodotObject.IsInstanceValid(neutral)
-                && GlobalPosition.DistanceSquaredTo(neutral.GlobalPosition) <= blockRadiusSq)
+            if (node is not Node2D neutral || !GodotObject.IsInstanceValid(neutral))
+                continue;
+
+            float blockRadius = 26.0f;
+            var blockValue = neutral.Get("BlockRadius");
+            if (blockValue.VariantType == Variant.Type.Float)
             {
-                return true;
+                blockRadius = blockValue.AsSingle();
             }
+            else
+            {
+                var collisionValue = neutral.Get("CollisionRadius");
+                if (collisionValue.VariantType == Variant.Type.Float)
+                    blockRadius = collisionValue.AsSingle() + 8.0f;
+            }
+
+            if (GlobalPosition.DistanceSquaredTo(neutral.GlobalPosition) <= blockRadius * blockRadius)
+                return true;
         }
         return false;
     }

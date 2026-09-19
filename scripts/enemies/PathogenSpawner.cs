@@ -59,6 +59,24 @@ public static class PathogenSpawner
         _overdriveEnabled = enabled;
     }
 
+    // --- Dual-track difficulty: Hard (Acute Crisis) spawn modifiers (docs/map.md §2) ---
+    /// <summary>Hard difficulty pathogen health multiplier (+40%).</summary>
+    public const float HardHealthMultiplier = 1.40f;
+
+    /// <summary>Hard difficulty pathogen movement-speed multiplier (+20%).</summary>
+    public const float HardSpeedMultiplier = 1.20f;
+
+    private static bool _hardMode = false;
+
+    /// <summary>True while the running scene is a Hard (Acute Crisis) run.</summary>
+    public static bool HardMode => _hardMode;
+
+    /// <summary>Called by Main per scene: Hard runs scale every spawned pathogen.</summary>
+    public static void ConfigureHardMode(bool hard)
+    {
+        _hardMode = hard;
+    }
+
     /// <summary>Ladder cycle: 0 = standard timeline, 1 = 15:00-18:00, 2 = 18:00-21:00, ...</summary>
     public static int GetOverdriveCycle(float gameTime)
     {
@@ -100,6 +118,24 @@ public static class PathogenSpawner
 
         enemy.MaxHealth *= GetOverdriveHealthMultiplier(gameTime);
         enemy.FloatSpeed *= GetOverdriveSpeedMultiplier(gameTime);
+    }
+
+    /// <summary>
+    /// Applies all spawn-time difficulty scaling (Hard acute-crisis modifiers plus
+    /// any endless overdrive ladder). Must run before the enemy enters the tree.
+    /// </summary>
+    public static void ApplySpawnScaling(BaseEnemy enemy, float gameTime)
+    {
+        if (enemy == null)
+            return;
+
+        if (_hardMode)
+        {
+            enemy.MaxHealth *= HardHealthMultiplier;
+            enemy.FloatSpeed *= HardSpeedMultiplier;
+        }
+
+        ApplyOverdriveScaling(enemy, gameTime);
     }
 
     /// <summary>Duration of the 06:00 / 12:00 swarm window using the raised cap.</summary>
@@ -262,7 +298,7 @@ public static class PathogenSpawner
             return null;
 
         ApplyEliteBoost(enemy, tier);
-        ApplyOverdriveScaling(enemy, gameTime);
+        ApplySpawnScaling(enemy, gameTime);
 
         enemy.GlobalPosition = spawnAngle >= 0.0f
             ? GetPointAtAngle(player.GlobalPosition, arenaSize, spawnAngle, 560.0f)
@@ -302,7 +338,7 @@ public static class PathogenSpawner
             return null;
 
         AttachBossPhases(enemy, 120.0f);
-        ApplyOverdriveScaling(enemy, gameTime);
+        ApplySpawnScaling(enemy, gameTime);
 
         enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, 520.0f);
         enemyContainer.AddChild(enemy);
@@ -337,7 +373,7 @@ public static class PathogenSpawner
             return null;
 
         AttachBossPhases(enemy, 150.0f);
-        ApplyOverdriveScaling(enemy, gameTime);
+        ApplySpawnScaling(enemy, gameTime);
 
         enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, 460.0f);
         enemyContainer.AddChild(enemy);
@@ -358,7 +394,7 @@ public static class PathogenSpawner
             return null;
 
         AttachBossPhases(enemy, 150.0f);
-        ApplyOverdriveScaling(enemy, gameTime);
+        ApplySpawnScaling(enemy, gameTime);
 
         enemy.GlobalPosition = spawnAngle >= 0.0f
             ? GetPointAtAngle(player.GlobalPosition, arenaSize, spawnAngle, 620.0f)
@@ -403,7 +439,7 @@ public static class PathogenSpawner
             if (enemy == null)
                 continue;
 
-            ApplyOverdriveScaling(enemy, gameTime);
+            ApplySpawnScaling(enemy, gameTime);
 
             float margin = (float)GD.RandRange(BackfillMarginMin, BackfillMarginMax);
             enemy.GlobalPosition = GetOffscreenSpawnPoint(player.GlobalPosition, arenaSize, viewWorldSize, margin);
@@ -475,7 +511,7 @@ public static class PathogenSpawner
                     GlobalPosition = center + new Vector2((float)GD.RandRange(-30, 30), (float)GD.RandRange(-30, 30)),
                     FibrinShield = 1
                 };
-                ApplyOverdriveScaling(staph, gameTime);
+                ApplySpawnScaling(staph, gameTime);
                 enemyContainer.AddChild(staph);
             }
             return 3;
@@ -491,7 +527,7 @@ public static class PathogenSpawner
                 {
                     GlobalPosition = center + new Vector2((float)GD.RandRange(-50, 50), (float)GD.RandRange(-50, 50))
                 };
-                ApplyOverdriveScaling(noro, gameTime);
+                ApplySpawnScaling(noro, gameTime);
                 enemyContainer.AddChild(noro);
             }
             return 10;
@@ -501,7 +537,7 @@ public static class PathogenSpawner
         if (enemy == null)
             return 0;
 
-        ApplyOverdriveScaling(enemy, gameTime);
+        ApplySpawnScaling(enemy, gameTime);
         enemy.GlobalPosition = GetSpawnPoint(player.GlobalPosition, arenaSize, dist);
         enemyContainer.AddChild(enemy);
         return 1;

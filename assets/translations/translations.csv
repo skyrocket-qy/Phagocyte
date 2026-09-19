@@ -566,3 +566,4 @@ ACH_GASTRIC_HARD_CLEAR_REWARD,Microtube talent point +1.,微管天賦點 +1。
 ACH_BBB_HARD_CLEAR_TITLE,Cerebral Scavenger: Encephalitis Terminated,腦膜清道夫：腦炎終結
 ACH_BBB_HARD_CLEAR_DESC,Clear the Blood-Brain Barrier on Hard (Acute Crisis).,通關地圖 05「血腦屏障毛細血管」Hard 難度（急性危象）。
 ACH_BBB_HARD_CLEAR_REWARD,Microtube talent point +1.,微管天賦點 +1。
+HARD_LOCKED_HINT,Clear the prerequisite organ on Normal to unlock Hard (Acute Crisis).,通關前置器官的 Normal 難度以解鎖 Hard（急性危象）。

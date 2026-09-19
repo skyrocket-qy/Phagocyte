@@ -9,6 +9,7 @@ using Phagocyte.UI;
 using Phagocyte.Enemies;
 using Phagocyte.Combat;
 using Phagocyte.Endgame;
+using Phagocyte.Environment;
 
 namespace Phagocyte;
 
@@ -162,6 +163,15 @@ public partial class Main : Node2D
     /// <summary>MultiMesh batch renderer for norovirus / influenza micro swarms.</summary>
     public PathogenSwarmRenderer? SwarmRenderer { get; private set; }
 
+    /// <summary>Active organ fluid mechanics acting directly on the player cell (docs/map.md §3).</summary>
+    public MapEnvironment? OrganEnvironment { get; private set; }
+
+    /// <summary>GDScript/HUD-friendly view of the active organ environment id.</summary>
+    public string EnvironmentId => OrganEnvironment?.MapId ?? "";
+
+    /// <summary>GDScript/HUD-friendly view of the organ drift currently applied to the player.</summary>
+    public Vector2 EnvironmentPlayerDrift => OrganEnvironment?.PlayerDrift ?? Vector2.Zero;
+
     // --- Pathological Overload Afflictions (docs/endgame.md §4) ---
     private float _febrileBurnTimer = AfflictionManager.FebrileBurnInterval;
     private float _antigenicDriftTimer = AfflictionManager.AntigenicDriftInterval;
@@ -172,6 +182,7 @@ public partial class Main : Node2D
         EnemySteering.ConfigureArena(ArenaSize);
         HostUlceration.Reset();
         PathogenSpawner.ConfigureOverdrive(IsEndlessRun);
+        PathogenSpawner.ConfigureHardMode(IsHardRun);
 
         Player = GetNodeOrNull<CharacterBody2D>("Macrophage");
         HudNode = GetNodeOrNull<Hud>("HUD");
@@ -240,6 +251,11 @@ public partial class Main : Node2D
         // Read map configuration from GM
         MapId = GameManager.SelectedMap;
         ConfigureMapEnvironment();
+
+        // Organ-specific fluid mechanics & physiology acting on the player (docs/map.md §3)
+        OrganEnvironment = MapEnvironment.ForMap(MapId);
+        OrganEnvironment.HardMode = IsHardRun;
+        OrganEnvironment.Attach(this);
 
         // Initial pathogen wave
         SpawnInitialWave(35);
@@ -414,6 +430,7 @@ public partial class Main : Node2D
 
         // Map mechanics
         ProcessMapMechanics(dt);
+        ProcessOrganEnvironment(dt);
         ProcessOverdriveEnvironment(dt);
         ProcessAfflictions(dt);
         ProcessNeutralMatter(dt);
@@ -738,6 +755,21 @@ public partial class Main : Node2D
             GD.PushWarning("[WaveDirector] Terminal boss vanished without a kill; settling as defeat.");
             EndRun(false, RunRecordManager.CauseSystemFailure);
         }
+    }
+
+    /// <summary>
+    /// Drives the organ fluid mechanics and hands their velocity offset to the
+    /// player cell (docs/map.md §3).
+    /// </summary>
+    private void ProcessOrganEnvironment(float dt)
+    {
+        if (OrganEnvironment == null)
+            return;
+
+        OrganEnvironment.Tick(this, dt);
+
+        if (Player is BaseCell cell)
+            cell.EnvironmentDrift = OrganEnvironment.PlayerDrift;
     }
 
     private void ProcessMapMechanics(float delta)

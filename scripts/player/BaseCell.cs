@@ -71,6 +71,12 @@ public partial class BaseCell : CharacterBody2D
     /// <summary>Set on the first real HP loss — drives the Squeeze tutorial cue.</summary>
     public bool HasTakenDamage { get; private set; } = false;
 
+    /// <summary>
+    /// Organ fluid-mechanics velocity offset (docs/map.md §3). Added straight onto
+    /// the swim velocity by <see cref="HandleMovement"/>.
+    /// </summary>
+    public Vector2 EnvironmentDrift { get; set; } = Vector2.Zero;
+
     // Inertial Nucleus offset
     public Vector2 NucleusOffset { get; set; } = Vector2.Zero;
     public Vector2 NucleusTargetOffset { get; set; } = Vector2.Zero;
@@ -522,8 +528,15 @@ public partial class BaseCell : CharacterBody2D
         if (inputVec != Vector2.Zero)
         {
             inputVec = inputVec.Normalized();
-            Velocity = Velocity.MoveToward(inputVec * CurrentSpeed, CurrentSpeed * 5.0f * delta);
+            Vector2 targetVelocity = inputVec * CurrentSpeed + EnvironmentDrift;
+            Velocity = Velocity.MoveToward(targetVelocity, CurrentSpeed * 5.0f * delta);
             NucleusTargetOffset = -inputVec * (CurrentRadius * 0.28f);
+        }
+        else if (EnvironmentDrift != Vector2.Zero)
+        {
+            // Fluid current keeps dragging the cell even without input (docs/map.md §3).
+            Velocity = Velocity.MoveToward(EnvironmentDrift, CurrentSpeed * 4.0f * delta);
+            NucleusTargetOffset = Vector2.Zero;
         }
         else
         {
