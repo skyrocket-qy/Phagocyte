@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
-/// Candida albicans (白色念珠菌)
+/// Candida albicans (ç™½è‰²å¿µç èŒ)
 /// Dimorphic transition elite. Sprouts piercing hyphae when damaged or approached, puncturing pseudopods.
 /// </summary>
 public partial class CandidaEnemy : BaseEnemy
@@ -51,7 +51,7 @@ public partial class CandidaEnemy : BaseEnemy
 
     protected override void CustomPhysicsProcess(float dt)
     {
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
         if (player != null && GodotObject.IsInstanceValid(player))
         {
             float dist = GlobalPosition.DistanceTo(player.GlobalPosition);
@@ -113,7 +113,7 @@ public partial class CandidaEnemy : BaseEnemy
     {
         if (!_hyphaeExtended)
         {
-            var p = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+            var p = PlayerRef;
             ExtendHyphae(p != null && GodotObject.IsInstanceValid(p) ? p.GlobalPosition : null);
         }
         base.TakeDamage(damage, source);

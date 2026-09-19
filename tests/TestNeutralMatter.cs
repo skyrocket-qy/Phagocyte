@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
@@ -14,7 +14,7 @@ namespace Phagocyte.Tests;
 /// and the host ulceration meter.
 /// </summary>
 [TestSuite]
-public partial class TestNeutralMatter : SceneTree
+public partial class TestNeutralMatter : TestHarness
 {
     private int _frame = 0;
     private bool _done = false;

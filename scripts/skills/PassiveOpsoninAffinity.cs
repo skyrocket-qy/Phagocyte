@@ -14,7 +14,7 @@ public partial class PassiveOpsoninAffinity : BaseSkill
 
     public PassiveOpsoninAffinity()
     {
-        SkillId = "passive_opsonin";
+        SkillId = SkillIds.PassiveOpsonin;
         NameKey = "SKILL_OPSONIN_NAME";
         DescKey = "SKILL_OPSONIN_DESC";
         BioKey = "SKILL_OPSONIN_BIO";
@@ -28,37 +28,17 @@ public partial class PassiveOpsoninAffinity : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            float bonusCrit = CritPerLevel * Level;
-            float bonusCritDmg = CritDmgPerLevel * Level;
-            cs.AddModifier("crit_chance", bonusCrit, 0.0f);
-            cs.AddModifier("crit_damage", 0.0f, bonusCritDmg);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            float bonusCrit = CritPerLevel * Level;
-            float bonusCritDmg = CritDmgPerLevel * Level;
-            Stats.Call("add_modifier", "crit_chance", bonusCrit, 0.0f);
-            Stats.Call("add_modifier", "crit_damage", 0.0f, bonusCritDmg);
-        }
+        float bonusCrit = CritPerLevel * Level;
+        float bonusCritDmg = CritDmgPerLevel * Level;
+        ApplyStat("crit_chance", bonusCrit, 0.0f);
+        ApplyStat("crit_damage", 0.0f, bonusCritDmg);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            float bonusCrit = CritPerLevel * Level;
-            float bonusCritDmg = CritDmgPerLevel * Level;
-            cs.RemoveModifier("crit_chance", bonusCrit, 0.0f);
-            cs.RemoveModifier("crit_damage", 0.0f, bonusCritDmg);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            float bonusCrit = CritPerLevel * Level;
-            float bonusCritDmg = CritDmgPerLevel * Level;
-            Stats.Call("remove_modifier", "crit_chance", bonusCrit, 0.0f);
-            Stats.Call("remove_modifier", "crit_damage", 0.0f, bonusCritDmg);
-        }
+        float bonusCrit = CritPerLevel * Level;
+        float bonusCritDmg = CritDmgPerLevel * Level;
+        RemoveStat("crit_chance", bonusCrit, 0.0f);
+        RemoveStat("crit_damage", 0.0f, bonusCritDmg);
     }
 }

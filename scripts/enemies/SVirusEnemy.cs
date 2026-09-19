@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
-/// Spike Coronaviral Virion (刺突冠狀病毒)
+/// Spike Coronaviral Virion (åˆºçªå† ç‹€ç—…æ¯’)
 /// Anchors to receptors via S spike glycoprotein crown; applies adhesive slow down to player.
 /// </summary>
 public partial class SVirusEnemy : BaseEnemy
@@ -36,7 +36,7 @@ public partial class SVirusEnemy : BaseEnemy
     {
         _replicationTimer += dt;
         _spikeTimer -= dt;
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
 
         if (player != null && GodotObject.IsInstanceValid(player) && !player.IsDead)
         {

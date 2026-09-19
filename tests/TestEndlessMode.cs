@@ -17,29 +17,18 @@ namespace Phagocyte.Tests;
 /// neutralization continuing the run, and membrane rupture as the only end.
 /// </summary>
 [TestSuite]
-public partial class TestEndlessMode : SceneTree
+public partial class TestEndlessMode : TestHarness
 {
-    private const string TestRecordsPath = "user://test_endless_records.json";
-    private const string TestAchievementsPath = "user://test_endless_achievements.json";
-
     private int _phase = 0;
     private Main? _main = null;
 
     public override void _Initialize()
     {
-        GD.Print("==================================================================");
-        GD.Print(">>> STARTING ENDLESS CYTOKINE STORM VERIFICATION <<<");
-        GD.Print("==================================================================");
+        Banner("STARTING ENDLESS CYTOKINE STORM VERIFICATION");
 
         // Isolate persistence from the player's real saves
-        RunRecordManager.SavePath = TestRecordsPath;
-        if (FileAccess.FileExists(TestRecordsPath))
-            DirAccess.RemoveAbsolute(TestRecordsPath);
+        IsolateSaves("endless");
         RunRecordManager.LoadFromDisk();
-
-        AchievementManager.SavePath = TestAchievementsPath;
-        if (FileAccess.FileExists(TestAchievementsPath))
-            DirAccess.RemoveAbsolute(TestAchievementsPath);
 
         GameManager.EndlessMode = false;
     }
@@ -159,15 +148,9 @@ public partial class TestEndlessMode : SceneTree
 
     private void RunEndlessRunIntegrationTests()
     {
-        GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
-        GameManager.SelectedDifficulty = RunRecordManager.DifficultyHard;
-        GameManager.EndlessMode = true;
-
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = InstantiateMain(
+            difficulty: RunRecordManager.DifficultyHard, endless: true);
         _main = main;
-        Root.AddChild(main);
-        main.SetPhysicsProcess(false);
 
         AssertThat(main.IsEndlessRun).IsTrue();
         AssertThat(main.IsHardRun).IsTrue();
@@ -329,23 +312,9 @@ public partial class TestEndlessMode : SceneTree
     private void Cleanup()
     {
         Paused = false;
-        GameManager.EndlessMode = false;
-        PathogenSpawner.ConfigureOverdrive(false);
-
-        if (_main != null && IsInstanceValid(_main))
-        {
-            if (_main.GetParent() != null)
-                _main.GetParent().RemoveChild(_main);
-            _main.Free();
-            _main = null;
-        }
-
-        if (FileAccess.FileExists(TestRecordsPath))
-            DirAccess.RemoveAbsolute(TestRecordsPath);
-        if (FileAccess.FileExists(TestAchievementsPath))
-            DirAccess.RemoveAbsolute(TestAchievementsPath);
-
-        RunRecordManager.SavePath = "";
-        AchievementManager.SavePath = "";
+        ResetRunGlobals();
+        FreeMain(_main);
+        _main = null;
+        RestoreSaves();
     }
 }

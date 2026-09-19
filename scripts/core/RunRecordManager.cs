@@ -12,29 +12,11 @@ namespace Phagocyte.Core;
 /// </summary>
 public partial class RunRecordManager : Node
 {
-    private static string _savePath = "";
+    private static readonly JsonStore.SavePathSlot _savePath = new("run_records.json");
     public static string SavePath
     {
-        get
-        {
-            if (string.IsNullOrEmpty(_savePath))
-            {
-                using var probe = FileAccess.Open("user://.probe", FileAccess.ModeFlags.Write);
-                if (probe != null)
-                {
-                    probe.Close();
-                    DirAccess.RemoveAbsolute("user://.probe");
-                    _savePath = "user://run_records.json";
-                }
-                else
-                {
-                    _savePath = "res://.user_data/run_records.json";
-                    DirAccess.MakeDirRecursiveAbsolute("res://.user_data");
-                }
-            }
-            return _savePath;
-        }
-        set => _savePath = value;
+        get => _savePath.Value;
+        set => _savePath.Value = value;
     }
 
     public const int MaxRecords = 50;
@@ -391,39 +373,17 @@ public partial class RunRecordManager : Node
             { "records", Records }
         };
 
-        var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
-        if (file == null && SavePath.StartsWith("user://"))
-        {
-            SavePath = "res://.user_data/run_records.json";
-            DirAccess.MakeDirRecursiveAbsolute("res://.user_data");
-            file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
-        }
-
-        if (file != null)
-        {
-            using (file)
-            {
-                file.StoreString(Json.Stringify(payload, "\t"));
-            }
-        }
+        SavePath = JsonStore.Write(SavePath, payload);
     }
 
     public static void LoadFromDisk()
     {
         Records = new Array<Dictionary>();
 
-        if (!FileAccess.FileExists(SavePath))
+        var data = JsonStore.Read(SavePath);
+        if (data == null)
             return;
 
-        using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Read);
-        if (file == null)
-            return;
-
-        var json = new Json();
-        if (json.Parse(file.GetAsText()) != Error.Ok || json.Data.VariantType != Variant.Type.Dictionary)
-            return;
-
-        var data = json.Data.AsGodotDictionary();
         if (!data.ContainsKey("records") || data["records"].VariantType != Variant.Type.Array)
             return;
 

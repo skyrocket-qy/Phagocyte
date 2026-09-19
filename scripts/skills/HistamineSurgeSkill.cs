@@ -17,7 +17,7 @@ public partial class HistamineSurgeSkill : BaseSkill
 
     public HistamineSurgeSkill()
     {
-        SkillId = "histamine_surge";
+        SkillId = SkillIds.HistamineSurge;
         NameKey = "SKILL_HISTAMINE_NAME";
         DescKey = "SKILL_HISTAMINE_DESC";
         BioKey = "SKILL_HISTAMINE_BIO";

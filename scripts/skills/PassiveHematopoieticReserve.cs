@@ -14,7 +14,7 @@ public partial class PassiveHematopoieticReserve : BaseSkill
 
     public PassiveHematopoieticReserve()
     {
-        SkillId = "passive_hematopoietic";
+        SkillId = SkillIds.PassiveHematopoietic;
         NameKey = "SKILL_HEMATOPOIETIC_NAME";
         DescKey = "SKILL_HEMATOPOIETIC_DESC";
         BioKey = "SKILL_HEMATOPOIETIC_BIO";
@@ -28,29 +28,13 @@ public partial class PassiveHematopoieticReserve : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.AddModifier("max_health", 0.0f, HealthPerLevel * Level);
-            cs.AddModifier("block", BlockPerLevel * Level, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            Stats.Call("add_modifier", "max_health", 0.0f, HealthPerLevel * Level);
-            Stats.Call("add_modifier", "block", BlockPerLevel * Level, 0.0f);
-        }
+        ApplyStat("max_health", 0.0f, HealthPerLevel * Level);
+        ApplyStat("block", BlockPerLevel * Level, 0.0f);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.RemoveModifier("max_health", 0.0f, HealthPerLevel * Level);
-            cs.RemoveModifier("block", BlockPerLevel * Level, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            Stats.Call("remove_modifier", "max_health", 0.0f, HealthPerLevel * Level);
-            Stats.Call("remove_modifier", "block", BlockPerLevel * Level, 0.0f);
-        }
+        RemoveStat("max_health", 0.0f, HealthPerLevel * Level);
+        RemoveStat("block", BlockPerLevel * Level, 0.0f);
     }
 }

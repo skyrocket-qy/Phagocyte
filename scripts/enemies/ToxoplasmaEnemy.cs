@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
-/// Toxoplasma gondii (剛地弓形蟲)
+/// Toxoplasma gondii (å‰›åœ°å¼“å½¢èŸ²)
 /// Crescent pseudocyst parasite. Periodically emits psychic neurotransmitter waves pulling player.
 /// </summary>
 public partial class ToxoplasmaEnemy : BaseEnemy
@@ -40,7 +40,7 @@ public partial class ToxoplasmaEnemy : BaseEnemy
         if (_pullDuration > 0.0f)
         {
             _pullDuration -= dt;
-            var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+            var player = PlayerRef;
             if (player != null && GodotObject.IsInstanceValid(player))
             {
                 // Pull player towards this parasite or hazard

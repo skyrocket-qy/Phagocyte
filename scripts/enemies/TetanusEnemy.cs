@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
-/// Clostridium tetani (破傷風梭菌)
+/// Clostridium tetani (ç ´å‚·é¢¨æ¢­èŒ)
 /// Drumstick terminal spore morphology. Ranged controller firing tetanospasmin electrical pulses.
 /// </summary>
 public partial class TetanusEnemy : BaseEnemy
@@ -33,7 +33,7 @@ public partial class TetanusEnemy : BaseEnemy
     protected override void CustomPhysicsProcess(float dt)
     {
         _attackTimer += dt;
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
         if (player == null || !GodotObject.IsInstanceValid(player))
             return;
 

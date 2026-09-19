@@ -14,10 +14,8 @@ namespace Phagocyte.Tests;
 /// (elite raid -> swarm -> sub-boss -> extreme swarm -> terminal boss lockdown).
 /// </summary>
 [TestSuite]
-public partial class TestWaveTimeline : SceneTree
+public partial class TestWaveTimeline : TestHarness
 {
-    private const string TestSavePath = "user://test_wave_timeline_records.json";
-
     private int _frame = 0;
     private bool _done = false;
     private Node2D? _container;
@@ -25,12 +23,8 @@ public partial class TestWaveTimeline : SceneTree
 
     public override void _Initialize()
     {
-        GD.Print("==================================================================");
-        GD.Print(">>> STARTING 15-MINUTE WAVE TIMELINE VERIFICATION <<<");
-        GD.Print("==================================================================");
-        RunRecordManager.SavePath = TestSavePath;
-        if (FileAccess.FileExists(TestSavePath))
-            DirAccess.RemoveAbsolute(TestSavePath);
+        Banner("STARTING 15-MINUTE WAVE TIMELINE VERIFICATION");
+        IsolateSaves("wave_timeline");
         RunRecordManager.LoadFromDisk();
     }
 
@@ -121,13 +115,8 @@ public partial class TestWaveTimeline : SceneTree
 
     private void RunDirectorIntegrationTests()
     {
-        GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
-
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = InstantiateMain();
         _main = main;
-        Root.AddChild(main);
-        main.SetPhysicsProcess(false);
 
         AssertThat(main.RunGoalSeconds).IsEqual(900.0f);
 
@@ -175,13 +164,9 @@ public partial class TestWaveTimeline : SceneTree
     private void Cleanup()
     {
         Paused = false;
-        if (_main != null && IsInstanceValid(_main))
-        {
-            if (_main.GetParent() != null)
-                _main.GetParent().RemoveChild(_main);
-            _main.Free();
-            _main = null;
-        }
+
+        FreeMain(_main);
+        _main = null;
 
         if (_container != null && IsInstanceValid(_container))
         {
@@ -189,8 +174,6 @@ public partial class TestWaveTimeline : SceneTree
             _container = null;
         }
 
-        if (FileAccess.FileExists(TestSavePath))
-            DirAccess.RemoveAbsolute(TestSavePath);
-        RunRecordManager.SavePath = "";
+        RestoreSaves();
     }
 }

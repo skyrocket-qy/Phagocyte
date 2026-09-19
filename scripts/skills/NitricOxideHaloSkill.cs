@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -45,7 +46,7 @@ public partial class NitricOxideHaloSkill : BaseSkill
 
     public NitricOxideHaloSkill()
     {
-        SkillId = "nitric_oxide_halo";
+        SkillId = SkillIds.NitricOxideHalo;
         NameKey = "SKILL_NO_NAME";
         DescKey = "SKILL_NO_DESC";
         BioKey = "SKILL_NO_BIO";
@@ -101,32 +102,20 @@ public partial class NitricOxideHaloSkill : BaseSkill
         var damageData = GetCalculatedDamage(BaseDamage);
         float dmg = (float)damageData["damage"];
 
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        foreach (var p in pathogens)
+        TargetingService.ForEachInRadius(Host.GlobalPosition, currentRadius, n =>
         {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
+            if (n.HasMethod("take_damage"))
             {
-                var eaten = n.Get("is_being_eaten");
-                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                    continue;
-
-                float dist = Host.GlobalPosition.DistanceTo(n.GlobalPosition);
-                if (dist <= currentRadius)
+                n.Call("take_damage", dmg);
+            }
+            else if (n.HasMethod("be_engulfed"))
+            {
+                var hpVar = n.Get("health");
+                if (hpVar.VariantType == Variant.Type.Float && (float)hpVar <= dmg * 1.5f)
                 {
-                    if (n.HasMethod("take_damage"))
-                    {
-                        n.Call("take_damage", dmg);
-                    }
-                    else if (n.HasMethod("be_engulfed"))
-                    {
-                        var hpVar = n.Get("health");
-                        if (hpVar.VariantType == Variant.Type.Float && (float)hpVar <= dmg * 1.5f)
-                        {
-                            n.Call("be_engulfed", Host);
-                        }
-                    }
+                    n.Call("be_engulfed", Host);
                 }
             }
-        }
+        });
     }
 }

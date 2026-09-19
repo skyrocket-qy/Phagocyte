@@ -232,8 +232,8 @@ public partial class GameManager : Node
             { "max_level", 5 }
         }},
         // --- 16 Active Weapons ---
-        { "ros_torrent", new Dictionary {
-            { "id", "ros_torrent" },
+        { SkillIds.RosTorrent, new Dictionary {
+            { "id", SkillIds.RosTorrent },
             { "name_key", "SKILL_ROS_NAME" },
             { "desc_key", "SKILL_ROS_DESC" },
             { "bio_key", "SKILL_ROS_BIO" },
@@ -243,8 +243,8 @@ public partial class GameManager : Node
             { "cooldown", 3.2f },
             { "max_level", 5 }
         }},
-        { "perforin_lance", new Dictionary {
-            { "id", "perforin_lance" },
+        { SkillIds.PerforinLance, new Dictionary {
+            { "id", SkillIds.PerforinLance },
             { "name_key", "SKILL_PERFORIN_NAME" },
             { "desc_key", "SKILL_PERFORIN_DESC" },
             { "bio_key", "SKILL_PERFORIN_BIO" },
@@ -254,8 +254,8 @@ public partial class GameManager : Node
             { "cooldown", 2.8f },
             { "max_level", 5 }
         }},
-        { "complement_cascade", new Dictionary {
-            { "id", "complement_cascade" },
+        { SkillIds.ComplementCascade, new Dictionary {
+            { "id", SkillIds.ComplementCascade },
             { "name_key", "SKILL_COMPLEMENT_NAME" },
             { "desc_key", "SKILL_COMPLEMENT_DESC" },
             { "bio_key", "SKILL_COMPLEMENT_BIO" },
@@ -265,8 +265,8 @@ public partial class GameManager : Node
             { "cooldown", 5.0f },
             { "max_level", 5 }
         }},
-        { "antibody_salvo", new Dictionary {
-            { "id", "antibody_salvo" },
+        { SkillIds.AntibodySalvo, new Dictionary {
+            { "id", SkillIds.AntibodySalvo },
             { "name_key", "SKILL_ANTIBODY_NAME" },
             { "desc_key", "SKILL_ANTIBODY_DESC" },
             { "bio_key", "SKILL_ANTIBODY_BIO" },
@@ -276,8 +276,8 @@ public partial class GameManager : Node
             { "cooldown", 4.0f },
             { "max_level", 5 }
         }},
-        { "pseudopod_lunge", new Dictionary {
-            { "id", "pseudopod_lunge" },
+        { SkillIds.PseudopodLunge, new Dictionary {
+            { "id", SkillIds.PseudopodLunge },
             { "name_key", "SKILL_LUNGE_NAME" },
             { "desc_key", "SKILL_LUNGE_DESC" },
             { "bio_key", "SKILL_LUNGE_BIO" },
@@ -287,8 +287,8 @@ public partial class GameManager : Node
             { "cooldown", 2.5f },
             { "max_level", 5 }
         }},
-        { "nitric_oxide_halo", new Dictionary {
-            { "id", "nitric_oxide_halo" },
+        { SkillIds.NitricOxideHalo, new Dictionary {
+            { "id", SkillIds.NitricOxideHalo },
             { "name_key", "SKILL_NO_NAME" },
             { "desc_key", "SKILL_NO_DESC" },
             { "bio_key", "SKILL_NO_BIO" },
@@ -298,8 +298,8 @@ public partial class GameManager : Node
             { "cooldown", 0.25f },
             { "max_level", 5 }
         }},
-        { "nuclease_blades", new Dictionary {
-            { "id", "nuclease_blades" },
+        { SkillIds.NucleaseBlades, new Dictionary {
+            { "id", SkillIds.NucleaseBlades },
             { "name_key", "SKILL_NUCLEASE_NAME" },
             { "desc_key", "SKILL_NUCLEASE_DESC" },
             { "bio_key", "SKILL_NUCLEASE_BIO" },
@@ -309,8 +309,8 @@ public partial class GameManager : Node
             { "cooldown", 4.5f },
             { "max_level", 5 }
         }},
-        { "granzyme_detonation", new Dictionary {
-            { "id", "granzyme_detonation" },
+        { SkillIds.GranzymeDetonation, new Dictionary {
+            { "id", SkillIds.GranzymeDetonation },
             { "name_key", "SKILL_GRANZYME_NAME" },
             { "desc_key", "SKILL_GRANZYME_DESC" },
             { "bio_key", "SKILL_GRANZYME_BIO" },
@@ -320,8 +320,8 @@ public partial class GameManager : Node
             { "cooldown", 3.5f },
             { "max_level", 5 }
         }},
-        { "interferon_wave", new Dictionary {
-            { "id", "interferon_wave" },
+        { SkillIds.InterferonWave, new Dictionary {
+            { "id", SkillIds.InterferonWave },
             { "name_key", "SKILL_INTERFERON_NAME" },
             { "desc_key", "SKILL_INTERFERON_DESC" },
             { "bio_key", "SKILL_INTERFERON_BIO" },
@@ -331,8 +331,8 @@ public partial class GameManager : Node
             { "cooldown", 6.0f },
             { "max_level", 5 }
         }},
-        { "lysozyme_ricochet", new Dictionary {
-            { "id", "lysozyme_ricochet" },
+        { SkillIds.LysozymeRicochet, new Dictionary {
+            { "id", SkillIds.LysozymeRicochet },
             { "name_key", "SKILL_LYSOZYME_NAME" },
             { "desc_key", "SKILL_LYSOZYME_DESC" },
             { "bio_key", "SKILL_LYSOZYME_BIO" },
@@ -342,8 +342,8 @@ public partial class GameManager : Node
             { "cooldown", 3.8f },
             { "max_level", 5 }
         }},
-        { "phagolysosome_vent", new Dictionary {
-            { "id", "phagolysosome_vent" },
+        { SkillIds.PhagolysosomeVent, new Dictionary {
+            { "id", SkillIds.PhagolysosomeVent },
             { "name_key", "SKILL_PHAGO_VENT_NAME" },
             { "desc_key", "SKILL_PHAGO_VENT_DESC" },
             { "bio_key", "SKILL_PHAGO_VENT_BIO" },
@@ -353,8 +353,8 @@ public partial class GameManager : Node
             { "cooldown", 2.0f },
             { "max_level", 5 }
         }},
-        { "pro_inflammatory_arc", new Dictionary {
-            { "id", "pro_inflammatory_arc" },
+        { SkillIds.ProInflammatoryArc, new Dictionary {
+            { "id", SkillIds.ProInflammatoryArc },
             { "name_key", "SKILL_PRO_INFLAM_NAME" },
             { "desc_key", "SKILL_PRO_INFLAM_DESC" },
             { "bio_key", "SKILL_PRO_INFLAM_BIO" },
@@ -364,8 +364,8 @@ public partial class GameManager : Node
             { "cooldown", 3.0f },
             { "max_level", 5 }
         }},
-        { "exosome_singularity", new Dictionary {
-            { "id", "exosome_singularity" },
+        { SkillIds.ExosomeSingularity, new Dictionary {
+            { "id", SkillIds.ExosomeSingularity },
             { "name_key", "SKILL_EXOSOME_NAME" },
             { "desc_key", "SKILL_EXOSOME_DESC" },
             { "bio_key", "SKILL_EXOSOME_BIO" },
@@ -375,8 +375,8 @@ public partial class GameManager : Node
             { "cooldown", 5.5f },
             { "max_level", 5 }
         }},
-        { "defensin_barbs", new Dictionary {
-            { "id", "defensin_barbs" },
+        { SkillIds.DefensinBarbs, new Dictionary {
+            { "id", SkillIds.DefensinBarbs },
             { "name_key", "SKILL_DEFENSIN_NAME" },
             { "desc_key", "SKILL_DEFENSIN_DESC" },
             { "bio_key", "SKILL_DEFENSIN_BIO" },
@@ -386,8 +386,8 @@ public partial class GameManager : Node
             { "cooldown", 3.0f },
             { "max_level", 5 }
         }},
-        { "mhc_tracer_beam", new Dictionary {
-            { "id", "mhc_tracer_beam" },
+        { SkillIds.MhcTracerBeam, new Dictionary {
+            { "id", SkillIds.MhcTracerBeam },
             { "name_key", "SKILL_MHC_TRACER_NAME" },
             { "desc_key", "SKILL_MHC_TRACER_DESC" },
             { "bio_key", "SKILL_MHC_TRACER_BIO" },
@@ -397,8 +397,8 @@ public partial class GameManager : Node
             { "cooldown", 4.0f },
             { "max_level", 5 }
         }},
-        { "histamine_surge", new Dictionary {
-            { "id", "histamine_surge" },
+        { SkillIds.HistamineSurge, new Dictionary {
+            { "id", SkillIds.HistamineSurge },
             { "name_key", "SKILL_HISTAMINE_NAME" },
             { "desc_key", "SKILL_HISTAMINE_DESC" },
             { "bio_key", "SKILL_HISTAMINE_BIO" },
@@ -410,8 +410,8 @@ public partial class GameManager : Node
         }},
 
         // --- 13 Passive Traits ---
-        { "passive_actin", new Dictionary {
-            { "id", "passive_actin" },
+        { SkillIds.PassiveActin, new Dictionary {
+            { "id", SkillIds.PassiveActin },
             { "name_key", "SKILL_ACTIN_NAME" },
             { "desc_key", "SKILL_ACTIN_DESC" },
             { "bio_key", "SKILL_ACTIN_BIO" },
@@ -421,8 +421,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_lysosome", new Dictionary {
-            { "id", "passive_lysosome" },
+        { SkillIds.PassiveLysosome, new Dictionary {
+            { "id", SkillIds.PassiveLysosome },
             { "name_key", "TREE_NODE_LYSOSOME_NAME" },
             { "desc_key", "TREE_NODE_LYSOSOME_DESC" },
             { "bio_key", "SKILL_LYSOSOME_BIO" },
@@ -432,8 +432,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_mitochondria", new Dictionary {
-            { "id", "passive_mitochondria" },
+        { SkillIds.PassiveMitochondria, new Dictionary {
+            { "id", SkillIds.PassiveMitochondria },
             { "name_key", "SKILL_MITOCHONDRIA_NAME" },
             { "desc_key", "SKILL_MITOCHONDRIA_DESC" },
             { "bio_key", "SKILL_MITOCHONDRIA_BIO" },
@@ -443,8 +443,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_opsonin", new Dictionary {
-            { "id", "passive_opsonin" },
+        { SkillIds.PassiveOpsonin, new Dictionary {
+            { "id", SkillIds.PassiveOpsonin },
             { "name_key", "SKILL_OPSONIN_NAME" },
             { "desc_key", "SKILL_OPSONIN_DESC" },
             { "bio_key", "SKILL_OPSONIN_BIO" },
@@ -454,8 +454,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_chemokine", new Dictionary {
-            { "id", "passive_chemokine" },
+        { SkillIds.PassiveChemokine, new Dictionary {
+            { "id", SkillIds.PassiveChemokine },
             { "name_key", "SKILL_CHEMOKINE_NAME" },
             { "desc_key", "SKILL_CHEMOKINE_DESC" },
             { "bio_key", "SKILL_CHEMOKINE_BIO" },
@@ -465,8 +465,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_bilayer", new Dictionary {
-            { "id", "passive_bilayer" },
+        { SkillIds.PassiveBilayer, new Dictionary {
+            { "id", SkillIds.PassiveBilayer },
             { "name_key", "SKILL_BILAYER_NAME" },
             { "desc_key", "SKILL_BILAYER_DESC" },
             { "bio_key", "SKILL_BILAYER_BIO" },
@@ -476,8 +476,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_autophagy", new Dictionary {
-            { "id", "passive_autophagy" },
+        { SkillIds.PassiveAutophagy, new Dictionary {
+            { "id", SkillIds.PassiveAutophagy },
             { "name_key", "SKILL_AUTOPHAGY_NAME" },
             { "desc_key", "SKILL_AUTOPHAGY_DESC" },
             { "bio_key", "SKILL_AUTOPHAGY_BIO" },
@@ -487,8 +487,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_glycolysis", new Dictionary {
-            { "id", "passive_glycolysis" },
+        { SkillIds.PassiveGlycolysis, new Dictionary {
+            { "id", SkillIds.PassiveGlycolysis },
             { "name_key", "SKILL_GLYCOLYSIS_NAME" },
             { "desc_key", "SKILL_GLYCOLYSIS_DESC" },
             { "bio_key", "SKILL_GLYCOLYSIS_BIO" },
@@ -498,8 +498,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_kinesin", new Dictionary {
-            { "id", "passive_kinesin" },
+        { SkillIds.PassiveKinesin, new Dictionary {
+            { "id", SkillIds.PassiveKinesin },
             { "name_key", "SKILL_KINESIN_NAME" },
             { "desc_key", "SKILL_KINESIN_DESC" },
             { "bio_key", "SKILL_KINESIN_BIO" },
@@ -509,8 +509,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_longevity", new Dictionary {
-            { "id", "passive_longevity" },
+        { SkillIds.PassiveLongevity, new Dictionary {
+            { "id", SkillIds.PassiveLongevity },
             { "name_key", "SKILL_LONGEVITY_NAME" },
             { "desc_key", "SKILL_LONGEVITY_DESC" },
             { "bio_key", "SKILL_LONGEVITY_BIO" },
@@ -520,8 +520,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_vdj", new Dictionary {
-            { "id", "passive_vdj" },
+        { SkillIds.PassiveVdj, new Dictionary {
+            { "id", SkillIds.PassiveVdj },
             { "name_key", "SKILL_VDJ_NAME" },
             { "desc_key", "SKILL_VDJ_DESC" },
             { "bio_key", "SKILL_VDJ_BIO" },
@@ -531,8 +531,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_endotoxin", new Dictionary {
-            { "id", "passive_endotoxin" },
+        { SkillIds.PassiveEndotoxin, new Dictionary {
+            { "id", SkillIds.PassiveEndotoxin },
             { "name_key", "SKILL_ENDOTOXIN_NAME" },
             { "desc_key", "SKILL_ENDOTOXIN_DESC" },
             { "bio_key", "SKILL_ENDOTOXIN_BIO" },
@@ -542,8 +542,8 @@ public partial class GameManager : Node
             { "cooldown", 0.0f },
             { "max_level", 5 }
         }},
-        { "passive_hematopoietic", new Dictionary {
-            { "id", "passive_hematopoietic" },
+        { SkillIds.PassiveHematopoietic, new Dictionary {
+            { "id", SkillIds.PassiveHematopoietic },
             { "name_key", "SKILL_HEMATOPOIETIC_NAME" },
             { "desc_key", "SKILL_HEMATOPOIETIC_DESC" },
             { "bio_key", "SKILL_HEMATOPOIETIC_BIO" },

@@ -13,7 +13,7 @@ public partial class PassiveKinesinTransit : BaseSkill
 
     public PassiveKinesinTransit()
     {
-        SkillId = "passive_kinesin";
+        SkillId = SkillIds.PassiveKinesin;
         NameKey = "SKILL_KINESIN_NAME";
         DescKey = "SKILL_KINESIN_DESC";
         BioKey = "SKILL_KINESIN_BIO";
@@ -27,29 +27,13 @@ public partial class PassiveKinesinTransit : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.AddModifier("projectile_speed", 0.0f, SpeedPerLevel * Level);
-            cs.AddModifier("pierce", 1.0f, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            Stats.Call("add_modifier", "projectile_speed", 0.0f, SpeedPerLevel * Level);
-            Stats.Call("add_modifier", "pierce", 1.0f, 0.0f);
-        }
+        ApplyStat("projectile_speed", 0.0f, SpeedPerLevel * Level);
+        ApplyStat("pierce", 1.0f, 0.0f);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.RemoveModifier("projectile_speed", 0.0f, SpeedPerLevel * Level);
-            cs.RemoveModifier("pierce", 1.0f, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            Stats.Call("remove_modifier", "projectile_speed", 0.0f, SpeedPerLevel * Level);
-            Stats.Call("remove_modifier", "pierce", 1.0f, 0.0f);
-        }
+        RemoveStat("projectile_speed", 0.0f, SpeedPerLevel * Level);
+        RemoveStat("pierce", 1.0f, 0.0f);
     }
 }

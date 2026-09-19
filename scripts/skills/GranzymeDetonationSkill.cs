@@ -16,7 +16,7 @@ public partial class GranzymeDetonationSkill : BaseSkill
 
     public GranzymeDetonationSkill()
     {
-        SkillId = "granzyme_detonation";
+        SkillId = SkillIds.GranzymeDetonation;
         NameKey = "SKILL_GRANZYME_NAME";
         DescKey = "SKILL_GRANZYME_DESC";
         BioKey = "SKILL_GRANZYME_BIO";

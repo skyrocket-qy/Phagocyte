@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
+using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
 
@@ -14,7 +16,7 @@ public partial class ComplementCascadeSkill : BaseSkill
 
     public ComplementCascadeSkill()
     {
-        SkillId = "complement_cascade";
+        SkillId = SkillIds.ComplementCascade;
         NameKey = "SKILL_COMPLEMENT_NAME";
         DescKey = "SKILL_COMPLEMENT_DESC";
         BioKey = "SKILL_COMPLEMENT_BIO";
@@ -69,23 +71,10 @@ public partial class ComplementCascadeSkill : BaseSkill
         if (Host == null)
             return;
 
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        foreach (var p in pathogens)
+        TargetingService.ForEachInRadius(center, radius, n =>
         {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                var eaten = n.Get("is_being_eaten");
-                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                    continue;
-
-                if (center.DistanceTo(n.GlobalPosition) <= radius)
-                {
-                    if (n.HasMethod("be_engulfed"))
-                    {
-                        n.Call("be_engulfed", Host);
-                    }
-                }
-            }
-        }
+            if (n.HasMethod("be_engulfed"))
+                n.Call("be_engulfed", Host);
+        });
     }
 }

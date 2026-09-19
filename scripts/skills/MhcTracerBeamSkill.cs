@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -20,7 +21,7 @@ public partial class MhcTracerBeamSkill : BaseSkill
 
     public MhcTracerBeamSkill()
     {
-        SkillId = "mhc_tracer_beam";
+        SkillId = SkillIds.MhcTracerBeam;
         NameKey = "SKILL_MHC_TRACER_NAME";
         DescKey = "SKILL_MHC_TRACER_DESC";
         BioKey = "SKILL_MHC_TRACER_BIO";
@@ -110,23 +111,7 @@ public partial class MhcTracerBeamSkill : BaseSkill
         if (Host == null)
             return null;
 
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        Node2D? best = null;
-        float minDist = SearchRange;
-
-        foreach (var p in pathogens)
-        {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                float d = Host.GlobalPosition.DistanceTo(n.GlobalPosition);
-                if (d < minDist)
-                {
-                    minDist = d;
-                    best = n;
-                }
-            }
-        }
-        return best;
+        return TargetingService.FindNearest(Host, SearchRange, skipEaten: false);
     }
 
     public partial class TracerVisual : Node2D

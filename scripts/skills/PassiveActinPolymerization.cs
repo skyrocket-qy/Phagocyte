@@ -14,7 +14,7 @@ public partial class PassiveActinPolymerization : BaseSkill
 
     public PassiveActinPolymerization()
     {
-        SkillId = "passive_actin";
+        SkillId = SkillIds.PassiveActin;
         NameKey = "SKILL_ACTIN_NAME";
         DescKey = "SKILL_ACTIN_DESC";
         BioKey = "SKILL_ACTIN_BIO";
@@ -28,37 +28,17 @@ public partial class PassiveActinPolymerization : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            float bonusArea = AreaPerLevel * Level;
-            float bonusSpeed = SpeedPerLevel * Level;
-            cs.AddModifier("area", 0.0f, bonusArea);
-            cs.AddModifier("move_speed", 0.0f, bonusSpeed);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            float bonusArea = AreaPerLevel * Level;
-            float bonusSpeed = SpeedPerLevel * Level;
-            Stats.Call("add_modifier", "area", 0.0f, bonusArea);
-            Stats.Call("add_modifier", "move_speed", 0.0f, bonusSpeed);
-        }
+        float bonusArea = AreaPerLevel * Level;
+        float bonusSpeed = SpeedPerLevel * Level;
+        ApplyStat("area", 0.0f, bonusArea);
+        ApplyStat("move_speed", 0.0f, bonusSpeed);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            float bonusArea = AreaPerLevel * Level;
-            float bonusSpeed = SpeedPerLevel * Level;
-            cs.RemoveModifier("area", 0.0f, bonusArea);
-            cs.RemoveModifier("move_speed", 0.0f, bonusSpeed);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            float bonusArea = AreaPerLevel * Level;
-            float bonusSpeed = SpeedPerLevel * Level;
-            Stats.Call("remove_modifier", "area", 0.0f, bonusArea);
-            Stats.Call("remove_modifier", "move_speed", 0.0f, bonusSpeed);
-        }
+        float bonusArea = AreaPerLevel * Level;
+        float bonusSpeed = SpeedPerLevel * Level;
+        RemoveStat("area", 0.0f, bonusArea);
+        RemoveStat("move_speed", 0.0f, bonusSpeed);
     }
 }

@@ -14,7 +14,7 @@ public partial class PassiveEndotoxinBarrier : BaseSkill
 
     public PassiveEndotoxinBarrier()
     {
-        SkillId = "passive_endotoxin";
+        SkillId = SkillIds.PassiveEndotoxin;
         NameKey = "SKILL_ENDOTOXIN_NAME";
         DescKey = "SKILL_ENDOTOXIN_DESC";
         BioKey = "SKILL_ENDOTOXIN_BIO";
@@ -28,29 +28,13 @@ public partial class PassiveEndotoxinBarrier : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.AddModifier("armor", ArmorPerLevel * Level, 0.0f);
-            cs.AddModifier("block", BlockPerLevel * Level, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            Stats.Call("add_modifier", "armor", ArmorPerLevel * Level, 0.0f);
-            Stats.Call("add_modifier", "block", BlockPerLevel * Level, 0.0f);
-        }
+        ApplyStat("armor", ArmorPerLevel * Level, 0.0f);
+        ApplyStat("block", BlockPerLevel * Level, 0.0f);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.RemoveModifier("armor", ArmorPerLevel * Level, 0.0f);
-            cs.RemoveModifier("block", BlockPerLevel * Level, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            Stats.Call("remove_modifier", "armor", ArmorPerLevel * Level, 0.0f);
-            Stats.Call("remove_modifier", "block", BlockPerLevel * Level, 0.0f);
-        }
+        RemoveStat("armor", ArmorPerLevel * Level, 0.0f);
+        RemoveStat("block", BlockPerLevel * Level, 0.0f);
     }
 }

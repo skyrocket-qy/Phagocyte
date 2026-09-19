@@ -12,29 +12,11 @@ public partial class AchievementManager : Node
     [Signal]
     public delegate void AchievementUnlockedEventHandler(string achId, Godot.Collections.Dictionary achData);
 
-    private static string _savePath = "";
+    private static readonly JsonStore.SavePathSlot _savePath = new("achievements.json");
     public static string SavePath
     {
-        get
-        {
-            if (string.IsNullOrEmpty(_savePath))
-            {
-                using var probe = FileAccess.Open("user://.probe", FileAccess.ModeFlags.Write);
-                if (probe != null)
-                {
-                    probe.Close();
-                    DirAccess.RemoveAbsolute("user://.probe");
-                    _savePath = "user://achievements.json";
-                }
-                else
-                {
-                    _savePath = "res://.user_data/achievements.json";
-                    DirAccess.MakeDirRecursiveAbsolute("res://.user_data");
-                }
-            }
-            return _savePath;
-        }
-        set => _savePath = value;
+        get => _savePath.Value;
+        set => _savePath.Value = value;
     }
 
     public static AchievementManager Instance { get; private set; } = null;
@@ -671,12 +653,8 @@ public partial class AchievementManager : Node
             { "unlocked_ids", UnlockedIds },
             { "progress_data", ProgressData }
         };
-        
-        using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
-        if (file != null)
-        {
-            file.StoreString(Json.Stringify(payload, "\t"));
-        }
+
+        JsonStore.Write(SavePath, payload);
     }
 
     /// <summary>
@@ -684,48 +662,33 @@ public partial class AchievementManager : Node
     /// </summary>
     public static void LoadFromDisk()
     {
-        if (!FileAccess.FileExists(SavePath))
+        var data = JsonStore.Read(SavePath);
+        if (data == null)
         {
             SyncUnlockedClasses();
             SyncMapUnlocks();
             return;
         }
 
-        using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Read);
-        if (file == null)
+        if (data.ContainsKey("unlocked_ids") && data["unlocked_ids"].VariantType == Variant.Type.Dictionary)
         {
-            SyncUnlockedClasses();
-            SyncMapUnlocks();
-            return;
+            UnlockedIds = data["unlocked_ids"].AsGodotDictionary();
+        }
+        if (data.ContainsKey("progress_data") && data["progress_data"].VariantType == Variant.Type.Dictionary)
+        {
+            var pd = data["progress_data"].AsGodotDictionary();
+            foreach (var k in pd.Keys)
+            {
+                ProgressData[k] = pd[k].AsSingle();
+            }
         }
 
-        string jsonStr = file.GetAsText();
-        
-        var json = new Json();
-        var err = json.Parse(jsonStr);
-        if (err == Error.Ok && json.Data.VariantType == Variant.Type.Dictionary)
+        // Legacy migration: the retired "Metabolic Storm" burst achievement
+        // is superseded by the 50-devoured survivor goal for the same reward.
+        if (UnlockedIds.ContainsKey("ach_trigger_burst") && UnlockedIds["ach_trigger_burst"].AsBool()
+            && !UnlockedIds.ContainsKey("ach_devour_50"))
         {
-            var data = json.Data.AsGodotDictionary();
-            if (data.ContainsKey("unlocked_ids") && data["unlocked_ids"].VariantType == Variant.Type.Dictionary)
-            {
-                UnlockedIds = data["unlocked_ids"].AsGodotDictionary();
-            }
-            if (data.ContainsKey("progress_data") && data["progress_data"].VariantType == Variant.Type.Dictionary)
-            {
-                var pd = data["progress_data"].AsGodotDictionary();
-                foreach (var k in pd.Keys)
-                {
-                    ProgressData[k] = pd[k].AsSingle();
-                }
-            }
-
-            // Legacy migration: the retired "Metabolic Storm" burst achievement
-            // is superseded by the 50-devoured survivor goal for the same reward.
-            if (UnlockedIds.ContainsKey("ach_trigger_burst") && UnlockedIds["ach_trigger_burst"].AsBool()
-                && !UnlockedIds.ContainsKey("ach_devour_50"))
-            {
-                UnlockedIds["ach_devour_50"] = true;
-            }
+            UnlockedIds["ach_devour_50"] = true;
         }
 
         SyncUnlockedClasses();
@@ -776,9 +739,6 @@ public partial class AchievementManager : Node
         SyncUnlockedClasses();
         SyncMapUnlocks();
 
-        if (FileAccess.FileExists(SavePath))
-        {
-            DirAccess.RemoveAbsolute(SavePath);
-        }
+        JsonStore.Delete(SavePath);
     }
 }

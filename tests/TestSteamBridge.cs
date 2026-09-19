@@ -12,25 +12,16 @@ namespace Phagocyte.Tests;
 /// USE_STEAMWORKS symbol, Steam API naming and offline achievement sync.
 /// </summary>
 [TestSuite]
-public partial class TestSteamBridge : SceneTree
+public partial class TestSteamBridge : TestHarness
 {
-    private const string TestAchPath = "user://test_steam_bridge_achievements.json";
-    private const string TestTreePath = "user://test_steam_bridge_tree.json";
-
     private int _frame = 0;
     private bool _done = false;
 
     public override void _Initialize()
     {
-        GD.Print("==================================================================");
-        GD.Print(">>> STARTING STEAMWORKS BRIDGE RESERVATION VERIFICATION <<<");
-        GD.Print("==================================================================");
+        Banner("STARTING STEAMWORKS BRIDGE RESERVATION VERIFICATION");
 
-        PassiveTreeManager.SavePath = TestTreePath;
-        if (FileAccess.FileExists(TestTreePath))
-            DirAccess.RemoveAbsolute(TestTreePath);
-
-        AchievementManager.SavePath = TestAchPath;
+        IsolateSaves("steam_bridge");
         AchievementManager.ResetAll();
     }
 
@@ -39,8 +30,7 @@ public partial class TestSteamBridge : SceneTree
         if (_done)
             return true;
 
-        _frame++;
-        if (_frame < 3)
+        if (!Gate(ref _frame, 3))
             return false;
 
         _done = true;
@@ -97,9 +87,6 @@ public partial class TestSteamBridge : SceneTree
     private static void Cleanup()
     {
         AchievementManager.ResetAll();
-        if (FileAccess.FileExists(PassiveTreeManager.SavePath))
-            DirAccess.RemoveAbsolute(PassiveTreeManager.SavePath);
-        AchievementManager.SavePath = "";
-        PassiveTreeManager.SavePath = "";
+        RestoreSaves();
     }
 }

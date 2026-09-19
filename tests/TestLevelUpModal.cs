@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using Godot.Collections;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using static GdUnit4.Assertions;
 
 namespace Phagocyte.Tests;
 
-public partial class TestLevelUpModal : SceneTree
+public partial class TestLevelUpModal : TestHarness
 {
     private int _frameCount = 0;
     private bool _testDone = false;
@@ -181,7 +181,7 @@ public partial class TestLevelUpModal : SceneTree
         AssertThat(hud.CellUpgradeModal!.Visible).IsFalse();
         AssertThat(Paused).IsFalse();
 
-        // The first level-up normally plays the 0.5s bullet-time cue (docs/tutorial.md §2);
+        // The first level-up normally plays the 0.5s bullet-time cue (docs/tutorial.md Â§2);
         // this runtime check exercises the draft flow directly.
         hud.SkipLevelUpBulletTime = true;
 

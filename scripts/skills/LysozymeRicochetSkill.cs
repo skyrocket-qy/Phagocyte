@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -17,7 +18,7 @@ public partial class LysozymeRicochetSkill : BaseSkill
 
     public LysozymeRicochetSkill()
     {
-        SkillId = "lysozyme_ricochet";
+        SkillId = SkillIds.LysozymeRicochet;
         NameKey = "SKILL_LYSOZYME_NAME";
         DescKey = "SKILL_LYSOZYME_DESC";
         BioKey = "SKILL_LYSOZYME_BIO";
@@ -131,26 +132,11 @@ public partial class LysozymeRicochetSkill : BaseSkill
             if (HostRef == null)
                 return null;
 
-            var pathogens = HostRef.GetTree().GetNodesInGroup("pathogens");
-            Node2D? best = null;
-            float minDist = 350.0f;
-
-            foreach (var p in pathogens)
-            {
-                if (p is Node2D n && GodotObject.IsInstanceValid(n) && n != current)
-                {
-                    if (_recentlyHit.Contains(n.GetInstanceId()))
-                        continue;
-
-                    float d = GlobalPosition.DistanceTo(n.GlobalPosition);
-                    if (d < minDist)
-                    {
-                        minDist = d;
-                        best = n;
-                    }
-                }
-            }
-            return best;
+            return TargetingService.FindNearest(
+                this,
+                350.0f,
+                enemy => enemy != current && !_recentlyHit.Contains(enemy.GetInstanceId()),
+                skipEaten: false);
         }
 
         public override void _Draw()

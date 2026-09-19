@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -18,7 +19,7 @@ public partial class ProInflammatoryArcSkill : BaseSkill
 
     public ProInflammatoryArcSkill()
     {
-        SkillId = "pro_inflammatory_arc";
+        SkillId = SkillIds.ProInflammatoryArc;
         NameKey = "SKILL_PRO_INFLAM_NAME";
         DescKey = "SKILL_PRO_INFLAM_DESC";
         BioKey = "SKILL_PRO_INFLAM_BIO";
@@ -63,23 +64,7 @@ public partial class ProInflammatoryArcSkill : BaseSkill
         if (Host == null)
             return result;
 
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        Node2D? first = null;
-        float minDist = SearchRange;
-
-        foreach (var p in pathogens)
-        {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                float d = Host.GlobalPosition.DistanceTo(n.GlobalPosition);
-                if (d < minDist)
-                {
-                    minDist = d;
-                    first = n;
-                }
-            }
-        }
-
+        var first = TargetingService.FindNearest(Host, SearchRange, skipEaten: false);
         if (first == null)
             return result;
 
@@ -88,31 +73,16 @@ public partial class ProInflammatoryArcSkill : BaseSkill
 
         for (int i = 1; i < maxChains; i++)
         {
-            Node2D? next = null;
-            float nextDist = ChainRange;
-
-            foreach (var p in pathogens)
-            {
-                if (p is Node2D n && GodotObject.IsInstanceValid(n) && !result.Contains(n))
-                {
-                    float d = current.GlobalPosition.DistanceTo(n.GlobalPosition);
-                    if (d < nextDist)
-                    {
-                        nextDist = d;
-                        next = n;
-                    }
-                }
-            }
-
-            if (next != null)
-            {
-                result.Add(next);
-                current = next;
-            }
-            else
-            {
+            var next = TargetingService.FindNearest(
+                current,
+                ChainRange,
+                enemy => !result.Contains(enemy),
+                skipEaten: false);
+            if (next == null)
                 break;
-            }
+
+            result.Add(next);
+            current = next;
         }
 
         return result;

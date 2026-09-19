@@ -26,49 +26,27 @@ public partial class TreeStatBundleSkill : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            foreach (var modifier in _modifiers)
-            {
-                bool isFlatOrPoints = modifier.Unit is PassiveTreeManager.TreeModifierUnit.Flat or PassiveTreeManager.TreeModifierUnit.PercentagePoints;
-                float flat = isFlatOrPoints ? modifier.Value * Level : 0.0f;
-                float percent = isFlatOrPoints ? 0.0f : modifier.Value * Level;
-                cs.AddModifier(modifier.Stat, flat, percent);
-            }
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            foreach (var modifier in _modifiers)
-            {
-                bool isFlatOrPoints = modifier.Unit is PassiveTreeManager.TreeModifierUnit.Flat or PassiveTreeManager.TreeModifierUnit.PercentagePoints;
-                float flat = isFlatOrPoints ? modifier.Value * Level : 0.0f;
-                float percent = isFlatOrPoints ? 0.0f : modifier.Value * Level;
-                Stats.Call("add_modifier", modifier.Stat, flat, percent);
-            }
-        }
+        foreach (var modifier in _modifiers)
+            ApplyStat(modifier.Stat, FlatOf(modifier) * Level, PercentOf(modifier) * Level);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            foreach (var modifier in _modifiers)
-            {
-                bool isFlatOrPoints = modifier.Unit is PassiveTreeManager.TreeModifierUnit.Flat or PassiveTreeManager.TreeModifierUnit.PercentagePoints;
-                float flat = isFlatOrPoints ? modifier.Value * Level : 0.0f;
-                float percent = isFlatOrPoints ? 0.0f : modifier.Value * Level;
-                cs.RemoveModifier(modifier.Stat, flat, percent);
-            }
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            foreach (var modifier in _modifiers)
-            {
-                bool isFlatOrPoints = modifier.Unit is PassiveTreeManager.TreeModifierUnit.Flat or PassiveTreeManager.TreeModifierUnit.PercentagePoints;
-                float flat = isFlatOrPoints ? modifier.Value * Level : 0.0f;
-                float percent = isFlatOrPoints ? 0.0f : modifier.Value * Level;
-                Stats.Call("remove_modifier", modifier.Stat, flat, percent);
-            }
-        }
+        foreach (var modifier in _modifiers)
+            RemoveStat(modifier.Stat, FlatOf(modifier) * Level, PercentOf(modifier) * Level);
+    }
+
+    private static float FlatOf(PassiveTreeManager.TreeStatModifier modifier)
+    {
+        bool isFlatOrPoints = modifier.Unit is PassiveTreeManager.TreeModifierUnit.Flat
+            or PassiveTreeManager.TreeModifierUnit.PercentagePoints;
+        return isFlatOrPoints ? modifier.Value : 0.0f;
+    }
+
+    private static float PercentOf(PassiveTreeManager.TreeStatModifier modifier)
+    {
+        bool isFlatOrPoints = modifier.Unit is PassiveTreeManager.TreeModifierUnit.Flat
+            or PassiveTreeManager.TreeModifierUnit.PercentagePoints;
+        return isFlatOrPoints ? 0.0f : modifier.Value;
     }
 }

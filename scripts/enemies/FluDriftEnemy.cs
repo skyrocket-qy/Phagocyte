@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
-/// Antigen-Drift Influenza Virus (抗原漂移流感病毒)
+/// Antigen-Drift Influenza Virus (æŠ—åŽŸæ¼‚ç§»æµæ„Ÿç—…æ¯’)
 /// Elite enemy. High-frequency HA/NA antigenic drift periodically resets resistance and mutations.
 /// </summary>
 public partial class FluDriftEnemy : BaseEnemy
@@ -29,7 +29,7 @@ public partial class FluDriftEnemy : BaseEnemy
 
     protected override float GetCollisionRadius() => 18.0f;
 
-    /// <summary>Shifting antigen hue for the GPU swarm batch renderer (docs/spec.md §9).</summary>
+    /// <summary>Shifting antigen hue for the GPU swarm batch renderer (docs/spec.md Â§9).</summary>
     public override Color SwarmBatchColor => _currentHue;
 
     protected override void CustomPhysicsProcess(float dt)
@@ -48,7 +48,7 @@ public partial class FluDriftEnemy : BaseEnemy
         _currentHue = new Color(GD.Randf(), GD.Randf(), GD.Randf(), 0.95f).Lerp(Colors.Cyan, 0.3f);
 
         // 2. Shockwave pushing player back
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
         if (player != null && GodotObject.IsInstanceValid(player))
         {
             Vector2 diff = player.GlobalPosition - GlobalPosition;

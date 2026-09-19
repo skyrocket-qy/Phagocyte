@@ -13,40 +13,40 @@ public partial class UpgradeManager : RefCounted
     // All catalog active weapon classes (16)
     public static Array<Dictionary> ActiveCatalog = new Array<Dictionary>()
     {
-        new Dictionary { { "id", "ros_torrent" }, { "name", "SKILL_ROS_NAME" }, { "desc", "SKILL_ROS_DESC" }, { "icon", "💨" }, { "class_type", typeof(RosTorrentSkill).AssemblyQualifiedName }, { "class_id", "macrophage" } },
-        new Dictionary { { "id", "perforin_lance" }, { "name", "SKILL_PERFORIN_NAME" }, { "desc", "SKILL_PERFORIN_DESC" }, { "icon", "🗡️" }, { "class_type", typeof(PerforinLanceSkill).AssemblyQualifiedName }, { "class_id", "ctl" } },
-        new Dictionary { { "id", "complement_cascade" }, { "name", "SKILL_COMPLEMENT_NAME" }, { "desc", "SKILL_COMPLEMENT_DESC" }, { "icon", "💥" }, { "class_type", typeof(ComplementCascadeSkill).AssemblyQualifiedName }, { "class_id", "neutrophil" } },
-        new Dictionary { { "id", "antibody_salvo" }, { "name", "SKILL_ANTIBODY_NAME" }, { "desc", "SKILL_ANTIBODY_DESC" }, { "icon", "🏹" }, { "class_type", typeof(AntibodySalvoSkill).AssemblyQualifiedName }, { "class_id", "b_cell" } },
-        new Dictionary { { "id", "pseudopod_lunge" }, { "name", "SKILL_LUNGE_NAME" }, { "desc", "SKILL_LUNGE_DESC" }, { "icon", "🥊" }, { "class_type", typeof(PseudopodLungeSkill).AssemblyQualifiedName }, { "class_id", "dendritic" } },
-        new Dictionary { { "id", "nitric_oxide_halo" }, { "name", "SKILL_NO_NAME" }, { "desc", "SKILL_NO_DESC" }, { "icon", "⭕" }, { "class_type", typeof(NitricOxideHaloSkill).AssemblyQualifiedName } },
-        new Dictionary { { "id", "nuclease_blades" }, { "name", "SKILL_NUCLEASE_NAME" }, { "desc", "SKILL_NUCLEASE_DESC" }, { "icon", "⛓️" }, { "class_type", typeof(NucleaseBladesSkill).AssemblyQualifiedName } },
-        new Dictionary { { "id", "granzyme_detonation" }, { "name", "SKILL_GRANZYME_NAME" }, { "desc", "SKILL_GRANZYME_DESC" }, { "icon", "🧬" }, { "class_type", typeof(GranzymeDetonationSkill).AssemblyQualifiedName }, { "class_id", "neutrophil" } },
-        new Dictionary { { "id", "interferon_wave" }, { "name", "SKILL_INTERFERON_NAME" }, { "desc", "SKILL_INTERFERON_DESC" }, { "icon", "🌊" }, { "class_type", typeof(InterferonWaveSkill).AssemblyQualifiedName } },
-        new Dictionary { { "id", "lysozyme_ricochet" }, { "name", "SKILL_LYSOZYME_NAME" }, { "desc", "SKILL_LYSOZYME_DESC" }, { "icon", "🧪" }, { "class_type", typeof(LysozymeRicochetSkill).AssemblyQualifiedName } },
-        new Dictionary { { "id", "phagolysosome_vent" }, { "name", "SKILL_PHAGO_VENT_NAME" }, { "desc", "SKILL_PHAGO_VENT_DESC" }, { "icon", "🛢️" }, { "class_type", typeof(PhagolysosomeVentSkill).AssemblyQualifiedName } },
-        new Dictionary { { "id", "pro_inflammatory_arc" }, { "name", "SKILL_PRO_INFLAM_NAME" }, { "desc", "SKILL_PRO_INFLAM_DESC" }, { "icon", "⚡" }, { "class_type", typeof(ProInflammatoryArcSkill).AssemblyQualifiedName } },
-        new Dictionary { { "id", "exosome_singularity" }, { "name", "SKILL_EXOSOME_NAME" }, { "desc", "SKILL_EXOSOME_DESC" }, { "icon", "🧲" }, { "class_type", typeof(ExosomeSingularitySkill).AssemblyQualifiedName } },
-        new Dictionary { { "id", "defensin_barbs" }, { "name", "SKILL_DEFENSIN_NAME" }, { "desc", "SKILL_DEFENSIN_DESC" }, { "icon", "🛡️" }, { "class_type", typeof(DefensinBarbsSkill).AssemblyQualifiedName } },
-        new Dictionary { { "id", "mhc_tracer_beam" }, { "name", "SKILL_MHC_TRACER_NAME" }, { "desc", "SKILL_MHC_TRACER_DESC" }, { "icon", "🎯" }, { "class_type", typeof(MhcTracerBeamSkill).AssemblyQualifiedName }, { "class_id", "dendritic" } },
-        new Dictionary { { "id", "histamine_surge" }, { "name", "SKILL_HISTAMINE_NAME" }, { "desc", "SKILL_HISTAMINE_DESC" }, { "icon", "💉" }, { "class_type", typeof(HistamineSurgeSkill).AssemblyQualifiedName } }
+        new Dictionary { { "id", SkillIds.RosTorrent }, { "name", "SKILL_ROS_NAME" }, { "desc", "SKILL_ROS_DESC" }, { "icon", "💨" }, { "class_type", typeof(RosTorrentSkill).AssemblyQualifiedName }, { "class_id", "macrophage" } },
+        new Dictionary { { "id", SkillIds.PerforinLance }, { "name", "SKILL_PERFORIN_NAME" }, { "desc", "SKILL_PERFORIN_DESC" }, { "icon", "🗡️" }, { "class_type", typeof(PerforinLanceSkill).AssemblyQualifiedName }, { "class_id", "ctl" } },
+        new Dictionary { { "id", SkillIds.ComplementCascade }, { "name", "SKILL_COMPLEMENT_NAME" }, { "desc", "SKILL_COMPLEMENT_DESC" }, { "icon", "💥" }, { "class_type", typeof(ComplementCascadeSkill).AssemblyQualifiedName }, { "class_id", "neutrophil" } },
+        new Dictionary { { "id", SkillIds.AntibodySalvo }, { "name", "SKILL_ANTIBODY_NAME" }, { "desc", "SKILL_ANTIBODY_DESC" }, { "icon", "🏹" }, { "class_type", typeof(AntibodySalvoSkill).AssemblyQualifiedName }, { "class_id", "b_cell" } },
+        new Dictionary { { "id", SkillIds.PseudopodLunge }, { "name", "SKILL_LUNGE_NAME" }, { "desc", "SKILL_LUNGE_DESC" }, { "icon", "🥊" }, { "class_type", typeof(PseudopodLungeSkill).AssemblyQualifiedName }, { "class_id", "dendritic" } },
+        new Dictionary { { "id", SkillIds.NitricOxideHalo }, { "name", "SKILL_NO_NAME" }, { "desc", "SKILL_NO_DESC" }, { "icon", "⭕" }, { "class_type", typeof(NitricOxideHaloSkill).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.NucleaseBlades }, { "name", "SKILL_NUCLEASE_NAME" }, { "desc", "SKILL_NUCLEASE_DESC" }, { "icon", "⛓️" }, { "class_type", typeof(NucleaseBladesSkill).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.GranzymeDetonation }, { "name", "SKILL_GRANZYME_NAME" }, { "desc", "SKILL_GRANZYME_DESC" }, { "icon", "🧬" }, { "class_type", typeof(GranzymeDetonationSkill).AssemblyQualifiedName }, { "class_id", "neutrophil" } },
+        new Dictionary { { "id", SkillIds.InterferonWave }, { "name", "SKILL_INTERFERON_NAME" }, { "desc", "SKILL_INTERFERON_DESC" }, { "icon", "🌊" }, { "class_type", typeof(InterferonWaveSkill).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.LysozymeRicochet }, { "name", "SKILL_LYSOZYME_NAME" }, { "desc", "SKILL_LYSOZYME_DESC" }, { "icon", "🧪" }, { "class_type", typeof(LysozymeRicochetSkill).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PhagolysosomeVent }, { "name", "SKILL_PHAGO_VENT_NAME" }, { "desc", "SKILL_PHAGO_VENT_DESC" }, { "icon", "🛢️" }, { "class_type", typeof(PhagolysosomeVentSkill).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.ProInflammatoryArc }, { "name", "SKILL_PRO_INFLAM_NAME" }, { "desc", "SKILL_PRO_INFLAM_DESC" }, { "icon", "⚡" }, { "class_type", typeof(ProInflammatoryArcSkill).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.ExosomeSingularity }, { "name", "SKILL_EXOSOME_NAME" }, { "desc", "SKILL_EXOSOME_DESC" }, { "icon", "🧲" }, { "class_type", typeof(ExosomeSingularitySkill).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.DefensinBarbs }, { "name", "SKILL_DEFENSIN_NAME" }, { "desc", "SKILL_DEFENSIN_DESC" }, { "icon", "🛡️" }, { "class_type", typeof(DefensinBarbsSkill).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.MhcTracerBeam }, { "name", "SKILL_MHC_TRACER_NAME" }, { "desc", "SKILL_MHC_TRACER_DESC" }, { "icon", "🎯" }, { "class_type", typeof(MhcTracerBeamSkill).AssemblyQualifiedName }, { "class_id", "dendritic" } },
+        new Dictionary { { "id", SkillIds.HistamineSurge }, { "name", "SKILL_HISTAMINE_NAME" }, { "desc", "SKILL_HISTAMINE_DESC" }, { "icon", "💉" }, { "class_type", typeof(HistamineSurgeSkill).AssemblyQualifiedName } }
     };
 
     // All catalog passive trait classes (13)
     public static Array<Dictionary> PassiveCatalog = new Array<Dictionary>()
     {
-        new Dictionary { { "id", "passive_actin" }, { "name", "SKILL_ACTIN_NAME" }, { "desc", "SKILL_ACTIN_DESC" }, { "icon", "🧬" }, { "class_type", typeof(PassiveActinPolymerization).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_lysosome" }, { "name", "TREE_NODE_LYSOSOME_NAME" }, { "desc", "TREE_NODE_LYSOSOME_DESC" }, { "icon", "🧪" }, { "class_type", typeof(PassiveLysosomePriming).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_mitochondria" }, { "name", "SKILL_MITOCHONDRIA_NAME" }, { "desc", "SKILL_MITOCHONDRIA_DESC" }, { "icon", "⚡" }, { "class_type", typeof(PassiveMitochondrialOverclock).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_opsonin" }, { "name", "SKILL_OPSONIN_NAME" }, { "desc", "SKILL_OPSONIN_DESC" }, { "icon", "🎯" }, { "class_type", typeof(PassiveOpsoninAffinity).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_chemokine" }, { "name", "SKILL_CHEMOKINE_NAME" }, { "desc", "SKILL_CHEMOKINE_DESC" }, { "icon", "🧲" }, { "class_type", typeof(PassiveChemokineReceptors).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_bilayer" }, { "name", "SKILL_BILAYER_NAME" }, { "desc", "SKILL_BILAYER_DESC" }, { "icon", "🛡️" }, { "class_type", typeof(PassiveBilayerHardening).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_autophagy" }, { "name", "SKILL_AUTOPHAGY_NAME" }, { "desc", "SKILL_AUTOPHAGY_DESC" }, { "icon", "🔄" }, { "class_type", typeof(PassiveAutophagicRecycle).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_glycolysis" }, { "name", "SKILL_GLYCOLYSIS_NAME" }, { "desc", "SKILL_GLYCOLYSIS_DESC" }, { "icon", "🍬" }, { "class_type", typeof(PassiveAerobicGlycolysis).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_kinesin" }, { "name", "SKILL_KINESIN_NAME" }, { "desc", "SKILL_KINESIN_DESC" }, { "icon", "🛤️" }, { "class_type", typeof(PassiveKinesinTransit).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_longevity" }, { "name", "SKILL_LONGEVITY_NAME" }, { "desc", "SKILL_LONGEVITY_DESC" }, { "icon", "⏳" }, { "class_type", typeof(PassiveCytokineLongevity).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_vdj" }, { "name", "SKILL_VDJ_NAME" }, { "desc", "SKILL_VDJ_DESC" }, { "icon", "🎲" }, { "class_type", typeof(PassiveVdjDiversity).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_endotoxin" }, { "name", "SKILL_ENDOTOXIN_NAME" }, { "desc", "SKILL_ENDOTOXIN_DESC" }, { "icon", "🧱" }, { "class_type", typeof(PassiveEndotoxinBarrier).AssemblyQualifiedName } },
-        new Dictionary { { "id", "passive_hematopoietic" }, { "name", "SKILL_HEMATOPOIETIC_NAME" }, { "desc", "SKILL_HEMATOPOIETIC_DESC" }, { "icon", "🩸" }, { "class_type", typeof(PassiveHematopoieticReserve).AssemblyQualifiedName } }
+        new Dictionary { { "id", SkillIds.PassiveActin }, { "name", "SKILL_ACTIN_NAME" }, { "desc", "SKILL_ACTIN_DESC" }, { "icon", "🧬" }, { "class_type", typeof(PassiveActinPolymerization).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveLysosome }, { "name", "TREE_NODE_LYSOSOME_NAME" }, { "desc", "TREE_NODE_LYSOSOME_DESC" }, { "icon", "🧪" }, { "class_type", typeof(PassiveLysosomePriming).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveMitochondria }, { "name", "SKILL_MITOCHONDRIA_NAME" }, { "desc", "SKILL_MITOCHONDRIA_DESC" }, { "icon", "⚡" }, { "class_type", typeof(PassiveMitochondrialOverclock).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveOpsonin }, { "name", "SKILL_OPSONIN_NAME" }, { "desc", "SKILL_OPSONIN_DESC" }, { "icon", "🎯" }, { "class_type", typeof(PassiveOpsoninAffinity).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveChemokine }, { "name", "SKILL_CHEMOKINE_NAME" }, { "desc", "SKILL_CHEMOKINE_DESC" }, { "icon", "🧲" }, { "class_type", typeof(PassiveChemokineReceptors).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveBilayer }, { "name", "SKILL_BILAYER_NAME" }, { "desc", "SKILL_BILAYER_DESC" }, { "icon", "🛡️" }, { "class_type", typeof(PassiveBilayerHardening).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveAutophagy }, { "name", "SKILL_AUTOPHAGY_NAME" }, { "desc", "SKILL_AUTOPHAGY_DESC" }, { "icon", "🔄" }, { "class_type", typeof(PassiveAutophagicRecycle).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveGlycolysis }, { "name", "SKILL_GLYCOLYSIS_NAME" }, { "desc", "SKILL_GLYCOLYSIS_DESC" }, { "icon", "🍬" }, { "class_type", typeof(PassiveAerobicGlycolysis).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveKinesin }, { "name", "SKILL_KINESIN_NAME" }, { "desc", "SKILL_KINESIN_DESC" }, { "icon", "🛤️" }, { "class_type", typeof(PassiveKinesinTransit).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveLongevity }, { "name", "SKILL_LONGEVITY_NAME" }, { "desc", "SKILL_LONGEVITY_DESC" }, { "icon", "⏳" }, { "class_type", typeof(PassiveCytokineLongevity).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveVdj }, { "name", "SKILL_VDJ_NAME" }, { "desc", "SKILL_VDJ_DESC" }, { "icon", "🎲" }, { "class_type", typeof(PassiveVdjDiversity).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveEndotoxin }, { "name", "SKILL_ENDOTOXIN_NAME" }, { "desc", "SKILL_ENDOTOXIN_DESC" }, { "icon", "🧱" }, { "class_type", typeof(PassiveEndotoxinBarrier).AssemblyQualifiedName } },
+        new Dictionary { { "id", SkillIds.PassiveHematopoietic }, { "name", "SKILL_HEMATOPOIETIC_NAME" }, { "desc", "SKILL_HEMATOPOIETIC_DESC" }, { "icon", "🩸" }, { "class_type", typeof(PassiveHematopoieticReserve).AssemblyQualifiedName } }
     };
 
     /// <summary>
@@ -57,11 +57,11 @@ public partial class UpgradeManager : RefCounted
 
     public static readonly System.Collections.Generic.Dictionary<string, string> CatalystPairs = new()
     {
-        { "perforin_lance", "passive_lysosome" },
-        { "complement_cascade", "passive_actin" },
-        { "antibody_salvo", "passive_opsonin" },
-        { "ros_torrent", "passive_mitochondria" },
-        { "pseudopod_lunge", "passive_chemokine" }
+        { SkillIds.PerforinLance, SkillIds.PassiveLysosome },
+        { SkillIds.ComplementCascade, SkillIds.PassiveActin },
+        { SkillIds.AntibodySalvo, SkillIds.PassiveOpsonin },
+        { SkillIds.RosTorrent, SkillIds.PassiveMitochondria },
+        { SkillIds.PseudopodLunge, SkillIds.PassiveChemokine }
     };
 
     /// <summary>

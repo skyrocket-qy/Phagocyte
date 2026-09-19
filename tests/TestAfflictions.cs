@@ -16,10 +16,8 @@ namespace Phagocyte.Tests;
 /// regen lock, extreme viscosity slow, febrile burn and antigenic drift.
 /// </summary>
 [TestSuite]
-public partial class TestAfflictions : SceneTree
+public partial class TestAfflictions : TestHarness
 {
-    private const string TestRecordsPath = "user://test_afflictions_records.json";
-
     private int _phase = 0;
     private Main? _main = null;
 
@@ -35,13 +33,9 @@ public partial class TestAfflictions : SceneTree
 
     public override void _Initialize()
     {
-        GD.Print("==================================================================");
-        GD.Print(">>> STARTING PATHOLOGICAL OVERLOAD AFFLICTION VERIFICATION <<<");
-        GD.Print("==================================================================");
+        Banner("STARTING PATHOLOGICAL OVERLOAD AFFLICTION VERIFICATION");
 
-        RunRecordManager.SavePath = TestRecordsPath;
-        if (FileAccess.FileExists(TestRecordsPath))
-            DirAccess.RemoveAbsolute(TestRecordsPath);
+        IsolateSaves("afflictions");
         RunRecordManager.LoadFromDisk();
 
         AfflictionManager.Clear();
@@ -183,21 +177,21 @@ public partial class TestAfflictions : SceneTree
 
     private void RunEndlessIntegrationTests()
     {
-        GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
-        GameManager.EndlessMode = true;
         AfflictionManager.SetSelection(AllAfflictions);
 
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = InstantiateMain(endless: true);
         _main = main;
-        Root.AddChild(main);
-        main.SetPhysicsProcess(false);
 
         var player = main.GetNodeOrNull<BaseCell>("Macrophage");
         AssertThat(player).IsNotNull();
 
+        // The febrile burn is a fixed 2% max-HP environmental tick; clear the
+        // innate avoidance so the assertion cannot be nullified by a block roll.
+        player!.Stats!.SetBase("block", 0.0f);
+        player.Stats.SetBase("evasion", 0.0f);
+
         // Extreme viscosity: -25% base move speed percent modifier
-        var speedStat = player!.Stats!.GetStatObj("move_speed");
+        var speedStat = player.Stats.GetStatObj("move_speed");
         AssertThat(speedStat).IsNotNull();
         AssertThat(speedStat!.PercentBonus).IsEqualApprox(-0.25f, 0.0001f);
 
@@ -226,16 +220,9 @@ public partial class TestAfflictions : SceneTree
         GameManager.EndlessMode = false;
         AfflictionManager.Clear();
 
-        if (_main != null && IsInstanceValid(_main))
-        {
-            if (_main.GetParent() != null)
-                _main.GetParent().RemoveChild(_main);
-            _main.Free();
-            _main = null;
-        }
+        FreeMain(_main);
+        _main = null;
 
-        if (FileAccess.FileExists(TestRecordsPath))
-            DirAccess.RemoveAbsolute(TestRecordsPath);
-        RunRecordManager.SavePath = "";
+        RestoreSaves();
     }
 }

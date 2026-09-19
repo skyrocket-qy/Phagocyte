@@ -8,7 +8,7 @@ using Phagocyte.Skills;
 
 namespace Phagocyte.Tests;
 
-public partial class TestCaptureSkillsShowcase : SceneTree
+public partial class TestCaptureSkillsShowcase : TestHarness
 {
     private int _frames = 0;
     private Node2D? _main;
@@ -113,12 +113,7 @@ public partial class TestCaptureSkillsShowcase : SceneTree
 
         if (_frames == 35)
         {
-            var img = Root.GetViewport().GetTexture().GetImage();
-            if (img != null && !img.IsEmpty())
-            {
-                img.SavePng("/Users/zelin/.gemini/antigravity/brain/90aa15b5-daf8-494f-9087-b33113cecd7f/skills_expansion_showcase.png");
-                GD.Print("[SUCCESS] Captured skills_expansion_showcase.png");
-            }
+            CaptureScreenshot("skills_expansion_showcase.png");
             Quit(0);
             return true;
         }

@@ -7,7 +7,7 @@ using Phagocyte.Player;
 
 namespace Phagocyte.Tests;
 
-public partial class TestCaptureHudScreenshot : SceneTree
+public partial class TestCaptureHudScreenshot : TestHarness
 {
     private int _frames = 0;
     private Node2D? _main;
@@ -51,12 +51,7 @@ public partial class TestCaptureHudScreenshot : SceneTree
 
         if (_frames == 25)
         {
-            var img = Root.GetViewport().GetTexture().GetImage();
-            if (img != null && !img.IsEmpty())
-            {
-                img.SavePng("/Users/zelin/.gemini/antigravity/brain/90aa15b5-daf8-494f-9087-b33113cecd7f/hud_survivor_normal.png");
-                GD.Print("[SUCCESS] Captured hud_survivor_normal.png");
-            }
+            CaptureScreenshot("hud_survivor_normal.png");
 
             // Damage player to 55% HP (triggers under-cell amber/green arc bar)
             if (_player != null)
@@ -68,12 +63,7 @@ public partial class TestCaptureHudScreenshot : SceneTree
 
         if (_frames == 35)
         {
-            var img = Root.GetViewport().GetTexture().GetImage();
-            if (img != null && !img.IsEmpty())
-            {
-                img.SavePng("/Users/zelin/.gemini/antigravity/brain/90aa15b5-daf8-494f-9087-b33113cecd7f/hud_survivor_damaged.png");
-                GD.Print("[SUCCESS] Captured hud_survivor_damaged.png (with under-cell arc bar)");
-            }
+            CaptureScreenshot("hud_survivor_damaged.png");
 
             // Drop player to 20% HP (critical vignette + ruby heartbeat arc bar)
             if (_player != null)
@@ -85,12 +75,7 @@ public partial class TestCaptureHudScreenshot : SceneTree
 
         if (_frames == 45)
         {
-            var img = Root.GetViewport().GetTexture().GetImage();
-            if (img != null && !img.IsEmpty())
-            {
-                img.SavePng("/Users/zelin/.gemini/antigravity/brain/90aa15b5-daf8-494f-9087-b33113cecd7f/hud_survivor_critical.png");
-                GD.Print("[SUCCESS] Captured hud_survivor_critical.png (with critical vignette & pulsing red arc)");
-            }
+            CaptureScreenshot("hud_survivor_critical.png");
 
             Quit(0);
             return true;

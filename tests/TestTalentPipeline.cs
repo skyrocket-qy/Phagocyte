@@ -16,11 +16,8 @@ namespace Phagocyte.Tests;
 /// start hub is permanently active at zero cost.
 /// </summary>
 [TestSuite]
-public partial class TestTalentPipeline : SceneTree
+public partial class TestTalentPipeline : TestHarness
 {
-    private const string TestTreePath = "user://test_talent_tree.json";
-    private const string TestAchievementsPath = "user://test_talent_achievements.json";
-
     private static readonly string[] MapIds =
     {
         "acute_wound", "alveolar_space", "hepatic_sinusoid", "gastric_lumen", "blood_brain_barrier"
@@ -36,16 +33,9 @@ public partial class TestTalentPipeline : SceneTree
 
     public override void _Initialize()
     {
-        GD.Print("==================================================================");
-        GD.Print(">>> STARTING TALENT POINT PIPELINE & INNATE START HUB VERIFICATION <<<");
-        GD.Print("==================================================================");
+        Banner("STARTING TALENT POINT PIPELINE & INNATE START HUB VERIFICATION");
 
-        PassiveTreeManager.SavePath = TestTreePath;
-        AchievementManager.SavePath = TestAchievementsPath;
-        if (FileAccess.FileExists(TestTreePath))
-            DirAccess.RemoveAbsolute(TestTreePath);
-        if (FileAccess.FileExists(TestAchievementsPath))
-            DirAccess.RemoveAbsolute(TestAchievementsPath);
+        IsolateSaves("talent");
 
         AchievementManager.ResetAll();
         PassiveTreeManager.ResetAll();
@@ -192,13 +182,8 @@ public partial class TestTalentPipeline : SceneTree
     private void RunInnateHubRunIntegrationTests()
     {
         PassiveTreeManager.ResetAll();
-        GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
-
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = InstantiateMain();
         _main = main;
-        Root.AddChild(main);
-        main.SetPhysicsProcess(false);
 
         var player = main.GetNodeOrNull<BaseCell>("Macrophage");
         AssertThat(player).IsNotNull();
@@ -216,24 +201,12 @@ public partial class TestTalentPipeline : SceneTree
     {
         Paused = false;
 
-        if (_main != null && IsInstanceValid(_main))
-        {
-            if (_main.GetParent() != null)
-                _main.GetParent().RemoveChild(_main);
-            _main.Free();
-            _main = null;
-        }
+        FreeMain(_main);
+        _main = null;
 
         AchievementManager.ResetAll();
         PassiveTreeManager.ResetAll();
-
-        if (FileAccess.FileExists(TestTreePath))
-            DirAccess.RemoveAbsolute(TestTreePath);
-        if (FileAccess.FileExists(TestAchievementsPath))
-            DirAccess.RemoveAbsolute(TestAchievementsPath);
-
-        PassiveTreeManager.SavePath = "";
-        AchievementManager.SavePath = "";
+        RestoreSaves();
         GameManager.SelectedClass = "macrophage";
     }
 }

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -16,7 +17,7 @@ public partial class RosTorrentSkill : BaseSkill
 
     public RosTorrentSkill()
     {
-        SkillId = "ros_torrent";
+        SkillId = SkillIds.RosTorrent;
         NameKey = "SKILL_ROS_NAME";
         DescKey = "SKILL_ROS_DESC";
         BioKey = "SKILL_ROS_BIO";
@@ -66,38 +67,8 @@ public partial class RosTorrentSkill : BaseSkill
         if (Host == null)
             return Vector2.Right;
 
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        Node2D? closestEnemy = null;
-        float minDist = AttackRange;
-
-        foreach (var p in pathogens)
-        {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                var eaten = n.Get("is_being_eaten");
-                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                    continue;
-
-                float d = Host.GlobalPosition.DistanceTo(n.GlobalPosition);
-                if (d < minDist)
-                {
-                    minDist = d;
-                    closestEnemy = n;
-                }
-            }
-        }
-
-        if (closestEnemy != null)
-        {
-            return (closestEnemy.GlobalPosition - Host.GlobalPosition).Normalized();
-        }
-
-        // Fallback to current velocity or facing
-        if (Host.Velocity.Length() > 20.0f)
-        {
-            return Host.Velocity.Normalized();
-        }
-        return Vector2.Right;
+        Vector2 fallback = Host.Velocity.Length() > 20.0f ? Host.Velocity.Normalized() : Vector2.Right;
+        return TargetingService.FindTargetDirection(Host, AttackRange, fallback);
     }
 
     private void FireJet(Vector2 dir, float areaMult, float speedVal, float lifeVal)

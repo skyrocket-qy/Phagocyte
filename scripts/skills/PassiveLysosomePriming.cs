@@ -14,7 +14,7 @@ public partial class PassiveLysosomePriming : BaseSkill
 
     public PassiveLysosomePriming()
     {
-        SkillId = "passive_lysosome";
+        SkillId = SkillIds.PassiveLysosome;
         NameKey = "TREE_NODE_LYSOSOME_NAME";
         DescKey = "TREE_NODE_LYSOSOME_DESC";
         BioKey = "SKILL_LYSOSOME_BIO";
@@ -28,37 +28,17 @@ public partial class PassiveLysosomePriming : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            float bonusMight = MightPerLevel * Level;
-            float bonusRegen = RegenPerLevel * Level;
-            cs.AddModifier("might", 0.0f, bonusMight);
-            cs.AddModifier("health_regen", bonusRegen, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            float bonusMight = MightPerLevel * Level;
-            float bonusRegen = RegenPerLevel * Level;
-            Stats.Call("add_modifier", "might", 0.0f, bonusMight);
-            Stats.Call("add_modifier", "health_regen", bonusRegen, 0.0f);
-        }
+        float bonusMight = MightPerLevel * Level;
+        float bonusRegen = RegenPerLevel * Level;
+        ApplyStat("might", 0.0f, bonusMight);
+        ApplyStat("health_regen", bonusRegen, 0.0f);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            float bonusMight = MightPerLevel * Level;
-            float bonusRegen = RegenPerLevel * Level;
-            cs.RemoveModifier("might", 0.0f, bonusMight);
-            cs.RemoveModifier("health_regen", bonusRegen, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            float bonusMight = MightPerLevel * Level;
-            float bonusRegen = RegenPerLevel * Level;
-            Stats.Call("remove_modifier", "might", 0.0f, bonusMight);
-            Stats.Call("remove_modifier", "health_regen", bonusRegen, 0.0f);
-        }
+        float bonusMight = MightPerLevel * Level;
+        float bonusRegen = RegenPerLevel * Level;
+        RemoveStat("might", 0.0f, bonusMight);
+        RemoveStat("health_regen", bonusRegen, 0.0f);
     }
 }

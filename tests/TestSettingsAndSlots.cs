@@ -8,7 +8,7 @@ using static GdUnit4.Assertions;
 
 namespace Phagocyte.Tests;
 
-public partial class TestSettingsAndSlots : SceneTree
+public partial class TestSettingsAndSlots : TestHarness
 {
     private int _framesWaited = 0;
     private bool _testDone = false;
@@ -16,6 +16,7 @@ public partial class TestSettingsAndSlots : SceneTree
     public override void _Initialize()
     {
         GD.Print("--- BEGINNING SETTINGS & DUAL-ROW SLOTS AUTOMATED VERIFICATION ---");
+        IsolateSaves("settings_slots");
         var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
         if (mainScene == null)
         {
@@ -139,12 +140,12 @@ public partial class TestSettingsAndSlots : SceneTree
         AssertThat(SettingsManager.Fullscreen).IsTrue();
         AssertThat(SettingsManager.Vsync).IsFalse();
 
-        AssertThat(FileAccess.FileExists("user://settings.json")).IsTrue();
+        AssertThat(FileAccess.FileExists(SettingsManager.SavePath)).IsTrue();
 
         SettingsManager.LoadFromDisk();
         AssertThat(Mathf.Abs(SettingsManager.MasterVolume - 0.65f) < 0.01f).IsTrue();
         AssertThat(SettingsManager.Fullscreen).IsTrue();
-        GD.Print("[PASS] 6. SettingsManager volume/graphics persistence to user://settings.json verified.");
+        GD.Print("[PASS] 6. SettingsManager volume/graphics persistence to the isolated save verified.");
 
         // =========================================================================
         // TEST 6: SettingsModal in HUD (Pause Menu)
@@ -212,6 +213,7 @@ public partial class TestSettingsAndSlots : SceneTree
         menuNode.QueueFree();
         main.QueueFree();
 
+        RestoreSaves();
         GD.Print("--- ALL SETTINGS & DUAL-ROW SLOTS TESTS PASSED SUCCESSFULLY! ---");
         Quit(0);
         return true;

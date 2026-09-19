@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -16,7 +17,7 @@ public partial class PhagolysosomeVentSkill : BaseSkill
 
     public PhagolysosomeVentSkill()
     {
-        SkillId = "phagolysosome_vent";
+        SkillId = SkillIds.PhagolysosomeVent;
         NameKey = "SKILL_PHAGO_VENT_NAME";
         DescKey = "SKILL_PHAGO_VENT_DESC";
         BioKey = "SKILL_PHAGO_VENT_BIO";
@@ -86,20 +87,13 @@ public partial class PhagolysosomeVentSkill : BaseSkill
             if (HostRef == null)
                 return;
 
-            var pathogens = HostRef.GetTree().GetNodesInGroup("pathogens");
-            foreach (var p in pathogens)
+            TargetingService.ForEachInRadius(GlobalPosition, Radius, n =>
             {
-                if (p is Node2D n && GodotObject.IsInstanceValid(n))
-                {
-                    if (GlobalPosition.DistanceTo(n.GlobalPosition) <= Radius)
-                    {
-                        if (n.HasMethod("take_damage"))
-                            n.Call("take_damage", DamagePerTick);
-                        else if (n.HasMethod("be_engulfed"))
-                            n.Call("be_engulfed", HostRef);
-                    }
-                }
-            }
+                if (n.HasMethod("take_damage"))
+                    n.Call("take_damage", DamagePerTick);
+                else if (n.HasMethod("be_engulfed"))
+                    n.Call("be_engulfed", HostRef);
+            }, skipEaten: false);
         }
 
         public override void _Draw()

@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
@@ -11,10 +11,10 @@ namespace Phagocyte.Tests;
 
 /// <summary>
 /// Verifies the five organ-specific fluid mechanics and physiological
-/// environments that act directly on the player cell (docs/map.md §3 / TODO module 3).
+/// environments that act directly on the player cell (docs/map.md Â§3 / TODO module 3).
 /// </summary>
 [TestSuite]
-public partial class TestMapEnvironments : SceneTree
+public partial class TestMapEnvironments : TestHarness
 {
     private int _phase = 0;
     private Main? _main = null;

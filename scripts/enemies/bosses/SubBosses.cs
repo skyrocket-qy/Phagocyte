@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 using Phagocyte.Combat;
@@ -34,7 +34,7 @@ public abstract partial class SubBossEnemy : BaseEnemy
 }
 
 /// <summary>
-/// Map 1 Sub-Boss: Streptococcus Chain-Lord (化膿性鏈球菌巨噬長鏈).
+/// Map 1 Sub-Boss: Streptococcus Chain-Lord (åŒ–è†¿æ€§éˆçƒèŒå·¨å™¬é•·éˆ).
 /// Super-long serpentine swimmer with multi-segment collision beads.
 /// </summary>
 public partial class StreptococcusChainLord : SubBossEnemy
@@ -79,7 +79,7 @@ public partial class StreptococcusChainLord : SubBossEnemy
     {
         _swayPhase += dt * 3.2f;
 
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
         Vector2 heading = WanderDir;
         if (player != null && GodotObject.IsInstanceValid(player) && !player.IsDead)
         {
@@ -129,7 +129,7 @@ public partial class StreptococcusChainLord : SubBossEnemy
             return;
         }
 
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
         if (player == null || !GodotObject.IsInstanceValid(player) || player.IsDead)
             return;
 
@@ -182,7 +182,7 @@ public partial class StreptococcusChainLord : SubBossEnemy
 }
 
 /// <summary>
-/// Map 2 Sub-Boss: Flu-Drift Cyclone (甲型變異流感暴風核心).
+/// Map 2 Sub-Boss: Flu-Drift Cyclone (ç”²åž‹è®Šç•°æµæ„Ÿæš´é¢¨æ ¸å¿ƒ).
 /// Every 30s triggers a full-screen antigenic drift that clears targeted crit marks.
 /// </summary>
 public partial class FluDriftCyclone : SubBossEnemy
@@ -238,7 +238,7 @@ public partial class FluDriftCyclone : SubBossEnemy
             }
         }
 
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
         if (player != null && GodotObject.IsInstanceValid(player))
         {
             Vector2 away = player.GlobalPosition - GlobalPosition;
@@ -321,7 +321,7 @@ public partial class DriftWave : Node2D
 }
 
 /// <summary>
-/// Map 3 Sub-Boss: TB Granuloma Behemoth (結核肉芽腫巨核).
+/// Map 3 Sub-Boss: TB Granuloma Behemoth (çµæ ¸è‚‰èŠ½è…«å·¨æ ¸).
 /// Dense waxy wall with heavy damage reduction; leaves caseous debris on death.
 /// </summary>
 public partial class TbGranulomaBehemoth : SubBossEnemy
@@ -439,7 +439,7 @@ public partial class CaseousNecrosis : StaticBody2D
 }
 
 /// <summary>
-/// Map 4 Sub-Boss: VacA Secretor (空泡毒素 VacA 分泌原體).
+/// Map 4 Sub-Boss: VacA Secretor (ç©ºæ³¡æ¯’ç´  VacA åˆ†æ³ŒåŽŸé«”).
 /// Trails large spreading acid pools across the gastric lumen.
 /// </summary>
 public partial class VacASecretor : SubBossEnemy
@@ -549,7 +549,7 @@ public partial class VacAAcidPool : BioHazardArea
 }
 
 /// <summary>
-/// Map 5 Sub-Boss: Toxoplasma Mega-Cyst (剛地弓形蟲巨型假包囊).
+/// Map 5 Sub-Boss: Toxoplasma Mega-Cyst (å‰›åœ°å¼“å½¢èŸ²å·¨åž‹å‡åŒ…å›Š).
 /// Upon reaching low HP, fires tachyzoites in four orthogonal directions.
 /// </summary>
 public partial class ToxoplasmaMegaCyst : SubBossEnemy
@@ -680,7 +680,7 @@ public partial class Tachyzoite : BaseEnemy
         if (_hasHit)
             return;
 
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
         if (player != null && GodotObject.IsInstanceValid(player) && !player.IsDead)
         {
             if (GlobalPosition.DistanceTo(player.GlobalPosition) <= 20.0f + player.CurrentRadius * 0.4f)

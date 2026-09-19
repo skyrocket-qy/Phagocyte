@@ -14,7 +14,7 @@ public partial class PassiveAerobicGlycolysis : BaseSkill
 
     public PassiveAerobicGlycolysis()
     {
-        SkillId = "passive_glycolysis";
+        SkillId = SkillIds.PassiveGlycolysis;
         NameKey = "SKILL_GLYCOLYSIS_NAME";
         DescKey = "SKILL_GLYCOLYSIS_DESC";
         BioKey = "SKILL_GLYCOLYSIS_BIO";
@@ -28,29 +28,13 @@ public partial class PassiveAerobicGlycolysis : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.AddModifier("move_speed", 0.0f, SpeedPerLevel * Level);
-            cs.AddModifier("might", 0.0f, MightPerLevel * Level);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            Stats.Call("add_modifier", "move_speed", 0.0f, SpeedPerLevel * Level);
-            Stats.Call("add_modifier", "might", 0.0f, MightPerLevel * Level);
-        }
+        ApplyStat("move_speed", 0.0f, SpeedPerLevel * Level);
+        ApplyStat("might", 0.0f, MightPerLevel * Level);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.RemoveModifier("move_speed", 0.0f, SpeedPerLevel * Level);
-            cs.RemoveModifier("might", 0.0f, MightPerLevel * Level);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            Stats.Call("remove_modifier", "move_speed", 0.0f, SpeedPerLevel * Level);
-            Stats.Call("remove_modifier", "might", 0.0f, MightPerLevel * Level);
-        }
+        RemoveStat("move_speed", 0.0f, SpeedPerLevel * Level);
+        RemoveStat("might", 0.0f, MightPerLevel * Level);
     }
 }

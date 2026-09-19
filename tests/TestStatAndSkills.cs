@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
@@ -10,7 +10,7 @@ using Phagocyte.UI;
 namespace Phagocyte.Tests;
 
 [TestSuite]
-public partial class TestStatAndSkills : SceneTree
+public partial class TestStatAndSkills : TestHarness
 {
     private int _frameCount = 0;
     private bool _testDone = false;
@@ -177,7 +177,7 @@ public partial class TestStatAndSkills : SceneTree
         AssertThat(sm!.ActiveSlots.Count).IsEqual(5);
         AssertThat(sm.PassiveSlots.Count).IsEqual(5);
 
-        // Macrophage innate 微絲變形 occupies passive slot 0; active slots start empty
+        // Macrophage innate å¾®çµ²è®Šå½¢ occupies passive slot 0; active slots start empty
         AssertThat(sm.GetActiveSlot(0)).IsNull();
         AssertThat(sm.GetPassiveSlot(0) is MacrophageDeformationSkill).IsTrue();
 

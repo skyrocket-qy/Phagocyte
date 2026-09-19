@@ -7,7 +7,7 @@ using static GdUnit4.Assertions;
 
 namespace Phagocyte.Tests;
 
-public partial class TestI18n : SceneTree
+public partial class TestI18n : TestHarness
 {
     private int _framesWaited = 0;
     private bool _testDone = false;

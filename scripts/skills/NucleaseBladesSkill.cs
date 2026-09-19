@@ -57,7 +57,7 @@ public partial class NucleaseBladesSkill : BaseSkill
 
     public NucleaseBladesSkill()
     {
-        SkillId = "nuclease_blades";
+        SkillId = SkillIds.NucleaseBlades;
         NameKey = "SKILL_NUCLEASE_NAME";
         DescKey = "SKILL_NUCLEASE_DESC";
         BioKey = "SKILL_NUCLEASE_BIO";

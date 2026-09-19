@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 using GdUnit4;
@@ -10,12 +10,12 @@ using Phagocyte.Enemies;
 namespace Phagocyte.Tests;
 
 /// <summary>
-/// Verifies the high-concurrency performance pipeline (docs/spec.md §9 /
+/// Verifies the high-concurrency performance pipeline (docs/spec.md Â§9 /
 /// TODO module 12): the 2D QuadTree spatial index, the MultiMeshInstance2D GPU
 /// batch renderer for microscopic swarms, and the passive enemy collision setup.
 /// </summary>
 [TestSuite]
-public partial class TestPerformancePipeline : SceneTree
+public partial class TestPerformancePipeline : TestHarness
 {
     private int _phase = 0;
     private Main? _main = null;

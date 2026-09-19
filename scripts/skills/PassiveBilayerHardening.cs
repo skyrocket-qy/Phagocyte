@@ -14,7 +14,7 @@ public partial class PassiveBilayerHardening : BaseSkill
 
     public PassiveBilayerHardening()
     {
-        SkillId = "passive_bilayer";
+        SkillId = SkillIds.PassiveBilayer;
         NameKey = "SKILL_BILAYER_NAME";
         DescKey = "SKILL_BILAYER_DESC";
         BioKey = "SKILL_BILAYER_BIO";
@@ -28,29 +28,13 @@ public partial class PassiveBilayerHardening : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.AddModifier("max_health", 0.0f, HealthPerLevel * Level);
-            cs.AddModifier("armor", ArmorPerLevel * Level, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            Stats.Call("add_modifier", "max_health", 0.0f, HealthPerLevel * Level);
-            Stats.Call("add_modifier", "armor", ArmorPerLevel * Level, 0.0f);
-        }
+        ApplyStat("max_health", 0.0f, HealthPerLevel * Level);
+        ApplyStat("armor", ArmorPerLevel * Level, 0.0f);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.RemoveModifier("max_health", 0.0f, HealthPerLevel * Level);
-            cs.RemoveModifier("armor", ArmorPerLevel * Level, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            Stats.Call("remove_modifier", "max_health", 0.0f, HealthPerLevel * Level);
-            Stats.Call("remove_modifier", "armor", ArmorPerLevel * Level, 0.0f);
-        }
+        RemoveStat("max_health", 0.0f, HealthPerLevel * Level);
+        RemoveStat("armor", ArmorPerLevel * Level, 0.0f);
     }
 }

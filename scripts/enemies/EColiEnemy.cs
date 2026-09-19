@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
-/// Escherichia coli (鞭毛大腸桿菌)
+/// Escherichia coli (éž­æ¯›å¤§è…¸æ¡¿èŒ)
 /// Peritrichous flagella rotation with chemotactic high-speed straight-line charging dashes.
 /// </summary>
 public partial class EColiEnemy : BaseEnemy
@@ -36,7 +36,7 @@ public partial class EColiEnemy : BaseEnemy
         _stateTimer += dt;
         _flagellaPhase += dt * 10.0f;
 
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
 
         switch (_currentState)
         {

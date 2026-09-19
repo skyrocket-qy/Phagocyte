@@ -17,7 +17,7 @@ public partial class DefensinBarbsSkill : BaseSkill
 
     public DefensinBarbsSkill()
     {
-        SkillId = "defensin_barbs";
+        SkillId = SkillIds.DefensinBarbs;
         NameKey = "SKILL_DEFENSIN_NAME";
         DescKey = "SKILL_DEFENSIN_DESC";
         BioKey = "SKILL_DEFENSIN_BIO";

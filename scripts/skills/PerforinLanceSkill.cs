@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Enemies;
 
@@ -16,7 +17,7 @@ public partial class PerforinLanceSkill : BaseSkill
 
     public PerforinLanceSkill()
     {
-        SkillId = "perforin_lance";
+        SkillId = SkillIds.PerforinLance;
         NameKey = "SKILL_PERFORIN_NAME";
         DescKey = "SKILL_PERFORIN_DESC";
         BioKey = "SKILL_PERFORIN_BIO";
@@ -61,37 +62,8 @@ public partial class PerforinLanceSkill : BaseSkill
         if (Host == null)
             return Vector2.Right;
 
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        Node2D? closestEnemy = null;
-        float minDist = AttackRange;
-
-        foreach (var p in pathogens)
-        {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                var eaten = n.Get("is_being_eaten");
-                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                    continue;
-
-                float d = Host.GlobalPosition.DistanceTo(n.GlobalPosition);
-                if (d < minDist)
-                {
-                    minDist = d;
-                    closestEnemy = n;
-                }
-            }
-        }
-
-        if (closestEnemy != null)
-        {
-            return (closestEnemy.GlobalPosition - Host.GlobalPosition).Normalized();
-        }
-
-        if (Host.Velocity.Length() > 20.0f)
-        {
-            return Host.Velocity.Normalized();
-        }
-        return Vector2.Right;
+        Vector2 fallback = Host.Velocity.Length() > 20.0f ? Host.Velocity.Normalized() : Vector2.Right;
+        return TargetingService.FindTargetDirection(Host, AttackRange, fallback);
     }
 
     private void ExecuteLanceStrike(Vector2 dir, int pierceLimit)
@@ -125,14 +97,7 @@ public partial class PerforinLanceSkill : BaseSkill
                     float dmg = (float)dmgDict["damage"];
                     bool isCrit = (bool)dmgDict["is_crit"];
 
-                    if (n is BaseEnemy be)
-                    {
-                        be.TakeDamage(dmg, Host, isCrit);
-                    }
-                    else if (n.HasMethod("take_damage"))
-                    {
-                        n.Call("take_damage", dmg, Host, isCrit);
-                    }
+                    CombatHelper.DealDamage(n, dmg, Host, isCrit);
                 }
             }
         }

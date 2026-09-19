@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
@@ -9,7 +9,7 @@ using Phagocyte.UI;
 namespace Phagocyte.Tests;
 
 [TestSuite]
-public partial class TestAllCells : SceneTree
+public partial class TestAllCells : TestHarness
 {
     private int _phase = 0;
     private int _frameCount = 0;
@@ -47,7 +47,7 @@ public partial class TestAllCells : SceneTree
                     AssertThat(baseCell.EngulfCollider!.Polygon.Length).IsEqual(32);
                     AssertThat(baseCell.Nucleus!.Polygon.Length).IsGreaterEqual(16);
 
-                    // Verify class-exclusive innate skill binding (docs/cell.md §2)
+                    // Verify class-exclusive innate skill binding (docs/cell.md Â§2)
                     var sm = baseCell.CellSkillManager!;
                     var slot0 = sm.GetActiveSlot(0);
 
@@ -91,7 +91,7 @@ public partial class TestAllCells : SceneTree
                             break;
                     }
 
-                    // Verify class-specific Lv.1 base stat matrix (docs/cell.md §3)
+                    // Verify class-specific Lv.1 base stat matrix (docs/cell.md Â§3)
                     switch (cid)
                     {
                         case "macrophage":

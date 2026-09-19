@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Core;
 using Phagocyte.Player;
@@ -9,7 +9,7 @@ using static GdUnit4.Assertions;
 
 namespace Phagocyte.Tests;
 
-public partial class TestVisualOverhaul : SceneTree
+public partial class TestVisualOverhaul : TestHarness
 {
     private int _framesWaited = 0;
     private bool _testDone = false;

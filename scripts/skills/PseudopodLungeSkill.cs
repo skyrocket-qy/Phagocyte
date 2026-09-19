@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using Phagocyte.Enemies;
+using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
 
@@ -15,7 +16,7 @@ public partial class PseudopodLungeSkill : BaseSkill
 
     public PseudopodLungeSkill()
     {
-        SkillId = "pseudopod_lunge";
+        SkillId = SkillIds.PseudopodLunge;
         NameKey = "SKILL_LUNGE_NAME";
         DescKey = "SKILL_LUNGE_DESC";
         BioKey = "SKILL_LUNGE_BIO";

@@ -9,23 +9,17 @@ using Phagocyte.UI;
 namespace Phagocyte.Tests;
 
 [TestSuite]
-public partial class TestRunRecords : SceneTree
+public partial class TestRunRecords : TestHarness
 {
-    private const string TestSavePath = "user://test_run_records.json";
-
     private int _phase = 0;
     private int _phaseFrames = 0;
     private Main? _main = null;
 
     public override void _Initialize()
     {
-        GD.Print("==================================================================");
-        GD.Print(">>> STARTING RUN RECORD & SETTLEMENT SYSTEM TEST <<<");
-        GD.Print("==================================================================");
+        Banner("STARTING RUN RECORD & SETTLEMENT SYSTEM TEST");
 
-        RunRecordManager.SavePath = TestSavePath;
-        if (FileAccess.FileExists(TestSavePath))
-            DirAccess.RemoveAbsolute(TestSavePath);
+        IsolateSaves("run_records");
         RunRecordManager.LoadFromDisk();
     }
 
@@ -385,17 +379,8 @@ public partial class TestRunRecords : SceneTree
     private void Cleanup()
     {
         Paused = false;
-        if (_main != null && IsInstanceValid(_main))
-        {
-            if (_main.GetParent() != null)
-                _main.GetParent().RemoveChild(_main);
-            _main.Free();
-            _main = null;
-        }
-
-        if (FileAccess.FileExists(TestSavePath))
-            DirAccess.RemoveAbsolute(TestSavePath);
-
-        RunRecordManager.SavePath = "";
+        FreeMain(_main);
+        _main = null;
+        RestoreSaves();
     }
 }

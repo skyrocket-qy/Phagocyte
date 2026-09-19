@@ -14,7 +14,7 @@ public partial class PassiveMitochondrialOverclock : BaseSkill
 
     public PassiveMitochondrialOverclock()
     {
-        SkillId = "passive_mitochondria";
+        SkillId = SkillIds.PassiveMitochondria;
         NameKey = "SKILL_MITOCHONDRIA_NAME";
         DescKey = "SKILL_MITOCHONDRIA_DESC";
         BioKey = "SKILL_MITOCHONDRIA_BIO";
@@ -28,37 +28,17 @@ public partial class PassiveMitochondrialOverclock : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            float bonusCdr = CdrPerLevel * Level;
-            float bonusDuration = DurationPerLevel * Level;
-            cs.AddModifier("cooldown_reduction", bonusCdr, 0.0f);
-            cs.AddModifier("duration", 0.0f, bonusDuration);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            float bonusCdr = CdrPerLevel * Level;
-            float bonusDuration = DurationPerLevel * Level;
-            Stats.Call("add_modifier", "cooldown_reduction", bonusCdr, 0.0f);
-            Stats.Call("add_modifier", "duration", 0.0f, bonusDuration);
-        }
+        float bonusCdr = CdrPerLevel * Level;
+        float bonusDuration = DurationPerLevel * Level;
+        ApplyStat("cooldown_reduction", bonusCdr, 0.0f);
+        ApplyStat("duration", 0.0f, bonusDuration);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            float bonusCdr = CdrPerLevel * Level;
-            float bonusDuration = DurationPerLevel * Level;
-            cs.RemoveModifier("cooldown_reduction", bonusCdr, 0.0f);
-            cs.RemoveModifier("duration", 0.0f, bonusDuration);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            float bonusCdr = CdrPerLevel * Level;
-            float bonusDuration = DurationPerLevel * Level;
-            Stats.Call("remove_modifier", "cooldown_reduction", bonusCdr, 0.0f);
-            Stats.Call("remove_modifier", "duration", 0.0f, bonusDuration);
-        }
+        float bonusCdr = CdrPerLevel * Level;
+        float bonusDuration = DurationPerLevel * Level;
+        RemoveStat("cooldown_reduction", bonusCdr, 0.0f);
+        RemoveStat("duration", 0.0f, bonusDuration);
     }
 }

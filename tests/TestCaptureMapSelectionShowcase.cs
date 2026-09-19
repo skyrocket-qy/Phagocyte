@@ -5,7 +5,7 @@ using Phagocyte.UI;
 
 namespace Phagocyte.Tests;
 
-public partial class TestCaptureMapSelectionShowcase : SceneTree
+public partial class TestCaptureMapSelectionShowcase : TestHarness
 {
     private int _frames = 0;
     private MainMenu? _menu;
@@ -38,12 +38,7 @@ public partial class TestCaptureMapSelectionShowcase : SceneTree
         if (_frames == 20 && _menu != null)
         {
             // Give time for scanline to move and draw
-            var img = Root.GetViewport().GetTexture().GetImage();
-            if (img != null && !img.IsEmpty())
-            {
-                img.SavePng("/Users/zelin/.gemini/antigravity/brain/90aa15b5-daf8-494f-9087-b33113cecd7f/map_selection_hologram_showcase.png");
-                GD.Print("[SUCCESS] Captured map_selection_hologram_showcase.png");
-            }
+            CaptureScreenshot("map_selection_hologram_showcase.png");
             Quit(0);
             return true;
         }

@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 using Phagocyte.Combat;
@@ -46,12 +46,12 @@ public abstract partial class TerminalBossEnemy : BaseEnemy
 
     protected BaseCell? GetPlayer()
     {
-        return GetTree().GetFirstNodeInGroup("player") as BaseCell;
+        return PlayerRef;
     }
 }
 
 /// <summary>
-/// Map 1 Terminal Boss: MRSA Super-Colony (耐甲氧西林金葡菌母體).
+/// Map 1 Terminal Boss: MRSA Super-Colony (è€ç”²æ°§è¥¿æž—é‡‘è‘¡èŒæ¯é«”).
 /// Massive drug-resistant capsule that splits into four enraged elites when its membrane breaks.
 /// </summary>
 public partial class MrsASuperColony : TerminalBossEnemy
@@ -187,7 +187,7 @@ public partial class MrsaEnragedElite : BaseEnemy
 }
 
 /// <summary>
-/// Map 2 Terminal Boss: Syncytial Mega-Capsid (融合性合胞體病毒複合體).
+/// Map 2 Terminal Boss: Syncytial Mega-Capsid (èžåˆæ€§åˆèƒžé«”ç—…æ¯’è¤‡åˆé«”).
 /// Fused syncytial cilia drag the cell inward while the traction field widens as the boss weakens.
 /// </summary>
 public partial class SyncytialMegaCapsid : TerminalBossEnemy
@@ -303,7 +303,7 @@ public partial class SyncytialMegaCapsid : TerminalBossEnemy
 }
 
 /// <summary>
-/// Map 3 Terminal Boss: Plasmodium Macro-Schizont (惡性瘧原蟲裂殖複合體).
+/// Map 3 Terminal Boss: Plasmodium Macro-Schizont (æƒ¡æ€§ç˜§åŽŸèŸ²è£‚æ®–è¤‡åˆé«”).
 /// Feeds on ambient erythrocytes to heal, then bursts into a merozoite swarm upon rupture.
 /// </summary>
 public partial class PlasmodiumMacroSchizont : TerminalBossEnemy
@@ -459,7 +459,7 @@ public partial class RbcMote : Node2D
 }
 
 /// <summary>
-/// Map 4 Terminal Boss: H. pylori Biofilm Core (幽門螺桿菌生物膜母核).
+/// Map 4 Terminal Boss: H. pylori Biofilm Core (å¹½é–€èžºæ¡¿èŒç”Ÿç‰©è†œæ¯æ ¸).
 /// Rotating toxin storm around the core and permanent strong acid muck.
 /// </summary>
 public partial class HpyloriBiofilmCore : TerminalBossEnemy
@@ -607,7 +607,7 @@ public partial class HpyloriAcidScar : BioHazardArea
 }
 
 /// <summary>
-/// Map 5 Terminal Boss: PrPsc Amyloid Aggregate (錯誤折疊朊病毒晶體).
+/// Map 5 Terminal Boss: PrPsc Amyloid Aggregate (éŒ¯èª¤æŠ˜ç–ŠæœŠç—…æ¯’æ™¶é«”).
 /// Extremely high armor while its crystalline shell is intact; the shell must be shattered first.
 /// </summary>
 public partial class PrpscAmyloidAggregate : TerminalBossEnemy

@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
@@ -10,7 +10,7 @@ using Phagocyte.UI;
 namespace Phagocyte.Tests;
 
 [TestSuite]
-public partial class TestSkillSystem : SceneTree
+public partial class TestSkillSystem : TestHarness
 {
     private int _framesWaited = 0;
     private bool _testDone = false;
@@ -53,7 +53,7 @@ public partial class TestSkillSystem : SceneTree
         AssertThat(sm.PassiveSlots.Count).IsEqual(5);
         GD.Print("[PASS] SkillManager contains exactly 5 Active slots and 5 Passive slots.");
 
-        // 2. Verify Passive Slot 0: innate Macrophage Deformation (微絲變形)
+        // 2. Verify Passive Slot 0: innate Macrophage Deformation (å¾®çµ²è®Šå½¢)
         var innatePassive = sm.GetPassiveSlot(0);
         AssertThat(innatePassive is MacrophageDeformationSkill).IsTrue();
         AssertThat(innatePassive!.SkillId).IsEqual("macrophage_pseudopods");
@@ -118,7 +118,7 @@ public partial class TestSkillSystem : SceneTree
             var card0 = slotsContainer.GetChild(0);
             var iconLbl = card0.GetNodeOrNull<Label>("IconLabel");
             AssertThat(iconLbl).IsNotNull();
-            AssertThat(iconLbl!.Text).IsEqual("💨");
+            AssertThat(iconLbl!.Text).IsEqual("ðŸ’¨");
             GD.Print("[PASS] HUD Slot 0 correctly displays active weapon icon: " + iconLbl.Text);
         }
 

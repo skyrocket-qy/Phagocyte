@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
@@ -9,7 +9,7 @@ using Phagocyte.UI;
 namespace Phagocyte.Tests;
 
 [TestSuite]
-public partial class TestSurvivorHudUx : SceneTree
+public partial class TestSurvivorHudUx : TestHarness
 {
     private int _framesWaited = 0;
     private bool _testDone = false;
@@ -66,8 +66,8 @@ public partial class TestSurvivorHudUx : SceneTree
         AssertThat(hud.TopCenterCapsule).IsNotNull();
         AssertThat(hud.TimerLabel).IsNotNull();
         AssertThat(hud.KillLabel).IsNotNull();
-        AssertThat(hud.TimerLabel!.Text.Contains("⏱️")).IsTrue();
-        AssertThat(hud.KillLabel!.Text.Contains("💀")).IsTrue();
+        AssertThat(hud.TimerLabel!.Text.Contains("â±ï¸")).IsTrue();
+        AssertThat(hud.KillLabel!.Text.Contains("ðŸ’€")).IsTrue();
         AssertThat(hud.KillLabel.Text.Contains("0")).IsTrue();
 
         // Simulate digestion / kill increment
@@ -164,7 +164,7 @@ public partial class TestSurvivorHudUx : SceneTree
         player.ApplySlow(3.0f, 0.5f);
         hud._Process(0.016);
         AssertThat(hud.BuffTag.Visible).IsTrue();
-        AssertThat(hud.BuffTag.Text.Contains("🐌")).IsTrue();
+        AssertThat(hud.BuffTag.Text.Contains("ðŸŒ")).IsTrue();
         GD.Print("[PASS] 6. Frameless Buff-only monitor verified (Hidden when calm, pops up on active Buff/Debuff).");
 
         GD.Print("==================================================================");

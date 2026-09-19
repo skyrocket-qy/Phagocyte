@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
-/// Rabies Lyssavirus (狂犬病病毒)
+/// Rabies Lyssavirus (ç‹‚çŠ¬ç—…ç—…æ¯’)
 /// Bullet-shaped virion. High-frequency 90-degree zig-zag trajectory; inverts player movement keys on collision.
 /// </summary>
 public partial class RabiesEnemy : BaseEnemy
@@ -43,7 +43,7 @@ public partial class RabiesEnemy : BaseEnemy
         {
             _zigZagTimer = 0.0f;
             // Turn left or right 90 degrees with forward bias towards player
-            var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+            var player = PlayerRef;
             float turnSign = GD.Randf() > 0.5f ? 1.0f : -1.0f;
             _currentTrajectory = _currentTrajectory.Rotated(Mathf.Pi * 0.5f * turnSign);
 
@@ -59,7 +59,7 @@ public partial class RabiesEnemy : BaseEnemy
         Position += Velocity * dt;
 
         // Check collision with player
-        var p = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var p = PlayerRef;
         if (p != null && GodotObject.IsInstanceValid(p) && _attackCooldown <= 0.0f)
         {
             if (GlobalPosition.DistanceTo(p.GlobalPosition) < (p.CurrentRadius + 12.0f))

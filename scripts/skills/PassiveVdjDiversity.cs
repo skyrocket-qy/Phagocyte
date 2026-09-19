@@ -14,7 +14,7 @@ public partial class PassiveVdjDiversity : BaseSkill
 
     public PassiveVdjDiversity()
     {
-        SkillId = "passive_vdj";
+        SkillId = SkillIds.PassiveVdj;
         NameKey = "SKILL_VDJ_NAME";
         DescKey = "SKILL_VDJ_DESC";
         BioKey = "SKILL_VDJ_BIO";
@@ -28,29 +28,13 @@ public partial class PassiveVdjDiversity : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.AddModifier("crit_damage", 0.0f, CritDamagePerLevel * Level);
-            cs.AddModifier("crit_chance", CritChancePerLevel * Level, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            Stats.Call("add_modifier", "crit_damage", 0.0f, CritDamagePerLevel * Level);
-            Stats.Call("add_modifier", "crit_chance", CritChancePerLevel * Level, 0.0f);
-        }
+        ApplyStat("crit_damage", 0.0f, CritDamagePerLevel * Level);
+        ApplyStat("crit_chance", CritChancePerLevel * Level, 0.0f);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.RemoveModifier("crit_damage", 0.0f, CritDamagePerLevel * Level);
-            cs.RemoveModifier("crit_chance", CritChancePerLevel * Level, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            Stats.Call("remove_modifier", "crit_damage", 0.0f, CritDamagePerLevel * Level);
-            Stats.Call("remove_modifier", "crit_chance", CritChancePerLevel * Level, 0.0f);
-        }
+        RemoveStat("crit_damage", 0.0f, CritDamagePerLevel * Level);
+        RemoveStat("crit_chance", CritChancePerLevel * Level, 0.0f);
     }
 }

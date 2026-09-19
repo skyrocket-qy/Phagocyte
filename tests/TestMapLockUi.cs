@@ -12,25 +12,16 @@ namespace Phagocyte.Tests;
 /// disabled Deploy button and the holographic scanner lock visuals data path.
 /// </summary>
 [TestSuite]
-public partial class TestMapLockUi : SceneTree
+public partial class TestMapLockUi : TestHarness
 {
-    private const string TestAchPath = "user://test_map_lock_ui_achievements.json";
-    private const string TestTreePath = "user://test_map_lock_ui_tree.json";
-
     private int _frame = 0;
     private bool _done = false;
 
     public override void _Initialize()
     {
-        GD.Print("==================================================================");
-        GD.Print(">>> STARTING ORGAN MAP LOCK UI VERIFICATION <<<");
-        GD.Print("==================================================================");
+        Banner("STARTING ORGAN MAP LOCK UI VERIFICATION");
 
-        PassiveTreeManager.SavePath = TestTreePath;
-        if (FileAccess.FileExists(TestTreePath))
-            DirAccess.RemoveAbsolute(TestTreePath);
-
-        AchievementManager.SavePath = TestAchPath;
+        IsolateSaves("map_lock_ui");
         AchievementManager.ResetAll();
     }
 
@@ -39,8 +30,7 @@ public partial class TestMapLockUi : SceneTree
         if (_done)
             return true;
 
-        _frame++;
-        if (_frame < 3)
+        if (!Gate(ref _frame, 3))
             return false;
 
         _done = true;
@@ -124,9 +114,6 @@ public partial class TestMapLockUi : SceneTree
     {
         GameManager.SelectedMap = "acute_wound";
         AchievementManager.ResetAll();
-        if (FileAccess.FileExists(PassiveTreeManager.SavePath))
-            DirAccess.RemoveAbsolute(PassiveTreeManager.SavePath);
-        AchievementManager.SavePath = "";
-        PassiveTreeManager.SavePath = "";
+        RestoreSaves();
     }
 }

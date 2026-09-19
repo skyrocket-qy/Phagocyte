@@ -72,29 +72,11 @@ public static class PassiveTreeManager
         return nodeId == NucleusNodeId;
     }
 
-    private static string _savePath = "";
+    private static readonly JsonStore.SavePathSlot _savePath = new("passive_tree.json");
     public static string SavePath
     {
-        get
-        {
-            if (string.IsNullOrEmpty(_savePath))
-            {
-                using var probe = FileAccess.Open("user://.probe", FileAccess.ModeFlags.Write);
-                if (probe != null)
-                {
-                    probe.Close();
-                    DirAccess.RemoveAbsolute("user://.probe");
-                    _savePath = "user://passive_tree.json";
-                }
-                else
-                {
-                    _savePath = "res://.user_data/passive_tree.json";
-                    DirAccess.MakeDirRecursiveAbsolute("res://.user_data");
-                }
-            }
-            return _savePath;
-        }
-        set => _savePath = value;
+        get => _savePath.Value;
+        set => _savePath.Value = value;
     }
 
     private static TreeNode Make(string id, string branch, int column, int row, TreeRarity rarity, string icon, string nameKey, string descKey, int maxStacks, int pointCost, Type? skillType, TreeStatModifier[] modifiers)
@@ -831,26 +813,16 @@ public static class PassiveTreeManager
             { "bonus_points", BonusPoints }
         };
 
-        using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
-        if (file != null)
-            file.StoreString(Json.Stringify(payload, "\t"));
+        JsonStore.Write(SavePath, payload);
     }
 
     public static void LoadFromDisk()
     {
         _loaded = true;
-        if (!FileAccess.FileExists(SavePath))
-            return;
 
-        using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Read);
-        if (file == null)
+        var data = JsonStore.Read(SavePath);
+        if (data == null)
             return;
-
-        var json = new Json();
-        if (json.Parse(file.GetAsText()) != Error.Ok || json.Data.VariantType != Variant.Type.Dictionary)
-            return;
-
-        var data = json.Data.AsGodotDictionary();
 
         if (data.TryGetValue("bonus_points", out var bonusVal))
         {
@@ -916,7 +888,6 @@ public static class PassiveTreeManager
         Allocations.Clear();
         BonusPoints = 0;
         _loaded = true;
-        if (FileAccess.FileExists(SavePath))
-            DirAccess.RemoveAbsolute(SavePath);
+        JsonStore.Delete(SavePath);
     }
 }

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -16,7 +17,7 @@ public partial class InterferonWaveSkill : BaseSkill
 
     public InterferonWaveSkill()
     {
-        SkillId = "interferon_wave";
+        SkillId = SkillIds.InterferonWave;
         NameKey = "SKILL_INTERFERON_NAME";
         DescKey = "SKILL_INTERFERON_DESC";
         BioKey = "SKILL_INTERFERON_BIO";
@@ -38,7 +39,6 @@ public partial class InterferonWaveSkill : BaseSkill
         float maxRadius = GetCalculatedArea(BaseRadius);
         var dmgData = GetCalculatedDamage(BaseDamage);
         float dmg = (float)dmgData["damage"];
-        float kb = BaseKnockback * (Stats is CellStats cs ? cs.GetStat("knockback") : 1.0f);
 
         // Spawn expanding visual wave
         var wave = new WaveVisual
@@ -49,44 +49,25 @@ public partial class InterferonWaveSkill : BaseSkill
         Host.GetParent().AddChild(wave);
 
         // Hit pathogens
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        foreach (var p in pathogens)
+        TargetingService.ForEachInRadius(Host.GlobalPosition, maxRadius, n =>
         {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                var eaten = n.Get("is_being_eaten");
-                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                    continue;
+            Vector2 pushDir = (n.GlobalPosition - Host.GlobalPosition).Normalized();
+            if (pushDir == Vector2.Zero)
+                pushDir = Vector2.Right;
 
-                float dist = Host.GlobalPosition.DistanceTo(n.GlobalPosition);
-                if (dist <= maxRadius)
-                {
-                    Vector2 pushDir = (n.GlobalPosition - Host.GlobalPosition).Normalized();
-                    if (pushDir == Vector2.Zero)
-                        pushDir = Vector2.Right;
+            // Knockback (pathogens are Node2D bodies, so the displacement is tweened)
+            var tween = Host.CreateTween();
+            tween.TweenProperty(n, "global_position", n.GlobalPosition + pushDir * 65.0f, 0.2f);
 
-                    // Knockback
-                    if (n is CharacterBody2D cb)
-                    {
-                        cb.Velocity += pushDir * kb;
-                    }
-                    else
-                    {
-                        var tween = Host.CreateTween();
-                        tween.TweenProperty(n, "global_position", n.GlobalPosition + pushDir * 65.0f, 0.2f);
-                    }
+            // Replication inhibition: 50% slow for 2s
+            if (n.HasMethod("apply_slow"))
+                n.Call("apply_slow", 2.0f, 0.5f);
 
-                    // Replication inhibition: 50% slow for 2s
-                    if (n.HasMethod("apply_slow"))
-                        n.Call("apply_slow", 2.0f, 0.5f);
-
-                    if (n.HasMethod("take_damage"))
-                        n.Call("take_damage", dmg);
-                    else if (n.HasMethod("be_engulfed"))
-                        n.Call("be_engulfed", Host);
-                }
-            }
-        }
+            if (n.HasMethod("take_damage"))
+                CombatHelper.DealDamage(n, dmg);
+            else if (n.HasMethod("be_engulfed"))
+                n.Call("be_engulfed", Host);
+        });
     }
 
     public partial class WaveVisual : Node2D

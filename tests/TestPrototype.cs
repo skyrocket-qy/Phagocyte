@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
@@ -8,7 +8,7 @@ using Phagocyte.Enemies;
 namespace Phagocyte.Tests;
 
 [TestSuite]
-public partial class TestPrototype : SceneTree
+public partial class TestPrototype : TestHarness
 {
     private int _framesWaited = 0;
     private bool _testDone = false;

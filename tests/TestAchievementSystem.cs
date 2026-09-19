@@ -9,7 +9,7 @@ using Phagocyte.UI;
 namespace Phagocyte.Tests;
 
 [TestSuite]
-public partial class TestAchievementSystem : SceneTree
+public partial class TestAchievementSystem : TestHarness
 {
     private int _phase = 0;
     private int _frameCount = 0;
@@ -22,10 +22,8 @@ public partial class TestAchievementSystem : SceneTree
         GD.Print(">>> STARTING ACHIEVEMENT & IMMUNE CELL PROGRESSION TEST <<<");
         GD.Print("==================================================================");
 
-        // Isolate passive-tree reward persistence from the player's real save
-        PassiveTreeManager.SavePath = "user://test_achievement_tree.json";
-        if (FileAccess.FileExists(PassiveTreeManager.SavePath))
-            DirAccess.RemoveAbsolute(PassiveTreeManager.SavePath);
+        // Isolate all persistent manager saves from the player's real files
+        IsolateSaves("achievement");
     }
 
     public override bool _Process(double delta)
@@ -170,7 +168,7 @@ public partial class TestAchievementSystem : SceneTree
                 AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("b_cell")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("dendritic")).IsTrue();
-                GD.Print("[PASS] Step 4: Full disk persistence (user://achievements.json) verified.");
+                GD.Print("[PASS] Step 4: Full disk persistence (isolated achievement save) verified.");
 
                 // --- Step 4b: Organ Map Unlock Chain (docs/achievement.md §2) ---
                 AchievementManager.RecordMapClear("acute_wound");
@@ -284,8 +282,6 @@ public partial class TestAchievementSystem : SceneTree
 
     private static void CleanupTestSave()
     {
-        if (FileAccess.FileExists(PassiveTreeManager.SavePath))
-            DirAccess.RemoveAbsolute(PassiveTreeManager.SavePath);
-        PassiveTreeManager.SavePath = "";
+        RestoreSaves();
     }
 }

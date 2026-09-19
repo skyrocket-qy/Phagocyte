@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
-/// Ebolavirus (伊波拉絲狀病毒)
+/// Ebolavirus (ä¼Šæ³¢æ‹‰çµ²ç‹€ç—…æ¯’)
 /// Long filamentous flexible virion with shepherd's crook morphology. Sweeping tail attacks bypass armor.
 /// </summary>
 public partial class EbolaEnemy : BaseEnemy
@@ -57,7 +57,7 @@ public partial class EbolaEnemy : BaseEnemy
         }
 
         // Tail sweep check with player
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
         if (player != null && GodotObject.IsInstanceValid(player) && _tailSweepCooldown <= 0.0f)
         {
             // Check tail tip position in global space

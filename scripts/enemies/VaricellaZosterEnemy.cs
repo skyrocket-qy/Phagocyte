@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
-/// Varicella Zoster Virus (帶狀皰疹病毒)
+/// Varicella Zoster Virus (å¸¶ç‹€çš°ç–¹ç—…æ¯’)
 /// Latent ambush virion. Drifts semi-transparently until host immune weakness triggers fierce ambush.
 /// </summary>
 public partial class VaricellaZosterEnemy : BaseEnemy
@@ -29,7 +29,7 @@ public partial class VaricellaZosterEnemy : BaseEnemy
     {
         if (!_isAwakened)
         {
-            var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+            var player = PlayerRef;
             if (player != null && GodotObject.IsInstanceValid(player))
             {
                 // Awaken if player health drops below 75% or close proximity (<150px)

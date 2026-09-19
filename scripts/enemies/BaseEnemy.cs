@@ -106,6 +106,13 @@ public abstract partial class BaseEnemy : Node2D
     {
     }
 
+    /// <summary>
+    /// Cached player lookup shared by subclass AI: avoids a per-frame scene-tree
+    /// group query across the 300-500 pathogen concurrency budget. The cache is
+    /// shared process-wide and re-resolved when the cell is freed.
+    /// </summary>
+    protected BaseCell? PlayerRef => EnemySteering.GetPlayer(this);
+
     protected virtual float GetCollisionRadius()
     {
         return 16.0f;

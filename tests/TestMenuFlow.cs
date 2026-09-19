@@ -7,7 +7,7 @@ using static GdUnit4.Assertions;
 
 namespace Phagocyte.Tests;
 
-public partial class TestMenuFlow : SceneTree
+public partial class TestMenuFlow : TestHarness
 {
     private int _framesWaited = 0;
     private bool _testDone = false;
@@ -15,6 +15,7 @@ public partial class TestMenuFlow : SceneTree
     public override void _Initialize()
     {
         GD.Print("--- BEGINNING MENU & SELECTION FLOW AUTOMATED TEST ---");
+        IsolateSaves("menu_flow");
 
         var menuScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         if (menuScene == null)
@@ -141,6 +142,7 @@ public partial class TestMenuFlow : SceneTree
 
         main.QueueFree();
         AchievementManager.ResetAll();
+        RestoreSaves();
 
         GD.Print("--- ALL MENU & SELECTION FLOW TESTS PASSED! ---");
         Quit(0);

@@ -14,7 +14,7 @@ public partial class PassiveChemokineReceptors : BaseSkill
 
     public PassiveChemokineReceptors()
     {
-        SkillId = "passive_chemokine";
+        SkillId = SkillIds.PassiveChemokine;
         NameKey = "SKILL_CHEMOKINE_NAME";
         DescKey = "SKILL_CHEMOKINE_DESC";
         BioKey = "SKILL_CHEMOKINE_BIO";
@@ -28,37 +28,17 @@ public partial class PassiveChemokineReceptors : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            float bonusMag = MagnetPerLevel * Level;
-            float bonusSpeed = SpeedPerLevel * Level;
-            cs.AddModifier("magnet", 0.0f, bonusMag);
-            cs.AddModifier("move_speed", 0.0f, bonusSpeed);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            float bonusMag = MagnetPerLevel * Level;
-            float bonusSpeed = SpeedPerLevel * Level;
-            Stats.Call("add_modifier", "magnet", 0.0f, bonusMag);
-            Stats.Call("add_modifier", "move_speed", 0.0f, bonusSpeed);
-        }
+        float bonusMag = MagnetPerLevel * Level;
+        float bonusSpeed = SpeedPerLevel * Level;
+        ApplyStat("magnet", 0.0f, bonusMag);
+        ApplyStat("move_speed", 0.0f, bonusSpeed);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            float bonusMag = MagnetPerLevel * Level;
-            float bonusSpeed = SpeedPerLevel * Level;
-            cs.RemoveModifier("magnet", 0.0f, bonusMag);
-            cs.RemoveModifier("move_speed", 0.0f, bonusSpeed);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            float bonusMag = MagnetPerLevel * Level;
-            float bonusSpeed = SpeedPerLevel * Level;
-            Stats.Call("remove_modifier", "magnet", 0.0f, bonusMag);
-            Stats.Call("remove_modifier", "move_speed", 0.0f, bonusSpeed);
-        }
+        float bonusMag = MagnetPerLevel * Level;
+        float bonusSpeed = SpeedPerLevel * Level;
+        RemoveStat("magnet", 0.0f, bonusMag);
+        RemoveStat("move_speed", 0.0f, bonusSpeed);
     }
 }

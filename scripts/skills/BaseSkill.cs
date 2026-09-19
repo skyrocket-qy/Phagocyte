@@ -116,6 +116,35 @@ public partial class BaseSkill : Node2D
 
     // --- Stat Consumption Helpers for Active Skills ---
 
+    /// <summary>
+    /// Registers one flat/percent stat modifier on the host, routing to the
+    /// typed CellStats API and falling back to a GDScript add_modifier method.
+    /// </summary>
+    protected void ApplyStat(string stat, float flat, float percent)
+    {
+        if (Stats is CellStats cs)
+        {
+            cs.AddModifier(stat, flat, percent);
+        }
+        else if (Stats != null && Stats.HasMethod("add_modifier"))
+        {
+            Stats.Call("add_modifier", stat, flat, percent);
+        }
+    }
+
+    /// <summary>Removes a modifier previously registered by <see cref="ApplyStat"/>.</summary>
+    protected void RemoveStat(string stat, float flat, float percent)
+    {
+        if (Stats is CellStats cs)
+        {
+            cs.RemoveModifier(stat, flat, percent);
+        }
+        else if (Stats != null && Stats.HasMethod("remove_modifier"))
+        {
+            Stats.Call("remove_modifier", stat, flat, percent);
+        }
+    }
+
     public float GetCalculatedCooldown()
     {
         if (Cooldown <= 0.0f)

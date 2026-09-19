@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 using System;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
 /// <summary>
-/// Human Immunodeficiency Virus / Retrovirus (人類免疫缺乏病毒)
+/// Human Immunodeficiency Virus / Retrovirus (äººé¡žå…ç–«ç¼ºä¹ç—…æ¯’)
 /// Targets CD4 core. Resource predator: steals ATP and EXP directly without hurting HP.
 /// </summary>
 public partial class HivEnemy : BaseEnemy
@@ -29,7 +29,7 @@ public partial class HivEnemy : BaseEnemy
     protected override void CustomPhysicsProcess(float dt)
     {
         _siphonCooldown -= dt;
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
 
         if (player != null && GodotObject.IsInstanceValid(player))
         {

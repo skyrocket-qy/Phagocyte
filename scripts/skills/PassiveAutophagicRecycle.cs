@@ -13,7 +13,7 @@ public partial class PassiveAutophagicRecycle : BaseSkill
 
     public PassiveAutophagicRecycle()
     {
-        SkillId = "passive_autophagy";
+        SkillId = SkillIds.PassiveAutophagy;
         NameKey = "SKILL_AUTOPHAGY_NAME";
         DescKey = "SKILL_AUTOPHAGY_DESC";
         BioKey = "SKILL_AUTOPHAGY_BIO";
@@ -27,25 +27,11 @@ public partial class PassiveAutophagicRecycle : BaseSkill
 
     public override void ApplyPassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.AddModifier("health_regen", RegenPerLevel * Level, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            Stats.Call("add_modifier", "health_regen", RegenPerLevel * Level, 0.0f);
-        }
+        ApplyStat("health_regen", RegenPerLevel * Level, 0.0f);
     }
 
     public override void RemovePassiveModifiers()
     {
-        if (Stats is CellStats cs)
-        {
-            cs.RemoveModifier("health_regen", RegenPerLevel * Level, 0.0f);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            Stats.Call("remove_modifier", "health_regen", RegenPerLevel * Level, 0.0f);
-        }
+        RemoveStat("health_regen", RegenPerLevel * Level, 0.0f);
     }
 }

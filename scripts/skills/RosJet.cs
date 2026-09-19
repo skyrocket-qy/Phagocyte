@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
@@ -50,16 +51,6 @@ public partial class RosJet : Area2D
     private void OnAreaEntered(Area2D area)
     {
         var enemy = area.GetParent();
-        if (enemy != null)
-        {
-            if (enemy is BaseEnemy be)
-            {
-                be.TakeDamage(Damage, Predator, IsCrit);
-            }
-            else if (enemy.HasMethod("take_damage"))
-            {
-                enemy.Call("take_damage", Damage, Predator, IsCrit);
-            }
-        }
+        CombatHelper.DealDamage(enemy, Damage, Predator, IsCrit);
     }
 }

@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
@@ -12,7 +12,7 @@ namespace Phagocyte.Tests;
 /// Verifies the screen active cap (300 / 450) and the kill-driven dynamic backfill loop.
 /// </summary>
 [TestSuite]
-public partial class TestDynamicBackfill : SceneTree
+public partial class TestDynamicBackfill : TestHarness
 {
     private int _frame = 0;
     private bool _done = false;

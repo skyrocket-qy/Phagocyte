@@ -12,7 +12,7 @@ using Phagocyte.UI;
 namespace Phagocyte.Tests;
 
 [TestSuite]
-public partial class TestPassiveTree : SceneTree
+public partial class TestPassiveTree : TestHarness
 {
     private int _phase = 0;
     private int _frameCount = 0;
@@ -21,9 +21,8 @@ public partial class TestPassiveTree : SceneTree
 
     public override void _Initialize()
     {
-        GD.Print("==================================================================");
-        GD.Print(">>> STARTING SHARED PASSIVE TREE VERIFICATION <<<");
-        GD.Print("==================================================================");
+        Banner("STARTING SHARED PASSIVE TREE VERIFICATION");
+        IsolateSaves("passive_tree");
     }
 
     public override bool _Process(double delta)
@@ -498,13 +497,14 @@ public partial class TestPassiveTree : SceneTree
 
     private void Cleanup()
     {
-        if (_main != null && IsInstanceValid(_main))
-            _main.QueueFree();
+        FreeMain(_main);
+        _main = null;
         if (_menu != null && IsInstanceValid(_menu))
             _menu.QueueFree();
 
         GameManager.SelectedClass = "macrophage";
         GameManager.SetLanguage("zh_CN");
         PassiveTreeManager.ResetAll();
+        RestoreSaves();
     }
 }

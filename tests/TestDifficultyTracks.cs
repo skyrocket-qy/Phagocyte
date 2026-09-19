@@ -14,35 +14,21 @@ namespace Phagocyte.Tests;
 /// environment frequency scaling and the unlock gating.
 /// </summary>
 [TestSuite]
-public partial class TestDifficultyTracks : SceneTree
+public partial class TestDifficultyTracks : TestHarness
 {
-    private const string TestTreePath = "user://test_difficulty_tree.json";
-    private const string TestAchievementsPath = "user://test_difficulty_achievements.json";
-    private const string TestRecordsPath = "user://test_difficulty_records.json";
-
     private int _phase = 0;
     private Main? _main = null;
 
     public override void _Initialize()
     {
-        GD.Print("==================================================================");
-        GD.Print(">>> STARTING DUAL-TRACK DIFFICULTY VERIFICATION <<<");
-        GD.Print("==================================================================");
+        Banner("STARTING DUAL-TRACK DIFFICULTY VERIFICATION");
 
-        PassiveTreeManager.SavePath = TestTreePath;
-        AchievementManager.SavePath = TestAchievementsPath;
-        RunRecordManager.SavePath = TestRecordsPath;
-        if (FileAccess.FileExists(TestTreePath))
-            DirAccess.RemoveAbsolute(TestTreePath);
-        if (FileAccess.FileExists(TestAchievementsPath))
-            DirAccess.RemoveAbsolute(TestAchievementsPath);
-        if (FileAccess.FileExists(TestRecordsPath))
-            DirAccess.RemoveAbsolute(TestRecordsPath);
+        IsolateSaves("difficulty");
         RunRecordManager.LoadFromDisk();
 
         AchievementManager.ResetAll();
         PassiveTreeManager.ResetAll();
-        GameManager.SelectedDifficulty = RunRecordManager.DifficultyNormal;
+        ResetRunGlobals();
     }
 
     public override bool _Process(double delta)
@@ -122,14 +108,8 @@ public partial class TestDifficultyTracks : SceneTree
 
     private void RunHardRunIntegrationTests()
     {
-        GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
-        GameManager.SelectedDifficulty = RunRecordManager.DifficultyHard;
-
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = InstantiateMain(difficulty: RunRecordManager.DifficultyHard);
         _main = main;
-        Root.AddChild(main);
-        main.SetPhysicsProcess(false);
 
         AssertThat(main.IsHardRun).IsTrue();
         AssertThat(main.RunDifficulty).IsEqual(RunRecordManager.DifficultyHard);
@@ -144,14 +124,10 @@ public partial class TestDifficultyTracks : SceneTree
         // A Hard clear settles as a Hard record, unlocks its Hard achievement and
         // awards the Hard talent point (docs/map.md §2 / docs/passivetree.md §5.2).
         int bonusBefore = PassiveTreeManager.BonusPoints;
-        var player = main.Player as Phagocyte.Player.BaseCell;
+        var player = MakePlayerInvulnerable(main);
         AssertThat(player).IsNotNull();
-        player!.Stats!.SetBase("max_health", 999999.0f);
-        player.Health = 999999.0f;
-        main.EnvironmentTime = 900.1f;
-        main._PhysicsProcess(0.02f);
-        AssertThat(main.TerminalBoss).IsNotNull();
-        main.TerminalBoss!.TakeDamage(9999999.0f);
+        ForceVictory(main);
+        AssertThat(main.TerminalBossNeutralized).IsTrue();
         AssertThat(main.RunEnded).IsTrue();
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(1);
         AssertThat(RunRecordManager.Records[0]["difficulty"].AsString()).IsEqual(RunRecordManager.DifficultyHard);
@@ -205,36 +181,18 @@ public partial class TestDifficultyTracks : SceneTree
 
     private void CleanupMain()
     {
-        if (_main != null && IsInstanceValid(_main))
-        {
-            if (_main.GetParent() != null)
-                _main.GetParent().RemoveChild(_main);
-            _main.Free();
-            _main = null;
-        }
+        FreeMain(_main);
+        _main = null;
     }
 
     private void Cleanup()
     {
         Paused = false;
         CleanupMain();
-        GameManager.SelectedDifficulty = RunRecordManager.DifficultyNormal;
-        GameManager.SelectedMap = "acute_wound";
-        PathogenSpawner.ConfigureHardMode(false);
-        PathogenSpawner.ConfigureOverdrive(false);
+        ResetRunGlobals();
 
         AchievementManager.ResetAll();
         PassiveTreeManager.ResetAll();
-
-        if (FileAccess.FileExists(TestTreePath))
-            DirAccess.RemoveAbsolute(TestTreePath);
-        if (FileAccess.FileExists(TestAchievementsPath))
-            DirAccess.RemoveAbsolute(TestAchievementsPath);
-        if (FileAccess.FileExists(TestRecordsPath))
-            DirAccess.RemoveAbsolute(TestRecordsPath);
-
-        PassiveTreeManager.SavePath = "";
-        AchievementManager.SavePath = "";
-        RunRecordManager.SavePath = "";
+        RestoreSaves();
     }
 }

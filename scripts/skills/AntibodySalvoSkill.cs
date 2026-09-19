@@ -1,6 +1,8 @@
 using Godot;
 using Godot.Collections;
 using System;
+using System.Collections.Generic;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Enemies;
 
@@ -18,7 +20,7 @@ public partial class AntibodySalvoSkill : BaseSkill
 
     public AntibodySalvoSkill()
     {
-        SkillId = "antibody_salvo";
+        SkillId = SkillIds.AntibodySalvo;
         NameKey = "SKILL_ANTIBODY_NAME";
         DescKey = "SKILL_ANTIBODY_DESC";
         BioKey = "SKILL_ANTIBODY_BIO";
@@ -56,27 +58,13 @@ public partial class AntibodySalvoSkill : BaseSkill
         }
     }
 
-    private Array<Node2D> GetNearbyPathogens()
+    private List<BaseEnemy> GetNearbyPathogens()
     {
-        var result = new Array<Node2D>();
+        var result = new List<BaseEnemy>();
         if (Host == null)
             return result;
 
-        var allPathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        foreach (var p in allPathogens)
-        {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                var eaten = n.Get("is_being_eaten");
-                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                    continue;
-
-                if (Host.GlobalPosition.DistanceTo(n.GlobalPosition) <= SearchRange)
-                {
-                    result.Add(n);
-                }
-            }
-        }
+        TargetingService.CollectInRadius(Host.GlobalPosition, SearchRange, result);
         return result;
     }
 
@@ -108,14 +96,7 @@ public partial class AntibodySalvoSkill : BaseSkill
                         float dmg = (float)dmgDict["damage"];
                         bool isCrit = (bool)dmgDict["is_crit"];
 
-                        if (target is BaseEnemy be)
-                        {
-                            be.TakeDamage(dmg, Host, isCrit);
-                        }
-                        else if (target.HasMethod("take_damage"))
-                        {
-                            target.Call("take_damage", dmg, Host, isCrit);
-                        }
+                        CombatHelper.DealDamage(target, dmg, Host, isCrit);
                     }
                 };
             }

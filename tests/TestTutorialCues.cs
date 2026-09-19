@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using Godot.Collections;
 using System;
 using GdUnit4;
@@ -14,11 +14,11 @@ namespace Phagocyte.Tests;
 
 /// <summary>
 /// Verifies the five first-run micro-cues and their supporting systems
-/// (docs/tutorial.md §2): Squeeze Mode, catalyst resonance pairing, opening
+/// (docs/tutorial.md Â§2): Squeeze Mode, catalyst resonance pairing, opening
 /// guide pathogens, WASD ring timing, squeeze hint and fluid arrow field data.
 /// </summary>
 [TestSuite]
-public partial class TestTutorialCues : SceneTree
+public partial class TestTutorialCues : TestHarness
 {
     private int _phase = 0;
     private Main? _main = null;
@@ -145,20 +145,20 @@ public partial class TestTutorialCues : SceneTree
             new Dictionary
             {
                 { "type", "new_passive" }, { "id", "passive_lysosome" },
-                { "name", "TREE_NODE_LYSOSOME_NAME" }, { "icon", "🧪" },
+                { "name", "TREE_NODE_LYSOSOME_NAME" }, { "icon", "ðŸ§ª" },
                 { "level", 1 }, { "badge", "NEW PASSIVE" },
                 { "desc", "TREE_NODE_LYSOSOME_DESC" }, { "catalyst", true }
             },
             new Dictionary
             {
                 { "type", "heal_fallback" }, { "id", "heal_a" },
-                { "name", "FALLBACK" }, { "icon", "💚" },
+                { "name", "FALLBACK" }, { "icon", "ðŸ’š" },
                 { "level", 0 }, { "badge", "HEAL" }, { "desc", "heal" }
             },
             new Dictionary
             {
                 { "type", "heal_fallback" }, { "id", "heal_b" },
-                { "name", "FALLBACK" }, { "icon", "💚" },
+                { "name", "FALLBACK" }, { "icon", "ðŸ’š" },
                 { "level", 0 }, { "badge", "HEAL" }, { "desc", "heal" }
             }
         };

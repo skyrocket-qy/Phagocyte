@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -17,7 +18,7 @@ public partial class ExosomeSingularitySkill : BaseSkill
 
     public ExosomeSingularitySkill()
     {
-        SkillId = "exosome_singularity";
+        SkillId = SkillIds.ExosomeSingularity;
         NameKey = "SKILL_EXOSOME_NAME";
         DescKey = "SKILL_EXOSOME_DESC";
         BioKey = "SKILL_EXOSOME_BIO";
@@ -59,23 +60,7 @@ public partial class ExosomeSingularitySkill : BaseSkill
         if (Host == null)
             return Vector2.Zero;
 
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        Node2D? closest = null;
-        float minDist = 450.0f;
-
-        foreach (var p in pathogens)
-        {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                float d = Host.GlobalPosition.DistanceTo(n.GlobalPosition);
-                if (d < minDist)
-                {
-                    minDist = d;
-                    closest = n;
-                }
-            }
-        }
-
+        var closest = TargetingService.FindNearest(Host, 450.0f, skipEaten: false);
         if (closest != null)
             return closest.GlobalPosition;
 

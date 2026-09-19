@@ -7,7 +7,7 @@ using Phagocyte.Player;
 
 namespace Phagocyte.Tests;
 
-public partial class TestCaptureScreenshot : SceneTree
+public partial class TestCaptureScreenshot : TestHarness
 {
     private int _frames = 0;
     private Node2D? _main;
@@ -39,12 +39,7 @@ public partial class TestCaptureScreenshot : SceneTree
 
         if (_frames == 35)
         {
-            var img = Root.GetViewport().GetTexture().GetImage();
-            if (img != null && !img.IsEmpty())
-            {
-                img.SavePng("/Users/zelin/.gemini/antigravity/brain/90aa15b5-daf8-494f-9087-b33113cecd7f/macrophage_detail.png");
-                GD.Print("[SUCCESS] Captured macrophage_detail.png (macro 2.8x view)");
-            }
+            CaptureScreenshot("macrophage_detail.png");
 
             // Switch to medium close-up
             if (_cam != null)
@@ -56,12 +51,7 @@ public partial class TestCaptureScreenshot : SceneTree
 
         if (_frames == 45)
         {
-            var img = Root.GetViewport().GetTexture().GetImage();
-            if (img != null && !img.IsEmpty())
-            {
-                img.SavePng("/Users/zelin/.gemini/antigravity/brain/90aa15b5-daf8-494f-9087-b33113cecd7f/game_screen_close.png");
-                GD.Print("[SUCCESS] Captured game_screen_close.png (medium 1.6x view)");
-            }
+            CaptureScreenshot("game_screen_close.png");
 
             // Switch to overview
             if (_cam != null)
@@ -73,12 +63,7 @@ public partial class TestCaptureScreenshot : SceneTree
 
         if (_frames < 55) return false;
 
-        var finalImg = Root.GetViewport().GetTexture().GetImage();
-        if (finalImg != null && !finalImg.IsEmpty())
-        {
-            finalImg.SavePng("/Users/zelin/.gemini/antigravity/brain/90aa15b5-daf8-494f-9087-b33113cecd7f/pathogens_showcase.png");
-            GD.Print("[SUCCESS] Captured pathogens_showcase.png (battlefield view)");
-        }
+        CaptureScreenshot("pathogens_showcase.png");
 
         Quit(0);
         return true;

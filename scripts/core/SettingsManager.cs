@@ -12,29 +12,11 @@ public partial class SettingsManager : Node
     [Signal]
     public delegate void SettingsChangedEventHandler();
 
-    private static string _savePath = "";
+    private static readonly JsonStore.SavePathSlot _savePath = new("settings.json");
     public static string SavePath
     {
-        get
-        {
-            if (string.IsNullOrEmpty(_savePath))
-            {
-                using var probe = FileAccess.Open("user://.probe", FileAccess.ModeFlags.Write);
-                if (probe != null)
-                {
-                    probe.Close();
-                    DirAccess.RemoveAbsolute("user://.probe");
-                    _savePath = "user://settings.json";
-                }
-                else
-                {
-                    _savePath = "res://.user_data/settings.json";
-                    DirAccess.MakeDirRecursiveAbsolute("res://.user_data");
-                }
-            }
-            return _savePath;
-        }
-        set => _savePath = value;
+        get => _savePath.Value;
+        set => _savePath.Value = value;
     }
 
     public static SettingsManager Instance = null;
@@ -135,40 +117,20 @@ public partial class SettingsManager : Node
             { "fullscreen", Fullscreen },
             { "vsync", Vsync }
         };
-        var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
-        if (file != null)
-        {
-            file.StoreString(Json.Stringify(payload, "\t"));
-            file.Close();
-        }
+        JsonStore.Write(SavePath, payload);
     }
 
     public static void LoadFromDisk()
     {
-        if (!FileAccess.FileExists(SavePath))
-        {
+        var d = JsonStore.Read(SavePath);
+        if (d == null)
             return;
-        }
 
-        var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Read);
-        if (file == null)
-        {
-            return;
-        }
-
-        string text = file.GetAsText();
-        file.Close();
-
-        var json = new Json();
-        if (json.Parse(text) == Error.Ok && json.Data.VariantType == Variant.Type.Dictionary)
-        {
-            var d = json.Data.AsGodotDictionary();
-            MasterVolume = d.ContainsKey("master_volume") ? (float)d["master_volume"] : 1.0f;
-            SfxVolume = d.ContainsKey("sfx_volume") ? (float)d["sfx_volume"] : 1.0f;
-            BgmVolume = d.ContainsKey("bgm_volume") ? (float)d["bgm_volume"] : 0.8f;
-            Fullscreen = d.ContainsKey("fullscreen") ? (bool)d["fullscreen"] : false;
-            Vsync = d.ContainsKey("vsync") ? (bool)d["vsync"] : true;
-        }
+        MasterVolume = d.ContainsKey("master_volume") ? (float)d["master_volume"] : 1.0f;
+        SfxVolume = d.ContainsKey("sfx_volume") ? (float)d["sfx_volume"] : 1.0f;
+        BgmVolume = d.ContainsKey("bgm_volume") ? (float)d["bgm_volume"] : 0.8f;
+        Fullscreen = d.ContainsKey("fullscreen") ? (bool)d["fullscreen"] : false;
+        Vsync = d.ContainsKey("vsync") ? (bool)d["vsync"] : true;
     }
 
     public static void ResetDefaults()
@@ -179,9 +141,6 @@ public partial class SettingsManager : Node
         Fullscreen = false;
         Vsync = true;
         ApplySettings();
-        if (FileAccess.FileExists(SavePath))
-        {
-            DirAccess.RemoveAbsolute(SavePath);
-        }
+        JsonStore.Delete(SavePath);
     }
 }
