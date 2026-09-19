@@ -160,11 +160,11 @@
 - [x] **五大細胞獨立起點中心**：巨噬（左上）、殺手 T（右側）、嗜中性球（左側）、B 細胞（右下）、樹突狀（正上）。
 - [x] **零複雜 Scaling 純數值原則**：所有節點僅提供透明純 Flat 與純 Percent 加成，每節點限購一次。
 - [x] **本地持久化與單鍵重置**：`user://passive_tree.json` 隨時支援 Reset All 免費重置。
-- [ ] **[P1] 地圖首通天賦點發放管線聯動**：
+- [x] **[P1] 地圖首通天賦點發放管線聯動**：
   - 5 大器官地圖 Normal / Hard 難度首次通關各獎勵 1 點微管天賦點（共 10 點），作為核心點亮資糧。
   - 當前出戰細胞的起點中心節點先天永久點亮、消耗 0 點。
   - **影響檔案**：`scripts/core/PassiveTreeManager.cs`, `scripts/core/AchievementManager.cs`
-- [ ] **[P2] 共軛焦螢光顯微視覺美化**：
+- [x] **[P2] 共軛焦螢光顯微視覺美化**：
   - 微管連線沿線流動的 ATP 生物電脈衝光效。
   - 囊泡節點呼吸發光效果與布朗運動背景塵埃。
   - **影響檔案**：`scripts/ui/PassiveTreeView.cs`
@@ -268,16 +268,13 @@
   - 4. **超武共鳴預兆**：主動技能達 Lv.5 時，三選一中對應被動卡牌泛出金色共鳴光環與 `【超武催化劑】` 標籤。
   - 5. **流體力學波紋**：踏入吸力或氣流場時，畫面四周浮現微觀流體動態箭頭粒子拖尾。
   - **影響檔案**：`scripts/ui/Hud.cs`, `scripts/player/BaseCell.cs`
-- [ ] **[P2] 防呆機制與局後星盤鏡頭平滑導引**：
-  - 開局 5 秒無操作防呆：細胞自動微幅向前漂移並吞食路徑上第一隻微型雜菌。
-  - 首局結算點擊確定後，相機平滑平移聚焦於星盤中央 HSC 細胞核並發出流動脈衝引導點亮。
 
 ---
 
 ## 🛠️ 模組十：臨床異常反饋、F8 快照診斷與 GM 控制台 (Feedback, Diagnostics & GM Tools)
 > **對應規格**：[`docs/feedback.md`](file:///Users/zelin/project/Phagocyte/docs/feedback.md)
 
-- [ ] **[P0] 戰鬥現場快照採集器 (`DiagnosticManager.cs`)**：
+<!-- - [ ] **[P0] 戰鬥現場快照採集器 (`DiagnosticManager.cs`)**：
   - 毫秒級生成包含確定性 RNG Seed、戰鬥時長、地圖與難度、細胞類別與各項屬性、活躍怪數、坐標速度、200 行環形日誌緩存與輕量螢幕截圖的結構化 JSON。
   - 支援將 Seed 輸入控制台 100% 精確重現地圖與波次。
   - **影響檔案**：新增 `scripts/core/DiagnosticManager.cs`
@@ -292,7 +289,7 @@
   - 左上角半透明診斷 HUD（FPS、Active Monsters/Cap、KPM、流體力學向量、當前 Seed、記憶體佔用）。
   - **影響檔案**：新增 `scripts/ui/DebugConsole.cs`
 - [ ] **[P2] 匿名數值平衡遙測服務 (`TelemetryService.cs`)**：
-  - 單局結算發送匿名摘要（$<2\text{KB}$），監控五大白血球勝率、技能選取率/DPS 貢獻比、猝死時間熱點與致命怪物排行。
+  - 單局結算發送匿名摘要（$<2\text{KB}$），監控五大白血球勝率、技能選取率/DPS 貢獻比、猝死時間熱點與致命怪物排行。 -->
 
 ---
 
@@ -303,30 +300,15 @@
 - [x] **細胞核懸浮微幅延遲彈簧物理**：阻尼簡諧運動 (`Damped Harmonic Oscillator`)。
 - [x] **多層次視差滾動與景深**：`MicroscopeParallax.cs` 模擬暗視野顯微鏡。
 - [x] **音頻管理**：`AudioManager.cs` 支援 BGM 與各類音效切換。
-- [ ] **[P1] 動態流體原生質 / 生命能量球 (`HeroGlobe.cs` + `globe_liquid.gdshader`)** *(來自 Vistrace 評估)*：
-  - 正弦波動頻率、表面張力波紋、球體玻璃邊緣發光 (Rim Glow)、頂部高光與流體平滑插值 (`Lerp`)。
-  - 用於替換 HUD 左下角扁平線性進度條為 **「巨噬細胞原生質體積球 (HP)」** 與 **「ATP 粒線體能量儲量球」**。
-  - **影響檔案**：`shaders/globe_liquid.gdshader`, `scripts/ui/HeroGlobe.cs`, `scenes/ui/hud.tscn`
-- [ ] **[P1] 細胞膜菲涅爾環受損視覺反饋** (`docs/tutorial.md` 第 3 節)：
-  - 膜健康 100% 鮮亮青藍色；$<50\%$ 轉為橙紅色微顫並向外脫落顆粒；$<20\%$ 全螢幕四周浮現暗紅色溶血光暈與心跳脈衝音效。
-  - **影響檔案**：`scripts/player/BaseCell.cs`, `scenes/ui/hud.tscn`
-- [ ] **[P2] 微環境病理詞綴系統 (Tissue Microenvironment Affixes)** *(來自 Vistrace 評估)*：
-  - 為 5 大組織引入隨機詞綴（低氧酸中毒、急性發炎風暴、纖維蛋白沉積）。
-- [ ] **[P2] 免疫援軍 / 守護伴隨微粒系統 (Immune Companions)** *(來自 Vistrace 評估)*：
-  - 補體 MAC 微粒（環繞射刺）、血小板防護環（抵擋彈幕）、趨化外泌體（施加調理易傷標記）。
 
 ---
 
 ## ⚡ 模組十二：高併發效能管線與底層架構優化 (Performance & Architecture Pipeline)
 > **對應規格**：[`docs/spec.md`](file:///Users/zelin/project/Phagocyte/docs/spec.md) 第 9 節
 
-- [ ] **[P2] 同屏 300～500 隻怪物高併發效能管線**：
+- [x] **[P2] 同屏 300～500 隻怪物高併發效能管線**：
   - 實現 2D `QuadTree` 空間分割管理或優化 Godot 2D 物理碰撞層。
   - 使用 `MultiMeshInstance2D` 實現同屏海量微型病毒（諾羅病毒、流感微粒）GPU 批次渲染。
-- [ ] **[P2] 趨化性自動巡航與壓測機器人 (`BotPlayerInputProvider.cs`)** *(來自 Vistrace 評估)*：
-  - 基於向量位能場的自動走位 Bot，用於一鍵長時間無人自動數值壓測。
-- [ ] **[P2] 運行期異常看門狗與黑盒子記錄器 (`AnomalyWatchdog.cs`)** *(來自 Vistrace 評估)*：
-  - 偵測 NaN/無窮大物理向量、殭屍實體與記憶體洩漏，自動輸出診斷日誌。
 
 ---
 

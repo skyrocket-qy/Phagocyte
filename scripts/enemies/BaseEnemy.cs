@@ -32,6 +32,15 @@ public abstract partial class BaseEnemy : Node2D
     /// <summary>Tactical threat intent driving steering (see docs/pathogen.md).</summary>
     [Export] public EnemyThreatMode ThreatMode { get; set; } = EnemyThreatMode.Drifter;
 
+    /// <summary>
+    /// Instance tint used by the GPU swarm batch renderer (docs/spec.md §9).
+    /// Defaults to white so the baked batch texture is drawn unmodified.
+    /// </summary>
+    public virtual Color SwarmBatchColor => Colors.White;
+
+    /// <summary>True while the swarm renderer supplies this enemy's visual.</summary>
+    public bool SwarmBatched { get; set; } = false;
+
     public bool IsBeingEaten { get; set; } = false;
     public virtual bool CanBeEngulfed => FibrinShield <= 0;
 
@@ -107,11 +116,16 @@ public abstract partial class BaseEnemy : Node2D
         HitArea = GetNodeOrNull<Area2D>("HitArea");
         if (HitArea == null)
         {
+            // Passive target only: pathogens are detected *by* player skills and the
+            // engulf area, so the enemy-side monitor is disabled to cut 2D physics
+            // broadphase cost at 300-500 concurrent bodies (docs/spec.md §9).
             HitArea = new Area2D
             {
                 Name = "HitArea",
                 CollisionLayer = 2, // Layer 2: Enemies
-                CollisionMask = 1   // Mask 1: Player
+                CollisionMask = 0,
+                Monitoring = false,
+                Monitorable = true
             };
             AddChild(HitArea);
         }

@@ -451,7 +451,9 @@ public partial class MainMenu : Control
 
         int stacks = PassiveTreeManager.GetNodeStacks(ActiveTreeClassKey, node.Id);
         string status = PassiveTreeManager.GetNodeName(node.Id);
-        if (stacks >= node.MaxStacks)
+        if (PassiveTreeManager.IsInnateStartNode(ActiveTreeClassKey, node.Id))
+            status += " • " + Tr("TREE_START_INNATE");
+        else if (stacks >= node.MaxStacks)
             status += " • " + Tr("TREE_MAXED");
         else if (PassiveTreeManager.CanPurchase(ActiveTreeClassKey, node.Id))
             status += " • " + Tr("TREE_PURCHASE_HINT");

@@ -23,6 +23,9 @@ public partial class NorovirusEnemy : BaseEnemy
 
     protected override float GetCollisionRadius() => 7.0f;
 
+    /// <summary>Cyan capsid tint for the GPU swarm batch renderer (docs/spec.md §9).</summary>
+    public override Color SwarmBatchColor => new(0.3f, 1.0f, 1.05f, 1.0f);
+
     public override void _Draw()
     {
         // Minuscule icosahedral capsid (hexagon/diamond)

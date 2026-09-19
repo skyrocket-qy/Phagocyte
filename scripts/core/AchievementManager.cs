@@ -134,6 +134,9 @@ public partial class AchievementManager : Node
         }},
 
         // --- Organ map clear chain (docs/achievement.md §2 / docs/map.md §2) ---
+        // Each map first-clear (Normal / Hard) awards 1 microtube talent point
+        // (docs/passivetree.md §5.2: 10 points from the 10 map clears). The final
+        // blood-brain-barrier clear additionally carries its +1 milestone bonus.
         { "ach_wound_clear", new Godot.Collections.Dictionary {
             { "id", "ach_wound_clear" },
             { "title_key", "ACH_WOUND_CLEAR_TITLE" },
@@ -146,7 +149,8 @@ public partial class AchievementManager : Node
             { "map_id", "acute_wound" },
             { "difficulty", "normal" },
             { "unlock_map", "alveolar_space" },
-            { "unlock_hard_map", "acute_wound" }
+            { "unlock_hard_map", "acute_wound" },
+            { "talent_points", 1 }
         }},
         { "ach_alveolar_clear", new Godot.Collections.Dictionary {
             { "id", "ach_alveolar_clear" },
@@ -160,7 +164,8 @@ public partial class AchievementManager : Node
             { "map_id", "alveolar_space" },
             { "difficulty", "normal" },
             { "unlock_map", "hepatic_sinusoid" },
-            { "unlock_hard_map", "alveolar_space" }
+            { "unlock_hard_map", "alveolar_space" },
+            { "talent_points", 1 }
         }},
         { "ach_hepatic_clear", new Godot.Collections.Dictionary {
             { "id", "ach_hepatic_clear" },
@@ -174,7 +179,8 @@ public partial class AchievementManager : Node
             { "map_id", "hepatic_sinusoid" },
             { "difficulty", "normal" },
             { "unlock_map", "gastric_lumen" },
-            { "unlock_hard_map", "hepatic_sinusoid" }
+            { "unlock_hard_map", "hepatic_sinusoid" },
+            { "talent_points", 1 }
         }},
         { "ach_gastric_clear", new Godot.Collections.Dictionary {
             { "id", "ach_gastric_clear" },
@@ -188,7 +194,8 @@ public partial class AchievementManager : Node
             { "map_id", "gastric_lumen" },
             { "difficulty", "normal" },
             { "unlock_map", "blood_brain_barrier" },
-            { "unlock_hard_map", "gastric_lumen" }
+            { "unlock_hard_map", "gastric_lumen" },
+            { "talent_points", 1 }
         }},
         { "ach_bbb_clear", new Godot.Collections.Dictionary {
             { "id", "ach_bbb_clear" },
@@ -215,7 +222,60 @@ public partial class AchievementManager : Node
             { "stat_key", "map_clear_acute_wound_hard" },
             { "map_id", "acute_wound" },
             { "difficulty", "hard" },
-            { "unlock_endless", true }
+            { "unlock_endless", true },
+            { "talent_points", 1 }
+        }},
+        { "ach_alveolar_hard_clear", new Godot.Collections.Dictionary {
+            { "id", "ach_alveolar_hard_clear" },
+            { "title_key", "ACH_ALVEOLAR_HARD_CLEAR_TITLE" },
+            { "desc_key", "ACH_ALVEOLAR_HARD_CLEAR_DESC" },
+            { "reward_key", "ACH_ALVEOLAR_HARD_CLEAR_REWARD" },
+            { "reward_cell", "" },
+            { "icon", "🌬️" },
+            { "target_value", 1.0f },
+            { "stat_key", "map_clear_alveolar_space_hard" },
+            { "map_id", "alveolar_space" },
+            { "difficulty", "hard" },
+            { "talent_points", 1 }
+        }},
+        { "ach_hepatic_hard_clear", new Godot.Collections.Dictionary {
+            { "id", "ach_hepatic_hard_clear" },
+            { "title_key", "ACH_HEPATIC_HARD_CLEAR_TITLE" },
+            { "desc_key", "ACH_HEPATIC_HARD_CLEAR_DESC" },
+            { "reward_key", "ACH_HEPATIC_HARD_CLEAR_REWARD" },
+            { "reward_cell", "" },
+            { "icon", "🩸" },
+            { "target_value", 1.0f },
+            { "stat_key", "map_clear_hepatic_sinusoid_hard" },
+            { "map_id", "hepatic_sinusoid" },
+            { "difficulty", "hard" },
+            { "talent_points", 1 }
+        }},
+        { "ach_gastric_hard_clear", new Godot.Collections.Dictionary {
+            { "id", "ach_gastric_hard_clear" },
+            { "title_key", "ACH_GASTRIC_HARD_CLEAR_TITLE" },
+            { "desc_key", "ACH_GASTRIC_HARD_CLEAR_DESC" },
+            { "reward_key", "ACH_GASTRIC_HARD_CLEAR_REWARD" },
+            { "reward_cell", "" },
+            { "icon", "🔥" },
+            { "target_value", 1.0f },
+            { "stat_key", "map_clear_gastric_lumen_hard" },
+            { "map_id", "gastric_lumen" },
+            { "difficulty", "hard" },
+            { "talent_points", 1 }
+        }},
+        { "ach_bbb_hard_clear", new Godot.Collections.Dictionary {
+            { "id", "ach_bbb_hard_clear" },
+            { "title_key", "ACH_BBB_HARD_CLEAR_TITLE" },
+            { "desc_key", "ACH_BBB_HARD_CLEAR_DESC" },
+            { "reward_key", "ACH_BBB_HARD_CLEAR_REWARD" },
+            { "reward_cell", "" },
+            { "icon", "🧬" },
+            { "target_value", 1.0f },
+            { "stat_key", "map_clear_blood_brain_barrier_hard" },
+            { "map_id", "blood_brain_barrier" },
+            { "difficulty", "hard" },
+            { "talent_points", 1 }
         }}
     };
 

@@ -171,29 +171,36 @@ public partial class TestPassiveTree : SceneTree
 
         AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(1);
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(0);
+        // The start hub is innately lit at 0 cost and can never be bought or refunded
+        // (docs/passivetree.md §2 L=0 / §5.1).
+        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(PassiveTreeManager.InnateStartStacks);
         AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_lysosome")).IsFalse();
+        AssertThat(PassiveTreeManager.GetSpentPoints("macrophage")).IsEqual(0);
+        GD.Print("[PASS] The macrophage start hub is innately lit and never consumes points.");
+
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 4)).IsTrue();
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 3)).IsFalse();
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(3);
 
-        AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_lysosome")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_thick_cytoplasm")).IsTrue();
-        AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(1);
-        AssertThat(PassiveTreeManager.RefundNode("macrophage", "passive_lysosome")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_lysosomal_appetite")).IsTrue();
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(1);
-        GD.Print("[PASS] Points, start anchors, and adjacency purchases behave correctly.");
+        AssertThat(PassiveTreeManager.RefundNode("macrophage", "passive_lysosome")).IsFalse();
+        AssertThat(PassiveTreeManager.RefundNode("macrophage", "tree_lysosomal_appetite")).IsTrue();
+        AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(2);
+        GD.Print("[PASS] Points, the innate start anchor, and adjacency purchases behave correctly.");
 
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 5)).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_glycolysis")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_actin")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_cytoskeletal_drift")).IsTrue();
         AssertThat(PassiveTreeManager.GetSpentPoints("macrophage")).IsEqual(4);
-        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_cytoskeletal_drift")).IsFalse();
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(0);
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_slipstream")).IsFalse();
         GD.Print("[PASS] Lineages open through the core metabolism ring from any start.");
 
         AssertThat(PassiveTreeManager.RecordRunLevel("ctl", 5)).IsTrue();
-        AssertThat(PassiveTreeManager.Purchase("ctl", "passive_opsonin")).IsTrue();
+        AssertThat(PassiveTreeManager.GetNodeStacks("ctl", "passive_opsonin")).IsEqual(PassiveTreeManager.InnateStartStacks);
         AssertThat(PassiveTreeManager.Purchase("ctl", "passive_vdj")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("ctl", "tree_assassins_mandate")).IsTrue();
         AssertThat(PassiveTreeManager.RefundNode("ctl", "passive_vdj")).IsFalse();
@@ -203,22 +210,23 @@ public partial class TestPassiveTree : SceneTree
 
         PassiveTreeManager.ResetAllocation("macrophage");
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 8)).IsTrue();
-        int lysosomeCap = PassiveTreeManager.GetMaxStacks("passive_lysosome");
-        AssertThat(lysosomeCap).IsEqual(1);
-        AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_lysosome")).IsTrue();
-        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(lysosomeCap);
+        AssertThat(PassiveTreeManager.GetMaxStacks("passive_lysosome")).IsEqual(1);
+        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(PassiveTreeManager.InnateStartStacks);
         AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_lysosome")).IsFalse();
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_thick_cytoplasm")).IsTrue();
+        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "tree_thick_cytoplasm")).IsEqual(1);
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_thick_cytoplasm")).IsFalse();
         GD.Print("[PASS] Each tree node is bought once and then caps out.");
 
         PassiveTreeManager.SaveToDisk();
         PassiveTreeManager.ReloadFromDisk();
         AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(8);
-        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(lysosomeCap);
-        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_thick_cytoplasm")).IsTrue();
+        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(PassiveTreeManager.InnateStartStacks);
         AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_bilayer")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_iron_membrane")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_rapid_clotting")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_endotoxin")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_second_wind")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_contained_fury")).IsTrue();
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(0);
         AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_autophagy")).IsFalse();
@@ -271,7 +279,7 @@ public partial class TestPassiveTree : SceneTree
         GD.Print("[PASS] Every connection is one orthogonal grid step and no node exceeds four links.");
 
         AssertThat(PassiveTreeManager.RecordRunLevel("dendritic", 25)).IsTrue();
-        AssertThat(PassiveTreeManager.Purchase("dendritic", "passive_chemokine")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "passive_chemokine")).IsFalse(); // innate start hub
         AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_far_sense")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_antigen_harvest")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_scavenger_field")).IsTrue();
@@ -279,7 +287,7 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_patient_observer")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_swarm_cartography")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_risk_assessment")).IsTrue();
-        AssertThat(PassiveTreeManager.GetSpentPoints("dendritic")).IsEqual(8);
+        AssertThat(PassiveTreeManager.GetSpentPoints("dendritic")).IsEqual(7);
         GD.Print("[PASS] A deep lineage path can be purchased point by point.");
 
         string prevLang = GameManager.CurrentLanguage;
@@ -360,11 +368,11 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(nucleusButton).IsNotNull();
         AssertThat(nucleusButton!.Text.Contains("🧫")).IsTrue();
 
-        _menu.OnTreeNodeActivated("passive_lysosome");
-        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(1);
+        _menu.OnTreeNodeActivated("tree_thick_cytoplasm");
+        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "tree_thick_cytoplasm")).IsEqual(1);
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(2);
-        AssertThat(_menu.ActiveTreeNodeId).IsEqual("passive_lysosome");
-        AssertThat(_menu.TreeStatusLbl!.Text.Contains("Lysosome")).IsTrue();
+        AssertThat(_menu.ActiveTreeNodeId).IsEqual("tree_thick_cytoplasm");
+        AssertThat(_menu.TreeStatusLbl!.Text.Contains("Cytoplasm")).IsTrue();
         GD.Print("[PASS] The menu flow purchases and preserves a macrophage tree node.");
 
         _menu.OnTreeNodeHovered("tree_blood_price");
@@ -423,10 +431,13 @@ public partial class TestPassiveTree : SceneTree
         AssertThat(tooltipLabel.Text.Contains("Cost")).IsFalse();
         GD.Print("[PASS] Hovering a tree node shows its tooltip immediately (no click, no rarity/cost text).");
 
-        _menu.OnTreeNodeRefundRequested("passive_lysosome");
-        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(0);
+        _menu.OnTreeNodeRefundRequested("tree_thick_cytoplasm");
+        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "tree_thick_cytoplasm")).IsEqual(0);
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(3);
-        _menu.OnTreeNodeActivated("passive_lysosome");
+        // The start hub stays innately lit regardless of refunds.
+        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "passive_lysosome")).IsEqual(PassiveTreeManager.InnateStartStacks);
+        AssertThat(PassiveTreeManager.RefundNode("macrophage", "passive_lysosome")).IsFalse();
+        _menu.OnTreeNodeActivated("tree_thick_cytoplasm");
         _menu.OnPassiveConfirmPressed();
         AssertThat(_menu.PassiveView.Visible).IsFalse();
         AssertThat(_menu.MapView.Visible).IsTrue();
@@ -437,7 +448,7 @@ public partial class TestPassiveTree : SceneTree
     {
         PassiveTreeManager.ResetAll();
         AssertThat(PassiveTreeManager.RecordRunLevel("ctl", 5)).IsTrue();
-        AssertThat(PassiveTreeManager.Purchase("ctl", "passive_opsonin")).IsTrue();
+        // The CTL start hub (opsonin) is innate, so the first purchase is its neighbor.
         AssertThat(PassiveTreeManager.Purchase("ctl", "tree_precise_edge")).IsTrue();
 
         GameManager.SelectedClass = "ctl";

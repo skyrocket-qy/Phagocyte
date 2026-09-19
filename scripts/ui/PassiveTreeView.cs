@@ -708,9 +708,16 @@ public partial class PassiveTreeView : Control
         for (int i = 0; i < 120; i++)
         {
             Vector2 basePosition = new Vector2(random.Randf() * Size.X, random.Randf() * Size.Y);
+
+            // Brownian motion: incommensurate multi-frequency jitter instead of a
+            // single smooth sine so each dust mote wanders irregularly (docs/tutorial.md §3).
+            float phase = i * 1.618f;
             Vector2 drift = new Vector2(
-                Mathf.Sin(_time * 0.40f + i * 1.7f),
-                Mathf.Cos(_time * 0.33f + i * 2.3f)) * (5.0f + (i % 5) * 2.0f);
+                Mathf.Sin(_time * (0.55f + (i % 3) * 0.17f) + phase)
+                    + 0.35f * Mathf.Sin(_time * 2.3f + phase * 2.7f),
+                Mathf.Cos(_time * (0.48f + (i % 4) * 0.13f) + phase * 1.31f)
+                    + 0.35f * Mathf.Cos(_time * 1.9f + phase * 3.1f)) * (5.0f + (i % 5) * 2.0f);
+
             float twinkle = 0.04f + 0.04f * Mathf.Sin(_time * 1.3f + i * 0.7f);
             Color dust = i % 7 == 0
                 ? new Color(1.0f, 0.55f, 0.35f, twinkle)
@@ -932,7 +939,19 @@ public partial class PassiveTreeView : Control
             {
                 Vector2[] points = { from, to };
                 float travel = Mathf.PosMod(_time * 0.22f + i * 0.137f, 1.0f);
-                layer.DrawCircle(PointAlong(points, travel), 4.2f, Colors.White);
+
+                // ATP bioelectric pulse: fading trail + soft glow behind the head.
+                Vector2 head = PointAlong(points, travel);
+                layer.DrawCircle(head, 9.0f, new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.16f));
+                layer.DrawCircle(head, 4.2f, Colors.White);
+                for (int trail = 1; trail <= 4; trail++)
+                {
+                    float t = Mathf.PosMod(travel - trail * 0.035f, 1.0f);
+                    float fade = 1.0f - trail / 5.0f;
+                    layer.DrawCircle(PointAlong(points, t), 3.6f * fade,
+                        new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.45f * fade));
+                }
+
                 float echo = Mathf.PosMod(travel + 0.22f, 1.0f);
                 layer.DrawCircle(PointAlong(points, echo), 2.6f, new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.55f));
             }
@@ -975,8 +994,11 @@ public partial class PassiveTreeView : Control
             if (hovered)
                 layer.DrawCircle(position, radius + 18.0f, new Color(1, 1, 1, 0.08f));
 
-            float halo = stacks > 0 ? 0.30f : 0.13f;
-            layer.DrawCircle(position, radius + 7.0f, new Color(branchColor.R, branchColor.G, branchColor.B, halo));
+            // Breathing vesicle glow: lit nodes pulse stronger than dormant ones.
+            float breath = 0.75f + 0.25f * Mathf.Sin(_time * (stacks > 0 ? 2.0f : 1.2f) + wobblePhase);
+            float halo = (stacks > 0 ? 0.34f : 0.13f) * breath;
+            layer.DrawCircle(position, radius + 7.0f + (stacks > 0 ? 1.6f * breath : 0.0f),
+                new Color(branchColor.R, branchColor.G, branchColor.B, halo));
 
             Color fill = stacks > 0
                 ? new Color(branchColor.R, branchColor.G, branchColor.B, 0.34f)

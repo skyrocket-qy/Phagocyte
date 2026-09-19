@@ -29,6 +29,9 @@ public partial class FluDriftEnemy : BaseEnemy
 
     protected override float GetCollisionRadius() => 18.0f;
 
+    /// <summary>Shifting antigen hue for the GPU swarm batch renderer (docs/spec.md §9).</summary>
+    public override Color SwarmBatchColor => _currentHue;
+
     protected override void CustomPhysicsProcess(float dt)
     {
         _driftMutationTimer += dt;

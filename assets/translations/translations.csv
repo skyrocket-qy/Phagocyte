@@ -553,3 +553,16 @@ RANK_EX_TITLE,Transcendent Existence,破格存在
 HUD_SQUEEZE_HINT,Hold [Space] to Squeeze,按住 [Space] 脫水穿梭
 HUD_SQUEEZE_HINT_PAD,Hold [L2] to Squeeze,按住 [L2] 脫水穿梭
 BADGE_CATALYST,Superweapon Catalyst,超武催化劑
+TREE_START_INNATE,Innate · permanently lit (0 points),先天永久點亮（消耗 0 點）
+ACH_ALVEOLAR_HARD_CLEAR_TITLE,Alveolar Scavenger: Hypoxia Terminated,肺泡清道夫：缺氧終結
+ACH_ALVEOLAR_HARD_CLEAR_DESC,Clear the Alveolar Gas Microcavity on Hard (Acute Crisis).,通關地圖 02「肺泡氣體微腔」Hard 難度（急性危象）。
+ACH_ALVEOLAR_HARD_CLEAR_REWARD,Microtube talent point +1.,微管天賦點 +1。
+ACH_HEPATIC_HARD_CLEAR_TITLE,Hepatic Scavenger: Jaundice Terminated,肝竇清道夫：黃疸終結
+ACH_HEPATIC_HARD_CLEAR_DESC,Clear the Hepatic Sinusoid on Hard (Acute Crisis).,通關地圖 03「肝血竇微循環」Hard 難度（急性危象）。
+ACH_HEPATIC_HARD_CLEAR_REWARD,Microtube talent point +1.,微管天賦點 +1。
+ACH_GASTRIC_HARD_CLEAR_TITLE,Gastric Scavenger: Perforation Terminated,胃黏膜清道夫：穿孔終結
+ACH_GASTRIC_HARD_CLEAR_DESC,Clear the Gastric Acid Mucosa on Hard (Acute Crisis).,通關地圖 04「胃腔極酸黏膜」Hard 難度（急性危象）。
+ACH_GASTRIC_HARD_CLEAR_REWARD,Microtube talent point +1.,微管天賦點 +1。
+ACH_BBB_HARD_CLEAR_TITLE,Cerebral Scavenger: Encephalitis Terminated,腦膜清道夫：腦炎終結
+ACH_BBB_HARD_CLEAR_DESC,Clear the Blood-Brain Barrier on Hard (Acute Crisis).,通關地圖 05「血腦屏障毛細血管」Hard 難度（急性危象）。
+ACH_BBB_HARD_CLEAR_REWARD,Microtube talent point +1.,微管天賦點 +1。

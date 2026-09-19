@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Phagocyte.Core;
 using Phagocyte.Enemies;
 
 namespace Phagocyte.Combat;
@@ -28,12 +29,15 @@ public partial class ProjectileManager : Node2D
     private readonly List<MultiMeshInstance2D> _typeMultiMeshes = new();
     private int[] _typeActiveCounts = Array.Empty<int>();
 
-    // 64px Spatial Hash Grid for O(1) enemy proximity queries
-    private const float GridCellSize = 64.0f;
-    private const float InvGridCellSize = 1.0f / GridCellSize;
-    private readonly Dictionary<long, List<BaseEnemy>> _spatialGrid = new();
-    private readonly List<List<BaseEnemy>> _bucketPool = new();
-    private int _bucketPoolUsed = 0;
+    // 2D QuadTree over the active pathogens: rebuilt once per physics frame and
+    // shared by every projectile, giving O(log n) neighborhood queries at the
+    // 300-500 enemy concurrency budget (docs/spec.md §9 / TODO module 12).
+    private const float ArenaQueryHalfExtent = 2600.0f;
+    private readonly QuadTree<BaseEnemy> _enemyTree = new(
+        new Rect2(-ArenaQueryHalfExtent, -ArenaQueryHalfExtent, ArenaQueryHalfExtent * 2.0f, ArenaQueryHalfExtent * 2.0f),
+        capacity: 8,
+        maxDepth: 6);
+    private readonly List<BaseEnemy> _enemyQuery = new(64);
 
     private Node2D? _hostNode;
     private static Texture2D? _cachedBulletTexture;
@@ -242,45 +246,16 @@ public partial class ProjectileManager : Node2D
         _nextSpawnIndex = (_nextSpawnIndex + 1) % MaxTotalProjectiles;
     }
 
-    private static long GetGridKey(int cx, int cy) => ((long)cx << 32) | (uint)cy;
-
-    private List<BaseEnemy> GetOrCreateBucket(long key)
+    private void RebuildEnemyIndex()
     {
-        if (!_spatialGrid.TryGetValue(key, out var bucket))
-        {
-            if (_bucketPoolUsed < _bucketPool.Count)
-            {
-                bucket = _bucketPool[_bucketPoolUsed++];
-                bucket.Clear();
-            }
-            else
-            {
-                bucket = new List<BaseEnemy>(8);
-                _bucketPool.Add(bucket);
-                _bucketPoolUsed++;
-            }
-            _spatialGrid[key] = bucket;
-        }
-        return bucket;
-    }
-
-    private void RebuildSpatialGrid()
-    {
-        _spatialGrid.Clear();
-        _bucketPoolUsed = 0;
+        _enemyTree.Clear();
 
         var enemies = BaseEnemy.ActiveEnemies;
         for (int i = 0; i < enemies.Count; i++)
         {
             var enemy = enemies[i];
             if (enemy == null || !GodotObject.IsInstanceValid(enemy) || enemy.IsBeingEaten) continue;
-
-            int cx = (int)MathF.Floor(enemy.GlobalPosition.X * InvGridCellSize);
-            int cy = (int)MathF.Floor(enemy.GlobalPosition.Y * InvGridCellSize);
-            long key = GetGridKey(cx, cy);
-
-            var bucket = GetOrCreateBucket(key);
-            bucket.Add(enemy);
+            _enemyTree.Insert(enemy.GlobalPosition, enemy);
         }
     }
 
@@ -289,7 +264,7 @@ public partial class ProjectileManager : Node2D
         float dt = (float)delta;
         Array.Clear(_typeActiveCounts, 0, _typeActiveCounts.Length);
 
-        RebuildSpatialGrid();
+        RebuildEnemyIndex();
 
         for (int a = _activeCount - 1; a >= 0; a--)
         {
@@ -310,50 +285,36 @@ public partial class ProjectileManager : Node2D
 
             p.Position += p.Direction * p.Speed * dt;
 
-            // 3x3 Neighborhood collision check in Spatial Grid
+            // QuadTree neighborhood query: O(log n + k) candidate lookup
             float queryRadius = p.Radius + 18.0f;
             float hitDistSq = queryRadius * queryRadius;
-
-            int minCx = (int)MathF.Floor((p.Position.X - queryRadius) * InvGridCellSize);
-            int maxCx = (int)MathF.Floor((p.Position.X + queryRadius) * InvGridCellSize);
-            int minCy = (int)MathF.Floor((p.Position.Y - queryRadius) * InvGridCellSize);
-            int maxCy = (int)MathF.Floor((p.Position.Y + queryRadius) * InvGridCellSize);
+            _enemyQuery.Clear();
+            _enemyTree.QueryCircle(p.Position, queryRadius, _enemyQuery);
 
             bool projectileAlive = true;
-
-            for (int cx = minCx; cx <= maxCx && projectileAlive; cx++)
+            for (int b = 0; b < _enemyQuery.Count && projectileAlive; b++)
             {
-                for (int cy = minCy; cy <= maxCy && projectileAlive; cy++)
+                var enemy = _enemyQuery[b];
+                if (enemy == null || !GodotObject.IsInstanceValid(enemy) || enemy.IsBeingEaten) continue;
+
+                ulong enemyId = enemy.GetInstanceId();
+                if (p.HasHitTarget(enemyId)) continue;
+
+                if (p.Position.DistanceSquaredTo(enemy.GlobalPosition) <= hitDistSq)
                 {
-                    long key = GetGridKey(cx, cy);
-                    if (!_spatialGrid.TryGetValue(key, out var bucket)) continue;
+                    p.AddHitTarget(enemyId);
 
-                    for (int b = 0; b < bucket.Count; b++)
+                    // Apply direct combat damage and stats
+                    enemy.TakeDamage(p.Damage, _hostNode, p.IsCrit);
+
+                    if (p.PierceRemaining > 0)
                     {
-                        var enemy = bucket[b];
-                        if (enemy == null || !GodotObject.IsInstanceValid(enemy) || enemy.IsBeingEaten) continue;
-
-                        ulong enemyId = enemy.GetInstanceId();
-                        if (p.HasHitTarget(enemyId)) continue;
-
-                        if (p.Position.DistanceSquaredTo(enemy.GlobalPosition) <= hitDistSq)
-                        {
-                            p.AddHitTarget(enemyId);
-
-                            // Apply direct combat damage and stats
-                            enemy.TakeDamage(p.Damage, _hostNode, p.IsCrit);
-
-                            if (p.PierceRemaining > 0)
-                            {
-                                p.PierceRemaining--;
-                            }
-                            else
-                            {
-                                projectileAlive = false;
-                                MarkInactive(slot);
-                                break;
-                            }
-                        }
+                        p.PierceRemaining--;
+                    }
+                    else
+                    {
+                        projectileAlive = false;
+                        MarkInactive(slot);
                     }
                 }
             }

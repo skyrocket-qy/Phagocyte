@@ -153,6 +153,15 @@ public partial class Main : Node2D
     /// <summary>Alive boss-incursion count (GDScript-friendly scalar view).</summary>
     public int RaidBossCount => _raidBosses.Count;
 
+    /// <summary>
+    /// GPU swarm batching for the microscopic species (docs/spec.md §9 / TODO module 12).
+    /// Enabled by default; disabling restores per-node drawing for every pathogen.
+    /// </summary>
+    public bool SwarmBatchingEnabled { get; set; } = true;
+
+    /// <summary>MultiMesh batch renderer for norovirus / influenza micro swarms.</summary>
+    public PathogenSwarmRenderer? SwarmRenderer { get; private set; }
+
     // --- Pathological Overload Afflictions (docs/endgame.md §4) ---
     private float _febrileBurnTimer = AfflictionManager.FebrileBurnInterval;
     private float _antigenicDriftTimer = AfflictionManager.AntigenicDriftInterval;
@@ -234,6 +243,17 @@ public partial class Main : Node2D
 
         // Initial pathogen wave
         SpawnInitialWave(35);
+
+        // GPU swarm batch renderer for the microscopic species (docs/spec.md §9).
+        // Parented to Main (not EnemyContainer) so the map fluid mechanics never
+        // drift the batch layer, and inserted before EnemyContainer so it draws
+        // above the arena backdrop but under the individually drawn pathogens.
+        if (EnemyContainer != null)
+        {
+            SwarmRenderer = new PathogenSwarmRenderer { Name = "PathogenSwarmRenderer" };
+            AddChild(SwarmRenderer);
+            MoveChild(SwarmRenderer, EnemyContainer.GetIndex());
+        }
 
         // Tutorial cue 1 (docs/tutorial.md §2): dormant micro-staph targets ahead
         SpawnTutorialGuides();
@@ -363,6 +383,19 @@ public partial class Main : Node2D
         {
             ArenaBorders.DefaultColor = border;
         }
+    }
+
+    /// <summary>
+    /// Idle-frame swarm batch sync: enemy physics has already advanced this frame,
+    /// so the MultiMesh transforms match the final positions.
+    /// </summary>
+    public override void _Process(double delta)
+    {
+        if (SwarmRenderer == null || !GodotObject.IsInstanceValid(SwarmRenderer))
+            return;
+
+        SwarmRenderer.Enabled = SwarmBatchingEnabled;
+        SwarmRenderer.Sync();
     }
 
     public override void _PhysicsProcess(double delta)

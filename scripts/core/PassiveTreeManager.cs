@@ -45,6 +45,12 @@ public static class PassiveTreeManager
 
     public const int BaseCellLevel = 1;
 
+    /// <summary>
+    /// The deployed cell's start hub is innately lit and never consumes points
+    /// (docs/passivetree.md §2 L=0 / §5.1).
+    /// </summary>
+    public const int InnateStartStacks = 1;
+
     public const string NucleusNodeId = "tree_hsc_core";
 
     public static readonly Vector2 WorldCenter = new(2400.0f, 2400.0f);
@@ -407,10 +413,14 @@ public static class PassiveTreeManager
         text.AppendLine("[b]" + node.Icon + " " + TranslationServer.Translate(node.NameKey) + "[/b]");
         if (IsNucleus(nodeId))
             text.AppendLine(TranslationServer.Translate("TREE_NUCLEUS_INNATE"));
+        else if (IsInnateStartNode(cellId, nodeId))
+            text.AppendLine(TranslationServer.Translate("TREE_START_INNATE"));
         text.AppendLine(GetNodeDescription(nodeId));
 
         string status = "";
-        if (stacks >= node.MaxStacks)
+        if (IsInnateStartNode(cellId, nodeId))
+            status = ""; // already stated in the header line above
+        else if (stacks >= node.MaxStacks)
             status = TranslationServer.Translate(IsNucleus(nodeId) ? "TREE_NUCLEUS_ACTIVE" : "TREE_MAXED");
         else if (CanPurchase(cellId, nodeId))
             status = TranslationServer.Translate("TREE_PURCHASE_HINT");
@@ -515,6 +525,14 @@ public static class PassiveTreeManager
         return StartNodes.TryGetValue(cellId, out var nodeId) ? nodeId : "";
     }
 
+    /// <summary>True when the node is the cell's innately lit start hub (0-point).</summary>
+    public static bool IsInnateStartNode(string cellId, string nodeId)
+    {
+        if (string.IsNullOrEmpty(cellId) || string.IsNullOrEmpty(nodeId) || IsNucleus(nodeId))
+            return false;
+        return nodeId == GetStartNode(cellId);
+    }
+
     public static int GetCellLevel(string cellId)
     {
         EnsureLoaded();
@@ -577,8 +595,11 @@ public static class PassiveTreeManager
         var visited = new System.Collections.Generic.HashSet<string> { NucleusNodeId };
         if (!string.IsNullOrEmpty(start))
         {
-            if (remaining.TryGetValue(start, out int startStacks))
-                connected[start] = startStacks;
+            // The start hub is innately lit at 0 cost (docs/passivetree.md §5.1).
+            int startStacks = remaining.TryGetValue(start, out int ownedStacks)
+                ? Math.Max(InnateStartStacks, ownedStacks)
+                : InnateStartStacks;
+            connected[start] = startStacks;
             visited.Add(start);
         }
 
@@ -659,7 +680,7 @@ public static class PassiveTreeManager
         int total = 0;
         foreach (var pair in GetAllocation(cellId))
         {
-            if (IsNucleus(pair.Key))
+            if (IsNucleus(pair.Key) || IsInnateStartNode(cellId, pair.Key))
                 continue;
             total += pair.Value * GetPointCost(pair.Key);
         }
@@ -739,6 +760,9 @@ public static class PassiveTreeManager
         EnsureLoaded();
         if (!IsKnownCell(cellId) || !IsKnownNode(nodeId) || IsNucleus(nodeId))
             return false;
+        // The innate start hub is permanent and never refundable.
+        if (IsInnateStartNode(cellId, nodeId))
+            return false;
         if (!Allocations.TryGetValue(cellId, out var owned) || !owned.TryGetValue(nodeId, out var stacks) || stacks <= 0)
             return false;
         if (!WouldRemainConnected(cellId, nodeId))
@@ -790,7 +814,12 @@ public static class PassiveTreeManager
         {
             var owned = new Dictionary();
             foreach (var nodePair in GetConnectedAllocation(cellPair.Key))
+            {
+                // The innate start hub is derived, never persisted.
+                if (IsNucleus(nodePair.Key) || IsInnateStartNode(cellPair.Key, nodePair.Key))
+                    continue;
                 owned[nodePair.Key] = nodePair.Value;
+            }
             if (owned.Count > 0)
                 allocations[cellPair.Key] = owned;
         }
