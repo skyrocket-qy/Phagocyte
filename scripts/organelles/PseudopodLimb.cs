@@ -35,6 +35,12 @@ public partial class PseudopodLimb : ModularOrganelle
     [Export] public float BendAmount { get; set; } = 16.0f;
     [Export] public float GrabHoldTime { get; set; } = 0.5f;
 
+    /// <summary>
+    /// When false, the limb coils and sways ambiently but never
+    /// auto-acquires targets (visual-only mode; explicit ForceLaunch still works).
+    /// </summary>
+    [Export] public bool CombatEnabled { get; set; } = true;
+
     public LimbState State { get; private set; } = LimbState.Retracted;
     public Node2D? GrabbedTarget { get; private set; }
     public float TipDistance { get; private set; }
@@ -108,6 +114,8 @@ public partial class PseudopodLimb : ModularOrganelle
         {
             case LimbState.Retracted:
                 _wanderPhase += dt * 1.4f;
+                if (!CombatEnabled)
+                    break;
                 _target = AcquireTarget(SearchRange * area);
                 if (_target != null)
                 {

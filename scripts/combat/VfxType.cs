@@ -6,5 +6,8 @@ public enum VfxType
     AcidOxidationSparks,
     LysisBurst,
     BarbImpact,
-    BiofilmBurst
+    BiofilmBurst,
+    MacRingBurst,
+    OpsoninBind,
+    PerforinPore
 }

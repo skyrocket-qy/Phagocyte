@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Organelles;
 using Phagocyte.Skills;
 
 namespace Phagocyte.Player;
@@ -62,6 +63,25 @@ public partial class Macrophage : BaseCell
         Stats.SetBase("area", 1.25f);
         Stats.SetBase("might", 1.0f);
         Stats.SetBase("block", 0.08f);
+    }
+
+    public override void _Ready()
+    {
+        base._Ready();
+        MountPseudopodLimb();
+    }
+
+    /// <summary>
+    /// The macrophage's signature IK pseudopod organelle: coils idle,
+    /// snaps out at nearby pathogens on its own cooldown.
+    /// </summary>
+    private void MountPseudopodLimb()
+    {
+        var limbScene = GD.Load<PackedScene>("res://scenes/skills/PseudopodLimb.tscn");
+        if (limbScene == null)
+            return;
+        if (limbScene.Instantiate() is PseudopodLimb limb)
+            limb.AttachTo(this);
     }
 
     public override void SetupInitialSkills()

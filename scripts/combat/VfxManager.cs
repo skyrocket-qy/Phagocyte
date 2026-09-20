@@ -88,6 +88,9 @@ public partial class VfxManager : Node2D
             VfxType.LysisBurst => 32,
             VfxType.CytoplasmSplatter => 24,
             VfxType.BiofilmBurst => 20,
+            VfxType.MacRingBurst => 28,
+            VfxType.OpsoninBind => 10,
+            VfxType.PerforinPore => 14,
             VfxType.AcidOxidationSparks => 16,
             VfxType.BarbImpact => 12,
             _ => 16
@@ -101,6 +104,9 @@ public partial class VfxManager : Node2D
             VfxType.LysisBurst => 0.45f,
             VfxType.CytoplasmSplatter => 0.35f,
             VfxType.BiofilmBurst => 0.40f,
+            VfxType.MacRingBurst => 0.50f,
+            VfxType.OpsoninBind => 0.30f,
+            VfxType.PerforinPore => 0.35f,
             VfxType.AcidOxidationSparks => 0.25f,
             VfxType.BarbImpact => 0.20f,
             _ => 0.30f
@@ -158,6 +164,33 @@ public partial class VfxManager : Node2D
                 mat.InitialVelocityMin = 60.0f;
                 mat.InitialVelocityMax = 150.0f;
                 mat.Gravity = new Vector3(0, 50, 0);
+                break;
+
+            case VfxType.MacRingBurst:
+                // MAC pore detonation: hot gold-white osmotic rupture flash
+                mat.Color = new Color(1.0f, 0.88f, 0.45f, 1.0f);
+                mat.InitialVelocityMin = 140.0f;
+                mat.InitialVelocityMax = 300.0f;
+                mat.ScaleMin = 0.8f;
+                mat.ScaleMax = 1.6f;
+                break;
+
+            case VfxType.OpsoninBind:
+                // Antibody Fab binding: soft opsonin gold tag sparks
+                mat.Color = new Color(1.0f, 0.82f, 0.35f, 0.95f);
+                mat.InitialVelocityMin = 40.0f;
+                mat.InitialVelocityMax = 110.0f;
+                mat.ScaleMin = 0.5f;
+                mat.ScaleMax = 0.9f;
+                break;
+
+            case VfxType.PerforinPore:
+                // Perforin polymerization: cold cyan-white pore assembly chill
+                mat.Color = new Color(0.55f, 0.95f, 1.0f, 1.0f);
+                mat.InitialVelocityMin = 60.0f;
+                mat.InitialVelocityMax = 160.0f;
+                mat.ScaleMin = 0.5f;
+                mat.ScaleMax = 1.0f;
                 break;
         }
 

@@ -17,6 +17,7 @@ public partial class AntibodySalvoSkill : BaseSkill
     [Export] public float BaseDamage { get; set; } = 18.0f;
     [Export] public int BaseMissileCount { get; set; } = 3;
     [Export] public float SearchRange { get; set; } = 600.0f;
+    [Export] public float BaseMissileSpeed { get; set; } = 420.0f;
 
     public AntibodySalvoSkill()
     {
@@ -73,7 +74,8 @@ public partial class AntibodySalvoSkill : BaseSkill
         if (!HasValidHost())
             return;
 
-        // If target is valid, home in on it after short delay
+        // Staggered launch cadence preserved; the missile itself now
+        // carries the visual flight + opsonization bind.
         if (target != null && GodotObject.IsInstanceValid(target))
         {
             var tree = Host.GetTree();
@@ -82,14 +84,27 @@ public partial class AntibodySalvoSkill : BaseSkill
                 var timer = tree.CreateTimer(0.2f + index * 0.05f);
                 timer.Timeout += () =>
                 {
+                    if (!HasValidHost())
+                        return;
                     if (target != null && GodotObject.IsInstanceValid(target))
                     {
                         if (target is BaseEnemy be && be.IsBeingEaten)
                             return;
 
                         GetDamage(BaseDamage, out float dmg, out bool isCrit);
+                        float speed = GetCalculatedSpeed(BaseMissileSpeed);
 
-                        CombatHelper.DealDamage(target, dmg, Host, isCrit);
+                        var missile = new AntibodyMissile
+                        {
+                            Damage = dmg,
+                            IsCrit = isCrit,
+                            Speed = speed,
+                            HostRef = Host
+                        };
+                        Host.GetParent().AddChild(missile);
+                        float spread = (index - (total - 1) / 2.0f) * 0.35f;
+                        Vector2 dir = (target.GlobalPosition - Host.GlobalPosition).Normalized().Rotated(spread);
+                        missile.Launch(target, Host.GlobalPosition, dir);
                     }
                 };
             }

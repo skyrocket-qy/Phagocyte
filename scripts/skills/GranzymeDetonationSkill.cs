@@ -2,6 +2,7 @@ using Godot;
 using System;
 using Phagocyte.Combat;
 using Phagocyte.Core;
+using Phagocyte.Player;
 
 namespace Phagocyte.Skills;
 
@@ -82,6 +83,8 @@ public partial class GranzymeDetonationSkill : BaseSkill
         // Spawn visual burst
         var burst = new ApoptosisBurstVisual { GlobalPosition = center };
         Host.GetParent().AddChild(burst);
+        AudioManager.Instance?.PlayEnemyDeath();
+        CameraFollow.Instance?.AddTrauma(0.3f);
 
         GetDamage(BaseDamage, out float dmg, out _);
         float splashRadius = GetCalculatedArea(110.0f);

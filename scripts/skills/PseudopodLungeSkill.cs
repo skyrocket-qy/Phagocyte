@@ -49,6 +49,16 @@ public partial class PseudopodLungeSkill : BaseSkill
 
             CombatHelper.DealDamage(n, dmg, Host, isCrit);
 
+            // Lamellipodial sheet + phagocytic cup over the drag.
+            var arm = new PseudopodArmVisual
+            {
+                GlobalPosition = Host.GlobalPosition,
+                Host = Host,
+                Target = n,
+                BaseHalfWidth = 24.0f * GetCalculatedArea(1.0f)
+            };
+            Host.GetParent().AddChild(arm);
+
             // Pull pathogen rapidly toward player
             var tween = Host.CreateTween();
             tween.TweenProperty(n, "global_position", Host.GlobalPosition, 0.15f);

@@ -60,12 +60,24 @@ public partial class PhagocyticGraspSkill : BaseSkill
             AudioManager.Instance?.PlayShoot();
         }
 
+        float areaScale = GetCalculatedArea(1.0f);
+
         foreach (var target in targets)
         {
             if (!GodotObject.IsInstanceValid(target))
                 continue;
 
             CombatHelper.DealDamage(target, dmg, Host, isCrit);
+
+            // Lamellipodial sheet + phagocytic cup over the drag.
+            var arm = new PseudopodArmVisual
+            {
+                GlobalPosition = Host.GlobalPosition,
+                Host = Host,
+                Target = target,
+                BaseHalfWidth = 24.0f * areaScale
+            };
+            Host.GetParent().AddChild(arm);
 
             if (!GodotObject.IsInstanceValid(target))
                 continue;
