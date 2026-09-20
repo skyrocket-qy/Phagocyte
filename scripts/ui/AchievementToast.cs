@@ -65,9 +65,9 @@ public partial class AchievementToast : PanelContainer
         string descKey = achData.TryGetValue("desc_key", out var dVal) ? dVal.AsString() : "ACH_DESC";
         string rewardCell = achData.TryGetValue("reward_cell", out var rVal) ? rVal.AsString() : "";
 
-        string headerText = !string.IsNullOrEmpty(rewardCell) 
-            ? "🧬 IMMUNE ARCHETYPE UNLOCKED!" 
-            : "⭐ MILESTONE ACHIEVED!";
+        string headerText = !string.IsNullOrEmpty(rewardCell)
+            ? Tr("ACH_HEADER_ARCHETYPE")
+            : Tr("ACH_HEADER_MILESTONE");
 
         var headerLabel = new Label
         {

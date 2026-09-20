@@ -193,8 +193,7 @@ public partial class PseudopodLimb : ModularOrganelle
             else
             {
                 DamageNumberSpawner.ShowDamage(GrabbedTarget.GlobalPosition, damage, isCrit);
-                if (GrabbedTarget.HasMethod("take_damage"))
-                    GrabbedTarget.Call("take_damage", damage, Host, isCrit);
+                CombatHelper.DamageOrEngulf(GrabbedTarget, damage, Host, isCrit);
             }
         }
 

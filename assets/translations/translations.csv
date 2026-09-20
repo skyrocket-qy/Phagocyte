@@ -564,3 +564,9 @@ ACH_BBB_HARD_CLEAR_TITLE,Cerebral Scavenger: Encephalitis Terminated,腦膜清�
 ACH_BBB_HARD_CLEAR_DESC,Clear the Blood-Brain Barrier on Hard (Acute Crisis).,通關地圖 05「血腦屏障毛細血管」Hard 難度（急性危象）。
 ACH_BBB_HARD_CLEAR_REWARD,Microtube talent point +1.,微管天賦點 +1。
 HARD_LOCKED_HINT,Clear the prerequisite organ on Normal to unlock Hard (Acute Crisis).,通關前置器官的 Normal 難度以解鎖 Hard（急性危象）。
+TOOLTIP_EMPTY_PASSIVE,Passive Trait Slot,被动特质槽
+COMBAT_EVADED,EVADED!,闪避！
+COMBAT_BLOCKED,BLOCKED!,格挡！
+COMBAT_CRIT,CRIT!,暴击！
+ACH_HEADER_ARCHETYPE,🧬 IMMUNE ARCHETYPE UNLOCKED!,🧬 免疫原型已解锁！
+ACH_HEADER_MILESTONE,⭐ MILESTONE ACHIEVED!,⭐ 里程碑达成！

@@ -86,6 +86,9 @@ public partial class TestSurvivorHudUx : TestHarness
         AssertThat(player.Health).IsEqual(140.0f);
 
         // Take damage -> Arc bar triggered & hit flash (Armor 10 => 10/60 DR)
+        // Zero the innate block/evasion roll so the DR math below is deterministic.
+        player.Stats!.SetBase("block", 0.0f);
+        player.Stats.SetBase("evasion", 0.0f);
         player.TakeDamage(20.0f);
         AssertThat(player.Health).IsEqualApprox(140.0f - 20.0f * (1.0f - 10.0f / 60.0f), 0.01f);
         GD.Print("[PASS] 3. Under-cell dynamic arc health bar and hit strobe flash verified.");

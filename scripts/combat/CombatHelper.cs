@@ -67,4 +67,24 @@ public static class CombatHelper
             target.Call("be_engulfed", source!);
         }
     }
+
+    /// <summary>Crit-aware variant of <see cref="DamageOrEngulf(Node?, float, Node2D?)"/>.</summary>
+    public static void DamageOrEngulf(Node? target, float damage, Node2D? source, bool isCrit)
+    {
+        if (target == null || !GodotObject.IsInstanceValid(target))
+            return;
+
+        if (target is BaseEnemy enemy)
+        {
+            enemy.TakeDamage(damage, source, isCrit);
+        }
+        else if (target.HasMethod("take_damage"))
+        {
+            target.Call("take_damage", damage, source!, isCrit);
+        }
+        else if (target.HasMethod("be_engulfed"))
+        {
+            target.Call("be_engulfed", source!);
+        }
+    }
 }

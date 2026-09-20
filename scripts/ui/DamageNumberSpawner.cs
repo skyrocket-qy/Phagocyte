@@ -75,12 +75,12 @@ public partial class DamageNumberSpawner : CanvasLayer
 
     public static void ShowEvaded(Vector2 worldPos)
     {
-        Instance?.SpawnTextInternal(worldPos, "EVADED!", new Color(0.25f, 0.95f, 0.55f), 14);
+        Instance?.SpawnTextInternal(worldPos, TranslationServer.Translate("COMBAT_EVADED"), new Color(0.25f, 0.95f, 0.55f), 14);
     }
 
     public static void ShowBlocked(Vector2 worldPos)
     {
-        Instance?.SpawnTextInternal(worldPos, "BLOCKED!", new Color(0.35f, 0.75f, 1.0f), 14);
+        Instance?.SpawnTextInternal(worldPos, TranslationServer.Translate("COMBAT_BLOCKED"), new Color(0.35f, 0.75f, 1.0f), 14);
     }
 
     public void Spawn(Vector2 worldPos, float amount, DamageNumberType type, bool isCrit = false)
@@ -99,7 +99,7 @@ public partial class DamageNumberSpawner : CanvasLayer
             case DamageNumberType.EnemyDamage:
                 if (isCrit)
                 {
-                    text = $"CRIT! {Mathf.RoundToInt(amount)}";
+                    text = $"{TranslationServer.Translate("COMBAT_CRIT")} {Mathf.RoundToInt(amount)}";
                     color = new Color(1.0f, 0.84f, 0.0f); // Gold
                     fontSize = 18;
                 }
@@ -124,13 +124,13 @@ public partial class DamageNumberSpawner : CanvasLayer
                 break;
 
             case DamageNumberType.Evaded:
-                text = "EVADED!";
+                text = TranslationServer.Translate("COMBAT_EVADED");
                 color = new Color(0.25f, 0.95f, 0.55f);
                 fontSize = 14;
                 break;
 
             case DamageNumberType.Blocked:
-                text = "BLOCKED!";
+                text = TranslationServer.Translate("COMBAT_BLOCKED");
                 color = new Color(0.35f, 0.75f, 1.0f);
                 fontSize = 14;
                 break;
