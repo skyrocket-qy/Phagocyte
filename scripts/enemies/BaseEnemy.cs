@@ -38,9 +38,6 @@ public abstract partial class BaseEnemy : Node2D
     /// </summary>
     public virtual Color SwarmBatchColor => Colors.White;
 
-    /// <summary>True while the swarm renderer supplies this enemy's visual.</summary>
-    public bool SwarmBatched { get; set; } = false;
-
     public bool IsBeingEaten { get; set; } = false;
     public virtual bool CanBeEngulfed => FibrinShield <= 0;
 

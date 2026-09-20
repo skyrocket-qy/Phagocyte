@@ -13,7 +13,6 @@ public partial class InterferonWaveSkill : BaseSkill
 {
     [Export] public float BaseDamage { get; set; } = 32.0f;
     [Export] public float BaseRadius { get; set; } = 480.0f;
-    [Export] public float BaseKnockback { get; set; } = 360.0f;
 
     public InterferonWaveSkill()
     {

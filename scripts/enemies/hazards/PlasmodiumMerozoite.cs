@@ -23,12 +23,6 @@ public partial class PlasmodiumMerozoite : BaseEnemy
 
     protected override float GetCollisionRadius() => 7.0f;
 
-    protected override void CustomPhysicsProcess(float dt)
-    {
-        // Chasing is handled by EnemySteering; merozoites just keep swarming visuals.
-        QueueRedraw();
-    }
-
     public override void _Draw()
     {
         // Teardrop pear shape

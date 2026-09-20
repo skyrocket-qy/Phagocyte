@@ -317,10 +317,12 @@ public partial class MainMenu : Control
 
     private void SwitchToView(Control targetView)
     {
-        if (TitleView != null) TitleView.Visible = targetView == TitleView;
-        if (ClassView != null) ClassView.Visible = targetView == ClassView;
-        if (PassiveView != null) PassiveView.Visible = targetView == PassiveView;
-        if (MapView != null) MapView.Visible = targetView == MapView;
+        Control?[] views = { TitleView, ClassView, PassiveView, MapView };
+        foreach (var view in views)
+        {
+            if (view != null)
+                view.Visible = view == targetView;
+        }
     }
 
     public void SetupClassButtons()

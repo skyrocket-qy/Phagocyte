@@ -30,7 +30,7 @@ public partial class AnthraxBacillus : BaseEnemy
 
     protected override void CustomPhysicsProcess(float dt)
     {
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = PlayerRef;
         if (player != null && GodotObject.IsInstanceValid(player))
         {
             // Chasing is handled by EnemySteering; keep facing for the toxin telegraph.

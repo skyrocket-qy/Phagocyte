@@ -128,13 +128,6 @@ public partial class RunRecordsModal : ModalBase
         SetHistoryTab((int)tab);
     }
 
-    public void Close()
-    {
-        if (SettlementMode)
-            return; // settlement must resolve through Retry / Menu
-        CloseModal();
-    }
-
     public override void UpdateLocalizedTexts()
     {
         base.UpdateLocalizedTexts();

@@ -32,14 +32,12 @@ public partial class BaseSkill : Node2D
     [Export] public bool IsInnate { get; set; } = false;
 
     public float CooldownTimer { get; set; } = 0.0f;
-    public int SlotIndex { get; set; } = -1;
     public CharacterBody2D? Host { get; set; } = null;
     public Node? Stats { get; set; } = null;
 
     public virtual void Setup(CharacterBody2D pHost, int pSlot)
     {
         Host = pHost;
-        SlotIndex = pSlot;
 
         if (Host != null)
         {

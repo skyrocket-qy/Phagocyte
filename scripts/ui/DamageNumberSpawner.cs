@@ -83,11 +83,6 @@ public partial class DamageNumberSpawner : CanvasLayer
         Instance?.SpawnTextInternal(worldPos, TranslationServer.Translate("COMBAT_BLOCKED"), new Color(0.35f, 0.75f, 1.0f), 14);
     }
 
-    public void Spawn(Vector2 worldPos, float amount, DamageNumberType type, bool isCrit = false)
-    {
-        Spawn2D(worldPos, amount, type, isCrit);
-    }
-
     public void Spawn2D(Vector2 worldPos, float amount, DamageNumberType type, bool isCrit = false)
     {
         string text;

@@ -73,10 +73,6 @@ public partial class AntibodySalvoSkill : BaseSkill
         if (!HasValidHost())
             return;
 
-        float angle = ((float)index / (float)Mathf.Max(1, total)) * Mathf.Tau;
-        Vector2 spawnDir = Vector2.FromAngle(angle);
-        Vector2 spawnPos = Host.GlobalPosition + spawnDir * 30.0f;
-
         // If target is valid, home in on it after short delay
         if (target != null && GodotObject.IsInstanceValid(target))
         {
@@ -88,8 +84,7 @@ public partial class AntibodySalvoSkill : BaseSkill
                 {
                     if (target != null && GodotObject.IsInstanceValid(target))
                     {
-                        var eaten = target.Get("is_being_eaten");
-                        if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
+                        if (target is BaseEnemy be && be.IsBeingEaten)
                             return;
 
                         GetDamage(BaseDamage, out float dmg, out bool isCrit);

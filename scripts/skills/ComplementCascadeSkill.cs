@@ -11,7 +11,6 @@ namespace Phagocyte.Skills;
 /// </summary>
 public partial class ComplementCascadeSkill : BaseSkill
 {
-    [Export] public float BaseDamage { get; set; } = 45.0f;
     [Export] public float BaseAreaRadius { get; set; } = 80.0f;
 
     public ComplementCascadeSkill()

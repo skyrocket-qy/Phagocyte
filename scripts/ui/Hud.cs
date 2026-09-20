@@ -34,13 +34,8 @@ public partial class Hud : CanvasLayer
     public Label? CountLabel { get; set; }
     public Label? SpeedLabel { get; set; }
 
-    // Backward compatibility aliases
-    public ProgressBar? AtpBar { get => ExpBar; set { } }
-    public Label? AtpLabel { get => ExpLabel; set { } }
-
     // Survivor-like Bottom HUD & Vignette Nodes
     public ProgressBar? BottomExpBar { get; set; }
-    public ProgressBar? TopExpBar { get => BottomExpBar; set => BottomExpBar = value; }
     public PanelContainer? TopCenterCapsule { get; set; }
     public Label? KillLabel { get; set; }
     public ColorRect? VignetteRect { get; set; }
@@ -148,8 +143,7 @@ public partial class Hud : CanvasLayer
         MapLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/MapLabel");
         BuffTag = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/BuffContainer/BuffTag");
 
-        BottomExpBar = GetNodeOrNull<ProgressBar>("BottomExpBar")
-            ?? GetNodeOrNull<ProgressBar>("TopExpBar");
+        BottomExpBar = GetNodeOrNull<ProgressBar>("BottomExpBar");
         VignetteRect = GetNodeOrNull<ColorRect>("CriticalHpVignette");
         SkillContainer = GetNodeOrNull<PanelContainer>("SkillContainer");
 
@@ -164,10 +158,8 @@ public partial class Hud : CanvasLayer
         ExpTitleLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPTitleLabel")
             ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/EXPTitleLabel");
         ExpBar = GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPBar")
-            ?? GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPBar")
             ?? GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/EXPBar");
         ExpLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPLabel")
-            ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/ATPContainer/ATPLabel")
             ?? GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/EXPLabel");
 
         SizeLabel = GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/SizeLabel")

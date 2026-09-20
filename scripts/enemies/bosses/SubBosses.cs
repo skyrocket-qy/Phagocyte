@@ -611,7 +611,7 @@ public partial class ToxoplasmaMegaCyst : SubBossEnemy
 public partial class Tachyzoite : BaseEnemy
 {
     private const float DashDuration = 2.6f;
-    private const float ContactDamage = 9.0f;
+    private const float DashHitDamage = 9.0f;
 
     private Vector2 _dashDirection = Vector2.Right;
     private float _dashTimer;
@@ -652,7 +652,7 @@ public partial class Tachyzoite : BaseEnemy
             if (GlobalPosition.DistanceTo(player.GlobalPosition) <= 20.0f + player.CurrentRadius * 0.4f)
             {
                 _hasHit = true;
-                player.TakeDamage(ContactDamage);
+                player.TakeDamage(DashHitDamage);
                 Die(null);
             }
         }

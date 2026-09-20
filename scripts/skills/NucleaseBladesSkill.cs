@@ -138,10 +138,4 @@ public partial class NucleaseBladesSkill : BaseSkill
             });
         }
     }
-
-    public override void Trigger()
-    {
-        base.Trigger();
-        // Cooldown reset handled by BaseSkill
-    }
 }

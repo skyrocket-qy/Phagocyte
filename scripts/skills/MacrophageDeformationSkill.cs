@@ -40,7 +40,6 @@ public partial class MacrophageDeformationSkill : BaseSkill
 
     public override void UpdateSkill(double delta)
     {
-        base.UpdateSkill(delta);
         if (!HasValidHost())
             return;
         UpdatePseudopodDeformation((float)delta);

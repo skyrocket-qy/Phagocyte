@@ -14,7 +14,6 @@ public partial class HistamineSurgeSkill : BaseSkill
     [Export] public float BaseDamage { get; set; } = 48.0f;
     [Export] public float BaseReach { get; set; } = 320.0f;
     [Export] public float ConeAngleDeg { get; set; } = 100.0f; // degrees
-    [Export] public float BaseKnockback { get; set; } = 450.0f;
 
     public HistamineSurgeSkill()
     {
@@ -40,7 +39,6 @@ public partial class HistamineSurgeSkill : BaseSkill
         Vector2 aimDir = FindAimDirection();
         float reach = GetCalculatedArea(BaseReach);
         GetDamage(BaseDamage, out float dmg, out _);
-        float kb = BaseKnockback * (Stats is CellStats cs ? cs.GetStat("knockback") : 1.0f);
         float halfConeRad = Mathf.DegToRad(ConeAngleDeg * 0.5f);
 
         // Spawn visual surge cone
@@ -66,9 +64,9 @@ public partial class HistamineSurgeSkill : BaseSkill
                 return;
 
             // Knockback (pathogens are Node2D bodies, so the displacement is tweened)
-            Vector2 push = toEnemy.Normalized() * kb;
+            Vector2 push = toEnemy.Normalized();
             var tween = Host.CreateTween();
-            tween.TweenProperty(n, "global_position", n.GlobalPosition + push.Normalized() * 80.0f, 0.2f);
+            tween.TweenProperty(n, "global_position", n.GlobalPosition + push * 80.0f, 0.2f);
 
             CombatHelper.DamageOrEngulf(n, dmg, Host);
         }, skipEaten: false);

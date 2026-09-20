@@ -36,11 +36,6 @@ public abstract partial class TerminalBossEnemy : BaseEnemy
             BossPhase.TelegraphDamage = TelegraphDamage;
         }
     }
-
-    protected BaseCell? GetPlayer()
-    {
-        return PlayerRef;
-    }
 }
 
 /// <summary>
@@ -220,7 +215,7 @@ public partial class SyncytialMegaCapsid : TerminalBossEnemy
     {
         _ciliaPhase += dt * 3.0f;
 
-        var player = GetPlayer();
+        var player = PlayerRef;
         if (player != null && !player.IsDead)
         {
             if (GlobalPosition.DistanceTo(player.GlobalPosition) <= CurrentAuraRadius)
@@ -244,7 +239,7 @@ public partial class SyncytialMegaCapsid : TerminalBossEnemy
     {
         TractionPulses++;
 
-        var player = GetPlayer();
+        var player = PlayerRef;
         if (player != null && !player.IsDead)
         {
             Vector2 pull = GlobalPosition - player.GlobalPosition;
@@ -502,7 +497,7 @@ public partial class HpyloriBiofilmCore : TerminalBossEnemy
     {
         ToxinTicks++;
 
-        var player = GetPlayer();
+        var player = PlayerRef;
         if (player == null || player.IsDead)
             return;
 

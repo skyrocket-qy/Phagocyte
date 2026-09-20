@@ -40,10 +40,6 @@ public partial class VaricellaZosterEnemy : BaseEnemy
                 }
             }
         }
-        else
-        {
-            // Aggressive chase is handled by EnemySteering (ChemoChaser after awakening).
-        }
     }
 
     public void Awaken()

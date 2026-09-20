@@ -90,14 +90,5 @@ public partial class RosTorrentSkill : BaseSkill
             rj.IsCrit = isCrit;
             rj.Scale = new Vector2(areaMult, areaMult);
         }
-        else
-        {
-            jet.Call("setup", Host, Host.GlobalPosition, dir);
-            jet.Set("speed", speedVal);
-            jet.Set("lifetime", lifeVal);
-            jet.Set("damage", dmg);
-            jet.Set("is_crit", isCrit);
-            jet.Scale = new Vector2(areaMult, areaMult);
-        }
     }
 }

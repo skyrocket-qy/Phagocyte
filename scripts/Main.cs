@@ -262,7 +262,8 @@ public partial class Main : Node2D
         OrganEnvironment.Attach(this);
 
         // Initial pathogen wave
-        SpawnInitialWave(35);
+        if (Player != null && EnemyContainer != null)
+            PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, 35);
 
         // GPU swarm batch renderer for the microscopic species (docs/spec.md §9).
         // Parented to Main (not EnemyContainer) so the map fluid mechanics never
@@ -279,7 +280,10 @@ public partial class Main : Node2D
         SpawnTutorialGuides();
 
         // Neutral environment matter (senescent RBCs + dormant toxin vesicles)
-        SeedNeutralMatter();
+        for (int i = 0; i < 4; i++)
+            SpawnSenescentRbc();
+        for (int i = 0; i < 3; i++)
+            SpawnToxinVesicle();
 
         AudioManager.Instance?.PlayBgm("battle_bgm", 0.6f);
     }
@@ -467,14 +471,6 @@ public partial class Main : Node2D
         if (CountGroup("senescent_rbc") < MaxSenescentRbc)
             SpawnSenescentRbc();
         if (CountGroup("toxin_vesicle") < MaxToxinVesicles)
-            SpawnToxinVesicle();
-    }
-
-    private void SeedNeutralMatter()
-    {
-        for (int i = 0; i < 4; i++)
-            SpawnSenescentRbc();
-        for (int i = 0; i < 3; i++)
             SpawnToxinVesicle();
     }
 
@@ -1125,13 +1121,6 @@ public partial class Main : Node2D
         HudNode?.ShowOverdriveAlert(title, desc);
         AudioManager.Instance?.PlaySfx("wave_complete", -3.0f);
         GD.Print($"[Overdrive] Cycle {cycle} engaged: HP ×{OverdriveHealthMultiplier:F2}, Speed ×{OverdriveSpeedMultiplier:F2}.");
-    }
-
-    private void SpawnInitialWave(int count)
-    {
-        if (Player == null || EnemyContainer == null)
-            return;
-        PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, count);
     }
 
     /// <summary>

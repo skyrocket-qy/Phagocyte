@@ -28,9 +28,6 @@ public partial class TutorialOverlay : Control
 
     private float _phase = 0.0f;
 
-    /// <summary>Diagnostics: number of draw passes (used by tests).</summary>
-    public int DrawCount { get; private set; } = 0;
-
     public override void _Ready()
     {
         MouseFilter = MouseFilterEnum.Ignore;
@@ -46,7 +43,6 @@ public partial class TutorialOverlay : Control
 
     public override void _Draw()
     {
-        DrawCount++;
         if (PlayerRef == null || !GodotObject.IsInstanceValid(PlayerRef))
             return;
 

@@ -132,15 +132,4 @@ public partial class SettingsManager : Node
         Fullscreen = d.ContainsKey("fullscreen") ? (bool)d["fullscreen"] : false;
         Vsync = d.ContainsKey("vsync") ? (bool)d["vsync"] : true;
     }
-
-    public static void ResetDefaults()
-    {
-        MasterVolume = 1.0f;
-        SfxVolume = 1.0f;
-        BgmVolume = 0.8f;
-        Fullscreen = false;
-        Vsync = true;
-        ApplySettings();
-        JsonStore.Delete(SavePath);
-    }
 }
