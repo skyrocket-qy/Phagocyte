@@ -132,6 +132,7 @@ public partial class Hud : CanvasLayer
 
     private Callable _langCallback;
     private Callable _achUnlockCallback;
+    private Callable? _levelUpCallback;
 
     public override void _Ready()
     {
@@ -511,10 +512,12 @@ public partial class Hud : CanvasLayer
                 return;
             if (PlayerRef.HasSignal("level_up"))
             {
-                var callable = Callable.From((int lvl) => OnPlayerLevelUp(lvl));
-                if (!PlayerRef.IsConnected("level_up", callable))
+                // Reuse one callable so the IsConnected guard actually matches;
+                // a fresh lambda per call would stack duplicate handlers.
+                _levelUpCallback ??= Callable.From((int lvl) => OnPlayerLevelUp(lvl));
+                if (!PlayerRef.IsConnected("level_up", _levelUpCallback.Value))
                 {
-                    PlayerRef.Connect("level_up", callable);
+                    PlayerRef.Connect("level_up", _levelUpCallback.Value);
                 }
             }
         }

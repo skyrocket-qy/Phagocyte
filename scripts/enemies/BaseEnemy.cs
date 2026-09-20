@@ -246,6 +246,8 @@ public abstract partial class BaseEnemy : Node2D
 
     protected void TakeDamageInternal(float damage, Node2D? source, bool isCrit)
     {
+        OnPreDamage(damage, source, isCrit);
+
         if (IsBeingEaten)
             return;
 
@@ -302,6 +304,25 @@ public abstract partial class BaseEnemy : Node2D
         {
             QueueRedraw();
         }
+
+        OnPostDamage(damage, source, isCrit);
+    }
+
+    /// <summary>
+    /// Runs at the top of every damage intake (before the eaten/shield guards).
+    /// Subclasses use it for hit-triggered reactions that must also fire on the
+    /// crit-routed overload.
+    /// </summary>
+    protected virtual void OnPreDamage(float damage, Node2D? source, bool isCrit)
+    {
+    }
+
+    /// <summary>
+    /// Runs at the bottom of every damage intake (after death resolution).
+    /// Subclasses use it for post-hit thresholds such as low-health splits.
+    /// </summary>
+    protected virtual void OnPostDamage(float damage, Node2D? source, bool isCrit)
+    {
     }
 
     public virtual void TakeDoTDamage(float dotDamage)

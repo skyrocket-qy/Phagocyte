@@ -800,11 +800,6 @@ public partial class BaseCell : CharacterBody2D
             atp = baseEnemy.GetAtpValue();
             baseEnemy.BeEngulfed(this);
         }
-        else if (enemy is StaphEnemy se)
-        {
-            atp = se.GetAtpValue();
-            se.BeEngulfed(this);
-        }
         else
         {
             if (enemy.HasMethod("get_atp_value"))

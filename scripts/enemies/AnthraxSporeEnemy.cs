@@ -31,15 +31,8 @@ public partial class AnthraxSporeEnemy : BaseEnemy
 
     protected override float GetCollisionRadius() => 16.0f;
 
-    public override void TakeDamage(float damage, Node2D? source = null)
+    protected override void OnPostDamage(float damage, Node2D? source, bool isCrit)
     {
-        TakeDamage(damage, source, false);
-    }
-
-    public override void TakeDamage(float damage, Node2D? source, bool isCrit)
-    {
-        base.TakeDamage(damage, source, isCrit);
-
         if (!_awakened && !IsBeingEaten && CurrentHealth > 0.0f && CurrentHealth <= MaxHealth * AwakenHealthRatio)
         {
             Awaken();

@@ -108,14 +108,13 @@ public partial class CandidaEnemy : BaseEnemy
         QueueRedraw();
     }
 
-    public override void TakeDamage(float damage, Node2D? source = null)
+    protected override void OnPreDamage(float damage, Node2D? source, bool isCrit)
     {
         if (!_hyphaeExtended)
         {
             var p = PlayerRef;
             ExtendHyphae(p != null && GodotObject.IsInstanceValid(p) ? p.GlobalPosition : null);
         }
-        base.TakeDamage(damage, source);
     }
 
     public override void OnEngulfAttemptFailed(Node2D? predator)

@@ -59,11 +59,10 @@ public partial class VaricellaZosterEnemy : BaseEnemy
         QueueRedraw();
     }
 
-    public override void TakeDamage(float damage, Node2D? source = null)
+    protected override void OnPreDamage(float damage, Node2D? source, bool isCrit)
     {
         if (!_isAwakened)
             Awaken();
-        base.TakeDamage(damage, source);
     }
 
     public override void _Draw()

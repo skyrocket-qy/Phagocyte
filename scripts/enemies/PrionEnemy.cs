@@ -10,7 +10,6 @@ namespace Phagocyte.Enemies;
 /// </summary>
 public partial class PrionEnemy : BaseEnemy
 {
-    private bool _hasSplit = false;
     public override bool CanBeEngulfed => false; // Lysosomes cannot digest misfolded amyloid prions!
 
     public PrionEnemy()
@@ -28,15 +27,10 @@ public partial class PrionEnemy : BaseEnemy
 
     protected override float GetCollisionRadius() => 28.0f;
 
-    public override void TakeDamage(float damage, Node2D? source = null)
+    protected override void OnPostDamage(float damage, Node2D? source, bool isCrit)
     {
-        base.TakeDamage(damage, source);
-
-        if (!_hasSplit && CurrentHealth <= (MaxHealth * 0.5f))
-        {
-            _hasSplit = true;
+        if (CurrentHealth <= MaxHealth * 0.5f && TryConsumeSplitBurst())
             SpawnFragments();
-        }
     }
 
     public override void OnEngulfAttemptFailed(Node2D? predator)

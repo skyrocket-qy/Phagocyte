@@ -24,10 +24,9 @@ public partial class PlasmodiumCarrierEnemy : BaseEnemy
 
     protected override float GetCollisionRadius() => 18.0f;
 
-    public override void TakeDamage(float damage, Node2D? source = null)
+    protected override void OnPreDamage(float damage, Node2D? source, bool isCrit)
     {
         RuptureIntoMerozoites();
-        base.TakeDamage(damage, source);
     }
 
     public override void Die(Node2D? killer)

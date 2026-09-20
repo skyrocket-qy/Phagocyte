@@ -139,27 +139,6 @@ public partial class DendriticCell : BaseCell
             EngulfCollider.Polygon = points;
         }
 
-        // Call base UpdateNucleus
-        UpdateNucleusReflection(delta);
-    }
-
-    private void UpdateNucleusReflection(float delta)
-    {
-        if (Nucleus == null)
-            return;
-
-        Vector2 targetLag = -Velocity * 0.08f;
-        float maxLag = CurrentRadius * 0.32f;
-        if (targetLag.Length() > maxLag)
-        {
-            targetLag = targetLag.Normalized() * maxLag;
-        }
-
-        float springK = 48.0f;
-        float damping = 9.5f;
-        Vector2 accel = (targetLag - NucleusOffset) * springK - NucleusVelocity * damping;
-        NucleusVelocity += accel * delta;
-        NucleusOffset += NucleusVelocity * delta;
-        Nucleus.Position = NucleusOffset;
+        UpdateNucleus(delta);
     }
 }

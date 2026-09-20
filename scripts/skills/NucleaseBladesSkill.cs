@@ -103,16 +103,16 @@ public partial class NucleaseBladesSkill : BaseSkill
             _canvas.QueueRedraw();
         }
 
-        CheckBladeCollisions(bladeCount, orbitR);
+        CheckBladeCollisions(bladeCount, orbitR, (float)delta);
     }
 
     private float _damageCooldown = 0.0f;
-    private void CheckBladeCollisions(int bladeCount, float orbitR)
+    private void CheckBladeCollisions(int bladeCount, float orbitR, float dt)
     {
         if (Host == null)
             return;
 
-        _damageCooldown -= 0.016f;
+        _damageCooldown -= dt;
         if (_damageCooldown > 0.0f)
             return;
 
