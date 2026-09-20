@@ -275,7 +275,11 @@ public partial class MainMenu : Control
             LangBtn.Text = GameManager.CurrentLanguage == "zh_CN" ? "🌐 English" : "🌐 简体中文";
 
         if (TitleLbl != null) TitleLbl.Text = Tr("TITLE_MAIN");
-        if (SubtitleLbl != null) SubtitleLbl.Text = Tr("SUBTITLE_MAIN");
+        if (SubtitleLbl != null)
+        {
+            SubtitleLbl.Text = Tr("SUBTITLE_MAIN");
+            SubtitleLbl.Visible = !string.IsNullOrEmpty(SubtitleLbl.Text);
+        }
         if (StartBtn != null) StartBtn.Text = Tr("BTN_START");
         if (CodexBtn != null) CodexBtn.Text = Tr("BTN_CODEX");
         if (RecordsBtn != null) RecordsBtn.Text = Tr("BTN_RECORDS");
