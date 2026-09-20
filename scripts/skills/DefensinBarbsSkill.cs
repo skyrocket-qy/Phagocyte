@@ -1,7 +1,9 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using Phagocyte.Combat;
 using Phagocyte.Core;
+using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
 
@@ -94,6 +96,7 @@ public partial class DefensinBarbsSkill : BaseSkill
 
         private int _hitCount = 0;
         private float _lifetime = 1.6f;
+        private readonly List<BaseEnemy> _scratchHits = new();
 
         public override void _Process(double delta)
         {
@@ -113,28 +116,23 @@ public partial class DefensinBarbsSkill : BaseSkill
 
         private void CheckHit()
         {
-            if (HostRef == null)
+            if (HostRef == null || _hitCount >= PierceLimit)
                 return;
 
-            var pathogens = HostRef.GetTree().GetNodesInGroup("pathogens");
-            foreach (var p in pathogens)
+            _scratchHits.Clear();
+            TargetingService.CollectInRadius(GlobalPosition, 20.0f, _scratchHits, skipEaten: false);
+            foreach (var n in _scratchHits)
             {
-                if (p is Node2D n && GodotObject.IsInstanceValid(n))
-                {
-                    if (GlobalPosition.DistanceTo(n.GlobalPosition) <= 20.0f)
-                    {
-                        _hitCount++;
-                        if (n.HasMethod("take_damage"))
-                            CombatHelper.DealDamage(n, Damage);
-                        else if (n.HasMethod("be_engulfed"))
-                            n.Call("be_engulfed", HostRef);
+                if (_hitCount >= PierceLimit)
+                    break;
 
-                        if (_hitCount >= PierceLimit)
-                        {
-                            QueueFree();
-                            break;
-                        }
-                    }
+                _hitCount++;
+                CombatHelper.DamageOrEngulf(n, Damage, HostRef);
+
+                if (_hitCount >= PierceLimit)
+                {
+                    QueueFree();
+                    break;
                 }
             }
         }

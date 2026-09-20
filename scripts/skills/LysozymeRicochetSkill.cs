@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Phagocyte.Combat;
 using Phagocyte.Core;
+using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
 
@@ -72,6 +73,7 @@ public partial class LysozymeRicochetSkill : BaseSkill
         private int _currentBounces = 0;
         private float _lifetime = 3.0f;
         private readonly HashSet<ulong> _recentlyHit = new();
+        private readonly List<BaseEnemy> _scratchHits = new();
 
         public override void _Process(double delta)
         {
@@ -90,40 +92,32 @@ public partial class LysozymeRicochetSkill : BaseSkill
 
         private void CheckHit()
         {
-            if (HostRef == null)
+            if (HostRef == null || _currentBounces >= MaxBounces)
                 return;
 
-            var pathogens = HostRef.GetTree().GetNodesInGroup("pathogens");
-            foreach (var p in pathogens)
+            _scratchHits.Clear();
+            TargetingService.CollectInRadius(GlobalPosition, 22.0f, _scratchHits, skipEaten: false);
+            foreach (var n in _scratchHits)
             {
-                if (p is Node2D n && GodotObject.IsInstanceValid(n))
+                if (_recentlyHit.Contains(n.GetInstanceId()))
+                    continue;
+
+                _recentlyHit.Add(n.GetInstanceId());
+                _currentBounces++;
+
+                CombatHelper.DamageOrEngulf(n, Damage, HostRef);
+
+                // Find next bounce target
+                Node2D? nextTarget = FindNextTarget(n);
+                if (nextTarget != null)
                 {
-                    if (_recentlyHit.Contains(n.GetInstanceId()))
-                        continue;
-
-                    if (GlobalPosition.DistanceTo(n.GlobalPosition) <= 22.0f)
-                    {
-                        _recentlyHit.Add(n.GetInstanceId());
-                        _currentBounces++;
-
-                        if (n.HasMethod("take_damage"))
-                            CombatHelper.DealDamage(n, Damage);
-                        else if (n.HasMethod("be_engulfed"))
-                            n.Call("be_engulfed", HostRef);
-
-                        // Find next bounce target
-                        Node2D? nextTarget = FindNextTarget(n);
-                        if (nextTarget != null)
-                        {
-                            Direction = (nextTarget.GlobalPosition - GlobalPosition).Normalized();
-                        }
-                        else
-                        {
-                            Direction = Direction.Rotated((float)GD.RandRange(1.8, 2.5));
-                        }
-                        break;
-                    }
+                    Direction = (nextTarget.GlobalPosition - GlobalPosition).Normalized();
                 }
+                else
+                {
+                    Direction = Direction.Rotated((float)GD.RandRange(1.8, 2.5));
+                }
+                break;
             }
         }
 

@@ -9,14 +9,17 @@ namespace Phagocyte.UI;
 /// Level-Up 3-Choice Epigenetic Mutation Modal.
 /// Pauses the game, displays 3 distinct choices (Active/Passive), and applies the selected upgrade.
 /// </summary>
-public partial class UpgradeModal : Control
+public partial class UpgradeModal : ModalBase
 {
     [Signal]
     public delegate void ChoiceAppliedEventHandler(Dictionary choice);
 
-    public Label? TitleLabel { get; set; }
     public Label? SubtitleLabel { get; set; }
     public HBoxContainer? CardsContainer { get; set; }
+
+    // Scene-built modal without a header: title lives inside the center VBox.
+    protected override string? TitleLabelPath => null;
+    protected override string? CloseButtonPath => null;
 
     private Array<Dictionary> _currentChoices = new();
     public Array<Dictionary> CurrentChoices => _currentChoices;
@@ -25,14 +28,12 @@ public partial class UpgradeModal : Control
 
     public override void _Ready()
     {
-        ProcessMode = ProcessModeEnum.Always;
-        Visible = false;
-
         TitleLabel = GetNodeOrNull<Label>("CenterContainer/VBox/TitleLabel");
         SubtitleLabel = GetNodeOrNull<Label>("CenterContainer/VBox/SubtitleLabel");
         CardsContainer = GetNodeOrNull<HBoxContainer>("CenterContainer/VBox/CardsContainer");
 
         SetupCardListeners();
+        InitModal();
     }
 
     private void SetupCardListeners()
@@ -87,10 +88,7 @@ public partial class UpgradeModal : Control
 
     private void PopulateCards()
     {
-        if (TitleLabel != null)
-            TitleLabel.Text = Tr("UPGRADE_MODAL_TITLE");
-        if (SubtitleLabel != null)
-            SubtitleLabel.Text = Tr("UPGRADE_MODAL_SUBTITLE");
+        UpdateLocalizedTexts();
 
         if (CardsContainer == null)
             return;
@@ -162,6 +160,16 @@ public partial class UpgradeModal : Control
         }
     }
 
+    /// <summary>Refreshes the static header; card texts refresh on the next open.</summary>
+    public override void UpdateLocalizedTexts()
+    {
+        base.UpdateLocalizedTexts();
+        if (TitleLabel != null)
+            TitleLabel.Text = Tr("UPGRADE_MODAL_TITLE");
+        if (SubtitleLabel != null)
+            SubtitleLabel.Text = Tr("UPGRADE_MODAL_SUBTITLE");
+    }
+
     private void ApplyCatalystAura(Control card, Label? badgeLbl, bool isCatalyst)
     {
         var aura = card.GetNodeOrNull<Panel>("CatalystAura");
@@ -174,19 +182,10 @@ public partial class UpgradeModal : Control
                 Visible = false
             };
             aura.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-            aura.AddThemeStyleboxOverride("panel", new StyleBoxFlat
-            {
-                BgColor = new Color(0.0f, 0.0f, 0.0f, 0.0f),
-                BorderColor = new Color(1.0f, 0.85f, 0.35f, 0.95f),
-                BorderWidthLeft = 2,
-                BorderWidthTop = 2,
-                BorderWidthRight = 2,
-                BorderWidthBottom = 2,
-                CornerRadiusTopLeft = 8,
-                CornerRadiusTopRight = 8,
-                CornerRadiusBottomLeft = 8,
-                CornerRadiusBottomRight = 8
-            });
+            aura.AddThemeStyleboxOverride("panel", UiBuilders.PanelStyle(
+                new Color(0.0f, 0.0f, 0.0f, 0.0f),
+                border: new Color(1.0f, 0.85f, 0.35f, 0.95f),
+                borderWidth: 2, cornerRadius: 8));
             card.AddChild(aura);
         }
 

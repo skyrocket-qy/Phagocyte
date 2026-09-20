@@ -383,22 +383,13 @@ public partial class RunRecordsModal : ModalBase
             MouseDefaultCursorShape = CursorShape.PointingHand
         };
 
-        var style = new StyleBoxFlat
-        {
-            BgColor = isBest
+        var style = UiBuilders.PanelStyle(
+            isBest
                 ? new Color(0.16f, 0.14f, 0.05f, 0.85f)
                 : chronic
                     ? new Color(0.15f, 0.12f, 0.04f, 0.78f)
                     : victory ? new Color(0.08f, 0.18f, 0.12f, 0.7f) : new Color(0.18f, 0.08f, 0.1f, 0.7f),
-            CornerRadiusTopLeft = 6,
-            CornerRadiusTopRight = 6,
-            CornerRadiusBottomLeft = 6,
-            CornerRadiusBottomRight = 6,
-            ContentMarginLeft = 12,
-            ContentMarginRight = 12,
-            ContentMarginTop = 8,
-            ContentMarginBottom = 8
-        };
+            cornerRadius: 6, marginH: 12, marginV: 8);
         if (isBest || chronic)
         {
             style.BorderWidthLeft = 2;

@@ -1,6 +1,6 @@
 using Godot;
 using System;
-using Phagocyte.Enemies;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -37,50 +37,30 @@ public partial class PseudopodLungeSkill : BaseSkill
 
         int amount = GetCalculatedAmount(1);
         float reach = GetCalculatedArea(BaseReach);
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
+        var dmgDict = GetCalculatedDamage(BaseDamage);
+        float dmg = (float)dmgDict["damage"];
+        bool isCrit = (bool)dmgDict["is_crit"];
 
         int pulled = 0;
-        foreach (var p in pathogens)
+        TargetingService.ForEachInRadius(Host.GlobalPosition, reach, n =>
         {
             if (pulled >= amount)
-                break;
+                return;
 
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
+            pulled++;
+
+            CombatHelper.DealDamage(n, dmg, Host, isCrit);
+
+            // Pull pathogen rapidly toward player
+            var tween = Host.CreateTween();
+            tween.TweenProperty(n, "global_position", Host.GlobalPosition, 0.15f);
+            tween.TweenCallback(Callable.From(() =>
             {
-                var eaten = n.Get("is_being_eaten");
-                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                    continue;
-
-                if (Host.GlobalPosition.DistanceTo(n.GlobalPosition) <= reach)
+                if (n != null && GodotObject.IsInstanceValid(n) && n.HasMethod("be_engulfed"))
                 {
-                    pulled++;
-
-                    // Deal blunt impact damage
-                    var dmgDict = GetCalculatedDamage(BaseDamage);
-                    float dmg = (float)dmgDict["damage"];
-                    bool isCrit = (bool)dmgDict["is_crit"];
-
-                    if (n is BaseEnemy be)
-                    {
-                        be.TakeDamage(dmg, Host, isCrit);
-                    }
-                    else if (n.HasMethod("take_damage"))
-                    {
-                        n.Call("take_damage", dmg, Host, isCrit);
-                    }
-
-                    // Pull pathogen rapidly toward player
-                    var tween = Host.CreateTween();
-                    tween.TweenProperty(n, "global_position", Host.GlobalPosition, 0.15f);
-                    tween.TweenCallback(Callable.From(() =>
-                    {
-                        if (n != null && GodotObject.IsInstanceValid(n) && n.HasMethod("be_engulfed"))
-                        {
-                            n.Call("be_engulfed", Host);
-                        }
-                    }));
+                    n.Call("be_engulfed", Host);
                 }
-            }
-        }
+            }));
+        });
     }
 }

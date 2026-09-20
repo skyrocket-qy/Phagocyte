@@ -24,16 +24,9 @@ public abstract partial class TerminalBossEnemy : BaseEnemy
     protected virtual float TelegraphScale => 1.35f;
     protected virtual float TelegraphDamage => 24.0f;
 
-    public override void OnEngulfAttemptFailed(Node2D? predator)
-    {
-        if (predator is BaseCell cell)
-        {
-            cell.TakeDamage(ContactDamage);
-            Vector2 repel = cell.GlobalPosition - GlobalPosition;
-            if (repel.LengthSquared() > 0.001f)
-                cell.Velocity += repel.Normalized() * 320.0f;
-        }
-    }
+    // Engulf attempts bounce off and damage the cell (repel handled by BaseEnemy).
+    protected override float EngulfContactDamage => ContactDamage;
+    protected override float EngulfRepelForce => 320.0f;
 
     protected override void SetupEnemy()
     {
@@ -58,7 +51,7 @@ public partial class MrsASuperColony : TerminalBossEnemy
 {
     public const int SplitCount = 4;
 
-    public bool HasSplit { get; private set; }
+    public bool HasSplit => SplitBurstConsumed;
 
     private float _capsulePhase;
 
@@ -86,11 +79,8 @@ public partial class MrsASuperColony : TerminalBossEnemy
 
     public override void Die(Node2D? killer)
     {
-        if (!HasSplit)
-        {
-            HasSplit = true;
+        if (TryConsumeSplitBurst())
             SpawnEnragedElites();
-        }
         base.Die(killer);
     }
 
@@ -310,7 +300,7 @@ public partial class PlasmodiumMacroSchizont : TerminalBossEnemy
     public const int MerozoiteBurstCount = 10;
 
     public int FeedsCount { get; private set; }
-    public bool HasRuptured { get; private set; }
+    public bool HasRuptured => SplitBurstConsumed;
 
     private float _feedTimer = FeedInterval;
     private float _pulsePhase;
@@ -374,11 +364,8 @@ public partial class PlasmodiumMacroSchizont : TerminalBossEnemy
 
     public override void Die(Node2D? killer)
     {
-        if (!HasRuptured)
-        {
-            HasRuptured = true;
+        if (TryConsumeSplitBurst())
             BurstMerozoites();
-        }
         base.Die(killer);
     }
 
@@ -533,17 +520,7 @@ public partial class HpyloriBiofilmCore : TerminalBossEnemy
     /// </summary>
     public void SpawnAcidScar()
     {
-        _scars.RemoveAll(scar => scar == null || !GodotObject.IsInstanceValid(scar));
-        if (_scars.Count >= MaxScars)
-            return;
-
-        var parent = GetParent();
-        if (parent == null)
-            return;
-
-        var scar = new HpyloriAcidScar { GlobalPosition = GlobalPosition };
-        parent.AddChild(scar);
-        _scars.Add(scar);
+        SpawnHazard(_scars, MaxScars);
     }
 
     public override void _Draw()

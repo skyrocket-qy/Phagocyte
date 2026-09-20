@@ -37,23 +37,10 @@ public partial class AchievementToast : PanelContainer
         OffsetBottom = -26.0f;
         ZIndex = 120;
 
-        var style = new StyleBoxFlat
-        {
-            BgColor = new Color(0.06f, 0.09f, 0.14f, 0.94f),
-            BorderColor = new Color(0.85f, 0.72f, 0.35f, 0.95f),
-            BorderWidthLeft = 2,
-            BorderWidthRight = 2,
-            BorderWidthTop = 2,
-            BorderWidthBottom = 2,
-            CornerRadiusTopLeft = 8,
-            CornerRadiusTopRight = 8,
-            CornerRadiusBottomLeft = 8,
-            CornerRadiusBottomRight = 8,
-            ContentMarginLeft = 14,
-            ContentMarginRight = 14,
-            ContentMarginTop = 8,
-            ContentMarginBottom = 8
-        };
+        var style = UiBuilders.PanelStyle(
+            new Color(0.06f, 0.09f, 0.14f, 0.94f),
+            border: new Color(0.85f, 0.72f, 0.35f, 0.95f),
+            borderWidth: 2, cornerRadius: 8, marginH: 14, marginV: 8);
         AddThemeStyleboxOverride("panel", style);
 
         var hbox = new HBoxContainer();

@@ -4,12 +4,13 @@ using Phagocyte.Core;
 namespace Phagocyte.UI;
 
 /// <summary>
-/// Shared scaffolding for the PanelContainer modals: hidden-on-ready state, the
-/// header ✕ button, the language-listener lifetime and the Closed signal.
+/// Shared scaffolding for the panel modals: hidden-on-ready state, the header
+/// ✕ button, the language-listener lifetime and the Closed signal.
 /// Subclasses resolve their own nodes, then call <see cref="InitModal"/> at the
-/// end of _Ready.
+/// end of _Ready. Control (not PanelContainer) so both scene-rooted panel
+/// modals and code-built Control modals can extend it.
 /// </summary>
-public partial class ModalBase : PanelContainer
+public partial class ModalBase : Control
 {
     [Signal]
     public delegate void ClosedEventHandler();

@@ -71,10 +71,7 @@ public partial class HistamineSurgeSkill : BaseSkill
             var tween = Host.CreateTween();
             tween.TweenProperty(n, "global_position", n.GlobalPosition + push.Normalized() * 80.0f, 0.2f);
 
-            if (n.HasMethod("take_damage"))
-                n.Call("take_damage", dmg);
-            else if (n.HasMethod("be_engulfed"))
-                n.Call("be_engulfed", Host);
+            CombatHelper.DamageOrEngulf(n, dmg, Host);
         }, skipEaten: false);
     }
 

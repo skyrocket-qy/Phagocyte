@@ -80,14 +80,11 @@ public partial class CodexModal : ModalBase
     {
         CurrentTab = tabIdx;
 
-        Color activeColor = new Color(1, 1, 1);
-        Color inactiveColor = new Color(0.7f, 0.7f, 0.7f);
-
-        if (TabSkillsBtn != null) TabSkillsBtn.Modulate = tabIdx == 0 ? activeColor : inactiveColor;
-        if (TabCellsBtn != null) TabCellsBtn.Modulate = tabIdx == 1 ? activeColor : inactiveColor;
-        if (TabPathogensBtn != null) TabPathogensBtn.Modulate = tabIdx == 2 ? activeColor : inactiveColor;
-        if (TabMapsBtn != null) TabMapsBtn.Modulate = tabIdx == 3 ? activeColor : inactiveColor;
-        if (TabAchievementsBtn != null) TabAchievementsBtn.Modulate = tabIdx == 4 ? activeColor : inactiveColor;
+        UiBuilders.SetTabActive(TabSkillsBtn, tabIdx == 0);
+        UiBuilders.SetTabActive(TabCellsBtn, tabIdx == 1);
+        UiBuilders.SetTabActive(TabPathogensBtn, tabIdx == 2);
+        UiBuilders.SetTabActive(TabMapsBtn, tabIdx == 3);
+        UiBuilders.SetTabActive(TabAchievementsBtn, tabIdx == 4);
 
         ActiveItemKey = "";
         RenderCurrentTab();
@@ -162,24 +159,14 @@ public partial class CodexModal : ModalBase
         if (DetailBadge != null) DetailBadge.Text = "[ " + d["type_label"].AsString() + " ]";
 
         string type = d["type"].AsString();
-        if (DetailBadge != null && DetailStats != null)
+        UiBuilders.BuildSkillBadge(type, d["cooldown"].AsSingle(), 1, d["max_level"].AsInt32(),
+            out string badgeText, out Color badgeColor, out string statsText);
+        if (DetailBadge != null)
         {
-            switch (type)
-            {
-                case "innate":
-                    DetailBadge.Modulate = new Color(0.4f, 0.95f, 0.8f);
-                    DetailStats.Text = Tr("TOOLTIP_ALWAYS_ACTIVE") + " • " + TextFormatter.Format(Tr("TOOLTIP_LV_FORMAT"), 1, d["max_level"].AsInt32());
-                    break;
-                case "active":
-                    DetailBadge.Modulate = new Color(1.0f, 0.85f, 0.3f);
-                    DetailStats.Text = TextFormatter.Format(Tr("TOOLTIP_CD"), d["cooldown"].AsSingle()) + " • " + TextFormatter.Format(Tr("TOOLTIP_LV_FORMAT"), 1, d["max_level"].AsInt32());
-                    break;
-                case "passive":
-                    DetailBadge.Modulate = new Color(0.6f, 0.8f, 1.0f);
-                    DetailStats.Text = Tr("TOOLTIP_ALWAYS_ACTIVE") + " • " + TextFormatter.Format(Tr("TOOLTIP_LV_FORMAT"), 1, d["max_level"].AsInt32());
-                    break;
-            }
+            DetailBadge.Text = badgeText;
+            DetailBadge.Modulate = badgeColor;
         }
+        if (DetailStats != null) DetailStats.Text = statsText;
 
         if (DetailDesc != null) DetailDesc.Text = Tr("CODEX_HEADER_TACTICAL") + "\n" + d["description"].AsString();
         if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_BIO") + "\n" + d["biochemistry"].AsString();

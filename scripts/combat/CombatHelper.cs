@@ -43,4 +43,28 @@ public static class CombatHelper
             target.Call("take_damage", damage);
         }
     }
+
+    /// <summary>
+    /// Applies damage when the target accepts it, otherwise falls back to
+    /// pathogen engulfment. Used by AoE waves and projectiles so the
+    /// take_damage/be_engulfed branch lives in one place.
+    /// </summary>
+    public static void DamageOrEngulf(Node? target, float damage, Node2D? source)
+    {
+        if (target == null || !GodotObject.IsInstanceValid(target))
+            return;
+
+        if (target is BaseEnemy enemy)
+        {
+            enemy.TakeDamage(damage);
+        }
+        else if (target.HasMethod("take_damage"))
+        {
+            target.Call("take_damage", damage);
+        }
+        else if (target.HasMethod("be_engulfed"))
+        {
+            target.Call("be_engulfed", source!);
+        }
+    }
 }

@@ -365,13 +365,72 @@ public abstract partial class BaseEnemy : Node2D
         }));
     }
 
+    /// <summary>Contact damage dealt to a cell whose engulf attempt bounces off.</summary>
+    protected virtual float EngulfContactDamage => 0.0f;
+
+    /// <summary>Knockback impulse applied to a cell whose engulf attempt bounces off.</summary>
+    protected virtual float EngulfRepelForce => 0.0f;
+
+    private bool _splitBurstConsumed;
+
+    /// <summary>True once the one-shot split/burst effect has fired.</summary>
+    protected bool SplitBurstConsumed => _splitBurstConsumed;
+
+    /// <summary>
+    /// One-shot guard shared by boss split/burst effects (death splits and
+    /// low-health bursts). Returns true the first call only.
+    /// </summary>
+    protected bool TryConsumeSplitBurst()
+    {
+        if (_splitBurstConsumed)
+            return false;
+
+        _splitBurstConsumed = true;
+        return true;
+    }
+
     public virtual void OnEngulfAttemptFailed(Node2D? predator)
     {
+        if (EngulfContactDamage > 0.0f || EngulfRepelForce > 0.0f)
+        {
+            if (predator is BaseCell cell)
+            {
+                if (EngulfContactDamage > 0.0f)
+                    cell.TakeDamage(EngulfContactDamage);
+
+                Vector2 repel = cell.GlobalPosition - GlobalPosition;
+                if (EngulfRepelForce > 0.0f && repel.LengthSquared() > 0.001f)
+                    cell.Velocity += repel.Normalized() * EngulfRepelForce;
+            }
+            return;
+        }
+
         if (FibrinShield > 0)
         {
             FibrinShield--;
             QueueRedraw();
         }
+    }
+
+    /// <summary>
+    /// Drops a hazard pool at this enemy's position, pruning destroyed entries
+    /// first and enforcing <paramref name="maxPools"/>. Returns null when the
+    /// cap is reached or there is no parent to attach to.
+    /// </summary>
+    protected THazard? SpawnHazard<THazard>(List<THazard> tracked, int maxPools) where THazard : Node2D, new()
+    {
+        tracked.RemoveAll(pool => pool == null || !GodotObject.IsInstanceValid(pool));
+        if (tracked.Count >= maxPools)
+            return null;
+
+        var parent = GetParent();
+        if (parent == null)
+            return null;
+
+        var hazard = new THazard { GlobalPosition = GlobalPosition };
+        parent.AddChild(hazard);
+        tracked.Add(hazard);
+        return hazard;
     }
 
     public override void _ExitTree()

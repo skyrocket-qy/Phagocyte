@@ -48,38 +48,7 @@ public partial class GranzymeDetonationSkill : BaseSkill
         if (Host == null)
             return null;
 
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        Node2D? bestTarget = null;
-        float highestHp = -1.0f;
-        float minDist = SearchRange;
-
-        foreach (var p in pathogens)
-        {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                var eaten = n.Get("is_being_eaten");
-                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                    continue;
-
-                float dist = Host.GlobalPosition.DistanceTo(n.GlobalPosition);
-                if (dist <= SearchRange)
-                {
-                    float hp = 10.0f;
-                    var hpVal = n.Get("health");
-                    if (hpVal.VariantType == Variant.Type.Float)
-                        hp = (float)hpVal;
-
-                    if (hp > highestHp || (hp == highestHp && dist < minDist))
-                    {
-                        highestHp = hp;
-                        minDist = dist;
-                        bestTarget = n;
-                    }
-                }
-            }
-        }
-
-        return bestTarget;
+        return TargetingService.FindNearest(Host, SearchRange);
     }
 
     private void InjectGranzyme(Node2D target)
@@ -120,10 +89,7 @@ public partial class GranzymeDetonationSkill : BaseSkill
 
         TargetingService.ForEachInRadius(center, splashRadius, n =>
         {
-            if (n.HasMethod("take_damage"))
-                CombatHelper.DealDamage(n, dmg);
-            else if (n.HasMethod("be_engulfed"))
-                n.Call("be_engulfed", Host);
+            CombatHelper.DamageOrEngulf(n, dmg, Host);
         });
     }
 

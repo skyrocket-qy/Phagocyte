@@ -718,34 +718,18 @@ public partial class Hud : CanvasLayer
             if (TooltipIcon != null) TooltipIcon.Text = data.TryGetValue("icon", out var icVal) ? icVal.AsString() : "";
             if (TooltipTitle != null) TooltipTitle.Text = data.TryGetValue("name", out var nmVal) ? nmVal.AsString() : "";
 
-            string badgeText = "";
-            Color badgeColor = new Color(1, 1, 1);
-            string statsText = "";
+            string badgeText;
+            Color badgeColor;
+            string statsText;
 
             bool isInnate = data.TryGetValue("is_innate", out var innVal) && innVal.AsBool();
             bool isPassive = data.TryGetValue("is_passive", out var passVal) && passVal.AsBool();
             int level = data.TryGetValue("level", out var lvVal) ? lvVal.AsInt32() : 1;
             int maxLevel = data.TryGetValue("max_level", out var mlvVal) ? mlvVal.AsInt32() : 5;
-
-            if (isInnate)
-            {
-                badgeText = "[ " + Tr("TOOLTIP_TAG_INNATE") + " ]";
-                badgeColor = new Color(0.4f, 0.95f, 0.8f);
-                statsText = Tr("TOOLTIP_ALWAYS_ACTIVE") + " • " + TextFormatter.Format(Tr("TOOLTIP_LV_FORMAT"), level, maxLevel);
-            }
-            else if (isPassive)
-            {
-                badgeText = "[ " + Tr("TOOLTIP_TAG_PASSIVE") + " ]";
-                badgeColor = new Color(0.6f, 0.8f, 1.0f);
-                statsText = Tr("TOOLTIP_ALWAYS_ACTIVE") + " • " + TextFormatter.Format(Tr("TOOLTIP_LV_FORMAT"), level, maxLevel);
-            }
-            else
-            {
-                badgeText = "[ " + Tr("TOOLTIP_TAG_ACTIVE") + " ]";
-                badgeColor = new Color(1.0f, 0.85f, 0.3f);
-                float maxCd = data.TryGetValue("cooldown_max", out var cdVal) ? cdVal.AsSingle() : 3.2f;
-                statsText = TextFormatter.Format(Tr("TOOLTIP_CD"), maxCd) + " • " + TextFormatter.Format(Tr("TOOLTIP_LV_FORMAT"), level, maxLevel);
-            }
+            float cooldown = data.TryGetValue("cooldown_max", out var cdVal) ? cdVal.AsSingle() : 3.2f;
+            string skillType = isInnate ? "innate" : isPassive ? "passive" : "active";
+            UiBuilders.BuildSkillBadge(skillType, cooldown, level, maxLevel,
+                out badgeText, out badgeColor, out statsText);
 
             if (TooltipBadge != null)
             {
@@ -1108,17 +1092,10 @@ public partial class Hud : CanvasLayer
             OffsetBottom = 620.0f
         };
 
-        var style = new StyleBoxFlat
-        {
-            BgColor = new Color(0.05f, 0.08f, 0.13f, 0.95f),
-            BorderColor = new Color(0.45f, 0.85f, 0.65f, 0.9f),
-            ContentMarginLeft = 16.0f,
-            ContentMarginRight = 16.0f,
-            ContentMarginTop = 12.0f,
-            ContentMarginBottom = 12.0f
-        };
-        style.SetBorderWidthAll(2);
-        style.SetCornerRadiusAll(10);
+        var style = UiBuilders.PanelStyle(
+            new Color(0.05f, 0.08f, 0.13f, 0.95f),
+            border: new Color(0.45f, 0.85f, 0.65f, 0.9f),
+            borderWidth: 2, cornerRadius: 10, marginH: 16, marginV: 12);
         TreeOverlayPanel.AddThemeStyleboxOverride("panel", style);
 
         TreeOverlayText = new RichTextLabel
@@ -1154,17 +1131,10 @@ public partial class Hud : CanvasLayer
             OffsetBottom = 78.0f
         };
 
-        var style = new StyleBoxFlat
-        {
-            BgColor = new Color(0.07f, 0.09f, 0.15f, 0.95f),
-            BorderColor = new Color(1.0f, 0.84f, 0.28f, 0.95f),
-            ContentMarginLeft = 16.0f,
-            ContentMarginRight = 16.0f,
-            ContentMarginTop = 8.0f,
-            ContentMarginBottom = 8.0f
-        };
-        style.SetBorderWidthAll(2);
-        style.SetCornerRadiusAll(8);
+        var style = UiBuilders.PanelStyle(
+            new Color(0.07f, 0.09f, 0.15f, 0.95f),
+            border: new Color(1.0f, 0.84f, 0.28f, 0.95f),
+            borderWidth: 2, cornerRadius: 8, marginH: 16, marginV: 8);
         AchievementBanner.AddThemeStyleboxOverride("panel", style);
 
         var hbox = new HBoxContainer();

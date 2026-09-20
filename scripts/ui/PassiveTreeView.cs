@@ -137,17 +137,10 @@ public partial class PassiveTreeView : Control
             ZIndex = 20,
             CustomMinimumSize = new Vector2(330, 0)
         };
-        var tooltipStyle = new StyleBoxFlat
-        {
-            BgColor = new Color(0.02f, 0.05f, 0.09f, 0.96f),
-            BorderColor = new Color(0.35f, 0.92f, 1.0f, 0.55f),
-            ContentMarginLeft = 14.0f,
-            ContentMarginRight = 14.0f,
-            ContentMarginTop = 10.0f,
-            ContentMarginBottom = 10.0f
-        };
-        tooltipStyle.SetBorderWidthAll(1);
-        tooltipStyle.SetCornerRadiusAll(8);
+        var tooltipStyle = UiBuilders.PanelStyle(
+            new Color(0.02f, 0.05f, 0.09f, 0.96f),
+            border: new Color(0.35f, 0.92f, 1.0f, 0.55f),
+            borderWidth: 1, cornerRadius: 8, marginH: 14, marginV: 10);
         _tooltipPanel.AddThemeStyleboxOverride("panel", tooltipStyle);
 
         _tooltipText = new RichTextLabel

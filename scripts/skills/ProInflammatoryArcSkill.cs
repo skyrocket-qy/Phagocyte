@@ -49,10 +49,7 @@ public partial class ProInflammatoryArcSkill : BaseSkill
             foreach (var t in targets)
             {
                 arcVisual.Points.Add(t.GlobalPosition);
-                if (t.HasMethod("take_damage"))
-                    t.Call("take_damage", dmg);
-                else if (t.HasMethod("be_engulfed"))
-                    t.Call("be_engulfed", Host);
+                CombatHelper.DamageOrEngulf(t, dmg, Host);
             }
             Host.GetParent().AddChild(arcVisual);
         }

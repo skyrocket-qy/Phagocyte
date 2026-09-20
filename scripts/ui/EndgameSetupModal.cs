@@ -31,10 +31,8 @@ public partial class EndgameSetupModal : ModalBase
         MouseFilter = MouseFilterEnum.Stop;
         SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
 
-        AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color(0.02f, 0.03f, 0.06f, 0.82f)
-        });
+        AddThemeStyleboxOverride("panel", UiBuilders.PanelStyle(
+            new Color(0.02f, 0.03f, 0.06f, 0.82f)));
 
         BuildLayout();
         InitModal();
@@ -46,23 +44,10 @@ public partial class EndgameSetupModal : ModalBase
         AddChild(center);
 
         var box = new PanelContainer { CustomMinimumSize = new Vector2(720, 0) };
-        box.AddThemeStyleboxOverride("panel", new StyleBoxFlat
-        {
-            BgColor = new Color(0.05f, 0.05f, 0.09f, 0.98f),
-            BorderColor = new Color(1.0f, 0.72f, 0.25f, 0.9f),
-            BorderWidthLeft = 2,
-            BorderWidthTop = 2,
-            BorderWidthRight = 2,
-            BorderWidthBottom = 2,
-            CornerRadiusTopLeft = 10,
-            CornerRadiusTopRight = 10,
-            CornerRadiusBottomLeft = 10,
-            CornerRadiusBottomRight = 10,
-            ContentMarginLeft = 24,
-            ContentMarginRight = 24,
-            ContentMarginTop = 20,
-            ContentMarginBottom = 20
-        });
+        box.AddThemeStyleboxOverride("panel", UiBuilders.PanelStyle(
+            new Color(0.05f, 0.05f, 0.09f, 0.98f),
+            border: new Color(1.0f, 0.72f, 0.25f, 0.9f),
+            borderWidth: 2, cornerRadius: 10, marginH: 24, marginV: 20));
         center.AddChild(box);
 
         var vbox = new VBoxContainer();

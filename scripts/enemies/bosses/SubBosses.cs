@@ -21,16 +21,9 @@ public abstract partial class SubBossEnemy : BaseEnemy
 
     protected virtual float ContactDamage => 16.0f;
 
-    public override void OnEngulfAttemptFailed(Node2D? predator)
-    {
-        if (predator is BaseCell cell)
-        {
-            cell.TakeDamage(ContactDamage);
-            Vector2 repel = cell.GlobalPosition - GlobalPosition;
-            if (repel.LengthSquared() > 0.001f)
-                cell.Velocity += repel.Normalized() * 240.0f;
-        }
-    }
+    // Engulf attempts bounce off and damage the cell (repel handled by BaseEnemy).
+    protected override float EngulfContactDamage => ContactDamage;
+    protected override float EngulfRepelForce => 240.0f;
 }
 
 /// <summary>
@@ -441,7 +434,7 @@ public partial class VacASecretor : SubBossEnemy
     public const float PoolInterval = 2.8f;
     public const int MaxPools = 6;
 
-    private readonly List<BioHazardArea> _pools = new();
+    private readonly List<VacAAcidPool> _pools = new();
     private float _spawnTimer = 1.2f;
     private float _bubblePhase;
 
@@ -475,21 +468,7 @@ public partial class VacASecretor : SubBossEnemy
 
     private void SpawnAcidPool()
     {
-        _pools.RemoveAll(pool => pool == null || !GodotObject.IsInstanceValid(pool));
-        if (_pools.Count >= MaxPools)
-            return;
-
-        var parent = GetParent();
-        if (parent == null)
-            return;
-
-        var pool = new VacAAcidPool
-        {
-            GlobalPosition = GlobalPosition,
-            Radius = 40.0f
-        };
-        parent.AddChild(pool);
-        _pools.Add(pool);
+        SpawnHazard(_pools, MaxPools);
     }
 
     public override void _Draw()
@@ -549,7 +528,6 @@ public partial class ToxoplasmaMegaCyst : SubBossEnemy
 {
     public const float BurstHealthRatio = 0.30f;
 
-    private bool _burstTriggered;
     private float _pulsePhase;
 
     public ToxoplasmaMegaCyst()
@@ -572,11 +550,8 @@ public partial class ToxoplasmaMegaCyst : SubBossEnemy
     {
         _pulsePhase += dt * 2.4f;
 
-        if (!_burstTriggered && CurrentHealth <= MaxHealth * BurstHealthRatio)
-        {
-            _burstTriggered = true;
+        if (CurrentHealth <= MaxHealth * BurstHealthRatio && TryConsumeSplitBurst())
             BurstTachyzoites();
-        }
 
         QueueRedraw();
     }

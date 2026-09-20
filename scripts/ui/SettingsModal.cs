@@ -110,15 +110,9 @@ public partial class SettingsModal : ModalBase
     {
         CurrentTab = tabIdx;
 
-        Color activeColor = new Color(1, 1, 1);
-        Color inactiveColor = new Color(0.7f, 0.7f, 0.7f);
-
-        if (TabControlsBtn != null)
-            TabControlsBtn.Modulate = tabIdx == 0 ? activeColor : inactiveColor;
-        if (TabAudioBtn != null)
-            TabAudioBtn.Modulate = tabIdx == 1 ? activeColor : inactiveColor;
-        if (TabGraphicsBtn != null)
-            TabGraphicsBtn.Modulate = tabIdx == 2 ? activeColor : inactiveColor;
+        UiBuilders.SetTabActive(TabControlsBtn, tabIdx == 0);
+        UiBuilders.SetTabActive(TabAudioBtn, tabIdx == 1);
+        UiBuilders.SetTabActive(TabGraphicsBtn, tabIdx == 2);
 
         if (ControlsPanel != null)
             ControlsPanel.Visible = tabIdx == 0;
