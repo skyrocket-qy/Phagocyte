@@ -10,11 +10,12 @@ namespace Phagocyte.Core;
 /// </summary>
 public partial class UpgradeManager : RefCounted
 {
-    // All catalog active weapon classes (16). Display metadata comes from the
+    // All catalog active weapon classes (17). Display metadata comes from the
     // single source of truth (GameManager.SkillCatalog); only the runtime class
     // used by the reflection factory lives here.
     public static Array<Dictionary> ActiveCatalog = new Array<Dictionary>()
     {
+        MakeEntry(SkillIds.PhagocyticGrasp, typeof(PhagocyticGraspSkill)),
         MakeEntry(SkillIds.RosTorrent, typeof(RosTorrentSkill)),
         MakeEntry(SkillIds.PerforinLance, typeof(PerforinLanceSkill)),
         MakeEntry(SkillIds.ComplementCascade, typeof(ComplementCascadeSkill)),

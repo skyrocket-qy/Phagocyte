@@ -197,16 +197,18 @@ public partial class GameManager : Node
     // Skill Catalog for Manual and Tooltips
     public static readonly Dictionary SkillCatalog = new Dictionary
     {
-        // --- Innate Morphology Skill ---
-        { "macrophage_pseudopods", new Dictionary {
-            { "id", "macrophage_pseudopods" },
-            { "name_key", "SKILL_DEFORM_NAME" },
-            { "desc_key", "SKILL_DEFORM_DESC" },
-            { "bio_key", "SKILL_DEFORM_BIO" },
+        // --- Macrophage Innate Active: Phagocytic Grasp (吞噬偽足) ---
+        // Chassis deformation is purely visual in BaseCell; the innate is
+        // the functional pseudopod grasp (phagosome formation).
+        { SkillIds.PhagocyticGrasp, new Dictionary {
+            { "id", SkillIds.PhagocyticGrasp },
+            { "name_key", "SKILL_GRASP_NAME" },
+            { "desc_key", "SKILL_GRASP_DESC" },
+            { "bio_key", "SKILL_GRASP_BIO" },
             { "icon", "🦠" },
             { "type", "innate" },
             { "class_id", "macrophage" },
-            { "cooldown", 0.0f },
+            { "cooldown", 3.0f },
             { "max_level", 5 }
         }},
         { "lysosomal_overload", new Dictionary {

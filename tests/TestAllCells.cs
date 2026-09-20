@@ -54,10 +54,10 @@ public partial class TestAllCells : TestHarness
                     switch (cid)
                     {
                         case "macrophage":
-                            AssertThat(slot0).IsNull();
-                            AssertThat(sm.GetPassiveSlot(0)).IsNotNull();
-                            AssertThat(sm.GetPassiveSlot(0)!.SkillId).IsEqual("macrophage_pseudopods");
-                            AssertThat(sm.GetPassiveSlot(0)!.IsInnate).IsTrue();
+                            AssertThat(slot0).IsNotNull();
+                            AssertThat(slot0!.SkillId).IsEqual("phagocytic_grasp");
+                            AssertThat(slot0!.IsInnate).IsTrue();
+                            AssertThat(sm.GetPassiveSlot(0)).IsNull();
                             AssertThat(baseCell.MaxHealth).IsEqual(140.0f);
                             AssertThat(baseCell.BaseSpeed).IsEqual(210.0f);
                             break;

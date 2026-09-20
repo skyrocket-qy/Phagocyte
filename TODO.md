@@ -37,7 +37,7 @@
   - **樹突狀細胞 (Dendritic)**：HP 110 ｜ Armor 2 ｜ Speed 225 ｜ Magnet 260 ｜ Duration 1.2 ｜ CDR 10%
   - **影響檔案**：`scripts/player/Macrophage.cs`, `CtlCell.cs`, `NeutrophilCell.cs`, `BCell.cs`, `DendriticCell.cs`
 - [x] **[P1] 白血球專屬固有技能 (Innate Skills) 校對與綁定**：
-  - 巨噬細胞：更正為固有技能【微絲變形】(`MacrophageDeformationSkill`，目前誤配為 RosTorrent)。
+  - 巨噬細胞：固有技能【吞噬偽足】(`PhagocyticGraspSkill`，主動，由近到遠抓 2 + `amount` 加成；變形下沉為全細胞共用底盤視覺，不再是技能)。
   - 殺手 T：固有技能【穿孔素長矛】(`PerforinLanceSkill`)。
   - 嗜中性球：固有技能【顆粒酶殉爆】(`GranzymeDetonationSkill`)。
   - B 細胞：固有技能【Y 型抗體齊射】(`AntibodySalvoSkill`)。

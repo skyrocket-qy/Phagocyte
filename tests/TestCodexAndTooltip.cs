@@ -56,7 +56,7 @@ public partial class TestCodexAndTooltip : TestHarness
 
         // 1. Verify Catalogs in GameManager
         AssertThat(GameManager.SkillCatalog.Count >= 9).IsTrue();
-        AssertThat(GameManager.SkillCatalog.ContainsKey("macrophage_pseudopods")).IsTrue();
+        AssertThat(GameManager.SkillCatalog.ContainsKey("phagocytic_grasp")).IsTrue();
         AssertThat(GameManager.SkillCatalog.ContainsKey("ros_torrent")).IsTrue();
         GD.Print("[PASS] GameManager.SkillCatalog contains complete skill definitions.");
 
@@ -67,16 +67,16 @@ public partial class TestCodexAndTooltip : TestHarness
         var skillTooltip = hud.SkillTooltip;
         AssertThat(skillTooltip).IsNotNull();
 
-        // Macrophage starts with the innate passive in slot 0; draft a ranged weapon to test the active tooltip
+        // Macrophage starts with the innate active (吞噬偽足) in slot 0; draft a ranged weapon to test the active tooltip
         var player = main.GetNodeOrNull<BaseCell>("Macrophage");
         AssertThat(player).IsNotNull();
-        AssertThat(player!.CellSkillManager!.EquipActive(new RosTorrentSkill(), 0)).IsTrue();
+        AssertThat(player!.CellSkillManager!.EquipActive(new RosTorrentSkill(), 1)).IsTrue();
         hud.UpdateSkillSlots();
 
         var slotsContainer = hud.SlotsContainer;
         AssertThat(slotsContainer != null && slotsContainer.GetChildCount() >= 6).IsTrue();
 
-        // Test Hover Slot 0 (Active Weapon)
+        // Test Hover Slot 0 (Innate Active 吞噬偽足)
         var card0 = slotsContainer!.GetChild<Control>(0);
         hud.OnSlotMouseEntered(0, card0);
         AssertThat(skillTooltip!.Visible).IsTrue();
@@ -84,26 +84,19 @@ public partial class TestCodexAndTooltip : TestHarness
         var tIcon = hud.TooltipIcon?.Text ?? "";
         var tTitle = hud.TooltipTitle?.Text ?? "";
         var tBadge = hud.TooltipBadge?.Text ?? "";
-        AssertThat(tIcon).IsEqual("\U0001F4A8");
-        AssertThat(tBadge.Contains("\u4E3B\u52A8") || tBadge.Contains("ACTIVE")).IsTrue();
-        AssertThat(hud.TooltipStats?.Text.Contains("3.2") ?? false).IsTrue();
-        GD.Print($"[PASS] Slot 0 Active Weapon Tooltip verified: '{tIcon} {tTitle}' ({tBadge})");
+        AssertThat(tIcon).IsEqual("\U0001F9A0");
+        AssertThat(tBadge.Contains("\u56FA\u6709") || tBadge.Contains("INNATE")).IsTrue();
+        GD.Print($"[PASS] Slot 0 Innate Active Tooltip verified: '{tIcon} {tTitle}' ({tBadge})");
 
-        // Test Hover Slot 5 (Innate Passive 微絲變形)
-        var card5 = slotsContainer!.GetChild<Control>(5);
-        hud.OnSlotMouseEntered(5, card5);
-        AssertThat(skillTooltip.Visible).IsTrue();
-        AssertThat(hud.TooltipIcon?.Text).IsEqual("\U0001F9A0");
-        var innateBadge = hud.TooltipBadge?.Text ?? "";
-        AssertThat(innateBadge.Contains("\u56FA\u6709") || innateBadge.Contains("INNATE")).IsTrue();
-        GD.Print($"[PASS] Slot 5 Innate Passive Tooltip verified: '{hud.TooltipIcon?.Text} {hud.TooltipTitle?.Text}' ({innateBadge})");
-
-        // Test Hover Slot 1 (Empty Slot)
-        var card1 = slotsContainer.GetChild<Control>(1);
+        // Test Hover Slot 1 (Drafted Active Weapon)
+        var card1 = slotsContainer!.GetChild<Control>(1);
         hud.OnSlotMouseEntered(1, card1);
-        AssertThat(hud.TooltipIcon?.Text).IsEqual("+");
-        AssertThat(hud.TooltipBio != null && hud.TooltipBio.Visible).IsFalse();
-        GD.Print($"[PASS] Slot 1 Empty Slot Tooltip verified: '{hud.TooltipIcon?.Text} {hud.TooltipTitle?.Text}'");
+        AssertThat(skillTooltip.Visible).IsTrue();
+        AssertThat(hud.TooltipIcon?.Text).IsEqual("\U0001F4A8");
+        var activeBadge = hud.TooltipBadge?.Text ?? "";
+        AssertThat(activeBadge.Contains("\u4E3B\u52A8") || activeBadge.Contains("ACTIVE")).IsTrue();
+        AssertThat(hud.TooltipStats?.Text.Contains("3.2") ?? false).IsTrue();
+        GD.Print($"[PASS] Slot 1 Active Weapon Tooltip verified: '{hud.TooltipIcon?.Text} {hud.TooltipTitle?.Text}' ({activeBadge})");
 
         // Test Hover Slot 2 (Empty Slot)
         var card2 = slotsContainer.GetChild<Control>(2);
@@ -172,11 +165,15 @@ public partial class TestCodexAndTooltip : TestHarness
 
         // 5. Bilingual Localization on Tooltip and Manual
         GameManager.SetLanguage("en");
-        hud.OnSlotMouseEntered(0, card0);
+        hud.OnSlotMouseEntered(1, card1);
         var enBadge = hud.TooltipBadge?.Text ?? "";
         AssertThat(enBadge.Contains("ACTIVE")).IsTrue();
         AssertThat(hud.TooltipTitle?.Text.Contains("ROS Torrent") ?? false).IsTrue();
         AssertThat(hud.TooltipDesc?.Text.Contains("\u3010\u0020\u6218\u672F\u673A\u5236\u0020\u3011") ?? false).IsFalse();
+        hud.OnSlotMouseEntered(0, card0);
+        var enInnateBadge = hud.TooltipBadge?.Text ?? "";
+        AssertThat(enInnateBadge.Contains("INNATE")).IsTrue();
+        AssertThat(hud.TooltipTitle?.Text.Contains("Phagocytic Grasp") ?? false).IsTrue();
 
         // Test Codex in English: ensure NO Chinese headers
         codexModal.OpenCodex(1); // Cells tab
@@ -185,18 +182,21 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(codexModal.DetailDesc?.Text.Contains("Deformation Trait") ?? false).IsTrue();
 
         codexModal.SwitchTab(0); // Skills tab
-        codexModal.SelectSkill("macrophage_pseudopods");
+        codexModal.SelectSkill("phagocytic_grasp");
         AssertThat(codexModal.DetailDesc?.Text.Contains("\u3010\u0020\u6218\u672F\u673A\u5236\u0020\u3011") ?? false).IsFalse();
         AssertThat(codexModal.DetailDesc?.Text.Contains("Tactical Effect") ?? false).IsTrue();
 
         codexModal.CloseCodex();
 
         GameManager.SetLanguage("zh_CN");
-        hud.OnSlotMouseEntered(0, card0);
+        hud.OnSlotMouseEntered(1, card1);
         var zhBadge = hud.TooltipBadge?.Text ?? "";
         AssertThat(zhBadge.Contains("\u4E3B\u52A8")).IsTrue();
         AssertThat(hud.TooltipTitle?.Text.Contains("\u6D3B\u6027\u6C27\u5C04\u6D41") ?? false).IsTrue();
         AssertThat(hud.TooltipDesc?.Text.Contains("\u3010\u0020\u6218\u672F\u673A\u5236\u0020\u3011") ?? false).IsTrue();
+        hud.OnSlotMouseEntered(0, card0);
+        var zhInnateBadge = hud.TooltipBadge?.Text ?? "";
+        AssertThat(zhInnateBadge.Contains("\u56FA\u6709")).IsTrue();
         hud.OnSlotMouseExited(0);
         GD.Print("[PASS] Tooltip and Manual dynamic bilingual switching verified without residual Chinese.");
 

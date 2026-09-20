@@ -35,6 +35,7 @@
 
 | 主動技能名稱 | 醫學原型機制 | 消耗的通用 Stat | 戰鬥表現與機制細節 |
 | :--- | :--- | :--- | :--- |
+| **0. 吞噬偽足<br>(Phagocytic Grasp，巨噬固有)** | 巨噬細胞偽足伸出包裹形成吞噬體 | `might`, `area`, `amount`, `cooldown_reduction` | 由近到遠伸出 2 根偽足抓取，`amount` 增加抓取隻數；先造成接觸傷害再拖回吞噬。不可吞噬者只吃傷害。阿米巴變形本身為全細胞共用底盤視覺。 |
 | **1. 穿孔素長矛<br>(Perforin Lance)** | 殺手 T 細胞在靶膜成孔 | `might`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近高危病原體射出高初速螺旋光束。`amount` 增加連發射線束數，`pierce` 增加貫穿人數。 |
 | **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解沉積引發爆破 | `might`, `area`, `cooldown_reduction`, `duration`, `knockback` | 在玩家周圍隨機生成生化光環地雷，`area` 擴大地雷半徑，延遲 1.5 秒引發強烈擊退衝擊波。 |
 | **3. Y 型抗體齊射<br>(Antibody Salvo)** | B 細胞分泌游離抗體中和病原體 | `might`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發巡航尋的 Y 型抗體飛彈，`amount` 直接增加單輪發射彈道數。 |

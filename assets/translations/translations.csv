@@ -305,6 +305,9 @@ UPGRADE_TO_LV,Upgrade to Lv.%d,升级至 Lv.%d
 SKILL_ANTIBODY_NAME,Antibody Salvo,抗体齐射
 SKILL_ANTIBODY_DESC,Fires auto-homing Y-antibodies tracking and neutralizing nearby pathogens.,发射自动追踪微粒的 Y 型抗体飞弹，精准歼灭近身病原体。
 SKILL_ANTIBODY_BIO,Biochem: Immunoglobulins with high-affinity Fab regions bind pathogen surface antigens to tag them for clearance.,生物机制：特异性免疫球蛋白 Fab 端高亲和力结合抗原位点，标记并中和入侵病原体。
+SKILL_GRASP_NAME,Phagocytic Grasp,吞噬偽足
+SKILL_GRASP_DESC,"Macrophage Innate: Extends 2 amoeboid pseudopods to grab nearest pathogens, dealing damage and dragging them back for engulfment. Extra grasps from Amount.",巨噬專屬固有：伸出 2 根阿米巴偽足抓取最近病原體，造成接觸傷害並拖回吞噬。彈道數（Amount）可增加抓取隻數。
+SKILL_GRASP_BIO,"Biochem: Actin-myosin pseudopod extension wraps pathogens into a phagosome (wiki step a). In-game: nearest-first multi-grasp, damage then be_engulfed; non-engulfable foes keep damage only.",生物機制：肌動-肌球蛋白偽足伸出包裹病原體形成吞噬體（a 步驟）。遊戲機制：由近到遠多重抓取，先傷後吞；不可吞噬者只吃傷害。
 SKILL_LUNGE_NAME,Pseudopod Lunge,伪足猛击
 SKILL_LUNGE_DESC,Snaps out an elongated amoebic pseudopod to whip and drag enemies.,向前快速弹射延伸伪足鞭击敌群，造成重击并拉扯病原体。
 SKILL_LUNGE_BIO,Biochem: Rapid actin cross-linking via filamin and arp2/3 drives localized cytoplasmic projection.,生物机制：细丝蛋白与 Arp2/3 复合体介导微丝快速成束与交联，爆发性延伸突触。

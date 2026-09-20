@@ -53,26 +53,26 @@ public partial class TestSkillSystem : TestHarness
         AssertThat(sm.PassiveSlots.Count).IsEqual(5);
         GD.Print("[PASS] SkillManager contains exactly 5 Active slots and 5 Passive slots.");
 
-        // 2. Verify Passive Slot 0: innate Macrophage Deformation (å¾®çµ²è®Šå½¢)
-        var innatePassive = sm.GetPassiveSlot(0);
-        AssertThat(innatePassive is MacrophageDeformationSkill).IsTrue();
-        AssertThat(innatePassive!.SkillId).IsEqual("macrophage_pseudopods");
-        AssertThat(innatePassive.IsInnate).IsTrue();
-        GD.Print("[PASS] Passive Slot 0 correctly contains the innate MacrophageDeformationSkill.");
+        // 2. Verify Active Slot 0: innate Phagocytic Grasp (吞噬偽足)
+        var innateActive = sm.GetActiveSlot(0);
+        AssertThat(innateActive is PhagocyticGraspSkill).IsTrue();
+        AssertThat(innateActive!.SkillId).IsEqual("phagocytic_grasp");
+        AssertThat(innateActive.IsInnate).IsTrue();
+        GD.Print("[PASS] Active Slot 0 correctly contains the innate PhagocyticGraspSkill.");
 
-        // 3. Verify Active Slots 0-4 start empty (Macrophage carries no ranged weapon)
-        for (int i = 0; i < 5; i++)
+        // 3. Verify Active Slots 1-4 start empty (slot 0 is the innate grasp)
+        for (int i = 1; i < 5; i++)
         {
             AssertThat(sm.GetActiveSlot(i)).IsNull();
         }
-        GD.Print("[PASS] Active Slots 0 to 4 are empty and available.");
+        GD.Print("[PASS] Active Slots 1 to 4 are empty and available.");
 
-        // 4. Verify Passive Slots 1-4 are initially empty
-        for (int i = 1; i < 5; i++)
+        // 4. Verify Passive Slots 0-4 are initially empty (deformation is chassis-visual now)
+        for (int i = 0; i < 5; i++)
         {
             AssertThat(sm.GetPassiveSlot(i)).IsNull();
         }
-        GD.Print("[PASS] Passive Slots 1 to 4 are initially empty and available.");
+        GD.Print("[PASS] Passive Slots 0 to 4 are initially empty and available.");
 
         // 5. Verify smooth deformation & 32-vertex collision sync
         player.UpdatePseudopodDeformation(0.016f);
@@ -80,9 +80,9 @@ public partial class TestSkillSystem : TestHarness
         AssertThat(player.EngulfCollider!.Polygon.Length).IsEqual(32);
         GD.Print($"[PASS] Smooth {player.Cytoplasm!.Polygon.Length}-vertex organic pseudopod deformation & CollisionPolygon2D sync verified.");
 
-        // 6. Test ROS Torrent auto-targeting & firing (drafted into active slot 0)
+        // 6. Test ROS Torrent auto-targeting & firing (drafted into active slot 1; slot 0 is the innate)
         var ros = new RosTorrentSkill();
-        AssertThat(sm.EquipActive(ros, 0)).IsTrue();
+        AssertThat(sm.EquipActive(ros, 1)).IsTrue();
         var staphScene = GD.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
         var enemy = staphScene.Instantiate<StaphEnemy>();
         enemy.GlobalPosition = player.GlobalPosition + new Vector2(150, 0);
@@ -102,24 +102,30 @@ public partial class TestSkillSystem : TestHarness
         AssertThat(projectileFound).IsTrue();
         GD.Print("[PASS] ROS Torrent projectile emission & target acquisition verified.");
 
-        // 7. Test equipping a passive trait into passive slot 1 (slot 0 is the innate)
+        // 7. Test equipping a passive trait into passive slot 0
         var actin = new PassiveActinPolymerization();
         float initialArea = player.Stats!.GetStat("area");
-        sm.EquipPassive(actin, 1);
-        AssertThat(sm.GetPassiveSlot(1)).IsEqual(actin);
+        sm.EquipPassive(actin, 0);
+        AssertThat(sm.GetPassiveSlot(0)).IsEqual(actin);
         AssertThat(player.Stats.GetStat("area")).IsGreater(initialArea);
         GD.Print("[PASS] Equipping passive trait dynamically modifies player stats.");
 
-        // 8. Verify HUD displays skills
+        // 8. Verify HUD displays skills (slot 0 = innate grasp, slot 1 = drafted ROS)
         hud!.UpdateSkillSlots();
         var slotsContainer = hud.SlotsContainer;
-        if (slotsContainer != null && slotsContainer.GetChildCount() > 0)
+        if (slotsContainer != null && slotsContainer.GetChildCount() > 1)
         {
-            var card0 = slotsContainer.GetChild(0);
-            var iconLbl = card0.GetNodeOrNull<Label>("IconLabel");
-            AssertThat(iconLbl).IsNotNull();
-            AssertThat(iconLbl!.Text).IsEqual("\U0001F4A8");
-            GD.Print("[PASS] HUD Slot 0 correctly displays active weapon icon: " + iconLbl.Text);
+            var graspCard = slotsContainer.GetChild(0);
+            var graspIcon = graspCard.GetNodeOrNull<Label>("IconLabel");
+            AssertThat(graspIcon).IsNotNull();
+            AssertThat(graspIcon!.Text).IsEqual("\U0001F9A0");
+            GD.Print("[PASS] HUD Slot 0 correctly displays innate grasp icon: " + graspIcon.Text);
+
+            var rosCard = slotsContainer.GetChild(1);
+            var rosIcon = rosCard.GetNodeOrNull<Label>("IconLabel");
+            AssertThat(rosIcon).IsNotNull();
+            AssertThat(rosIcon!.Text).IsEqual("\U0001F4A8");
+            GD.Print("[PASS] HUD Slot 1 correctly displays active weapon icon: " + rosIcon.Text);
         }
 
         GD.Print("--- ALL 5+5 SKILL SYSTEM AUTOMATED TESTS PASSED SUCCESSFULLY! ---");
