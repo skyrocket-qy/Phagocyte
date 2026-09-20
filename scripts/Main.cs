@@ -1267,26 +1267,6 @@ public partial class Main : Node2D
 
         GetTree().Paused = true;
     }
-
-    private void SpawnStaphAroundPlayer(float dist)
-    {
-        if (Player == null || EnemyContainer == null || StaphScene == null)
-            return;
-
-        float angle = GD.Randf() * Mathf.Tau;
-        var offset = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * dist;
-        var spawnPos = Player.GlobalPosition + offset;
-
-        // Clamp within arena boundaries (-arena_size/2 to +arena_size/2)
-        float halfW = (ArenaSize.X * 0.5f) - 60.0f;
-        float halfH = (ArenaSize.Y * 0.5f) - 60.0f;
-        spawnPos.X = Mathf.Clamp(spawnPos.X, -halfW, halfW);
-        spawnPos.Y = Mathf.Clamp(spawnPos.Y, -halfH, halfH);
-
-        var staph = StaphScene.Instantiate<Node2D>();
-        staph.GlobalPosition = spawnPos;
-        EnemyContainer.AddChild(staph);
-    }
 }
 
 /// <summary>

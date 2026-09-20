@@ -156,7 +156,6 @@ public partial class CodexModal : ModalBase
         ActiveItemKey = key;
         var d = GameManager.GetSkillInfo(key);
         if (DetailTitle != null) DetailTitle.Text = d["icon"].AsString() + " " + d["name"].AsString();
-        if (DetailBadge != null) DetailBadge.Text = "[ " + d["type_label"].AsString() + " ]";
 
         string type = d["type"].AsString();
         UiBuilders.BuildSkillBadge(type, d["cooldown"].AsSingle(), 1, d["max_level"].AsInt32(),

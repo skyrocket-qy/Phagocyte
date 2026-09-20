@@ -876,19 +876,6 @@ public partial class GameManager : Node
             return new Dictionary();
         }
         var d = (Dictionary)SkillCatalog[key];
-        string typeLabel = "";
-        switch (d["type"].AsString())
-        {
-            case "innate":
-                typeLabel = TranslationServer.Translate("TOOLTIP_TAG_INNATE");
-                break;
-            case "active":
-                typeLabel = TranslationServer.Translate("TOOLTIP_TAG_ACTIVE");
-                break;
-            case "passive":
-                typeLabel = TranslationServer.Translate("TOOLTIP_TAG_PASSIVE");
-                break;
-        }
         return new Dictionary {
             { "id", d["id"] },
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },
@@ -896,7 +883,6 @@ public partial class GameManager : Node
             { "biochemistry", TranslationServer.Translate(d["bio_key"].AsString()) },
             { "icon", d["icon"] },
             { "type", d["type"] },
-            { "type_label", typeLabel },
             { "cooldown", d["cooldown"] },
             { "max_level", d["max_level"] }
         };
