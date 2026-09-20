@@ -24,51 +24,21 @@ public partial class TbEnemy : BaseEnemy
 
     protected override float GetCollisionRadius() => 14.0f;
 
-    public override void BeEngulfed(Node2D? predator)
+    // Acid-resistant mycolic wall: digestion is slow and burns the predator.
+    protected override float EngulfDigestDuration => 0.75f;
+
+    protected override void OnEngulfedBy(Node2D? predator)
     {
-        if (IsBeingEaten)
-            return;
-
-        if (!CanBeEngulfed)
-        {
-            OnEngulfAttemptFailed(predator);
-            return;
-        }
-
-        IsBeingEaten = true;
-
         if (predator is BaseCell player)
         {
             // Apply digestion burn: deals 4 dps to player cytoplasm
             player.ApplyTBDigestionBurn(2.5f, 4.0f);
         }
+    }
 
-        if (HitArea != null)
-        {
-            HitArea.SetDeferred(Area2D.PropertyName.Monitoring, false);
-            HitArea.SetDeferred(Area2D.PropertyName.Monitorable, false);
-        }
-        if (EnemyCollisionShape != null)
-        {
-            EnemyCollisionShape.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
-        }
-
-        Vector2 predPos = predator != null && GodotObject.IsInstanceValid(predator) ? predator.GlobalPosition : GlobalPosition;
-
-        // Slow digestion tween (0.75s instead of 0.25s)
-        var tween = CreateTween().SetParallel(true);
-        tween.TweenProperty(this, "global_position", predPos, 0.75)
-            .SetTrans(Tween.TransitionType.Quad)
-            .SetEase(Tween.EaseType.In);
-        tween.TweenProperty(this, "scale", Vector2.Zero, 0.75)
-            .SetTrans(Tween.TransitionType.Back)
-            .SetEase(Tween.EaseType.In);
-        tween.TweenProperty(this, "modulate:a", 0.0f, 0.75);
-        tween.Chain().TweenCallback(Callable.From(() =>
-        {
-            EmitSignal(SignalName.Digested, this);
-            QueueFree();
-        }));
+    protected override void PlayDigestionVfx(Vector2 pos)
+    {
+        // No lysis burst: the waxy wall smoulders out instead.
     }
 
     public override void _Draw()

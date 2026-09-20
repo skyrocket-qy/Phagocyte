@@ -41,7 +41,7 @@ public partial class MacrophageDeformationSkill : BaseSkill
     public override void UpdateSkill(double delta)
     {
         base.UpdateSkill(delta);
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
         UpdatePseudopodDeformation((float)delta);
         UpdateNucleus((float)delta);

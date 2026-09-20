@@ -33,15 +33,9 @@ public partial class PrionEnemy : BaseEnemy
             SpawnFragments();
     }
 
-    public override void OnEngulfAttemptFailed(Node2D? predator)
-    {
-        if (predator is BaseCell cell)
-        {
-            // Contact with player pseudopods damages cell and repels
-            cell.TakeDamage(18.0f);
-            cell.Velocity += (cell.GlobalPosition - GlobalPosition).Normalized() * 250.0f;
-        }
-    }
+    // Contact with player pseudopods damages the cell and repels it.
+    protected override float EngulfContactDamage => 18.0f;
+    protected override float EngulfRepelForce => 250.0f;
 
     private void SpawnFragments()
     {

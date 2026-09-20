@@ -33,12 +33,11 @@ public partial class InterferonWaveSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         float maxRadius = GetCalculatedArea(BaseRadius);
-        var dmgData = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgData["damage"];
+        GetDamage(BaseDamage, out float dmg, out _);
 
         // Spawn expanding visual wave
         var wave = new WaveVisual

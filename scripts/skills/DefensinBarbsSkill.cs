@@ -36,16 +36,13 @@ public partial class DefensinBarbsSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         int count = GetCalculatedAmount(BaseCount);
         int pierce = GetCalculatedPierce(BasePierce);
         float speed = GetCalculatedSpeed(BaseSpeed);
-        var dmgData = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgData["damage"];
-
-        bool isCrit = (bool)dmgData["is_crit"];
+        GetDamage(BaseDamage, out float dmg, out bool isCrit);
 
         if (Phagocyte.Combat.ProjectileManager.Instance != null)
         {

@@ -34,14 +34,13 @@ public partial class ExosomeSingularitySkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         Vector2 targetPos = FindClusteredTargetPosition();
         float dur = GetCalculatedDuration(BaseDuration);
         float rad = GetCalculatedArea(BaseRadius);
-        var dmgData = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgData["damage"];
+        GetDamage(BaseDamage, out float dmg, out _);
 
         var singularity = new SingularityVortex
         {

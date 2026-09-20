@@ -33,7 +33,7 @@ public partial class GranzymeDetonationSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         Node2D? target = FindPriorityTarget();
@@ -76,15 +76,14 @@ public partial class GranzymeDetonationSkill : BaseSkill
 
     private void DetonateCaspase(Vector2 center)
     {
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         // Spawn visual burst
         var burst = new ApoptosisBurstVisual { GlobalPosition = center };
         Host.GetParent().AddChild(burst);
 
-        var dmgData = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgData["damage"];
+        GetDamage(BaseDamage, out float dmg, out _);
         float splashRadius = GetCalculatedArea(110.0f);
 
         TargetingService.ForEachInRadius(center, splashRadius, n =>

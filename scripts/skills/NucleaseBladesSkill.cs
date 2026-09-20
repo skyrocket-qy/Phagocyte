@@ -84,7 +84,7 @@ public partial class NucleaseBladesSkill : BaseSkill
     public override void _Process(double delta)
     {
         base._Process(delta);
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         GlobalPosition = Host.GlobalPosition;
@@ -118,8 +118,7 @@ public partial class NucleaseBladesSkill : BaseSkill
 
         _damageCooldown = 0.22f; // tick damage every ~0.2s
 
-        var dmgData = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgData["damage"];
+        GetDamage(BaseDamage, out float dmg, out _);
 
         for (int i = 0; i < bladeCount; i++)
         {

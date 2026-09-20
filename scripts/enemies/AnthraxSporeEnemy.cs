@@ -14,9 +14,7 @@ public partial class AnthraxSporeEnemy : BaseEnemy
     /// <summary>HP ratio that triggers the two-stage shell-break awakening.</summary>
     public const float AwakenHealthRatio = 0.5f;
 
-    public bool HasAwakened { get; private set; }
-
-    private bool _awakened;
+    public bool HasAwakened => SplitBurstConsumed;
 
     public AnthraxSporeEnemy()
     {
@@ -33,7 +31,7 @@ public partial class AnthraxSporeEnemy : BaseEnemy
 
     protected override void OnPostDamage(float damage, Node2D? source, bool isCrit)
     {
-        if (!_awakened && !IsBeingEaten && CurrentHealth > 0.0f && CurrentHealth <= MaxHealth * AwakenHealthRatio)
+        if (!HasAwakened && !IsBeingEaten && CurrentHealth > 0.0f && CurrentHealth <= MaxHealth * AwakenHealthRatio)
         {
             Awaken();
         }
@@ -45,10 +43,8 @@ public partial class AnthraxSporeEnemy : BaseEnemy
     /// </summary>
     public void Awaken()
     {
-        if (_awakened)
+        if (!TryConsumeSplitBurst())
             return;
-        _awakened = true;
-        HasAwakened = true;
 
         var parent = GetParent();
         if (parent != null)
@@ -75,7 +71,7 @@ public partial class AnthraxSporeEnemy : BaseEnemy
     public override void Die(Node2D? killer)
     {
         // Hatch into virulent AnthraxBacillus when destroyed before awakening
-        if (!_awakened)
+        if (!HasAwakened)
         {
             var parent = GetParent();
             if (parent != null)

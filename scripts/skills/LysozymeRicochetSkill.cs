@@ -35,14 +35,13 @@ public partial class LysozymeRicochetSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         int amount = GetCalculatedAmount(1);
         int bounces = GetCalculatedPierce(BaseBounces);
         float speed = GetCalculatedSpeed(BaseSpeed);
-        var dmgData = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgData["damage"];
+        GetDamage(BaseDamage, out float dmg, out _);
 
         for (int i = 0; i < amount; i++)
         {

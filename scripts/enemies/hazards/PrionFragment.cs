@@ -25,13 +25,7 @@ public partial class PrionFragment : BaseEnemy
 
     protected override float GetCollisionRadius() => 12.0f;
 
-    public override void OnEngulfAttemptFailed(Node2D? predator)
-    {
-        if (predator is BaseCell cell)
-        {
-            cell.TakeDamage(10.0f);
-        }
-    }
+    protected override float EngulfContactDamage => 10.0f;
 
     public override void _Draw()
     {

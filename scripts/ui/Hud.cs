@@ -452,14 +452,11 @@ public partial class Hud : CanvasLayer
 
         if (LevelLabel != null) LevelLabel.Text = TextFormatter.Format(Tr("HUD_LEVEL"), LastLevel);
         if (HpTitleLabel != null) HpTitleLabel.Text = Tr("HUD_HP_TITLE");
-        if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)LastHealth, (int)LastMaxHealth);
+        RenderVitalLines(LastHealth, LastMaxHealth, LastRadiusRatio, LastSpeed);
         if (ExpTitleLabel != null) ExpTitleLabel.Text = Tr("HUD_EXP_TITLE");
         UpdateExpDisplay();
 
-        if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), LastDigestedCount);
-        if (KillLabel != null) KillLabel.Text = TextFormatter.Format(Tr("HUD_KILL_COUNT"), LastDigestedCount);
-        if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), LastRadiusRatio);
-        if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
+        RenderCountLines(LastDigestedCount);
         if (SkillTitleLbl != null) SkillTitleLbl.Text = Tr("SKILL_BAR_DUAL_TITLE");
 
         UpdateBuffStatus();
@@ -503,6 +500,47 @@ public partial class Hud : CanvasLayer
         }
     }
 
+    /// <summary>Resolves the player's SkillManager UI payload, typed or GDScript.</summary>
+    private bool TryGetSkillsData(out Array<Dictionary> skillsData)
+    {
+        skillsData = new Array<Dictionary>();
+        if (PlayerRef == null)
+            return false;
+
+        var smNode = PlayerRef.GetNodeOrNull<Node>("SkillManager");
+        if (smNode is SkillManager csharpSm)
+        {
+            skillsData = csharpSm.GetAllUiData();
+        }
+        else if (smNode != null && smNode.HasMethod("GetAllUiData"))
+        {
+            skillsData = smNode.Call("GetAllUiData").AsGodotArray<Dictionary>();
+        }
+        else if (smNode != null && smNode.HasMethod("get_all_ui_data"))
+        {
+            skillsData = smNode.Call("get_all_ui_data").AsGodotArray<Dictionary>();
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void RenderVitalLines(float health, float maxHealth, float radiusRatio, float speed)
+    {
+        if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)health, (int)maxHealth);
+        if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), radiusRatio);
+        if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)speed);
+    }
+
+    private void RenderCountLines(int digested)
+    {
+        if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), digested);
+        if (KillLabel != null) KillLabel.Text = TextFormatter.Format(Tr("HUD_KILL_COUNT"), digested);
+    }
+
     public void UpdateSkillSlots()
     {
         if (PlayerRef == null || !GodotObject.IsInstanceValid(PlayerRef))
@@ -522,24 +560,8 @@ public partial class Hud : CanvasLayer
             }
         }
 
-        Array<Dictionary> skillsData;
-        var smNode = PlayerRef.GetNodeOrNull<Node>("SkillManager");
-        if (smNode is SkillManager csharpSm)
-        {
-            skillsData = csharpSm.GetAllUiData();
-        }
-        else if (smNode != null && smNode.HasMethod("GetAllUiData"))
-        {
-            skillsData = smNode.Call("GetAllUiData").AsGodotArray<Dictionary>();
-        }
-        else if (smNode != null && smNode.HasMethod("get_all_ui_data"))
-        {
-            skillsData = smNode.Call("get_all_ui_data").AsGodotArray<Dictionary>();
-        }
-        else
-        {
+        if (!TryGetSkillsData(out var skillsData))
             return;
-        }
 
         if (SlotsContainer == null)
             return;
@@ -691,24 +713,8 @@ public partial class Hud : CanvasLayer
                 return;
         }
 
-        Array<Dictionary> skillsData;
-        var smNode = PlayerRef.GetNodeOrNull<Node>("SkillManager");
-        if (smNode is SkillManager csharpSm)
-        {
-            skillsData = csharpSm.GetAllUiData();
-        }
-        else if (smNode != null && smNode.HasMethod("GetAllUiData"))
-        {
-            skillsData = smNode.Call("GetAllUiData").AsGodotArray<Dictionary>();
-        }
-        else if (smNode != null && smNode.HasMethod("get_all_ui_data"))
-        {
-            skillsData = smNode.Call("get_all_ui_data").AsGodotArray<Dictionary>();
-        }
-        else
-        {
+        if (!TryGetSkillsData(out var skillsData))
             return;
-        }
 
         if (slotIdx < 0 || slotIdx >= skillsData.Count)
             return;
@@ -854,12 +860,9 @@ public partial class Hud : CanvasLayer
                 HpBar.MaxValue = LastMaxHealth;
                 HpBar.Value = LastHealth;
             }
-            if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)LastHealth, (int)LastMaxHealth);
             UpdateExpDisplay();
-            if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), LastRadiusRatio);
-            if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), LastDigestedCount);
-            if (KillLabel != null) KillLabel.Text = TextFormatter.Format(Tr("HUD_KILL_COUNT"), LastDigestedCount);
-            if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
+            RenderVitalLines(LastHealth, LastMaxHealth, LastRadiusRatio, LastSpeed);
+            RenderCountLines(LastDigestedCount);
         }
         else
         {
@@ -914,10 +917,8 @@ public partial class Hud : CanvasLayer
             HpBar.MaxValue = maxHealth;
             HpBar.Value = health;
         }
-        if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)health, (int)maxHealth);
 
-        if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), radiusRatio);
-        if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)LastSpeed);
+        RenderVitalLines(health, maxHealth, radiusRatio, LastSpeed);
         RefreshTreeOverlay();
     }
 
@@ -930,8 +931,7 @@ public partial class Hud : CanvasLayer
             if (digProp.VariantType == Variant.Type.Int)
             {
                 LastDigestedCount = digProp.AsInt32();
-                if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), LastDigestedCount);
-                if (KillLabel != null) KillLabel.Text = TextFormatter.Format(Tr("HUD_KILL_COUNT"), LastDigestedCount);
+                RenderCountLines(LastDigestedCount);
             }
         }
     }

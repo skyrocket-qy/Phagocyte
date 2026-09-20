@@ -47,7 +47,7 @@ public partial class MhcTracerBeamSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         _currentTarget = FindBestTarget();
@@ -60,7 +60,7 @@ public partial class MhcTracerBeamSkill : BaseSkill
     public override void _Process(double delta)
     {
         base._Process(delta);
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         GlobalPosition = Host.GlobalPosition;
@@ -75,8 +75,7 @@ public partial class MhcTracerBeamSkill : BaseSkill
 
             if (_currentTarget != null && GodotObject.IsInstanceValid(_currentTarget))
             {
-                var dmgData = GetCalculatedDamage(BaseDps * (float)delta);
-                float dmg = (float)dmgData["damage"];
+                GetDamage(BaseDps * (float)delta, out float dmg, out _);
                 CombatHelper.DealDamage(_currentTarget, dmg);
 
                 // Apply vulnerability tag (metadata flag, clearable by antigenic drift)

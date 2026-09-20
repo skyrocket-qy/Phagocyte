@@ -32,7 +32,7 @@ public partial class ComplementCascadeSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         int amount = GetCalculatedAmount(1);
@@ -60,7 +60,7 @@ public partial class ComplementCascadeSkill : BaseSkill
         var timer = tree.CreateTimer(delay);
         timer.Timeout += () =>
         {
-            if (Host == null || !GodotObject.IsInstanceValid(Host))
+            if (!HasValidHost())
                 return;
             DetonateMacRing(pos, radius);
         };

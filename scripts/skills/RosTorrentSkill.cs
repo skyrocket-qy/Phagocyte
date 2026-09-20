@@ -33,7 +33,7 @@ public partial class RosTorrentSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         AudioManager.Instance?.PlayShoot();
@@ -79,9 +79,7 @@ public partial class RosTorrentSkill : BaseSkill
         var jet = JetScene.Instantiate<Node2D>();
         Host.GetParent().AddChild(jet);
 
-        var dmgDict = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgDict["damage"];
-        bool isCrit = (bool)dmgDict["is_crit"];
+        GetDamage(BaseDamage, out float dmg, out bool isCrit);
 
         if (jet is RosJet rj)
         {

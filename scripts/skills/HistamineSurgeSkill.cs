@@ -34,13 +34,12 @@ public partial class HistamineSurgeSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         Vector2 aimDir = FindAimDirection();
         float reach = GetCalculatedArea(BaseReach);
-        var dmgData = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgData["damage"];
+        GetDamage(BaseDamage, out float dmg, out _);
         float kb = BaseKnockback * (Stats is CellStats cs ? cs.GetStat("knockback") : 1.0f);
         float halfConeRad = Mathf.DegToRad(ConeAngleDeg * 0.5f);
 

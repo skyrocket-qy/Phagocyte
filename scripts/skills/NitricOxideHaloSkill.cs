@@ -72,7 +72,7 @@ public partial class NitricOxideHaloSkill : BaseSkill
     public override void _Process(double delta)
     {
         base._Process(delta);
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         GlobalPosition = Host.GlobalPosition;
@@ -92,15 +92,14 @@ public partial class NitricOxideHaloSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         float hostR = Host.Get("CurrentRadius").VariantType == Variant.Type.Float
             ? (float)Host.Get("CurrentRadius")
             : 48.0f;
         float currentRadius = hostR + GetCalculatedArea(BaseRadius - 48.0f);
-        var damageData = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)damageData["damage"];
+        GetDamage(BaseDamage, out float dmg, out _);
 
         TargetingService.ForEachInRadius(Host.GlobalPosition, currentRadius, n =>
         {

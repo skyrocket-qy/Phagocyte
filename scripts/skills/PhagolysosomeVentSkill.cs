@@ -33,13 +33,12 @@ public partial class PhagolysosomeVentSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         float duration = GetCalculatedDuration(BaseDuration);
         float radius = GetCalculatedArea(BaseRadius);
-        var dmgData = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgData["damage"];
+        GetDamage(BaseDamage, out float dmg, out _);
 
         var puddle = new AcidPuddle
         {

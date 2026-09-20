@@ -129,6 +129,20 @@ public abstract partial class BaseEnemy : Node2D
         return 16.0f;
     }
 
+    /// <summary>
+    /// True when this enemy overlaps a live player cell, using the player's
+    /// current radius plus <paramref name="margin"/>. Shared by contact effects.
+    /// </summary>
+    protected bool IsTouchingPlayer(float margin)
+    {
+        var player = PlayerRef;
+        if (player == null || !GodotObject.IsInstanceValid(player) || player.IsDead)
+            return false;
+
+        float reach = player.CurrentRadius + margin;
+        return GlobalPosition.DistanceSquaredTo(player.GlobalPosition) < reach * reach;
+    }
+
     private void EnsureCollisionNodes()
     {
         HitArea = GetNodeOrNull<Area2D>("HitArea");
@@ -357,6 +371,7 @@ public abstract partial class BaseEnemy : Node2D
         }
 
         IsBeingEaten = true;
+        OnEngulfedBy(predator);
 
         if (HitArea != null)
         {
@@ -369,21 +384,36 @@ public abstract partial class BaseEnemy : Node2D
         }
 
         Vector2 predPos = predator != null && GodotObject.IsInstanceValid(predator) ? predator.GlobalPosition : GlobalPosition;
+        float digestDuration = EngulfDigestDuration;
 
         var tween = CreateTween().SetParallel(true);
-        tween.TweenProperty(this, "global_position", predPos, 0.25)
+        tween.TweenProperty(this, "global_position", predPos, digestDuration)
             .SetTrans(Tween.TransitionType.Quad)
             .SetEase(Tween.EaseType.In);
-        tween.TweenProperty(this, "scale", Vector2.Zero, 0.25)
+        tween.TweenProperty(this, "scale", Vector2.Zero, digestDuration)
             .SetTrans(Tween.TransitionType.Back)
             .SetEase(Tween.EaseType.In);
-        tween.TweenProperty(this, "modulate:a", 0.0f, 0.25);
+        tween.TweenProperty(this, "modulate:a", 0.0f, digestDuration);
         tween.Chain().TweenCallback(Callable.From(() =>
         {
-            VfxManager.Instance?.Play(VfxType.LysisBurst, predPos);
+            PlayDigestionVfx(predPos);
             EmitSignal(SignalName.Digested, this);
             QueueFree();
         }));
+    }
+
+    /// <summary>Seconds the engulf-shrink tween takes before the pathogen is digested.</summary>
+    protected virtual float EngulfDigestDuration => 0.25f;
+
+    /// <summary>Runs once the cell has committed to digesting this pathogen.</summary>
+    protected virtual void OnEngulfedBy(Node2D? predator)
+    {
+    }
+
+    /// <summary>VFX played at the digestion point when the tween completes.</summary>
+    protected virtual void PlayDigestionVfx(Vector2 pos)
+    {
+        VfxManager.Instance?.Play(VfxType.LysisBurst, pos);
     }
 
     /// <summary>Contact damage dealt to a cell whose engulf attempt bounces off.</summary>

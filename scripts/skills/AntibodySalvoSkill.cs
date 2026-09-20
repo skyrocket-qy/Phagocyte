@@ -36,7 +36,7 @@ public partial class AntibodySalvoSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         int amount = GetCalculatedAmount(BaseMissileCount);
@@ -70,7 +70,7 @@ public partial class AntibodySalvoSkill : BaseSkill
 
     private void FireAntibody(Node2D? target, int index, int total)
     {
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         float angle = ((float)index / (float)Mathf.Max(1, total)) * Mathf.Tau;
@@ -92,9 +92,7 @@ public partial class AntibodySalvoSkill : BaseSkill
                         if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
                             return;
 
-                        var dmgDict = GetCalculatedDamage(BaseDamage);
-                        float dmg = (float)dmgDict["damage"];
-                        bool isCrit = (bool)dmgDict["is_crit"];
+                        GetDamage(BaseDamage, out float dmg, out bool isCrit);
 
                         CombatHelper.DealDamage(target, dmg, Host, isCrit);
                     }

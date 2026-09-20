@@ -40,7 +40,7 @@ public partial class SVirusEnemy : BaseEnemy
         if (player != null && GodotObject.IsInstanceValid(player) && !player.IsDead)
         {
             // If overlapping player, apply receptor adhesive slow
-            if (GlobalPosition.DistanceTo(player.GlobalPosition) < (player.CurrentRadius + 12.0f))
+            if (IsTouchingPlayer(12.0f))
             {
                 player.ApplySlow(2.5f, 0.65f); // 35% speed reduction
             }

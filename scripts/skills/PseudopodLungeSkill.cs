@@ -32,14 +32,12 @@ public partial class PseudopodLungeSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         int amount = GetCalculatedAmount(1);
         float reach = GetCalculatedArea(BaseReach);
-        var dmgDict = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgDict["damage"];
-        bool isCrit = (bool)dmgDict["is_crit"];
+        GetDamage(BaseDamage, out float dmg, out bool isCrit);
 
         int pulled = 0;
         TargetingService.ForEachInRadius(Host.GlobalPosition, reach, n =>

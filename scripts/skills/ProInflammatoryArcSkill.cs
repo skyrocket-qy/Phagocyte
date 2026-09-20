@@ -35,12 +35,11 @@ public partial class ProInflammatoryArcSkill : BaseSkill
     public override void Trigger()
     {
         base.Trigger();
-        if (Host == null || !GodotObject.IsInstanceValid(Host))
+        if (!HasValidHost())
             return;
 
         int chainCount = GetCalculatedAmount(BaseChainCount);
-        var dmgData = GetCalculatedDamage(BaseDamage);
-        float dmg = (float)dmgData["damage"];
+        GetDamage(BaseDamage, out float dmg, out _);
 
         var targets = FindChainTargets(chainCount);
         if (targets.Count > 0)

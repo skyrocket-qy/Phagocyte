@@ -61,7 +61,7 @@ public partial class RabiesEnemy : BaseEnemy
         var p = PlayerRef;
         if (p != null && GodotObject.IsInstanceValid(p) && _attackCooldown <= 0.0f)
         {
-            if (GlobalPosition.DistanceTo(p.GlobalPosition) < (p.CurrentRadius + 12.0f))
+            if (IsTouchingPlayer(12.0f))
             {
                 _attackCooldown = 2.5f;
                 p.TakeDamage(8.0f);
