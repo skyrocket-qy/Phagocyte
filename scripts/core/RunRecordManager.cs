@@ -129,7 +129,7 @@ public partial class RunRecordManager : Node
         return Mathf.RoundToInt(total);
     }
 
-    public static RunRecordManager Instance { get; private set; } = null;
+    public static RunRecordManager? Instance { get; private set; } = null;
 
     public static Array<Dictionary> Records { get; private set; } = new Array<Dictionary>();
 

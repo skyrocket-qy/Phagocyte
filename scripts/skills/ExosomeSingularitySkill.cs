@@ -117,10 +117,14 @@ public partial class ExosomeSingularitySkill : BaseSkill
 
                 if (doTick)
                 {
-                    if (n.HasMethod("take_damage"))
+                    if (n is IDamageable)
+                        CombatHelper.DealDamage(n, DamagePerTick);
+                    else if (n is IEngulfable engulfable && dist <= 24.0f)
+                        engulfable.BeEngulfed(HostRef);
+                    else if (n.HasMethod("take_damage"))
                         CombatHelper.DealDamage(n, DamagePerTick);
                     else if (n.HasMethod("be_engulfed") && dist <= 24.0f)
-                        n.Call("be_engulfed", HostRef);
+                        n.Call("be_engulfed", HostRef!);
                 }
             }, skipEaten: false);
         }

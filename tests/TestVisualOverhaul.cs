@@ -48,7 +48,7 @@ public partial class TestVisualOverhaul : TestHarness
             return true;
         }
 
-        var player = ((BaseCell)main.Player) ?? main.GetNodeOrNull<BaseCell>("Macrophage");
+        var player = (main.Player as BaseCell) ?? main.GetNodeOrNull<BaseCell>("Macrophage");
         if (player == null)
         {
             GD.PrintErr("[FAIL] Player not found in Main scene");
@@ -98,7 +98,7 @@ public partial class TestVisualOverhaul : TestHarness
         var we = main.GetNodeOrNull<WorldEnvironment>("WorldEnvironment");
         AssertThat(we != null && we.Environment != null).IsTrue();
 
-        var env = we!.Environment;
+        var env = we!.Environment!;
         AssertThat(env.GlowEnabled).IsTrue();
         AssertThat(env.BackgroundMode).IsEqual(Godot.Environment.BGMode.Canvas);
         GD.Print("[PASS] 4. WorldEnvironment 2D Glow / Bloom verified (BG_CANVAS, Glow Enabled, HDR Threshold 1.0).");

@@ -1,6 +1,7 @@
 using Godot;
 using Godot.Collections;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -121,12 +122,12 @@ public partial class BaseSkill : Node2D
         return Host != null && GodotObject.IsInstanceValid(Host);
     }
 
-    /// <summary>Damage + crit flag in one call, avoiding the dictionary unpack at every site.</summary>
+    /// <summary>Damage + crit flag in one call, zero-GC struct unpack.</summary>
     protected void GetDamage(float baseDmg, out float damage, out bool isCrit)
     {
         var data = GetCalculatedDamage(baseDmg);
-        damage = (float)data["damage"];
-        isCrit = (bool)data["is_crit"];
+        damage = data.Damage;
+        isCrit = data.IsCrit;
     }
 
     /// <summary>
@@ -135,9 +136,9 @@ public partial class BaseSkill : Node2D
     /// </summary>
     protected void ApplyStat(string stat, float flat, float percent)
     {
-        if (Stats is CellStats cs)
+        if (Stats is IStatHost host)
         {
-            cs.AddModifier(stat, flat, percent);
+            host.AddModifier(stat, flat, percent);
         }
         else if (Stats != null && Stats.HasMethod("add_modifier"))
         {
@@ -148,9 +149,9 @@ public partial class BaseSkill : Node2D
     /// <summary>Removes a modifier previously registered by <see cref="ApplyStat"/>.</summary>
     protected void RemoveStat(string stat, float flat, float percent)
     {
-        if (Stats is CellStats cs)
+        if (Stats is IStatHost host)
         {
-            cs.RemoveModifier(stat, flat, percent);
+            host.RemoveModifier(stat, flat, percent);
         }
         else if (Stats != null && Stats.HasMethod("remove_modifier"))
         {
@@ -163,9 +164,9 @@ public partial class BaseSkill : Node2D
         if (Cooldown <= 0.0f)
             return 0.0f;
 
-        if (Stats is CellStats cs)
+        if (Stats is IStatHost host)
         {
-            float cdr = cs.GetStat("cooldown_reduction");
+            float cdr = host.GetStat("cooldown_reduction");
             return Cooldown * (1.0f - cdr);
         }
         else if (Stats != null && Stats.HasMethod("get_stat"))
@@ -176,28 +177,22 @@ public partial class BaseSkill : Node2D
         return Cooldown;
     }
 
-    public Dictionary GetCalculatedDamage(float baseDmg)
+    public DamageResult GetCalculatedDamage(float baseDmg)
     {
-        var result = new Dictionary
-        {
-            ["damage"] = baseDmg,
-            ["is_crit"] = false
-        };
-
         if (Stats is CellStats cs)
         {
             float might = cs.GetStat("might");
             float dmg = baseDmg * might;
             if (cs.RollCritical())
             {
-                result["damage"] = dmg * cs.GetStat("crit_damage");
-                result["is_crit"] = true;
+                return new DamageResult(dmg * cs.GetStat("crit_damage"), true);
             }
-            else
-            {
-                result["damage"] = dmg;
-            }
-            return result;
+            return new DamageResult(dmg, false);
+        }
+        else if (Stats is IStatHost host)
+        {
+            float might = host.GetStat("might");
+            return new DamageResult(baseDmg * might, false);
         }
         else if (Stats != null && Stats.HasMethod("get_stat"))
         {
@@ -206,23 +201,18 @@ public partial class BaseSkill : Node2D
             bool rollCrit = Stats.HasMethod("roll_critical") && (bool)Stats.Call("roll_critical");
             if (rollCrit)
             {
-                result["damage"] = dmg * (float)Stats.Call("get_stat", "crit_damage");
-                result["is_crit"] = true;
+                return new DamageResult(dmg * (float)Stats.Call("get_stat", "crit_damage"), true);
             }
-            else
-            {
-                result["damage"] = dmg;
-            }
-            return result;
+            return new DamageResult(dmg, false);
         }
 
-        return result;
+        return new DamageResult(baseDmg, false);
     }
 
     public float GetCalculatedArea(float baseArea)
     {
-        if (Stats is CellStats cs)
-            return baseArea * cs.GetStat("area");
+        if (Stats is IStatHost host)
+            return baseArea * host.GetStat("area");
         if (Stats != null && Stats.HasMethod("get_stat"))
             return baseArea * (float)Stats.Call("get_stat", "area");
         return baseArea;
@@ -230,8 +220,8 @@ public partial class BaseSkill : Node2D
 
     public int GetCalculatedAmount(int baseAmount)
     {
-        if (Stats is CellStats cs)
-            return baseAmount + (int)cs.GetStat("amount");
+        if (Stats is IStatHost host)
+            return baseAmount + (int)host.GetStat("amount");
         if (Stats != null && Stats.HasMethod("get_stat"))
             return baseAmount + (int)(float)Stats.Call("get_stat", "amount");
         return baseAmount;
@@ -239,8 +229,8 @@ public partial class BaseSkill : Node2D
 
     public int GetCalculatedPierce(int basePierce)
     {
-        if (Stats is CellStats cs)
-            return basePierce + (int)cs.GetStat("pierce");
+        if (Stats is IStatHost host)
+            return basePierce + (int)host.GetStat("pierce");
         if (Stats != null && Stats.HasMethod("get_stat"))
             return basePierce + (int)(float)Stats.Call("get_stat", "pierce");
         return basePierce;
@@ -248,8 +238,8 @@ public partial class BaseSkill : Node2D
 
     public float GetCalculatedSpeed(float baseSpeed)
     {
-        if (Stats is CellStats cs)
-            return baseSpeed * cs.GetStat("projectile_speed");
+        if (Stats is IStatHost host)
+            return baseSpeed * host.GetStat("projectile_speed");
         if (Stats != null && Stats.HasMethod("get_stat"))
             return baseSpeed * (float)Stats.Call("get_stat", "projectile_speed");
         return baseSpeed;
@@ -257,8 +247,8 @@ public partial class BaseSkill : Node2D
 
     public float GetCalculatedDuration(float baseDuration)
     {
-        if (Stats is CellStats cs)
-            return baseDuration * cs.GetStat("duration");
+        if (Stats is IStatHost host)
+            return baseDuration * host.GetStat("duration");
         if (Stats != null && Stats.HasMethod("get_stat"))
             return baseDuration * (float)Stats.Call("get_stat", "duration");
         return baseDuration;

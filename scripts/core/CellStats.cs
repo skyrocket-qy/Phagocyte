@@ -8,7 +8,7 @@ namespace Phagocyte.Core;
 /// Excludes any skill-specific stats to maintain complete modularity.
 /// Formula: Final = (Base + Flat) * (1 + Pct)
 /// </summary>
-public partial class CellStats : Node
+public partial class CellStats : Node, IStatHost
 {
     [Signal]
     public delegate void StatChangedEventHandler(string statName, float newVal);

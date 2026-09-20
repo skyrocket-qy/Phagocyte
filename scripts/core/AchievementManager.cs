@@ -19,7 +19,7 @@ public partial class AchievementManager : Node
         set => _savePath.Value = value;
     }
 
-    public static AchievementManager Instance { get; private set; } = null;
+    public static AchievementManager? Instance { get; private set; } = null;
     private static System.Collections.Generic.List<Callable> _listeners = new System.Collections.Generic.List<Callable>();
 
     public static readonly Godot.Collections.Dictionary Achievements = new Godot.Collections.Dictionary

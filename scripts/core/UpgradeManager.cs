@@ -65,7 +65,7 @@ public partial class UpgradeManager : RefCounted
             { "name", info["name_key"] },
             { "desc", info["desc_key"] },
             { "icon", info["icon"] },
-            { "class_type", skillType.AssemblyQualifiedName },
+            { "class_type", skillType.AssemblyQualifiedName ?? "" },
             { "class_id", info["class_id"] }
         };
     }
@@ -314,11 +314,12 @@ public partial class UpgradeManager : RefCounted
             {
                 if (choice.TryGetValue("skill_class", out var classVal))
                 {
-                    Type skillType = Type.GetType(classVal.AsString());
+                    Type? skillType = Type.GetType(classVal.AsString());
                     if (skillType != null)
                     {
-                        BaseSkill newSkill = (BaseSkill)Activator.CreateInstance(skillType);
-                        return sm.EquipActive(newSkill);
+                        BaseSkill? newSkill = (BaseSkill?)Activator.CreateInstance(skillType);
+                        if (newSkill != null)
+                            return sm.EquipActive(newSkill);
                     }
                 }
                 break;
@@ -328,11 +329,12 @@ public partial class UpgradeManager : RefCounted
             {
                 if (choice.TryGetValue("skill_class", out var classVal))
                 {
-                    Type skillType = Type.GetType(classVal.AsString());
+                    Type? skillType = Type.GetType(classVal.AsString());
                     if (skillType != null)
                     {
-                        BaseSkill newSkill = (BaseSkill)Activator.CreateInstance(skillType);
-                        return sm.EquipPassive(newSkill);
+                        BaseSkill? newSkill = (BaseSkill?)Activator.CreateInstance(skillType);
+                        if (newSkill != null)
+                            return sm.EquipPassive(newSkill);
                     }
                 }
                 break;

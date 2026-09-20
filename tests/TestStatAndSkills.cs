@@ -141,8 +141,7 @@ public partial class TestStatAndSkills : TestHarness
 
         // Damage with might 1.10
         var dmgCalc = activeWeapon.GetCalculatedDamage(20.0f);
-        float dmgVal = dmgCalc["damage"].AsSingle();
-        AssertThat(Mathf.IsEqualApprox(dmgVal, 22.0f) || dmgCalc["is_crit"].AsBool()).IsTrue();
+        AssertThat(Mathf.IsEqualApprox(dmgCalc.Damage, 22.0f) || dmgCalc.IsCrit).IsTrue();
 
         GD.Print("[PASS] Test 5: Active weapon stat consumption (CDR, Area, Amount, Damage) verified.");
 

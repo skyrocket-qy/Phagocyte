@@ -95,10 +95,8 @@ public partial class PathogenSwarmRenderer : Node2D
             _species[i].VisibleCount = 0;
 
         _scratch.Clear();
-        var active = BaseEnemy.ActiveEnemies;
-        for (int i = 0; i < active.Count; i++)
+        foreach (var enemy in BaseEnemy.ActiveEnemies)
         {
-            var enemy = active[i];
             if (enemy == null || !GodotObject.IsInstanceValid(enemy))
                 continue;
             if (_indexById.ContainsKey(enemy.EnemyId))

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Endgame;
 using Phagocyte.Skills;
@@ -773,7 +774,11 @@ public partial class BaseCell : CharacterBody2D
     private void OnEngulfAreaEntered(Area2D area)
     {
         var enemy = area.GetParent();
-        if (enemy != null && enemy.HasMethod("be_engulfed"))
+        if (enemy is IEngulfable)
+        {
+            ConsumePathogen((Node2D)enemy);
+        }
+        else if (enemy != null && enemy.HasMethod("be_engulfed"))
         {
             ConsumePathogen((Node2D)enemy);
         }
@@ -788,17 +793,17 @@ public partial class BaseCell : CharacterBody2D
         if (IsSqueezing)
             return;
 
-        if (enemy is BaseEnemy be && !be.CanBeEngulfed)
+        if (enemy is IEngulfable blockable && !blockable.CanBeEngulfed)
         {
-            be.OnEngulfAttemptFailed(this);
+            blockable.OnEngulfAttemptFailed(this);
             return;
         }
 
         float atp = 12.0f;
-        if (enemy is BaseEnemy baseEnemy)
+        if (enemy is IEngulfable engulfable)
         {
-            atp = baseEnemy.GetAtpValue();
-            baseEnemy.BeEngulfed(this);
+            atp = engulfable.GetAtpValue();
+            engulfable.BeEngulfed(this);
         }
         else
         {

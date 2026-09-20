@@ -54,7 +54,7 @@ public partial class TestLevelUpModal : TestHarness
         {
             { "type", "new_active" },
             { "id", "perforin_lance" },
-            { "skill_class", typeof(PerforinLanceSkill).AssemblyQualifiedName }
+            { "skill_class", typeof(PerforinLanceSkill).AssemblyQualifiedName ?? "" }
         };
         bool resActive = UpgradeManager.ApplyChoice(mockPlayer, newActiveChoice);
         AssertThat(resActive).IsTrue();
@@ -65,7 +65,7 @@ public partial class TestLevelUpModal : TestHarness
         {
             { "type", "new_passive" },
             { "id", "passive_actin" },
-            { "skill_class", typeof(PassiveActinPolymerization).AssemblyQualifiedName }
+            { "skill_class", typeof(PassiveActinPolymerization).AssemblyQualifiedName ?? "" }
         };
         bool resPassive = UpgradeManager.ApplyChoice(mockPlayer, newPassiveChoice);
         AssertThat(resPassive).IsTrue();
@@ -79,7 +79,7 @@ public partial class TestLevelUpModal : TestHarness
         {
             { "type", "upgrade_passive" },
             { "id", "passive_actin" },
-            { "skill_ref", sm.GetPassiveSlot(0) }
+            { "skill_ref", sm.GetPassiveSlot(0)! }
         };
         bool resUp = UpgradeManager.ApplyChoice(mockPlayer, upgradeChoice);
         AssertThat(resUp).IsTrue();

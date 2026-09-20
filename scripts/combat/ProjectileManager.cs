@@ -250,10 +250,8 @@ public partial class ProjectileManager : Node2D
     {
         _enemyTree.Clear();
 
-        var enemies = BaseEnemy.ActiveEnemies;
-        for (int i = 0; i < enemies.Count; i++)
+        foreach (var enemy in BaseEnemy.ActiveEnemies)
         {
-            var enemy = enemies[i];
             if (enemy == null || !GodotObject.IsInstanceValid(enemy) || enemy.IsBeingEaten) continue;
             _enemyTree.Insert(enemy.GlobalPosition, enemy);
         }

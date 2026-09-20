@@ -81,8 +81,8 @@ public partial class ComplementCascadeSkill : BaseSkill
             swell.TweenProperty(be, "scale", be.Scale * 1.3f, 0.12f);
             swell.TweenCallback(Callable.From(() =>
             {
-                if (GodotObject.IsInstanceValid(be) && !be.IsBeingEaten && be.HasMethod("be_engulfed"))
-                    be.Call("be_engulfed", Host);
+                if (GodotObject.IsInstanceValid(be) && !be.IsBeingEaten)
+                    be.BeEngulfed(Host);
             }));
         });
     }

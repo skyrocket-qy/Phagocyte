@@ -103,7 +103,18 @@ public partial class NitricOxideHaloSkill : BaseSkill
 
         TargetingService.ForEachInRadius(Host.GlobalPosition, currentRadius, n =>
         {
-            if (n.HasMethod("take_damage"))
+            if (n is IDamageable)
+            {
+                CombatHelper.DealDamage(n, dmg);
+            }
+            else if (n is IEngulfable engulfable)
+            {
+                if (n.CurrentHealth <= dmg * 1.5f)
+                {
+                    engulfable.BeEngulfed(Host);
+                }
+            }
+            else if (n.HasMethod("take_damage"))
             {
                 CombatHelper.DealDamage(n, dmg);
             }
@@ -112,7 +123,7 @@ public partial class NitricOxideHaloSkill : BaseSkill
                 var hpVar = n.Get("health");
                 if (hpVar.VariantType == Variant.Type.Float && (float)hpVar <= dmg * 1.5f)
                 {
-                    n.Call("be_engulfed", Host);
+                    n.Call("be_engulfed", Host!);
                 }
             }
         });

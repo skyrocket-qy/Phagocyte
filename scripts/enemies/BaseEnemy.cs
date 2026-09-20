@@ -8,7 +8,7 @@ using Phagocyte.UI;
 
 namespace Phagocyte.Enemies;
 
-public abstract partial class BaseEnemy : Node2D
+public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
 {
     [Signal]
     public delegate void DigestedEventHandler(BaseEnemy enemy);
@@ -65,19 +65,18 @@ public abstract partial class BaseEnemy : Node2D
     public Area2D? HitArea { get; set; }
     public CollisionShape2D? EnemyCollisionShape { get; set; }
 
-    public static readonly List<BaseEnemy> ActiveEnemies = new();
+    private static readonly HashSet<BaseEnemy> _activeEnemies = new();
+    public static IReadOnlyCollection<BaseEnemy> ActiveEnemies => _activeEnemies;
 
     public override void _EnterTree()
     {
         base._EnterTree();
-        if (!ActiveEnemies.Contains(this))
-            ActiveEnemies.Add(this);
+        _activeEnemies.Add(this);
     }
 
     public override void _Ready()
     {
-        if (!ActiveEnemies.Contains(this))
-            ActiveEnemies.Add(this);
+        _activeEnemies.Add(this);
         AddToGroup("pathogens");
         CurrentHealth = MaxHealth;
         DriftTimer = GD.Randf() * 5.0f;
@@ -483,7 +482,7 @@ public abstract partial class BaseEnemy : Node2D
 
     public override void _ExitTree()
     {
-        ActiveEnemies.Remove(this);
+        _activeEnemies.Remove(this);
         base._ExitTree();
     }
 

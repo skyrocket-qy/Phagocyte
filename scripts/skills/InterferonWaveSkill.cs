@@ -2,6 +2,7 @@ using Godot;
 using System;
 using Phagocyte.Combat;
 using Phagocyte.Core;
+using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
 
@@ -58,13 +59,19 @@ public partial class InterferonWaveSkill : BaseSkill
             tween.TweenProperty(n, "global_position", n.GlobalPosition + pushDir * 65.0f, 0.2f);
 
             // Replication inhibition: 50% slow for 2s
-            if (n.HasMethod("apply_slow"))
+            if (n is BaseEnemy be)
+                be.ApplySlow(2.0f, 0.5f);
+            else if (n.HasMethod("apply_slow"))
                 n.Call("apply_slow", 2.0f, 0.5f);
 
-            if (n.HasMethod("take_damage"))
+            if (n is IDamageable)
+                CombatHelper.DealDamage(n, dmg);
+            else if (n is IEngulfable engulfable)
+                engulfable.BeEngulfed(Host);
+            else if (n.HasMethod("take_damage"))
                 CombatHelper.DealDamage(n, dmg);
             else if (n.HasMethod("be_engulfed"))
-                n.Call("be_engulfed", Host);
+                n.Call("be_engulfed", Host!);
         });
     }
 

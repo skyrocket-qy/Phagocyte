@@ -48,6 +48,24 @@ public partial class PassiveTreeView : Control
 
     private static readonly string[] BranchOrder = { "precision", "senses", "motility", "ballistics", "vitality" };
 
+    /// <summary>
+    /// Catalog-ordered node list, sorted once (rarity, id).
+    /// <c>PassiveTreeManager.Nodes</c> is a static catalog, so re-sorting
+    /// on every <c>Render</c>/<c>DrawNodes</c> is pure waste.
+    /// </summary>
+    private static readonly List<PassiveTreeManager.TreeNode> _orderedNodes = BuildOrderedNodes();
+
+    private static List<PassiveTreeManager.TreeNode> BuildOrderedNodes()
+    {
+        var ordered = new List<PassiveTreeManager.TreeNode>(PassiveTreeManager.Nodes);
+        ordered.Sort((a, b) =>
+        {
+            int rarity = a.Rarity.CompareTo(b.Rarity);
+            return rarity != 0 ? rarity : string.Compare(a.Id, b.Id, System.StringComparison.Ordinal);
+        });
+        return ordered;
+    }
+
     private Control? _zoomRoot;
     private TreeGraphLayer? _graphLayer;
     private PanelContainer? _tooltipPanel;
@@ -208,14 +226,7 @@ public partial class PassiveTreeView : Control
         }
         _buttons.Clear();
 
-        var ordered = new List<PassiveTreeManager.TreeNode>(PassiveTreeManager.Nodes);
-        ordered.Sort((a, b) =>
-        {
-            int rarity = a.Rarity.CompareTo(b.Rarity);
-            return rarity != 0 ? rarity : string.Compare(a.Id, b.Id, System.StringComparison.Ordinal);
-        });
-
-        foreach (var node in ordered)
+        foreach (var node in _orderedNodes)
         {
             var button = CreateNodeButton(node);
             _buttons[node.Id] = button;
@@ -964,14 +975,7 @@ public partial class PassiveTreeView : Control
 
     private void DrawNodes(Control layer, Godot.Collections.Dictionary<string, int> owned, string start)
     {
-        var ordered = new List<PassiveTreeManager.TreeNode>(PassiveTreeManager.Nodes);
-        ordered.Sort((a, b) =>
-        {
-            int rarity = a.Rarity.CompareTo(b.Rarity);
-            return rarity != 0 ? rarity : string.Compare(a.Id, b.Id, System.StringComparison.Ordinal);
-        });
-
-        foreach (var node in ordered)
+        foreach (var node in _orderedNodes)
         {
             bool isNucleus = PassiveTreeManager.IsNucleus(node.Id);
             Vector2 position = node.Position;

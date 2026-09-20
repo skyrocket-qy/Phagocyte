@@ -18,13 +18,13 @@ public static class CombatHelper
         if (target == null || !GodotObject.IsInstanceValid(target))
             return;
 
-        if (target is BaseEnemy enemy)
+        if (target is IDamageable damageable)
         {
-            enemy.TakeDamage(damage, source, isCrit);
+            damageable.TakeDamage(damage, source, isCrit);
         }
         else if (target.HasMethod("take_damage"))
         {
-            target.Call("take_damage", damage, source, isCrit);
+            target.Call("take_damage", damage, source!, isCrit);
         }
     }
 
@@ -34,9 +34,9 @@ public static class CombatHelper
         if (target == null || !GodotObject.IsInstanceValid(target))
             return;
 
-        if (target is BaseEnemy enemy)
+        if (target is IDamageable damageable)
         {
-            enemy.TakeDamage(damage);
+            damageable.TakeDamage(damage);
         }
         else if (target.HasMethod("take_damage"))
         {
@@ -54,9 +54,13 @@ public static class CombatHelper
         if (target == null || !GodotObject.IsInstanceValid(target))
             return;
 
-        if (target is BaseEnemy enemy)
+        if (target is IDamageable damageable)
         {
-            enemy.TakeDamage(damage);
+            damageable.TakeDamage(damage);
+        }
+        else if (target is IEngulfable engulfable)
+        {
+            engulfable.BeEngulfed(source);
         }
         else if (target.HasMethod("take_damage"))
         {
@@ -74,9 +78,13 @@ public static class CombatHelper
         if (target == null || !GodotObject.IsInstanceValid(target))
             return;
 
-        if (target is BaseEnemy enemy)
+        if (target is IDamageable damageable)
         {
-            enemy.TakeDamage(damage, source, isCrit);
+            damageable.TakeDamage(damage, source, isCrit);
+        }
+        else if (target is IEngulfable engulfable)
+        {
+            engulfable.BeEngulfed(source);
         }
         else if (target.HasMethod("take_damage"))
         {

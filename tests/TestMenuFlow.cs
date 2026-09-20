@@ -101,7 +101,7 @@ public partial class TestMenuFlow : TestHarness
         GD.Print("[PASS] Transition to PassiveView with GameManager.selected_class = 'macrophage' verified.");
 
         menu.OnPassiveConfirmPressed();
-        AssertThat(menu.PassiveView.Visible).IsFalse();
+        AssertThat(menu.PassiveView!.Visible).IsFalse();
         AssertThat(menu.MapView != null && menu.MapView.Visible).IsTrue();
         GD.Print("[PASS] Transition from PassiveView to MapView verified.");
 

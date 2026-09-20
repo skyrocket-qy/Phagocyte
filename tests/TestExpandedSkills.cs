@@ -49,17 +49,17 @@ public partial class TestExpandedSkills : SceneTree
 
         foreach (var type in activeTypes)
         {
-            var skill = (BaseSkill)Activator.CreateInstance(type);
+            var skill = (BaseSkill?)Activator.CreateInstance(type);
             AssertThat(skill).IsNotNull();
-            AssertThat(skill.IsPassive).IsFalse();
-            AssertThat(skill.SkillId.Length > 0).IsTrue();
-            AssertThat(skill.NameKey.Length > 0).IsTrue();
-            AssertThat(skill.DescKey.Length > 0).IsTrue();
-            AssertThat(skill.BioKey.Length > 0).IsTrue();
-            AssertThat(skill.IconSymbol.Length > 0).IsTrue();
+            AssertThat(skill!.IsPassive).IsFalse();
+            AssertThat(skill!.SkillId.Length > 0).IsTrue();
+            AssertThat(skill!.NameKey.Length > 0).IsTrue();
+            AssertThat(skill!.DescKey.Length > 0).IsTrue();
+            AssertThat(skill!.BioKey.Length > 0).IsTrue();
+            AssertThat(skill!.IconSymbol.Length > 0).IsTrue();
 
             // Verify entry exists in GameManager.SkillCatalog
-            AssertThat(GameManager.SkillCatalog.ContainsKey(skill.SkillId)).IsTrue();
+            AssertThat(GameManager.SkillCatalog.ContainsKey(skill!.SkillId)).IsTrue();
         }
         GD.Print($"[PASS] Step 2: All {activeTypes.Length} Active Weapons instantiated and verified in GameManager.SkillCatalog.");
 
@@ -83,17 +83,17 @@ public partial class TestExpandedSkills : SceneTree
 
         foreach (var type in passiveTypes)
         {
-            var skill = (BaseSkill)Activator.CreateInstance(type);
+            var skill = (BaseSkill?)Activator.CreateInstance(type);
             AssertThat(skill).IsNotNull();
-            AssertThat(skill.IsPassive).IsTrue();
-            AssertThat(skill.SkillId.Length > 0).IsTrue();
-            AssertThat(skill.NameKey.Length > 0).IsTrue();
-            AssertThat(skill.DescKey.Length > 0).IsTrue();
-            AssertThat(skill.BioKey.Length > 0).IsTrue();
-            AssertThat(skill.IconSymbol.Length > 0).IsTrue();
+            AssertThat(skill!.IsPassive).IsTrue();
+            AssertThat(skill!.SkillId.Length > 0).IsTrue();
+            AssertThat(skill!.NameKey.Length > 0).IsTrue();
+            AssertThat(skill!.DescKey.Length > 0).IsTrue();
+            AssertThat(skill!.BioKey.Length > 0).IsTrue();
+            AssertThat(skill!.IconSymbol.Length > 0).IsTrue();
 
             // Verify entry exists in GameManager.SkillCatalog
-            AssertThat(GameManager.SkillCatalog.ContainsKey(skill.SkillId)).IsTrue();
+            AssertThat(GameManager.SkillCatalog.ContainsKey(skill!.SkillId)).IsTrue();
         }
         GD.Print($"[PASS] Step 3: All {passiveTypes.Length} Passive Organelle Traits instantiated and verified in GameManager.SkillCatalog.");
 

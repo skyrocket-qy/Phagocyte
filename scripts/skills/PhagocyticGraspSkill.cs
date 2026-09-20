@@ -91,9 +91,13 @@ public partial class PhagocyticGraspSkill : BaseSkill
             tween.TweenProperty(target, "global_position", Host.GlobalPosition, 0.15f);
             tween.TweenCallback(Callable.From(() =>
             {
-                if (target != null && GodotObject.IsInstanceValid(target) && target.HasMethod("be_engulfed"))
+                if (target != null && GodotObject.IsInstanceValid(target) && target is IEngulfable engulfable)
                 {
-                    target.Call("be_engulfed", Host);
+                    engulfable.BeEngulfed(Host);
+                }
+                else if (target != null && GodotObject.IsInstanceValid(target) && target.HasMethod("be_engulfed"))
+                {
+                    target.Call("be_engulfed", Host!);
                 }
             }));
         }

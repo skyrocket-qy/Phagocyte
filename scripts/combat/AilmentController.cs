@@ -232,10 +232,17 @@ public partial class AilmentController : Node
         if (parent == null || !GodotObject.IsInstanceValid(parent) || parent.IsQueuedForDeletion())
             return;
 
-        // Call TakeDoTDamage via duck typing or Reflection
-        if (parent.HasMethod("TakeDoTDamage"))
+        if (parent is IDamageable damageable)
+        {
+            damageable.TakeDoTDamage(damage);
+        }
+        else if (parent.HasMethod("TakeDoTDamage"))
         {
             parent.Call("TakeDoTDamage", damage);
+        }
+        else if (parent.HasMethod("take_dot_damage"))
+        {
+            parent.Call("take_dot_damage", damage);
         }
     }
 }

@@ -32,6 +32,8 @@ public static class TargetingService
             return false;
         if (n is BaseEnemy enemy && (enemy.IsBeingEaten || enemy.CurrentHealth <= 0.0f))
             return false;
+        if (n is IDamageable or IEngulfable)
+            return true;
         return n.HasMethod("take_damage") || n.HasMethod("be_engulfed");
     }
 

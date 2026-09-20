@@ -19,7 +19,7 @@ public partial class SettingsManager : Node
         set => _savePath.Value = value;
     }
 
-    public static SettingsManager Instance = null;
+    public static SettingsManager? Instance = null;
 
     public static float MasterVolume = 1.0f;
     public static float SfxVolume = 1.0f;

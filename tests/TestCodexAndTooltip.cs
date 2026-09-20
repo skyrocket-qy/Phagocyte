@@ -160,7 +160,7 @@ public partial class TestCodexAndTooltip : TestHarness
         // Close codex from pause menu
         codexModal.CloseCodex();
         hud.ResumeGame();
-        AssertThat(hud.PauseModal.Visible || codexModal.Visible).IsFalse();
+        AssertThat(hud.PauseModal!.Visible || codexModal.Visible).IsFalse();
         GD.Print("[PASS] In-game pause modal and manual cleanly resumed.");
 
         // 5. Bilingual Localization on Tooltip and Manual

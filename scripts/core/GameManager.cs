@@ -25,7 +25,7 @@ public partial class GameManager : Node
     // Static callback list for decoupled notification
     private static Array<Callable> _languageListeners = new Array<Callable>();
 
-    private static System.Collections.Generic.Dictionary<string, PackedScene> _cellScenes;
+    private static System.Collections.Generic.Dictionary<string, PackedScene>? _cellScenes;
     private static System.Collections.Generic.Dictionary<string, PackedScene> CellScenes
     {
         get
