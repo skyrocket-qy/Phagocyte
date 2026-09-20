@@ -16,7 +16,6 @@ public partial class PseudomonasEnemy : BaseEnemy
         EnemyId = "pseudomonas";
         DisplayNameKey = "PATHOGEN_PSEUDOMONAS_NAME";
         MaxHealth = 30.0f;
-        CurrentHealth = 30.0f;
         AtpValue = 14.0f;
         BaseScore = 35;
         FloatSpeed = 42.0f;
@@ -36,32 +35,28 @@ public partial class PseudomonasEnemy : BaseEnemy
 
     public override void Die(Node2D? killer)
     {
-        // Drop sticky biofilm puddle on death
-        var parent = GetParent();
-        if (parent != null)
-        {
-            var biofilm = new BiofilmArea
-            {
-                GlobalPosition = GlobalPosition
-            };
-            parent.AddChild(biofilm);
-        }
+        SpawnBiofilmResidue();
         base.Die(killer);
     }
 
     public override void BeEngulfed(Node2D? predator)
     {
         // When engulfed and digested, also spawn a biofilm residue
-        var parent = GetParent();
-        if (parent != null)
-        {
-            var biofilm = new BiofilmArea
-            {
-                GlobalPosition = GlobalPosition
-            };
-            parent.AddChild(biofilm);
-        }
+        SpawnBiofilmResidue();
         base.BeEngulfed(predator);
+    }
+
+    /// <summary>Drops the sticky biofilm puddle left behind by either death path.</summary>
+    private void SpawnBiofilmResidue()
+    {
+        var parent = GetParent();
+        if (parent == null)
+            return;
+
+        parent.AddChild(new BiofilmArea
+        {
+            GlobalPosition = GlobalPosition
+        });
     }
 
     public override void _Draw()

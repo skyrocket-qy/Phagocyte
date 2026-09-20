@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using Phagocyte.Player;
 
@@ -17,7 +17,6 @@ public partial class HivEnemy : BaseEnemy
         EnemyId = "hiv";
         DisplayNameKey = "PATHOGEN_HIV_NAME";
         MaxHealth = 24.0f;
-        CurrentHealth = 24.0f;
         AtpValue = 14.0f;
         BaseScore = 35;
         FloatSpeed = 48.0f;
@@ -41,9 +40,7 @@ public partial class HivEnemy : BaseEnemy
                 player.DrainAtp(15.0f);
 
                 // Visual siphon line
-                Modulate = new Color(0.2f, 1.5f, 1.5f, 1.0f);
-                var tw = CreateTween();
-                tw.TweenProperty(this, "modulate", Colors.White, 0.3);
+                FlashModulate(new Color(0.2f, 1.5f, 1.5f, 1.0f), 0.3f);
             }
         }
     }

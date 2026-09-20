@@ -77,8 +77,7 @@ public partial class MhcTracerBeamSkill : BaseSkill
             {
                 var dmgData = GetCalculatedDamage(BaseDps * (float)delta);
                 float dmg = (float)dmgData["damage"];
-                if (_currentTarget.HasMethod("take_damage"))
-                    _currentTarget.Call("take_damage", dmg);
+                CombatHelper.DealDamage(_currentTarget, dmg);
 
                 // Apply vulnerability tag (metadata flag, clearable by antigenic drift)
                 _currentTarget.SetMeta("mhc_marked", true);

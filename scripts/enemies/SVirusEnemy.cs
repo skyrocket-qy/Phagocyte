@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using Phagocyte.Player;
 
@@ -21,7 +21,6 @@ public partial class SVirusEnemy : BaseEnemy
         EnemyId = "s_virus";
         DisplayNameKey = "PATHOGEN_SVIRUS_NAME";
         MaxHealth = 22.0f;
-        CurrentHealth = 22.0f;
         AtpValue = 10.0f;
         BaseScore = 15;
         FloatSpeed = 38.0f;

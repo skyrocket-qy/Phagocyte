@@ -23,7 +23,6 @@ public partial class HpyloriEnemy : BaseEnemy
         EnemyId = "h_pylori";
         DisplayNameKey = "PATHOGEN_HPYLORI_NAME";
         MaxHealth = 32.0f;
-        CurrentHealth = 32.0f;
         AtpValue = 16.0f;
         BaseScore = 35;
         FloatSpeed = 58.0f;

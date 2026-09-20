@@ -23,7 +23,6 @@ public partial class AnthraxSporeEnemy : BaseEnemy
         EnemyId = "anthrax_spore";
         DisplayNameKey = "PATHOGEN_ANTHRAX_NAME";
         MaxHealth = 45.0f;
-        CurrentHealth = 45.0f;
         Armor = 3.0f;
         FloatSpeed = 25.0f;
         AtpValue = 10.0f;

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -117,7 +118,6 @@ public partial class NucleaseBladesSkill : BaseSkill
 
         _damageCooldown = 0.22f; // tick damage every ~0.2s
 
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
         var dmgData = GetCalculatedDamage(BaseDamage);
         float dmg = (float)dmgData["damage"];
 
@@ -126,27 +126,17 @@ public partial class NucleaseBladesSkill : BaseSkill
             float angle = _currentOrbitAngle + i * (Mathf.Tau / bladeCount);
             Vector2 bladePos = Host.GlobalPosition + Vector2.FromAngle(angle) * orbitR;
 
-            foreach (var p in pathogens)
+            TargetingService.ForEachInRadius(bladePos, 28.0f, n =>
             {
-                if (p is Node2D n && GodotObject.IsInstanceValid(n))
+                if (n.HasMethod("take_damage"))
                 {
-                    var eaten = n.Get("is_being_eaten");
-                    if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                        continue;
-
-                    if (bladePos.DistanceTo(n.GlobalPosition) <= 28.0f)
-                    {
-                        if (n.HasMethod("take_damage"))
-                        {
-                            n.Call("take_damage", dmg);
-                        }
-                        else if (n.HasMethod("be_engulfed"))
-                        {
-                            n.Call("be_engulfed", Host);
-                        }
-                    }
+                    CombatHelper.DealDamage(n, dmg);
                 }
-            }
+                else if (n.HasMethod("be_engulfed"))
+                {
+                    n.Call("be_engulfed", Host);
+                }
+            });
         }
     }
 

@@ -14,7 +14,6 @@ public partial class AspergillusEnemy : BaseEnemy
         EnemyId = "aspergillus";
         DisplayNameKey = "PATHOGEN_ASPERGILLUS_NAME";
         MaxHealth = 38.0f;
-        CurrentHealth = 38.0f;
         AtpValue = 22.0f;
         BaseScore = 15;
         FloatSpeed = 28.0f;

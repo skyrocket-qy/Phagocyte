@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -124,7 +125,7 @@ public partial class DefensinBarbsSkill : BaseSkill
                     {
                         _hitCount++;
                         if (n.HasMethod("take_damage"))
-                            n.Call("take_damage", Damage);
+                            CombatHelper.DealDamage(n, Damage);
                         else if (n.HasMethod("be_engulfed"))
                             n.Call("be_engulfed", HostRef);
 

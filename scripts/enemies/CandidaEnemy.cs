@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using Phagocyte.Player;
 
@@ -26,7 +26,6 @@ public partial class CandidaEnemy : BaseEnemy
         EnemyId = "candida";
         DisplayNameKey = "PATHOGEN_CANDIDA_NAME";
         MaxHealth = 45.0f;
-        CurrentHealth = 45.0f;
         AtpValue = 24.0f;
         BaseScore = 35;
         FloatSpeed = 32.0f;

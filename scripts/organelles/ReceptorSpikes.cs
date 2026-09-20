@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Phagocyte.Combat;
 using Phagocyte.Enemies;
 using Phagocyte.Player;
 
@@ -48,17 +49,12 @@ public partial class ReceptorSpikes : ModularOrganelle
         float step = Mathf.Tau / Mathf.Max(4, SpikeCount);
         float halfHitAngle = step * 0.42f;
 
-        var pathogens = GetTree().GetNodesInGroup("pathogens");
-        foreach (var node in pathogens)
+        foreach (var enemy in BaseEnemy.ActiveEnemies)
         {
-            if (node is not Node2D candidate || !GodotObject.IsInstanceValid(candidate))
-                continue;
-            if (candidate is BaseEnemy enemy && (enemy.IsBeingEaten || enemy.CurrentHealth <= 0.0f))
-                continue;
-            if (!candidate.HasMethod("take_damage") && !candidate.HasMethod("be_engulfed"))
+            if (!TargetingService.IsAttackable(enemy))
                 continue;
 
-            Vector2 offset = candidate.GlobalPosition - Host!.GlobalPosition;
+            Vector2 offset = enemy.GlobalPosition - Host!.GlobalPosition;
             float distance = offset.Length();
             if (distance < innerBand || distance > outerBand)
                 continue;
@@ -70,12 +66,12 @@ public partial class ReceptorSpikes : ModularOrganelle
             if (toNearestSpike > halfHitAngle)
                 continue;
 
-            ulong id = candidate.GetInstanceId();
+            ulong id = enemy.GetInstanceId();
             if (_hitReadyAt.TryGetValue(id, out float readyAt) && _time < readyAt)
                 continue;
 
             _hitReadyAt[id] = _time + HitInterval;
-            Intercept(candidate, offset / Mathf.Max(0.0001f, distance));
+            Intercept(enemy, offset / Mathf.Max(0.0001f, distance));
         }
 
         PruneCooldowns();

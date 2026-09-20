@@ -72,7 +72,7 @@ public partial class DormantToxinVesicle : Node2D
     {
         var tree = GetTree();
 
-        var player = tree.GetFirstNodeInGroup("player") as BaseCell;
+        var player = EnemySteering.GetPlayer(this);
         if (player != null && GodotObject.IsInstanceValid(player) && !player.IsDead)
         {
             if (GlobalPosition.DistanceTo(player.GlobalPosition) <= TriggerRadius + player.CurrentRadius * 0.5f)
@@ -82,14 +82,10 @@ public partial class DormantToxinVesicle : Node2D
             }
         }
 
-        foreach (var node in tree.GetNodesInGroup("pathogens"))
+        if (TargetingService.AnyInRadius(GlobalPosition, TriggerRadius + 16.0f, skipEaten: false))
         {
-            if (node is Node2D enemy && GodotObject.IsInstanceValid(enemy)
-                && GlobalPosition.DistanceTo(enemy.GlobalPosition) <= TriggerRadius + 16.0f)
-            {
-                Explode();
-                return true;
-            }
+            Explode();
+            return true;
         }
 
         foreach (var node in tree.GetNodesInGroup("enemy_shots"))
@@ -151,21 +147,18 @@ public partial class DormantToxinVesicle : Node2D
             };
             parent.AddChild(burst);
 
-            var player = GetTree().GetFirstNodeInGroup("player") as BaseCell;
+            var player = EnemySteering.GetPlayer(this);
             if (player != null && GodotObject.IsInstanceValid(player) && !player.IsDead
                 && GlobalPosition.DistanceTo(player.GlobalPosition) <= BlastRadius)
             {
                 player.TakeEnvironmentalDamage(PlayerBlastDamage);
             }
 
-            foreach (var node in GetTree().GetNodesInGroup("pathogens"))
-            {
-                if (node is BaseEnemy enemy && GodotObject.IsInstanceValid(enemy)
-                    && GlobalPosition.DistanceTo(enemy.GlobalPosition) <= BlastRadius)
-                {
-                    enemy.TakeDamage(EnemyBlastDamage, null);
-                }
-            }
+            TargetingService.ForEachInRadius(
+                GlobalPosition,
+                BlastRadius,
+                enemy => enemy.TakeDamage(EnemyBlastDamage, null),
+                skipEaten: false);
         }
 
         QueueFree();

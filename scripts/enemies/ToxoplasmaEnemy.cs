@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using Phagocyte.Player;
 
@@ -19,7 +19,6 @@ public partial class ToxoplasmaEnemy : BaseEnemy
         EnemyId = "toxoplasma";
         DisplayNameKey = "PATHOGEN_TOXOPLASMA_NAME";
         MaxHealth = 40.0f;
-        CurrentHealth = 40.0f;
         AtpValue = 25.0f;
         BaseScore = 35;
         FloatSpeed = 32.0f;

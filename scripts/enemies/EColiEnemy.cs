@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using Phagocyte.Player;
 
@@ -22,7 +22,6 @@ public partial class EColiEnemy : BaseEnemy
         EnemyId = "e_coli";
         DisplayNameKey = "PATHOGEN_ECOLI_NAME";
         MaxHealth = 28.0f;
-        CurrentHealth = 28.0f;
         AtpValue = 15.0f;
         BaseScore = 15;
         FloatSpeed = 45.0f;

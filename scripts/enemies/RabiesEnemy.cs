@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using Phagocyte.Player;
 
@@ -19,7 +19,6 @@ public partial class RabiesEnemy : BaseEnemy
         EnemyId = "rabies";
         DisplayNameKey = "PATHOGEN_RABIES_NAME";
         MaxHealth = 22.0f;
-        CurrentHealth = 22.0f;
         AtpValue = 16.0f;
         BaseScore = 35;
         FloatSpeed = 65.0f;

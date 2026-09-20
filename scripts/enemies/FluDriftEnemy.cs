@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using Phagocyte.Player;
 
@@ -19,7 +19,6 @@ public partial class FluDriftEnemy : BaseEnemy
         EnemyId = "flu_drift";
         DisplayNameKey = "PATHOGEN_FLUDRIFT_NAME";
         MaxHealth = 65.0f;
-        CurrentHealth = 65.0f;
         AtpValue = 26.0f;
         BaseScore = 100;
         FloatSpeed = 42.0f;
@@ -59,9 +58,7 @@ public partial class FluDriftEnemy : BaseEnemy
         }
 
         // 3. Flash effect
-        Modulate = Colors.White * 2.0f;
-        var tw = CreateTween();
-        tw.TweenProperty(this, "modulate", Colors.White, 0.3);
+        FlashModulate(Colors.White * 2.0f, 0.3f);
 
         QueueRedraw();
     }

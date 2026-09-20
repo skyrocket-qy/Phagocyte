@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Enemies;
 using Phagocyte.Player;
 using Phagocyte.UI;
@@ -251,24 +252,19 @@ public partial class PseudopodLimb : ModularOrganelle
 
     private Node2D? AcquireTarget(float searchRange)
     {
-        var pathogens = GetTree().GetNodesInGroup("pathogens");
         Node2D? best = null;
         float bestDistance = searchRange;
 
-        foreach (var node in pathogens)
+        foreach (var enemy in BaseEnemy.ActiveEnemies)
         {
-            if (node is not Node2D candidate || !GodotObject.IsInstanceValid(candidate))
-                continue;
-            if (candidate is BaseEnemy enemy && (enemy.IsBeingEaten || enemy.CurrentHealth <= 0.0f))
-                continue;
-            if (!candidate.HasMethod("take_damage") && !candidate.HasMethod("be_engulfed"))
+            if (!TargetingService.IsAttackable(enemy))
                 continue;
 
-            float distance = Host!.GlobalPosition.DistanceTo(candidate.GlobalPosition);
+            float distance = Host!.GlobalPosition.DistanceTo(enemy.GlobalPosition);
             if (distance <= bestDistance)
             {
                 bestDistance = distance;
-                best = candidate;
+                best = enemy;
             }
         }
 

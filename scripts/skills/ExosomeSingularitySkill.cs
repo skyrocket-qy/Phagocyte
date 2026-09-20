@@ -107,34 +107,23 @@ public partial class ExosomeSingularitySkill : BaseSkill
             if (HostRef == null)
                 return;
 
-            var pathogens = HostRef.GetTree().GetNodesInGroup("pathogens");
-            foreach (var p in pathogens)
+            TargetingService.ForEachInRadius(GlobalPosition, Radius, n =>
             {
-                if (p is Node2D n && GodotObject.IsInstanceValid(n))
-                {
-                    float dist = GlobalPosition.DistanceTo(n.GlobalPosition);
-                    if (dist <= Radius && dist > 10.0f)
-                    {
-                        Vector2 pullDir = (GlobalPosition - n.GlobalPosition).Normalized();
-                        if (n is CharacterBody2D cb)
-                        {
-                            cb.Velocity += pullDir * PullForce * dt;
-                        }
-                        else
-                        {
-                            n.GlobalPosition += pullDir * PullForce * 0.4f * dt;
-                        }
+                float dist = GlobalPosition.DistanceTo(n.GlobalPosition);
+                if (dist <= 10.0f)
+                    return;
 
-                        if (doTick)
-                        {
-                            if (n.HasMethod("take_damage"))
-                                n.Call("take_damage", DamagePerTick);
-                            else if (n.HasMethod("be_engulfed") && dist <= 24.0f)
-                                n.Call("be_engulfed", HostRef);
-                        }
-                    }
+                Vector2 pullDir = (GlobalPosition - n.GlobalPosition).Normalized();
+                n.GlobalPosition += pullDir * PullForce * 0.4f * dt;
+
+                if (doTick)
+                {
+                    if (n.HasMethod("take_damage"))
+                        CombatHelper.DealDamage(n, DamagePerTick);
+                    else if (n.HasMethod("be_engulfed") && dist <= 24.0f)
+                        n.Call("be_engulfed", HostRef);
                 }
-            }
+            }, skipEaten: false);
         }
 
         public override void _Draw()

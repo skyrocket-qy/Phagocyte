@@ -106,7 +106,7 @@ public partial class NitricOxideHaloSkill : BaseSkill
         {
             if (n.HasMethod("take_damage"))
             {
-                n.Call("take_damage", dmg);
+                CombatHelper.DealDamage(n, dmg);
             }
             else if (n.HasMethod("be_engulfed"))
             {

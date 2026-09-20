@@ -219,9 +219,6 @@ SKILL_COMPLEMENT_BIO,"Biochem: Classical/Alternative pathway activation assemble
 SKILL_LYSOSOME_NAME,Lysosomal Overload,溶酶体过载
 SKILL_LYSOSOME_DESC,"Periodically bursts acidic hydrolases radially, melting dense surrounding swarms.",周期性向四周环形喷射酸性水解酶水滴，融化密集贴身敌群。
 SKILL_LYSOSOME_BIO,"Biochem: Lysosomes fuse to release acid hydrolases (cathepsins, nucleases, lipases) at pH 4.5-5.0 to digest macromolecular structures.",生物机制：溶酶体膜破裂释放 pH 4.5~5.0 的酸性水解酶群，分解病原体的核酸、蛋白质与脂质膜。
-SKILL_INTERFERON_NAME,Interferon Pulse,干扰素脉冲
-SKILL_INTERFERON_DESC,Emits antiviral signaling waves that paralyze pathogen surface receptors and slows them by 50%.,发射抗病毒干扰素脉冲，瘫痪周遭病原体表面受体并降低其 50% 移动速度。
-SKILL_INTERFERON_BIO,Biochem: Type I interferons (IFN-alpha/beta) bind cellular receptors to induce protein kinase R and 2'-5' oligoadenylate synthetase.,生物机制：I 型干扰素 (IFN-α/β) 诱导抗病毒蛋白合成，抑制病原体侵染酶活性并中断微管运输。
 SKILL_PERFORIN_NAME,Perforin Injection,穿孔素注射
 SKILL_PERFORIN_DESC,"CTL Exclusive Innate: Injects perforin and granzyme B on contact, directly destroying pathogen nuclei.",杀手 T 细胞专属固有：接触靶标时注入穿孔素与颗粒酶 B，无视护盾直接破坏核心。
 SKILL_PERFORIN_BIO,"Biochem: Polymerizes into transmembrane pores, allowing granzymes to enter target cytoplasm and cleave pro-caspases.",生物机制：穿孔素在靶细胞膜聚合形成孔道，介导颗粒酶进入促发 Caspase 凋亡级联反应。

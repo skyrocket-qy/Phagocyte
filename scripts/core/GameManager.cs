@@ -220,17 +220,6 @@ public partial class GameManager : Node
             { "cooldown", 4.5f },
             { "max_level", 5 }
         }},
-        { "interferon_pulse", new Dictionary {
-            { "id", "interferon_pulse" },
-            { "name_key", "SKILL_INTERFERON_NAME" },
-            { "desc_key", "SKILL_INTERFERON_DESC" },
-            { "bio_key", "SKILL_INTERFERON_BIO" },
-            { "icon", "📡" },
-            { "type", "active" },
-            { "class_id", "" },
-            { "cooldown", 6.0f },
-            { "max_level", 5 }
-        }},
         // --- 16 Active Weapons ---
         { SkillIds.RosTorrent, new Dictionary {
             { "id", SkillIds.RosTorrent },
@@ -262,7 +251,7 @@ public partial class GameManager : Node
             { "icon", "💥" },
             { "type", "active" },
             { "class_id", "neutrophil" },
-            { "cooldown", 5.0f },
+            { "cooldown", 4.0f },
             { "max_level", 5 }
         }},
         { SkillIds.AntibodySalvo, new Dictionary {
@@ -273,7 +262,7 @@ public partial class GameManager : Node
             { "icon", "🏹" },
             { "type", "innate" },
             { "class_id", "b_cell" },
-            { "cooldown", 4.0f },
+            { "cooldown", 3.5f },
             { "max_level", 5 }
         }},
         { SkillIds.PseudopodLunge, new Dictionary {
@@ -284,7 +273,7 @@ public partial class GameManager : Node
             { "icon", "🥊" },
             { "type", "active" },
             { "class_id", "dendritic" },
-            { "cooldown", 2.5f },
+            { "cooldown", 3.0f },
             { "max_level", 5 }
         }},
         { SkillIds.NitricOxideHalo, new Dictionary {

@@ -15,7 +15,6 @@ public partial class TbEnemy : BaseEnemy
         EnemyId = "tb";
         DisplayNameKey = "PATHOGEN_TB_NAME";
         MaxHealth = 35.0f;
-        CurrentHealth = 35.0f;
         AtpValue = 18.0f;
         BaseScore = 100;
         FloatSpeed = 30.0f;

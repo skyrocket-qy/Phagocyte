@@ -23,6 +23,19 @@ public static class TargetingService
     }
 
     /// <summary>
+    /// True when the node is a valid, living pathogen that accepts damage or
+    /// engulfment. Used by organelles that scan for contact targets.
+    /// </summary>
+    public static bool IsAttackable(Node? node)
+    {
+        if (node is not Node2D n || !GodotObject.IsInstanceValid(n))
+            return false;
+        if (n is BaseEnemy enemy && (enemy.IsBeingEaten || enemy.CurrentHealth <= 0.0f))
+            return false;
+        return n.HasMethod("take_damage") || n.HasMethod("be_engulfed");
+    }
+
+    /// <summary>
     /// Nearest pathogen within <paramref name="maxRange"/> of
     /// <paramref name="origin"/>, or null when none is in range.
     /// </summary>
@@ -114,5 +127,54 @@ public static class TargetingService
             if (center.DistanceSquaredTo(enemy.GlobalPosition) <= radiusSq)
                 action(enemy);
         }
+    }
+
+    /// <summary>
+    /// True when at least one pathogen lies within <paramref name="radius"/> of
+    /// <paramref name="center"/>.
+    /// </summary>
+    public static bool AnyInRadius(Vector2 center, float radius, bool skipEaten = true)
+    {
+        float radiusSq = radius * radius;
+        foreach (var enemy in BaseEnemy.ActiveEnemies)
+        {
+            if (!IsValidTarget(enemy))
+                continue;
+            if (skipEaten && enemy.IsBeingEaten)
+                continue;
+
+            if (center.DistanceSquaredTo(enemy.GlobalPosition) <= radiusSq)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Counts pathogens within <paramref name="radius"/> of <paramref name="center"/>,
+    /// optionally restricted by <paramref name="predicate"/>.
+    /// </summary>
+    public static int CountInRadius(
+        Vector2 center,
+        float radius,
+        System.Func<BaseEnemy, bool>? predicate = null,
+        bool skipEaten = true)
+    {
+        int count = 0;
+        float radiusSq = radius * radius;
+        foreach (var enemy in BaseEnemy.ActiveEnemies)
+        {
+            if (!IsValidTarget(enemy))
+                continue;
+            if (skipEaten && enemy.IsBeingEaten)
+                continue;
+            if (predicate != null && !predicate(enemy))
+                continue;
+
+            if (center.DistanceSquaredTo(enemy.GlobalPosition) <= radiusSq)
+                count++;
+        }
+
+        return count;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using Phagocyte.Player;
 
@@ -18,7 +18,6 @@ public partial class TetanusEnemy : BaseEnemy
         EnemyId = "tetanus";
         DisplayNameKey = "PATHOGEN_TETANUS_NAME";
         MaxHealth = 30.0f;
-        CurrentHealth = 30.0f;
         AtpValue = 20.0f;
         BaseScore = 35;
         FloatSpeed = 35.0f;

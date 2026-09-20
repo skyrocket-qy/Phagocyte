@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -54,36 +55,27 @@ public partial class HistamineSurgeSkill : BaseSkill
         Host.GetParent().AddChild(surgeVisual);
 
         // Hit enemies in cone
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        foreach (var p in pathogens)
+        TargetingService.ForEachInRadius(Host.GlobalPosition, reach, n =>
         {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                Vector2 toEnemy = n.GlobalPosition - Host.GlobalPosition;
-                float dist = toEnemy.Length();
-                if (dist <= reach && dist > 1.0f)
-                {
-                    float angleDiff = Mathf.Abs(aimDir.AngleTo(toEnemy));
-                    if (angleDiff <= halfConeRad)
-                    {
-                        // Knockback
-                        Vector2 push = toEnemy.Normalized() * kb;
-                        if (n is CharacterBody2D cb)
-                            cb.Velocity += push;
-                        else
-                        {
-                            var tween = Host.CreateTween();
-                            tween.TweenProperty(n, "global_position", n.GlobalPosition + push.Normalized() * 80.0f, 0.2f);
-                        }
+            Vector2 toEnemy = n.GlobalPosition - Host.GlobalPosition;
+            float dist = toEnemy.Length();
+            if (dist <= 1.0f)
+                return;
 
-                        if (n.HasMethod("take_damage"))
-                            n.Call("take_damage", dmg);
-                        else if (n.HasMethod("be_engulfed"))
-                            n.Call("be_engulfed", Host);
-                    }
-                }
-            }
-        }
+            float angleDiff = Mathf.Abs(aimDir.AngleTo(toEnemy));
+            if (angleDiff > halfConeRad)
+                return;
+
+            // Knockback (pathogens are Node2D bodies, so the displacement is tweened)
+            Vector2 push = toEnemy.Normalized() * kb;
+            var tween = Host.CreateTween();
+            tween.TweenProperty(n, "global_position", n.GlobalPosition + push.Normalized() * 80.0f, 0.2f);
+
+            if (n.HasMethod("take_damage"))
+                n.Call("take_damage", dmg);
+            else if (n.HasMethod("be_engulfed"))
+                n.Call("be_engulfed", Host);
+        }, skipEaten: false);
     }
 
     private Vector2 FindAimDirection()

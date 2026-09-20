@@ -107,6 +107,17 @@ public abstract partial class BaseEnemy : Node2D
     }
 
     /// <summary>
+    /// Brief modulate flash used by damage and ability feedback: sets the tint
+    /// and tweens it back to white over <paramref name="duration"/> seconds.
+    /// </summary>
+    protected void FlashModulate(Color flashColor, float duration)
+    {
+        Modulate = flashColor;
+        var tw = CreateTween();
+        tw.TweenProperty(this, "modulate", Colors.White, duration);
+    }
+
+    /// <summary>
     /// Cached player lookup shared by subclass AI: avoids a per-frame scene-tree
     /// group query across the 300-500 pathogen concurrency budget. The cache is
     /// shared process-wide and re-resolved when the cell is freed.
@@ -281,9 +292,7 @@ public abstract partial class BaseEnemy : Node2D
         }
 
         // Flash modulate
-        Modulate = new Color(1.8f, 0.4f, 0.4f, 1.0f);
-        var tw = CreateTween();
-        tw.TweenProperty(this, "modulate", Colors.White, 0.15);
+        FlashModulate(new Color(1.8f, 0.4f, 0.4f, 1.0f), 0.15f);
 
         if (CurrentHealth <= 0.0f)
         {

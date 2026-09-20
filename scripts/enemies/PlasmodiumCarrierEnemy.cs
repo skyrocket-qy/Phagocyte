@@ -16,7 +16,6 @@ public partial class PlasmodiumCarrierEnemy : BaseEnemy
         EnemyId = "plasmodium";
         DisplayNameKey = "PATHOGEN_PLASMODIUM_NAME";
         MaxHealth = 30.0f;
-        CurrentHealth = 30.0f;
         AtpValue = 28.0f;
         BaseScore = 15;
         FloatSpeed = 25.0f;

@@ -14,7 +14,6 @@ public partial class NorovirusEnemy : BaseEnemy
         EnemyId = "norovirus";
         DisplayNameKey = "PATHOGEN_NOROVIRUS_NAME";
         MaxHealth = 8.0f;
-        CurrentHealth = 8.0f;
         AtpValue = 3.5f;
         BaseScore = 5;
         FloatSpeed = 50.0f;

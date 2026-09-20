@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using Phagocyte.Player;
 
@@ -17,7 +17,6 @@ public partial class VaricellaZosterEnemy : BaseEnemy
         EnemyId = "varicella_zoster";
         DisplayNameKey = "PATHOGEN_ZOSTER_NAME";
         MaxHealth = 26.0f;
-        CurrentHealth = 26.0f;
         AtpValue = 18.0f;
         BaseScore = 15;
         FloatSpeed = 35.0f;
@@ -56,9 +55,7 @@ public partial class VaricellaZosterEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
 
         // Flash into visible existence
-        Modulate = Colors.Red * 2.0f;
-        var tw = CreateTween();
-        tw.TweenProperty(this, "modulate", Colors.White, 0.4);
+        FlashModulate(Colors.Red * 2.0f, 0.4f);
         QueueRedraw();
     }
 

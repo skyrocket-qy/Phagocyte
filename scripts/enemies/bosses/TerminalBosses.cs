@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using System.Collections.Generic;
 using Phagocyte.Combat;
@@ -67,7 +67,6 @@ public partial class MrsASuperColony : TerminalBossEnemy
         EnemyId = "mrsa_super_colony";
         DisplayNameKey = "PATHOGEN_MRSA_NAME";
         MaxHealth = 1600.0f;
-        CurrentHealth = 1600.0f;
         AtpValue = 400.0f;
         FloatSpeed = 20.0f;
         Armor = 12.0f;
@@ -154,7 +153,6 @@ public partial class MrsaEnragedElite : BaseEnemy
         EnemyId = "mrsa_enraged_elite";
         DisplayNameKey = "PATHOGEN_MRSA_ELITE_NAME";
         MaxHealth = 140.0f;
-        CurrentHealth = 140.0f;
         AtpValue = 40.0f;
         BaseScore = 35;
         FloatSpeed = 72.0f;
@@ -206,7 +204,6 @@ public partial class SyncytialMegaCapsid : TerminalBossEnemy
         EnemyId = "syncytial_mega_capsid";
         DisplayNameKey = "PATHOGEN_SYNCYTIAL_NAME";
         MaxHealth = 1400.0f;
-        CurrentHealth = 1400.0f;
         AtpValue = 380.0f;
         FloatSpeed = 18.0f;
         Armor = 6.0f;
@@ -323,7 +320,6 @@ public partial class PlasmodiumMacroSchizont : TerminalBossEnemy
         EnemyId = "plasmodium_macro_schizont";
         DisplayNameKey = "PATHOGEN_MACROSCHIZONT_NAME";
         MaxHealth = 1500.0f;
-        CurrentHealth = 1500.0f;
         AtpValue = 380.0f;
         FloatSpeed = 20.0f;
         Armor = 5.0f;
@@ -481,7 +477,6 @@ public partial class HpyloriBiofilmCore : TerminalBossEnemy
         EnemyId = "hpylori_biofilm_core";
         DisplayNameKey = "PATHOGEN_BIOFILM_CORE_NAME";
         MaxHealth = 1500.0f;
-        CurrentHealth = 1500.0f;
         AtpValue = 380.0f;
         FloatSpeed = 16.0f;
         Armor = 8.0f;
@@ -628,7 +623,6 @@ public partial class PrpscAmyloidAggregate : TerminalBossEnemy
         EnemyId = "prpsc_amyloid_aggregate";
         DisplayNameKey = "PATHOGEN_AMYLOID_NAME";
         MaxHealth = 1800.0f;
-        CurrentHealth = 1800.0f;
         AtpValue = 450.0f;
         FloatSpeed = 14.0f;
         Armor = 25.0f;

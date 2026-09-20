@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using Phagocyte.Player;
 
@@ -20,7 +20,6 @@ public partial class EbolaEnemy : BaseEnemy
         EnemyId = "ebola";
         DisplayNameKey = "PATHOGEN_EBOLA_NAME";
         MaxHealth = 42.0f;
-        CurrentHealth = 42.0f;
         AtpValue = 24.0f;
         BaseScore = 35;
         FloatSpeed = 38.0f;

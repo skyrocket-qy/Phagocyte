@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 
 namespace Phagocyte.Enemies;
 
@@ -29,7 +30,6 @@ public partial class MalignantCellEnemy : BaseEnemy
         EnemyId = "malignant_cell";
         DisplayNameKey = "PATHOGEN_MALIGNANT_NAME";
         MaxHealth = 120.0f;
-        CurrentHealth = 120.0f;
         AtpValue = 48.0f;
         BaseScore = 100;
         FloatSpeed = 26.0f;
@@ -74,7 +74,6 @@ public partial class MalignantCellEnemy : BaseEnemy
             GlobalPosition = GlobalPosition + offset
         };
         daughter.MaxHealth = MaxHealth * SplitHealthRatio;
-        daughter.CurrentHealth = daughter.MaxHealth;
         parent.AddChild(daughter);
 
         SplitCount++;
@@ -85,16 +84,11 @@ public partial class MalignantCellEnemy : BaseEnemy
 
     private int CountNearbySiblings()
     {
-        int count = 0;
-        foreach (var node in GetTree().GetNodesInGroup("pathogens"))
-        {
-            if (node is MalignantCellEnemy sibling && sibling != this && GodotObject.IsInstanceValid(sibling))
-            {
-                if (GlobalPosition.DistanceTo(sibling.GlobalPosition) <= SiblingCheckRadius)
-                    count++;
-            }
-        }
-        return count;
+        return TargetingService.CountInRadius(
+            GlobalPosition,
+            SiblingCheckRadius,
+            enemy => enemy is MalignantCellEnemy sibling && sibling != this,
+            skipEaten: false);
     }
 
     public override void _Draw()

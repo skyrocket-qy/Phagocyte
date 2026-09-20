@@ -17,7 +17,6 @@ public partial class PrionFragment : BaseEnemy
         EnemyId = "prion_fragment";
         DisplayNameKey = "PATHOGEN_PRION_NAME";
         MaxHealth = 25.0f;
-        CurrentHealth = 25.0f;
         AtpValue = 18.0f;
         BaseScore = 5;
         FloatSpeed = 50.0f;

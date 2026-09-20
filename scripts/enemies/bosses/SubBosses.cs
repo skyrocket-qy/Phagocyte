@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using System.Collections.Generic;
 using Phagocyte.Combat;
@@ -54,7 +54,6 @@ public partial class StreptococcusChainLord : SubBossEnemy
         EnemyId = "streptococcus_chain_lord";
         DisplayNameKey = "PATHOGEN_CHAINLORD_NAME";
         MaxHealth = 420.0f;
-        CurrentHealth = 420.0f;
         AtpValue = 120.0f;
         FloatSpeed = 54.0f;
         Armor = 3.0f;
@@ -198,7 +197,6 @@ public partial class FluDriftCyclone : SubBossEnemy
         EnemyId = "flu_drift_cyclone";
         DisplayNameKey = "PATHOGEN_FLUDUST_CYCLONE_NAME";
         MaxHealth = 380.0f;
-        CurrentHealth = 380.0f;
         AtpValue = 130.0f;
         FloatSpeed = 46.0f;
         Armor = 2.0f;
@@ -229,13 +227,10 @@ public partial class FluDriftCyclone : SubBossEnemy
     {
         _hue = new Color(GD.Randf(), GD.Randf(), GD.Randf(), 0.95f).Lerp(Colors.Cyan, 0.35f);
 
-        foreach (var node in GetTree().GetNodesInGroup("pathogens"))
+        foreach (var pathogen in BaseEnemy.ActiveEnemies)
         {
-            if (node is Node2D pathogen && GodotObject.IsInstanceValid(pathogen))
-            {
-                if (pathogen.HasMeta("mhc_marked"))
-                    pathogen.RemoveMeta("mhc_marked");
-            }
+            if (pathogen.HasMeta("mhc_marked"))
+                pathogen.RemoveMeta("mhc_marked");
         }
 
         var player = PlayerRef;
@@ -333,7 +328,6 @@ public partial class TbGranulomaBehemoth : SubBossEnemy
         EnemyId = "tb_granuloma_behemoth";
         DisplayNameKey = "PATHOGEN_TB_BEHEMOTH_NAME";
         MaxHealth = 650.0f;
-        CurrentHealth = 650.0f;
         AtpValue = 150.0f;
         FloatSpeed = 24.0f;
         Armor = 14.0f;
@@ -456,7 +450,6 @@ public partial class VacASecretor : SubBossEnemy
         EnemyId = "vaca_secretor";
         DisplayNameKey = "PATHOGEN_VACA_NAME";
         MaxHealth = 400.0f;
-        CurrentHealth = 400.0f;
         AtpValue = 120.0f;
         FloatSpeed = 34.0f;
         Armor = 4.0f;
@@ -564,7 +557,6 @@ public partial class ToxoplasmaMegaCyst : SubBossEnemy
         EnemyId = "toxoplasma_mega_cyst";
         DisplayNameKey = "PATHOGEN_MEGACYST_NAME";
         MaxHealth = 520.0f;
-        CurrentHealth = 520.0f;
         AtpValue = 140.0f;
         FloatSpeed = 20.0f;
         Armor = 5.0f;
@@ -655,7 +647,6 @@ public partial class Tachyzoite : BaseEnemy
         EnemyId = "tachyzoite";
         DisplayNameKey = "PATHOGEN_TACHYZOITE_NAME";
         MaxHealth = 8.0f;
-        CurrentHealth = 8.0f;
         AtpValue = 3.0f;
         BaseScore = 5;
         FloatSpeed = 320.0f;

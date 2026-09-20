@@ -18,7 +18,6 @@ public partial class PrionEnemy : BaseEnemy
         EnemyId = "prion";
         DisplayNameKey = "PATHOGEN_PRION_NAME";
         MaxHealth = 150.0f;
-        CurrentHealth = 150.0f;
         Armor = 4.0f;
         AtpValue = 60.0f;
         BaseScore = 100;

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
@@ -117,24 +118,13 @@ public partial class GranzymeDetonationSkill : BaseSkill
         float dmg = (float)dmgData["damage"];
         float splashRadius = GetCalculatedArea(110.0f);
 
-        var pathogens = Host.GetTree().GetNodesInGroup("pathogens");
-        foreach (var p in pathogens)
+        TargetingService.ForEachInRadius(center, splashRadius, n =>
         {
-            if (p is Node2D n && GodotObject.IsInstanceValid(n))
-            {
-                var eaten = n.Get("is_being_eaten");
-                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                    continue;
-
-                if (center.DistanceTo(n.GlobalPosition) <= splashRadius)
-                {
-                    if (n.HasMethod("take_damage"))
-                        n.Call("take_damage", dmg);
-                    else if (n.HasMethod("be_engulfed"))
-                        n.Call("be_engulfed", Host);
-                }
-            }
-        }
+            if (n.HasMethod("take_damage"))
+                CombatHelper.DealDamage(n, dmg);
+            else if (n.HasMethod("be_engulfed"))
+                n.Call("be_engulfed", Host);
+        });
     }
 
     public partial class ApoptosisMarker : Node2D

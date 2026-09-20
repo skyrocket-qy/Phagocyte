@@ -15,7 +15,6 @@ public partial class AnthraxBacillus : BaseEnemy
         EnemyId = "anthrax_bacillus";
         DisplayNameKey = "PATHOGEN_ANTHRAX_NAME";
         MaxHealth = 35.0f;
-        CurrentHealth = 35.0f;
         AtpValue = 22.0f;
         BaseScore = 100;
         FloatSpeed = 70.0f;
