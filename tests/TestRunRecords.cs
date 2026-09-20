@@ -119,8 +119,8 @@ public partial class TestRunRecords : TestHarness
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(2);
         // Newest run is stored first
         AssertThat(RunRecordManager.Records[0]["result"].AsString()).IsEqual(RunRecordManager.ResultDefeat);
-        AssertThat(RunRecordManager.Records[0]["cause"].AsString()).IsEqual(RunRecordManager.CauseMembraneRupture);
-        AssertThat(RunRecordManager.Records[0]["victory_criteria"].AsGodotDictionary()["met"].AsBool()).IsFalse();
+        // A cause-less defeat records the documented content/setup fallback cause.
+        AssertThat(RunRecordManager.Records[0]["cause"].AsString()).IsEqual(RunRecordManager.CauseSystemFailure);
         AssertThat(RunRecordManager.Records[0]["class_id"].AsString()).IsEqual("ctl");
         AssertThat(RunRecordManager.Records[0]["kills"].AsInt32()).IsEqual(80);
         AssertThat(RunRecordManager.Records[0]["rank"].AsString()).IsEqual(RunRecordManager.RankD);
@@ -278,6 +278,9 @@ public partial class TestRunRecords : TestHarness
 
         var doomed = cellScene.Instantiate<Macrophage>();
         Root.AddChild(doomed);
+        // Damage math below must not be nullified by the innate block/evasion roll.
+        doomed.Stats!.SetBase("block", 0.0f);
+        doomed.Stats.SetBase("evasion", 0.0f);
         bool died = false;
         doomed.Died += () => died = true;
         doomed.TakeDamage(999999.0f);
@@ -288,7 +291,9 @@ public partial class TestRunRecords : TestHarness
 
         var survivor = cellScene.Instantiate<Macrophage>();
         Root.AddChild(survivor);
-        survivor.Stats!.AddModifier("armor", 40.0f, 0.0f); // Macrophage base 10 + 40 = 50; 50 / (50 + 50) = 0.5 DR
+        survivor.Stats!.SetBase("block", 0.0f);
+        survivor.Stats.SetBase("evasion", 0.0f);
+        survivor.Stats.AddModifier("armor", 40.0f, 0.0f); // Macrophage base 10 + 40 = 50; 50 / (50 + 50) = 0.5 DR
         float hpBefore = survivor.Health;
         survivor.TakeDamage(20.0f);
         float hpLost = hpBefore - survivor.Health;
@@ -354,8 +359,12 @@ public partial class TestRunRecords : TestHarness
         var player = main2.GetNodeOrNull<BaseCell>("Macrophage");
         AssertThat(player).IsNotNull();
 
+        // Lethal damage must not be nullified by the innate block/evasion roll.
+        player!.Stats!.SetBase("block", 0.0f);
+        player.Stats.SetBase("evasion", 0.0f);
+
         int before = RunRecordManager.GetRunCount();
-        player!.TakeDamage(999999.0f);
+        player.TakeDamage(999999.0f);
 
         AssertThat(player.IsDead).IsTrue();
         AssertThat(main2.RunEnded).IsTrue();

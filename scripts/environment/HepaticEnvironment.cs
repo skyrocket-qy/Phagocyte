@@ -29,6 +29,8 @@ public sealed class HepaticEnvironment : MapEnvironment
     protected override void Process(Main main, float dt)
     {
         PlayerDrift = new Vector2(FlowDragX, Mathf.Sin(Time * 0.8f) * 6.0f) * 0.35f;
+        // Hepatic sinusoid slow-flow drag on the pathogen population.
+        FluidVector = new Vector2(FlowDragX, Mathf.Sin(main.EnvironmentTime * 0.8f) * 6.0f) * 0.35f;
 
         var player = Cell(main);
         if (player?.Stats == null)

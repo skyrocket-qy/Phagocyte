@@ -4,14 +4,8 @@ using Phagocyte.Core;
 
 namespace Phagocyte.UI;
 
-public partial class SettingsModal : PanelContainer
+public partial class SettingsModal : ModalBase
 {
-    [Signal]
-    public delegate void ClosedEventHandler();
-
-    public Label? TitleLabel { get; set; }
-    public Button? CloseBtn { get; set; }
-
     public Button? TabControlsBtn { get; set; }
     public Button? TabAudioBtn { get; set; }
     public Button? TabGraphicsBtn { get; set; }
@@ -44,16 +38,8 @@ public partial class SettingsModal : PanelContainer
 
     public int CurrentTab { get; set; } = 0;
 
-    private Callable _langCallback;
-
     public override void _Ready()
     {
-        ProcessMode = ProcessModeEnum.Always;
-        Visible = false;
-
-        TitleLabel = GetNodeOrNull<Label>("VBox/Header/Title");
-        CloseBtn = GetNodeOrNull<Button>("VBox/Header/CloseButton");
-
         TabControlsBtn = GetNodeOrNull<Button>("VBox/TabBar/ControlsTab");
         TabAudioBtn = GetNodeOrNull<Button>("VBox/TabBar/AudioTab");
         TabGraphicsBtn = GetNodeOrNull<Button>("VBox/TabBar/GraphicsTab");
@@ -83,9 +69,6 @@ public partial class SettingsModal : PanelContainer
         FullscreenCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/FullscreenCheck");
         VsyncCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/VSyncCheck");
 
-        if (CloseBtn != null)
-            CloseBtn.Pressed += CloseSettings;
-
         if (TabControlsBtn != null)
             TabControlsBtn.Pressed += () => SwitchTab(0);
         if (TabAudioBtn != null)
@@ -107,16 +90,8 @@ public partial class SettingsModal : PanelContainer
         if (VsyncCheck != null)
             VsyncCheck.Toggled += OnVsyncToggled;
 
-        _langCallback = Callable.From((string _) => UpdateLocalizedTexts());
-        GameManager.AddLanguageListener(_langCallback);
-
         SyncUiFromSettings();
-        UpdateLocalizedTexts();
-    }
-
-    public override void _ExitTree()
-    {
-        GameManager.RemoveLanguageListener(_langCallback);
+        InitModal();
     }
 
     public void OpenSettings(int targetTab = 0)
@@ -128,8 +103,7 @@ public partial class SettingsModal : PanelContainer
 
     public void CloseSettings()
     {
-        Visible = false;
-        EmitSignal(SignalName.Closed);
+        CloseModal();
     }
 
     public void SwitchTab(int tabIdx)
@@ -214,10 +188,10 @@ public partial class SettingsModal : PanelContainer
         SettingsManager.SetVsync(toggledOn);
     }
 
-    public void UpdateLocalizedTexts()
+    public override void UpdateLocalizedTexts()
     {
+        base.UpdateLocalizedTexts();
         if (TitleLabel != null) TitleLabel.Text = Tr("SETTINGS_TITLE");
-        if (CloseBtn != null) CloseBtn.Text = "✕";
 
         if (TabControlsBtn != null) TabControlsBtn.Text = Tr("SETTINGS_TAB_CONTROLS");
         if (TabAudioBtn != null) TabAudioBtn.Text = Tr("SETTINGS_TAB_AUDIO");

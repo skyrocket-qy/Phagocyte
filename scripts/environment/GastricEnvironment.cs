@@ -25,6 +25,10 @@ public sealed class GastricEnvironment : MapEnvironment
     {
         // Gastric churn: periodic lateral wave on the player's swim velocity.
         PlayerDrift = new Vector2(Mathf.Sin(Time * 0.9f) * 8.0f, Mathf.Cos(Time * 1.3f) * 6.0f);
+        // Gastric mucosa acid churn on the pathogen population.
+        FluidVector = new Vector2(
+            Mathf.Sin(main.EnvironmentTime * 2.0f) * 20.0f,
+            Mathf.Cos(main.EnvironmentTime * 1.5f) * 10.0f) * 0.4f;
 
         var container = Container(main);
         var player = Cell(main);

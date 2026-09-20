@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
@@ -66,8 +66,8 @@ public partial class TestSurvivorHudUx : TestHarness
         AssertThat(hud.TopCenterCapsule).IsNotNull();
         AssertThat(hud.TimerLabel).IsNotNull();
         AssertThat(hud.KillLabel).IsNotNull();
-        AssertThat(hud.TimerLabel!.Text.Contains("â±ï¸")).IsTrue();
-        AssertThat(hud.KillLabel!.Text.Contains("ðŸ’€")).IsTrue();
+        AssertThat(hud.TimerLabel!.Text.Contains("\u23F1\uFE0F")).IsTrue();
+        AssertThat(hud.KillLabel!.Text.Contains("\U0001F480")).IsTrue();
         AssertThat(hud.KillLabel.Text.Contains("0")).IsTrue();
 
         // Simulate digestion / kill increment
@@ -164,7 +164,7 @@ public partial class TestSurvivorHudUx : TestHarness
         player.ApplySlow(3.0f, 0.5f);
         hud._Process(0.016);
         AssertThat(hud.BuffTag.Visible).IsTrue();
-        AssertThat(hud.BuffTag.Text.Contains("ðŸŒ")).IsTrue();
+        AssertThat(hud.BuffTag.Text.Contains("\U0001F40C")).IsTrue();
         GD.Print("[PASS] 6. Frameless Buff-only monitor verified (Hidden when calm, pops up on active Buff/Debuff).");
 
         GD.Print("==================================================================");

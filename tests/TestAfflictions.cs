@@ -140,6 +140,9 @@ public partial class TestAfflictions : TestHarness
         var cell = cellScene.Instantiate<Macrophage>();
         Root.AddChild(cell);
         AssertThat(cell.Stats).IsNotNull();
+        // The damage comparison must not be nullified by the innate 8% block roll.
+        cell.Stats!.SetBase("block", 0.0f);
+        cell.Stats.SetBase("evasion", 0.0f);
 
         float hpBeforePathogen = cell.Health;
         cell.TakeDamage(10.0f);

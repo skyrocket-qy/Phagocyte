@@ -33,6 +33,10 @@ public sealed class AlveolarEnvironment : MapEnvironment
         else
             PlayerDrift = Vector2.Zero;
 
+        // Respiratory airflow on the pathogen population (was Main.ProcessMapMechanics).
+        float breathForce = Mathf.Sin(main.EnvironmentTime * 1.2f) * 28.0f;
+        FluidVector = new Vector2(breathForce, Mathf.Sin(main.EnvironmentTime * 0.6f) * 12.0f) * 0.6f;
+
         var container = Container(main);
         var player = Cell(main);
         if (container == null || player == null)

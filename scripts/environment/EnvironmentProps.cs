@@ -119,13 +119,15 @@ public partial class HyperoxicPocket : Node2D
     {
         if (_buffTarget == null || !GodotObject.IsInstanceValid(_buffTarget))
             return;
-        _buffTarget.Stats?.AddModifier("cooldown_reduction", 0.0f, BuffBonus);
+        // CDR is expressed in flat percentage points (docs/stat.md): a percent
+        // modifier would scale a base of 0 and do nothing.
+        _buffTarget.Stats?.AddModifier("cooldown_reduction", BuffBonus, 0.0f);
     }
 
     private void RemoveBuff()
     {
         if (_buffTarget != null && GodotObject.IsInstanceValid(_buffTarget))
-            _buffTarget.Stats?.RemoveModifier("cooldown_reduction", 0.0f, BuffBonus);
+            _buffTarget.Stats?.RemoveModifier("cooldown_reduction", BuffBonus, 0.0f);
         _buffTarget = null;
     }
 

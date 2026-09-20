@@ -157,8 +157,7 @@ public abstract partial class TestHarness : SceneTree
         GameManager.SelectedDifficulty = RunRecordManager.DifficultyNormal;
         GameManager.SelectedMap = "acute_wound";
         GameManager.EndlessMode = false;
-        PathogenSpawner.ConfigureHardMode(false);
-        PathogenSpawner.ConfigureOverdrive(false);
+        PathogenSpawner.Reset();
     }
 
     /// <summary>Prints the standard suite banner.</summary>

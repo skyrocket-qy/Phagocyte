@@ -18,6 +18,8 @@ public partial class TestMapEnvironments : TestHarness
 {
     private int _phase = 0;
     private Main? _main = null;
+    private FenestraWall? _fenestraWall = null;
+    private BaseCell? _hepaticPlayer = null;
 
     public override void _Initialize()
     {
@@ -49,18 +51,22 @@ public partial class TestMapEnvironments : TestHarness
                 _phase++;
                 return false;
             case 4:
-                RunHepaticTests();
+                RunHepaticTestsPart1();
                 _phase++;
                 return false;
             case 5:
-                RunGastricTests();
+                RunHepaticTestsPart2();
                 _phase++;
                 return false;
             case 6:
-                RunBloodBrainBarrierTests();
+                RunGastricTests();
                 _phase++;
                 return false;
             case 7:
+                RunBloodBrainBarrierTests();
+                _phase++;
+                return false;
+            case 8:
                 RunPlayerDriftIntegrationTests();
                 _phase++;
                 return false;
@@ -112,6 +118,9 @@ public partial class TestMapEnvironments : TestHarness
         main._PhysicsProcess(0.02);
         AssertThat(main.OrganEnvironment!.PlayerDrift.IsEqualApprox(new Vector2(16.0f, 10.0f))).IsTrue();
         AssertThat(((BaseCell)main.Player!).EnvironmentDrift.IsEqualApprox(new Vector2(16.0f, 10.0f))).IsTrue();
+        // Pathogen fluid current is the 40% suction drag owned by the environment.
+        AssertThat(main.OrganEnvironment.FluidVector.IsEqualApprox(new Vector2(6.4f, 4.0f))).IsTrue();
+        AssertThat(main.CurrentFluidVector.IsEqualApprox(new Vector2(6.4f, 4.0f))).IsTrue();
 
         // Fibrin clots congeal across the wound floor; the first appears after ~2.5s.
         main._PhysicsProcess(3.0f);
@@ -158,6 +167,12 @@ public partial class TestMapEnvironments : TestHarness
         environment.Tick(main, 3.5f); // t = 10.5 -> rest
         AssertThat(environment.PlayerDrift).IsEqual(Vector2.Zero);
 
+        // Respiratory airflow is the 60% sinusoidal current at the run clock (t = 10.5).
+        Vector2 expectedFlow = new Vector2(
+            Mathf.Sin(main.EnvironmentTime * 1.2f) * 28.0f,
+            Mathf.Sin(main.EnvironmentTime * 0.6f) * 12.0f) * 0.6f;
+        AssertThat(environment.FluidVector.IsEqualApprox(expectedFlow)).IsTrue();
+
         // Hyperoxic pocket grants temporal CDR when entered.
         environment.Tick(main, 7.0f); // push pocket spawn timer past its interval
         HyperoxicPocket? pocket = null;
@@ -180,12 +195,14 @@ public partial class TestMapEnvironments : TestHarness
         GD.Print("[PASS] Alveolar 12s breathing shear and hyperoxic CDR pockets verified.");
     }
 
-    private void RunHepaticTests()
+    private void RunHepaticTestsPart1()
     {
         var main = SpawnMain("hepatic_sinusoid");
+        _main = main;
         var environment = main.OrganEnvironment as HepaticEnvironment;
         AssertThat(environment).IsNotNull();
         var player = (BaseCell)main.Player!;
+        _hepaticPlayer = player;
 
         float baseArmor = player.Stats!.GetStat("armor");
         AssertThat(baseArmor).IsGreater(0.0f);
@@ -199,6 +216,9 @@ public partial class TestMapEnvironments : TestHarness
         AssertThat(environment.ArmorBroken).IsFalse();
         AssertThat(player.Stats.GetStat("armor")).IsEqualApprox(baseArmor, 0.001f);
 
+        // Sinusoid flow drag also drives the pathogen current.
+        AssertThat(environment.FluidVector.LengthSquared()).IsGreater(0.0f);
+
         // Endothelial fenestrae block enlarged cells; Squeeze Mode fits the pore.
         environment.Tick(main, HepaticEnvironment.FenestraInterval + 1.0f);
         FenestraWall? wall = null;
@@ -211,19 +231,28 @@ public partial class TestMapEnvironments : TestHarness
             }
         }
         AssertThat(wall).IsNotNull();
+        _fenestraWall = wall;
 
         Input.ActionRelease("squeeze_mode");
         player.EnvironmentDrift = Vector2.Zero;
         wall!._PhysicsProcess(0.02);
         AssertThat(((CollisionShape2D)wall.GetChild(0)).Disabled).IsFalse();
 
+        // Squeeze on: the wall disables its shapes via SetDeferred, so the
+        // assertion is deferred to the next frame in Part 2.
         Input.ActionPress("squeeze_mode");
         player._PhysicsProcess(0.02);
         AssertThat(player.IsSqueezing).IsTrue();
         wall._PhysicsProcess(0.02);
-        AssertThat(((CollisionShape2D)wall.GetChild(0)).Disabled).IsTrue();
-        Input.ActionRelease("squeeze_mode");
+    }
 
+    private void RunHepaticTestsPart2()
+    {
+        var wall = _fenestraWall;
+        AssertThat(wall).IsNotNull();
+        AssertThat(((CollisionShape2D)wall!.GetChild(0)).Disabled).IsTrue();
+
+        Input.ActionRelease("squeeze_mode");
         GD.Print("[PASS] Hepatic bile-acid armor strip and fenestra pore gating verified.");
     }
 
@@ -235,6 +264,8 @@ public partial class TestMapEnvironments : TestHarness
 
         // Force a surge and park the player on top of the acid pool.
         main.OrganEnvironment!.Tick(main, 7.0f);
+        // Churn current drives the pathogen population.
+        AssertThat(main.OrganEnvironment.FluidVector.LengthSquared()).IsGreater(0.0f);
         AcidSurge? surge = null;
         foreach (var child in main.EnemyContainer!.GetChildren())
         {
@@ -281,6 +312,8 @@ public partial class TestMapEnvironments : TestHarness
 
         main.OrganEnvironment!.Tick(main, 0.4f);
         AssertThat(main.OrganEnvironment.PlayerDrift.LengthSquared()).IsGreater(0.0f);
+        // Synaptic micro-vibration current is owned by the environment too.
+        AssertThat(main.OrganEnvironment.FluidVector.LengthSquared()).IsGreater(0.0f);
 
         // Neural electric pulses periodically scramble the movement direction.
         main.OrganEnvironment.Tick(main, BloodBrainBarrierEnvironment.PulseInterval + 0.5f);

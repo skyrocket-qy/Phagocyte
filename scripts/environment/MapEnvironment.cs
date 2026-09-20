@@ -16,6 +16,13 @@ public abstract class MapEnvironment
     /// <summary>World-space velocity offset applied to the player's swim velocity.</summary>
     public Vector2 PlayerDrift { get; protected set; } = Vector2.Zero;
 
+    /// <summary>
+    /// Fluid current applied to free pathogens (world-space px/s). Owned by the
+    /// organ environment so Main applies one generic drift instead of repeating
+    /// per-map formulas.
+    /// </summary>
+    public Vector2 FluidVector { get; protected set; } = Vector2.Zero;
+
     /// <summary>Hard (Acute Crisis) variant: exclusive organ hazards go permanent.</summary>
     public bool HardMode { get; set; }
 

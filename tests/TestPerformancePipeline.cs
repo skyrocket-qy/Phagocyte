@@ -146,7 +146,8 @@ public partial class TestPerformancePipeline : TestHarness
                 (float)(random.NextDouble() * 800.0 - 400.0),
                 (float)(random.NextDouble() * 800.0 - 400.0));
 
-            bool found = tree.TryFindNearest(center, 1200.0f, scratch, out Vector2 nearest);
+            // Radius covers the whole cloud from any query center (±450 + ±500 corner).
+            bool found = tree.TryFindNearest(center, 2500.0f, scratch, out Vector2 nearest, positionOf: p => p);
 
             float bestSq = float.MaxValue;
             foreach (var point in points)

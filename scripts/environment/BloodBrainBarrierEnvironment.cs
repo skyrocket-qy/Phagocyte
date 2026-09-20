@@ -51,6 +51,11 @@ public sealed class BloodBrainBarrierEnvironment : MapEnvironment
             Mathf.Sin(Time * 1.4f) * ShearAmplitudeX * shearScale,
             Mathf.Cos(Time * 0.9f) * ShearAmplitudeY * shearScale);
 
+        // High-frequency synaptic micro-vibrations on the pathogen population.
+        FluidVector = new Vector2(
+            Mathf.Sin(main.EnvironmentTime * 5.0f) * 8.0f,
+            Mathf.Cos(main.EnvironmentTime * 4.0f) * 8.0f) * 0.25f;
+
         var player = Cell(main);
         if (player == null)
             return;

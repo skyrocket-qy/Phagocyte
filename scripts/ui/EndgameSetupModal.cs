@@ -10,12 +10,8 @@ namespace Phagocyte.UI;
 /// combination of the six Pathological Overload Afflictions. Bonuses are
 /// additive and previewed as the live settlement score multiplier.
 /// </summary>
-public partial class EndgameSetupModal : PanelContainer
+public partial class EndgameSetupModal : ModalBase
 {
-    [Signal]
-    public delegate void ClosedEventHandler();
-
-    public Label? TitleLabel { get; set; }
     public Label? HintLabel { get; set; }
     public VBoxContainer? AfflictionList { get; set; }
     public Label? TotalLabel { get; set; }
@@ -24,12 +20,13 @@ public partial class EndgameSetupModal : PanelContainer
 
     private readonly Dictionary<string, CheckBox> _checks = new();
     private readonly Dictionary<string, Label> _descLabels = new();
-    private Callable _langCallback;
+
+    // Fully code-built modal: no header node paths to resolve.
+    protected override string? TitleLabelPath => null;
+    protected override string? CloseButtonPath => null;
 
     public override void _Ready()
     {
-        ProcessMode = ProcessModeEnum.Always;
-        Visible = false;
         ZIndex = 70;
         MouseFilter = MouseFilterEnum.Stop;
         SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
@@ -40,15 +37,7 @@ public partial class EndgameSetupModal : PanelContainer
         });
 
         BuildLayout();
-
-        _langCallback = Callable.From((string _) => UpdateLocalizedTexts());
-        GameManager.AddLanguageListener(_langCallback);
-        UpdateLocalizedTexts();
-    }
-
-    public override void _ExitTree()
-    {
-        GameManager.RemoveLanguageListener(_langCallback);
+        InitModal();
     }
 
     private void BuildLayout()
@@ -166,8 +155,9 @@ public partial class EndgameSetupModal : PanelContainer
         Visible = true;
     }
 
-    public void UpdateLocalizedTexts()
+    public override void UpdateLocalizedTexts()
     {
+        base.UpdateLocalizedTexts();
         if (TitleLabel != null) TitleLabel.Text = Tr("ENDLESS_SETUP_TITLE");
         if (HintLabel != null) HintLabel.Text = Tr("ENDLESS_SETUP_HINT");
         if (ConfirmBtn != null) ConfirmBtn.Text = Tr("BTN_ENDLESS_CONFIRM");
@@ -200,7 +190,6 @@ public partial class EndgameSetupModal : PanelContainer
 
     private void OnCancelPressed()
     {
-        Visible = false;
-        EmitSignal(SignalName.Closed);
+        CloseModal();
     }
 }

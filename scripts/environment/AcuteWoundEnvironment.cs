@@ -23,6 +23,8 @@ public sealed class AcuteWoundEnvironment : MapEnvironment
     {
         // Exudate suction is added straight onto the player's swim velocity.
         PlayerDrift = new Vector2(ExudateSuctionX, ExudateSuctionY);
+        // Directional tissue-fluid suction on the pathogen population.
+        FluidVector = new Vector2(ExudateSuctionX, ExudateSuctionY) * 0.4f;
 
         var container = Container(main);
         var player = Cell(main);

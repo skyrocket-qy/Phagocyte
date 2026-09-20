@@ -181,8 +181,12 @@ public partial class Main : Node2D
         StaphScene ??= DefaultStaphScene;
         EnemySteering.ConfigureArena(ArenaSize);
         HostUlceration.Reset();
-        PathogenSpawner.ConfigureOverdrive(IsEndlessRun);
-        PathogenSpawner.ConfigureHardMode(IsHardRun);
+        // Run-scoped spawn modifiers: set once per run, never leaks across scenes.
+        PathogenSpawner.ConfigureRun(new PathogenSpawner.RunConfig
+        {
+            HardMode = IsHardRun,
+            Overdrive = IsEndlessRun
+        });
 
         Player = GetNodeOrNull<CharacterBody2D>("Macrophage");
         HudNode = GetNodeOrNull<Hud>("HUD");
@@ -428,9 +432,9 @@ public partial class Main : Node2D
         if (SwarmWindowTimer > 0.0f)
             SwarmWindowTimer = Mathf.Max(0.0f, SwarmWindowTimer - dt);
 
-        // Map mechanics
-        ProcessMapMechanics(dt);
+        // Map mechanics (environment ticks first so its fluid current is same-frame)
         ProcessOrganEnvironment(dt);
+        ProcessMapMechanics(dt);
         ProcessOverdriveEnvironment(dt);
         ProcessAfflictions(dt);
         ProcessNeutralMatter(dt);
@@ -777,91 +781,17 @@ public partial class Main : Node2D
         if (EnemyContainer == null)
             return;
 
-        CurrentFluidVector = Vector2.Zero;
+        // The organ environment owns its fluid current (docs/map.md §3); Main only
+        // applies it to the free pathogen population.
+        CurrentFluidVector = OrganEnvironment?.FluidVector ?? Vector2.Zero;
 
-        if (MapId == "alveolar_space")
+        foreach (var child in EnemyContainer.GetChildren())
         {
-            // SPEC Section 5: Periodic respiratory breathing airflow thrust in lung alveoli
-            float breathForce = Mathf.Sin(EnvironmentTime * 1.2f) * 28.0f;
-            var breathVec = new Vector2(breathForce, Mathf.Sin(EnvironmentTime * 0.6f) * 12.0f);
-            CurrentFluidVector = breathVec * 0.6f;
-            // Gently pushes all free pathogens with fluid current
-            foreach (var child in EnemyContainer.GetChildren())
-            {
-                if (child is Node2D enemy)
-                {
-                    var eaten = enemy.Get("is_being_eaten");
-                    if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                        continue;
-                    enemy.Position += breathVec * delta * 0.6f;
-                }
-            }
-        }
-        else if (MapId == "acute_wound")
-        {
-            // SPEC Section 5: Directional tissue fluid suction towards wound tear
-            var suctionVec = new Vector2(16.0f, 10.0f);
-            CurrentFluidVector = suctionVec * 0.4f;
-            foreach (var child in EnemyContainer.GetChildren())
-            {
-                if (child is Node2D enemy)
-                {
-                    var eaten = enemy.Get("is_being_eaten");
-                    if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                        continue;
-                    enemy.Position += suctionVec * delta * 0.4f;
-                }
-            }
-        }
-        else if (MapId == "hepatic_sinusoid")
-        {
-            // Hepatic sinusoid slow flow drag: gentle steady drift
-            var flowVec = new Vector2(10.0f, Mathf.Sin(EnvironmentTime * 0.8f) * 6.0f);
-            CurrentFluidVector = flowVec * 0.35f;
-            foreach (var child in EnemyContainer.GetChildren())
-            {
-                if (child is Node2D enemy)
-                {
-                    var eaten = enemy.Get("is_being_eaten");
-                    if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                        continue;
-                    enemy.Position += flowVec * delta * 0.35f;
-                }
-            }
-        }
-        else if (MapId == "gastric_lumen")
-        {
-            // Gastric mucosa acid churn: periodic lateral wave
-            float churnForce = Mathf.Sin(EnvironmentTime * 2.0f) * 20.0f;
-            var churnVec = new Vector2(churnForce, Mathf.Cos(EnvironmentTime * 1.5f) * 10.0f);
-            CurrentFluidVector = churnVec * 0.4f;
-            foreach (var child in EnemyContainer.GetChildren())
-            {
-                if (child is Node2D enemy)
-                {
-                    var eaten = enemy.Get("is_being_eaten");
-                    if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                        continue;
-                    enemy.Position += churnVec * delta * 0.4f;
-                }
-            }
-        }
-        else if (MapId == "blood_brain_barrier")
-        {
-            // High-frequency synaptic micro-vibrations
-            float pulse = Mathf.Sin(EnvironmentTime * 5.0f) * 8.0f;
-            var microVec = new Vector2(pulse, Mathf.Cos(EnvironmentTime * 4.0f) * 8.0f);
-            CurrentFluidVector = microVec * 0.25f;
-            foreach (var child in EnemyContainer.GetChildren())
-            {
-                if (child is Node2D enemy)
-                {
-                    var eaten = enemy.Get("is_being_eaten");
-                    if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                        continue;
-                    enemy.Position += microVec * delta * 0.25f;
-                }
-            }
+            if (child is not Node2D enemy)
+                continue;
+            if (enemy.Get("is_being_eaten").AsBool())
+                continue;
+            enemy.Position += CurrentFluidVector * delta;
         }
     }
 
@@ -1235,16 +1165,17 @@ public partial class Main : Node2D
         if (RunEnded)
             return;
 
-        if (victory && IsEndlessRun)
+        if (victory && !RunRecordManager.CanSettleVictory(EnvironmentTime, TerminalBossNeutralized, IsEndlessRun))
         {
-            GD.PushWarning("[Main] Endless overdrive runs can only settle as defeat (membrane rupture).");
-            return;
-        }
-
-        if (victory && !RunRecordManager.IsVictoryCriteriaMet(EnvironmentTime, TerminalBossNeutralized))
-        {
-            GD.PushWarning($"[Main] Victory rejected: 15:00 survival + terminal boss neutralization required " +
-                           $"(survival={EnvironmentTime:F1}s, boss_neutralized={TerminalBossNeutralized}).");
+            if (IsEndlessRun)
+            {
+                GD.PushWarning("[Main] Endless overdrive runs can only settle as defeat (membrane rupture).");
+            }
+            else
+            {
+                GD.PushWarning($"[Main] Victory rejected: 15:00 survival + terminal boss neutralization required " +
+                               $"(survival={EnvironmentTime:F1}s, boss_neutralized={TerminalBossNeutralized}).");
+            }
             return;
         }
 

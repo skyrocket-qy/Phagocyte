@@ -89,7 +89,7 @@ public partial class TestSettingsAndSlots : TestHarness
         hud.OnSlotMouseEntered(5, card5);
         AssertThat(hud.SkillTooltip != null && hud.SkillTooltip.Visible).IsTrue();
         string badgeText = hud.TooltipBadge?.Text ?? "";
-        AssertThat(badgeText.Contains("被动") || badgeText.Contains("PASSIVE")).IsTrue();
+        AssertThat(badgeText.Contains("\u56FA\u6709") || badgeText.Contains("INNATE")).IsTrue();
 
         hud.OnSlotMouseExited(5);
         AssertThat(hud.SkillTooltip != null && hud.SkillTooltip.Visible).IsFalse();
@@ -107,23 +107,26 @@ public partial class TestSettingsAndSlots : TestHarness
         AssertThat(skillMgr).IsNotNull();
 
         var mito = new PassiveMitochondrialOverclock();
-        bool equipped = skillMgr!.EquipPassive(mito, 0); // Slot 0 in passives = Slot 5 in UI
+        // Passive slot 0 is the cell's innate trait; equip into the next free slot
+        // (slot 1 in passives = Slot 6 in the UI grid).
+        bool equipped = skillMgr!.EquipPassive(mito, 1);
         AssertThat(equipped).IsTrue();
 
         hud.UpdateSkillSlots();
-        var slot5Icon = card5.GetNodeOrNull<Label>("IconLabel");
-        var slot5Badge = card5.GetNodeOrNull<Label>("BadgeLabel");
-        var slot5Cd = card5.GetNodeOrNull<ProgressBar>("CooldownBar");
+        var card6 = slotsContainer.GetChild<Control>(6);
+        var slot6Icon = card6.GetNodeOrNull<Label>("IconLabel");
+        var slot6Badge = card6.GetNodeOrNull<Label>("BadgeLabel");
+        var slot6Cd = card6.GetNodeOrNull<ProgressBar>("CooldownBar");
 
-        AssertThat(slot5Icon).IsNotNull();
-        AssertThat(slot5Icon!.Text).IsEqual("⚡");
-        AssertThat(slot5Badge).IsNotNull();
-        AssertThat(slot5Badge!.Text.Contains("1")).IsTrue();
-        if (slot5Cd != null)
+        AssertThat(slot6Icon).IsNotNull();
+        AssertThat(slot6Icon!.Text).IsEqual("⚡");
+        AssertThat(slot6Badge).IsNotNull();
+        AssertThat(slot6Badge!.Text.Contains("1")).IsTrue();
+        if (slot6Cd != null)
         {
-            AssertThat(slot5Cd.Visible).IsFalse();
+            AssertThat(slot6Cd.Visible).IsFalse();
         }
-        GD.Print("[PASS] 5. Equipped passive skill correctly populates Slot 5 with icon, Lv.1, and no cooldown bar.");
+        GD.Print("[PASS] 5. Equipped passive skill correctly populates Slot 6 with icon, Lv.1, and no cooldown bar.");
 
         // =========================================================================
         // TEST 5: SettingsManager Persistence and Core API

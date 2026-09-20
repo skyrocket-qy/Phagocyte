@@ -48,15 +48,40 @@ public static class PathogenSpawner
     private static readonly float[] OverdriveHealthBonus = { 0.50f, 1.20f, 2.20f, 3.60f };
     private static readonly float[] OverdriveSpeedBonus = { 0.15f, 0.30f, 0.50f, 0.70f };
 
-    private static bool _overdriveEnabled = false;
+    /// <summary>
+    /// Run-scoped spawn modifiers. Set once per run by Main so scaling can never
+    /// leak across scenes or test suites.
+    /// </summary>
+    public sealed class RunConfig
+    {
+        public bool HardMode { get; set; }
+        public bool Overdrive { get; set; }
+    }
+
+    private static RunConfig _active = new();
+
+    /// <summary>The configuration of the currently running scene (never null).</summary>
+    public static RunConfig Active => _active;
+
+    /// <summary>Replaces the run configuration. Called by Main per scene.</summary>
+    public static void ConfigureRun(RunConfig config)
+    {
+        _active = config ?? new RunConfig();
+    }
+
+    /// <summary>Returns to the neutral (standard, non-overdrive) configuration.</summary>
+    public static void Reset()
+    {
+        _active = new RunConfig();
+    }
 
     /// <summary>True while the running scene is an endless overdrive run.</summary>
-    public static bool OverdriveEnabled => _overdriveEnabled;
+    public static bool OverdriveEnabled => _active.Overdrive;
 
     /// <summary>Called by Main per scene: endless runs enable ladder scaling on every spawn.</summary>
     public static void ConfigureOverdrive(bool enabled)
     {
-        _overdriveEnabled = enabled;
+        _active.Overdrive = enabled;
     }
 
     // --- Dual-track difficulty: Hard (Acute Crisis) spawn modifiers (docs/map.md §2) ---
@@ -66,15 +91,13 @@ public static class PathogenSpawner
     /// <summary>Hard difficulty pathogen movement-speed multiplier (+20%).</summary>
     public const float HardSpeedMultiplier = 1.20f;
 
-    private static bool _hardMode = false;
-
     /// <summary>True while the running scene is a Hard (Acute Crisis) run.</summary>
-    public static bool HardMode => _hardMode;
+    public static bool HardMode => _active.HardMode;
 
     /// <summary>Called by Main per scene: Hard runs scale every spawned pathogen.</summary>
     public static void ConfigureHardMode(bool hard)
     {
-        _hardMode = hard;
+        _active.HardMode = hard;
     }
 
     /// <summary>Ladder cycle: 0 = standard timeline, 1 = 15:00-18:00, 2 = 18:00-21:00, ...</summary>
@@ -113,7 +136,7 @@ public static class PathogenSpawner
     /// </summary>
     public static void ApplyOverdriveScaling(BaseEnemy enemy, float gameTime)
     {
-        if (!_overdriveEnabled || enemy == null)
+        if (!_active.Overdrive || enemy == null)
             return;
 
         enemy.MaxHealth *= GetOverdriveHealthMultiplier(gameTime);
@@ -129,7 +152,7 @@ public static class PathogenSpawner
         if (enemy == null)
             return;
 
-        if (_hardMode)
+        if (_active.HardMode)
         {
             enemy.MaxHealth *= HardHealthMultiplier;
             enemy.FloatSpeed *= HardSpeedMultiplier;

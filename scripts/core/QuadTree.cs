@@ -71,20 +71,28 @@ public sealed class QuadTree<T>
         var area = new Rect2(
             center - new Vector2(radius, radius),
             new Vector2(radius * 2.0f, radius * 2.0f));
-        QueryCircleRecursive(_root, center, radiusSq, area, results);
+        QueryCircleRecursive(_root, center, radiusSq, area, results, isRoot: true);
     }
 
     /// <summary>Appends every item whose position lies inside the rectangle.</summary>
     public void QueryRect(Rect2 area, List<T> results)
     {
-        QueryRectRecursive(_root, area, results);
+        QueryRectRecursive(_root, area, results, isRoot: true);
     }
 
     /// <summary>
     /// Nearest item within <paramref name="maxRadius"/>. <paramref name="scratch"/>
     /// is reused between calls to keep steady-state queries allocation-free.
+    /// Items are located via <paramref name="positionOf"/>; when omitted, Node2D
+    /// items use their global position.
     /// </summary>
-    public bool TryFindNearest(Vector2 center, float maxRadius, List<T> scratch, out T nearest, Func<T, bool>? predicate = null)
+    public bool TryFindNearest(
+        Vector2 center,
+        float maxRadius,
+        List<T> scratch,
+        out T nearest,
+        Func<T, bool>? predicate = null,
+        Func<T, Vector2>? positionOf = null)
     {
         scratch.Clear();
         QueryCircle(center, maxRadius, scratch);
@@ -98,20 +106,37 @@ public sealed class QuadTree<T>
         {
             if (predicate != null && !predicate(candidate))
                 continue;
+            if (!TryGetPosition(candidate, positionOf, out Vector2 candidatePos))
+                continue;
 
-            if (candidate is Node2D node)
+            float d = center.DistanceSquaredTo(candidatePos);
+            if (d <= maxSq && d < bestSq)
             {
-                float d = center.DistanceSquaredTo(node.GlobalPosition);
-                if (d <= maxSq && d < bestSq)
-                {
-                    bestSq = d;
-                    nearest = candidate;
-                    found = true;
-                }
+                bestSq = d;
+                nearest = candidate;
+                found = true;
             }
         }
 
         return found;
+    }
+
+    private static bool TryGetPosition(T candidate, Func<T, Vector2>? positionOf, out Vector2 position)
+    {
+        if (positionOf != null)
+        {
+            position = positionOf(candidate);
+            return true;
+        }
+
+        if (candidate is Node2D node)
+        {
+            position = node.GlobalPosition;
+            return true;
+        }
+
+        position = default;
+        return false;
     }
 
     private void InsertInto(Node node, Item item)
@@ -168,9 +193,11 @@ public sealed class QuadTree<T>
         return (bottom ? 2 : 0) + (right ? 1 : 0);
     }
 
-    private static void QueryCircleRecursive(Node node, Vector2 center, float radiusSq, Rect2 area, List<T> results)
+    private static void QueryCircleRecursive(Node node, Vector2 center, float radiusSq, Rect2 area, List<T> results, bool isRoot)
     {
-        if (!node.Bounds.Intersects(area, true))
+        // The root keeps items that lie outside the tree bounds; those must stay
+        // queryable, so the root's item list is always scanned.
+        if (!isRoot && !node.Bounds.Intersects(area, true))
             return;
 
         for (int i = 0; i < node.Items.Count; i++)
@@ -184,12 +211,12 @@ public sealed class QuadTree<T>
             return;
 
         for (int c = 0; c < 4; c++)
-            QueryCircleRecursive(node.Children[c]!, center, radiusSq, area, results);
+            QueryCircleRecursive(node.Children[c]!, center, radiusSq, area, results, isRoot: false);
     }
 
-    private static void QueryRectRecursive(Node node, Rect2 area, List<T> results)
+    private static void QueryRectRecursive(Node node, Rect2 area, List<T> results, bool isRoot)
     {
-        if (!node.Bounds.Intersects(area, true))
+        if (!isRoot && !node.Bounds.Intersects(area, true))
             return;
 
         for (int i = 0; i < node.Items.Count; i++)
@@ -202,7 +229,7 @@ public sealed class QuadTree<T>
             return;
 
         for (int c = 0; c < 4; c++)
-            QueryRectRecursive(node.Children[c]!, area, results);
+            QueryRectRecursive(node.Children[c]!, area, results, isRoot: false);
     }
 
     private Node Rent(Rect2 bounds, int depth)

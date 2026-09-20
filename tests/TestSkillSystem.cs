@@ -118,7 +118,7 @@ public partial class TestSkillSystem : TestHarness
             var card0 = slotsContainer.GetChild(0);
             var iconLbl = card0.GetNodeOrNull<Label>("IconLabel");
             AssertThat(iconLbl).IsNotNull();
-            AssertThat(iconLbl!.Text).IsEqual("ðŸ’¨");
+            AssertThat(iconLbl!.Text).IsEqual("\U0001F4A8");
             GD.Print("[PASS] HUD Slot 0 correctly displays active weapon icon: " + iconLbl.Text);
         }
 

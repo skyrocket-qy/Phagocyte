@@ -1,10 +1,11 @@
-﻿using Godot;
+using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Enemies;
+using Phagocyte.Environment;
 using Phagocyte.Player;
 
 namespace Phagocyte.Tests;
@@ -112,7 +113,10 @@ public partial class TestNeutralMatter : TestHarness
         AssertThat(pellet.IsQueuedForDeletion()).IsTrue();
         AssertThat(rbc.IsConsumed).IsFalse();
         GD.Print("[PASS] Enemy pellets are absorbed by neutral RBC cover.");
-        rbc.QueueFree();
+        // Free immediately: this synchronous suite runs every phase in one frame,
+        // so a queued free would leave a stale RBC at the origin for later phases.
+        _container.RemoveChild(rbc);
+        rbc.Free();
     }
 
     private void TestToxinVesicle()
@@ -211,7 +215,7 @@ public partial class TestNeutralMatter : TestHarness
         int hazardsBefore = 0;
         foreach (var child in main.EnemyContainer.GetChildren())
         {
-            if (child is BioHazardArea)
+            if (child is BioHazardArea && child is not FibrinClot)
                 hazardsBefore++;
         }
 
@@ -220,7 +224,7 @@ public partial class TestNeutralMatter : TestHarness
         int hazardsAfter = 0;
         foreach (var child in main.EnemyContainer.GetChildren())
         {
-            if (child is BioHazardArea)
+            if (child is BioHazardArea && child is not FibrinClot)
                 hazardsAfter++;
         }
         AssertThat(hazardsAfter).IsEqual(hazardsBefore + 1);

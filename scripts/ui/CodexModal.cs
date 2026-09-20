@@ -5,14 +5,8 @@ using Phagocyte.Core;
 
 namespace Phagocyte.UI;
 
-public partial class CodexModal : PanelContainer
+public partial class CodexModal : ModalBase
 {
-    [Signal]
-    public delegate void ClosedEventHandler();
-
-    public Label? TitleLabel { get; set; }
-    public Button? CloseBtn { get; set; }
-
     public Button? TabSkillsBtn { get; set; }
     public Button? TabCellsBtn { get; set; }
     public Button? TabPathogensBtn { get; set; }
@@ -29,16 +23,8 @@ public partial class CodexModal : PanelContainer
     public int CurrentTab { get; set; } = 0;
     public string ActiveItemKey { get; set; } = "";
 
-    private Callable _langCallback;
-
     public override void _Ready()
     {
-        ProcessMode = ProcessModeEnum.Always;
-        Visible = false;
-
-        TitleLabel = GetNodeOrNull<Label>("VBox/Header/Title");
-        CloseBtn = GetNodeOrNull<Button>("VBox/Header/CloseButton");
-
         TabSkillsBtn = GetNodeOrNull<Button>("VBox/TabBar/SkillsTab");
         TabCellsBtn = GetNodeOrNull<Button>("VBox/TabBar/CellsTab");
         TabPathogensBtn = GetNodeOrNull<Button>("VBox/TabBar/PathogensTab");
@@ -52,9 +38,6 @@ public partial class CodexModal : PanelContainer
         DetailDesc = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailDesc");
         DetailBio = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailBio");
 
-        if (CloseBtn != null)
-            CloseBtn.Pressed += CloseCodex;
-
         if (TabSkillsBtn != null)
             TabSkillsBtn.Pressed += () => SwitchTab(0);
         if (TabCellsBtn != null)
@@ -66,15 +49,7 @@ public partial class CodexModal : PanelContainer
         if (TabAchievementsBtn != null)
             TabAchievementsBtn.Pressed += () => SwitchTab(4);
 
-        _langCallback = Callable.From((string _) => UpdateLocalizedTexts());
-        GameManager.AddLanguageListener(_langCallback);
-
-        UpdateLocalizedTexts();
-    }
-
-    public override void _ExitTree()
-    {
-        GameManager.RemoveLanguageListener(_langCallback);
+        InitModal();
     }
 
     public void OpenCodex(int targetTab = 0)
@@ -85,14 +60,13 @@ public partial class CodexModal : PanelContainer
 
     public void CloseCodex()
     {
-        Visible = false;
-        EmitSignal(SignalName.Closed);
+        CloseModal();
     }
 
-    public void UpdateLocalizedTexts()
+    public override void UpdateLocalizedTexts()
     {
+        base.UpdateLocalizedTexts();
         if (TitleLabel != null) TitleLabel.Text = Tr("CODEX_TITLE");
-        if (CloseBtn != null) CloseBtn.Text = "✕";
         if (TabSkillsBtn != null) TabSkillsBtn.Text = Tr("CODEX_TAB_SKILLS");
         if (TabCellsBtn != null) TabCellsBtn.Text = Tr("CODEX_TAB_CELLS");
         if (TabPathogensBtn != null) TabPathogensBtn.Text = Tr("CODEX_TAB_PATHOGENS");

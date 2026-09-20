@@ -142,6 +142,16 @@ public partial class RunRecordManager : Node
         return bossNeutralized && survivalTime >= StandardClearSeconds - 0.01f;
     }
 
+    /// <summary>
+    /// Single settlement decision shared by the run lifecycle (Main.EndRun) and
+    /// the record store (RecordRun): endless overdrive runs can only settle as
+    /// defeat, and standard victories must meet the canonical criteria.
+    /// </summary>
+    public static bool CanSettleVictory(float survivalTime, bool bossNeutralized, bool endless)
+    {
+        return !endless && IsVictoryCriteriaMet(survivalTime, bossNeutralized);
+    }
+
     public RunRecordManager()
     {
         Instance = this;
@@ -205,7 +215,7 @@ public partial class RunRecordManager : Node
         bool survivedFullTime = survivalTime >= StandardClearSeconds - 0.01f;
         // Endless overdrive has no clear settlement: the standard criteria are
         // recorded as raw facts but can never be "met" into a victory.
-        bool criteriaMet = !endless && IsVictoryCriteriaMet(survivalTime, bossNeutralized);
+        bool criteriaMet = CanSettleVictory(survivalTime, bossNeutralized, endless);
 
         if (result == ResultVictory && !criteriaMet)
         {

@@ -11,13 +11,8 @@ namespace Phagocyte.UI;
 /// Medical record panel. Shows the settlement of the just-finished run
 /// (victory / defeat) and the persistent history of past runs.
 /// </summary>
-public partial class RunRecordsModal : PanelContainer
+public partial class RunRecordsModal : ModalBase
 {
-    [Signal]
-    public delegate void ClosedEventHandler();
-
-    public Label? TitleLabel { get; set; }
-    public Button? CloseBtn { get; set; }
     public Label? BannerLabel { get; set; }
     public VBoxContainer? SummaryBox { get; set; }
     public Label? HistoryHeader { get; set; }
@@ -39,15 +34,9 @@ public partial class RunRecordsModal : PanelContainer
     private VBoxContainer? _rootBox = null;
     private Dictionary? _record = null;
     private bool _clearArmed = false;
-    private Callable _langCallback;
 
     public override void _Ready()
     {
-        ProcessMode = ProcessModeEnum.Always;
-        Visible = false;
-
-        TitleLabel = GetNodeOrNull<Label>("VBox/Header/Title");
-        CloseBtn = GetNodeOrNull<Button>("VBox/Header/CloseButton");
         BannerLabel = GetNodeOrNull<Label>("VBox/Banner");
         SummaryBox = GetNodeOrNull<VBoxContainer>("VBox/SummaryBox");
         HistoryHeader = GetNodeOrNull<Label>("VBox/HistoryHeader");
@@ -60,8 +49,6 @@ public partial class RunRecordsModal : PanelContainer
 
         SetupHistoryTabs();
 
-        if (CloseBtn != null)
-            CloseBtn.Pressed += Close;
         if (ClearBtn != null)
             ClearBtn.Pressed += OnClearPressed;
         if (RetryBtn != null)
@@ -69,10 +56,7 @@ public partial class RunRecordsModal : PanelContainer
         if (MenuBtn != null)
             MenuBtn.Pressed += OnMenuPressed;
 
-        _langCallback = Callable.From((string _) => UpdateLocalizedTexts());
-        GameManager.AddLanguageListener(_langCallback);
-
-        UpdateLocalizedTexts();
+        InitModal();
     }
 
     private void SetupHistoryTabs()
@@ -88,11 +72,6 @@ public partial class RunRecordsModal : PanelContainer
         _rootBox.AddChild(HistoryTabs);
         if (HistoryHeader != null)
             _rootBox.MoveChild(HistoryTabs, HistoryHeader.GetIndex());
-    }
-
-    public override void _ExitTree()
-    {
-        GameManager.RemoveLanguageListener(_langCallback);
     }
 
     public void OpenSettlement(Dictionary record)
@@ -153,14 +132,13 @@ public partial class RunRecordsModal : PanelContainer
     {
         if (SettlementMode)
             return; // settlement must resolve through Retry / Menu
-        Visible = false;
-        EmitSignal(SignalName.Closed);
+        CloseModal();
     }
 
-    public void UpdateLocalizedTexts()
+    public override void UpdateLocalizedTexts()
     {
+        base.UpdateLocalizedTexts();
         if (TitleLabel != null) TitleLabel.Text = Tr("RECORDS_TITLE");
-        if (CloseBtn != null) CloseBtn.Text = "✕";
         if (RetryBtn != null) RetryBtn.Text = Tr("RECORDS_RETRY");
         if (MenuBtn != null) MenuBtn.Text = Tr("RECORDS_MENU");
 
