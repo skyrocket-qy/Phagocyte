@@ -83,6 +83,24 @@ public partial class MainMenu : Control
 
     private Callable _langCallback;
 
+    /// <summary>GFP watermark pulse state (alpha 0.2-0.3 breathing + slow drift).</summary>
+    public TextureRect? Watermark { get; set; }
+    private Vector2 _watermarkBasePos;
+    private double _watermarkTime;
+
+    public override void _Process(double delta)
+    {
+        if (Watermark == null)
+            return;
+        _watermarkTime += delta;
+        double phase = _watermarkTime * Math.Tau / 4.0;
+        var mod = Watermark.Modulate;
+        mod.A = 0.25f + 0.05f * (float)Math.Sin(phase);
+        Watermark.Modulate = mod;
+        Watermark.Position = _watermarkBasePos
+            + new Vector2(8.0f * (float)Math.Sin(phase * 0.5), 6.0f * (float)Math.Cos(phase * 0.37));
+    }
+
     public override void _Ready()
     {
         TitleView = GetNodeOrNull<Control>("TitleView");
@@ -92,6 +110,10 @@ public partial class MainMenu : Control
         CellCodexModal = GetNodeOrNull<CodexModal>("CodexModal");
         CellSettingsModal = GetNodeOrNull<SettingsModal>("SettingsModal");
         RecordsModal = GetNodeOrNull<RunRecordsModal>("RunRecordsModal");
+
+        Watermark = GetNodeOrNull<TextureRect>("Watermark");
+        if (Watermark != null)
+            _watermarkBasePos = Watermark.Position;
 
         TitleLbl = GetNodeOrNull<Label>("TitleView/TitleLabel");
         StartBtn = GetNodeOrNull<Button>("TitleView/VBox/StartButton");

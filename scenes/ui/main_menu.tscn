@@ -8,6 +8,9 @@
 [ext_resource type="Script" path="res://scripts/ui/PassiveTreeView.cs" id="5_tree"]
 [ext_resource type="LabelSettings" path="res://assets/fonts/TitleLabelSettings.tres" id="7_title_ls"]
 [ext_resource type="Font" path="res://assets/fonts/BodyMediumFont.tres" id="8_btn_font"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/menu/background.jpeg" id="9_menu_bg"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/menu/cell.jpeg" id="10_menu_cell"]
+[ext_resource type="Shader" path="res://shaders/menu_watermark_blend.gdshader" id="11_wm_shader"]
 
 [sub_resource type="Curve" id="Curve_menu_ambient"]
 _data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.5, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -15,6 +18,11 @@ point_count = 3
 
 [sub_resource type="Gradient" id="Gradient_menu_ambient"]
 colors = PackedColorArray(0.12, 0.45, 0.6, 0.35, 0.35, 0.15, 0.45, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_watermark"]
+shader = ExtResource("11_wm_shader")
+shader_parameter/tint = Color(0.39, 1, 0.85, 1)
+shader_parameter/strength = 1.25
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.07, 0.11, 0.16, 0.85)
@@ -49,7 +57,7 @@ content_margin_right = 30.0
 content_margin_bottom = 25.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
-bg_color = Color(0.08, 0.13, 0.18, 0.9)
+bg_color = Color(0.05, 0.09, 0.14, 0.92)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -61,12 +69,12 @@ corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-bg_color = Color(0.12, 0.22, 0.32, 0.95)
+bg_color = Color(0.07, 0.2, 0.16, 0.95)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0, 0.9, 1, 1)
+border_color = Color(0.39, 1, 0.85, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -101,7 +109,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.03, 0.06, 0.09, 1)
+color = Color(0.15, 0.2, 0.22, 1)
+
+[node name="BgImage" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("9_menu_bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="Particles" type="CPUParticles2D" parent="."]
 position = Vector2(640, 360)
@@ -119,6 +139,25 @@ scale_amount_min = 10.0
 scale_amount_max = 30.0
 scale_amount_curve = SubResource("Curve_menu_ambient")
 color_ramp = SubResource("Gradient_menu_ambient")
+
+[node name="Watermark" type="TextureRect" parent="."]
+modulate = Color(1, 1, 1, 0.25)
+layout_mode = 1
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -580.0
+offset_top = -260.0
+offset_right = -20.0
+offset_bottom = 260.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+material = SubResource("ShaderMaterial_watermark")
+texture = ExtResource("10_menu_cell")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TitleView" type="Control" parent="."]
 layout_mode = 1
@@ -162,9 +201,9 @@ theme_override_constants/separation = 16
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.88, 0.97, 0.98, 1)
-theme_override_colors/font_hover_color = Color(0, 0.9, 1, 1)
-theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
 theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
 theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 18
@@ -177,9 +216,9 @@ text = "开始免疫行动"
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.88, 0.97, 0.98, 1)
-theme_override_colors/font_hover_color = Color(0, 0.9, 1, 1)
-theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
 theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
 theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 16
@@ -192,9 +231,9 @@ text = "微观档案馆 (Codex)"
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.88, 0.97, 0.98, 1)
-theme_override_colors/font_hover_color = Color(0, 0.9, 1, 1)
-theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
 theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
 theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 16
@@ -207,9 +246,9 @@ text = "病历记录"
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.88, 0.97, 0.98, 1)
-theme_override_colors/font_hover_color = Color(0, 0.9, 1, 1)
-theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
 theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
 theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 16
@@ -222,9 +261,9 @@ text = "系统设置"
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.88, 0.97, 0.98, 1)
-theme_override_colors/font_hover_color = Color(0, 0.9, 1, 1)
-theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
 theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
 theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 15
@@ -328,14 +367,30 @@ theme_override_constants/separation = 40
 custom_minimum_size = Vector2(180, 46)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "返回主标题"
 
 [node name="ConfirmButton" type="Button" parent="ClassView/Buttons"]
 custom_minimum_size = Vector2(240, 46)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "下一步：被动树"
 
 [node name="PassiveView" type="Control" parent="."]
@@ -455,42 +510,90 @@ theme_override_constants/separation = 12
 custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "返回选择细胞"
 
 [node name="ResetButton" type="Button" parent="PassiveView/Buttons"]
 custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "重置天赋树"
 
 [node name="ConfirmButton" type="Button" parent="PassiveView/Buttons"]
 custom_minimum_size = Vector2(190, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "下一步：选择病理战场"
 
 [node name="ZoomOutButton" type="Button" parent="PassiveView/Buttons"]
 custom_minimum_size = Vector2(80, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "缩小"
 
 [node name="ZoomInButton" type="Button" parent="PassiveView/Buttons"]
 custom_minimum_size = Vector2(80, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "放大"
 
 [node name="FitButton" type="Button" parent="PassiveView/Buttons"]
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "显示全树"
 
 [node name="MapView" type="Control" parent="."]
@@ -625,14 +728,30 @@ theme_override_constants/separation = 40
 custom_minimum_size = Vector2(180, 46)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "返回选择细胞"
 
 [node name="DeployButton" type="Button" parent="MapView/Buttons"]
 custom_minimum_size = Vector2(220, 46)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.91, 0.97, 0.96, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "🚀 开始出击"
 
 [node name="CodexModal" parent="." instance=ExtResource("2_codex")]

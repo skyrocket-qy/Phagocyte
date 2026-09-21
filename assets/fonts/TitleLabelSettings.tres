@@ -5,7 +5,7 @@
 [resource]
 font = ExtResource("1_titlefont")
 font_size = 56
-font_color = Color(0.62, 0.92, 1, 1)
+font_color = Color(0.88, 0.95, 0.95, 1)
 line_spacing = 0.0
 outline_size = 5
 outline_color = Color(0.02, 0.06, 0.09, 0.9)
