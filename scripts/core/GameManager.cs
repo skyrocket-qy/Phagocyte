@@ -141,13 +141,18 @@ public partial class GameManager : Node
         }
     }
 
-    /// <summary>Language cycle: zh_CN -> zh_TW -> en -> zh_CN.</summary>
+    /// <summary>Language cycle: zh_CN -> zh_TW -> ja -> de -> fr -> ru -> es -> en.</summary>
     public static string ToggleLanguage()
     {
         string nextLang = CurrentLanguage switch
         {
             "zh_CN" => "zh_TW",
-            "zh_TW" => "en",
+            "zh_TW" => "ja",
+            "ja" => "de",
+            "de" => "fr",
+            "fr" => "ru",
+            "ru" => "es",
+            "es" => "en",
             _ => "zh_CN",
         };
         SetLanguage(nextLang);

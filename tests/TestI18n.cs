@@ -70,7 +70,7 @@ public partial class TestI18n : TestHarness
         AssertThat(mapEn["name"].AsString().Contains("Acute Wound")).IsTrue();
         GD.Print("[PASS] Class and Map metadata translations verified.");
 
-        // 4. Test Toggle Functionality (zh_CN -> zh_TW -> en -> zh_CN)
+        // 4. Test Toggle Functionality (en -> zh_CN -> zh_TW -> ja -> de -> fr -> ru -> es -> en)
         string newLang = GameManager.ToggleLanguage();
         AssertThat(newLang).IsEqual("zh_CN");
         AssertThat(GameManager.CurrentLanguage).IsEqual("zh_CN");
@@ -82,10 +82,16 @@ public partial class TestI18n : TestHarness
         AssertThat(menu.StartBtn?.Text.Contains("開始免疫行動") ?? false).IsTrue();
         GD.Print("[PASS] Traditional Chinese (zh_TW) text rendering verified.");
 
-        newLang = GameManager.ToggleLanguage();
-        AssertThat(newLang).IsEqual("en");
-        AssertThat(GameManager.CurrentLanguage).IsEqual("en");
-        GD.Print("[PASS] GameManager.toggle_language() cycle verified.");
+        string[] restCycle = { "ja", "de", "fr", "ru", "es", "en" };
+        foreach (string expected in restCycle)
+        {
+            newLang = GameManager.ToggleLanguage();
+            AssertThat(newLang).IsEqual(expected);
+            AssertThat(GameManager.CurrentLanguage).IsEqual(expected);
+        }
+        menu.UpdateAllTexts();
+        AssertThat(menu.StartBtn?.Text.Contains("Begin Immune Action") ?? false).IsTrue();
+        GD.Print("[PASS] GameManager.toggle_language() 8-locale cycle verified.");
 
         // 5. Test In-Game HUD Localization
         menu.QueueFree();
