@@ -164,8 +164,11 @@ public static class CatalogBuilders
 
     public static void BuildTree(out TreeNode[] nodes, out (string From, string To)[] edges,
         out System.Collections.Generic.Dictionary<string, string> starts,
-        out System.Collections.Generic.Dictionary<string, Vector2> regions)
+        out System.Collections.Generic.Dictionary<string, Vector2> regions,
+        out System.Collections.Generic.Dictionary<string, TreeTrait> traits)
     {
+        traits = BuildTreeTraits();
+
         var root = CatalogLoader.LoadObject(DataPaths.PassiveTree);
         if (!root.TryGetValue("nodes", out var nodesVar) || nodesVar.VariantType != Variant.Type.Array)
             throw new DataLoadException(DataPaths.PassiveTree, "Missing 'nodes' array.");
@@ -183,10 +186,11 @@ public static class CatalogBuilders
             }
         }
         if (regions.Count == 0)
-            throw new DataLoadException(DataPaths.PassiveTree, "Missing 'regions' array (5x5 region squares are data-owned).");
+            throw new DataLoadException(DataPaths.PassiveTree, "Missing 'regions' array (region squares are data-owned).");
 
         var nodeList = new System.Collections.Generic.List<TreeNode>();
         var branchCounts = new System.Collections.Generic.Dictionary<string, int>();
+        var traitUseCounts = new System.Collections.Generic.Dictionary<string, int>();
         var seen = new HashSet<string>();
         foreach (var item in nodesVar.AsGodotArray())
         {
@@ -202,37 +206,26 @@ public static class CatalogBuilders
             Vector2 nodePosition = GridPosition(col, rowIdx);
             float regionExtent = RegionRadius * GridStep + 0.5f;
             if (Mathf.Abs(nodePosition.X - regionCenter.X) > regionExtent || Mathf.Abs(nodePosition.Y - regionCenter.Y) > regionExtent)
-                throw new DataLoadException(DataPaths.PassiveTree, $"Node '{id}' lies outside its '{branch}' 5x5 region square.");
+                throw new DataLoadException(DataPaths.PassiveTree, $"Node '{id}' lies outside its '{branch}' region square.");
             branchCounts[branch] = branchCounts.TryGetValue(branch, out int branchCount) ? branchCount + 1 : 1;
-            if (!System.Enum.TryParse<TreeRarity>(CatalogLoader.GetString(row, "rarity", "normal"), true, out var rarity))
-                throw new DataLoadException(DataPaths.PassiveTree, $"Node '{id}' has unknown rarity.");
-            var mods = new System.Collections.Generic.List<TreeStatModifier>();
-            if (row.TryGetValue("modifiers", out var modsVar) && modsVar.VariantType == Variant.Type.Array)
-            {
-                foreach (var m in modsVar.AsGodotArray())
-                {
-                    var md = m.AsGodotDictionary();
-                    if (!System.Enum.TryParse<TreeModifierUnit>(CatalogLoader.GetString(md, "unit", "flat"), true, out var unit))
-                        throw new DataLoadException(DataPaths.PassiveTree, $"Node '{id}' has unknown modifier unit.");
-                    mods.Add(new TreeStatModifier(
-                        CatalogLoader.GetString(md, "stat"),
-                        CatalogLoader.GetFloat(md, "value"),
-                        unit));
-                }
-            }
-            string skillId = CatalogLoader.GetString(row, "skill");
+
+            string traitId = CatalogLoader.GetString(row, "trait");
+            if (string.IsNullOrEmpty(traitId) || !traits.TryGetValue(traitId, out var trait))
+                throw new DataLoadException(DataPaths.PassiveTree, $"Node '{id}' references unknown trait '{traitId}'.");
+            traitUseCounts[traitId] = traitUseCounts.TryGetValue(traitId, out int traitUses) ? traitUses + 1 : 1;
+
             nodeList.Add(new TreeNode(
                 id,
                 nodePosition,
-                rarity,
+                trait.Rarity,
                 branch,
-                CatalogLoader.GetString(row, "icon"),
-                CatalogLoader.GetString(row, "name_key"),
-                CatalogLoader.GetString(row, "desc_key"),
+                trait.Icon,
+                trait.NameKey,
+                trait.DescKey,
                 CatalogLoader.GetInt(row, "max_stacks", 1),
                 CatalogLoader.GetInt(row, "point_cost", 1),
-                PassiveTreeManager.ResolveSkillType(skillId),
-                mods.ToArray(),
+                traitId,
+                trait.Modifiers,
                 LayerOf(col, rowIdx)));
         }
         nodes = nodeList.ToArray();
@@ -259,6 +252,11 @@ public static class CatalogBuilders
             if (!branchCounts.ContainsKey(regionPair.Key))
                 throw new DataLoadException(DataPaths.PassiveTree, $"Region '{regionPair.Key}' has no nodes.");
         }
+        foreach (var traitPair in traits)
+        {
+            if (!traitUseCounts.ContainsKey(traitPair.Key))
+                throw new DataLoadException(DataPaths.PassiveTraits, $"Trait '{traitPair.Key}' is never referenced by a node.");
+        }
         foreach (var kv in starts)
         {
             if (!TryFindNode(nodes, kv.Value, out var startNode))
@@ -266,7 +264,51 @@ public static class CatalogBuilders
             if (!regions.TryGetValue(startNode.Branch, out var regionCenter) || startNode.Position.DistanceTo(regionCenter) > 0.5f)
                 throw new DataLoadException(DataPaths.PassiveTree, $"Start node '{kv.Value}' must sit at the centre of its '{startNode.Branch}' region.");
         }
-        GD.Print($"[Catalog] Loaded {nodes.Length} tree nodes, {edges.Length} edges, {regions.Count} regions.");
+        GD.Print($"[Catalog] Loaded {nodes.Length} tree nodes, {edges.Length} edges, {regions.Count} regions, {traits.Count} traits.");
+    }
+
+    private static System.Collections.Generic.Dictionary<string, TreeTrait> BuildTreeTraits()
+    {
+        var table = new System.Collections.Generic.Dictionary<string, TreeTrait>();
+        var root = CatalogLoader.LoadObject(DataPaths.PassiveTraits);
+        if (!root.TryGetValue("traits", out var traitsVar) || traitsVar.VariantType != Variant.Type.Array)
+            throw new DataLoadException(DataPaths.PassiveTraits, "Missing 'traits' array.");
+
+        foreach (var item in traitsVar.AsGodotArray())
+        {
+            var row = item.AsGodotDictionary();
+            string id = CatalogLoader.GetString(row, "id");
+            if (string.IsNullOrEmpty(id) || table.ContainsKey(id))
+                throw new DataLoadException(DataPaths.PassiveTraits, $"Duplicate or missing trait id '{id}'.");
+            if (!System.Enum.TryParse<TreeRarity>(CatalogLoader.GetString(row, "rarity", "normal"), true, out var rarity))
+                throw new DataLoadException(DataPaths.PassiveTraits, $"Trait '{id}' has unknown rarity.");
+
+            var mods = new System.Collections.Generic.List<TreeStatModifier>();
+            if (row.TryGetValue("modifiers", out var modsVar) && modsVar.VariantType == Variant.Type.Array)
+            {
+                foreach (var m in modsVar.AsGodotArray())
+                {
+                    var md = m.AsGodotDictionary();
+                    if (!System.Enum.TryParse<TreeModifierUnit>(CatalogLoader.GetString(md, "unit", "flat"), true, out var unit))
+                        throw new DataLoadException(DataPaths.PassiveTraits, $"Trait '{id}' has unknown modifier unit.");
+                    mods.Add(new TreeStatModifier(
+                        CatalogLoader.GetString(md, "stat"),
+                        CatalogLoader.GetFloat(md, "value"),
+                        unit));
+                }
+            }
+            if (mods.Count == 0 && rarity != TreeRarity.Start)
+                throw new DataLoadException(DataPaths.PassiveTraits, $"Trait '{id}' has no modifiers.");
+
+            table[id] = new TreeTrait(
+                id,
+                rarity,
+                CatalogLoader.GetString(row, "icon", "🧬"),
+                CatalogLoader.GetString(row, "name_key"),
+                CatalogLoader.GetString(row, "desc_key"),
+                mods.ToArray());
+        }
+        return table;
     }
 
     private static bool TryFindNode(TreeNode[] nodes, string id, out TreeNode node)

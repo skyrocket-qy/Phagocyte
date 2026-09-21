@@ -62,10 +62,14 @@ public static class DataValidator
             }
         }
 
-        // Tree → nodes, skills, stats.
+        // Tree → nodes, traits, skills, stats.
         var nodeIds = new HashSet<string>();
         foreach (var node in PassiveTreeManager.Nodes)
+        {
             nodeIds.Add(node.Id);
+            if (!PassiveTreeManager.TryGetTrait(node.TraitId, out _))
+                errors.Add($"Tree node '{node.Id}' references unknown trait '{node.TraitId}'.");
+        }
         foreach (var edge in PassiveTreeManager.Edges)
         {
             if (!nodeIds.Contains(edge.From))
@@ -78,12 +82,12 @@ public static class DataValidator
             if (!nodeIds.Contains(kv.Value))
                 errors.Add($"Start node for '{kv.Key}' references unknown node '{kv.Value}'.");
         }
-        foreach (var node in PassiveTreeManager.Nodes)
+        foreach (var trait in PassiveTreeManager.Traits.Values)
         {
-            foreach (var mod in node.Modifiers)
+            foreach (var mod in trait.Modifiers)
             {
                 if (!PassiveTreeManager.HasStatLabel(mod.Stat))
-                    errors.Add($"Tree node '{node.Id}' modifies unknown stat '{mod.Stat}'.");
+                    errors.Add($"Tree trait '{trait.Id}' modifies unknown stat '{mod.Stat}'.");
             }
         }
 
@@ -107,10 +111,10 @@ public static class DataValidator
         CheckKeys(GameManager.MapData, missing, known, "map");
         CheckKeys(GameManager.ClassData, missing, known, "class");
         CheckKeys(AchievementManager.Achievements, missing, known, "achievement");
-        foreach (var node in PassiveTreeManager.Nodes)
+        foreach (var trait in PassiveTreeManager.Traits.Values)
         {
-            CheckKey(node.NameKey, missing, known);
-            CheckKey(node.DescKey, missing, known);
+            CheckKey(trait.NameKey, missing, known);
+            CheckKey(trait.DescKey, missing, known);
         }
         foreach (var kv in PassiveTreeManager.StatLabelValues)
             CheckKey(kv.Value, missing, known);

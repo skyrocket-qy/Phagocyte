@@ -17,7 +17,8 @@ public static class PassiveTreeManager
         Normal,
         Magic,
         Rare,
-        Unique
+        Unique,
+        Start
     }
 
     public enum TreeModifierUnit
@@ -29,6 +30,19 @@ public static class PassiveTreeManager
 
     public readonly record struct TreeStatModifier(string Stat, float Value, TreeModifierUnit Unit);
 
+    /// <summary>
+    /// Reusable talent trait (docs/passivetree.md §1.2): nodes reference a trait
+    /// by id, so identical traits always share one name, icon, rarity and
+    /// modifier bundle.
+    /// </summary>
+    public readonly record struct TreeTrait(
+        string Id,
+        TreeRarity Rarity,
+        string Icon,
+        string NameKey,
+        string DescKey,
+        TreeStatModifier[] Modifiers);
+
     public readonly record struct TreeNode(
         string Id,
         Vector2 Position,
@@ -39,7 +53,7 @@ public static class PassiveTreeManager
         string DescKey,
         int MaxStacks,
         int PointCost,
-        Type? SkillType,
+        string TraitId,
         TreeStatModifier[] Modifiers,
         int Ring);
 
@@ -56,18 +70,18 @@ public static class PassiveTreeManager
     public const float GridStep = 150.0f;
 
     /// <summary>
-    /// Every branch owns a 5x5 square of grid slots centred on one hub
-    /// (docs/passivetree.md §2). The cell start hubs sit at the square centre;
+    /// Every branch owns a 3x3 square of grid slots centred on one hub
+    /// (docs/passivetree.md §1.1). The cell start hubs sit at the square centre;
     /// the core square is centred on the world origin.
     /// </summary>
-    public const int RegionRadius = 2;
+    public const int RegionRadius = 1;
 
     /// <summary>
-    /// Region squares tile edge-to-edge: each is 5x5 grid cells wide
-    /// (half extent 2.5 steps, side 750px), so neighbouring centres 5 steps
-    /// apart share a border and the six squares form one 15x10 board.
+    /// Region squares tile edge-to-edge: each is 3x3 grid cells wide
+    /// (half extent 1.5 steps, side 450px), so neighbouring centres 3 steps
+    /// apart share a border and the six squares form one 6x9 board.
     /// </summary>
-    public const float RegionHalfExtent = 2.5f;
+    public const float RegionHalfExtent = 1.5f;
 
     public static Vector2 GridPosition(int column, int row)
     {
@@ -120,6 +134,23 @@ public static class PassiveTreeManager
         }
     }
 
+    /// <summary>trait id → reusable trait definition (name/icon/rarity/modifiers).</summary>
+    public static System.Collections.Generic.IReadOnlyDictionary<string, TreeTrait> Traits
+    {
+        get
+        {
+            EnsureTreeLoaded();
+            DataValidator.EnsureValidated();
+            return _loadedTraits;
+        }
+    }
+
+    public static bool TryGetTrait(string traitId, out TreeTrait trait)
+    {
+        EnsureTreeLoaded();
+        return _loadedTraits.TryGetValue(traitId, out trait);
+    }
+
     /// <summary>branch id → region square centre in world coordinates.</summary>
     public static System.Collections.Generic.IReadOnlyDictionary<string, Vector2> RegionCenters
     {
@@ -137,7 +168,7 @@ public static class PassiveTreeManager
         return _loadedRegions.TryGetValue(branch, out center);
     }
 
-    /// <summary>Region square in world coordinates (5x5 cells, side 5 grid steps).</summary>
+    /// <summary>Region square in world coordinates (3x3 cells, side 3 grid steps).</summary>
     public static Rect2 GetRegionBounds(string branch)
     {
         if (!TryGetRegionCenter(branch, out var center))
@@ -149,53 +180,30 @@ public static class PassiveTreeManager
     private static System.Collections.Generic.Dictionary<string, string>? _statLabels;
     private static System.Collections.Generic.Dictionary<string, string> StatLabels => _statLabels ??= CatalogBuilders.BuildStatLabels();
 
-    /// <summary>All tree data loads in one pass so Nodes/Edges/Starts stay consistent.</summary>
+    /// <summary>All tree data loads in one pass so Nodes/Edges/Starts/Traits stay consistent.</summary>
     private static bool _treeLoaded = false;
     private static (string From, string To)[] _loadedEdges = System.Array.Empty<(string, string)>();
     private static System.Collections.Generic.Dictionary<string, string> _loadedStarts = new();
     private static System.Collections.Generic.Dictionary<string, Vector2> _loadedRegions = new();
+    private static System.Collections.Generic.Dictionary<string, TreeTrait> _loadedTraits = new();
 
     private static void EnsureTreeLoaded()
     {
         if (_treeLoaded)
             return;
         _treeLoaded = true;
-        CatalogBuilders.BuildTree(out var nodes, out var edges, out var starts, out var regions);
+        CatalogBuilders.BuildTree(out var nodes, out var edges, out var starts, out var regions, out var traits);
         _nodes = nodes;
         _loadedEdges = edges;
         _loadedStarts = starts;
         _loadedRegions = regions;
+        _loadedTraits = traits;
     }
 
     private static TreeNode[] LoadTreeNodes()
     {
         EnsureTreeLoaded();
         return _nodes!;
-    }
-
-    /// <summary>skill id (passive_tree.json) → skill Type for legacy loadout nodes.</summary>
-    private static readonly System.Collections.Generic.Dictionary<string, System.Type> SkillTypes = new()
-    {
-        { "passive_opsonin", typeof(PassiveOpsoninAffinity) },
-        { "passive_vdj", typeof(PassiveVdjDiversity) },
-        { "passive_chemokine", typeof(PassiveChemokineReceptors) },
-        { "passive_actin", typeof(PassiveActinPolymerization) },
-        { "passive_kinesin", typeof(PassiveKinesinTransit) },
-        { "passive_lysosome", typeof(PassiveLysosomePriming) },
-        { "passive_bilayer", typeof(PassiveBilayerHardening) },
-        { "passive_endotoxin", typeof(PassiveEndotoxinBarrier) },
-        { "passive_autophagy", typeof(PassiveAutophagicRecycle) },
-        { "passive_mitochondria", typeof(PassiveMitochondrialOverclock) },
-        { "passive_glycolysis", typeof(PassiveAerobicGlycolysis) },
-        { "passive_hematopoietic", typeof(PassiveHematopoieticReserve) },
-        { "passive_longevity", typeof(PassiveCytokineLongevity) }
-    };
-
-    public static System.Type? ResolveSkillType(string skillId)
-    {
-        if (string.IsNullOrEmpty(skillId))
-            return null;
-        return SkillTypes.TryGetValue(skillId, out var t) ? t : null;
     }
 
     public static bool HasStatLabel(string stat)
@@ -215,6 +223,7 @@ public static class PassiveTreeManager
             TreeRarity.Magic => TranslationServer.Translate("TREE_RARITY_MAGIC"),
             TreeRarity.Rare => TranslationServer.Translate("TREE_RARITY_RARE"),
             TreeRarity.Unique => TranslationServer.Translate("TREE_RARITY_UNIQUE"),
+            TreeRarity.Start => TranslationServer.Translate("TREE_RARITY_START"),
             _ => TranslationServer.Translate("TREE_RARITY_NORMAL")
         };
     }
@@ -313,7 +322,18 @@ public static class PassiveTreeManager
     }
 
     public static Dictionary<string, int> CellLevels = new();
-    public static Dictionary<string, Dictionary<string, int>> Allocations = new();
+
+    /// <summary>Maximum build profiles (talent loadouts) per cell.</summary>
+    public const int MaxProfiles = 3;
+
+    /// <summary>
+    /// cellId → ordered build profiles; each profile maps nodeId → stacks.
+    /// Lists always hold between 1 and <see cref="MaxProfiles"/> slots.
+    /// </summary>
+    public static Dictionary<string, Array<Dictionary<string, int>>> Allocations = new();
+
+    /// <summary>cellId → index of the profile currently edited and deployed.</summary>
+    public static Dictionary<string, int> ActiveProfiles = new();
 
     /// <summary>
     /// Extra talent points awarded by meta progression (achievement map clears, etc.).
@@ -427,18 +447,124 @@ public static class PassiveTreeManager
         return GetConnectedAllocation(cellId);
     }
 
-    private static Dictionary<string, int> GetValidOwnedNodes(string cellId)
+    /// <summary>All profile slots for a cell, guaranteeing at least one slot.</summary>
+    private static Array<Dictionary<string, int>> GetSlots(string cellId)
+    {
+        if (!Allocations.TryGetValue(cellId, out var slots) || slots.Count == 0)
+        {
+            slots = new Array<Dictionary<string, int>> { new Dictionary<string, int>() };
+            Allocations[cellId] = slots;
+        }
+        return slots;
+    }
+
+    /// <summary>The profile slot currently edited and deployed.</summary>
+    private static Dictionary<string, int> GetActiveOwned(string cellId)
+    {
+        return GetSlots(cellId)[GetActiveProfile(cellId)];
+    }
+
+    /// <summary>Number of build profiles stored for a cell (0 when the cell is unknown).</summary>
+    public static int GetProfileCount(string cellId)
+    {
+        EnsureLoaded();
+        if (!IsKnownCell(cellId))
+            return 0;
+        return GetSlots(cellId).Count;
+    }
+
+    /// <summary>Index of the active build profile (0 when the cell is unknown).</summary>
+    public static int GetActiveProfile(string cellId)
+    {
+        EnsureLoaded();
+        if (!IsKnownCell(cellId))
+            return 0;
+        var slots = GetSlots(cellId);
+        if (!ActiveProfiles.TryGetValue(cellId, out int active) || active < 0 || active >= slots.Count)
+        {
+            active = 0;
+            ActiveProfiles[cellId] = 0;
+        }
+        return active;
+    }
+
+    /// <summary>Switch the active build profile. Returns false for unknown cells or out-of-range indices.</summary>
+    public static bool SetActiveProfile(string cellId, int index)
+    {
+        EnsureLoaded();
+        if (!IsKnownCell(cellId))
+            return false;
+        var slots = GetSlots(cellId);
+        if (index < 0 || index >= slots.Count)
+            return false;
+        if (!ActiveProfiles.TryGetValue(cellId, out int current) || current != index)
+        {
+            ActiveProfiles[cellId] = index;
+            SaveToDisk();
+        }
+        return true;
+    }
+
+    /// <summary>Append an empty build profile and switch to it. Refused at <see cref="MaxProfiles"/>.</summary>
+    public static bool AddProfile(string cellId)
+    {
+        EnsureLoaded();
+        if (!IsKnownCell(cellId))
+            return false;
+        var slots = GetSlots(cellId);
+        if (slots.Count >= MaxProfiles)
+            return false;
+        slots.Add(new Dictionary<string, int>());
+        ActiveProfiles[cellId] = slots.Count - 1;
+        SaveToDisk();
+        return true;
+    }
+
+    /// <summary>
+    /// Delete one build profile. The last remaining profile is kept.
+    /// Deleting the active (or an earlier) slot moves the active index along.
+    /// </summary>
+    public static bool DeleteProfile(string cellId, int index)
+    {
+        EnsureLoaded();
+        if (!IsKnownCell(cellId))
+            return false;
+        var slots = GetSlots(cellId);
+        if (slots.Count <= 1 || index < 0 || index >= slots.Count)
+            return false;
+        int active = GetActiveProfile(cellId);
+        slots.RemoveAt(index);
+        if (active == index)
+            active = Math.Max(0, index - 1);
+        else if (active > index)
+            active -= 1;
+        ActiveProfiles[cellId] = active;
+        SaveToDisk();
+        return true;
+    }
+
+    /// <summary>Display name for a profile slot (配置一/二/三).</summary>
+    public static string GetProfileName(int index)
+    {
+        return TranslationServer.Translate("TREE_PROFILE_" + (index + 1));
+    }
+
+    private static Dictionary<string, int> FilterValidNodes(string cellId, Dictionary<string, int> owned)
     {
         var result = new Dictionary<string, int>();
-        if (!IsKnownCell(cellId) || !Allocations.TryGetValue(cellId, out var owned))
-            return result;
-
         foreach (var pair in owned)
         {
             if (IsKnownNode(pair.Key) && pair.Value > 0)
                 result[pair.Key] = Math.Min(GetMaxStacks(pair.Key), pair.Value);
         }
         return result;
+    }
+
+    private static Dictionary<string, int> GetValidOwnedNodes(string cellId)
+    {
+        if (!IsKnownCell(cellId))
+            return new Dictionary<string, int>();
+        return FilterValidNodes(cellId, GetActiveOwned(cellId));
     }
 
     private static bool HasVisitedNeighbor(string nodeId, System.Collections.Generic.HashSet<string> visited)
@@ -453,7 +579,11 @@ public static class PassiveTreeManager
 
     public static Dictionary<string, int> GetConnectedAllocation(string cellId)
     {
-        var remaining = GetValidOwnedNodes(cellId);
+        return GetConnectedFrom(GetValidOwnedNodes(cellId), cellId);
+    }
+
+    private static Dictionary<string, int> GetConnectedFrom(Dictionary<string, int> remaining, string cellId)
+    {
         var connected = new Dictionary<string, int>();
         string start = GetStartNode(cellId);
         var visited = new System.Collections.Generic.HashSet<string>();
@@ -606,12 +736,7 @@ public static class PassiveTreeManager
         if (!CanPurchase(cellId, nodeId))
             return false;
 
-        if (!Allocations.TryGetValue(cellId, out var owned))
-        {
-            owned = new Dictionary<string, int>();
-            Allocations[cellId] = owned;
-        }
-
+        var owned = GetActiveOwned(cellId);
         owned[nodeId] = GetNodeStacks(cellId, nodeId) + 1;
         SaveToDisk();
         return true;
@@ -625,7 +750,8 @@ public static class PassiveTreeManager
         // The innate start hub is permanent and never refundable.
         if (IsInnateStartNode(cellId, nodeId))
             return false;
-        if (!Allocations.TryGetValue(cellId, out var owned) || !owned.TryGetValue(nodeId, out var stacks) || stacks <= 0)
+        var owned = GetActiveOwned(cellId);
+        if (!owned.TryGetValue(nodeId, out var stacks) || stacks <= 0)
             return false;
         if (!WouldRemainConnected(cellId, nodeId))
             return false;
@@ -635,8 +761,6 @@ public static class PassiveTreeManager
         else
             owned[nodeId] = stacks - 1;
 
-        if (owned.Count == 0)
-            Allocations.Remove(cellId);
         SaveToDisk();
         return true;
     }
@@ -644,8 +768,14 @@ public static class PassiveTreeManager
     public static void ResetAllocation(string cellId)
     {
         EnsureLoaded();
-        if (Allocations.Remove(cellId))
+        if (!IsKnownCell(cellId))
+            return;
+        var owned = GetActiveOwned(cellId);
+        if (owned.Count > 0)
+        {
+            owned.Clear();
             SaveToDisk();
+        }
     }
 
     public static BaseSkill? CreateStackedSkill(string nodeId, int stacks)
@@ -654,14 +784,6 @@ public static class PassiveTreeManager
             return null;
 
         int level = Mathf.Clamp(stacks, 1, node.MaxStacks);
-        if (node.SkillType != null)
-        {
-            if (Activator.CreateInstance(node.SkillType) is not BaseSkill skill)
-                return null;
-            skill.Level = level;
-            return skill;
-        }
-
         return new TreeStatBundleSkill(node, level);
     }
 
@@ -672,28 +794,55 @@ public static class PassiveTreeManager
             levels[pair.Key] = pair.Value;
 
         var allocations = new Dictionary();
+        var actives = new Dictionary();
         foreach (var cellPair in Allocations)
         {
-            var owned = new Dictionary();
-            foreach (var nodePair in GetConnectedAllocation(cellPair.Key))
+            if (!IsKnownCell(cellPair.Key))
+                continue;
+            var slotsOut = new Godot.Collections.Array();
+            bool anyNonEmpty = false;
+            foreach (var owned in cellPair.Value)
             {
-                // The innate start hub is derived, never persisted.
-                if (IsInnateStartNode(cellPair.Key, nodePair.Key))
-                    continue;
-                owned[nodePair.Key] = nodePair.Value;
+                var slotOut = new Dictionary();
+                foreach (var nodePair in GetConnectedFrom(FilterValidNodes(cellPair.Key, owned), cellPair.Key))
+                {
+                    // The innate start hub is derived, never persisted.
+                    if (IsInnateStartNode(cellPair.Key, nodePair.Key))
+                        continue;
+                    slotOut[nodePair.Key] = nodePair.Value;
+                }
+                if (slotOut.Count > 0)
+                    anyNonEmpty = true;
+                slotsOut.Add(slotOut);
             }
-            if (owned.Count > 0)
-                allocations[cellPair.Key] = owned;
+            if (!anyNonEmpty)
+                continue;
+            allocations[cellPair.Key] = slotsOut;
+            actives[cellPair.Key] = GetActiveProfile(cellPair.Key);
         }
 
         var payload = new Dictionary
         {
             { "cell_levels", levels },
             { "allocations", allocations },
+            { "active_profiles", actives },
             { "bonus_points", BonusPoints }
         };
 
         JsonStore.Write(SavePath, payload);
+    }
+
+    private static Dictionary<string, int> ParseSlotDict(string cellId, Dictionary savedOwned)
+    {
+        var owned = new Dictionary<string, int>();
+        foreach (var nodeKey in savedOwned.Keys)
+        {
+            string nodeId = nodeKey.AsString();
+            int stacks = Mathf.Clamp(savedOwned[nodeKey].AsInt32(), 1, GetMaxStacks(nodeId));
+            if (IsKnownNode(nodeId))
+                owned[nodeId] = stacks;
+        }
+        return owned;
     }
 
     public static void LoadFromDisk()
@@ -726,30 +875,61 @@ public static class PassiveTreeManager
             foreach (var key in allocations.Keys)
             {
                 string cellId = key.AsString();
-                if (!IsKnownCell(cellId) || allocations[key].VariantType != Variant.Type.Dictionary)
+                if (!IsKnownCell(cellId))
                     continue;
 
-                var owned = new Dictionary<string, int>();
-                var savedOwned = allocations[key].AsGodotDictionary();
-                foreach (var nodeKey in savedOwned.Keys)
+                var slots = new Array<Dictionary<string, int>>();
+                var raw = allocations[key];
+                if (raw.VariantType == Variant.Type.Array)
                 {
-                    string nodeId = nodeKey.AsString();
-                    int stacks = Mathf.Clamp(savedOwned[nodeKey].AsInt32(), 1, GetMaxStacks(nodeId));
-                    if (IsKnownNode(nodeId))
-                        owned[nodeId] = stacks;
+                    foreach (var slotVar in raw.AsGodotArray())
+                    {
+                        if (slots.Count >= MaxProfiles)
+                            break;
+                        if (slotVar.VariantType != Variant.Type.Dictionary)
+                            continue;
+                        slots.Add(ParseSlotDict(cellId, slotVar.AsGodotDictionary()));
+                    }
                 }
-                if (owned.Count > 0)
-                    Allocations[cellId] = owned;
+                else if (raw.VariantType == Variant.Type.Dictionary)
+                {
+                    // Legacy single-slot format migrates into profile slot 0.
+                    slots.Add(ParseSlotDict(cellId, raw.AsGodotDictionary()));
+                }
+                if (slots.Count == 0)
+                    slots.Add(new Dictionary<string, int>());
+                Allocations[cellId] = slots;
+            }
+        }
+
+        if (data.TryGetValue("active_profiles", out var activeVal) && activeVal.VariantType == Variant.Type.Dictionary)
+        {
+            var actives = activeVal.AsGodotDictionary();
+            foreach (var key in actives.Keys)
+            {
+                string cellId = key.AsString();
+                if (!IsKnownCell(cellId) || !Allocations.TryGetValue(cellId, out var slots))
+                    continue;
+                ActiveProfiles[cellId] = Mathf.Clamp(actives[key].AsInt32(), 0, slots.Count - 1);
             }
         }
 
         foreach (var cellId in new System.Collections.Generic.List<string>(Allocations.Keys))
         {
-            var connected = GetConnectedAllocation(cellId);
-            if (connected.Count > 0)
-                Allocations[cellId] = connected;
-            else
+            var slots = Allocations[cellId];
+            bool anyKept = false;
+            for (int i = 0; i < slots.Count; i++)
+            {
+                var connected = GetConnectedFrom(FilterValidNodes(cellId, slots[i]), cellId);
+                slots[i] = connected;
+                if (connected.Count > 0)
+                    anyKept = true;
+            }
+            if (!anyKept)
+            {
                 Allocations.Remove(cellId);
+                ActiveProfiles.Remove(cellId);
+            }
         }
     }
 
@@ -757,6 +937,7 @@ public static class PassiveTreeManager
     {
         CellLevels.Clear();
         Allocations.Clear();
+        ActiveProfiles.Clear();
         BonusPoints = 0;
         _loaded = false;
         EnsureLoaded();
@@ -766,6 +947,7 @@ public static class PassiveTreeManager
     {
         CellLevels.Clear();
         Allocations.Clear();
+        ActiveProfiles.Clear();
         BonusPoints = 0;
         _loaded = true;
         JsonStore.Delete(SavePath);

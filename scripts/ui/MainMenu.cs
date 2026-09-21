@@ -47,6 +47,14 @@ public partial class MainMenu : Control
     public Label? TreeLevelLbl { get; set; }
     public Label? TreePointsLbl { get; set; }
     public PassiveTreeView? TreeCanvas { get; set; }
+    public HBoxContainer? ProfileHBox { get; set; }
+    public Button? ProfileAddBtn { get; set; }
+    public Button? ProfileDeleteBtn { get; set; }
+    private readonly System.Collections.Generic.List<Button> _profileTabBtns = new();
+    private ButtonGroup? _profileButtonGroup;
+
+    /// <summary>Number of build-profile tab buttons currently shown.</summary>
+    public int ProfileTabCount => _profileTabBtns.Count;
     public Button? PassiveBackBtn { get; set; }
     public Button? PassiveResetBtn { get; set; }
     public Button? PassiveConfirmBtn { get; set; }
@@ -263,6 +271,32 @@ public partial class MainMenu : Control
             TreeCanvas.TreeNodeHovered += OnTreeNodeHovered;
             TreeCanvas.TreeNodeRefundRequested += OnTreeNodeRefundRequested;
         }
+        // Build-profile tabs (docs/passivetree.md §5.4): dynamic slots, up to MaxProfiles.
+        if (TreeLevelLbl != null && TreeLevelLbl.GetParent() is Container infoRow)
+        {
+            _profileButtonGroup = new ButtonGroup { AllowUnpress = false };
+            ProfileHBox = new HBoxContainer
+            {
+                Name = "ProfileHBox",
+                Alignment = BoxContainer.AlignmentMode.Begin
+            };
+            ProfileAddBtn = new Button
+            {
+                Name = "ProfileAddButton",
+                CustomMinimumSize = new Vector2(56, 40)
+            };
+            ProfileAddBtn.Pressed += OnProfileAddPressed;
+            ProfileDeleteBtn = new Button
+            {
+                Name = "ProfileDeleteButton",
+                CustomMinimumSize = new Vector2(96, 40)
+            };
+            ProfileDeleteBtn.Pressed += OnProfileDeletePressed;
+            ProfileHBox.AddChild(ProfileAddBtn);
+            ProfileHBox.AddChild(ProfileDeleteBtn);
+            infoRow.AddChild(ProfileHBox);
+            infoRow.MoveChild(ProfileHBox, 0);
+        }
         if (PassiveBackBtn != null)
             PassiveBackBtn.Pressed += () => { if (ClassView != null) SwitchToView(ClassView); };
         if (PassiveResetBtn != null)
@@ -310,6 +344,7 @@ public partial class MainMenu : Control
         if (PassiveResetBtn != null) PassiveResetBtn.Text = Tr("TREE_RESET");
         if (PassiveConfirmBtn != null) PassiveConfirmBtn.Text = Tr("BTN_CONFIRM_MAP");
         if (TreeZoomOutBtn != null) TreeZoomOutBtn.Text = Tr("TREE_ZOOM_OUT");
+        RefreshProfileTexts();
         if (TreeZoomInBtn != null) TreeZoomInBtn.Text = Tr("TREE_ZOOM_IN");
 
         if (MapHeaderLbl != null) MapHeaderLbl.Text = Tr("HEADER_SELECT_MAP");
@@ -521,6 +556,88 @@ public partial class MainMenu : Control
         TreeCanvas?.Render(ActiveTreeClassKey);
         if (TreeLevelLbl != null) TreeLevelLbl.Text = TextFormatter.Format(Tr("TREE_LEVEL"), level);
         if (TreePointsLbl != null) TreePointsLbl.Text = TextFormatter.Format(Tr("TREE_POINTS"), available, spent);
+        RefreshProfileTabs();
+    }
+
+    private void RefreshProfileTabs()
+    {
+        if (ProfileHBox == null)
+            return;
+
+        foreach (var old in _profileTabBtns)
+        {
+            if (IsInstanceValid(old))
+            {
+                ProfileHBox.RemoveChild(old);
+                old.QueueFree();
+            }
+        }
+        _profileTabBtns.Clear();
+
+        int count = PassiveTreeManager.GetProfileCount(ActiveTreeClassKey);
+        int active = PassiveTreeManager.GetActiveProfile(ActiveTreeClassKey);
+        for (int i = 0; i < count; i++)
+        {
+            int index = i;
+            var tab = new Button
+            {
+                Name = $"ProfileTab{index}",
+                CustomMinimumSize = new Vector2(120, 40),
+                ToggleMode = true,
+                ButtonGroup = _profileButtonGroup,
+                ButtonPressed = index == active
+            };
+            tab.Pressed += () => OnProfileTabPressed(index);
+            _profileTabBtns.Add(tab);
+            ProfileHBox.AddChild(tab);
+            ProfileHBox.MoveChild(tab, index);
+        }
+        RefreshProfileTexts();
+    }
+
+    private void RefreshProfileTexts()
+    {
+        int count = PassiveTreeManager.GetProfileCount(ActiveTreeClassKey);
+        int active = PassiveTreeManager.GetActiveProfile(ActiveTreeClassKey);
+        for (int i = 0; i < _profileTabBtns.Count && i < count; i++)
+        {
+            _profileTabBtns[i].Text = PassiveTreeManager.GetProfileName(i);
+            _profileTabBtns[i].ButtonPressed = i == active;
+        }
+        if (ProfileAddBtn != null)
+        {
+            ProfileAddBtn.Text = Tr("TREE_PROFILE_ADD");
+            ProfileAddBtn.Visible = count < PassiveTreeManager.MaxProfiles;
+        }
+        if (ProfileDeleteBtn != null)
+        {
+            ProfileDeleteBtn.Text = Tr("TREE_PROFILE_DELETE");
+            ProfileDeleteBtn.Disabled = count <= 1;
+        }
+    }
+
+    public void OnProfileTabPressed(int index)
+    {
+        PassiveTreeManager.SetActiveProfile(ActiveTreeClassKey, index);
+        ActiveTreeNodeId = PassiveTreeManager.GetStartNode(ActiveTreeClassKey);
+        RefreshPassiveView();
+    }
+
+    public void OnProfileAddPressed()
+    {
+        if (!PassiveTreeManager.AddProfile(ActiveTreeClassKey))
+            return;
+        ActiveTreeNodeId = PassiveTreeManager.GetStartNode(ActiveTreeClassKey);
+        RefreshPassiveView();
+    }
+
+    public void OnProfileDeletePressed()
+    {
+        int active = PassiveTreeManager.GetActiveProfile(ActiveTreeClassKey);
+        if (!PassiveTreeManager.DeleteProfile(ActiveTreeClassKey, active))
+            return;
+        ActiveTreeNodeId = PassiveTreeManager.GetStartNode(ActiveTreeClassKey);
+        RefreshPassiveView();
     }
 
     public void OnTreeNodeActivated(string nodeId)

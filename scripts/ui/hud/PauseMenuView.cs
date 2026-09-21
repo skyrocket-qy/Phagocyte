@@ -163,6 +163,8 @@ public partial class PauseMenuView : Node
 
         text.AppendLine("[b]" + Tr("TREE_OVERLAY_TITLE") + "[/b]");
         text.AppendLine(className);
+        text.AppendLine(TextFormatter.Format(Tr("TREE_OVERLAY_PROFILE"),
+            PassiveTreeManager.GetProfileName(PassiveTreeManager.GetActiveProfile(classId))));
         text.AppendLine(TextFormatter.Format(Tr("TREE_OVERLAY_LEVEL"), PassiveTreeManager.GetCellLevel(classId), LastLevel));
         text.AppendLine(TextFormatter.Format(Tr("TREE_POINTS"), PassiveTreeManager.GetPointsAvailable(classId), PassiveTreeManager.GetSpentPoints(classId)));
         text.AppendLine();

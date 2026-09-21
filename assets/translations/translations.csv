@@ -606,3 +606,10 @@ TREE_NODE_SMALL_EVASION_NAME,Evasion Filament,闪避微管,閃避微管,回避�
 TREE_NODE_SMALL_BLOCK_NAME,Block Filament,格挡微管,格擋微管,防御のフィラメント,Blockfilament,Filament de blocage,Филамент блокировки,Filamento de bloqueo
 TREE_NODE_SMALL_LIFE_STEAL_NAME,Siphon Filament,汲取微管,汲取微管,吸収のフィラメント,Siphonfilament,Filament de siphonage,Филамент высасывания,Filamento de sifón
 TREE_NODE_SMALL_MAGNET_NAME,Chemotaxis Filament,趋化微管,趨化微管,走化性のフィラメント,Chemotaxis-Filament,Filament de chimiotaxie,Филамент хемотаксиса,Filamento de quimiotaxis
+TREE_RARITY_START,Start,起始,起始,スタート,Start,Départ,Старт,Inicio
+TREE_PROFILE_1,Build 1,配置一,配置一,ビルド1,Build 1,Build 1,Сборка 1,Configuración 1
+TREE_PROFILE_2,Build 2,配置二,配置二,ビルド2,Build 2,Build 2,Сборка 2,Configuración 2
+TREE_PROFILE_3,Build 3,配置三,配置三,ビルド3,Build 3,Build 3,Сборка 3,Configuración 3
+TREE_PROFILE_ADD,+,+,+,＋,+,+,+,+
+TREE_PROFILE_DELETE,Delete build,刪除此配置,刪除此配置,このビルドを削除,Build löschen,Supprimer ce build,Удалить сборку,Eliminar configuración
+TREE_OVERLAY_PROFILE,Build: %s,配置：%s,配置：%s,ビルド：%s,Build: %s,Build : %s,Сборка: %s,Configuración: %s

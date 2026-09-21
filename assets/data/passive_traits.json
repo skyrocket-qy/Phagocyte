@@ -1,0 +1,795 @@
+{
+  "traits": [
+    {
+      "desc_key": "",
+      "icon": "🧬",
+      "id": "trait_passive_actin",
+      "modifiers": [],
+      "name_key": "SKILL_ACTIN_NAME",
+      "rarity": "start"
+    },
+    {
+      "desc_key": "SKILL_AUTOPHAGY_DESC",
+      "icon": "🔄",
+      "id": "trait_passive_autophagy",
+      "modifiers": [
+        {
+          "stat": "health_regen",
+          "unit": "flat",
+          "value": 0.4
+        }
+      ],
+      "name_key": "SKILL_AUTOPHAGY_NAME",
+      "rarity": "magic"
+    },
+    {
+      "desc_key": "SKILL_BILAYER_DESC",
+      "icon": "🛡️",
+      "id": "trait_passive_bilayer",
+      "modifiers": [
+        {
+          "stat": "max_health",
+          "unit": "percent",
+          "value": 0.15
+        },
+        {
+          "stat": "armor",
+          "unit": "flat",
+          "value": 2.0
+        }
+      ],
+      "name_key": "SKILL_BILAYER_NAME",
+      "rarity": "unique"
+    },
+    {
+      "desc_key": "",
+      "icon": "🧲",
+      "id": "trait_passive_chemokine",
+      "modifiers": [],
+      "name_key": "SKILL_CHEMOKINE_NAME",
+      "rarity": "start"
+    },
+    {
+      "desc_key": "SKILL_ENDOTOXIN_DESC",
+      "icon": "🧱",
+      "id": "trait_passive_endotoxin",
+      "modifiers": [
+        {
+          "stat": "armor",
+          "unit": "flat",
+          "value": 3.0
+        },
+        {
+          "stat": "block",
+          "unit": "flat",
+          "value": 0.04
+        }
+      ],
+      "name_key": "SKILL_ENDOTOXIN_NAME",
+      "rarity": "rare"
+    },
+    {
+      "desc_key": "SKILL_GLYCOLYSIS_DESC",
+      "icon": "🍬",
+      "id": "trait_passive_glycolysis",
+      "modifiers": [
+        {
+          "stat": "move_speed",
+          "unit": "percent",
+          "value": 0.06
+        },
+        {
+          "stat": "might",
+          "unit": "percent",
+          "value": 0.05
+        }
+      ],
+      "name_key": "SKILL_GLYCOLYSIS_NAME",
+      "rarity": "magic"
+    },
+    {
+      "desc_key": "SKILL_HEMATOPOIETIC_DESC",
+      "icon": "🩸",
+      "id": "trait_passive_hematopoietic",
+      "modifiers": [
+        {
+          "stat": "max_health",
+          "unit": "percent",
+          "value": 0.1
+        },
+        {
+          "stat": "block",
+          "unit": "flat",
+          "value": 0.03
+        }
+      ],
+      "name_key": "SKILL_HEMATOPOIETIC_NAME",
+      "rarity": "rare"
+    },
+    {
+      "desc_key": "",
+      "icon": "🛤️",
+      "id": "trait_passive_kinesin",
+      "modifiers": [],
+      "name_key": "SKILL_KINESIN_NAME",
+      "rarity": "start"
+    },
+    {
+      "desc_key": "SKILL_LONGEVITY_DESC",
+      "icon": "⏳",
+      "id": "trait_passive_longevity",
+      "modifiers": [
+        {
+          "stat": "duration",
+          "unit": "percent",
+          "value": 0.15
+        },
+        {
+          "stat": "knockback",
+          "unit": "percent",
+          "value": 0.1
+        }
+      ],
+      "name_key": "SKILL_LONGEVITY_NAME",
+      "rarity": "magic"
+    },
+    {
+      "desc_key": "",
+      "icon": "🧪",
+      "id": "trait_passive_lysosome",
+      "modifiers": [],
+      "name_key": "TREE_NODE_LYSOSOME_NAME",
+      "rarity": "start"
+    },
+    {
+      "desc_key": "SKILL_MITOCHONDRIA_DESC",
+      "icon": "⚡",
+      "id": "trait_passive_mitochondria",
+      "modifiers": [
+        {
+          "stat": "cooldown_reduction",
+          "unit": "percentagepoints",
+          "value": 0.08
+        },
+        {
+          "stat": "duration",
+          "unit": "percent",
+          "value": 0.1
+        }
+      ],
+      "name_key": "SKILL_MITOCHONDRIA_NAME",
+      "rarity": "magic"
+    },
+    {
+      "desc_key": "",
+      "icon": "🎯",
+      "id": "trait_passive_opsonin",
+      "modifiers": [],
+      "name_key": "SKILL_OPSONIN_NAME",
+      "rarity": "start"
+    },
+    {
+      "desc_key": "SKILL_VDJ_DESC",
+      "icon": "🎲",
+      "id": "trait_passive_vdj",
+      "modifiers": [
+        {
+          "stat": "crit_damage",
+          "unit": "percent",
+          "value": 0.15
+        },
+        {
+          "stat": "crit_chance",
+          "unit": "flat",
+          "value": 0.03
+        }
+      ],
+      "name_key": "SKILL_VDJ_NAME",
+      "rarity": "rare"
+    },
+    {
+      "desc_key": "",
+      "icon": "🌀",
+      "id": "trait_small_area",
+      "modifiers": [
+        {
+          "stat": "area",
+          "unit": "percent",
+          "value": 0.06
+        }
+      ],
+      "name_key": "TREE_NODE_SMALL_AREA_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🧲",
+      "id": "trait_small_magnet",
+      "modifiers": [
+        {
+          "stat": "magnet",
+          "unit": "percent",
+          "value": 0.1
+        }
+      ],
+      "name_key": "TREE_NODE_SMALL_MAGNET_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "⚔️",
+      "id": "trait_small_might",
+      "modifiers": [
+        {
+          "stat": "might",
+          "unit": "percent",
+          "value": 0.04
+        }
+      ],
+      "name_key": "TREE_NODE_SMALL_MIGHT_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "💨",
+      "id": "trait_small_move_speed",
+      "modifiers": [
+        {
+          "stat": "move_speed",
+          "unit": "percent",
+          "value": 0.03
+        }
+      ],
+      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🚀",
+      "id": "trait_small_projectile_speed",
+      "modifiers": [
+        {
+          "stat": "projectile_speed",
+          "unit": "percent",
+          "value": 0.08
+        }
+      ],
+      "name_key": "TREE_NODE_SMALL_PROJECTILE_SPEED_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🚀",
+      "id": "trait_tree_adaptive_overdrive",
+      "modifiers": [
+        {
+          "stat": "might",
+          "unit": "percent",
+          "value": 0.2
+        },
+        {
+          "stat": "move_speed",
+          "unit": "percent",
+          "value": 0.08
+        }
+      ],
+      "name_key": "TREE_NODE_ADAPTIVE_OVERDRIVE_NAME",
+      "rarity": "rare"
+    },
+    {
+      "desc_key": "",
+      "icon": "🏃",
+      "id": "trait_tree_aerobic_sprint",
+      "modifiers": [
+        {
+          "stat": "move_speed",
+          "unit": "percent",
+          "value": 0.1
+        }
+      ],
+      "name_key": "TREE_NODE_AEROBIC_SPRINT_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🌾",
+      "id": "trait_tree_antigen_harvest",
+      "modifiers": [
+        {
+          "stat": "magnet",
+          "unit": "percent",
+          "value": 0.15
+        }
+      ],
+      "name_key": "TREE_NODE_ANTIGEN_HARVEST_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "⚔️",
+      "id": "trait_tree_assassins_mandate",
+      "modifiers": [
+        {
+          "stat": "crit_chance",
+          "unit": "flat",
+          "value": 0.1
+        }
+      ],
+      "name_key": "TREE_NODE_ASSASSINS_MANDATE_NAME",
+      "rarity": "magic"
+    },
+    {
+      "desc_key": "",
+      "icon": "🧵",
+      "id": "trait_tree_ballistic_threads",
+      "modifiers": [
+        {
+          "stat": "projectile_speed",
+          "unit": "percent",
+          "value": 0.12
+        }
+      ],
+      "name_key": "TREE_NODE_BALLISTIC_THREADS_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🩸",
+      "id": "trait_tree_blood_price",
+      "modifiers": [
+        {
+          "stat": "might",
+          "unit": "percent",
+          "value": 0.08
+        }
+      ],
+      "name_key": "TREE_NODE_BLOOD_PRICE_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🌋",
+      "id": "trait_tree_contained_fury",
+      "modifiers": [
+        {
+          "stat": "might",
+          "unit": "percent",
+          "value": 0.09
+        }
+      ],
+      "name_key": "TREE_NODE_CONTAINED_FURY_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🌀",
+      "id": "trait_tree_cytoskeletal_drift",
+      "modifiers": [
+        {
+          "stat": "move_speed",
+          "unit": "percent",
+          "value": 0.05
+        }
+      ],
+      "name_key": "TREE_NODE_CYTOSKELETAL_DRIFT_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🩹",
+      "id": "trait_tree_deep_wound",
+      "modifiers": [
+        {
+          "stat": "crit_damage",
+          "unit": "percent",
+          "value": 0.15
+        }
+      ],
+      "name_key": "TREE_NODE_DEEP_WOUND_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🥾",
+      "id": "trait_tree_enduring_march",
+      "modifiers": [
+        {
+          "stat": "move_speed",
+          "unit": "percent",
+          "value": 0.04
+        }
+      ],
+      "name_key": "TREE_NODE_ENDURING_MARCH_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "⏱️",
+      "id": "trait_tree_execution_tempo",
+      "modifiers": [
+        {
+          "stat": "crit_damage",
+          "unit": "percent",
+          "value": 0.2
+        }
+      ],
+      "name_key": "TREE_NODE_EXECUTION_TEMPO_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "⏳",
+      "id": "trait_tree_extended_chambers",
+      "modifiers": [
+        {
+          "stat": "duration",
+          "unit": "percent",
+          "value": 0.12
+        }
+      ],
+      "name_key": "TREE_NODE_EXTENDED_CHAMBERS_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🔭",
+      "id": "trait_tree_far_sense",
+      "modifiers": [
+        {
+          "stat": "magnet",
+          "unit": "percent",
+          "value": 0.2
+        }
+      ],
+      "name_key": "TREE_NODE_FAR_SENSE_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🛰️",
+      "id": "trait_tree_guided_salvo",
+      "modifiers": [
+        {
+          "stat": "projectile_speed",
+          "unit": "percent",
+          "value": 0.1
+        }
+      ],
+      "name_key": "TREE_NODE_GUIDED_SALVO_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "♾️",
+      "id": "trait_tree_immortal_culture",
+      "modifiers": [
+        {
+          "stat": "health_regen",
+          "unit": "flat",
+          "value": 2.0
+        },
+        {
+          "stat": "life_steal",
+          "unit": "percent",
+          "value": 0.04
+        }
+      ],
+      "name_key": "TREE_NODE_IMMORTAL_CULTURE_NAME",
+      "rarity": "magic"
+    },
+    {
+      "desc_key": "",
+      "icon": "🦾",
+      "id": "trait_tree_iron_membrane",
+      "modifiers": [
+        {
+          "stat": "armor",
+          "unit": "flat",
+          "value": 3.0
+        }
+      ],
+      "name_key": "TREE_NODE_IRON_MEMBRANE_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🪽",
+      "id": "trait_tree_lightfooted_killer",
+      "modifiers": [
+        {
+          "stat": "move_speed",
+          "unit": "percent",
+          "value": 0.07
+        }
+      ],
+      "name_key": "TREE_NODE_LIGHTFOOTED_KILLER_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🍀",
+      "id": "trait_tree_lucky_mutation",
+      "modifiers": [
+        {
+          "stat": "evasion",
+          "unit": "percent",
+          "value": 0.04
+        }
+      ],
+      "name_key": "TREE_NODE_LUCKY_MUTATION_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🧿",
+      "id": "trait_tree_marked_core",
+      "modifiers": [
+        {
+          "stat": "crit_chance",
+          "unit": "flat",
+          "value": 0.02
+        }
+      ],
+      "name_key": "TREE_NODE_MARKED_CORE_NAME",
+      "rarity": "magic"
+    },
+    {
+      "desc_key": "",
+      "icon": "🌌",
+      "id": "trait_tree_omnipotent_cytoplasm",
+      "modifiers": [
+        {
+          "stat": "area",
+          "unit": "percent",
+          "value": 0.3
+        },
+        {
+          "stat": "duration",
+          "unit": "percent",
+          "value": 0.2
+        },
+        {
+          "stat": "projectile_speed",
+          "unit": "percent",
+          "value": 0.2
+        },
+        {
+          "stat": "cooldown_reduction",
+          "unit": "percentagepoints",
+          "value": 0.15
+        },
+        {
+          "stat": "max_health",
+          "unit": "percent",
+          "value": -0.25
+        }
+      ],
+      "name_key": "TREE_NODE_OMNIPOTENT_CYTOPLASM_NAME",
+      "rarity": "unique"
+    },
+    {
+      "desc_key": "",
+      "icon": "🏹",
+      "id": "trait_tree_overdrawn_strings",
+      "modifiers": [
+        {
+          "stat": "might",
+          "unit": "percent",
+          "value": 0.07
+        }
+      ],
+      "name_key": "TREE_NODE_OVERDRAWN_STRINGS_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🔥",
+      "id": "trait_tree_oxidative_pace",
+      "modifiers": [
+        {
+          "stat": "cooldown_reduction",
+          "unit": "percentagepoints",
+          "value": 0.05
+        }
+      ],
+      "name_key": "TREE_NODE_OXIDATIVE_PACE_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🦉",
+      "id": "trait_tree_patient_observer",
+      "modifiers": [
+        {
+          "stat": "duration",
+          "unit": "percent",
+          "value": 0.14
+        }
+      ],
+      "name_key": "TREE_NODE_PATIENT_OBSERVER_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "📌",
+      "id": "trait_tree_piercing_filaments",
+      "modifiers": [
+        {
+          "stat": "pierce",
+          "unit": "flat",
+          "value": 1.0
+        }
+      ],
+      "name_key": "TREE_NODE_PIERCING_FILAMENTS_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🔍",
+      "id": "trait_tree_precise_edge",
+      "modifiers": [
+        {
+          "stat": "crit_chance",
+          "unit": "flat",
+          "value": 0.02
+        }
+      ],
+      "name_key": "TREE_NODE_PRECISE_EDGE_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🏇",
+      "id": "trait_tree_pseudopod_marathon",
+      "modifiers": [
+        {
+          "stat": "move_speed",
+          "unit": "percent",
+          "value": 0.18
+        }
+      ],
+      "name_key": "TREE_NODE_PSEUDOPOD_MARATHON_NAME",
+      "rarity": "magic"
+    },
+    {
+      "desc_key": "",
+      "icon": "🩺",
+      "id": "trait_tree_rapid_clotting",
+      "modifiers": [
+        {
+          "stat": "armor",
+          "unit": "flat",
+          "value": 2.0
+        }
+      ],
+      "name_key": "TREE_NODE_RAPID_CLOTTING_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🧭",
+      "id": "trait_tree_rapid_reposition",
+      "modifiers": [
+        {
+          "stat": "move_speed",
+          "unit": "percent",
+          "value": 0.06
+        }
+      ],
+      "name_key": "TREE_NODE_RAPID_REPOSITION_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "⚖️",
+      "id": "trait_tree_risk_assessment",
+      "modifiers": [
+        {
+          "stat": "cooldown_reduction",
+          "unit": "percentagepoints",
+          "value": 0.04
+        }
+      ],
+      "name_key": "TREE_NODE_RISK_ASSESSMENT_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🌩️",
+      "id": "trait_tree_rolling_thunder",
+      "modifiers": [
+        {
+          "stat": "projectile_speed",
+          "unit": "percent",
+          "value": 0.3
+        }
+      ],
+      "name_key": "TREE_NODE_ROLLING_THUNDER_NAME",
+      "rarity": "magic"
+    },
+    {
+      "desc_key": "",
+      "icon": "🗺️",
+      "id": "trait_tree_scavenger_field",
+      "modifiers": [
+        {
+          "stat": "magnet",
+          "unit": "percent",
+          "value": 0.17
+        }
+      ],
+      "name_key": "TREE_NODE_SCAVENGER_FIELD_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🌬️",
+      "id": "trait_tree_second_wind",
+      "modifiers": [
+        {
+          "stat": "health_regen",
+          "unit": "flat",
+          "value": 0.5
+        }
+      ],
+      "name_key": "TREE_NODE_SECOND_WIND_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "💨",
+      "id": "trait_tree_slipstream",
+      "modifiers": [
+        {
+          "stat": "move_speed",
+          "unit": "percent",
+          "value": 0.08
+        }
+      ],
+      "name_key": "TREE_NODE_SLIPSTREAM_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "🔱",
+      "id": "trait_tree_splitting_volley",
+      "modifiers": [
+        {
+          "stat": "amount",
+          "unit": "flat",
+          "value": 1.0
+        }
+      ],
+      "name_key": "TREE_NODE_SPLITTING_VOLLEY_NAME",
+      "rarity": "normal"
+    },
+    {
+      "desc_key": "",
+      "icon": "📡",
+      "id": "trait_tree_swarm_cartography",
+      "modifiers": [
+        {
+          "stat": "magnet",
+          "unit": "percent",
+          "value": 0.4
+        }
+      ],
+      "name_key": "TREE_NODE_SWARM_CARTOGRAPHY_NAME",
+      "rarity": "magic"
+    },
+    {
+      "desc_key": "",
+      "icon": "🫧",
+      "id": "trait_tree_thick_cytoplasm",
+      "modifiers": [
+        {
+          "stat": "max_health",
+          "unit": "percent",
+          "value": 0.08
+        }
+      ],
+      "name_key": "TREE_NODE_THICK_CYTOPLASM_NAME",
+      "rarity": "normal"
+    }
+  ]
+}

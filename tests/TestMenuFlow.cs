@@ -108,6 +108,28 @@ public partial class TestMenuFlow : TestHarness
         AssertThat(menu.ActiveTreeClassKey).IsEqual("macrophage");
         GD.Print("[PASS] Transition to PassiveView with GameManager.selected_class = 'macrophage' verified.");
 
+        AssertThat(menu.ProfileHBox).IsNotNull();
+        AssertThat(menu.ProfileAddBtn).IsNotNull();
+        AssertThat(menu.ProfileDeleteBtn).IsNotNull();
+        AssertThat(menu.ProfileTabCount).IsEqual(1);
+        AssertThat(menu.ProfileAddBtn!.Visible).IsTrue();
+        AssertThat(menu.ProfileDeleteBtn!.Disabled).IsTrue();
+        menu.OnProfileAddPressed();
+        AssertThat(menu.ProfileTabCount).IsEqual(2);
+        AssertThat(PassiveTreeManager.GetActiveProfile("macrophage")).IsEqual(1);
+        menu.OnProfileAddPressed();
+        AssertThat(menu.ProfileTabCount).IsEqual(3);
+        AssertThat(menu.ProfileAddBtn.Visible).IsFalse();
+        menu.OnProfileTabPressed(0);
+        AssertThat(PassiveTreeManager.GetActiveProfile("macrophage")).IsEqual(0);
+        menu.OnProfileDeletePressed();
+        AssertThat(menu.ProfileTabCount).IsEqual(2);
+        AssertThat(menu.ProfileAddBtn.Visible).IsTrue();
+        menu.OnProfileDeletePressed();
+        AssertThat(menu.ProfileTabCount).IsEqual(1);
+        AssertThat(menu.ProfileDeleteBtn.Disabled).IsTrue();
+        GD.Print("[PASS] Build profile tabs add, switch, and delete with correct button states.");
+
         menu.OnPassiveConfirmPressed();
         AssertThat(menu.PassiveView!.Visible).IsFalse();
         AssertThat(menu.MapView != null && menu.MapView.Visible).IsTrue();

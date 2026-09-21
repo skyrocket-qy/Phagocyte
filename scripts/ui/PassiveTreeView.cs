@@ -966,6 +966,7 @@ public partial class PassiveTreeView : Control
         return node.Rarity switch
         {
             PassiveTreeManager.TreeRarity.Unique => 42.0f,
+            PassiveTreeManager.TreeRarity.Start => 40.0f,
             PassiveTreeManager.TreeRarity.Rare => 38.0f,
             PassiveTreeManager.TreeRarity.Magic => 32.0f,
             _ => 25.0f
@@ -995,6 +996,9 @@ public partial class PassiveTreeView : Control
                 node.Position + new Vector2(-radius, 0)
             }, node.Position, wobblePhase),
             PassiveTreeManager.TreeRarity.Unique => Wobble(PolygonPoints(node.Position, radius, 6, 0.0f), node.Position, wobblePhase),
+            // Start hubs are axis-aligned squares: corners at distance √2·radius
+            // so the half side matches the given radius.
+            PassiveTreeManager.TreeRarity.Start => Wobble(PolygonPoints(node.Position, radius * 1.4142f, 4, Mathf.Pi / 4.0f), node.Position, wobblePhase),
             _ => Wobble(PolygonPoints(node.Position, radius, 40, 0.0f), node.Position, wobblePhase)
         };
     }
@@ -1040,6 +1044,7 @@ public partial class PassiveTreeView : Control
             PassiveTreeManager.TreeRarity.Magic => new Color(0.32f, 0.72f, 1.00f, 1.0f),
             PassiveTreeManager.TreeRarity.Rare => new Color(1.00f, 0.78f, 0.32f, 1.0f),
             PassiveTreeManager.TreeRarity.Unique => new Color(1.00f, 0.48f, 0.22f, 1.0f),
+            PassiveTreeManager.TreeRarity.Start => new Color(0.45f, 0.95f, 1.00f, 1.0f),
             _ => new Color(1.0f, 1.0f, 1.0f, 1.0f)
         };
     }

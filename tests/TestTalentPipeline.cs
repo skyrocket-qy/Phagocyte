@@ -188,13 +188,13 @@ public partial class TestTalentPipeline : TestHarness
         var player = main.GetNodeOrNull<BaseCell>("Macrophage");
         AssertThat(player).IsNotNull();
 
-        // The innate hub's passive is applied to the run for free.
+        // The innate hub is instantiated for free but carries no stat effects.
         AssertThat(player!.GetNodeOrNull<Node>("TreeLoadout_passive_lysosome")).IsNotNull();
         AssertThat(player.Stats).IsNotNull();
-        AssertThat(player.Stats!.GetStat("might")).IsGreater(1.0f);
+        AssertThat(player.Stats!.GetStat("might")).IsEqualApprox(1.0f, 0.001f);
         AssertThat(PassiveTreeManager.GetSpentPoints("macrophage")).IsEqual(0);
 
-        GD.Print("[PASS] The innate start hub's passive is active in the run at zero point cost.");
+        GD.Print("[PASS] The innate start hub is present in the run at zero point cost with no stat effects.");
     }
 
     private void Cleanup()

@@ -1,1079 +1,359 @@
 {
   "edges": [
     [
-      "tree_motility_f13",
-      "tree_motility_f14"
+      "tree_motility_f01",
+      "tree_enduring_march"
     ],
     [
-      "tree_motility_f13",
-      "tree_motility_f08"
-    ],
-    [
-      "tree_motility_f08",
-      "tree_motility_f09"
-    ],
-    [
-      "tree_motility_f08",
-      "tree_motility_f06"
-    ],
-    [
-      "tree_motility_f06",
+      "tree_motility_f01",
       "tree_oxidative_pace"
     ],
     [
-      "tree_motility_f06",
-      "tree_motility_f04"
+      "tree_oxidative_pace",
+      "passive_actin"
     ],
     [
-      "tree_motility_f04",
+      "tree_oxidative_pace",
       "tree_rapid_reposition"
     ],
     [
-      "tree_motility_f04",
-      "tree_motility_f01"
+      "tree_rapid_reposition",
+      "tree_pseudopod_marathon"
     ],
     [
-      "tree_motility_f01",
-      "tree_motility_f02"
+      "tree_rapid_reposition",
+      "tree_patient_observer"
     ],
     [
-      "tree_motility_f01",
-      "tree_senses_f13"
+      "tree_patient_observer",
+      "tree_swarm_cartography"
     ],
     [
-      "tree_senses_f13",
-      "tree_senses_f14"
+      "tree_patient_observer",
+      "tree_lucky_mutation"
     ],
     [
-      "tree_senses_f13",
-      "tree_senses_f08"
+      "tree_lucky_mutation",
+      "passive_chemokine"
     ],
     [
-      "tree_senses_f08",
-      "tree_senses_f09"
+      "tree_lucky_mutation",
+      "tree_scavenger_field"
     ],
     [
-      "tree_senses_f08",
-      "tree_senses_f06"
+      "tree_scavenger_field",
+      "tree_far_sense"
     ],
     [
-      "tree_senses_f06",
-      "tree_senses_f07"
+      "tree_scavenger_field",
+      "passive_endotoxin"
     ],
     [
-      "tree_senses_f06",
-      "tree_senses_f03"
+      "passive_endotoxin",
+      "tree_second_wind"
     ],
     [
-      "tree_senses_f03",
-      "tree_senses_f04"
+      "passive_endotoxin",
+      "tree_contained_fury"
     ],
     [
-      "tree_senses_f03",
+      "tree_contained_fury",
+      "passive_lysosome"
+    ],
+    [
+      "tree_contained_fury",
+      "passive_autophagy"
+    ],
+    [
+      "passive_autophagy",
+      "tree_iron_membrane"
+    ],
+    [
+      "tree_enduring_march",
+      "tree_aerobic_sprint"
+    ],
+    [
+      "tree_enduring_march",
+      "passive_actin"
+    ],
+    [
+      "passive_actin",
+      "tree_cytoskeletal_drift"
+    ],
+    [
+      "passive_actin",
+      "tree_pseudopod_marathon"
+    ],
+    [
+      "tree_pseudopod_marathon",
+      "tree_slipstream"
+    ],
+    [
+      "tree_pseudopod_marathon",
+      "tree_swarm_cartography"
+    ],
+    [
+      "tree_swarm_cartography",
+      "tree_senses_f01"
+    ],
+    [
+      "tree_swarm_cartography",
+      "passive_chemokine"
+    ],
+    [
+      "passive_chemokine",
+      "tree_risk_assessment"
+    ],
+    [
+      "passive_chemokine",
+      "tree_far_sense"
+    ],
+    [
+      "tree_far_sense",
+      "tree_antigen_harvest"
+    ],
+    [
+      "tree_far_sense",
+      "tree_second_wind"
+    ],
+    [
+      "tree_second_wind",
+      "tree_rapid_clotting"
+    ],
+    [
+      "tree_second_wind",
+      "passive_lysosome"
+    ],
+    [
+      "passive_lysosome",
+      "tree_thick_cytoplasm"
+    ],
+    [
+      "passive_lysosome",
+      "tree_iron_membrane"
+    ],
+    [
+      "tree_iron_membrane",
+      "passive_bilayer"
+    ],
+    [
+      "tree_aerobic_sprint",
+      "tree_ballistics_f01"
+    ],
+    [
+      "tree_aerobic_sprint",
+      "tree_cytoskeletal_drift"
+    ],
+    [
+      "tree_cytoskeletal_drift",
+      "tree_splitting_volley"
+    ],
+    [
+      "tree_cytoskeletal_drift",
+      "tree_slipstream"
+    ],
+    [
+      "tree_slipstream",
+      "tree_extended_chambers"
+    ],
+    [
+      "tree_slipstream",
       "tree_senses_f01"
     ],
     [
       "tree_senses_f01",
-      "tree_swarm_cartography"
-    ],
-    [
-      "tree_senses_f01",
-      "tree_vitality_f13"
-    ],
-    [
-      "tree_vitality_f13",
-      "tree_vitality_f14"
-    ],
-    [
-      "tree_vitality_f13",
-      "tree_vitality_f11"
-    ],
-    [
-      "tree_vitality_f11",
-      "tree_vitality_f12"
-    ],
-    [
-      "tree_vitality_f11",
-      "tree_vitality_f09"
-    ],
-    [
-      "tree_vitality_f09",
-      "tree_vitality_f10"
-    ],
-    [
-      "tree_vitality_f09",
-      "tree_vitality_f06"
-    ],
-    [
-      "tree_vitality_f06",
-      "tree_vitality_f07"
-    ],
-    [
-      "tree_vitality_f06",
-      "tree_vitality_f01"
-    ],
-    [
-      "tree_vitality_f01",
-      "tree_vitality_f02"
-    ],
-    [
-      "tree_motility_f14",
-      "tree_motility_f15"
-    ],
-    [
-      "tree_motility_f14",
-      "tree_motility_f09"
-    ],
-    [
-      "tree_motility_f09",
-      "tree_motility_f10"
-    ],
-    [
-      "tree_motility_f09",
-      "tree_oxidative_pace"
-    ],
-    [
-      "tree_oxidative_pace",
-      "passive_actin"
-    ],
-    [
-      "tree_oxidative_pace",
-      "tree_rapid_reposition"
-    ],
-    [
-      "tree_rapid_reposition",
-      "tree_motility_f05"
-    ],
-    [
-      "tree_rapid_reposition",
-      "tree_motility_f02"
-    ],
-    [
-      "tree_motility_f02",
-      "tree_pseudopod_marathon"
-    ],
-    [
-      "tree_motility_f02",
-      "tree_senses_f14"
-    ],
-    [
-      "tree_senses_f14",
-      "tree_senses_f15"
-    ],
-    [
-      "tree_senses_f14",
-      "tree_senses_f09"
-    ],
-    [
-      "tree_senses_f09",
-      "tree_senses_f10"
-    ],
-    [
-      "tree_senses_f09",
-      "tree_senses_f07"
-    ],
-    [
-      "tree_senses_f07",
-      "passive_chemokine"
-    ],
-    [
-      "tree_senses_f07",
-      "tree_senses_f04"
-    ],
-    [
-      "tree_senses_f04",
-      "tree_scavenger_field"
-    ],
-    [
-      "tree_senses_f04",
-      "tree_swarm_cartography"
-    ],
-    [
-      "tree_swarm_cartography",
-      "tree_lucky_mutation"
-    ],
-    [
-      "tree_swarm_cartography",
-      "tree_vitality_f14"
-    ],
-    [
-      "tree_vitality_f14",
-      "passive_autophagy"
-    ],
-    [
-      "tree_vitality_f14",
-      "tree_vitality_f12"
-    ],
-    [
-      "tree_vitality_f12",
-      "tree_bulwark_metabolism"
-    ],
-    [
-      "tree_vitality_f12",
-      "tree_vitality_f10"
-    ],
-    [
-      "tree_vitality_f10",
-      "passive_lysosome"
-    ],
-    [
-      "tree_vitality_f10",
-      "tree_vitality_f07"
-    ],
-    [
-      "tree_vitality_f07",
-      "tree_vitality_f08"
-    ],
-    [
-      "tree_vitality_f07",
-      "tree_vitality_f02"
-    ],
-    [
-      "tree_vitality_f02",
-      "tree_vitality_f03"
-    ],
-    [
-      "tree_motility_f15",
-      "tree_motility_f16"
-    ],
-    [
-      "tree_motility_f15",
-      "tree_motility_f10"
-    ],
-    [
-      "tree_motility_f10",
-      "tree_motility_f11"
-    ],
-    [
-      "tree_motility_f10",
-      "passive_actin"
-    ],
-    [
-      "passive_actin",
-      "tree_cytoskeletal_drift"
-    ],
-    [
-      "passive_actin",
-      "tree_motility_f05"
-    ],
-    [
-      "tree_motility_f05",
-      "tree_slipstream"
-    ],
-    [
-      "tree_motility_f05",
-      "tree_pseudopod_marathon"
-    ],
-    [
-      "tree_pseudopod_marathon",
-      "tree_motility_f03"
-    ],
-    [
-      "tree_pseudopod_marathon",
-      "tree_senses_f15"
-    ],
-    [
-      "tree_senses_f15",
-      "tree_senses_f16"
-    ],
-    [
-      "tree_senses_f15",
-      "tree_senses_f10"
-    ],
-    [
-      "tree_senses_f10",
-      "tree_senses_f11"
-    ],
-    [
-      "tree_senses_f10",
-      "passive_chemokine"
-    ],
-    [
-      "passive_chemokine",
-      "tree_far_sense"
-    ],
-    [
-      "passive_chemokine",
-      "tree_scavenger_field"
-    ],
-    [
-      "tree_scavenger_field",
-      "tree_antigen_harvest"
-    ],
-    [
-      "tree_scavenger_field",
-      "tree_lucky_mutation"
-    ],
-    [
-      "tree_lucky_mutation",
-      "tree_patient_observer"
-    ],
-    [
-      "tree_lucky_mutation",
-      "passive_autophagy"
-    ],
-    [
-      "passive_autophagy",
-      "tree_contained_fury"
-    ],
-    [
-      "passive_autophagy",
-      "tree_bulwark_metabolism"
-    ],
-    [
-      "tree_bulwark_metabolism",
-      "passive_endotoxin"
-    ],
-    [
-      "tree_bulwark_metabolism",
-      "passive_lysosome"
-    ],
-    [
-      "passive_lysosome",
-      "tree_thick_cytoplasm"
-    ],
-    [
-      "passive_lysosome",
-      "tree_vitality_f08"
-    ],
-    [
-      "tree_vitality_f08",
-      "tree_lysosomal_appetite"
-    ],
-    [
-      "tree_vitality_f08",
-      "tree_vitality_f03"
-    ],
-    [
-      "tree_vitality_f03",
-      "tree_vitality_f04"
-    ],
-    [
-      "tree_motility_f16",
-      "tree_motility_f17"
-    ],
-    [
-      "tree_motility_f16",
-      "tree_motility_f11"
-    ],
-    [
-      "tree_motility_f11",
-      "tree_motility_f12"
-    ],
-    [
-      "tree_motility_f11",
-      "tree_cytoskeletal_drift"
-    ],
-    [
-      "tree_cytoskeletal_drift",
-      "tree_motility_f07"
-    ],
-    [
-      "tree_cytoskeletal_drift",
-      "tree_slipstream"
-    ],
-    [
-      "tree_slipstream",
-      "tree_aerobic_sprint"
-    ],
-    [
-      "tree_slipstream",
-      "tree_motility_f03"
-    ],
-    [
-      "tree_motility_f03",
-      "tree_enduring_march"
-    ],
-    [
-      "tree_motility_f03",
-      "tree_senses_f16"
-    ],
-    [
-      "tree_senses_f16",
-      "tree_senses_f17"
-    ],
-    [
-      "tree_senses_f16",
-      "tree_senses_f11"
-    ],
-    [
-      "tree_senses_f11",
-      "tree_senses_f12"
-    ],
-    [
-      "tree_senses_f11",
-      "tree_far_sense"
-    ],
-    [
-      "tree_far_sense",
-      "tree_risk_assessment"
-    ],
-    [
-      "tree_far_sense",
-      "tree_antigen_harvest"
-    ],
-    [
-      "tree_antigen_harvest",
-      "tree_senses_f05"
-    ],
-    [
-      "tree_antigen_harvest",
-      "tree_patient_observer"
-    ],
-    [
-      "tree_patient_observer",
-      "tree_senses_f02"
-    ],
-    [
-      "tree_patient_observer",
-      "tree_contained_fury"
-    ],
-    [
-      "tree_contained_fury",
-      "tree_second_wind"
-    ],
-    [
-      "tree_contained_fury",
-      "passive_endotoxin"
-    ],
-    [
-      "passive_endotoxin",
-      "tree_rapid_clotting"
-    ],
-    [
-      "passive_endotoxin",
-      "tree_thick_cytoplasm"
-    ],
-    [
-      "tree_thick_cytoplasm",
-      "passive_bilayer"
-    ],
-    [
-      "tree_thick_cytoplasm",
-      "tree_lysosomal_appetite"
-    ],
-    [
-      "tree_lysosomal_appetite",
-      "tree_iron_membrane"
-    ],
-    [
-      "tree_lysosomal_appetite",
-      "tree_vitality_f04"
-    ],
-    [
-      "tree_vitality_f04",
-      "tree_vitality_f05"
-    ],
-    [
-      "tree_motility_f17",
-      "tree_ballistics_f13"
-    ],
-    [
-      "tree_motility_f17",
-      "tree_motility_f12"
-    ],
-    [
-      "tree_motility_f12",
-      "tree_ballistics_f09"
-    ],
-    [
-      "tree_motility_f12",
-      "tree_motility_f07"
-    ],
-    [
-      "tree_motility_f07",
-      "tree_ballistics_f07"
-    ],
-    [
-      "tree_motility_f07",
-      "tree_aerobic_sprint"
-    ],
-    [
-      "tree_aerobic_sprint",
-      "tree_ballistics_f05"
-    ],
-    [
-      "tree_aerobic_sprint",
-      "tree_enduring_march"
-    ],
-    [
-      "tree_enduring_march",
-      "tree_rolling_thunder"
-    ],
-    [
-      "tree_enduring_march",
-      "tree_senses_f17"
-    ],
-    [
-      "tree_senses_f17",
-      "passive_glycolysis"
-    ],
-    [
-      "tree_senses_f17",
-      "tree_senses_f12"
-    ],
-    [
-      "tree_senses_f12",
-      "tree_immortal_culture"
-    ],
-    [
-      "tree_senses_f12",
-      "tree_risk_assessment"
-    ],
-    [
-      "tree_risk_assessment",
-      "passive_longevity"
-    ],
-    [
-      "tree_risk_assessment",
-      "tree_senses_f05"
-    ],
-    [
-      "tree_senses_f05",
-      "tree_core_f05"
-    ],
-    [
-      "tree_senses_f05",
-      "tree_senses_f02"
-    ],
-    [
-      "tree_senses_f02",
-      "tree_core_f01"
-    ],
-    [
-      "tree_senses_f02",
-      "tree_second_wind"
-    ],
-    [
-      "tree_second_wind",
-      "tree_precision_f12"
-    ],
-    [
-      "tree_second_wind",
-      "tree_rapid_clotting"
-    ],
-    [
-      "tree_rapid_clotting",
-      "tree_precision_f10"
-    ],
-    [
-      "tree_rapid_clotting",
-      "passive_bilayer"
-    ],
-    [
-      "passive_bilayer",
-      "tree_precision_f09"
-    ],
-    [
-      "passive_bilayer",
-      "tree_iron_membrane"
-    ],
-    [
-      "tree_iron_membrane",
-      "tree_precision_f06"
-    ],
-    [
-      "tree_iron_membrane",
-      "tree_vitality_f05"
-    ],
-    [
-      "tree_vitality_f05",
-      "tree_precision_f01"
-    ],
-    [
-      "tree_ballistics_f13",
-      "tree_ballistics_f14"
-    ],
-    [
-      "tree_ballistics_f13",
-      "tree_ballistics_f09"
-    ],
-    [
-      "tree_ballistics_f09",
-      "tree_ballistics_f10"
-    ],
-    [
-      "tree_ballistics_f09",
-      "tree_ballistics_f07"
-    ],
-    [
-      "tree_ballistics_f07",
-      "tree_splitting_volley"
-    ],
-    [
-      "tree_ballistics_f07",
-      "tree_ballistics_f05"
-    ],
-    [
-      "tree_ballistics_f05",
-      "tree_ballistics_f06"
-    ],
-    [
-      "tree_ballistics_f05",
-      "tree_rolling_thunder"
-    ],
-    [
-      "tree_rolling_thunder",
-      "tree_ballistics_f01"
-    ],
-    [
-      "tree_rolling_thunder",
-      "passive_glycolysis"
-    ],
-    [
-      "passive_glycolysis",
-      "tree_core_f15"
-    ],
-    [
-      "passive_glycolysis",
-      "tree_immortal_culture"
-    ],
-    [
-      "tree_immortal_culture",
-      "tree_core_f12"
-    ],
-    [
-      "tree_immortal_culture",
-      "passive_longevity"
-    ],
-    [
-      "passive_longevity",
-      "tree_core_f09"
-    ],
-    [
-      "passive_longevity",
-      "tree_core_f05"
-    ],
-    [
-      "tree_core_f05",
-      "tree_core_f06"
-    ],
-    [
-      "tree_core_f05",
-      "tree_core_f01"
-    ],
-    [
-      "tree_core_f01",
-      "tree_core_f02"
-    ],
-    [
-      "tree_core_f01",
-      "tree_precision_f12"
-    ],
-    [
-      "tree_precision_f12",
-      "tree_precision_f13"
-    ],
-    [
-      "tree_precision_f12",
-      "tree_precision_f10"
-    ],
-    [
-      "tree_precision_f10",
-      "tree_blood_price"
-    ],
-    [
-      "tree_precision_f10",
-      "tree_precision_f09"
-    ],
-    [
-      "tree_precision_f09",
-      "tree_marked_core"
-    ],
-    [
-      "tree_precision_f09",
-      "tree_precision_f06"
-    ],
-    [
-      "tree_precision_f06",
-      "tree_execution_tempo"
-    ],
-    [
-      "tree_precision_f06",
-      "tree_precision_f01"
-    ],
-    [
-      "tree_precision_f01",
-      "tree_precision_f02"
-    ],
-    [
-      "tree_ballistics_f14",
-      "tree_ballistics_f15"
-    ],
-    [
-      "tree_ballistics_f14",
-      "tree_ballistics_f10"
-    ],
-    [
-      "tree_ballistics_f10",
-      "tree_piercing_filaments"
-    ],
-    [
-      "tree_ballistics_f10",
-      "tree_splitting_volley"
-    ],
-    [
-      "tree_splitting_volley",
-      "passive_kinesin"
-    ],
-    [
-      "tree_splitting_volley",
-      "tree_ballistics_f06"
-    ],
-    [
-      "tree_ballistics_f06",
-      "tree_extended_chambers"
-    ],
-    [
-      "tree_ballistics_f06",
-      "tree_ballistics_f01"
-    ],
-    [
-      "tree_ballistics_f01",
-      "tree_ballistics_f02"
-    ],
-    [
-      "tree_ballistics_f01",
-      "tree_core_f15"
-    ],
-    [
-      "tree_core_f15",
-      "tree_core_f16"
-    ],
-    [
-      "tree_core_f15",
-      "tree_core_f12"
-    ],
-    [
-      "tree_core_f12",
-      "tree_core_f13"
-    ],
-    [
-      "tree_core_f12",
-      "tree_core_f09"
-    ],
-    [
-      "tree_core_f09",
-      "tree_core_f10"
-    ],
-    [
-      "tree_core_f09",
-      "tree_core_f06"
-    ],
-    [
-      "tree_core_f06",
-      "tree_core_f07"
-    ],
-    [
-      "tree_core_f06",
-      "tree_core_f02"
-    ],
-    [
-      "tree_core_f02",
-      "tree_core_f03"
-    ],
-    [
-      "tree_core_f02",
-      "tree_precision_f13"
-    ],
-    [
-      "tree_precision_f13",
-      "tree_precision_f14"
-    ],
-    [
-      "tree_precision_f13",
-      "tree_blood_price"
-    ],
-    [
-      "tree_blood_price",
-      "tree_deep_wound"
-    ],
-    [
-      "tree_blood_price",
-      "tree_marked_core"
-    ],
-    [
-      "tree_marked_core",
-      "passive_opsonin"
-    ],
-    [
-      "tree_marked_core",
-      "tree_execution_tempo"
-    ],
-    [
-      "tree_execution_tempo",
-      "tree_precise_edge"
-    ],
-    [
-      "tree_execution_tempo",
-      "tree_precision_f02"
-    ],
-    [
-      "tree_precision_f02",
-      "tree_precision_f03"
-    ],
-    [
-      "tree_ballistics_f15",
-      "tree_ballistics_f16"
-    ],
-    [
-      "tree_ballistics_f15",
-      "tree_piercing_filaments"
-    ],
-    [
-      "tree_piercing_filaments",
-      "tree_ballistics_f11"
-    ],
-    [
-      "tree_piercing_filaments",
-      "passive_kinesin"
-    ],
-    [
-      "passive_kinesin",
-      "tree_ballistic_threads"
-    ],
-    [
-      "passive_kinesin",
-      "tree_extended_chambers"
-    ],
-    [
-      "tree_extended_chambers",
-      "tree_guided_salvo"
-    ],
-    [
-      "tree_extended_chambers",
-      "tree_ballistics_f02"
-    ],
-    [
-      "tree_ballistics_f02",
-      "tree_ballistics_f03"
-    ],
-    [
-      "tree_ballistics_f02",
-      "tree_core_f16"
-    ],
-    [
-      "tree_core_f16",
-      "tree_core_f17"
-    ],
-    [
-      "tree_core_f16",
-      "tree_core_f13"
-    ],
-    [
-      "tree_core_f13",
-      "tree_core_f14"
-    ],
-    [
-      "tree_core_f13",
-      "tree_core_f10"
-    ],
-    [
-      "tree_core_f10",
-      "tree_core_f11"
-    ],
-    [
-      "tree_core_f10",
-      "tree_core_f07"
-    ],
-    [
-      "tree_core_f07",
-      "tree_core_f08"
-    ],
-    [
-      "tree_core_f07",
-      "tree_core_f03"
-    ],
-    [
-      "tree_core_f03",
-      "tree_core_f04"
-    ],
-    [
-      "tree_core_f03",
-      "tree_precision_f14"
-    ],
-    [
-      "tree_precision_f14",
-      "tree_precision_f15"
-    ],
-    [
-      "tree_precision_f14",
-      "tree_deep_wound"
-    ],
-    [
-      "tree_deep_wound",
-      "tree_lightfooted_killer"
-    ],
-    [
-      "tree_deep_wound",
-      "passive_opsonin"
-    ],
-    [
-      "passive_opsonin",
-      "passive_vdj"
-    ],
-    [
-      "passive_opsonin",
-      "tree_precise_edge"
-    ],
-    [
-      "tree_precise_edge",
-      "tree_precision_f07"
-    ],
-    [
-      "tree_precise_edge",
-      "tree_precision_f03"
-    ],
-    [
-      "tree_precision_f03",
-      "tree_precision_f04"
-    ],
-    [
-      "tree_ballistics_f16",
-      "tree_ballistics_f17"
-    ],
-    [
-      "tree_ballistics_f16",
-      "tree_ballistics_f11"
-    ],
-    [
-      "tree_ballistics_f11",
-      "tree_ballistics_f12"
-    ],
-    [
-      "tree_ballistics_f11",
-      "tree_ballistic_threads"
-    ],
-    [
-      "tree_ballistic_threads",
-      "tree_ballistics_f08"
-    ],
-    [
-      "tree_ballistic_threads",
-      "tree_guided_salvo"
-    ],
-    [
-      "tree_guided_salvo",
-      "tree_overdrawn_strings"
-    ],
-    [
-      "tree_guided_salvo",
-      "tree_ballistics_f03"
-    ],
-    [
-      "tree_ballistics_f03",
-      "tree_ballistics_f04"
-    ],
-    [
-      "tree_ballistics_f03",
-      "tree_core_f17"
-    ],
-    [
-      "tree_core_f17",
-      "tree_core_f18"
-    ],
-    [
-      "tree_core_f17",
-      "tree_core_f14"
-    ],
-    [
-      "tree_core_f14",
       "passive_hematopoietic"
     ],
     [
-      "tree_core_f14",
-      "tree_core_f11"
+      "tree_senses_f01",
+      "tree_risk_assessment"
     ],
     [
-      "tree_core_f11",
-      "tree_omnipotent_cytoplasm"
+      "tree_risk_assessment",
+      "passive_longevity"
     ],
     [
-      "tree_core_f11",
-      "tree_core_f08"
+      "tree_risk_assessment",
+      "tree_antigen_harvest"
     ],
     [
-      "tree_core_f08",
-      "tree_adaptive_overdrive"
+      "tree_antigen_harvest",
+      "tree_core_f01"
     ],
     [
-      "tree_core_f08",
-      "tree_core_f04"
+      "tree_antigen_harvest",
+      "tree_rapid_clotting"
     ],
     [
-      "tree_core_f04",
-      "passive_mitochondria"
+      "tree_rapid_clotting",
+      "tree_execution_tempo"
     ],
     [
-      "tree_core_f04",
-      "tree_precision_f15"
+      "tree_rapid_clotting",
+      "tree_thick_cytoplasm"
     ],
     [
-      "tree_precision_f15",
-      "tree_precision_f16"
+      "tree_thick_cytoplasm",
+      "tree_precise_edge"
     ],
     [
-      "tree_precision_f15",
-      "tree_lightfooted_killer"
+      "tree_thick_cytoplasm",
+      "passive_bilayer"
     ],
     [
-      "tree_lightfooted_killer",
-      "tree_precision_f11"
+      "passive_bilayer",
+      "tree_marked_core"
     ],
     [
-      "tree_lightfooted_killer",
-      "passive_vdj"
+      "tree_ballistics_f01",
+      "tree_piercing_filaments"
     ],
     [
-      "passive_vdj",
-      "tree_assassins_mandate"
+      "tree_ballistics_f01",
+      "tree_splitting_volley"
     ],
     [
-      "passive_vdj",
-      "tree_precision_f07"
+      "tree_splitting_volley",
+      "passive_kinesin"
     ],
     [
-      "tree_precision_f07",
-      "tree_precision_f08"
+      "tree_splitting_volley",
+      "tree_extended_chambers"
     ],
     [
-      "tree_precision_f07",
-      "tree_precision_f04"
+      "tree_extended_chambers",
+      "tree_rolling_thunder"
     ],
     [
-      "tree_precision_f04",
-      "tree_precision_f05"
-    ],
-    [
-      "tree_ballistics_f17",
-      "tree_ballistics_f12"
-    ],
-    [
-      "tree_ballistics_f12",
-      "tree_ballistics_f08"
-    ],
-    [
-      "tree_ballistics_f08",
-      "tree_overdrawn_strings"
-    ],
-    [
-      "tree_overdrawn_strings",
-      "tree_ballistics_f04"
-    ],
-    [
-      "tree_ballistics_f04",
-      "tree_core_f18"
-    ],
-    [
-      "tree_core_f18",
+      "tree_extended_chambers",
       "passive_hematopoietic"
     ],
     [
       "passive_hematopoietic",
+      "passive_glycolysis"
+    ],
+    [
+      "passive_hematopoietic",
+      "passive_longevity"
+    ],
+    [
+      "passive_longevity",
+      "tree_immortal_culture"
+    ],
+    [
+      "passive_longevity",
+      "tree_core_f01"
+    ],
+    [
+      "tree_core_f01",
+      "tree_omnipotent_cytoplasm"
+    ],
+    [
+      "tree_core_f01",
+      "tree_execution_tempo"
+    ],
+    [
+      "tree_execution_tempo",
+      "tree_blood_price"
+    ],
+    [
+      "tree_execution_tempo",
+      "tree_precise_edge"
+    ],
+    [
+      "tree_precise_edge",
+      "passive_opsonin"
+    ],
+    [
+      "tree_precise_edge",
+      "tree_marked_core"
+    ],
+    [
+      "tree_marked_core",
+      "tree_lightfooted_killer"
+    ],
+    [
+      "tree_piercing_filaments",
+      "tree_overdrawn_strings"
+    ],
+    [
+      "tree_piercing_filaments",
+      "passive_kinesin"
+    ],
+    [
+      "passive_kinesin",
+      "tree_ballistic_threads"
+    ],
+    [
+      "passive_kinesin",
+      "tree_rolling_thunder"
+    ],
+    [
+      "tree_rolling_thunder",
+      "tree_guided_salvo"
+    ],
+    [
+      "tree_rolling_thunder",
+      "passive_glycolysis"
+    ],
+    [
+      "passive_glycolysis",
+      "tree_core_f02"
+    ],
+    [
+      "passive_glycolysis",
+      "tree_immortal_culture"
+    ],
+    [
+      "tree_immortal_culture",
+      "tree_adaptive_overdrive"
+    ],
+    [
+      "tree_immortal_culture",
       "tree_omnipotent_cytoplasm"
     ],
     [
       "tree_omnipotent_cytoplasm",
+      "passive_mitochondria"
+    ],
+    [
+      "tree_omnipotent_cytoplasm",
+      "tree_blood_price"
+    ],
+    [
+      "tree_blood_price",
+      "tree_deep_wound"
+    ],
+    [
+      "tree_blood_price",
+      "passive_opsonin"
+    ],
+    [
+      "passive_opsonin",
+      "passive_vdj"
+    ],
+    [
+      "passive_opsonin",
+      "tree_lightfooted_killer"
+    ],
+    [
+      "tree_lightfooted_killer",
+      "tree_assassins_mandate"
+    ],
+    [
+      "tree_overdrawn_strings",
+      "tree_ballistic_threads"
+    ],
+    [
+      "tree_ballistic_threads",
+      "tree_guided_salvo"
+    ],
+    [
+      "tree_guided_salvo",
+      "tree_core_f02"
+    ],
+    [
+      "tree_core_f02",
       "tree_adaptive_overdrive"
     ],
     [
@@ -1082,3009 +362,535 @@
     ],
     [
       "passive_mitochondria",
-      "tree_precision_f16"
+      "tree_deep_wound"
     ],
     [
-      "tree_precision_f16",
-      "tree_precision_f11"
+      "tree_deep_wound",
+      "passive_vdj"
     ],
     [
-      "tree_precision_f11",
+      "passive_vdj",
       "tree_assassins_mandate"
-    ],
-    [
-      "tree_assassins_mandate",
-      "tree_precision_f08"
-    ],
-    [
-      "tree_precision_f08",
-      "tree_precision_f05"
     ]
   ],
   "nodes": [
     {
       "branch": "vitality",
-      "col": -5,
-      "desc_key": "",
-      "icon": "🫀",
-      "id": "tree_vitality_f01",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "max_health",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAX_HEALTH_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 7,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🧱",
-      "id": "tree_vitality_f02",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "armor",
-          "unit": "flat",
-          "value": 1.0
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_ARMOR_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 7,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -3,
-      "desc_key": "",
-      "icon": "💚",
-      "id": "tree_vitality_f03",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "health_regen",
-          "unit": "flat",
-          "value": 0.5
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_HEALTH_REGEN_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 7,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
       "col": -2,
-      "desc_key": "",
-      "icon": "✋",
-      "id": "tree_vitality_f04",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "block",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_BLOCK_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 7,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -1,
-      "desc_key": "",
-      "icon": "🌊",
-      "id": "tree_vitality_f05",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "area",
-          "unit": "percent",
-          "value": 0.06
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_AREA_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 7,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -5,
-      "desc_key": "",
-      "icon": "💢",
-      "id": "tree_vitality_f06",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "knockback",
-          "unit": "percent",
-          "value": 0.12
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_KNOCKBACK_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 6,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🫀",
-      "id": "tree_vitality_f07",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "max_health",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAX_HEALTH_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 6,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -3,
-      "desc_key": "",
-      "icon": "🧱",
-      "id": "tree_vitality_f08",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "armor",
-          "unit": "flat",
-          "value": 1.0
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_ARMOR_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 6,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -5,
-      "desc_key": "",
-      "icon": "💚",
-      "id": "tree_vitality_f09",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "health_regen",
-          "unit": "flat",
-          "value": 0.5
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_HEALTH_REGEN_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 5,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -4,
-      "desc_key": "",
-      "icon": "✋",
-      "id": "tree_vitality_f10",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "block",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_BLOCK_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 5,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -5,
-      "desc_key": "",
-      "icon": "🩹",
-      "id": "tree_vitality_f11",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "max_health",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAX_HEALTH_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 4,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🛡️",
-      "id": "tree_vitality_f12",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "armor",
-          "unit": "flat",
-          "value": 2.0
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_ARMOR_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 4,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -5,
-      "desc_key": "",
-      "icon": "🌿",
-      "id": "tree_vitality_f13",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "health_regen",
-          "unit": "flat",
-          "value": 0.3
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_HEALTH_REGEN_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 3,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🩹",
-      "id": "tree_vitality_f14",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "max_health",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAX_HEALTH_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 3,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 0,
-      "desc_key": "",
-      "icon": "🔍",
-      "id": "tree_precision_f01",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_chance",
-          "unit": "flat",
-          "value": 0.01
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_CRIT_CHANCE_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 7,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 1,
-      "desc_key": "",
-      "icon": "🗡️",
-      "id": "tree_precision_f02",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_damage",
-          "unit": "percent",
-          "value": 0.1
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_CRIT_DAMAGE_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 7,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 2,
-      "desc_key": "",
-      "icon": "💨",
-      "id": "tree_precision_f03",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 7,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🌀",
-      "id": "tree_precision_f04",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "evasion",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_EVASION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 7,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 4,
-      "desc_key": "",
-      "icon": "🔻",
-      "id": "tree_precision_f05",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "pierce",
-          "unit": "flat",
-          "value": 1.0
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_PIERCE_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 7,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 0,
-      "desc_key": "",
-      "icon": "🎯",
-      "id": "tree_precision_f06",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_chance",
-          "unit": "flat",
-          "value": 0.02
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_CRIT_CHANCE_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 6,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🩸",
-      "id": "tree_precision_f07",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_damage",
-          "unit": "percent",
-          "value": 0.1
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_CRIT_DAMAGE_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 6,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 4,
-      "desc_key": "",
-      "icon": "🛼",
-      "id": "tree_precision_f08",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 6,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 0,
-      "desc_key": "",
-      "icon": "🍃",
-      "id": "tree_precision_f09",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "evasion",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_EVASION_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 5,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 0,
-      "desc_key": "",
-      "icon": "🔍",
-      "id": "tree_precision_f10",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_chance",
-          "unit": "flat",
-          "value": 0.01
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_CRIT_CHANCE_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 4,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 4,
-      "desc_key": "",
-      "icon": "🗡️",
-      "id": "tree_precision_f11",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_damage",
-          "unit": "percent",
-          "value": 0.1
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_CRIT_DAMAGE_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 4,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 0,
-      "desc_key": "",
-      "icon": "💨",
-      "id": "tree_precision_f12",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 3,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 1,
-      "desc_key": "",
-      "icon": "🌀",
-      "id": "tree_precision_f13",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "evasion",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_EVASION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 3,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 2,
-      "desc_key": "",
-      "icon": "🧿",
-      "id": "tree_precision_f14",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_chance",
-          "unit": "flat",
-          "value": 0.01
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_CRIT_CHANCE_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 3,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 3,
-      "desc_key": "",
-      "icon": "💥",
-      "id": "tree_precision_f15",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_damage",
-          "unit": "percent",
-          "value": 0.15
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_CRIT_DAMAGE_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 3,
-      "skill": ""
-    },
-    {
-      "branch": "precision",
-      "col": 4,
-      "desc_key": "",
-      "icon": "🏃",
-      "id": "tree_precision_f16",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 3,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -5,
-      "desc_key": "",
-      "icon": "📡",
-      "id": "tree_senses_f01",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "magnet",
-          "unit": "percent",
-          "value": 0.1
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAGNET_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 2,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -1,
-      "desc_key": "",
-      "icon": "⏲️",
-      "id": "tree_senses_f02",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_DURATION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 2,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -5,
-      "desc_key": "",
-      "icon": "⏱️",
-      "id": "tree_senses_f03",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.04
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 1,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🌀",
-      "id": "tree_senses_f04",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "evasion",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_EVASION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 1,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -1,
-      "desc_key": "",
-      "icon": "🌊",
-      "id": "tree_senses_f05",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "area",
-          "unit": "percent",
-          "value": 0.06
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_AREA_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 1,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -5,
-      "desc_key": "",
-      "icon": "🧲",
-      "id": "tree_senses_f06",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "magnet",
-          "unit": "percent",
-          "value": 0.15
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAGNET_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 0,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🕰️",
-      "id": "tree_senses_f07",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_DURATION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 0,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -5,
-      "desc_key": "",
-      "icon": "🕐",
-      "id": "tree_senses_f08",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -1,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🍃",
-      "id": "tree_senses_f09",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "evasion",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_EVASION_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -1,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -3,
-      "desc_key": "",
-      "icon": "⭕",
-      "id": "tree_senses_f10",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "area",
-          "unit": "percent",
-          "value": 0.06
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_AREA_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -1,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -2,
-      "desc_key": "",
-      "icon": "🧭",
-      "id": "tree_senses_f11",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "magnet",
-          "unit": "percent",
-          "value": 0.1
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAGNET_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -1,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -1,
-      "desc_key": "",
-      "icon": "⏳",
-      "id": "tree_senses_f12",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.12
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_DURATION_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -1,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -5,
-      "desc_key": "",
-      "icon": "⌛",
-      "id": "tree_senses_f13",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -2,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🧭",
-      "id": "tree_senses_f14",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "magnet",
-          "unit": "percent",
-          "value": 0.1
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAGNET_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -2,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -3,
-      "desc_key": "",
-      "icon": "⏳",
-      "id": "tree_senses_f15",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.12
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_DURATION_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -2,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -2,
-      "desc_key": "",
-      "icon": "⌛",
-      "id": "tree_senses_f16",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -2,
-      "skill": ""
-    },
-    {
-      "branch": "senses",
-      "col": -1,
-      "desc_key": "",
-      "icon": "🧭",
-      "id": "tree_senses_f17",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "magnet",
-          "unit": "percent",
-          "value": 0.1
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAGNET_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -2,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 0,
-      "desc_key": "",
-      "icon": "💥",
-      "id": "tree_core_f01",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "might",
-          "unit": "percent",
-          "value": 0.04
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MIGHT_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 2,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 1,
-      "desc_key": "",
-      "icon": "🌊",
-      "id": "tree_core_f02",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "area",
-          "unit": "percent",
-          "value": 0.06
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_AREA_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 2,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 2,
-      "desc_key": "",
-      "icon": "⏳",
-      "id": "tree_core_f03",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.12
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_DURATION_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 2,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🚀",
-      "id": "tree_core_f04",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_PROJECTILE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 2,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 0,
-      "desc_key": "",
-      "icon": "🕐",
-      "id": "tree_core_f05",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 1,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 1,
-      "desc_key": "",
-      "icon": "❤️",
-      "id": "tree_core_f06",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "max_health",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAX_HEALTH_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 1,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 2,
-      "desc_key": "",
-      "icon": "🏃",
-      "id": "tree_core_f07",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 1,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🫀",
-      "id": "tree_core_f08",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "life_steal",
-          "unit": "percent",
-          "value": 0.01
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_LIFE_STEAL_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 1,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 1,
-      "desc_key": "",
-      "icon": "💚",
-      "id": "tree_core_f09",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "health_regen",
-          "unit": "flat",
-          "value": 0.5
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_HEALTH_REGEN_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 0,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 2,
-      "desc_key": "",
-      "icon": "🔍",
-      "id": "tree_core_f10",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_chance",
-          "unit": "flat",
-          "value": 0.01
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_CRIT_CHANCE_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 0,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🧱",
-      "id": "tree_core_f11",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "armor",
-          "unit": "flat",
-          "value": 1.0
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_ARMOR_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 0,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 1,
-      "desc_key": "",
-      "icon": "⚔️",
-      "id": "tree_core_f12",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "might",
-          "unit": "percent",
-          "value": 0.06
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MIGHT_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -1,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 2,
-      "desc_key": "",
-      "icon": "⭕",
-      "id": "tree_core_f13",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "area",
-          "unit": "percent",
-          "value": 0.06
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_AREA_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -1,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 3,
-      "desc_key": "",
-      "icon": "⏲️",
-      "id": "tree_core_f14",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_DURATION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -1,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 1,
-      "desc_key": "",
-      "icon": "💨",
-      "id": "tree_core_f15",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.12
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_PROJECTILE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -2,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 2,
-      "desc_key": "",
-      "icon": "⌛",
-      "id": "tree_core_f16",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -2,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🩹",
-      "id": "tree_core_f17",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "max_health",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MAX_HEALTH_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -2,
-      "skill": ""
-    },
-    {
-      "branch": "core",
-      "col": 4,
-      "desc_key": "",
-      "icon": "💨",
-      "id": "tree_core_f18",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -2,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -5,
-      "desc_key": "",
-      "icon": "🏃",
-      "id": "tree_motility_f01",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -3,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🕐",
-      "id": "tree_motility_f02",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -3,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -2,
-      "desc_key": "",
-      "icon": "⚔️",
-      "id": "tree_motility_f03",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "might",
-          "unit": "percent",
-          "value": 0.06
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MIGHT_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -3,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -5,
-      "desc_key": "",
-      "icon": "🥊",
-      "id": "tree_motility_f04",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "knockback",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_KNOCKBACK_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -4,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -3,
-      "desc_key": "",
-      "icon": "♻️",
-      "id": "tree_motility_f05",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "health_regen",
-          "unit": "flat",
-          "value": 0.3
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_HEALTH_REGEN_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -4,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -5,
-      "desc_key": "",
-      "icon": "🛡️",
-      "id": "tree_motility_f06",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "armor",
-          "unit": "flat",
-          "value": 2.0
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_ARMOR_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -5,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -1,
-      "desc_key": "",
-      "icon": "🏃",
-      "id": "tree_motility_f07",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -5,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -5,
-      "desc_key": "",
-      "icon": "🕐",
-      "id": "tree_motility_f08",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -6,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -4,
-      "desc_key": "",
-      "icon": "⚔️",
-      "id": "tree_motility_f09",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "might",
-          "unit": "percent",
-          "value": 0.06
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MIGHT_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -6,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -3,
-      "desc_key": "",
-      "icon": "🥊",
-      "id": "tree_motility_f10",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "knockback",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_KNOCKBACK_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -6,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -2,
-      "desc_key": "",
-      "icon": "♻️",
-      "id": "tree_motility_f11",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "health_regen",
-          "unit": "flat",
-          "value": 0.3
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_HEALTH_REGEN_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -6,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -1,
-      "desc_key": "",
-      "icon": "💨",
-      "id": "tree_motility_f12",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -6,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -5,
-      "desc_key": "",
-      "icon": "⌛",
-      "id": "tree_motility_f13",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -7,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🔺",
-      "id": "tree_motility_f14",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "might",
-          "unit": "percent",
-          "value": 0.04
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MIGHT_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -7,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -3,
-      "desc_key": "",
-      "icon": "💨",
-      "id": "tree_motility_f15",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -7,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -2,
-      "desc_key": "",
-      "icon": "🏃",
-      "id": "tree_motility_f16",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -7,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -1,
-      "desc_key": "",
-      "icon": "🛼",
-      "id": "tree_motility_f17",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_MOVE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -7,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 1,
-      "desc_key": "",
-      "icon": "🚀",
-      "id": "tree_ballistics_f01",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_PROJECTILE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -3,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 2,
-      "desc_key": "",
-      "icon": "🎇",
-      "id": "tree_ballistics_f02",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "amount",
-          "unit": "flat",
-          "value": 1.0
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_AMOUNT_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -3,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 3,
-      "desc_key": "",
-      "icon": "📌",
-      "id": "tree_ballistics_f03",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "pierce",
-          "unit": "flat",
-          "value": 1.0
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_PIERCE_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -3,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 4,
-      "desc_key": "",
-      "icon": "🧛",
-      "id": "tree_ballistics_f04",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "life_steal",
-          "unit": "percent",
-          "value": 0.01
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_LIFE_STEAL_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -3,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 0,
-      "desc_key": "",
-      "icon": "🕐",
-      "id": "tree_ballistics_f05",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.03
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -4,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 1,
-      "desc_key": "",
-      "icon": "⏳",
-      "id": "tree_ballistics_f06",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.12
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_DURATION_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -4,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 0,
-      "desc_key": "",
-      "icon": "🚀",
-      "id": "tree_ballistics_f07",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_PROJECTILE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -5,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 4,
-      "desc_key": "",
-      "icon": "🫀",
-      "id": "tree_ballistics_f08",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "life_steal",
-          "unit": "percent",
-          "value": 0.01
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_LIFE_STEAL_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -5,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 0,
-      "desc_key": "",
-      "icon": "⏱️",
-      "id": "tree_ballistics_f09",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.04
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -6,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 1,
-      "desc_key": "",
-      "icon": "🕰️",
-      "id": "tree_ballistics_f10",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_DURATION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -6,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🏹",
-      "id": "tree_ballistics_f11",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_PROJECTILE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -6,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 4,
-      "desc_key": "",
-      "icon": "⏱️",
-      "id": "tree_ballistics_f12",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.04
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -6,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 0,
-      "desc_key": "",
-      "icon": "🕰️",
-      "id": "tree_ballistics_f13",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_DURATION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -7,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 1,
-      "desc_key": "",
-      "icon": "🏹",
-      "id": "tree_ballistics_f14",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_PROJECTILE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -7,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 2,
-      "desc_key": "",
-      "icon": "⏳",
-      "id": "tree_ballistics_f15",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.12
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_DURATION_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": -7,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🚀",
-      "id": "tree_ballistics_f16",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_PROJECTILE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -7,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 4,
-      "desc_key": "",
-      "icon": "🏹",
-      "id": "tree_ballistics_f17",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SMALL_PROJECTILE_SPEED_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -7,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -3,
-      "desc_key": "TREE_NODE_LYSOSOME_DESC",
-      "icon": "🧪",
       "id": "passive_lysosome",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "TREE_NODE_LYSOSOME_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": 5,
-      "skill": "passive_lysosome"
+      "row": 2,
+      "trait": "trait_passive_lysosome"
     },
     {
       "branch": "vitality",
-      "col": -2,
-      "desc_key": "",
-      "icon": "🫧",
+      "col": -1,
       "id": "tree_thick_cytoplasm",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "max_health",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_THICK_CYTOPLASM_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 5,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -2,
-      "desc_key": "",
-      "icon": "🍽️",
-      "id": "tree_lysosomal_appetite",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "might",
-          "unit": "percent",
-          "value": 0.06
-        }
-      ],
-      "name_key": "TREE_NODE_LYSOSOMAL_APPETITE_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": 6,
-      "skill": ""
+      "row": 2,
+      "trait": "trait_tree_thick_cytoplasm"
     },
     {
       "branch": "vitality",
       "col": -1,
-      "desc_key": "SKILL_BILAYER_DESC",
-      "icon": "🛡️",
       "id": "passive_bilayer",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_BILAYER_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": 5,
-      "skill": "passive_bilayer"
+      "row": 3,
+      "trait": "trait_passive_bilayer"
     },
     {
       "branch": "vitality",
-      "col": -1,
-      "desc_key": "",
-      "icon": "🦾",
+      "col": -2,
       "id": "tree_iron_membrane",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "armor",
-          "unit": "flat",
-          "value": 3.0
-        }
-      ],
-      "name_key": "TREE_NODE_IRON_MEMBRANE_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 6,
-      "skill": ""
-    },
-    {
-      "branch": "vitality",
-      "col": -2,
-      "desc_key": "SKILL_ENDOTOXIN_DESC",
-      "icon": "🧱",
-      "id": "passive_endotoxin",
-      "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_ENDOTOXIN_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 4,
-      "skill": "passive_endotoxin"
+      "row": 3,
+      "trait": "trait_tree_iron_membrane"
     },
     {
       "branch": "vitality",
       "col": -1,
-      "desc_key": "",
-      "icon": "🩺",
       "id": "tree_rapid_clotting",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "armor",
-          "unit": "flat",
-          "value": 2.0
-        }
-      ],
-      "name_key": "TREE_NODE_RAPID_CLOTTING_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 4,
-      "skill": ""
+      "row": 1,
+      "trait": "trait_tree_rapid_clotting"
     },
     {
       "branch": "vitality",
-      "col": -1,
-      "desc_key": "",
-      "icon": "🌬️",
+      "col": -2,
       "id": "tree_second_wind",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "health_regen",
-          "unit": "flat",
-          "value": 0.5
-        }
-      ],
-      "name_key": "TREE_NODE_SECOND_WIND_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 3,
-      "skill": ""
+      "row": 1,
+      "trait": "trait_tree_second_wind"
     },
     {
       "branch": "vitality",
-      "col": -2,
-      "desc_key": "",
-      "icon": "🌋",
+      "col": -3,
+      "id": "passive_endotoxin",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": 1,
+      "trait": "trait_passive_endotoxin"
+    },
+    {
+      "branch": "vitality",
+      "col": -3,
       "id": "tree_contained_fury",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "might",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_CONTAINED_FURY_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 3,
-      "skill": ""
+      "row": 2,
+      "trait": "trait_tree_contained_fury"
     },
     {
       "branch": "vitality",
       "col": -3,
-      "desc_key": "SKILL_AUTOPHAGY_DESC",
-      "icon": "🔄",
       "id": "passive_autophagy",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_AUTOPHAGY_NAME",
       "point_cost": 1,
-      "rarity": "magic",
       "row": 3,
-      "skill": "passive_autophagy"
-    },
-    {
-      "branch": "vitality",
-      "col": -3,
-      "desc_key": "",
-      "icon": "🏰",
-      "id": "tree_bulwark_metabolism",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "max_health",
-          "unit": "percent",
-          "value": 0.25
-        }
-      ],
-      "name_key": "TREE_NODE_BULWARK_METABOLISM_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
-      "row": 4,
-      "skill": ""
+      "trait": "trait_passive_autophagy"
     },
     {
       "branch": "precision",
-      "col": 2,
-      "desc_key": "SKILL_OPSONIN_DESC",
-      "icon": "🎯",
+      "col": 1,
       "id": "passive_opsonin",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_OPSONIN_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": 5,
-      "skill": "passive_opsonin"
+      "row": 2,
+      "trait": "trait_passive_opsonin"
     },
     {
       "branch": "precision",
-      "col": 3,
-      "desc_key": "SKILL_VDJ_DESC",
-      "icon": "🎲",
+      "col": 2,
       "id": "passive_vdj",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_VDJ_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": 5,
-      "skill": "passive_vdj"
+      "row": 2,
+      "trait": "trait_passive_vdj"
     },
     {
       "branch": "precision",
-      "col": 4,
-      "desc_key": "",
-      "icon": "⚔️",
+      "col": 2,
       "id": "tree_assassins_mandate",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_chance",
-          "unit": "flat",
-          "value": 0.1
-        }
-      ],
-      "name_key": "TREE_NODE_ASSASSINS_MANDATE_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": 5,
-      "skill": ""
+      "row": 3,
+      "trait": "trait_tree_assassins_mandate"
     },
     {
       "branch": "precision",
-      "col": 2,
-      "desc_key": "",
-      "icon": "🔍",
+      "col": 0,
       "id": "tree_precise_edge",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_chance",
-          "unit": "flat",
-          "value": 0.02
-        }
-      ],
-      "name_key": "TREE_NODE_PRECISE_EDGE_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 6,
-      "skill": ""
+      "row": 2,
+      "trait": "trait_tree_precise_edge"
     },
     {
       "branch": "precision",
-      "col": 1,
-      "desc_key": "",
-      "icon": "🧿",
+      "col": 0,
       "id": "tree_marked_core",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_chance",
-          "unit": "flat",
-          "value": 0.02
-        }
-      ],
-      "name_key": "TREE_NODE_MARKED_CORE_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 5,
-      "skill": ""
+      "row": 3,
+      "trait": "trait_tree_marked_core"
     },
     {
       "branch": "precision",
-      "col": 1,
-      "desc_key": "",
-      "icon": "⏱️",
+      "col": 0,
       "id": "tree_execution_tempo",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_damage",
-          "unit": "percent",
-          "value": 0.2
-        }
-      ],
-      "name_key": "TREE_NODE_EXECUTION_TEMPO_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 6,
-      "skill": ""
+      "row": 1,
+      "trait": "trait_tree_execution_tempo"
     },
     {
       "branch": "precision",
       "col": 1,
-      "desc_key": "",
-      "icon": "🩸",
       "id": "tree_blood_price",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "might",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_BLOOD_PRICE_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 4,
-      "skill": ""
+      "row": 1,
+      "trait": "trait_tree_blood_price"
     },
     {
       "branch": "precision",
       "col": 2,
-      "desc_key": "",
-      "icon": "🩹",
       "id": "tree_deep_wound",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "crit_damage",
-          "unit": "percent",
-          "value": 0.15
-        }
-      ],
-      "name_key": "TREE_NODE_DEEP_WOUND_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 4,
-      "skill": ""
+      "row": 1,
+      "trait": "trait_tree_deep_wound"
     },
     {
       "branch": "precision",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🪽",
+      "col": 1,
       "id": "tree_lightfooted_killer",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_LIGHTFOOTED_KILLER_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 4,
-      "skill": ""
+      "row": 3,
+      "trait": "trait_tree_lightfooted_killer"
     },
     {
       "branch": "senses",
-      "col": -3,
-      "desc_key": "SKILL_CHEMOKINE_DESC",
-      "icon": "🧲",
+      "col": -2,
       "id": "passive_chemokine",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_CHEMOKINE_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": 0,
-      "skill": "passive_chemokine"
+      "row": -1,
+      "trait": "trait_passive_chemokine"
     },
     {
       "branch": "senses",
       "col": -2,
-      "desc_key": "",
-      "icon": "🔭",
       "id": "tree_far_sense",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "magnet",
-          "unit": "percent",
-          "value": 0.2
-        }
-      ],
-      "name_key": "TREE_NODE_FAR_SENSE_NAME",
       "point_cost": 1,
-      "rarity": "normal",
       "row": 0,
-      "skill": ""
+      "trait": "trait_tree_far_sense"
     },
     {
       "branch": "senses",
-      "col": -2,
-      "desc_key": "",
-      "icon": "🌾",
+      "col": -1,
       "id": "tree_antigen_harvest",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "magnet",
-          "unit": "percent",
-          "value": 0.15
-        }
-      ],
-      "name_key": "TREE_NODE_ANTIGEN_HARVEST_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 1,
-      "skill": ""
+      "row": 0,
+      "trait": "trait_tree_antigen_harvest"
     },
     {
       "branch": "senses",
       "col": -3,
-      "desc_key": "",
-      "icon": "🗺️",
       "id": "tree_scavenger_field",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "magnet",
-          "unit": "percent",
-          "value": 0.15
-        }
-      ],
-      "name_key": "TREE_NODE_SCAVENGER_FIELD_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 1,
-      "skill": ""
+      "row": 0,
+      "trait": "trait_tree_scavenger_field"
     },
     {
       "branch": "senses",
       "col": -3,
-      "desc_key": "",
-      "icon": "🍀",
       "id": "tree_lucky_mutation",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "evasion",
-          "unit": "percent",
-          "value": 0.04
-        }
-      ],
-      "name_key": "TREE_NODE_LUCKY_MUTATION_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 2,
-      "skill": ""
+      "row": -1,
+      "trait": "trait_tree_lucky_mutation"
     },
     {
       "branch": "senses",
-      "col": -2,
-      "desc_key": "",
-      "icon": "🦉",
+      "col": -3,
       "id": "tree_patient_observer",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.12
-        }
-      ],
-      "name_key": "TREE_NODE_PATIENT_OBSERVER_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 2,
-      "skill": ""
+      "row": -2,
+      "trait": "trait_tree_patient_observer"
     },
     {
       "branch": "senses",
-      "col": -4,
-      "desc_key": "",
-      "icon": "📡",
+      "col": -2,
       "id": "tree_swarm_cartography",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "magnet",
-          "unit": "percent",
-          "value": 0.4
-        }
-      ],
-      "name_key": "TREE_NODE_SWARM_CARTOGRAPHY_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": 2,
-      "skill": ""
+      "row": -2,
+      "trait": "trait_tree_swarm_cartography"
     },
     {
       "branch": "senses",
       "col": -1,
-      "desc_key": "",
-      "icon": "⚖️",
       "id": "tree_risk_assessment",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.04
-        }
-      ],
-      "name_key": "TREE_NODE_RISK_ASSESSMENT_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": 0,
-      "skill": ""
+      "row": -1,
+      "trait": "trait_tree_risk_assessment"
+    },
+    {
+      "branch": "senses",
+      "col": -1,
+      "id": "tree_senses_f01",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": -2,
+      "trait": "trait_small_magnet"
     },
     {
       "branch": "core",
       "col": 0,
-      "desc_key": "SKILL_LONGEVITY_DESC",
-      "icon": "⏳",
       "id": "passive_longevity",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_LONGEVITY_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": 0,
-      "skill": "passive_longevity"
+      "row": -1,
+      "trait": "trait_passive_longevity"
     },
     {
       "branch": "core",
-      "col": 0,
-      "desc_key": "",
-      "icon": "♾️",
+      "col": 1,
       "id": "tree_immortal_culture",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "health_regen",
-          "unit": "flat",
-          "value": 2.0
-        },
-        {
-          "stat": "life_steal",
-          "unit": "percent",
-          "value": 0.04
-        }
-      ],
-      "name_key": "TREE_NODE_IMMORTAL_CULTURE_NAME",
       "point_cost": 1,
-      "rarity": "rare",
       "row": -1,
-      "skill": ""
+      "trait": "trait_tree_immortal_culture"
     },
     {
       "branch": "core",
-      "col": 0,
-      "desc_key": "SKILL_GLYCOLYSIS_DESC",
-      "icon": "🍬",
+      "col": 1,
       "id": "passive_glycolysis",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_GLYCOLYSIS_NAME",
       "point_cost": 1,
-      "rarity": "magic",
       "row": -2,
-      "skill": "passive_glycolysis"
+      "trait": "trait_passive_glycolysis"
     },
     {
       "branch": "core",
-      "col": 4,
-      "desc_key": "SKILL_MITOCHONDRIA_DESC",
-      "icon": "⚡",
+      "col": 2,
       "id": "passive_mitochondria",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_MITOCHONDRIA_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": 2,
-      "skill": "passive_mitochondria"
+      "row": 0,
+      "trait": "trait_passive_mitochondria"
     },
     {
       "branch": "core",
-      "col": 4,
-      "desc_key": "",
-      "icon": "🚀",
+      "col": 2,
       "id": "tree_adaptive_overdrive",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "might",
-          "unit": "percent",
-          "value": 0.2
-        },
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_ADAPTIVE_OVERDRIVE_NAME",
       "point_cost": 1,
-      "rarity": "rare",
-      "row": 1,
-      "skill": ""
+      "row": -1,
+      "trait": "trait_tree_adaptive_overdrive"
     },
     {
       "branch": "core",
-      "col": 4,
-      "desc_key": "",
-      "icon": "🌌",
+      "col": 1,
       "id": "tree_omnipotent_cytoplasm",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "area",
-          "unit": "percent",
-          "value": 0.3
-        },
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.2
-        },
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.2
-        },
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.15
-        },
-        {
-          "stat": "max_health",
-          "unit": "percent",
-          "value": -0.25
-        }
-      ],
-      "name_key": "TREE_NODE_OMNIPOTENT_CYTOPLASM_NAME",
       "point_cost": 1,
-      "rarity": "unique",
       "row": 0,
-      "skill": ""
+      "trait": "trait_tree_omnipotent_cytoplasm"
     },
     {
       "branch": "core",
-      "col": 4,
-      "desc_key": "SKILL_HEMATOPOIETIC_DESC",
-      "icon": "🩸",
+      "col": 0,
       "id": "passive_hematopoietic",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_HEMATOPOIETIC_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": -1,
-      "skill": "passive_hematopoietic"
+      "row": -2,
+      "trait": "trait_passive_hematopoietic"
+    },
+    {
+      "branch": "core",
+      "col": 0,
+      "id": "tree_core_f01",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": 0,
+      "trait": "trait_small_might"
+    },
+    {
+      "branch": "core",
+      "col": 2,
+      "id": "tree_core_f02",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": -2,
+      "trait": "trait_small_area"
     },
     {
       "branch": "motility",
-      "col": -3,
-      "desc_key": "SKILL_ACTIN_DESC",
-      "icon": "🧬",
+      "col": -2,
       "id": "passive_actin",
       "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_ACTIN_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": -5,
-      "skill": "passive_actin"
-    },
-    {
-      "branch": "motility",
-      "col": -2,
-      "desc_key": "",
-      "icon": "🌀",
-      "id": "tree_cytoskeletal_drift",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.05
-        }
-      ],
-      "name_key": "TREE_NODE_CYTOSKELETAL_DRIFT_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -5,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -2,
-      "desc_key": "",
-      "icon": "💨",
-      "id": "tree_slipstream",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_SLIPSTREAM_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
       "row": -4,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🔥",
-      "id": "tree_oxidative_pace",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "cooldown_reduction",
-          "unit": "percentagepoints",
-          "value": 0.04
-        }
-      ],
-      "name_key": "TREE_NODE_OXIDATIVE_PACE_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -5,
-      "skill": ""
-    },
-    {
-      "branch": "motility",
-      "col": -4,
-      "desc_key": "",
-      "icon": "🧭",
-      "id": "tree_rapid_reposition",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.06
-        }
-      ],
-      "name_key": "TREE_NODE_RAPID_REPOSITION_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -4,
-      "skill": ""
+      "trait": "trait_passive_actin"
     },
     {
       "branch": "motility",
       "col": -1,
-      "desc_key": "",
-      "icon": "🏃",
-      "id": "tree_aerobic_sprint",
+      "id": "tree_cytoskeletal_drift",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.1
-        }
-      ],
-      "name_key": "TREE_NODE_AEROBIC_SPRINT_NAME",
       "point_cost": 1,
-      "rarity": "normal",
       "row": -4,
-      "skill": ""
+      "trait": "trait_tree_cytoskeletal_drift"
+    },
+    {
+      "branch": "motility",
+      "col": -1,
+      "id": "tree_slipstream",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": -3,
+      "trait": "trait_tree_slipstream"
     },
     {
       "branch": "motility",
       "col": -3,
-      "desc_key": "",
-      "icon": "🏇",
-      "id": "tree_pseudopod_marathon",
+      "id": "tree_oxidative_pace",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.18
-        }
-      ],
-      "name_key": "TREE_NODE_PSEUDOPOD_MARATHON_NAME",
       "point_cost": 1,
-      "rarity": "magic",
+      "row": -4,
+      "trait": "trait_tree_oxidative_pace"
+    },
+    {
+      "branch": "motility",
+      "col": -3,
+      "id": "tree_rapid_reposition",
+      "max_stacks": 1,
+      "point_cost": 1,
       "row": -3,
-      "skill": ""
+      "trait": "trait_tree_rapid_reposition"
     },
     {
       "branch": "motility",
       "col": -1,
-      "desc_key": "",
-      "icon": "🥾",
+      "id": "tree_aerobic_sprint",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": -5,
+      "trait": "trait_tree_aerobic_sprint"
+    },
+    {
+      "branch": "motility",
+      "col": -2,
+      "id": "tree_pseudopod_marathon",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": -3,
+      "trait": "trait_tree_pseudopod_marathon"
+    },
+    {
+      "branch": "motility",
+      "col": -2,
       "id": "tree_enduring_march",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "move_speed",
-          "unit": "percent",
-          "value": 0.04
-        }
-      ],
-      "name_key": "TREE_NODE_ENDURING_MARCH_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": -3,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 2,
-      "desc_key": "SKILL_KINESIN_DESC",
-      "icon": "🛤️",
-      "id": "passive_kinesin",
-      "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "SKILL_KINESIN_NAME",
-      "point_cost": 1,
-      "rarity": "magic",
       "row": -5,
-      "skill": "passive_kinesin"
+      "trait": "trait_tree_enduring_march"
     },
     {
-      "branch": "ballistics",
-      "col": 0,
-      "desc_key": "",
-      "icon": "🌩️",
-      "id": "tree_rolling_thunder",
+      "branch": "motility",
+      "col": -3,
+      "id": "tree_motility_f01",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.3
-        }
-      ],
-      "name_key": "TREE_NODE_ROLLING_THUNDER_NAME",
       "point_cost": 1,
-      "rarity": "magic",
-      "row": -3,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🧵",
-      "id": "tree_ballistic_threads",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.12
-        }
-      ],
-      "name_key": "TREE_NODE_BALLISTIC_THREADS_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
       "row": -5,
-      "skill": ""
+      "trait": "trait_small_move_speed"
     },
     {
       "branch": "ballistics",
       "col": 1,
-      "desc_key": "",
-      "icon": "🔱",
+      "id": "passive_kinesin",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": -4,
+      "trait": "trait_passive_kinesin"
+    },
+    {
+      "branch": "ballistics",
+      "col": 1,
+      "id": "tree_rolling_thunder",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": -3,
+      "trait": "trait_tree_rolling_thunder"
+    },
+    {
+      "branch": "ballistics",
+      "col": 2,
+      "id": "tree_ballistic_threads",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": -4,
+      "trait": "trait_tree_ballistic_threads"
+    },
+    {
+      "branch": "ballistics",
+      "col": 0,
       "id": "tree_splitting_volley",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "amount",
-          "unit": "flat",
-          "value": 1.0
-        }
-      ],
-      "name_key": "TREE_NODE_SPLITTING_VOLLEY_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": -5,
-      "skill": ""
+      "row": -4,
+      "trait": "trait_tree_splitting_volley"
     },
     {
       "branch": "ballistics",
-      "col": 2,
-      "desc_key": "",
-      "icon": "📌",
+      "col": 1,
       "id": "tree_piercing_filaments",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "pierce",
-          "unit": "flat",
-          "value": 1.0
-        }
-      ],
-      "name_key": "TREE_NODE_PIERCING_FILAMENTS_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": -6,
-      "skill": ""
-    },
-    {
-      "branch": "ballistics",
-      "col": 3,
-      "desc_key": "",
-      "icon": "🛰️",
-      "id": "tree_guided_salvo",
-      "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "projectile_speed",
-          "unit": "percent",
-          "value": 0.1
-        }
-      ],
-      "name_key": "TREE_NODE_GUIDED_SALVO_NAME",
-      "point_cost": 1,
-      "rarity": "normal",
-      "row": -4,
-      "skill": ""
+      "row": -5,
+      "trait": "trait_tree_piercing_filaments"
     },
     {
       "branch": "ballistics",
       "col": 2,
-      "desc_key": "",
-      "icon": "⏳",
-      "id": "tree_extended_chambers",
+      "id": "tree_guided_salvo",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "duration",
-          "unit": "percent",
-          "value": 0.12
-        }
-      ],
-      "name_key": "TREE_NODE_EXTENDED_CHAMBERS_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": -4,
-      "skill": ""
+      "row": -3,
+      "trait": "trait_tree_guided_salvo"
     },
     {
       "branch": "ballistics",
-      "col": 4,
-      "desc_key": "",
-      "icon": "🏹",
+      "col": 0,
+      "id": "tree_extended_chambers",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": -3,
+      "trait": "trait_tree_extended_chambers"
+    },
+    {
+      "branch": "ballistics",
+      "col": 2,
       "id": "tree_overdrawn_strings",
       "max_stacks": 1,
-      "modifiers": [
-        {
-          "stat": "might",
-          "unit": "percent",
-          "value": 0.08
-        }
-      ],
-      "name_key": "TREE_NODE_OVERDRAWN_STRINGS_NAME",
       "point_cost": 1,
-      "rarity": "normal",
-      "row": -4,
-      "skill": ""
+      "row": -5,
+      "trait": "trait_tree_overdrawn_strings"
+    },
+    {
+      "branch": "ballistics",
+      "col": 0,
+      "id": "tree_ballistics_f01",
+      "max_stacks": 1,
+      "point_cost": 1,
+      "row": -5,
+      "trait": "trait_small_projectile_speed"
     }
   ],
   "regions": [
     {
-      "branch": "vitality",
-      "col": -3,
-      "row": 5
-    },
-    {
       "branch": "precision",
-      "col": 2,
-      "row": 5
+      "col": 1,
+      "row": 2
     },
     {
       "branch": "senses",
-      "col": -3,
-      "row": 0
-    },
-    {
-      "branch": "core",
-      "col": 2,
-      "row": 0
+      "col": -2,
+      "row": -1
     },
     {
       "branch": "motility",
-      "col": -3,
-      "row": -5
+      "col": -2,
+      "row": -4
     },
     {
       "branch": "ballistics",
-      "col": 2,
-      "row": -5
+      "col": 1,
+      "row": -4
+    },
+    {
+      "branch": "vitality",
+      "col": -2,
+      "row": 2
+    },
+    {
+      "branch": "core",
+      "col": 1,
+      "row": -1
     }
   ],
   "start_nodes": {
