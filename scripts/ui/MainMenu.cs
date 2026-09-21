@@ -21,7 +21,6 @@ public partial class MainMenu : Control
 
     // Title View Controls
     public Label? TitleLbl { get; set; }
-    public Label? SubtitleLbl { get; set; }
     public Button? StartBtn { get; set; }
     public Button? CodexBtn { get; set; }
     public Button? RecordsBtn { get; set; }
@@ -92,7 +91,6 @@ public partial class MainMenu : Control
         LangBtn = GetNodeOrNull<Button>("LangButton");
 
         TitleLbl = GetNodeOrNull<Label>("TitleView/TitleLabel");
-        SubtitleLbl = GetNodeOrNull<Label>("TitleView/SubtitleLabel");
         StartBtn = GetNodeOrNull<Button>("TitleView/VBox/StartButton");
         CodexBtn = GetNodeOrNull<Button>("TitleView/VBox/CodexButton");
         RecordsBtn = GetNodeOrNull<Button>("TitleView/VBox/RecordsButton");
@@ -272,14 +270,9 @@ public partial class MainMenu : Control
     public void UpdateAllTexts()
     {
         if (LangBtn != null)
-            LangBtn.Text = GameManager.CurrentLanguage == "zh_CN" ? "🌐 English" : "🌐 简体中文";
+            LangBtn.Text = GameManager.CurrentLanguage == "zh_CN" ? "English" : "简体中文";
 
         if (TitleLbl != null) TitleLbl.Text = Tr("TITLE_MAIN");
-        if (SubtitleLbl != null)
-        {
-            SubtitleLbl.Text = Tr("SUBTITLE_MAIN");
-            SubtitleLbl.Visible = !string.IsNullOrEmpty(SubtitleLbl.Text);
-        }
         if (StartBtn != null) StartBtn.Text = Tr("BTN_START");
         if (CodexBtn != null) CodexBtn.Text = Tr("BTN_CODEX");
         if (RecordsBtn != null) RecordsBtn.Text = Tr("BTN_RECORDS");

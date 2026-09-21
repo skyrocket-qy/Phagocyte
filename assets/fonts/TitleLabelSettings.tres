@@ -1,0 +1,14 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3]
+
+[ext_resource type="Font" path="res://assets/fonts/TitleFont.tres" id="1_titlefont"]
+
+[resource]
+font = ExtResource("1_titlefont")
+font_size = 56
+font_color = Color(0.62, 0.92, 1, 1)
+line_spacing = 0.0
+outline_size = 6
+outline_color = Color(0.02, 0.06, 0.09, 0.9)
+shadow_size = 12
+shadow_color = Color(0, 0.9, 1, 0.45)
+shadow_offset = Vector2(0, 0)

@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://by7d5sw8fuhej"
-path="res://.godot/imported/chinese_font.ttf-7bf1633f2a712d84ddf8fc3006831742.fontdata"
+uid="uid://uobxghkpoueu"
+path="res://.godot/imported/SmileySans-Title.ttf-ebe6a122f8baece20df266602cfb06ab.fontdata"
 
 [deps]
 
-source_file="res://assets/fonts/chinese_font.ttf"
-dest_files=["res://.godot/imported/chinese_font.ttf-7bf1633f2a712d84ddf8fc3006831742.fontdata"]
+source_file="res://assets/fonts/SmileySans-Title.ttf"
+dest_files=["res://.godot/imported/SmileySans-Title.ttf-ebe6a122f8baece20df266602cfb06ab.fontdata"]
 
 [params]
 

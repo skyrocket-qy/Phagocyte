@@ -42,7 +42,7 @@ enabled=PackedStringArray("res://addons/godot_ai/plugin.cfg")
 
 [gui]
 
-theme/custom_font="res://assets/fonts/chinese_font.ttf"
+theme/custom_font="res://assets/fonts/NotoSansSC-Body.ttf"
 
 [input]
 

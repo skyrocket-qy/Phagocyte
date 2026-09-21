@@ -1,11 +1,10 @@
 id,en,zh_CN
 TITLE_MAIN,PHAGOCYTE,噬血者
-SUBTITLE_MAIN,,
-BTN_START,🩸 Begin Immune Action,🩸 开始免疫行动
-BTN_CODEX,🔬 Microscopic Codex,🔬 微观档案馆
+BTN_START,Begin Immune Action,开始免疫行动
+BTN_CODEX,Microscopic Codex,微观档案馆
 BTN_QUIT,Exit Game,退出游戏
 BTN_CLOSE,Close Codex,关闭档案
-LANG_SWITCH_LABEL,🌐 简体中文,🌐 English
+LANG_SWITCH_LABEL,简体中文,English
 HEADER_SELECT_CLASS,Select Your Immune Defense Cell,选择你的免疫防御细胞
 STATUS_UNLOCKED,Status: Unlocked (READY),状态：已解锁
 STATUS_LOCKED,Status: Under Specialization (Coming Soon),状态：研发特化中 (敬请期待)
@@ -359,7 +358,7 @@ ACH_GIANT_VOLUME_DESC,Expand cell volume to 2.0x or greater through Area mutatio
 ACH_FULL_ARSENAL_TITLE,Metabolic Arsenal,基因武装
 ACH_FULL_ARSENAL_DESC,Equip 5 active skills simultaneously in a run.,在单次战局中同时激活装配 5 种主动生化武器。
 SKILL_BAR_DUAL_TITLE,⚔️ Actives (5)  |  🧬 Passives (5),⚔️ 主动武器 (5)  |  🧬 被动特质 (5)
-BTN_SETTINGS,⚙️ Settings,⚙️ 系統設定
+BTN_SETTINGS,Settings,系統設定
 SETTINGS_TITLE,⚙️ System Settings,⚙️ 系統設定
 SETTINGS_TAB_CONTROLS,🎮 Controls Guide,🎮 操作指南
 SETTINGS_TAB_AUDIO,🔊 Audio & Sound,🔊 聲音音效
@@ -430,7 +429,7 @@ SKILL_ENDOTOXIN_BIO,Biochem: Down-regulation of TLR4-MD2 inflammatory cascade pr
 SKILL_HEMATOPOIETIC_NAME,Hematopoietic Reserve,造血干细胞储备
 SKILL_HEMATOPOIETIC_DESC,"Max HP +10%, grants Revival +1.",最大生命值 +10%，获得一次原地满血重生机会。
 SKILL_HEMATOPOIETIC_BIO,Biochem: Pluripotent hematopoietic stem cells in bone marrow niches trigger emergency clonal replenishment upon leukocyte lysis.,生物机制：保留多能造血干细胞种子，在白血球发生不可逆裂解破损时触发紧急克隆增殖，实现原地满血重生。
-BTN_RECORDS,📋 Run Records,📋 病歷記錄
+BTN_RECORDS,Run Records,病歷記錄
 RECORDS_TITLE,📋 Medical Records,📋 病歷記錄
 RECORDS_SETTLEMENT_VICTORY,✅ Antibody Neutralization — Run Cleared,✅ 抗體中和 — 通關
 RECORDS_SETTLEMENT_DEFEAT,☠️ SIRS Analysis — Run Failed,☠️ SIRS 分析 — 陣亡
