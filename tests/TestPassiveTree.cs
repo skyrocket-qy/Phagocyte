@@ -89,10 +89,10 @@ public partial class TestPassiveTree : TestHarness
             starts.Add(start);
         }
         AssertThat(starts.Count).IsEqual(5);
-        AssertThat(starts.Contains(PassiveTreeManager.NucleusNodeId)).IsFalse();
+        AssertThat(PassiveTreeManager.IsKnownNode("tree_hsc_core")).IsFalse();
         GD.Print("[PASS] All five cells begin at distinct nodes on one shared tree.");
 
-        AssertThat(PassiveTreeManager.Nodes.Length).IsGreaterEqual(52);
+        AssertThat(PassiveTreeManager.Nodes.Length).IsGreaterEqual(51);
         var nodeIds = new List<string>();
         int tradeoffCount = 0;
         int comboCount = 0;
@@ -105,7 +105,6 @@ public partial class TestPassiveTree : TestHarness
         };
         foreach (var node in PassiveTreeManager.Nodes)
         {
-            bool isNucleus = PassiveTreeManager.IsNucleus(node.Id);
             AssertThat(nodeIds.Contains(node.Id)).IsFalse();
             nodeIds.Add(node.Id);
             if (!rarities.Contains(node.Rarity))
@@ -127,8 +126,7 @@ public partial class TestPassiveTree : TestHarness
                 else
                     negative = true;
             }
-            if (!isNucleus)
-                AssertThat(effects >= 1).IsTrue();
+            AssertThat(effects >= 1).IsTrue();
             if (node.Rarity == PassiveTreeManager.TreeRarity.Normal)
                 AssertThat(node.Modifiers.Length).IsEqual(1);
             if (node.Rarity == PassiveTreeManager.TreeRarity.Magic && node.SkillType == null)
@@ -150,14 +148,14 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(PassiveTreeManager.GetPointCost("tree_assassins_mandate")).IsEqual(1);
         AssertThat(PassiveTreeManager.GetPointCost("tree_adaptive_overdrive")).IsEqual(1);
         AssertThat(PassiveTreeManager.GetPointCost("tree_omnipotent_cytoplasm")).IsEqual(1);
-        GD.Print("[PASS] The shared tree has 52 validated nodes with rarities, combinations, and trade-offs.");
+        GD.Print("[PASS] The shared tree has 51 validated nodes with rarities, combinations, and trade-offs.");
 
-        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", PassiveTreeManager.NucleusNodeId)).IsEqual(1);
-        AssertThat(PassiveTreeManager.GetPointCost(PassiveTreeManager.NucleusNodeId)).IsEqual(0);
-        AssertThat(PassiveTreeManager.GetNeighbors(PassiveTreeManager.NucleusNodeId).Count).IsEqual(4);
-        AssertThat(PassiveTreeManager.RefundNode("macrophage", PassiveTreeManager.NucleusNodeId)).IsFalse();
+        string macroStart = PassiveTreeManager.GetStartNode("macrophage");
+        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", macroStart)).IsEqual(1);
+        AssertThat(PassiveTreeManager.GetPointCost(macroStart)).IsEqual(1);
+        AssertThat(PassiveTreeManager.RefundNode("macrophage", macroStart)).IsFalse();
         AssertThat(PassiveTreeManager.GetSpentPoints("macrophage")).IsEqual(0);
-        GD.Print("[PASS] The innate HSC nucleus is always active and never consumes points.");
+        GD.Print("[PASS] The innate start hub is always active and never consumes points.");
 
         string prevLang = GameManager.CurrentLanguage;
         GameManager.SetLanguage("en");
@@ -274,7 +272,6 @@ public partial class TestPassiveTree : TestHarness
         }
         foreach (var pair in degrees)
             AssertThat(pair.Value).IsLessEqual(4);
-        AssertThat(PassiveTreeManager.GetNeighbors(PassiveTreeManager.NucleusNodeId).Count).IsEqual(4);
         GD.Print("[PASS] Every connection is one orthogonal grid step and no node exceeds four links.");
 
         AssertThat(PassiveTreeManager.RecordRunLevel("dendritic", 25)).IsTrue();
@@ -291,9 +288,7 @@ public partial class TestPassiveTree : TestHarness
 
         string prevLang = GameManager.CurrentLanguage;
         GameManager.SetLanguage("en");
-        AssertThat(PassiveTreeManager.GetNodeName(PassiveTreeManager.NucleusNodeId).Contains("HSC")).IsTrue();
         AssertThat(PassiveTreeManager.GetNodeTooltipText("dendritic", "tree_thick_cytoplasm").Contains("atrophy")).IsFalse();
-        AssertThat(PassiveTreeManager.GetNodeTooltipText("dendritic", PassiveTreeManager.NucleusNodeId).Contains("Innate")).IsTrue();
         GameManager.SetLanguage(prevLang);
 
         AssertThat(PassiveTreeManager.Purchase("dendritic", "passive_hematopoietic")).IsTrue();
@@ -358,14 +353,11 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(_menu.TreeCanvas!.RenderedNodeCount).IsEqual(PassiveTreeManager.Nodes.Length);
         AssertThat(PassiveTreeManager.TryGetNode("passive_lysosome", out var lysosomeNode)).IsTrue();
         AssertThat(PassiveTreeView.HitTestWorldPosition(lysosomeNode.Position)).IsEqual("passive_lysosome");
-        AssertThat(PassiveTreeView.HitTestWorldPosition(PassiveTreeManager.WorldCenter)).IsEqual(PassiveTreeManager.NucleusNodeId);
+        AssertThat(PassiveTreeView.HitTestWorldPosition(PassiveTreeManager.WorldCenter)).IsNull();
         AssertThat(PassiveTreeView.HitTestWorldPosition(new Vector2(-1000, -1000))).IsNull();
         var startButton = _menu.TreeCanvas.GetNodeOrNull<Button>("ZoomRoot/TreeNode_passive_lysosome");
         AssertThat(startButton).IsNotNull();
         AssertThat(startButton!.Text.Contains("🧪")).IsTrue();
-        var nucleusButton = _menu.TreeCanvas.GetNodeOrNull<Button>("ZoomRoot/TreeNode_" + PassiveTreeManager.NucleusNodeId);
-        AssertThat(nucleusButton).IsNotNull();
-        AssertThat(nucleusButton!.Text.Contains("🧫")).IsTrue();
 
         _menu.OnTreeNodeActivated("tree_thick_cytoplasm");
         AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "tree_thick_cytoplasm")).IsEqual(1);

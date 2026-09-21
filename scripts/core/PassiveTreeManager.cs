@@ -51,8 +51,6 @@ public static class PassiveTreeManager
     /// </summary>
     public const int InnateStartStacks = 1;
 
-    public const string NucleusNodeId = "tree_hsc_core";
-
     public static readonly Vector2 WorldCenter = new(2400.0f, 2400.0f);
 
     public const float GridStep = 150.0f;
@@ -65,11 +63,6 @@ public static class PassiveTreeManager
     public static int LayerOf(int column, int row)
     {
         return Math.Abs(column) + Math.Abs(row);
-    }
-
-    public static bool IsNucleus(string nodeId)
-    {
-        return nodeId == NucleusNodeId;
     }
 
     private static readonly JsonStore.SavePathSlot _savePath = new("passive_tree.json");
@@ -201,8 +194,6 @@ public static class PassiveTreeManager
 
     public static string DescribeNodeEffects(TreeNode node)
     {
-        if (IsNucleus(node.Id))
-            return TranslationServer.Translate("TREE_NUCLEUS_DESC");
         if (!string.IsNullOrEmpty(node.DescKey))
             return TranslationServer.Translate(node.DescKey);
 
@@ -244,9 +235,7 @@ public static class PassiveTreeManager
         int stacks = GetNodeStacks(cellId, nodeId);
         var text = new StringBuilder();
         text.AppendLine("[b]" + node.Icon + " " + TranslationServer.Translate(node.NameKey) + "[/b]");
-        if (IsNucleus(nodeId))
-            text.AppendLine(TranslationServer.Translate("TREE_NUCLEUS_INNATE"));
-        else if (IsInnateStartNode(cellId, nodeId))
+        if (IsInnateStartNode(cellId, nodeId))
             text.AppendLine(TranslationServer.Translate("TREE_START_INNATE"));
         text.AppendLine(GetNodeDescription(nodeId));
 
@@ -254,7 +243,7 @@ public static class PassiveTreeManager
         if (IsInnateStartNode(cellId, nodeId))
             status = ""; // already stated in the header line above
         else if (stacks >= node.MaxStacks)
-            status = TranslationServer.Translate(IsNucleus(nodeId) ? "TREE_NUCLEUS_ACTIVE" : "TREE_MAXED");
+            status = TranslationServer.Translate("TREE_MAXED");
         else if (CanPurchase(cellId, nodeId))
             status = TranslationServer.Translate("TREE_PURCHASE_HINT");
         else if (GetPointsAvailable(cellId) >= node.PointCost)
@@ -344,7 +333,7 @@ public static class PassiveTreeManager
     {
         if (!TryGetNode(nodeId, out var node))
             return int.MaxValue;
-        return IsNucleus(nodeId) ? 0 : Math.Max(1, node.PointCost);
+        return Math.Max(1, node.PointCost);
     }
 
     public static TreeRarity GetRarity(string nodeId)
@@ -361,7 +350,7 @@ public static class PassiveTreeManager
     /// <summary>True when the node is the cell's innately lit start hub (0-point).</summary>
     public static bool IsInnateStartNode(string cellId, string nodeId)
     {
-        if (string.IsNullOrEmpty(cellId) || string.IsNullOrEmpty(nodeId) || IsNucleus(nodeId))
+        if (string.IsNullOrEmpty(cellId) || string.IsNullOrEmpty(nodeId))
             return false;
         return nodeId == GetStartNode(cellId);
     }
@@ -423,9 +412,9 @@ public static class PassiveTreeManager
     public static Dictionary<string, int> GetConnectedAllocation(string cellId)
     {
         var remaining = GetValidOwnedNodes(cellId);
-        var connected = new Dictionary<string, int> { [NucleusNodeId] = 1 };
+        var connected = new Dictionary<string, int>();
         string start = GetStartNode(cellId);
-        var visited = new System.Collections.Generic.HashSet<string> { NucleusNodeId };
+        var visited = new System.Collections.Generic.HashSet<string>();
         if (!string.IsNullOrEmpty(start))
         {
             // The start hub is innately lit at 0 cost (docs/passivetree.md §5.1).
@@ -475,7 +464,7 @@ public static class PassiveTreeManager
             remaining.Remove(removeNodeId);
 
         string start = GetStartNode(cellId);
-        var visited = new System.Collections.Generic.HashSet<string> { NucleusNodeId };
+        var visited = new System.Collections.Generic.HashSet<string>();
         if (!string.IsNullOrEmpty(start))
             visited.Add(start);
         var frontier = new System.Collections.Generic.Queue<string>();
@@ -513,7 +502,7 @@ public static class PassiveTreeManager
         int total = 0;
         foreach (var pair in GetAllocation(cellId))
         {
-            if (IsNucleus(pair.Key) || IsInnateStartNode(cellId, pair.Key))
+            if (IsInnateStartNode(cellId, pair.Key))
                 continue;
             total += pair.Value * GetPointCost(pair.Key);
         }
@@ -561,8 +550,6 @@ public static class PassiveTreeManager
         EnsureLoaded();
         if (!IsKnownCell(cellId) || !IsKnownNode(nodeId))
             return false;
-        if (IsNucleus(nodeId))
-            return false;
         if (GetNodeStacks(cellId, nodeId) >= GetMaxStacks(nodeId))
             return false;
         if (GetPointsAvailable(cellId) < GetPointCost(nodeId))
@@ -591,7 +578,7 @@ public static class PassiveTreeManager
     public static bool RefundNode(string cellId, string nodeId)
     {
         EnsureLoaded();
-        if (!IsKnownCell(cellId) || !IsKnownNode(nodeId) || IsNucleus(nodeId))
+        if (!IsKnownCell(cellId) || !IsKnownNode(nodeId))
             return false;
         // The innate start hub is permanent and never refundable.
         if (IsInnateStartNode(cellId, nodeId))
@@ -649,7 +636,7 @@ public static class PassiveTreeManager
             foreach (var nodePair in GetConnectedAllocation(cellPair.Key))
             {
                 // The innate start hub is derived, never persisted.
-                if (IsNucleus(nodePair.Key) || IsInnateStartNode(cellPair.Key, nodePair.Key))
+                if (IsInnateStartNode(cellPair.Key, nodePair.Key))
                     continue;
                 owned[nodePair.Key] = nodePair.Value;
             }

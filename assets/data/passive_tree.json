@@ -1,22 +1,6 @@
 {
   "edges": [
     [
-      "tree_hsc_core",
-      "passive_glycolysis"
-    ],
-    [
-      "tree_hsc_core",
-      "passive_mitochondria"
-    ],
-    [
-      "tree_hsc_core",
-      "passive_hematopoietic"
-    ],
-    [
-      "tree_hsc_core",
-      "passive_longevity"
-    ],
-    [
       "passive_hematopoietic",
       "tree_adaptive_overdrive"
     ],
@@ -266,20 +250,6 @@
     ]
   ],
   "nodes": [
-    {
-      "branch": "core",
-      "col": 0,
-      "desc_key": "",
-      "icon": "🧫",
-      "id": "tree_hsc_core",
-      "max_stacks": 1,
-      "modifiers": [],
-      "name_key": "TREE_NODE_HSC_NAME",
-      "point_cost": 0,
-      "rarity": "unique",
-      "row": 0,
-      "skill": ""
-    },
     {
       "branch": "precision",
       "col": 2,

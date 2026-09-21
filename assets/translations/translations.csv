@@ -37,10 +37,6 @@ TREE_BRANCH_MOTILITY,Granule Activation Region,颗粒活化区域,颗粒活化�
 TREE_BRANCH_BALLISTICS,Endoplasmic Factory,内质网工厂,内质网工厂,小胞体工場,Endoplasma-Fabrik,Usine endoplasmique,Эндоплазматическая фабрика,Fábrica endoplasmática
 TREE_BRANCH_VITALITY,Monocyte Giantization Region,单核巨化区域,单核巨化区域,単球巨大化領域,Monozyten-Gigantisierungsregion,Région de gigantisation monocytaire,Область гигантизации моноцитов,Región de gigantismo monocitario
 TREE_BRANCH_CORE,Hematopoietic Core,造血核心区,造血核心区,造血コア,Hämatopoetischer Kern,Noyau hématopoïétique,Гемопоэтическое ядро,Núcleo hematopoyético
-TREE_NODE_HSC_NAME,Pluripotent HSC,全能造血干细胞,全能造血干细胞,多能性造血幹細胞,Pluripotente HSZ,CSH pluripotente,Плюрипотентная ГСК,CMH pluripotente
-TREE_NUCLEUS_DESC,The shared hematopoietic stem cell chassis. All five lineage portals radiate from this nucleus.,共享的造血干细胞底盘。五大谱系门户皆由核心向外辐射分化。,共享的造血干细胞底盘。五大谱系门户皆由核心向外辐射分化。,共有造血幹細胞シャーシ。五大系列ポータルがこの核から放射状に分化する。,Gemeinsames hämatopoetisches Stammzell-Chassis. Alle fünf Linienportale strahlen von diesem Kern aus.,Châssis partagé de cellules souches hématopoïétiques. Les cinq portails de lignée en rayonnent.,Общее шасси гемопоэтических стволовых клеток. Все пять порталов линий расходятся от этого ядра.,Chasis compartido de células madre hematopoyéticas. Los cinco portales de linaje irradian de este núcleo.
-TREE_NUCLEUS_INNATE,Innate · always active,先天核心 · 永久生效,先天核心 · 永久生效,先天 · 常時発動,Angeboren · immer aktiv,Inné · toujours actif,Врождённое · всегда активно,Innato · siempre activo
-TREE_NUCLEUS_ACTIVE,The nucleus is always active.,核心永久生效。,核心永久生效。,核は常時発動中。,Der Kern ist immer aktiv.,Le noyau est toujours actif.,Ядро всегда активно.,El núcleo siempre está activo.
 STAT_MIGHT,Might,伤害,伤害,攻撃,Macht,Puissance,Мощь,Poder
 STAT_AREA,Area,范围,范围,範囲,Bereich,Zone,Область,Área
 STAT_COOLDOWN_REDUCTION,Cooldown Reduction,冷却缩减,冷却缩减,冷却短縮,Abklingzeitreduktion,Réduction de recharge,Сокращение перезарядки,Reducción de recarga

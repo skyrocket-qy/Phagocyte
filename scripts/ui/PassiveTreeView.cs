@@ -6,9 +6,9 @@ namespace Phagocyte.UI;
 
 /// <summary>
 /// Confocal-fluorescence grid board for the shared passive tree.
-/// The pluripotent HSC sits at the lattice center; five lineage bands and the
-/// core metabolism block are wired by orthogonal microtubule traces between
-/// adjacent cells, so routes never overlap or cross.
+/// Five lineage start hubs and the core metabolism block are wired by
+/// orthogonal microtubule traces between adjacent cells, so routes never
+/// overlap or cross.
 /// Pan, zoom, hover tooltips, left-click purchases, right-click refunds.
 /// </summary>
 public partial class PassiveTreeView : Control
@@ -813,7 +813,6 @@ public partial class PassiveTreeView : Control
 
         DrawBands(_graphLayer);
         DrawEdges(_graphLayer, owned, start);
-        DrawNucleus(_graphLayer);
         DrawNodes(_graphLayer, owned, start);
     }
 
@@ -871,28 +870,6 @@ public partial class PassiveTreeView : Control
     private static Rect2 ExpandBounds(Rect2 bounds, float pad)
     {
         return new Rect2(bounds.Position - new Vector2(pad, pad), bounds.Size + new Vector2(pad * 2.0f, pad * 2.0f));
-    }
-
-    private void DrawNucleus(Control layer)
-    {
-        Vector2 center = PassiveTreeManager.WorldCenter;
-        float pulse = 1.0f + 0.03f * Mathf.Sin(_time * 1.7f);
-        for (int i = 0; i < 9; i++)
-        {
-            float radius = (168.0f - i * 15.0f) * pulse;
-            layer.DrawCircle(center, radius, new Color(0.55f, 0.92f, 1.0f, 0.012f + i * 0.0018f));
-        }
-
-        layer.DrawCircle(center, 70.0f * pulse, new Color(0.045f, 0.11f, 0.19f, 0.96f));
-        layer.DrawArc(center, 74.0f * pulse, 0.0f, Mathf.Tau, 64, new Color(0.55f, 0.95f, 1.0f, 0.45f), 2.4f, true);
-        layer.DrawArc(center, 56.0f * pulse, 0.0f, Mathf.Tau, 64, new Color(0.76f, 0.55f, 1.0f, 0.20f), 1.6f, true);
-
-        for (int i = 0; i < 3; i++)
-        {
-            float startAngle = _time * (0.45f + i * 0.16f) + i * 2.1f;
-            layer.DrawArc(center, 30.0f + i * 12.0f, startAngle, startAngle + 2.1f, 32,
-                new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.24f - i * 0.05f), 3.0f, true);
-        }
     }
 
     private void DrawEdges(Control layer, Godot.Collections.Dictionary<string, int> owned, string start)
@@ -957,7 +934,6 @@ public partial class PassiveTreeView : Control
     {
         foreach (var node in _orderedNodes)
         {
-            bool isNucleus = PassiveTreeManager.IsNucleus(node.Id);
             Vector2 position = node.Position;
             int stacks = owned.TryGetValue(node.Id, out int ownedStacks) ? ownedStacks : 0;
             bool hovered = HoveredNodeId == node.Id;
@@ -988,11 +964,6 @@ public partial class PassiveTreeView : Control
             layer.DrawPolyline(ClosedShape(node, radius, wobblePhase), edge,
                 node.Rarity == PassiveTreeManager.TreeRarity.Unique ? 4.6f : 2.8f, true);
 
-            if (isNucleus)
-            {
-                float corePulse = 4.0f + 2.0f * Mathf.Sin(_time * 2.2f);
-                layer.DrawArc(position, radius + corePulse, 0.0f, Mathf.Tau, 64, new Color(0.65f, 0.95f, 1.0f, 0.75f), 2.4f, true);
-            }
             if (isStart)
             {
                 float pulse = 7.0f + 2.4f * Mathf.Sin(_time * 2.6f);
@@ -1009,12 +980,10 @@ public partial class PassiveTreeView : Control
 
     private static float GetNodeRadius(PassiveTreeManager.TreeNode node)
     {
-        if (PassiveTreeManager.IsNucleus(node.Id))
-            return 46.0f;
         return node.Rarity switch
         {
-            PassiveTreeManager.TreeRarity.Unique => 52.0f,
-            PassiveTreeManager.TreeRarity.Rare => 42.0f,
+            PassiveTreeManager.TreeRarity.Unique => 42.0f,
+            PassiveTreeManager.TreeRarity.Rare => 38.0f,
             PassiveTreeManager.TreeRarity.Magic => 32.0f,
             _ => 25.0f
         };
@@ -1035,15 +1004,14 @@ public partial class PassiveTreeView : Control
     {
         return node.Rarity switch
         {
-            PassiveTreeManager.TreeRarity.Magic => Wobble(new[]
+            PassiveTreeManager.TreeRarity.Rare => Wobble(new[]
             {
                 node.Position + new Vector2(0, -radius),
                 node.Position + new Vector2(radius, 0),
                 node.Position + new Vector2(0, radius),
                 node.Position + new Vector2(-radius, 0)
             }, node.Position, wobblePhase),
-            PassiveTreeManager.TreeRarity.Rare => Wobble(PolygonPoints(node.Position, radius, 6, -Mathf.Pi / 2.0f), node.Position, wobblePhase),
-            PassiveTreeManager.TreeRarity.Unique => Wobble(StarPoints(node.Position, radius, radius * 0.46f, 8, -Mathf.Pi / 2.0f), node.Position, wobblePhase),
+            PassiveTreeManager.TreeRarity.Unique => Wobble(PolygonPoints(node.Position, radius, 6, 0.0f), node.Position, wobblePhase),
             _ => Wobble(PolygonPoints(node.Position, radius, 40, 0.0f), node.Position, wobblePhase)
         };
     }
@@ -1082,26 +1050,14 @@ public partial class PassiveTreeView : Control
         return points;
     }
 
-    private static Vector2[] StarPoints(Vector2 center, float outer, float inner, int points, float rotation)
-    {
-        var shape = new Vector2[points * 2];
-        for (int i = 0; i < points * 2; i++)
-        {
-            float radius = i % 2 == 0 ? outer : inner;
-            float angle = rotation + Mathf.Pi * i / points;
-            shape[i] = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
-        }
-        return shape;
-    }
-
     private static Color GetRarityColor(PassiveTreeManager.TreeRarity rarity)
     {
         return rarity switch
         {
-            PassiveTreeManager.TreeRarity.Magic => new Color(0.66f, 0.55f, 1.0f, 1.0f),
+            PassiveTreeManager.TreeRarity.Magic => new Color(0.32f, 0.72f, 1.00f, 1.0f),
             PassiveTreeManager.TreeRarity.Rare => new Color(1.00f, 0.78f, 0.32f, 1.0f),
             PassiveTreeManager.TreeRarity.Unique => new Color(1.00f, 0.48f, 0.22f, 1.0f),
-            _ => new Color(0.46f, 0.68f, 0.90f, 1.0f)
+            _ => new Color(1.0f, 1.0f, 1.0f, 1.0f)
         };
     }
 
