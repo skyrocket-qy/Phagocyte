@@ -14,10 +14,10 @@
 flowchart TD
     subgraph StartingHubs [五大細胞獨立起點中心 (5 Distinct Starting Hubs)]
         HUB_MAC["【巨噬起點中心】<br>(Macrophage Hub · 左上方)<br>體積 Area / 生命 HP / 護甲 Armor / 格擋 Block"]
-        HUB_CTL["【殺手 T 起點中心】<br>(CTL Hub · 右側)<br>移速 Speed / 暴擊 Crit / 穿透 Pierce / 閃避 Evasion"]
-        HUB_NEU["【嗜中性球起點中心】<br>(Neutrophil Hub · 左側)<br>傷害 Might / 擊退 Knock / 自癒 Regen"]
+        HUB_CTL["【殺手 T 起點中心】<br>(CTL Hub · 右上方)<br>移速 Speed / 暴擊 Crit / 穿透 Pierce / 閃避 Evasion"]
+        HUB_NEU["【嗜中性球起點中心】<br>(Neutrophil Hub · 左下方)<br>傷害 Might / 擊退 Knock / 自癒 Regen"]
         HUB_B["【B 細胞起點中心】<br>(B-Cell Hub · 右下方)<br>彈道數 Amount / 彈速 ProjSpd / CDR / 汲取 LifeSteal"]
-        HUB_DC["【樹突狀起點中心】<br>(Dendritic Hub · 正上方)<br>拾取 Magnet / 持續 Duration / 冷卻 CDR"]
+        HUB_DC["【樹突狀起點中心】<br>(Dendritic Hub · 左中段)<br>拾取 Magnet / 持續 Duration / 冷卻 CDR"]
     end
 
     subgraph CentralHighway [中央微管聯通主幹網絡 (Inter-Hub Microtubules)]
@@ -31,6 +31,22 @@ flowchart TD
     HUB_DC <--> CORE
 ```
 
+### 1.1 六區域方格排列 (2×3 Region Matrix)
+
+每個區域都是 **5×5 = 25 個節點的完整方格（Region Square）**，細胞起點位於方格正中心；
+五個細胞方格加上「造血核心區」共六個方格，以 **2 欄 × 3 列** 緊密相連（edge-to-edge、無間隙），
+拼成一整塊 **10×15 的節點棋盤（共 150 個節點）**：
+
+```
+[巨噬 vitality ][CTL precision  ]
+[樹突 senses   ][核心 core      ]
+[嗜中 motility ][B 細胞 ballistics]
+```
+
+- 每一格節點都與上下左右相鄰節點以單位正交微管相連（含跨區邊界），全盤共 275 條連線。
+- **造血核心區（Hematopoietic Core）** 位於棋盤中段右欄，與樹突、CTL、B 細胞三區相鄰。
+- 每個區域方格邊長 750px（5 格）；起點先天點亮，玩家由起點向四方逐步點亮，可自由跨越區界。
+
 ---
 
 ## 2. 正交微管網格棋盤拓撲與環層定義 (Orthogonal Grid & Ring Layers)
@@ -41,6 +57,7 @@ flowchart TD
 - **世界座標映射公式**：
   $$\text{Position} = \text{WorldCenter} + \begin{pmatrix} col \times \text{GridStep} \\ -row \times \text{GridStep} \end{pmatrix} \quad (\text{GridStep} = 150.0\,\text{px})$$
 - **正交相鄰連線原則**：微管光纖僅允許在上下左右相鄰格點間鋪設，**絕不允許斜向連線，絕不交叉重疊**。
+- **5×5 區域方格（Region Squares）**：五個細胞區域與造血核心各佔一個完整的 5×5 節點方格（25 節點），以 2 欄×3 列拼成一塊 10×15 棋盤；細胞起點固定在所屬方格正中心。所有上下左右相鄰的節點（含跨區邊界）皆以單位正交微管相連，因此可自由跨區點亮。
 - **細胞專屬曼哈頓環層（Cell-Specific Ring Layer $L$）**：
   每個節點相對於各細胞專屬起點 $(col_{\text{start}}, row_{\text{start}})$ 的層級深度由曼哈頓步數決定：
   $$\text{Ring Layer } L_{\text{cell}} = |col - col_{\text{start}}| + |row - row_{\text{start}}|$$
@@ -84,12 +101,12 @@ flowchart TD
 
 ### 4.2 殺手 T 細胞起點中心 (CTL Starting Hub)
 - **色調**：冰藍色與銳利青綠螢光。
-- **位置**：星盤右側。
+- **位置**：星盤右上方。
 - **專精純屬性**：`move_speed`（移動速度）、`crit_chance`（暴擊率）、`crit_damage`（暴擊傷害）、`pierce`（彈道穿透數）、`evasion`（流體閃避率）。
 
 ### 4.3 嗜中性球起點中心 (Neutrophil Starting Hub)
 - **色調**：烈焰橙與酸性亮黃螢光。
-- **位置**：星盤左側。
+- **位置**：星盤左下方。
 - **專精純屬性**：`might`（傷害強度）、`knockback`（擊退力量）、`health_regen`（生命自癒）、`armor`（膜剛性護甲）。
 
 ### 4.4 B 淋巴細胞起點中心 (B-Cell Starting Hub)
@@ -99,7 +116,7 @@ flowchart TD
 
 ### 4.5 樹突狀細胞起點中心 (Dendritic Starting Hub)
 - **色調**：電離紫與微光金綠螢光。
-- **位置**：星盤正上方。
+- **位置**：星盤左中段。
 - **專精純屬性**：`magnet`（ATP 拾取半徑）、`duration`（狀態與光環持續時間）、`cooldown_reduction`（技能冷卻縮減）、`area`（感知與效果範圍）。
 
 ---

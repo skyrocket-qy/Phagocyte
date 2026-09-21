@@ -163,13 +163,30 @@ public static class CatalogBuilders
     }
 
     public static void BuildTree(out TreeNode[] nodes, out (string From, string To)[] edges,
-        out System.Collections.Generic.Dictionary<string, string> starts)
+        out System.Collections.Generic.Dictionary<string, string> starts,
+        out System.Collections.Generic.Dictionary<string, Vector2> regions)
     {
         var root = CatalogLoader.LoadObject(DataPaths.PassiveTree);
         if (!root.TryGetValue("nodes", out var nodesVar) || nodesVar.VariantType != Variant.Type.Array)
             throw new DataLoadException(DataPaths.PassiveTree, "Missing 'nodes' array.");
 
+        regions = new System.Collections.Generic.Dictionary<string, Vector2>();
+        if (root.TryGetValue("regions", out var regionsVar) && regionsVar.VariantType == Variant.Type.Array)
+        {
+            foreach (var item in regionsVar.AsGodotArray())
+            {
+                var regionRow = item.AsGodotDictionary();
+                string branch = CatalogLoader.GetString(regionRow, "branch");
+                if (string.IsNullOrEmpty(branch) || regions.ContainsKey(branch))
+                    throw new DataLoadException(DataPaths.PassiveTree, $"Duplicate or missing region branch '{branch}'.");
+                regions[branch] = GridPosition(CatalogLoader.GetInt(regionRow, "col"), CatalogLoader.GetInt(regionRow, "row"));
+            }
+        }
+        if (regions.Count == 0)
+            throw new DataLoadException(DataPaths.PassiveTree, "Missing 'regions' array (5x5 region squares are data-owned).");
+
         var nodeList = new System.Collections.Generic.List<TreeNode>();
+        var branchCounts = new System.Collections.Generic.Dictionary<string, int>();
         var seen = new HashSet<string>();
         foreach (var item in nodesVar.AsGodotArray())
         {
@@ -177,8 +194,16 @@ public static class CatalogBuilders
             string id = CatalogLoader.GetString(row, "id");
             if (string.IsNullOrEmpty(id) || !seen.Add(id))
                 throw new DataLoadException(DataPaths.PassiveTree, $"Duplicate or missing node id '{id}'.");
+            string branch = CatalogLoader.GetString(row, "branch");
             int col = CatalogLoader.GetInt(row, "col");
             int rowIdx = CatalogLoader.GetInt(row, "row");
+            if (!regions.TryGetValue(branch, out var regionCenter))
+                throw new DataLoadException(DataPaths.PassiveTree, $"Node '{id}' belongs to unknown region '{branch}'.");
+            Vector2 nodePosition = GridPosition(col, rowIdx);
+            float regionExtent = RegionRadius * GridStep + 0.5f;
+            if (Mathf.Abs(nodePosition.X - regionCenter.X) > regionExtent || Mathf.Abs(nodePosition.Y - regionCenter.Y) > regionExtent)
+                throw new DataLoadException(DataPaths.PassiveTree, $"Node '{id}' lies outside its '{branch}' 5x5 region square.");
+            branchCounts[branch] = branchCounts.TryGetValue(branch, out int branchCount) ? branchCount + 1 : 1;
             if (!System.Enum.TryParse<TreeRarity>(CatalogLoader.GetString(row, "rarity", "normal"), true, out var rarity))
                 throw new DataLoadException(DataPaths.PassiveTree, $"Node '{id}' has unknown rarity.");
             var mods = new System.Collections.Generic.List<TreeStatModifier>();
@@ -198,9 +223,9 @@ public static class CatalogBuilders
             string skillId = CatalogLoader.GetString(row, "skill");
             nodeList.Add(new TreeNode(
                 id,
-                GridPosition(col, rowIdx),
+                nodePosition,
                 rarity,
-                CatalogLoader.GetString(row, "branch"),
+                branch,
                 CatalogLoader.GetString(row, "icon"),
                 CatalogLoader.GetString(row, "name_key"),
                 CatalogLoader.GetString(row, "desc_key"),
@@ -228,7 +253,34 @@ public static class CatalogBuilders
             foreach (string k in startsVar.AsGodotDictionary().Keys)
                 starts[k] = startsVar.AsGodotDictionary()[k].AsString();
         }
-        GD.Print($"[Catalog] Loaded {nodes.Length} tree nodes, {edges.Length} edges.");
+
+        foreach (var regionPair in regions)
+        {
+            if (!branchCounts.ContainsKey(regionPair.Key))
+                throw new DataLoadException(DataPaths.PassiveTree, $"Region '{regionPair.Key}' has no nodes.");
+        }
+        foreach (var kv in starts)
+        {
+            if (!TryFindNode(nodes, kv.Value, out var startNode))
+                throw new DataLoadException(DataPaths.PassiveTree, $"Start node '{kv.Value}' for '{kv.Key}' is not a tree node.");
+            if (!regions.TryGetValue(startNode.Branch, out var regionCenter) || startNode.Position.DistanceTo(regionCenter) > 0.5f)
+                throw new DataLoadException(DataPaths.PassiveTree, $"Start node '{kv.Value}' must sit at the centre of its '{startNode.Branch}' region.");
+        }
+        GD.Print($"[Catalog] Loaded {nodes.Length} tree nodes, {edges.Length} edges, {regions.Count} regions.");
+    }
+
+    private static bool TryFindNode(TreeNode[] nodes, string id, out TreeNode node)
+    {
+        foreach (var candidate in nodes)
+        {
+            if (candidate.Id == id)
+            {
+                node = candidate;
+                return true;
+            }
+        }
+        node = default;
+        return false;
     }
 
     public static System.Collections.Generic.Dictionary<string, string> BuildStatLabels()

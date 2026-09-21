@@ -55,6 +55,20 @@ public static class PassiveTreeManager
 
     public const float GridStep = 150.0f;
 
+    /// <summary>
+    /// Every branch owns a 5x5 square of grid slots centred on one hub
+    /// (docs/passivetree.md §2). The cell start hubs sit at the square centre;
+    /// the core square is centred on the world origin.
+    /// </summary>
+    public const int RegionRadius = 2;
+
+    /// <summary>
+    /// Region squares tile edge-to-edge: each is 5x5 grid cells wide
+    /// (half extent 2.5 steps, side 750px), so neighbouring centres 5 steps
+    /// apart share a border and the six squares form one 15x10 board.
+    /// </summary>
+    public const float RegionHalfExtent = 2.5f;
+
     public static Vector2 GridPosition(int column, int row)
     {
         return WorldCenter + new Vector2(column * GridStep, -row * GridStep);
@@ -106,6 +120,32 @@ public static class PassiveTreeManager
         }
     }
 
+    /// <summary>branch id → region square centre in world coordinates.</summary>
+    public static System.Collections.Generic.IReadOnlyDictionary<string, Vector2> RegionCenters
+    {
+        get
+        {
+            EnsureTreeLoaded();
+            DataValidator.EnsureValidated();
+            return _loadedRegions;
+        }
+    }
+
+    public static bool TryGetRegionCenter(string branch, out Vector2 center)
+    {
+        EnsureTreeLoaded();
+        return _loadedRegions.TryGetValue(branch, out center);
+    }
+
+    /// <summary>Region square in world coordinates (5x5 cells, side 5 grid steps).</summary>
+    public static Rect2 GetRegionBounds(string branch)
+    {
+        if (!TryGetRegionCenter(branch, out var center))
+            return new Rect2(Vector2.Zero, Vector2.Zero);
+        float half = RegionHalfExtent * GridStep;
+        return new Rect2(center - new Vector2(half, half), new Vector2(half * 2.0f, half * 2.0f));
+    }
+
     private static System.Collections.Generic.Dictionary<string, string>? _statLabels;
     private static System.Collections.Generic.Dictionary<string, string> StatLabels => _statLabels ??= CatalogBuilders.BuildStatLabels();
 
@@ -113,16 +153,18 @@ public static class PassiveTreeManager
     private static bool _treeLoaded = false;
     private static (string From, string To)[] _loadedEdges = System.Array.Empty<(string, string)>();
     private static System.Collections.Generic.Dictionary<string, string> _loadedStarts = new();
+    private static System.Collections.Generic.Dictionary<string, Vector2> _loadedRegions = new();
 
     private static void EnsureTreeLoaded()
     {
         if (_treeLoaded)
             return;
         _treeLoaded = true;
-        CatalogBuilders.BuildTree(out var nodes, out var edges, out var starts);
+        CatalogBuilders.BuildTree(out var nodes, out var edges, out var starts, out var regions);
         _nodes = nodes;
         _loadedEdges = edges;
         _loadedStarts = starts;
+        _loadedRegions = regions;
     }
 
     private static TreeNode[] LoadTreeNodes()

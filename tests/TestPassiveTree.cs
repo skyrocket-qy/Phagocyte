@@ -92,7 +92,7 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(PassiveTreeManager.IsKnownNode("tree_hsc_core")).IsFalse();
         GD.Print("[PASS] All five cells begin at distinct nodes on one shared tree.");
 
-        AssertThat(PassiveTreeManager.Nodes.Length).IsGreaterEqual(51);
+        AssertThat(PassiveTreeManager.Nodes.Length).IsEqual(150);
         var nodeIds = new List<string>();
         int tradeoffCount = 0;
         int comboCount = 0;
@@ -188,13 +188,13 @@ public partial class TestPassiveTree : TestHarness
         GD.Print("[PASS] Points, the innate start anchor, and adjacency purchases behave correctly.");
 
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 5)).IsTrue();
-        AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_glycolysis")).IsTrue();
-        AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_actin")).IsTrue();
-        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_cytoskeletal_drift")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "passive_bilayer")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_rapid_clotting")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_second_wind")).IsTrue();
         AssertThat(PassiveTreeManager.GetSpentPoints("macrophage")).IsEqual(4);
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(0);
-        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_slipstream")).IsFalse();
-        GD.Print("[PASS] Lineages open through the core metabolism ring from any start.");
+        AssertThat(PassiveTreeManager.Purchase("macrophage", "tree_enduring_march")).IsFalse();
+        GD.Print("[PASS] Boundary gate nodes open the way toward the core ring from any start.");
 
         AssertThat(PassiveTreeManager.RecordRunLevel("ctl", 5)).IsTrue();
         AssertThat(PassiveTreeManager.GetNodeStacks("ctl", "passive_opsonin")).IsEqual(PassiveTreeManager.InnateStartStacks);
@@ -234,12 +234,11 @@ public partial class TestPassiveTree : TestHarness
     {
         PassiveTreeManager.ResetAll();
 
-        int layerOne = 0;
         var cells = new System.Collections.Generic.Dictionary<(int, int), string>();
         foreach (var node in PassiveTreeManager.Nodes)
         {
             AssertThat(node.Ring).IsGreaterEqual(0);
-            AssertThat(node.Ring).IsLessEqual(8);
+            AssertThat(node.Ring).IsLessEqual(14);
             Vector2 offset = node.Position - PassiveTreeManager.WorldCenter;
             int column = Mathf.RoundToInt(offset.X / PassiveTreeManager.GridStep);
             int row = Mathf.RoundToInt(-offset.Y / PassiveTreeManager.GridStep);
@@ -247,11 +246,80 @@ public partial class TestPassiveTree : TestHarness
             AssertThat(node.Ring).IsEqual(Math.Abs(column) + Math.Abs(row));
             AssertThat(cells.ContainsKey((column, row))).IsFalse();
             cells[(column, row)] = node.Id;
-            if (node.Ring == 1)
-                layerOne++;
         }
-        AssertThat(layerOne).IsEqual(4);
         GD.Print("[PASS] Every node sits on its own grid cell with a matching layer.");
+
+        // Six 5x5 region squares, one per branch: every node lives inside its own
+        // square, cell start hubs sit at the square centre, and no two squares
+        // overlap (centres at least 5 grid steps apart on one axis).
+        var regionCenters = PassiveTreeManager.RegionCenters;
+        AssertThat(regionCenters.Count).IsEqual(6);
+        foreach (var node in PassiveTreeManager.Nodes)
+        {
+            AssertThat(regionCenters.ContainsKey(node.Branch)).IsTrue();
+            Vector2 local = (node.Position - regionCenters[node.Branch]) / PassiveTreeManager.GridStep;
+            AssertThat(Mathf.Abs(local.X)).IsLessEqual(PassiveTreeManager.RegionRadius + 0.001f);
+            AssertThat(Mathf.Abs(local.Y)).IsLessEqual(PassiveTreeManager.RegionRadius + 0.001f);
+        }
+        var regionBranches = new System.Collections.Generic.List<string>(regionCenters.Keys);
+        var regionCells = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.HashSet<(int, int)>>();
+        foreach (var node in PassiveTreeManager.Nodes)
+        {
+            Vector2 local = (node.Position - regionCenters[node.Branch]) / PassiveTreeManager.GridStep;
+            if (!regionCells.TryGetValue(node.Branch, out var seen))
+            {
+                seen = new System.Collections.Generic.HashSet<(int, int)>();
+                regionCells[node.Branch] = seen;
+            }
+            AssertThat(seen.Add((Mathf.RoundToInt(local.X), Mathf.RoundToInt(local.Y)))).IsTrue();
+        }
+        foreach (string branch in regionBranches)
+        {
+            AssertThat(regionCells.TryGetValue(branch, out var seen)).IsTrue();
+            AssertThat(seen!.Count).IsEqual(25);
+            Rect2 region = PassiveTreeManager.GetRegionBounds(branch);
+            AssertThat(region.Size.X).IsEqualApprox(5.0f * PassiveTreeManager.GridStep, 0.01f);
+            AssertThat(region.Size.Y).IsEqualApprox(5.0f * PassiveTreeManager.GridStep, 0.01f);
+        }
+        // Six 5x5 blocks arranged 2 columns x 3 rows form one 10x15 board.
+        Rect2 board = PassiveTreeManager.GetRegionBounds(regionBranches[0]);
+        for (int i = 1; i < regionBranches.Count; i++)
+            board = board.Merge(PassiveTreeManager.GetRegionBounds(regionBranches[i]));
+        AssertThat(Mathf.RoundToInt(board.Size.X / PassiveTreeManager.GridStep)).IsEqual(10);
+        AssertThat(Mathf.RoundToInt(board.Size.Y / PassiveTreeManager.GridStep)).IsEqual(15);
+        AssertThat(cells.Count).IsEqual(150);
+        for (int i = 0; i < regionBranches.Count; i++)
+        {
+            for (int j = i + 1; j < regionBranches.Count; j++)
+            {
+                Vector2 delta = (regionCenters[regionBranches[i]] - regionCenters[regionBranches[j]]) / PassiveTreeManager.GridStep;
+                AssertThat(Mathf.Abs(delta.X) >= 5.0f - 0.001f || Mathf.Abs(delta.Y) >= 5.0f - 0.001f).IsTrue();
+            }
+        }
+        // The six 5x5 squares tile edge-to-edge: every square shares a border
+        // with at least one neighbour, so the board is one seamless 10x15 block.
+        foreach (string branch in regionBranches)
+        {
+            bool touching = false;
+            foreach (string other in regionBranches)
+            {
+                if (other == branch)
+                    continue;
+                Vector2 delta = (regionCenters[branch] - regionCenters[other]) / PassiveTreeManager.GridStep;
+                if (Mathf.Abs(Mathf.Abs(delta.X) - 5.0f) < 0.001f && Mathf.Abs(delta.Y) < 0.001f)
+                    touching = true;
+                if (Mathf.Abs(Mathf.Abs(delta.Y) - 5.0f) < 0.001f && Mathf.Abs(delta.X) < 0.001f)
+                    touching = true;
+            }
+            AssertThat(touching).IsTrue();
+        }
+        foreach (var cellKey in GameManager.ClassData.Keys)
+        {
+            string cell = cellKey.AsString();
+            AssertThat(PassiveTreeManager.TryGetNode(PassiveTreeManager.GetStartNode(cell), out var startNode)).IsTrue();
+            AssertThat(startNode.Position.DistanceTo(regionCenters[startNode.Branch])).IsLess(0.5f);
+        }
+        GD.Print("[PASS] Every region is a 5x5 square centred on its cell's start hub.");
 
         var degrees = new System.Collections.Generic.Dictionary<string, int>();
         var segments = new System.Collections.Generic.HashSet<(string, string)>();
@@ -291,9 +359,10 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(PassiveTreeManager.GetNodeTooltipText("dendritic", "tree_thick_cytoplasm").Contains("atrophy")).IsFalse();
         GameManager.SetLanguage(prevLang);
 
-        AssertThat(PassiveTreeManager.Purchase("dendritic", "passive_hematopoietic")).IsTrue();
-        AssertThat(PassiveTreeManager.Purchase("dendritic", "passive_lysosome")).IsTrue();
-        AssertThat(PassiveTreeManager.CanPurchase("dendritic", "tree_thick_cytoplasm")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "passive_longevity")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "tree_immortal_culture")).IsTrue();
+        AssertThat(PassiveTreeManager.Purchase("dendritic", "passive_glycolysis")).IsTrue();
+        AssertThat(PassiveTreeManager.CanPurchase("dendritic", "tree_rolling_thunder")).IsTrue();
         GD.Print("[PASS] Cross-lineage portals stay purchasable through the core ring.");
     }
 
@@ -353,7 +422,8 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(_menu.TreeCanvas!.RenderedNodeCount).IsEqual(PassiveTreeManager.Nodes.Length);
         AssertThat(PassiveTreeManager.TryGetNode("passive_lysosome", out var lysosomeNode)).IsTrue();
         AssertThat(PassiveTreeView.HitTestWorldPosition(lysosomeNode.Position)).IsEqual("passive_lysosome");
-        AssertThat(PassiveTreeView.HitTestWorldPosition(PassiveTreeManager.WorldCenter)).IsNull();
+        // The full 10x15 board now covers the world origin (core region cell -2,0).
+        AssertThat(PassiveTreeView.HitTestWorldPosition(PassiveTreeManager.WorldCenter)).IsNotNull();
         AssertThat(PassiveTreeView.HitTestWorldPosition(new Vector2(-1000, -1000))).IsNull();
         var startButton = _menu.TreeCanvas.GetNodeOrNull<Button>("ZoomRoot/TreeNode_passive_lysosome");
         AssertThat(startButton).IsNotNull();

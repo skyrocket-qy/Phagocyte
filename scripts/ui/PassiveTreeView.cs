@@ -46,7 +46,7 @@ public partial class PassiveTreeView : Control
         { "core", new Color(0.76f, 0.55f, 1.00f, 1.0f) }
     };
 
-    private static readonly string[] BranchOrder = { "precision", "senses", "motility", "ballistics", "vitality" };
+    private static readonly string[] BranchOrder = { "precision", "senses", "motility", "ballistics", "vitality", "core" };
 
     /// <summary>
     /// Catalog-ordered node list, sorted once (rarity, id).
@@ -325,20 +325,41 @@ public partial class PassiveTreeView : Control
         bool started = false;
         Vector2 min = Vector2.Zero;
         Vector2 max = Vector2.Zero;
-        foreach (var node in PassiveTreeManager.Nodes)
+
+        void Include(Vector2 point)
         {
             if (!started)
             {
-                min = node.Position;
-                max = node.Position;
+                min = point;
+                max = point;
                 started = true;
             }
             else
             {
-                min = new Vector2(Mathf.Min(min.X, node.Position.X), Mathf.Min(min.Y, node.Position.Y));
-                max = new Vector2(Mathf.Max(max.X, node.Position.X), Mathf.Max(max.Y, node.Position.Y));
+                min = new Vector2(Mathf.Min(min.X, point.X), Mathf.Min(min.Y, point.Y));
+                max = new Vector2(Mathf.Max(max.X, point.X), Mathf.Max(max.Y, point.Y));
             }
         }
+
+        foreach (var node in PassiveTreeManager.Nodes)
+            Include(node.Position);
+
+        foreach (string branch in BranchOrder)
+        {
+            if (!PassiveTreeManager.TryGetRegionCenter(branch, out _))
+                continue;
+            Rect2 region = PassiveTreeManager.GetRegionBounds(branch);
+            Include(region.Position);
+            Include(region.End);
+        }
+
+        Rect2 board = GetRegionBoardBounds();
+        if (board.Size.X > 0.0f || board.Size.Y > 0.0f)
+        {
+            Include(new Vector2(board.GetCenter().X, board.Position.Y - PassiveTreeManager.GridStep));
+            Include(new Vector2(board.GetCenter().X, board.End.Y + PassiveTreeManager.GridStep));
+        }
+
         if (!started)
             return new Rect2(Vector2.Zero, Vector2.Zero);
 
@@ -767,40 +788,42 @@ public partial class PassiveTreeView : Control
     private void DrawBranchLabels()
     {
         Font font = ThemeDB.FallbackFont;
+        Rect2 board = GetRegionBoardBounds();
         foreach (string branch in BranchOrder)
         {
-            Rect2 bounds = GetBranchBounds(branch);
-            if (bounds.Size.X <= 0.0f && bounds.Size.Y <= 0.0f)
+            if (!PassiveTreeManager.TryGetRegionCenter(branch, out _))
                 continue;
 
-            Vector2 farthest = bounds.GetCenter();
-            float bestDistance = -1.0f;
-            foreach (var node in PassiveTreeManager.Nodes)
-            {
-                if (node.Branch != branch)
-                    continue;
-                float distance = node.Position.DistanceTo(PassiveTreeManager.WorldCenter);
-                if (distance > bestDistance)
-                {
-                    bestDistance = distance;
-                    farthest = node.Position;
-                }
-            }
-
-            Vector2 direction = farthest - PassiveTreeManager.WorldCenter;
-            if (direction.LengthSquared() < 1.0f)
-                direction = new Vector2(0, -1);
-            Vector2 world = farthest + direction.Normalized() * 44.0f;
-            Vector2 screen = WorldToScreen(world);
-            if (screen.X < 60.0f || screen.Y < 20.0f || screen.X > Size.X - 60.0f || screen.Y > Size.Y - 20.0f)
-                continue;
-
+            // Regions tile edge-to-edge; each label sits in the outer margin of
+            // its own board column (left column labels left, right column right).
+            Rect2 region = PassiveTreeManager.GetRegionBounds(branch);
+            bool leftColumn = region.GetCenter().X <= board.GetCenter().X;
+            Vector2 edge = WorldToScreen(new Vector2(leftColumn ? board.Position.X : board.End.X, region.GetCenter().Y));
             string label = GetBranchLabel(branch);
             Vector2 textSize = font.GetStringSize(label, HorizontalAlignment.Left, -1, 14);
-            Vector2 origin = screen - new Vector2(textSize.X * 0.5f, textSize.Y * 0.5f);
+            Vector2 origin = new(leftColumn ? edge.X - textSize.X - 14.0f : edge.X + 14.0f, edge.Y - textSize.Y * 0.5f);
+            if (origin.X < 4.0f || origin.Y < 8.0f || origin.X + textSize.X > Size.X - 4.0f || origin.Y > Size.Y - 8.0f)
+                continue;
+
             DrawString(font, origin + new Vector2(1.0f, 1.0f), label, HorizontalAlignment.Left, -1, 14, new Color(0.0f, 0.0f, 0.0f, 0.55f));
             DrawString(font, origin, label, HorizontalAlignment.Left, -1, 14, GetBranchColor(branch, 0.62f));
         }
+    }
+
+    /// <summary>Union of all region squares: the seamless 15x10 board.</summary>
+    private static Rect2 GetRegionBoardBounds()
+    {
+        bool started = false;
+        Rect2 board = new();
+        foreach (string branch in BranchOrder)
+        {
+            if (!PassiveTreeManager.TryGetRegionCenter(branch, out _))
+                continue;
+            Rect2 region = PassiveTreeManager.GetRegionBounds(branch);
+            board = started ? board.Merge(region) : region;
+            started = true;
+        }
+        return board;
     }
 
     private void DrawGraph()
@@ -818,58 +841,17 @@ public partial class PassiveTreeView : Control
 
     private void DrawBands(Control layer)
     {
-        float pad = PassiveTreeManager.GridStep * 0.62f;
         foreach (string branch in BranchOrder)
         {
-            Rect2 bounds = GetBranchBounds(branch);
-            if (bounds.Size.X <= 0.0f && bounds.Size.Y <= 0.0f)
+            if (!PassiveTreeManager.TryGetRegionCenter(branch, out _))
                 continue;
 
             Color color = GetBranchColor(branch, 1.0f);
-            Rect2 rect = ExpandBounds(bounds, pad);
-            layer.DrawRect(rect, new Color(color.R, color.G, color.B, 0.040f));
-            layer.DrawRect(rect, new Color(color.R, color.G, color.B, 0.14f), false, 1.5f);
+            Rect2 rect = PassiveTreeManager.GetRegionBounds(branch);
+            bool core = branch == "core";
+            layer.DrawRect(rect, new Color(color.R, color.G, color.B, core ? 0.055f : 0.040f));
+            layer.DrawRect(rect, new Color(color.R, color.G, color.B, core ? 0.20f : 0.14f), false, core ? 1.8f : 1.5f);
         }
-
-        Rect2 core = GetBranchBounds("core");
-        if (core.Size.X > 0.0f || core.Size.Y > 0.0f)
-        {
-            Color coreColor = GetBranchColor("core", 1.0f);
-            Rect2 rect = ExpandBounds(core, pad * 1.2f);
-            layer.DrawRect(rect, new Color(coreColor.R, coreColor.G, coreColor.B, 0.055f));
-            layer.DrawRect(rect, new Color(coreColor.R, coreColor.G, coreColor.B, 0.20f), false, 1.8f);
-        }
-    }
-
-    private static Rect2 GetBranchBounds(string branch)
-    {
-        bool started = false;
-        Vector2 min = Vector2.Zero;
-        Vector2 max = Vector2.Zero;
-        foreach (var node in PassiveTreeManager.Nodes)
-        {
-            if (node.Branch != branch)
-                continue;
-            if (!started)
-            {
-                min = node.Position;
-                max = node.Position;
-                started = true;
-            }
-            else
-            {
-                min = new Vector2(Mathf.Min(min.X, node.Position.X), Mathf.Min(min.Y, node.Position.Y));
-                max = new Vector2(Mathf.Max(max.X, node.Position.X), Mathf.Max(max.Y, node.Position.Y));
-            }
-        }
-        if (!started)
-            return new Rect2(Vector2.Zero, Vector2.Zero);
-        return new Rect2(min, max - min);
-    }
-
-    private static Rect2 ExpandBounds(Rect2 bounds, float pad)
-    {
-        return new Rect2(bounds.Position - new Vector2(pad, pad), bounds.Size + new Vector2(pad * 2.0f, pad * 2.0f));
     }
 
     private void DrawEdges(Control layer, Godot.Collections.Dictionary<string, int> owned, string start)

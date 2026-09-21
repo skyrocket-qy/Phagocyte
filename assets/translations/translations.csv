@@ -588,3 +588,21 @@ RECORDS_DMG_FMT,%.0f (Taken: %.0f),%.0f（承伤：%.0f）,%.0f（承伤：%.0f�
 RECORDS_DEFENSE_FMT,💨 %d Evaded | 🛡️ %d Blocked | 💚 +%s HP,💨 %d 闪避 | 🛡️ %d 格挡 | 💚 +%s 生命,💨 %d 闪避 | 🛡️ %d 格挡 | 💚 +%s 生命,💨 %d 回避 | 🛡️ %d 格挡 | 💚 +%s HP,💨 %d Ausgewichen | 🛡️ %d Geblockt | 💚 +%s LP,💨 %d esquivés | 🛡️ %d bloqués | 💚 +%s PV,💨 %d уклонений | 🛡️ %d блоков | 💚 +%s HP,💨 %d evadidos | 🛡️ %d bloqueados | 💚 +%s PV
 RECORDS_LEVEL_ABBR,Lv.,等级,等级,Lv.,St.,Nv.,Ур.,Nv.
 RECORDS_KPM_FMT,🎯 %d · %.0f KPM · Σ %d,🎯 %d · %.0f 击杀/分 · Σ %d,🎯 %d · %.0f 击杀/分 · Σ %d,🎯 %d · %.0f KPM · Σ %d,🎯 %d · %.0f KPM · Σ %d,🎯 %d · %.0f KPM · Σ %d,🎯 %d · %.0f KPM · Σ %d,🎯 %d · %.0f KPM · Σ %d
+TREE_NODE_SMALL_MIGHT_NAME,Might Filament,力量微管,力量微管,力のフィラメント,Kraftfilament,Filament de puissance,Филамент силы,Filamento de poder
+TREE_NODE_SMALL_AREA_NAME,Radius Filament,范围微管,範圍微管,範囲のフィラメント,Radiusfilament,Filament de rayon,Филамент радиуса,Filamento de radio
+TREE_NODE_SMALL_COOLDOWN_REDUCTION_NAME,Tempo Filament,冷却微管,冷卻微管,テンポのフィラメント,Tempofilament,Filament de tempo,Филамент темпа,Filamento de tempo
+TREE_NODE_SMALL_PROJECTILE_SPEED_NAME,Velocity Filament,弹速微管,彈速微管,弾速のフィラメント,Geschwindigkeitsfilament,Filament de vélocité,Филамент скорости,Filamento de velocidad
+TREE_NODE_SMALL_DURATION_NAME,Duration Filament,持续微管,持續微管,持続のフィラメント,Dauerfilament,Filament de durée,Филамент длительности,Filamento de duración
+TREE_NODE_SMALL_AMOUNT_NAME,Payload Filament,弹道微管,彈道微管,弾数のフィラメント,Ladungsfilament,Filament de charge,Филамент снарядов,Filamento de carga
+TREE_NODE_SMALL_PIERCE_NAME,Penetration Filament,穿透微管,穿透微管,貫通のフィラメント,Durchschlagsfilament,Filament de perforation,Филамент пробития,Filamento de perforación
+TREE_NODE_SMALL_KNOCKBACK_NAME,Impact Filament,击退微管,擊退微管,衝撃のフィラメント,Stoßfilament,Filament d’impact,Филамент отбрасывания,Filamento de impacto
+TREE_NODE_SMALL_CRIT_CHANCE_NAME,Precision Filament,精准微管,精準微管,精密のフィラメント,Präzisionsfilament,Filament de précision,Филамент точности,Filamento de precisión
+TREE_NODE_SMALL_CRIT_DAMAGE_NAME,Lethality Filament,致命微管,致命微管,致死のフィラメント,Letalitätsfilament,Filament de létalité,Филамент летальности,Filamento de letalidad
+TREE_NODE_SMALL_MAX_HEALTH_NAME,Vitality Filament,生命微管,生命微管,生命のフィラメント,Vitalitätsfilament,Filament de vitalité,Филамент жизненности,Filamento de vitalidad
+TREE_NODE_SMALL_HEALTH_REGEN_NAME,Regeneration Filament,再生微管,再生微管,再生のフィラメント,Regenerationsfilament,Filament de régénération,Филамент регенерации,Filamento de regeneración
+TREE_NODE_SMALL_ARMOR_NAME,Membrane Filament,护甲微管,護甲微管,膜のフィラメント,Membranfilament,Filament de membrane,Филамент мембраны,Filamento de membrana
+TREE_NODE_SMALL_MOVE_SPEED_NAME,Motility Filament,移速微管,移速微管,運動のフィラメント,Motilitätsfilament,Filament de motilité,Филамент подвижности,Filamento de movilidad
+TREE_NODE_SMALL_EVASION_NAME,Evasion Filament,闪避微管,閃避微管,回避のフィラメント,Ausweichfilament,Filament d’évasion,Филамент уклонения,Filamento de evasión
+TREE_NODE_SMALL_BLOCK_NAME,Block Filament,格挡微管,格擋微管,防御のフィラメント,Blockfilament,Filament de blocage,Филамент блокировки,Filamento de bloqueo
+TREE_NODE_SMALL_LIFE_STEAL_NAME,Siphon Filament,汲取微管,汲取微管,吸収のフィラメント,Siphonfilament,Filament de siphonage,Филамент высасывания,Filamento de sifón
+TREE_NODE_SMALL_MAGNET_NAME,Chemotaxis Filament,趋化微管,趨化微管,走化性のフィラメント,Chemotaxis-Filament,Filament de chimiotaxie,Филамент хемотаксиса,Filamento de quimiotaxis
