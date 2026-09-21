@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Directors;
 using Phagocyte.Player;
 
 namespace Phagocyte.Environment;
@@ -21,17 +22,17 @@ public sealed class GastricEnvironment : MapEnvironment
     private float _surgeTimer = 6.0f;
     private float _zoneTimer = 3.0f;
 
-    protected override void Process(Main main, float dt)
+    protected override void Process(IRunContext context, float dt)
     {
         // Gastric churn: periodic lateral wave on the player's swim velocity.
         PlayerDrift = new Vector2(Mathf.Sin(Time * 0.9f) * 8.0f, Mathf.Cos(Time * 1.3f) * 6.0f);
         // Gastric mucosa acid churn on the pathogen population.
         FluidVector = new Vector2(
-            Mathf.Sin(main.EnvironmentTime * 2.0f) * 20.0f,
-            Mathf.Cos(main.EnvironmentTime * 1.5f) * 10.0f) * 0.4f;
+            Mathf.Sin(context.EnvironmentTime * 2.0f) * 20.0f,
+            Mathf.Cos(context.EnvironmentTime * 1.5f) * 10.0f) * 0.4f;
 
-        var container = Container(main);
-        var player = Cell(main);
+        var container = Container(context);
+        var player = Cell(context);
         if (container == null || player == null)
             return;
 
@@ -43,7 +44,7 @@ public sealed class GastricEnvironment : MapEnvironment
             {
                 container.AddChild(new NeutralizationZone
                 {
-                    GlobalPosition = PointNear(Vector2.Zero, main.ArenaSize * 0.8f, 200.0f, 900.0f)
+                    GlobalPosition = PointNear(Vector2.Zero, context.ArenaSize * 0.8f, 200.0f, 900.0f)
                 });
             }
         }
@@ -56,7 +57,7 @@ public sealed class GastricEnvironment : MapEnvironment
             {
                 container.AddChild(new AcidSurge
                 {
-                    GlobalPosition = PointNear(player.GlobalPosition, main.ArenaSize, 120.0f, 760.0f)
+                    GlobalPosition = PointNear(player.GlobalPosition, context.ArenaSize, 120.0f, 760.0f)
                 });
             }
             GD.Print("[Gastric] Acid surge inbound.");

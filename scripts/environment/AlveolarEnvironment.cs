@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Directors;
 
 namespace Phagocyte.Environment;
 
@@ -21,7 +22,7 @@ public sealed class AlveolarEnvironment : MapEnvironment
 
     private float _pocketTimer = 3.0f;
 
-    protected override void Process(Main main, float dt)
+    protected override void Process(IRunContext context, float dt)
     {
         float phase = Mathf.PosMod(Time, BreathPeriod);
         if (phase < BreathPhaseSeconds)
@@ -34,11 +35,11 @@ public sealed class AlveolarEnvironment : MapEnvironment
             PlayerDrift = Vector2.Zero;
 
         // Respiratory airflow on the pathogen population (was Main.ProcessMapMechanics).
-        float breathForce = Mathf.Sin(main.EnvironmentTime * 1.2f) * 28.0f;
-        FluidVector = new Vector2(breathForce, Mathf.Sin(main.EnvironmentTime * 0.6f) * 12.0f) * 0.6f;
+        float breathForce = Mathf.Sin(context.EnvironmentTime * 1.2f) * 28.0f;
+        FluidVector = new Vector2(breathForce, Mathf.Sin(context.EnvironmentTime * 0.6f) * 12.0f) * 0.6f;
 
-        var container = Container(main);
-        var player = Cell(main);
+        var container = Container(context);
+        var player = Cell(context);
         if (container == null || player == null)
             return;
 
@@ -52,7 +53,7 @@ public sealed class AlveolarEnvironment : MapEnvironment
 
         container.AddChild(new HyperoxicPocket
         {
-            GlobalPosition = PointNear(player.GlobalPosition, main.ArenaSize, 200.0f, 700.0f)
+            GlobalPosition = PointNear(player.GlobalPosition, context.ArenaSize, 200.0f, 700.0f)
         });
     }
 }

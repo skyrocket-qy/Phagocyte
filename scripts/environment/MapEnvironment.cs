@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Directors;
 using Phagocyte.Player;
 
 namespace Phagocyte.Environment;
@@ -30,27 +31,27 @@ public abstract class MapEnvironment
 
     protected RandomNumberGenerator Rng { get; } = new();
 
-    public virtual void Attach(Main main)
+    public virtual void Attach(IRunContext context)
     {
         Rng.Seed = (ulong)MapId.GetHashCode() ^ 0x51F15EEDUL;
     }
 
-    public void Tick(Main main, float dt)
+    public void Tick(IRunContext context, float dt)
     {
         Time += dt;
-        Process(main, dt);
+        Process(context, dt);
     }
 
-    protected abstract void Process(Main main, float dt);
+    protected abstract void Process(IRunContext context, float dt);
 
-    protected static BaseCell? Cell(Main main)
+    protected static BaseCell? Cell(IRunContext context)
     {
-        return main.Player as BaseCell;
+        return context.Player as BaseCell;
     }
 
-    protected static Node2D? Container(Main main)
+    protected static Node2D? Container(IRunContext context)
     {
-        return main.EnemyContainer;
+        return context.EnemyContainer;
     }
 
     /// <summary>Hard mode shortens timers by +50% frequency (docs/achievement.md §2.1).</summary>

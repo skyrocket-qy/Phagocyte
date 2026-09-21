@@ -7,6 +7,12 @@
 [ext_resource type="Script" path="res://scripts/environment/MicroscopeParallax.cs" id="5_parallax"]
 [ext_resource type="Shader" path="res://shaders/microscope_postprocess.gdshader" id="6_postprocess"]
 [ext_resource type="PackedScene" path="res://scenes/ui/run_records_modal.tscn" id="7_records"]
+[ext_resource type="Script" path="res://scripts/directors/WaveDirectorComponent.cs" id="8_wave"]
+[ext_resource type="Script" path="res://scripts/directors/BossEncounterManager.cs" id="9_boss"]
+[ext_resource type="Script" path="res://scripts/directors/OverdriveDirector.cs" id="10_overdrive"]
+[ext_resource type="Script" path="res://scripts/directors/NeutralMatterManager.cs" id="11_neutral"]
+[ext_resource type="Script" path="res://scripts/directors/OrganEnvironmentSystem.cs" id="12_organ"]
+[ext_resource type="Script" path="res://scripts/directors/RunSettlementService.cs" id="13_settlement"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
 shader = ExtResource("2_bg_shader")
@@ -51,6 +57,12 @@ shader_parameter/noise_amount = 0.012
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
+WaveDirector = NodePath("WaveDirector")
+BossManager = NodePath("BossController")
+Overdrive = NodePath("OverdriveSystem")
+NeutralMatter = NodePath("NeutralMatterSystem")
+OrganSystem = NodePath("OrganEnvironmentSystem")
+Settlement = NodePath("SettlementController")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_main")
@@ -111,6 +123,24 @@ position = Vector2(2420, 0)
 shape = SubResource("RectangleShape2D_vert")
 
 [node name="EnemyContainer" type="Node2D" parent="."]
+
+[node name="WaveDirector" type="Node" parent="."]
+script = ExtResource("8_wave")
+
+[node name="BossController" type="Node" parent="."]
+script = ExtResource("9_boss")
+
+[node name="OverdriveSystem" type="Node" parent="."]
+script = ExtResource("10_overdrive")
+
+[node name="NeutralMatterSystem" type="Node" parent="."]
+script = ExtResource("11_neutral")
+
+[node name="OrganEnvironmentSystem" type="Node" parent="."]
+script = ExtResource("12_organ")
+
+[node name="SettlementController" type="Node" parent="."]
+script = ExtResource("13_settlement")
 
 [node name="Macrophage" parent="." instance=ExtResource("3_macrophage")]
 

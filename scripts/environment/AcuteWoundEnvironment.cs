@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Directors;
 using Phagocyte.Player;
 
 namespace Phagocyte.Environment;
@@ -19,15 +20,15 @@ public sealed class AcuteWoundEnvironment : MapEnvironment
 
     private float _clotTimer = 2.5f;
 
-    protected override void Process(Main main, float dt)
+    protected override void Process(IRunContext context, float dt)
     {
         // Exudate suction is added straight onto the player's swim velocity.
         PlayerDrift = new Vector2(ExudateSuctionX, ExudateSuctionY);
         // Directional tissue-fluid suction on the pathogen population.
         FluidVector = new Vector2(ExudateSuctionX, ExudateSuctionY) * 0.4f;
 
-        var container = Container(main);
-        var player = Cell(main);
+        var container = Container(context);
+        var player = Cell(context);
         if (container == null || player == null)
             return;
 
@@ -42,7 +43,7 @@ public sealed class AcuteWoundEnvironment : MapEnvironment
         var clot = new FibrinClot
         {
             HardBiofilm = HardMode,
-            GlobalPosition = PointNear(player.GlobalPosition, main.ArenaSize, 180.0f, 620.0f)
+            GlobalPosition = PointNear(player.GlobalPosition, context.ArenaSize, 180.0f, 620.0f)
         };
         container.AddChild(clot);
     }

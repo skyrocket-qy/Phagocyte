@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Directors;
 
 namespace Phagocyte.Environment;
 
@@ -20,11 +21,11 @@ public sealed class BloodBrainBarrierEnvironment : MapEnvironment
 
     private float _pulseTimer = 6.0f;
 
-    public override void Attach(Main main)
+    public override void Attach(IRunContext context)
     {
-        base.Attach(main);
+        base.Attach(context);
 
-        var container = Container(main);
+        var container = Container(context);
         if (container == null)
             return;
 
@@ -41,7 +42,7 @@ public sealed class BloodBrainBarrierEnvironment : MapEnvironment
         }
     }
 
-    protected override void Process(Main main, float dt)
+    protected override void Process(IRunContext context, float dt)
     {
         // High-shear capillary flow: strong oscillating lateral drag. Hard mode is
         // a permanent acute crisis: the shear is stronger and the neural pulses
@@ -53,10 +54,10 @@ public sealed class BloodBrainBarrierEnvironment : MapEnvironment
 
         // High-frequency synaptic micro-vibrations on the pathogen population.
         FluidVector = new Vector2(
-            Mathf.Sin(main.EnvironmentTime * 5.0f) * 8.0f,
-            Mathf.Cos(main.EnvironmentTime * 4.0f) * 8.0f) * 0.25f;
+            Mathf.Sin(context.EnvironmentTime * 5.0f) * 8.0f,
+            Mathf.Cos(context.EnvironmentTime * 4.0f) * 8.0f) * 0.25f;
 
-        var player = Cell(main);
+        var player = Cell(context);
         if (player == null)
             return;
 

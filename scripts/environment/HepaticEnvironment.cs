@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Directors;
 
 namespace Phagocyte.Environment;
 
@@ -26,13 +27,13 @@ public sealed class HepaticEnvironment : MapEnvironment
     /// <summary>True while the bile-acid surge has stripped the arena's armor.</summary>
     public bool ArmorBroken => _armorBreakTimer > 0.0f;
 
-    protected override void Process(Main main, float dt)
+    protected override void Process(IRunContext context, float dt)
     {
         PlayerDrift = new Vector2(FlowDragX, Mathf.Sin(Time * 0.8f) * 6.0f) * 0.35f;
         // Hepatic sinusoid slow-flow drag on the pathogen population.
-        FluidVector = new Vector2(FlowDragX, Mathf.Sin(main.EnvironmentTime * 0.8f) * 6.0f) * 0.35f;
+        FluidVector = new Vector2(FlowDragX, Mathf.Sin(context.EnvironmentTime * 0.8f) * 6.0f) * 0.35f;
 
-        var player = Cell(main);
+        var player = Cell(context);
         if (player?.Stats == null)
             return;
 
@@ -62,7 +63,7 @@ public sealed class HepaticEnvironment : MapEnvironment
             }
         }
 
-        var container = Container(main);
+        var container = Container(context);
         if (container == null)
             return;
 
@@ -75,7 +76,7 @@ public sealed class HepaticEnvironment : MapEnvironment
             return;
 
         bool vertical = Rng.Randf() < 0.5f;
-        Vector2 position = PointNear(Vector2.Zero, main.ArenaSize * 0.7f, 300.0f, 900.0f);
+        Vector2 position = PointNear(Vector2.Zero, context.ArenaSize * 0.7f, 300.0f, 900.0f);
         var wall = new FenestraWall
         {
             Rotation = vertical ? 0.0f : Mathf.Pi * 0.5f,
