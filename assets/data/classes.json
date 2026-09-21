@@ -1,0 +1,47 @@
+[
+  {
+    "id": "macrophage",
+    "name_key": "CLASS_MACROPHAGE_NAME",
+    "role_key": "CLASS_MACROPHAGE_ROLE",
+    "scene_path": "res://scenes/characters/macrophage.tscn",
+    "trait_key": "CLASS_MACROPHAGE_TRAIT",
+    "unlock_achievement": "",
+    "unlocked": true
+  },
+  {
+    "id": "ctl",
+    "name_key": "CLASS_CTL_NAME",
+    "role_key": "CLASS_CTL_ROLE",
+    "scene_path": "res://scenes/characters/ctl_cell.tscn",
+    "trait_key": "CLASS_CTL_TRAIT",
+    "unlock_achievement": "ach_engulf_20",
+    "unlocked": true
+  },
+  {
+    "id": "neutrophil",
+    "name_key": "CLASS_NEUTROPHIL_NAME",
+    "role_key": "CLASS_NEUTROPHIL_ROLE",
+    "scene_path": "res://scenes/characters/neutrophil_cell.tscn",
+    "trait_key": "CLASS_NEUTROPHIL_TRAIT",
+    "unlock_achievement": "ach_devour_50",
+    "unlocked": false
+  },
+  {
+    "id": "b_cell",
+    "name_key": "CLASS_B_CELL_NAME",
+    "role_key": "CLASS_B_CELL_ROLE",
+    "scene_path": "res://scenes/characters/b_cell.tscn",
+    "trait_key": "CLASS_B_CELL_TRAIT",
+    "unlock_achievement": "ach_reach_level_5",
+    "unlocked": false
+  },
+  {
+    "id": "dendritic",
+    "name_key": "CLASS_DENDRITIC_NAME",
+    "role_key": "CLASS_DENDRITIC_ROLE",
+    "scene_path": "res://scenes/characters/dendritic_cell.tscn",
+    "trait_key": "CLASS_DENDRITIC_TRAIT",
+    "unlock_achievement": "ach_survive_180s",
+    "unlocked": false
+  }
+]

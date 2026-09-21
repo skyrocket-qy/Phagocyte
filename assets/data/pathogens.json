@@ -1,0 +1,162 @@
+[
+  {
+    "danger_level": "★☆☆",
+    "desc_key": "PATHOGEN_STAPH_DESC",
+    "icon": "🧫",
+    "id": "staph",
+    "name_key": "PATHOGEN_STAPH_NAME",
+    "trait_key": "PATHOGEN_STAPH_TRAIT"
+  },
+  {
+    "danger_level": "★★☆",
+    "desc_key": "PATHOGEN_SVIRUS_DESC",
+    "icon": "🦠",
+    "id": "s_virus",
+    "name_key": "PATHOGEN_SVIRUS_NAME",
+    "trait_key": "PATHOGEN_SVIRUS_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_FLUDRIFT_DESC",
+    "icon": "🧬",
+    "id": "flu_drift",
+    "name_key": "PATHOGEN_FLUDRIFT_NAME",
+    "trait_key": "PATHOGEN_FLUDRIFT_TRAIT"
+  },
+  {
+    "danger_level": "★★★★",
+    "desc_key": "PATHOGEN_MALIGNANT_DESC",
+    "icon": "☣️",
+    "id": "malignant_cell",
+    "name_key": "PATHOGEN_MALIGNANT_NAME",
+    "trait_key": "PATHOGEN_MALIGNANT_TRAIT"
+  },
+  {
+    "danger_level": "★★☆",
+    "desc_key": "PATHOGEN_PSEUDOMONAS_DESC",
+    "icon": "🧪",
+    "id": "pseudomonas",
+    "name_key": "PATHOGEN_PSEUDOMONAS_NAME",
+    "trait_key": "PATHOGEN_PSEUDOMONAS_TRAIT"
+  },
+  {
+    "danger_level": "★★☆",
+    "desc_key": "PATHOGEN_ECOLI_DESC",
+    "icon": "⚡",
+    "id": "e_coli",
+    "name_key": "PATHOGEN_ECOLI_NAME",
+    "trait_key": "PATHOGEN_ECOLI_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_TB_DESC",
+    "icon": "🔥",
+    "id": "tb",
+    "name_key": "PATHOGEN_TB_NAME",
+    "trait_key": "PATHOGEN_TB_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_TETANUS_DESC",
+    "icon": "🎯",
+    "id": "tetanus",
+    "name_key": "PATHOGEN_TETANUS_NAME",
+    "trait_key": "PATHOGEN_TETANUS_TRAIT"
+  },
+  {
+    "danger_level": "★★☆",
+    "desc_key": "PATHOGEN_HPYLORI_DESC",
+    "icon": "🌀",
+    "id": "h_pylori",
+    "name_key": "PATHOGEN_HPYLORI_NAME",
+    "trait_key": "PATHOGEN_HPYLORI_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_ANTHRAX_DESC",
+    "icon": "🛡️",
+    "id": "anthrax_spore",
+    "name_key": "PATHOGEN_ANTHRAX_NAME",
+    "trait_key": "PATHOGEN_ANTHRAX_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_HIV_DESC",
+    "icon": "🩸",
+    "id": "hiv",
+    "name_key": "PATHOGEN_HIV_NAME",
+    "trait_key": "PATHOGEN_HIV_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_RABIES_DESC",
+    "icon": "💥",
+    "id": "rabies",
+    "name_key": "PATHOGEN_RABIES_NAME",
+    "trait_key": "PATHOGEN_RABIES_TRAIT"
+  },
+  {
+    "danger_level": "★★★★",
+    "desc_key": "PATHOGEN_EBOLA_DESC",
+    "icon": "🐍",
+    "id": "ebola",
+    "name_key": "PATHOGEN_EBOLA_NAME",
+    "trait_key": "PATHOGEN_EBOLA_TRAIT"
+  },
+  {
+    "danger_level": "★☆☆",
+    "desc_key": "PATHOGEN_NOROVIRUS_DESC",
+    "icon": "🌊",
+    "id": "norovirus",
+    "name_key": "PATHOGEN_NOROVIRUS_NAME",
+    "trait_key": "PATHOGEN_NOROVIRUS_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_ZOSTER_DESC",
+    "icon": "👻",
+    "id": "varicella_zoster",
+    "name_key": "PATHOGEN_ZOSTER_NAME",
+    "trait_key": "PATHOGEN_ZOSTER_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_CANDIDA_DESC",
+    "icon": "🍄",
+    "id": "candida",
+    "name_key": "PATHOGEN_CANDIDA_NAME",
+    "trait_key": "PATHOGEN_CANDIDA_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_ASPERGILLUS_DESC",
+    "icon": "☣️",
+    "id": "aspergillus",
+    "name_key": "PATHOGEN_ASPERGILLUS_NAME",
+    "trait_key": "PATHOGEN_ASPERGILLUS_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_PLASMODIUM_DESC",
+    "icon": "🦟",
+    "id": "plasmodium",
+    "name_key": "PATHOGEN_PLASMODIUM_NAME",
+    "trait_key": "PATHOGEN_PLASMODIUM_TRAIT"
+  },
+  {
+    "danger_level": "★★★",
+    "desc_key": "PATHOGEN_TOXOPLASMA_DESC",
+    "icon": "🧠",
+    "id": "toxoplasma",
+    "name_key": "PATHOGEN_TOXOPLASMA_NAME",
+    "trait_key": "PATHOGEN_TOXOPLASMA_TRAIT"
+  },
+  {
+    "danger_level": "★★★★★",
+    "desc_key": "PATHOGEN_PRION_DESC",
+    "icon": "💎",
+    "id": "prion",
+    "name_key": "PATHOGEN_PRION_NAME",
+    "trait_key": "PATHOGEN_PRION_TRAIT"
+  }
+]

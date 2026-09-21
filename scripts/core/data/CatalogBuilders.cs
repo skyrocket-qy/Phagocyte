@@ -1,0 +1,236 @@
+using Godot;
+using Godot.Collections;
+using System.Collections.Generic;
+using static Phagocyte.Core.PassiveTreeManager;
+
+namespace Phagocyte.Core;
+
+/// <summary>
+/// Per-catalog assembly: JSON rows → runtime dictionaries with schema defaults
+/// and type restoration (int / Color / Vector2). Duplicate ids throw
+/// <see cref="DataLoadException"/>. Shapes match the former C# literals exactly
+/// so every consumer and test keeps working unchanged.
+/// </summary>
+public static class CatalogBuilders
+{
+    public static Dictionary BuildSkills()
+    {
+        var table = new Dictionary();
+        var seen = new HashSet<string>();
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.Skills))
+        {
+            string id = CatalogLoader.GetString(row, "id");
+            if (string.IsNullOrEmpty(id) || !seen.Add(id))
+                throw new DataLoadException(DataPaths.Skills, $"Duplicate or missing skill id '{id}'.");
+            table[id] = new Dictionary
+            {
+                { "id", id },
+                { "name_key", CatalogLoader.GetString(row, "name_key") },
+                { "desc_key", CatalogLoader.GetString(row, "desc_key") },
+                { "bio_key", CatalogLoader.GetString(row, "bio_key") },
+                { "icon", CatalogLoader.GetString(row, "icon") },
+                { "type", CatalogLoader.GetString(row, "type") },
+                { "class_id", CatalogLoader.GetString(row, "class_id") },
+                { "cooldown", CatalogLoader.GetFloat(row, "cooldown") },
+                { "max_level", CatalogLoader.GetInt(row, "max_level", 5) }
+            };
+        }
+        GD.Print($"[Catalog] Loaded {table.Count} skills.");
+        return table;
+    }
+
+    public static Dictionary BuildPathogens()
+    {
+        var table = new Dictionary();
+        var seen = new HashSet<string>();
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.Pathogens))
+        {
+            string id = CatalogLoader.GetString(row, "id");
+            if (string.IsNullOrEmpty(id) || !seen.Add(id))
+                throw new DataLoadException(DataPaths.Pathogens, $"Duplicate or missing pathogen id '{id}'.");
+            table[id] = new Dictionary
+            {
+                { "id", id },
+                { "name_key", CatalogLoader.GetString(row, "name_key") },
+                { "desc_key", CatalogLoader.GetString(row, "desc_key") },
+                { "trait_key", CatalogLoader.GetString(row, "trait_key") },
+                { "icon", CatalogLoader.GetString(row, "icon") },
+                { "danger_level", CatalogLoader.GetString(row, "danger_level") }
+            };
+        }
+        GD.Print($"[Catalog] Loaded {table.Count} pathogens.");
+        return table;
+    }
+
+    public static Dictionary BuildMaps()
+    {
+        var table = new Dictionary();
+        var seen = new HashSet<string>();
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.Maps))
+        {
+            string id = CatalogLoader.GetString(row, "id");
+            if (string.IsNullOrEmpty(id) || !seen.Add(id))
+                throw new DataLoadException(DataPaths.Maps, $"Duplicate or missing map id '{id}'.");
+            table[id] = new Dictionary
+            {
+                { "id", id },
+                { "organ_key", CatalogLoader.GetString(row, "organ_key") },
+                { "organ_icon", CatalogLoader.GetString(row, "organ_icon") },
+                { "name_key", CatalogLoader.GetString(row, "name_key") },
+                { "subtitle_key", CatalogLoader.GetString(row, "subtitle_key") },
+                { "env_key", CatalogLoader.GetString(row, "env_key") },
+                { "mech_key", CatalogLoader.GetString(row, "mech_key") },
+                { "threat_key", CatalogLoader.GetString(row, "threat_key") },
+                { "difficulty", CatalogLoader.GetInt(row, "difficulty", 1) },
+                { "color_code", CatalogLoader.GetColor(row, "color_code", new Color(1, 1, 1, 1)) },
+                { "scanner_pos", CatalogLoader.GetVector2(row, "scanner_pos", Vector2.Zero) },
+                { "bg_color", CatalogLoader.GetColor(row, "bg_color", new Color(0.05f, 0.08f, 0.12f, 1.0f)) },
+                { "bg_color_deep", CatalogLoader.GetColor(row, "bg_color_deep", new Color(0.04f, 0.05f, 0.09f, 1.0f)) },
+                { "bg_color_accent", CatalogLoader.GetColor(row, "bg_color_accent", new Color(0.14f, 0.04f, 0.08f, 1.0f)) },
+                { "fiber_color", CatalogLoader.GetColor(row, "fiber_color", new Color(0.22f, 0.18f, 0.32f, 0.35f)) },
+                { "unlocked", CatalogLoader.GetBool(row, "unlocked") },
+                { "hard_unlocked", CatalogLoader.GetBool(row, "hard_unlocked") }
+            };
+        }
+        GD.Print($"[Catalog] Loaded {table.Count} maps.");
+        return table;
+    }
+
+    public static Dictionary BuildClasses()
+    {
+        var table = new Dictionary();
+        var seen = new HashSet<string>();
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.Classes))
+        {
+            string id = CatalogLoader.GetString(row, "id");
+            if (string.IsNullOrEmpty(id) || !seen.Add(id))
+                throw new DataLoadException(DataPaths.Classes, $"Duplicate or missing class id '{id}'.");
+            table[id] = new Dictionary
+            {
+                { "name_key", CatalogLoader.GetString(row, "name_key") },
+                { "role_key", CatalogLoader.GetString(row, "role_key") },
+                { "trait_key", CatalogLoader.GetString(row, "trait_key") },
+                { "unlocked", CatalogLoader.GetBool(row, "unlocked") },
+                { "unlock_achievement", CatalogLoader.GetString(row, "unlock_achievement") },
+                { "scene_path", CatalogLoader.GetString(row, "scene_path") }
+            };
+        }
+        GD.Print($"[Catalog] Loaded {table.Count} classes.");
+        return table;
+    }
+
+    public static Dictionary BuildAchievements()
+    {
+        var table = new Dictionary();
+        var seen = new HashSet<string>();
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.Achievements))
+        {
+            string id = CatalogLoader.GetString(row, "id");
+            if (string.IsNullOrEmpty(id) || !seen.Add(id))
+                throw new DataLoadException(DataPaths.Achievements, $"Duplicate or missing achievement id '{id}'.");
+            var entry = new Dictionary
+            {
+                { "id", id },
+                { "title_key", CatalogLoader.GetString(row, "title_key") },
+                { "desc_key", CatalogLoader.GetString(row, "desc_key") },
+                { "reward_key", CatalogLoader.GetString(row, "reward_key") },
+                { "reward_cell", CatalogLoader.GetString(row, "reward_cell") },
+                { "icon", CatalogLoader.GetString(row, "icon") },
+                { "target_value", CatalogLoader.GetFloat(row, "target_value", 1.0f) },
+                { "stat_key", CatalogLoader.GetString(row, "stat_key") }
+            };
+            // Map-clear chain extras (absent on generic achievements).
+            foreach (string opt in new[] { "map_id", "difficulty", "unlock_map", "unlock_hard_map" })
+            {
+                string v = CatalogLoader.GetString(row, opt);
+                if (!string.IsNullOrEmpty(v))
+                    entry[opt] = v;
+            }
+            if (row.ContainsKey("talent_points"))
+                entry["talent_points"] = CatalogLoader.GetInt(row, "talent_points");
+            if (row.ContainsKey("unlock_endless"))
+                entry["unlock_endless"] = CatalogLoader.GetBool(row, "unlock_endless");
+            table[id] = entry;
+        }
+        GD.Print($"[Catalog] Loaded {table.Count} achievements.");
+        return table;
+    }
+
+    public static void BuildTree(out TreeNode[] nodes, out (string From, string To)[] edges,
+        out System.Collections.Generic.Dictionary<string, string> starts)
+    {
+        var root = CatalogLoader.LoadObject(DataPaths.PassiveTree);
+        if (!root.TryGetValue("nodes", out var nodesVar) || nodesVar.VariantType != Variant.Type.Array)
+            throw new DataLoadException(DataPaths.PassiveTree, "Missing 'nodes' array.");
+
+        var nodeList = new System.Collections.Generic.List<TreeNode>();
+        var seen = new HashSet<string>();
+        foreach (var item in nodesVar.AsGodotArray())
+        {
+            var row = item.AsGodotDictionary();
+            string id = CatalogLoader.GetString(row, "id");
+            if (string.IsNullOrEmpty(id) || !seen.Add(id))
+                throw new DataLoadException(DataPaths.PassiveTree, $"Duplicate or missing node id '{id}'.");
+            int col = CatalogLoader.GetInt(row, "col");
+            int rowIdx = CatalogLoader.GetInt(row, "row");
+            if (!System.Enum.TryParse<TreeRarity>(CatalogLoader.GetString(row, "rarity", "normal"), true, out var rarity))
+                throw new DataLoadException(DataPaths.PassiveTree, $"Node '{id}' has unknown rarity.");
+            var mods = new System.Collections.Generic.List<TreeStatModifier>();
+            if (row.TryGetValue("modifiers", out var modsVar) && modsVar.VariantType == Variant.Type.Array)
+            {
+                foreach (var m in modsVar.AsGodotArray())
+                {
+                    var md = m.AsGodotDictionary();
+                    if (!System.Enum.TryParse<TreeModifierUnit>(CatalogLoader.GetString(md, "unit", "flat"), true, out var unit))
+                        throw new DataLoadException(DataPaths.PassiveTree, $"Node '{id}' has unknown modifier unit.");
+                    mods.Add(new TreeStatModifier(
+                        CatalogLoader.GetString(md, "stat"),
+                        CatalogLoader.GetFloat(md, "value"),
+                        unit));
+                }
+            }
+            string skillId = CatalogLoader.GetString(row, "skill");
+            nodeList.Add(new TreeNode(
+                id,
+                GridPosition(col, rowIdx),
+                rarity,
+                CatalogLoader.GetString(row, "branch"),
+                CatalogLoader.GetString(row, "icon"),
+                CatalogLoader.GetString(row, "name_key"),
+                CatalogLoader.GetString(row, "desc_key"),
+                CatalogLoader.GetInt(row, "max_stacks", 1),
+                CatalogLoader.GetInt(row, "point_cost", 1),
+                PassiveTreeManager.ResolveSkillType(skillId),
+                mods.ToArray(),
+                LayerOf(col, rowIdx)));
+        }
+        nodes = nodeList.ToArray();
+
+        if (!root.TryGetValue("edges", out var edgesVar) || edgesVar.VariantType != Variant.Type.Array)
+            throw new DataLoadException(DataPaths.PassiveTree, "Missing 'edges' array.");
+        var edgeList = new System.Collections.Generic.List<(string, string)>();
+        foreach (var item in edgesVar.AsGodotArray())
+        {
+            var pair = item.AsGodotArray();
+            edgeList.Add((pair[0].AsString(), pair[1].AsString()));
+        }
+        edges = edgeList.ToArray();
+
+        starts = new System.Collections.Generic.Dictionary<string, string>();
+        if (root.TryGetValue("start_nodes", out var startsVar) && startsVar.VariantType == Variant.Type.Dictionary)
+        {
+            foreach (string k in startsVar.AsGodotDictionary().Keys)
+                starts[k] = startsVar.AsGodotDictionary()[k].AsString();
+        }
+        GD.Print($"[Catalog] Loaded {nodes.Length} tree nodes, {edges.Length} edges.");
+    }
+
+    public static System.Collections.Generic.Dictionary<string, string> BuildStatLabels()
+    {
+        var table = new System.Collections.Generic.Dictionary<string, string>();
+        var root = CatalogLoader.LoadObject(DataPaths.StatLabels);
+        foreach (string k in root.Keys)
+            table[k] = root[k].AsString();
+        return table;
+    }
+}

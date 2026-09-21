@@ -573,3 +573,15 @@ COMBAT_BLOCKED,BLOCKED!,格挡！
 COMBAT_CRIT,CRIT!,暴击！
 ACH_HEADER_ARCHETYPE,🧬 IMMUNE ARCHETYPE UNLOCKED!,🧬 免疫原型已解锁！
 ACH_HEADER_MILESTONE,⭐ MILESTONE ACHIEVED!,⭐ 里程碑达成！
+BADGE_HEAL,HEAL,治疗
+HEAL_FALLBACK_NAME,ATP Biochemistry Recharge,ATP 生化质回充
+HEAL_FALLBACK_DESC,Instantly restore 35% max HP and trigger a pulse.,立即回复 35% 最大生命值并触发脉冲。
+SCANNER_HEADER,HOST BIO-SCAN // VASCULAR NETWORK,宿主生物扫描 // 血管网络
+SCANNER_FREQ,FREQ 440MHz,频率 440MHz
+SCANNER_ORGAN,ORGAN,器官
+SCANNER_TARGET_FMT,► TARGET: %s · %s,► 目标：%s · %s
+SCANNER_LOCATION_FMT,LOC: %s | INFECTION SEVERITY: HIGH,位置：%s | 感染严重度：高
+RECORDS_DMG_FMT,%.0f (Taken: %.0f),%.0f（承伤：%.0f）
+RECORDS_DEFENSE_FMT,💨 %d Evaded | 🛡️ %d Blocked | 💚 +%s HP,💨 %d 闪避 | 🛡️ %d 格挡 | 💚 +%s 生命
+RECORDS_LEVEL_ABBR,Lv.,等级
+RECORDS_KPM_FMT,🎯 %d · %.0f KPM · Σ %d,🎯 %d · %.0f 击杀/分 · Σ %d

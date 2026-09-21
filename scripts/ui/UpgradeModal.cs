@@ -137,7 +137,7 @@ public partial class UpgradeModal : ModalBase
                     }
                     else
                     {
-                        string badgeKey = choice.TryGetValue("badge", out var bgVal) ? bgVal.AsString() : "UPGRADE";
+                        string badgeKey = choice.TryGetValue("badge", out var bgVal) ? bgVal.AsString() : "BADGE_UPGRADE";
                         badgeLbl.Text = "[ " + Tr(badgeKey) + " ]";
                         badgeLbl.Modulate = new Color(0.5f, 0.8f, 1.0f);
                     }
@@ -145,7 +145,10 @@ public partial class UpgradeModal : ModalBase
                 if (descLbl != null)
                 {
                     string descKey = choice.TryGetValue("desc", out var dVal) ? dVal.AsString() : "";
-                    descLbl.Text = Tr(descKey);
+                    int descLvl = choice.TryGetValue("level", out var dlVal) ? dlVal.AsInt32() : 0;
+                    descLbl.Text = descKey == "UPGRADE_TO_LV"
+                        ? TextFormatter.Format(Tr(descKey), descLvl)
+                        : Tr(descKey);
                 }
 
                 // Cue 4 (docs/tutorial.md §2): maxed active + paired passive shows

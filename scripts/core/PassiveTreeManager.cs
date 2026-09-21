@@ -79,248 +79,99 @@ public static class PassiveTreeManager
         set => _savePath.Value = value;
     }
 
-    private static TreeNode Make(string id, string branch, int column, int row, TreeRarity rarity, string icon, string nameKey, string descKey, int maxStacks, int pointCost, Type? skillType, TreeStatModifier[] modifiers)
+
+    // Tree topology is data-owned (assets/data/passive_tree.json); position math
+    // (GridPosition/LayerOf) stays in code. Loaded once and cached.
+    private static TreeNode[]? _nodes;
+    public static TreeNode[] Nodes
     {
-        return new TreeNode(id, GridPosition(column, row), rarity, branch, icon, nameKey, descKey, maxStacks, pointCost, skillType, modifiers, LayerOf(column, row));
+        get
+        {
+            _nodes ??= LoadTreeNodes();
+            DataValidator.EnsureValidated();
+            return _nodes;
+        }
     }
 
-    private static TreeNode Legacy(string id, string branch, int column, int row, string icon, string nameKey, string descKey, Type skillType)
+    public static (string From, string To)[] Edges
     {
-        return Make(id, branch, column, row, TreeRarity.Magic, icon, nameKey, descKey, 1, 1, skillType, System.Array.Empty<TreeStatModifier>());
+        get
+        {
+            EnsureTreeLoaded();
+            DataValidator.EnsureValidated();
+            return _loadedEdges;
+        }
     }
 
-    private static TreeNode Micro(string id, string branch, int column, int row, string icon, string nameKey, params TreeStatModifier[] modifiers)
+    public static System.Collections.Generic.Dictionary<string, string> StartNodes
     {
-        return Make(id, branch, column, row, TreeRarity.Normal, icon, nameKey, "", 1, 1, null, modifiers);
+        get
+        {
+            EnsureTreeLoaded();
+            DataValidator.EnsureValidated();
+            return _loadedStarts;
+        }
     }
 
-    private static TreeNode Notable(string id, string branch, int column, int row, string icon, string nameKey, params TreeStatModifier[] modifiers)
+    private static System.Collections.Generic.Dictionary<string, string>? _statLabels;
+    private static System.Collections.Generic.Dictionary<string, string> StatLabels => _statLabels ??= CatalogBuilders.BuildStatLabels();
+
+    /// <summary>All tree data loads in one pass so Nodes/Edges/Starts stay consistent.</summary>
+    private static bool _treeLoaded = false;
+    private static (string From, string To)[] _loadedEdges = System.Array.Empty<(string, string)>();
+    private static System.Collections.Generic.Dictionary<string, string> _loadedStarts = new();
+
+    private static void EnsureTreeLoaded()
     {
-        return Make(id, branch, column, row, TreeRarity.Magic, icon, nameKey, "", 1, 1, null, modifiers);
+        if (_treeLoaded)
+            return;
+        _treeLoaded = true;
+        CatalogBuilders.BuildTree(out var nodes, out var edges, out var starts);
+        _nodes = nodes;
+        _loadedEdges = edges;
+        _loadedStarts = starts;
     }
 
-    private static TreeNode RareNode(string id, string branch, int column, int row, string icon, string nameKey, params TreeStatModifier[] modifiers)
+    private static TreeNode[] LoadTreeNodes()
     {
-        return Make(id, branch, column, row, TreeRarity.Rare, icon, nameKey, "", 1, 1, null, modifiers);
+        EnsureTreeLoaded();
+        return _nodes!;
     }
 
-    private static TreeNode UniqueNode(string id, string branch, int column, int row, string icon, string nameKey, params TreeStatModifier[] modifiers)
+    /// <summary>skill id (passive_tree.json) → skill Type for legacy loadout nodes.</summary>
+    private static readonly System.Collections.Generic.Dictionary<string, System.Type> SkillTypes = new()
     {
-        return Make(id, branch, column, row, TreeRarity.Unique, icon, nameKey, "", 1, 1, null, modifiers);
-    }
-
-    private static TreeStatModifier Fx(string stat, float value, TreeModifierUnit unit)
-    {
-        return new TreeStatModifier(stat, value, unit);
-    }
-
-    public static readonly TreeNode[] Nodes =
-    {
-        Make(NucleusNodeId, "core", 0, 0, TreeRarity.Unique, "🧫", "TREE_NODE_HSC_NAME", "", 1, 0, null, System.Array.Empty<TreeStatModifier>()),
-
-        Micro("tree_precise_edge", "precision", 2, 1, "🔍", "TREE_NODE_PRECISE_EDGE_NAME",
-            Fx("crit_chance", 0.02f, TreeModifierUnit.Flat)),
-        Micro("tree_marked_core", "precision", 4, 1, "🧿", "TREE_NODE_MARKED_CORE_NAME",
-            Fx("crit_chance", 0.02f, TreeModifierUnit.Flat)),
-        Legacy("passive_opsonin", "precision", 2, 0, "🎯", "SKILL_OPSONIN_NAME", "SKILL_OPSONIN_DESC", typeof(PassiveOpsoninAffinity)),
-        Legacy("passive_vdj", "precision", 3, 0, "🎲", "SKILL_VDJ_NAME", "SKILL_VDJ_DESC", typeof(PassiveVdjDiversity)),
-        Micro("tree_execution_tempo", "precision", 4, 0, "⏱️", "TREE_NODE_EXECUTION_TEMPO_NAME",
-            Fx("crit_damage", 0.20f, TreeModifierUnit.Percent)),
-        Notable("tree_assassins_mandate", "precision", 3, 1, "⚔️", "TREE_NODE_ASSASSINS_MANDATE_NAME",
-            Fx("crit_chance", 0.10f, TreeModifierUnit.Flat)),
-        Micro("tree_blood_price", "precision", 5, 0, "🩸", "TREE_NODE_BLOOD_PRICE_NAME",
-            Fx("might", 0.08f, TreeModifierUnit.Percent)),
-        Micro("tree_deep_wound", "precision", 5, 1, "🩹", "TREE_NODE_DEEP_WOUND_NAME",
-            Fx("crit_damage", 0.15f, TreeModifierUnit.Percent)),
-        Micro("tree_lightfooted_killer", "precision", 6, 1, "🪽", "TREE_NODE_LIGHTFOOTED_KILLER_NAME",
-            Fx("move_speed", 0.05f, TreeModifierUnit.Percent)),
-
-        Legacy("passive_chemokine", "senses", 0, 2, "🧲", "SKILL_CHEMOKINE_NAME", "SKILL_CHEMOKINE_DESC", typeof(PassiveChemokineReceptors)),
-        Micro("tree_far_sense", "senses", 1, 2, "🔭", "TREE_NODE_FAR_SENSE_NAME",
-            Fx("magnet", 0.20f, TreeModifierUnit.Percent)),
-        Micro("tree_lucky_mutation", "senses", 3, 2, "🍀", "TREE_NODE_LUCKY_MUTATION_NAME",
-            Fx("evasion", 0.04f, TreeModifierUnit.Percent)),
-        Micro("tree_antigen_harvest", "senses", 1, 3, "🌾", "TREE_NODE_ANTIGEN_HARVEST_NAME",
-            Fx("magnet", 0.15f, TreeModifierUnit.Percent)),
-        Micro("tree_patient_observer", "senses", 3, 3, "🦉", "TREE_NODE_PATIENT_OBSERVER_NAME",
-            Fx("duration", 0.12f, TreeModifierUnit.Percent)),
-        Micro("tree_scavenger_field", "senses", 2, 2, "🗺️", "TREE_NODE_SCAVENGER_FIELD_NAME",
-            Fx("magnet", 0.15f, TreeModifierUnit.Percent)),
-        Micro("tree_risk_assessment", "senses", 2, 3, "⚖️", "TREE_NODE_RISK_ASSESSMENT_NAME",
-            Fx("cooldown_reduction", 0.04f, TreeModifierUnit.PercentagePoints)),
-        Notable("tree_swarm_cartography", "senses", 4, 2, "📡", "TREE_NODE_SWARM_CARTOGRAPHY_NAME",
-            Fx("magnet", 0.40f, TreeModifierUnit.Percent)),
-
-        Legacy("passive_actin", "motility", -2, 0, "🧬", "SKILL_ACTIN_NAME", "SKILL_ACTIN_DESC", typeof(PassiveActinPolymerization)),
-        Micro("tree_cytoskeletal_drift", "motility", -3, 0, "🌀", "TREE_NODE_CYTOSKELETAL_DRIFT_NAME",
-            Fx("move_speed", 0.05f, TreeModifierUnit.Percent)),
-        Micro("tree_slipstream", "motility", -4, 0, "💨", "TREE_NODE_SLIPSTREAM_NAME",
-            Fx("move_speed", 0.08f, TreeModifierUnit.Percent)),
-        Micro("tree_oxidative_pace", "motility", -3, -1, "🔥", "TREE_NODE_OXIDATIVE_PACE_NAME",
-            Fx("cooldown_reduction", 0.04f, TreeModifierUnit.PercentagePoints)),
-        Micro("tree_rapid_reposition", "motility", -4, -1, "🧭", "TREE_NODE_RAPID_REPOSITION_NAME",
-            Fx("move_speed", 0.06f, TreeModifierUnit.Percent)),
-        Micro("tree_enduring_march", "motility", -5, -1, "🥾", "TREE_NODE_ENDURING_MARCH_NAME",
-            Fx("move_speed", 0.04f, TreeModifierUnit.Percent)),
-        Micro("tree_aerobic_sprint", "motility", -5, 0, "🏃", "TREE_NODE_AEROBIC_SPRINT_NAME",
-            Fx("move_speed", 0.10f, TreeModifierUnit.Percent)),
-        Notable("tree_pseudopod_marathon", "motility", -6, 0, "🏇", "TREE_NODE_PSEUDOPOD_MARATHON_NAME",
-            Fx("move_speed", 0.18f, TreeModifierUnit.Percent)),
-
-        Legacy("passive_kinesin", "ballistics", 2, -1, "🛤️", "SKILL_KINESIN_NAME", "SKILL_KINESIN_DESC", typeof(PassiveKinesinTransit)),
-        Micro("tree_ballistic_threads", "ballistics", 3, -1, "🧵", "TREE_NODE_BALLISTIC_THREADS_NAME",
-            Fx("projectile_speed", 0.12f, TreeModifierUnit.Percent)),
-        Micro("tree_splitting_volley", "ballistics", 2, -2, "🔱", "TREE_NODE_SPLITTING_VOLLEY_NAME",
-            Fx("amount", 1.0f, TreeModifierUnit.Flat)),
-        Micro("tree_guided_salvo", "ballistics", 4, -1, "🛰️", "TREE_NODE_GUIDED_SALVO_NAME",
-            Fx("projectile_speed", 0.10f, TreeModifierUnit.Percent)),
-        Micro("tree_piercing_filaments", "ballistics", 3, -2, "📌", "TREE_NODE_PIERCING_FILAMENTS_NAME",
-            Fx("pierce", 1.0f, TreeModifierUnit.Flat)),
-        Micro("tree_extended_chambers", "ballistics", 5, -1, "⏳", "TREE_NODE_EXTENDED_CHAMBERS_NAME",
-            Fx("duration", 0.12f, TreeModifierUnit.Percent)),
-        Micro("tree_overdrawn_strings", "ballistics", 4, -2, "🏹", "TREE_NODE_OVERDRAWN_STRINGS_NAME",
-            Fx("might", 0.08f, TreeModifierUnit.Percent)),
-        Notable("tree_rolling_thunder", "ballistics", 6, -1, "🌩️", "TREE_NODE_ROLLING_THUNDER_NAME",
-            Fx("projectile_speed", 0.30f, TreeModifierUnit.Percent)),
-
-        Legacy("passive_lysosome", "vitality", -1, 1, "🧪", "TREE_NODE_LYSOSOME_NAME", "TREE_NODE_LYSOSOME_DESC", typeof(PassiveLysosomePriming)),
-        Micro("tree_thick_cytoplasm", "vitality", -2, 1, "🫧", "TREE_NODE_THICK_CYTOPLASM_NAME",
-            Fx("max_health", 0.08f, TreeModifierUnit.Percent)),
-        Micro("tree_rapid_clotting", "vitality", -4, 1, "🩺", "TREE_NODE_RAPID_CLOTTING_NAME",
-            Fx("armor", 2.0f, TreeModifierUnit.Flat)),
-        Micro("tree_lysosomal_appetite", "vitality", -2, 2, "🍽️", "TREE_NODE_LYSOSOMAL_APPETITE_NAME",
-            Fx("might", 0.06f, TreeModifierUnit.Percent)),
-        Micro("tree_iron_membrane", "vitality", -3, 2, "🦾", "TREE_NODE_IRON_MEMBRANE_NAME",
-            Fx("armor", 3.0f, TreeModifierUnit.Flat)),
-        Legacy("passive_bilayer", "vitality", -3, 1, "🛡️", "SKILL_BILAYER_NAME", "SKILL_BILAYER_DESC", typeof(PassiveBilayerHardening)),
-        Legacy("passive_endotoxin", "vitality", -5, 1, "🧱", "SKILL_ENDOTOXIN_NAME", "SKILL_ENDOTOXIN_DESC", typeof(PassiveEndotoxinBarrier)),
-        Micro("tree_second_wind", "vitality", -4, 2, "🌬️", "TREE_NODE_SECOND_WIND_NAME",
-            Fx("health_regen", 0.50f, TreeModifierUnit.Flat)),
-        Micro("tree_contained_fury", "vitality", -5, 2, "🌋", "TREE_NODE_CONTAINED_FURY_NAME",
-            Fx("might", 0.08f, TreeModifierUnit.Percent)),
-        Legacy("passive_autophagy", "vitality", -6, 2, "🔄", "SKILL_AUTOPHAGY_NAME", "SKILL_AUTOPHAGY_DESC", typeof(PassiveAutophagicRecycle)),
-        Notable("tree_bulwark_metabolism", "vitality", -6, 1, "🏰", "TREE_NODE_BULWARK_METABOLISM_NAME",
-            Fx("max_health", 0.25f, TreeModifierUnit.Percent)),
-
-        Legacy("passive_mitochondria", "core", 1, 0, "⚡", "SKILL_MITOCHONDRIA_NAME", "SKILL_MITOCHONDRIA_DESC", typeof(PassiveMitochondrialOverclock)),
-        RareNode("tree_adaptive_overdrive", "core", 1, 1, "🚀", "TREE_NODE_ADAPTIVE_OVERDRIVE_NAME",
-            Fx("might", 0.20f, TreeModifierUnit.Percent),
-            Fx("move_speed", 0.08f, TreeModifierUnit.Percent)),
-        UniqueNode("tree_omnipotent_cytoplasm", "core", 1, -1, "🌌", "TREE_NODE_OMNIPOTENT_CYTOPLASM_NAME",
-            Fx("area", 0.30f, TreeModifierUnit.Percent),
-            Fx("duration", 0.20f, TreeModifierUnit.Percent),
-            Fx("projectile_speed", 0.20f, TreeModifierUnit.Percent),
-            Fx("cooldown_reduction", 0.15f, TreeModifierUnit.PercentagePoints),
-            Fx("max_health", -0.25f, TreeModifierUnit.Percent)),
-        Legacy("passive_glycolysis", "core", -1, 0, "🍬", "SKILL_GLYCOLYSIS_NAME", "SKILL_GLYCOLYSIS_DESC", typeof(PassiveAerobicGlycolysis)),
-        Legacy("passive_hematopoietic", "core", 0, 1, "🩸", "SKILL_HEMATOPOIETIC_NAME", "SKILL_HEMATOPOIETIC_DESC", typeof(PassiveHematopoieticReserve)),
-        RareNode("tree_immortal_culture", "core", -1, -1, "♾️", "TREE_NODE_IMMORTAL_CULTURE_NAME",
-            Fx("health_regen", 2.0f, TreeModifierUnit.Flat),
-            Fx("life_steal", 0.04f, TreeModifierUnit.Percent)),
-        Legacy("passive_longevity", "core", 0, -1, "⏳", "SKILL_LONGEVITY_NAME", "SKILL_LONGEVITY_DESC", typeof(PassiveCytokineLongevity))
+        { "passive_opsonin", typeof(PassiveOpsoninAffinity) },
+        { "passive_vdj", typeof(PassiveVdjDiversity) },
+        { "passive_chemokine", typeof(PassiveChemokineReceptors) },
+        { "passive_actin", typeof(PassiveActinPolymerization) },
+        { "passive_kinesin", typeof(PassiveKinesinTransit) },
+        { "passive_lysosome", typeof(PassiveLysosomePriming) },
+        { "passive_bilayer", typeof(PassiveBilayerHardening) },
+        { "passive_endotoxin", typeof(PassiveEndotoxinBarrier) },
+        { "passive_autophagy", typeof(PassiveAutophagicRecycle) },
+        { "passive_mitochondria", typeof(PassiveMitochondrialOverclock) },
+        { "passive_glycolysis", typeof(PassiveAerobicGlycolysis) },
+        { "passive_hematopoietic", typeof(PassiveHematopoieticReserve) },
+        { "passive_longevity", typeof(PassiveCytokineLongevity) }
     };
 
-    public static readonly (string From, string To)[] Edges =
+    public static System.Type? ResolveSkillType(string skillId)
     {
-        (NucleusNodeId, "passive_glycolysis"),
-        (NucleusNodeId, "passive_mitochondria"),
-        (NucleusNodeId, "passive_hematopoietic"),
-        (NucleusNodeId, "passive_longevity"),
-        ("passive_hematopoietic", "tree_adaptive_overdrive"),
-        ("passive_mitochondria", "tree_adaptive_overdrive"),
-        ("passive_glycolysis", "tree_immortal_culture"),
-        ("tree_immortal_culture", "passive_longevity"),
-        ("passive_longevity", "tree_omnipotent_cytoplasm"),
-        ("passive_mitochondria", "tree_omnipotent_cytoplasm"),
-        ("passive_hematopoietic", "passive_chemokine"),
-        ("passive_hematopoietic", "passive_lysosome"),
-        ("passive_mitochondria", "passive_opsonin"),
-        ("passive_glycolysis", "passive_actin"),
-        ("tree_omnipotent_cytoplasm", "passive_kinesin"),
-        ("passive_glycolysis", "passive_lysosome"),
-        ("passive_chemokine", "tree_far_sense"),
-        ("tree_far_sense", "tree_antigen_harvest"),
-        ("tree_far_sense", "tree_scavenger_field"),
-        ("tree_scavenger_field", "tree_lucky_mutation"),
-        ("tree_lucky_mutation", "tree_patient_observer"),
-        ("tree_lucky_mutation", "tree_swarm_cartography"),
-        ("tree_scavenger_field", "tree_risk_assessment"),
-        ("tree_antigen_harvest", "tree_risk_assessment"),
-        ("tree_patient_observer", "tree_risk_assessment"),
-        ("tree_lucky_mutation", "tree_assassins_mandate"),
-        ("passive_opsonin", "tree_precise_edge"),
-        ("passive_opsonin", "passive_vdj"),
-        ("passive_vdj", "tree_assassins_mandate"),
-        ("passive_vdj", "tree_execution_tempo"),
-        ("tree_execution_tempo", "tree_marked_core"),
-        ("tree_execution_tempo", "tree_blood_price"),
-        ("tree_marked_core", "tree_deep_wound"),
-        ("tree_deep_wound", "tree_lightfooted_killer"),
-        ("tree_assassins_mandate", "tree_marked_core"),
-        ("passive_actin", "tree_cytoskeletal_drift"),
-        ("tree_cytoskeletal_drift", "tree_slipstream"),
-        ("tree_cytoskeletal_drift", "tree_oxidative_pace"),
-        ("tree_slipstream", "tree_rapid_reposition"),
-        ("tree_oxidative_pace", "tree_rapid_reposition"),
-        ("tree_slipstream", "tree_aerobic_sprint"),
-        ("tree_aerobic_sprint", "tree_pseudopod_marathon"),
-        ("tree_aerobic_sprint", "tree_enduring_march"),
-        ("tree_rapid_reposition", "tree_enduring_march"),
-        ("passive_kinesin", "tree_splitting_volley"),
-        ("passive_kinesin", "tree_ballistic_threads"),
-        ("tree_splitting_volley", "tree_piercing_filaments"),
-        ("tree_ballistic_threads", "tree_guided_salvo"),
-        ("tree_guided_salvo", "tree_extended_chambers"),
-        ("tree_piercing_filaments", "tree_overdrawn_strings"),
-        ("tree_extended_chambers", "tree_rolling_thunder"),
-        ("passive_lysosome", "tree_thick_cytoplasm"),
-        ("tree_thick_cytoplasm", "tree_lysosomal_appetite"),
-        ("tree_thick_cytoplasm", "passive_bilayer"),
-        ("tree_lysosomal_appetite", "tree_iron_membrane"),
-        ("passive_bilayer", "tree_iron_membrane"),
-        ("passive_bilayer", "tree_rapid_clotting"),
-        ("tree_rapid_clotting", "tree_second_wind"),
-        ("tree_rapid_clotting", "passive_endotoxin"),
-        ("tree_second_wind", "tree_contained_fury"),
-        ("tree_contained_fury", "passive_autophagy"),
-        ("passive_endotoxin", "tree_contained_fury"),
-        ("passive_endotoxin", "tree_bulwark_metabolism"),
-        ("passive_autophagy", "tree_bulwark_metabolism"),
-        ("passive_actin", "tree_thick_cytoplasm"),
-        ("passive_opsonin", "passive_kinesin"),
-    };
+        if (string.IsNullOrEmpty(skillId))
+            return null;
+        return SkillTypes.TryGetValue(skillId, out var t) ? t : null;
+    }
 
-    public static readonly System.Collections.Generic.Dictionary<string, string> StartNodes = new()
+    public static bool HasStatLabel(string stat)
     {
-        { "macrophage", "passive_lysosome" },
-        { "ctl", "passive_opsonin" },
-        { "neutrophil", "passive_actin" },
-        { "b_cell", "passive_kinesin" },
-        { "dendritic", "passive_chemokine" }
-    };
+        return StatLabels.ContainsKey(stat);
+    }
 
-    private static readonly System.Collections.Generic.Dictionary<string, string> StatLabels = new()
-    {
-        { "might", "STAT_MIGHT" },
-        { "area", "STAT_AREA" },
-        { "cooldown_reduction", "STAT_COOLDOWN_REDUCTION" },
-        { "projectile_speed", "STAT_PROJECTILE_SPEED" },
-        { "duration", "STAT_DURATION" },
-        { "amount", "STAT_AMOUNT" },
-        { "pierce", "STAT_PIERCE" },
-        { "knockback", "STAT_KNOCKBACK" },
-        { "crit_chance", "STAT_CRIT_CHANCE" },
-        { "crit_damage", "STAT_CRIT_DAMAGE" },
-        { "ailment_damage", "STAT_AILMENT_DAMAGE" },
-        { "max_health", "STAT_MAX_HEALTH" },
-        { "health_regen", "STAT_HEALTH_REGEN" },
-        { "armor", "STAT_ARMOR" },
-        { "move_speed", "STAT_MOVE_SPEED" },
-        { "evasion", "STAT_EVASION" },
-        { "block", "STAT_BLOCK" },
-        { "life_steal", "STAT_LIFE_STEAL" },
-        { "magnet", "STAT_MAGNET" }
-    };
+    public static System.Collections.Generic.IReadOnlyDictionary<string, string> StatLabelValues => StatLabels;
+
+
+
 
     public static string GetRarityName(TreeRarity rarity)
     {

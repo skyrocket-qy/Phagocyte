@@ -170,8 +170,8 @@ public partial class UpgradeManager : RefCounted
                         { "name", !string.IsNullOrEmpty(skill.NameKey) ? skill.NameKey : skill.SkillId },
                         { "icon", skill.IconSymbol },
                         { "level", skill.Level + 1 },
-                        { "badge", "UPGRADE" },
-                        { "desc", !string.IsNullOrEmpty(skill.DescKey) ? skill.DescKey : $"Upgrade to Lv.{skill.Level + 1}" },
+                        { "badge", "BADGE_UPGRADE" },
+                        { "desc", !string.IsNullOrEmpty(skill.DescKey) ? skill.DescKey : "UPGRADE_TO_LV" },
                         { "skill_ref", skill }
                     });
                 }
@@ -196,8 +196,8 @@ public partial class UpgradeManager : RefCounted
                         { "name", !string.IsNullOrEmpty(skill.NameKey) ? skill.NameKey : skill.SkillId },
                         { "icon", skill.IconSymbol },
                         { "level", skill.Level + 1 },
-                        { "badge", "UPGRADE" },
-                        { "desc", !string.IsNullOrEmpty(skill.DescKey) ? skill.DescKey : $"Upgrade to Lv.{skill.Level + 1}" },
+                        { "badge", "BADGE_UPGRADE" },
+                        { "desc", !string.IsNullOrEmpty(skill.DescKey) ? skill.DescKey : "UPGRADE_TO_LV" },
                         { "skill_ref", skill }
                     };
                     ApplyCatalystFlag(player, passiveCandidate, skill.SkillId);
@@ -228,7 +228,7 @@ public partial class UpgradeManager : RefCounted
                         { "name", item["name"] },
                         { "icon", item["icon"] },
                         { "level", 1 },
-                        { "badge", "NEW ACTIVE" },
+                        { "badge", "BADGE_NEW_ACTIVE" },
                         { "desc", item["desc"] },
                         { "skill_class", item["class_type"] }
                     });
@@ -252,7 +252,7 @@ public partial class UpgradeManager : RefCounted
                         { "name", item["name"] },
                         { "icon", item["icon"] },
                         { "level", 1 },
-                        { "badge", "NEW PASSIVE" },
+                        { "badge", "BADGE_NEW_PASSIVE" },
                         { "desc", item["desc"] },
                         { "skill_class", item["class_type"] }
                     };
@@ -279,11 +279,11 @@ public partial class UpgradeManager : RefCounted
             {
                 { "type", "heal_fallback" },
                 { "id", "heal_fallback" },
-                { "name", "ATP 生化質回充" },
+                { "name", "HEAL_FALLBACK_NAME" },
                 { "icon", "💚" },
                 { "level", 0 },
-                { "badge", "HEAL" },
-                { "desc", "立即回復 35% 最大生命值並觸發脈衝" }
+                { "badge", "BADGE_HEAL" },
+                { "desc", "HEAL_FALLBACK_DESC" }
             });
         }
 

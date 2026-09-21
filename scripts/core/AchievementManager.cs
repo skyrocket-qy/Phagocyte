@@ -22,244 +22,18 @@ public partial class AchievementManager : Node
     public static AchievementManager? Instance { get; private set; } = null;
     private static System.Collections.Generic.List<Callable> _listeners = new System.Collections.Generic.List<Callable>();
 
-    public static readonly Godot.Collections.Dictionary Achievements = new Godot.Collections.Dictionary
+    // Achievement definitions are data-owned (assets/data/achievements.json).
+    // Loaded once and cached; in-session unlocks mutate the cached entries.
+    private static Godot.Collections.Dictionary? _achievements;
+    public static Godot.Collections.Dictionary Achievements
     {
-        { "ach_first_digestion", new Godot.Collections.Dictionary {
-            { "id", "ach_first_digestion" },
-            { "title_key", "ACH_FIRST_DIGESTION_TITLE" },
-            { "desc_key", "ACH_FIRST_DIGESTION_DESC" },
-            { "reward_key", "" },
-            { "reward_cell", "" },
-            { "icon", "🦠" },
-            { "target_value", 1.0f },
-            { "stat_key", "digested" }
-        }},
-        { "ach_engulf_20", new Godot.Collections.Dictionary {
-            { "id", "ach_engulf_20" },
-            { "title_key", "ACH_ENGULF_20_TITLE" },
-            { "desc_key", "ACH_ENGULF_20_DESC" },
-            { "reward_key", "ACH_ENGULF_20_REWARD" },
-            { "reward_cell", "ctl" },
-            { "icon", "⚡" },
-            { "target_value", 200.0f },
-            { "stat_key", "digested" }
-        }},
-        { "ach_devour_50", new Godot.Collections.Dictionary {
-            { "id", "ach_devour_50" },
-            { "title_key", "ACH_DEVOUR_50_TITLE" },
-            { "desc_key", "ACH_DEVOUR_50_DESC" },
-            { "reward_key", "ACH_DEVOUR_50_REWARD" },
-            { "reward_cell", "neutrophil" },
-            { "icon", "🌪️" },
-            { "target_value", 500.0f },
-            { "stat_key", "digested" }
-        }},
-        { "ach_reach_level_5", new Godot.Collections.Dictionary {
-            { "id", "ach_reach_level_5" },
-            { "title_key", "ACH_REACH_LEVEL_5_TITLE" },
-            { "desc_key", "ACH_REACH_LEVEL_5_DESC" },
-            { "reward_key", "ACH_REACH_LEVEL_5_REWARD" },
-            { "reward_cell", "b_cell" },
-            { "icon", "🏹" },
-            { "target_value", 15.0f },
-            { "stat_key", "level" }
-        }},
-        { "ach_survive_180s", new Godot.Collections.Dictionary {
-            { "id", "ach_survive_180s" },
-            { "title_key", "ACH_SURVIVE_180S_TITLE" },
-            { "desc_key", "ACH_SURVIVE_180S_DESC" },
-            { "reward_key", "ACH_SURVIVE_180S_REWARD" },
-            { "reward_cell", "dendritic" },
-            { "icon", "📍" },
-            { "target_value", 480.0f },
-            { "stat_key", "survival_time" }
-        }},
-        { "ach_giant_volume", new Godot.Collections.Dictionary {
-            { "id", "ach_giant_volume" },
-            { "title_key", "ACH_GIANT_VOLUME_TITLE" },
-            { "desc_key", "ACH_GIANT_VOLUME_DESC" },
-            { "reward_key", "" },
-            { "reward_cell", "" },
-            { "icon", "🌟" },
-            { "target_value", 2.0f },
-            { "stat_key", "radius_ratio" }
-        }},
-        { "ach_full_arsenal", new Godot.Collections.Dictionary {
-            { "id", "ach_full_arsenal" },
-            { "title_key", "ACH_FULL_ARSENAL_TITLE" },
-            { "desc_key", "ACH_FULL_ARSENAL_DESC" },
-            { "reward_key", "" },
-            { "reward_cell", "" },
-            { "icon", "🛡️" },
-            { "target_value", 5.0f },
-            { "stat_key", "active_skills" }
-        }},
-        { "ach_first_evolution", new Godot.Collections.Dictionary {
-            { "id", "ach_first_evolution" },
-            { "title_key", "ACH_FIRST_EVOLUTION_TITLE" },
-            { "desc_key", "ACH_FIRST_EVOLUTION_DESC" },
-            { "reward_key", "" },
-            { "reward_cell", "" },
-            { "icon", "🧬" },
-            { "target_value", 1.0f },
-            { "stat_key", "first_evolution" }
-        }},
-        { "ach_prion_cleared", new Godot.Collections.Dictionary {
-            { "id", "ach_prion_cleared" },
-            { "title_key", "ACH_PRION_CLEARED_TITLE" },
-            { "desc_key", "ACH_PRION_CLEARED_DESC" },
-            { "reward_key", "" },
-            { "reward_cell", "" },
-            { "icon", "💎" },
-            { "target_value", 1.0f },
-            { "stat_key", "prion_cleared" }
-        }},
-
-        // --- Organ map clear chain (docs/achievement.md §2 / docs/map.md §2) ---
-        // Each map first-clear (Normal / Hard) awards 1 microtube talent point
-        // (docs/passivetree.md §5.2: 10 points from the 10 map clears). The final
-        // blood-brain-barrier clear additionally carries its +1 milestone bonus.
-        { "ach_wound_clear", new Godot.Collections.Dictionary {
-            { "id", "ach_wound_clear" },
-            { "title_key", "ACH_WOUND_CLEAR_TITLE" },
-            { "desc_key", "ACH_WOUND_CLEAR_DESC" },
-            { "reward_key", "ACH_WOUND_CLEAR_REWARD" },
-            { "reward_cell", "" },
-            { "icon", "🩹" },
-            { "target_value", 1.0f },
-            { "stat_key", "map_clear_acute_wound" },
-            { "map_id", "acute_wound" },
-            { "difficulty", "normal" },
-            { "unlock_map", "alveolar_space" },
-            { "unlock_hard_map", "acute_wound" },
-            { "talent_points", 1 }
-        }},
-        { "ach_alveolar_clear", new Godot.Collections.Dictionary {
-            { "id", "ach_alveolar_clear" },
-            { "title_key", "ACH_ALVEOLAR_CLEAR_TITLE" },
-            { "desc_key", "ACH_ALVEOLAR_CLEAR_DESC" },
-            { "reward_key", "ACH_ALVEOLAR_CLEAR_REWARD" },
-            { "reward_cell", "" },
-            { "icon", "🫁" },
-            { "target_value", 1.0f },
-            { "stat_key", "map_clear_alveolar_space" },
-            { "map_id", "alveolar_space" },
-            { "difficulty", "normal" },
-            { "unlock_map", "hepatic_sinusoid" },
-            { "unlock_hard_map", "alveolar_space" },
-            { "talent_points", 1 }
-        }},
-        { "ach_hepatic_clear", new Godot.Collections.Dictionary {
-            { "id", "ach_hepatic_clear" },
-            { "title_key", "ACH_HEPATIC_CLEAR_TITLE" },
-            { "desc_key", "ACH_HEPATIC_CLEAR_DESC" },
-            { "reward_key", "ACH_HEPATIC_CLEAR_REWARD" },
-            { "reward_cell", "" },
-            { "icon", "🫀" },
-            { "target_value", 1.0f },
-            { "stat_key", "map_clear_hepatic_sinusoid" },
-            { "map_id", "hepatic_sinusoid" },
-            { "difficulty", "normal" },
-            { "unlock_map", "gastric_lumen" },
-            { "unlock_hard_map", "hepatic_sinusoid" },
-            { "talent_points", 1 }
-        }},
-        { "ach_gastric_clear", new Godot.Collections.Dictionary {
-            { "id", "ach_gastric_clear" },
-            { "title_key", "ACH_GASTRIC_CLEAR_TITLE" },
-            { "desc_key", "ACH_GASTRIC_CLEAR_DESC" },
-            { "reward_key", "ACH_GASTRIC_CLEAR_REWARD" },
-            { "reward_cell", "" },
-            { "icon", "🌋" },
-            { "target_value", 1.0f },
-            { "stat_key", "map_clear_gastric_lumen" },
-            { "map_id", "gastric_lumen" },
-            { "difficulty", "normal" },
-            { "unlock_map", "blood_brain_barrier" },
-            { "unlock_hard_map", "gastric_lumen" },
-            { "talent_points", 1 }
-        }},
-        { "ach_bbb_clear", new Godot.Collections.Dictionary {
-            { "id", "ach_bbb_clear" },
-            { "title_key", "ACH_BBB_CLEAR_TITLE" },
-            { "desc_key", "ACH_BBB_CLEAR_DESC" },
-            { "reward_key", "ACH_BBB_CLEAR_REWARD" },
-            { "reward_cell", "" },
-            { "icon", "🧠" },
-            { "target_value", 1.0f },
-            { "stat_key", "map_clear_blood_brain_barrier" },
-            { "map_id", "blood_brain_barrier" },
-            { "difficulty", "normal" },
-            { "unlock_hard_map", "blood_brain_barrier" },
-            { "talent_points", 2 }
-        }},
-        { "ach_wound_hard_clear", new Godot.Collections.Dictionary {
-            { "id", "ach_wound_hard_clear" },
-            { "title_key", "ACH_WOUND_HARD_CLEAR_TITLE" },
-            { "desc_key", "ACH_WOUND_HARD_CLEAR_DESC" },
-            { "reward_key", "ACH_WOUND_HARD_CLEAR_REWARD" },
-            { "reward_cell", "" },
-            { "icon", "☣️" },
-            { "target_value", 1.0f },
-            { "stat_key", "map_clear_acute_wound_hard" },
-            { "map_id", "acute_wound" },
-            { "difficulty", "hard" },
-            { "unlock_endless", true },
-            { "talent_points", 1 }
-        }},
-        { "ach_alveolar_hard_clear", new Godot.Collections.Dictionary {
-            { "id", "ach_alveolar_hard_clear" },
-            { "title_key", "ACH_ALVEOLAR_HARD_CLEAR_TITLE" },
-            { "desc_key", "ACH_ALVEOLAR_HARD_CLEAR_DESC" },
-            { "reward_key", "ACH_ALVEOLAR_HARD_CLEAR_REWARD" },
-            { "reward_cell", "" },
-            { "icon", "🌬️" },
-            { "target_value", 1.0f },
-            { "stat_key", "map_clear_alveolar_space_hard" },
-            { "map_id", "alveolar_space" },
-            { "difficulty", "hard" },
-            { "talent_points", 1 }
-        }},
-        { "ach_hepatic_hard_clear", new Godot.Collections.Dictionary {
-            { "id", "ach_hepatic_hard_clear" },
-            { "title_key", "ACH_HEPATIC_HARD_CLEAR_TITLE" },
-            { "desc_key", "ACH_HEPATIC_HARD_CLEAR_DESC" },
-            { "reward_key", "ACH_HEPATIC_HARD_CLEAR_REWARD" },
-            { "reward_cell", "" },
-            { "icon", "🩸" },
-            { "target_value", 1.0f },
-            { "stat_key", "map_clear_hepatic_sinusoid_hard" },
-            { "map_id", "hepatic_sinusoid" },
-            { "difficulty", "hard" },
-            { "talent_points", 1 }
-        }},
-        { "ach_gastric_hard_clear", new Godot.Collections.Dictionary {
-            { "id", "ach_gastric_hard_clear" },
-            { "title_key", "ACH_GASTRIC_HARD_CLEAR_TITLE" },
-            { "desc_key", "ACH_GASTRIC_HARD_CLEAR_DESC" },
-            { "reward_key", "ACH_GASTRIC_HARD_CLEAR_REWARD" },
-            { "reward_cell", "" },
-            { "icon", "🔥" },
-            { "target_value", 1.0f },
-            { "stat_key", "map_clear_gastric_lumen_hard" },
-            { "map_id", "gastric_lumen" },
-            { "difficulty", "hard" },
-            { "talent_points", 1 }
-        }},
-        { "ach_bbb_hard_clear", new Godot.Collections.Dictionary {
-            { "id", "ach_bbb_hard_clear" },
-            { "title_key", "ACH_BBB_HARD_CLEAR_TITLE" },
-            { "desc_key", "ACH_BBB_HARD_CLEAR_DESC" },
-            { "reward_key", "ACH_BBB_HARD_CLEAR_REWARD" },
-            { "reward_cell", "" },
-            { "icon", "🧬" },
-            { "target_value", 1.0f },
-            { "stat_key", "map_clear_blood_brain_barrier_hard" },
-            { "map_id", "blood_brain_barrier" },
-            { "difficulty", "hard" },
-            { "talent_points", 1 }
-        }}
-    };
+        get
+        {
+            _achievements ??= CatalogBuilders.BuildAchievements();
+            DataValidator.EnsureValidated();
+            return _achievements;
+        }
+    }
 
     public static Godot.Collections.Dictionary UnlockedIds = new Godot.Collections.Dictionary();
     public static Godot.Collections.Dictionary ProgressData = new Godot.Collections.Dictionary
@@ -328,7 +102,7 @@ public partial class AchievementManager : Node
         string rewardC = data.GetValueOrDefault("reward_cell", "").AsString();
         if (!string.IsNullOrEmpty(rewardC))
         {
-            GameManager.UnlockClass(rewardC);
+            GameEvents.RaiseClassUnlock(rewardC);
         }
 
         // Apply organ-map unlock chain rewards (maps, Hard modes, talent points)
@@ -469,15 +243,15 @@ public partial class AchievementManager : Node
     {
         string nextMap = achievementData.GetValueOrDefault("unlock_map", "").AsString();
         if (!string.IsNullOrEmpty(nextMap))
-            GameManager.UnlockMap(nextMap);
+            GameEvents.RaiseMapUnlock(nextMap);
 
         string hardMap = achievementData.GetValueOrDefault("unlock_hard_map", "").AsString();
         if (!string.IsNullOrEmpty(hardMap))
-            GameManager.UnlockMapHard(hardMap);
+            GameEvents.RaiseMapHardUnlock(hardMap);
 
         int talentPoints = achievementData.GetValueOrDefault("talent_points", 0).AsInt32();
         if (talentPoints > 0)
-            PassiveTreeManager.AddBonusPoints(talentPoints);
+            GameEvents.RaiseBonusPoints(talentPoints);
     }
 
     /// <summary>
@@ -486,7 +260,7 @@ public partial class AchievementManager : Node
     /// </summary>
     private static void SyncMapUnlocks()
     {
-        GameManager.ResetMapUnlocks();
+        GameEvents.RaiseMapsReset();
 
         foreach (string achId in Achievements.Keys)
         {
@@ -496,11 +270,11 @@ public partial class AchievementManager : Node
             var raw = Achievements[achId].AsGodotDictionary();
             string nextMap = raw.GetValueOrDefault("unlock_map", "").AsString();
             if (!string.IsNullOrEmpty(nextMap))
-                GameManager.UnlockMap(nextMap);
+                GameEvents.RaiseMapUnlock(nextMap);
 
             string hardMap = raw.GetValueOrDefault("unlock_hard_map", "").AsString();
             if (!string.IsNullOrEmpty(hardMap))
-                GameManager.UnlockMapHard(hardMap);
+                GameEvents.RaiseMapHardUnlock(hardMap);
         }
     }
 
@@ -700,7 +474,7 @@ public partial class AchievementManager : Node
     /// </summary>
     private static void SyncUnlockedClasses()
     {
-        GameManager.UnlockClass("macrophage");
+        GameEvents.RaiseClassUnlock("macrophage");
 
         foreach (string achId in Achievements.Keys)
         {
@@ -710,11 +484,11 @@ public partial class AchievementManager : Node
             {
                 if (IsUnlocked(achId))
                 {
-                    GameManager.UnlockClass(rewardCell);
+                    GameEvents.RaiseClassUnlock(rewardCell);
                 }
                 else
                 {
-                    GameManager.LockClass(rewardCell);
+                    GameEvents.RaiseClassLock(rewardCell);
                 }
             }
         }

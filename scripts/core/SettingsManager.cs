@@ -40,7 +40,10 @@ public partial class SettingsManager : Node
     }
 
     /// <summary>
-    /// Apply runtime audio and display server settings
+    /// Apply runtime audio and display server settings.
+    /// Single source of truth for volumes (Phase 3): the Master bus is pushed
+    /// here; Sfx/Bgm channel levels are read from these statics by
+    /// AudioManager at play time (all players sit on the Master bus).
     /// </summary>
     public static void ApplySettings()
     {

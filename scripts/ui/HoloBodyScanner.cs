@@ -496,7 +496,7 @@ public partial class HoloBodyScanner : Control
         canvas.DrawString(
             ThemeDB.FallbackFont,
             new Vector2(16, 26),
-            "HOST BIO-SCAN // VASCULAR NETWORK",
+            Tr("SCANNER_HEADER"),
             HorizontalAlignment.Left,
             -1,
             12,
@@ -506,7 +506,7 @@ public partial class HoloBodyScanner : Control
         canvas.DrawString(
             ThemeDB.FallbackFont,
             new Vector2(size.X - 120, 26),
-            "FREQ 440MHz",
+            Tr("SCANNER_FREQ"),
             HorizontalAlignment.Left,
             -1,
             11,
@@ -518,7 +518,7 @@ public partial class HoloBodyScanner : Control
         if (GameManager.MapData.ContainsKey(activeKey))
         {
             var data = (Godot.Collections.Dictionary)GameManager.MapData[activeKey];
-            string organ = data.TryGetValue("organ_key", out var okVal) ? TranslationServer.Translate(okVal.AsString()) : "ORGAN";
+            string organ = data.TryGetValue("organ_key", out var okVal) ? TranslationServer.Translate(okVal.AsString()) : Tr("SCANNER_ORGAN");
             string name = data.TryGetValue("name_key", out var nkVal) ? TranslationServer.Translate(nkVal.AsString()) : activeKey;
             string subtitle = data.TryGetValue("subtitle_key", out var skVal) ? TranslationServer.Translate(skVal.AsString()) : "";
             Color c = data.TryGetValue("color_code", out var ccVal) ? ccVal.AsColor() : new Color(0.3f, 0.8f, 1.0f);
@@ -528,7 +528,7 @@ public partial class HoloBodyScanner : Control
 
             string line1 = locked
                 ? $"► {Tr("SCANNER_TARGET_LOCKED")}: {organ} · {name}"
-                : $"► TARGET: {organ} · {name}";
+                : TextFormatter.Format(Tr("SCANNER_TARGET_FMT"), organ, name);
             Color line1Color = locked ? new Color(1.0f, 0.45f, 0.4f, 0.95f) : c;
 
             canvas.DrawString(
@@ -560,7 +560,7 @@ public partial class HoloBodyScanner : Control
                 canvas.DrawString(
                     hudFont,
                     new Vector2(16, size.Y - 10),
-                    $"LOC: {subtitle} | INFECTION SEVERITY: HIGH",
+                    TextFormatter.Format(Tr("SCANNER_LOCATION_FMT"), subtitle),
                     HorizontalAlignment.Left,
                     -1,
                     11,

@@ -1,0 +1,21 @@
+{
+  "might": "STAT_MIGHT",
+  "area": "STAT_AREA",
+  "cooldown_reduction": "STAT_COOLDOWN_REDUCTION",
+  "projectile_speed": "STAT_PROJECTILE_SPEED",
+  "duration": "STAT_DURATION",
+  "amount": "STAT_AMOUNT",
+  "pierce": "STAT_PIERCE",
+  "knockback": "STAT_KNOCKBACK",
+  "crit_chance": "STAT_CRIT_CHANCE",
+  "crit_damage": "STAT_CRIT_DAMAGE",
+  "ailment_damage": "STAT_AILMENT_DAMAGE",
+  "max_health": "STAT_MAX_HEALTH",
+  "health_regen": "STAT_HEALTH_REGEN",
+  "armor": "STAT_ARMOR",
+  "move_speed": "STAT_MOVE_SPEED",
+  "evasion": "STAT_EVASION",
+  "block": "STAT_BLOCK",
+  "life_steal": "STAT_LIFE_STEAL",
+  "magnet": "STAT_MAGNET"
+}

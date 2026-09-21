@@ -65,8 +65,8 @@ public partial class RunRecordsModal : ModalBase
             return;
 
         HistoryTabs = new TabBar { Name = "HistoryTabs" };
-        HistoryTabs.AddTab("Victories");
-        HistoryTabs.AddTab("Defeats");
+        HistoryTabs.AddTab(Tr("RECORDS_TAB_VICTORIES"));
+        HistoryTabs.AddTab(Tr("RECORDS_TAB_DEFEATS"));
         HistoryTabs.TabChanged += OnHistoryTabChanged;
 
         _rootBox.AddChild(HistoryTabs);
@@ -263,8 +263,8 @@ public partial class RunRecordsModal : ModalBase
             int blocked = tel.TryGetValue("blocked_count", out var bl) ? bl.AsInt32() : 0;
             float lifeSteal = tel.TryGetValue("lifesteal_healed", out var ls) ? ls.AsSingle() : 0.0f;
 
-            AddSummaryRow("RECORDS_TOTAL_DMG", $"{dmgDealt:F0} (Taken: {dmgTaken:F0})");
-            AddSummaryRow("RECORDS_DEFENSE_PROCS", $"💨 {evaded} Evaded | 🛡️ {blocked} Blocked | 💚 +{lifeSteal:F0} HP");
+            AddSummaryRow("RECORDS_TOTAL_DMG", TextFormatter.Format(Tr("RECORDS_DMG_FMT"), dmgDealt, dmgTaken));
+            AddSummaryRow("RECORDS_DEFENSE_PROCS", TextFormatter.Format(Tr("RECORDS_DEFENSE_FMT"), evaded, blocked, $"{lifeSteal:F0}"));
         }
     }
 
@@ -415,7 +415,7 @@ public partial class RunRecordsModal : ModalBase
         var label = new Label
         {
             Text = string.Format(
-                "{0} {1}\n⏱ {2}  ·  Lv.{3}  ·  🦠 {4}  ·  {5}",
+                "{0} {1}\n⏱ {2}  ·  " + Tr("RECORDS_LEVEL_ABBR") + "{3}  ·  🦠 {4}  ·  {5}",
                 chronic ? "🌡️" : victory ? "✅" : "☠️",
                 chronic ? Tr("RECORDS_CHRONIC_TAG") : Tr(victory ? "RECORDS_VICTORY_TAG" : "RECORDS_DEFEAT_TAG"),
                 RunRecordManager.FormatTime(rec.GetValueOrDefault("survival_time", 0.0f).AsSingle()),
@@ -463,7 +463,7 @@ public partial class RunRecordsModal : ModalBase
         int score = rec.GetValueOrDefault("score", 0).AsInt32();
         var stats = new Label
         {
-            Text = $"🎯 {kills}  ·  {kpm:F0} KPM  ·  Σ {score}  ·  {GetDifficultyName(rec.GetValueOrDefault("difficulty", RunRecordManager.DifficultyNormal).AsString())}",
+            Text = TextFormatter.Format(Tr("RECORDS_KPM_FMT"), kills, kpm, score) + "  ·  " + GetDifficultyName(rec.GetValueOrDefault("difficulty", RunRecordManager.DifficultyNormal).AsString()),
             Modulate = new Color(0.6f, 0.7f, 0.8f),
             VerticalAlignment = VerticalAlignment.Center
         };

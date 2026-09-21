@@ -1,0 +1,112 @@
+[
+  {
+    "bg_color": "#0d141fff",
+    "bg_color_accent": "#240a14ff",
+    "bg_color_deep": "#0a0d17ff",
+    "color_code": "#e63946ff",
+    "difficulty": 1,
+    "env_key": "MAP_WOUND_ENV",
+    "fiber_color": "#382e5259",
+    "hard_unlocked": false,
+    "id": "acute_wound",
+    "mech_key": "MAP_WOUND_MECH",
+    "name_key": "MAP_WOUND_NAME",
+    "organ_icon": "🩹",
+    "organ_key": "ORGAN_SKIN",
+    "scanner_pos": [
+      0.26,
+      0.48
+    ],
+    "subtitle_key": "MAP_WOUND_SUBTITLE",
+    "threat_key": "MAP_WOUND_THREAT",
+    "unlocked": true
+  },
+  {
+    "bg_color": "#0a1c21ff",
+    "bg_color_accent": "#0a1f29ff",
+    "bg_color_deep": "#050f1aff",
+    "color_code": "#2a9d8fff",
+    "difficulty": 2,
+    "env_key": "MAP_ALVEOLAR_ENV",
+    "fiber_color": "#3380a659",
+    "hard_unlocked": false,
+    "id": "alveolar_space",
+    "mech_key": "MAP_ALVEOLAR_MECH",
+    "name_key": "MAP_ALVEOLAR_NAME",
+    "organ_icon": "🫁",
+    "organ_key": "ORGAN_LUNGS",
+    "scanner_pos": [
+      0.5,
+      0.28
+    ],
+    "subtitle_key": "MAP_ALVEOLAR_SUBTITLE",
+    "threat_key": "MAP_ALVEOLAR_THREAT",
+    "unlocked": false
+  },
+  {
+    "bg_color": "#0d0805ff",
+    "bg_color_accent": "#2e170aff",
+    "bg_color_deep": "#0d0805ff",
+    "color_code": "#e76f51ff",
+    "difficulty": 3,
+    "env_key": "MAP_HEPATIC_ENV",
+    "fiber_color": "#8c662659",
+    "hard_unlocked": false,
+    "id": "hepatic_sinusoid",
+    "mech_key": "MAP_HEPATIC_MECH",
+    "name_key": "MAP_HEPATIC_NAME",
+    "organ_icon": "🫀",
+    "organ_key": "ORGAN_LIVER",
+    "scanner_pos": [
+      0.42,
+      0.38
+    ],
+    "subtitle_key": "MAP_HEPATIC_SUBTITLE",
+    "threat_key": "MAP_HEPATIC_THREAT",
+    "unlocked": false
+  },
+  {
+    "bg_color": "#0f0a03ff",
+    "bg_color_accent": "#2b1f05ff",
+    "bg_color_deep": "#0f0a03ff",
+    "color_code": "#f4a261ff",
+    "difficulty": 4,
+    "env_key": "MAP_GASTRIC_ENV",
+    "fiber_color": "#99801a59",
+    "hard_unlocked": false,
+    "id": "gastric_lumen",
+    "mech_key": "MAP_GASTRIC_MECH",
+    "name_key": "MAP_GASTRIC_NAME",
+    "organ_icon": "🌋",
+    "organ_key": "ORGAN_STOMACH",
+    "scanner_pos": [
+      0.58,
+      0.4
+    ],
+    "subtitle_key": "MAP_GASTRIC_SUBTITLE",
+    "threat_key": "MAP_GASTRIC_THREAT",
+    "unlocked": false
+  },
+  {
+    "bg_color": "#080512ff",
+    "bg_color_accent": "#140a26ff",
+    "bg_color_deep": "#080512ff",
+    "color_code": "#9d4eddff",
+    "difficulty": 5,
+    "env_key": "MAP_BBB_ENV",
+    "fiber_color": "#5940a666",
+    "hard_unlocked": false,
+    "id": "blood_brain_barrier",
+    "mech_key": "MAP_BBB_MECH",
+    "name_key": "MAP_BBB_NAME",
+    "organ_icon": "🧠",
+    "organ_key": "ORGAN_BRAIN",
+    "scanner_pos": [
+      0.5,
+      0.11
+    ],
+    "subtitle_key": "MAP_BBB_SUBTITLE",
+    "threat_key": "MAP_BBB_THREAT",
+    "unlocked": false
+  }
+]

@@ -23,9 +23,14 @@ public partial class AudioManager : Node
     // Stream cache for zero runtime IO latency
     private readonly Dictionary<string, AudioStream> _audioCache = new(StringComparer.OrdinalIgnoreCase);
 
-    public float MasterVolume { get; set; } = 1.0f;
-    public float BgmVolume { get; set; } = 0.8f;
-    public float SfxVolume { get; set; } = 1.0f;
+    /// <summary>
+    /// Volume state is single-sourced in <see cref="SettingsManager"/> (Phase 3):
+    /// playback always reads the persisted values, so slider changes apply
+    /// without any push ordering between the two autoloads.
+    /// </summary>
+    public float MasterVolume => SettingsManager.MasterVolume;
+    public float BgmVolume => SettingsManager.BgmVolume;
+    public float SfxVolume => SettingsManager.SfxVolume;
 
     public override void _Ready()
     {
