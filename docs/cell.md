@@ -58,6 +58,8 @@ $$R(\theta, t) = R_{\text{base}} \times \left(1.0 + \text{Amplitude} \times \tex
 [樹突細胞]   HP: 110 | Armor:  2 | Speed: 225 | Magnet: 260 | Duration: 1.2| CDR: 10%
 ```
 
+選角檔案欄（`ClassView/HBox/DetailPanel`）直接取用上表數值：生命／移速／護甲渲染為五職業歸一化的五格相對條（`◆◇`），第四行為各職業簽名屬性（格擋／暴擊／傷害／彈速／拾取）；簡介（`CLASS_<ID>_BIO`）與固有技能分別取自文案表與技能目錄（`type=innate`）。數值源頭仍是各 `*Cell.cs` 的 `ApplyClassBaseStats`，`classes.json` 僅做展示鏡像，調數值時兩邊需同步。
+
 ---
 
 ## 4. 動態體積與範圍縮放機制 (Volume & Area Scaling)

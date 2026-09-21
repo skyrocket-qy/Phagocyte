@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using System;
 using Phagocyte.Core;
 
@@ -29,9 +30,14 @@ public partial class MainMenu : Control
     // Class View Controls
     public Label? ClassHeaderLbl { get; set; }
     public VBoxContainer? ClassListContainer { get; set; }
+    public Label? ClassBadgeLbl { get; set; }
     public Label? ClassNameLbl { get; set; }
+    public Label? ClassBioLbl { get; set; }
     public Label? ClassRoleLbl { get; set; }
-    public Label? ClassTraitLbl { get; set; }
+    public Label? ClassStatsHeaderLbl { get; set; }
+    public Label? ClassStatsLbl { get; set; }
+    public Label? ClassSkillHeaderLbl { get; set; }
+    public Label? ClassSkillLbl { get; set; }
     public Label? ClassStatusLbl { get; set; }
     public Button? ClassConfirmBtn { get; set; }
     public Button? ClassBackBtn { get; set; }
@@ -124,9 +130,14 @@ public partial class MainMenu : Control
 
         ClassHeaderLbl = GetNodeOrNull<Label>("ClassView/HeaderLabel");
         ClassListContainer = GetNodeOrNull<VBoxContainer>("ClassView/HBox/ClassList");
+        ClassBadgeLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassBadgeLabel");
         ClassNameLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassNameLabel");
+        ClassBioLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassBioLabel");
         ClassRoleLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassRoleLabel");
-        ClassTraitLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassTraitLabel");
+        ClassStatsHeaderLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatsHeader");
+        ClassStatsLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatsLabel");
+        ClassSkillHeaderLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassSkillHeader");
+        ClassSkillLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassSkillLabel");
         ClassStatusLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatusLabel");
         ClassConfirmBtn = GetNodeOrNull<Button>("ClassView/Buttons/ConfirmButton");
         ClassBackBtn = GetNodeOrNull<Button>("ClassView/Buttons/BackButton");
@@ -373,11 +384,31 @@ public partial class MainMenu : Control
     {
         ActiveClassKey = key;
         var data = GameManager.GetClassInfo(key);
-        if (ClassNameLbl != null) ClassNameLbl.Text = data["name"].AsString();
-        if (ClassRoleLbl != null) ClassRoleLbl.Text = Tr("LABEL_ROLE") + data["role"].AsString();
-        if (ClassTraitLbl != null) ClassTraitLbl.Text = Tr("LABEL_TRAIT") + data["trait"].AsString();
+        bool unlocked = data.TryGetValue("unlocked", out Variant unlockedVal) && unlockedVal.AsBool();
 
-        bool unlocked = data["unlocked"].AsBool();
+        if (ClassBadgeLbl != null)
+        {
+            ClassBadgeLbl.Text = "[ " + Tr(unlocked ? "CLASS_BADGE_READY" : "CLASS_BADGE_LOCKED") + " ]";
+            ClassBadgeLbl.Modulate = unlocked ? new Color(0.3f, 1.0f, 0.4f) : new Color(1.0f, 0.68f, 0.25f);
+        }
+        if (ClassNameLbl != null && data.TryGetValue("name", out Variant nameVal))
+            ClassNameLbl.Text = nameVal.AsString();
+        if (ClassBioLbl != null)
+        {
+            string bioKey = data.TryGetValue("bio_key", out Variant bioKeyVal) ? bioKeyVal.AsString() : "";
+            ClassBioLbl.Text = Tr("CODEX_HEADER_BIO") + "\n" + (string.IsNullOrEmpty(bioKey) ? "" : Tr(bioKey));
+        }
+        if (ClassRoleLbl != null && data.TryGetValue("role", out Variant roleVal))
+            ClassRoleLbl.Text = Tr("LABEL_ROLE") + roleVal.AsString();
+        if (ClassStatsHeaderLbl != null)
+            ClassStatsHeaderLbl.Text = Tr("CLASS_STATS_HEADER");
+        if (ClassStatsLbl != null)
+            ClassStatsLbl.Text = BuildClassVitalsText(data);
+        if (ClassSkillHeaderLbl != null)
+            ClassSkillHeaderLbl.Text = Tr("CLASS_SKILL_HEADER");
+        if (ClassSkillLbl != null)
+            ClassSkillLbl.Text = BuildClassSkillText(key);
+
         if (ClassStatusLbl != null)
         {
             if (unlocked)
@@ -397,6 +428,80 @@ public partial class MainMenu : Control
             ClassConfirmBtn.Disabled = !unlocked;
             ClassConfirmBtn.Text = unlocked ? Tr("BTN_CONFIRM_PASSIVE") : Tr("BTN_CONFIRM_CLASS_LOCKED");
         }
+    }
+
+    /// <summary>
+    /// Baseline vitals block: HP / speed / armor as 5-cell relative bars
+    /// (normalized across all classes) plus the class signature stat.
+    /// </summary>
+    private string BuildClassVitalsText(Dictionary data)
+    {
+        float hp = data.TryGetValue("base_hp", out Variant hpVal) ? hpVal.AsSingle() : 100.0f;
+        float speed = data.TryGetValue("base_speed", out Variant spVal) ? spVal.AsSingle() : 230.0f;
+        float armor = data.TryGetValue("base_armor", out Variant arVal) ? arVal.AsSingle() : 0.0f;
+
+        float minHp = float.MaxValue, maxHp = float.MinValue;
+        float minSp = float.MaxValue, maxSp = float.MinValue;
+        float minAr = float.MaxValue, maxAr = float.MinValue;
+        foreach (string id in GameManager.ClassData.Keys)
+        {
+            var d = (Dictionary)GameManager.ClassData[id];
+            float h = d.TryGetValue("base_hp", out Variant hv) ? hv.AsSingle() : 100.0f;
+            float s = d.TryGetValue("base_speed", out Variant sv) ? sv.AsSingle() : 230.0f;
+            float a = d.TryGetValue("base_armor", out Variant av) ? av.AsSingle() : 0.0f;
+            minHp = Mathf.Min(minHp, h); maxHp = Mathf.Max(maxHp, h);
+            minSp = Mathf.Min(minSp, s); maxSp = Mathf.Max(maxSp, s);
+            minAr = Mathf.Min(minAr, a); maxAr = Mathf.Max(maxAr, a);
+        }
+
+        var lines = new System.Collections.Generic.List<string>
+        {
+            $"{PassiveTreeManager.GetStatLabel("max_health")} {VitalsBar(hp, minHp, maxHp)}",
+            $"{PassiveTreeManager.GetStatLabel("move_speed")} {VitalsBar(speed, minSp, maxSp)}",
+            $"{PassiveTreeManager.GetStatLabel("armor")} {VitalsBar(armor, minAr, maxAr)}"
+        };
+
+        string sigStat = data.TryGetValue("trait_stat", out Variant sigVal) ? sigVal.AsString() : "";
+        if (!string.IsNullOrEmpty(sigStat))
+        {
+            float sigNum = data.TryGetValue("trait_stat_value", out Variant signVal) ? signVal.AsSingle() : 0.0f;
+            lines.Add($"{PassiveTreeManager.GetStatLabel(sigStat)} {FormatSignatureStat(sigStat, sigNum)}");
+        }
+        return string.Join("\n", lines);
+    }
+
+    private static string VitalsBar(float value, float min, float max)
+    {
+        int cells = 3;
+        if (max > min)
+            cells = 1 + Mathf.RoundToInt(4.0f * (value - min) / (max - min));
+        cells = Mathf.Clamp(cells, 1, 5);
+        return new string('◆', cells) + new string('◇', 5 - cells);
+    }
+
+    private static string FormatSignatureStat(string stat, float value) => stat switch
+    {
+        "crit_chance" or "evasion" or "block" or "life_steal" or "cooldown_reduction" => $"{value * 100.0f:F0}%",
+        "might" or "area" or "projectile_speed" or "duration" or "amount" or "knockback" or "crit_damage" => $"×{value:F1}".TrimEnd('0').TrimEnd('.'),
+        _ => value % 1.0f == 0.0f ? $"{value:F0}" : $"{value:F1}"
+    };
+
+    /// <summary>Innate skill line: icon + name + full description from the skill catalog.</summary>
+    private string BuildClassSkillText(string classKey)
+    {
+        foreach (string id in GameManager.SkillCatalog.Keys)
+        {
+            var s = (Dictionary)GameManager.SkillCatalog[id];
+            if (s.TryGetValue("type", out Variant typeVal) && typeVal.AsString() == "innate"
+                && s.TryGetValue("class_id", out Variant cidVal) && cidVal.AsString() == classKey)
+            {
+                string icon = s.TryGetValue("icon", out Variant iconVal) ? iconVal.AsString() : "";
+                string nameKey = s.TryGetValue("name_key", out Variant nVal) ? nVal.AsString() : "";
+                string descKey = s.TryGetValue("desc_key", out Variant dVal) ? dVal.AsString() : "";
+                return $"{icon} {Tr(nameKey)}\n{Tr(descKey)}";
+            }
+        }
+        return "-";
     }
 
     public void OnStartPressed()

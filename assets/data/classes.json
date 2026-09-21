@@ -5,8 +5,14 @@
     "role_key": "CLASS_MACROPHAGE_ROLE",
     "scene_path": "res://scenes/characters/macrophage.tscn",
     "trait_key": "CLASS_MACROPHAGE_TRAIT",
+    "bio_key": "CLASS_MACROPHAGE_BIO",
     "unlock_achievement": "",
-    "unlocked": true
+    "unlocked": true,
+    "base_hp": 140.0,
+    "base_speed": 210.0,
+    "base_armor": 10.0,
+    "trait_stat": "block",
+    "trait_stat_value": 0.08
   },
   {
     "id": "ctl",
@@ -14,8 +20,14 @@
     "role_key": "CLASS_CTL_ROLE",
     "scene_path": "res://scenes/characters/ctl_cell.tscn",
     "trait_key": "CLASS_CTL_TRAIT",
+    "bio_key": "CLASS_CTL_BIO",
     "unlock_achievement": "ach_engulf_20",
-    "unlocked": true
+    "unlocked": true,
+    "base_hp": 90.0,
+    "base_speed": 260.0,
+    "base_armor": 0.0,
+    "trait_stat": "crit_chance",
+    "trait_stat_value": 0.15
   },
   {
     "id": "neutrophil",
@@ -23,8 +35,14 @@
     "role_key": "CLASS_NEUTROPHIL_ROLE",
     "scene_path": "res://scenes/characters/neutrophil_cell.tscn",
     "trait_key": "CLASS_NEUTROPHIL_TRAIT",
+    "bio_key": "CLASS_NEUTROPHIL_BIO",
     "unlock_achievement": "ach_devour_50",
-    "unlocked": false
+    "unlocked": false,
+    "base_hp": 100.0,
+    "base_speed": 230.0,
+    "base_armor": 5.0,
+    "trait_stat": "might",
+    "trait_stat_value": 1.2
   },
   {
     "id": "b_cell",
@@ -32,8 +50,14 @@
     "role_key": "CLASS_B_CELL_ROLE",
     "scene_path": "res://scenes/characters/b_cell.tscn",
     "trait_key": "CLASS_B_CELL_TRAIT",
+    "bio_key": "CLASS_B_CELL_BIO",
     "unlock_achievement": "ach_reach_level_5",
-    "unlocked": false
+    "unlocked": false,
+    "base_hp": 95.0,
+    "base_speed": 220.0,
+    "base_armor": 0.0,
+    "trait_stat": "projectile_speed",
+    "trait_stat_value": 1.3
   },
   {
     "id": "dendritic",
@@ -41,7 +65,13 @@
     "role_key": "CLASS_DENDRITIC_ROLE",
     "scene_path": "res://scenes/characters/dendritic_cell.tscn",
     "trait_key": "CLASS_DENDRITIC_TRAIT",
+    "bio_key": "CLASS_DENDRITIC_BIO",
     "unlock_achievement": "ach_survive_180s",
-    "unlocked": false
+    "unlocked": false,
+    "base_hp": 110.0,
+    "base_speed": 225.0,
+    "base_armor": 2.0,
+    "trait_stat": "magnet",
+    "trait_stat_value": 260.0
   }
 ]

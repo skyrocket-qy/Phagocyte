@@ -198,8 +198,14 @@ public partial class GameManager : Node
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },
             { "role", TranslationServer.Translate(d["role_key"].AsString()) },
             { "trait", TranslationServer.Translate(d["trait_key"].AsString()) },
+            { "bio_key", d.TryGetValue("bio_key", out Variant bioVal) ? bioVal : "" },
             { "unlocked", d["unlocked"] },
-            { "unlock_achievement", d.TryGetValue("unlock_achievement", out Variant val) ? val : "" }
+            { "unlock_achievement", d.TryGetValue("unlock_achievement", out Variant val) ? val : "" },
+            { "base_hp", d.TryGetValue("base_hp", out Variant hpVal) ? hpVal : 100.0f },
+            { "base_speed", d.TryGetValue("base_speed", out Variant spVal) ? spVal : 230.0f },
+            { "base_armor", d.TryGetValue("base_armor", out Variant arVal) ? arVal : 0.0f },
+            { "trait_stat", d.TryGetValue("trait_stat", out Variant tsVal) ? tsVal : "" },
+            { "trait_stat_value", d.TryGetValue("trait_stat_value", out Variant tsvVal) ? tsvVal : 0.0f }
         };
     }
 

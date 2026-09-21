@@ -110,9 +110,15 @@ public static class CatalogBuilders
                 { "name_key", CatalogLoader.GetString(row, "name_key") },
                 { "role_key", CatalogLoader.GetString(row, "role_key") },
                 { "trait_key", CatalogLoader.GetString(row, "trait_key") },
+                { "bio_key", CatalogLoader.GetString(row, "bio_key") },
                 { "unlocked", CatalogLoader.GetBool(row, "unlocked") },
                 { "unlock_achievement", CatalogLoader.GetString(row, "unlock_achievement") },
-                { "scene_path", CatalogLoader.GetString(row, "scene_path") }
+                { "scene_path", CatalogLoader.GetString(row, "scene_path") },
+                { "base_hp", CatalogLoader.GetFloat(row, "base_hp", 100.0f) },
+                { "base_speed", CatalogLoader.GetFloat(row, "base_speed", 230.0f) },
+                { "base_armor", CatalogLoader.GetFloat(row, "base_armor", 0.0f) },
+                { "trait_stat", CatalogLoader.GetString(row, "trait_stat") },
+                { "trait_stat_value", CatalogLoader.GetFloat(row, "trait_stat_value", 0.0f) }
             };
         }
         GD.Print($"[Catalog] Loaded {table.Count} classes.");

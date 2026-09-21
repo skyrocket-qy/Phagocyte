@@ -71,6 +71,8 @@ public partial class TestMenuFlow : TestHarness
         {
             menu.SelectClass(lockedId);
             AssertThat(menu.ClassConfirmBtn.Disabled).IsTrue();
+            AssertThat(menu.ClassBadgeLbl).IsNotNull();
+            AssertThat(menu.ClassBadgeLbl!.Text.StartsWith("[ ")).IsTrue();
         }
         GD.Print("[PASS] Initial lock state enforced: Macrophage unlocked, other 4 cells locked.");
 
@@ -87,6 +89,11 @@ public partial class TestMenuFlow : TestHarness
         {
             menu.SelectClass(cellId);
             AssertThat(menu.ClassConfirmBtn.Disabled).IsFalse();
+            // Detail dossier: badge + bio + baseline vitals + innate skill
+            AssertThat(menu.ClassBadgeLbl!.Text.StartsWith("[ ")).IsTrue();
+            AssertThat(menu.ClassBioLbl!.Text.Length).IsGreater(10);
+            AssertThat(menu.ClassStatsLbl!.Text.Contains("◆")).IsTrue();
+            AssertThat(menu.ClassSkillLbl!.Text.Contains("\n")).IsTrue();
         }
         GD.Print("[PASS] All 5 immune defense cells selectable and confirmed unlocked via achievements.");
 

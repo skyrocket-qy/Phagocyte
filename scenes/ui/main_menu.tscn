@@ -92,6 +92,10 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_sep"]
+color = Color(0, 0.9, 1, 0.25)
+thickness = 1
+
 [node name="MainMenu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -305,9 +309,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -480.0
-offset_top = -220.0
+offset_top = -260.0
 offset_right = 480.0
-offset_bottom = 180.0
+offset_bottom = 220.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 28
@@ -324,7 +328,13 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="VBox" type="VBoxContainer" parent="ClassView/HBox/DetailPanel"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 10
+
+[node name="ClassBadgeLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.4, 1)
+theme_override_font_sizes/font_size = 13
+text = "[ 就绪 ]"
 
 [node name="ClassNameLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
 layout_mode = 2
@@ -332,20 +342,51 @@ theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
 theme_override_font_sizes/font_size = 22
 text = "巨噬细胞"
 
-[node name="ClassStatusLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
+[node name="DetailSeparator" type="HSeparator" parent="ClassView/HBox/DetailPanel/VBox"]
 layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_sep")
+
+[node name="ClassBioLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.9, 0.94, 1)
 theme_override_font_sizes/font_size = 14
-text = "状态：已解锁 (READY)"
+text = "【 生物机制 】"
+autowrap_mode = 3
 
 [node name="ClassRoleLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 15
 text = "定位：近战重装 / 吞噬"
 
-[node name="ClassTraitLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
+[node name="ClassStatsHeader" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+text = "【 初始生化指标 】"
+
+[node name="ClassStatsLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "生命"
+
+[node name="ClassSkillHeader" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+text = "【 固有技能 】"
+
+[node name="ClassSkillLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "固有技能"
+autowrap_mode = 3
+
+[node name="ClassStatusLabel" type="Label" parent="ClassView/HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "变形特性：顶点位移幅度极大，伪足延伸速度快"
+text = "状态：已解锁 (READY)"
 autowrap_mode = 3
 
 [node name="Buttons" type="HBoxContainer" parent="ClassView"]
