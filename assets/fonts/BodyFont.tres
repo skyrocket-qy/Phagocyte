@@ -4,4 +4,4 @@
 
 [resource]
 base_font = ExtResource("1_noto")
-variation_opentype = {"wght": 400}
+variation_embolden = 0.25
