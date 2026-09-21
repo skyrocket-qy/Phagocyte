@@ -371,12 +371,10 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "tree_thick_cytoplasm")).IsEqual(1);
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(2);
         AssertThat(_menu.ActiveTreeNodeId).IsEqual("tree_thick_cytoplasm");
-        AssertThat(_menu.TreeStatusLbl!.Text.Contains("Cytoplasm")).IsTrue();
         GD.Print("[PASS] The menu flow purchases and preserves a macrophage tree node.");
 
         _menu.OnTreeNodeHovered("tree_blood_price");
         AssertThat(_menu.ActiveTreeNodeId).IsEqual("tree_blood_price");
-        AssertThat(_menu.TreeStatusLbl.Text.Contains("Blood Price")).IsTrue();
 
         string tooltip = PassiveTreeManager.GetNodeTooltipText("macrophage", "tree_blood_price");
         AssertThat(tooltip.Contains("Blood Price")).IsTrue();

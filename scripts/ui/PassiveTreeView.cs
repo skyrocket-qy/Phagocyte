@@ -729,7 +729,6 @@ public partial class PassiveTreeView : Control
             DrawCircle(basePosition + drift + parallax, i % 11 == 0 ? 2.2f : 1.5f, dust);
         }
 
-        DrawLegend();
         DrawBranchLabels();
     }
 
@@ -801,25 +800,6 @@ public partial class PassiveTreeView : Control
             Vector2 origin = screen - new Vector2(textSize.X * 0.5f, textSize.Y * 0.5f);
             DrawString(font, origin + new Vector2(1.0f, 1.0f), label, HorizontalAlignment.Left, -1, 14, new Color(0.0f, 0.0f, 0.0f, 0.55f));
             DrawString(font, origin, label, HorizontalAlignment.Left, -1, 14, GetBranchColor(branch, 0.62f));
-        }
-    }
-
-    private void DrawLegend()
-    {
-        Font font = ThemeDB.FallbackFont;
-        float y = Size.Y - 74.0f;
-        var rows = new (Color Dot, string Key)[]
-        {
-            (BranchColors["core"], "TREE_RING_NUCLEUS"),
-            (PlasmaCyan, "TREE_RING_CYTOPLASM"),
-            (BranchColors["vitality"], "TREE_RING_MEMBRANE")
-        };
-        for (int i = 0; i < rows.Length; i++)
-        {
-            float rowY = y + i * 17.0f;
-            DrawCircle(new Vector2(24.0f, rowY - 4.0f), 4.0f, new Color(rows[i].Dot.R, rows[i].Dot.G, rows[i].Dot.B, 0.85f));
-            DrawString(font, new Vector2(36.0f, rowY), TranslationServer.Translate(rows[i].Key),
-                HorizontalAlignment.Left, -1, 12, new Color(0.72f, 0.84f, 0.94f, 0.55f));
         }
     }
 

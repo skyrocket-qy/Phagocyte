@@ -12,10 +12,9 @@ BTN_CONFIRM_PASSIVE,Next: Passive Tree,下一步：被动树,下一步：被动�
 BTN_CONFIRM_MAP,Next: Select Battlefield,下一步：选择病理战场,下一步：选择病理战场,次へ：戦場を選択,Weiter: Schlachtfeld wählen,Suivant : choisir le champ de bataille,Далее: выбор поля боя,Siguiente: elegir campo de batalla
 BTN_BACK_PASSIVE,Back to Passive Tree,返回被动树,返回被动树,パッシブツリーに戻る,Zurück zum Passivbaum,Retour à l’arbre passif,Назад к дереву пассивок,Volver al árbol de pasivas
 BTN_CONFIRM_CLASS_LOCKED,Not Yet Unlocked,尚未解锁,尚未解锁,まだ解放されていない,Noch nicht freigeschaltet,Pas encore débloqué,Пока заблокировано,Aún bloqueada
-HEADER_SELECT_PASSIVE,Select Passive Tree,选择被动树,选择被动树,パッシブツリーを選択,Passivbaum wählen,Sélectionnez l’arbre passif,Выберите дерево пассивок,Elige el árbol de pasivas
+HEADER_SELECT_PASSIVE,Select Talent Tree,天赋树选择,天賦樹選擇,タレントツリーを選択,Talentbaum wählen,Sélectionnez l’arbre de talents,Выберите дерево талантов,Elige el árbol de talentos
 TREE_LEVEL,Cell Level: %d,细胞等级：%d,细胞等级：%d,細胞レベル：%d,Zellstufe: %d,Niveau cellulaire : %d,Уровень клетки: %d,Nivel celular: %d
 TREE_POINTS,Passive Points: %d available (%d spent),被动点数：可用 %d（已用 %d）,被动点数：可用 %d（已用 %d）,パッシブポイント：残り%d（使用%d）,Passive Punkte: %d verfügbar (%d ausgegeben),Points passifs : %d dispo. (%d dépensés),Пассивные очки: доступно %d (потрачено %d),Puntos pasivos: %d disponibles (%d gastados)
-TREE_SELECT_NODE,Select a tree node to inspect it.,选择一个天赋节点以查看详情。,选择一个天赋节点以查看详情。,ノードを選択して詳細を確認。,Wähle einen Baumnoten zur Inspektion.,Sélectionnez un nœud pour l’inspecter.,Выберите узел дерева для осмотра.,Selecciona un nodo para inspeccionarlo.
 TREE_START_NODE,Start node.,起始节点。,起始节点。,開始ノード。,Startknoten.,Nœud de départ.,Стартовый узел.,Nodo inicial.
 TREE_NODE_STACKS,Stacks: %d/%d,层数：%d/%d,层数：%d/%d,スタック：%d/%d,Stapel: %d/%d,Charges : %d/%d,Стаки: %d/%d,Acumulaciones: %d/%d
 TREE_PURCHASE_HINT,Left-click a glowing node to purchase. Right-click an owned node to refund.,左键点击发光节点购买，右键点击已拥有节点返还。,左键点击发光节点购买，右键点击已拥有节点返还。,発光ノード左クリックで購入。所有ノード右クリックで返金。,Leuchtenden Knoten linksklicken zum Kaufen. Eigenen Knoten rechtsklicken zum Erstatten.,Clic gauche sur un nœud lumineux pour acheter. Clic droit sur un nœud possédé pour rembourser.,ЛКМ по светящемуся узлу — купить. ПКМ по купленному — вернуть.,Clic izquierdo en nodo brillante para comprar. Clic derecho en nodo propio para reembolsar.
@@ -32,16 +31,12 @@ TREE_EFFECTS_PER_STACK,Effects:,效果：,效果：,効果：,Effekte:,Effets :,
 TREE_COST,Cost: %d point(s),消耗：%d 点,消耗：%d 点,消費：%dポイント,Kosten: %d Punkt(e),Coût : %d point(s),Цена: %d очк.,Coste: %d punto(s)
 TREE_ZOOM_OUT,Zoom Out,缩小,缩小,縮小,Verkleinern,Dézoomer,Отдалить,Alejar
 TREE_ZOOM_IN,Zoom In,放大,放大,拡大,Vergrößern,Zoomer,Приблизить,Acercar
-TREE_FIT_VIEW,Fit Tree,显示全树,显示全树,全体表示,Gesamtansicht,Vue d’ensemble,Показать всё,Ver todo
 TREE_BRANCH_PRECISION,Polarized Effector Region,极化纤毛区域,极化纤毛区域,極性エフェクター領域,Polarisierte Effektorregion,Région effectrice polarisée,Поляризованная эффекторная область,Región efectora polarizada
 TREE_BRANCH_SENSES,Antigen Sensing Hub,抗原感知中枢,抗原感知中枢,抗原感知中枢,Antigen-Wahrnehmungszentrum,Hub de détection d’antigènes,Центр распознавания антигенов,Centro de detección de antígenos
 TREE_BRANCH_MOTILITY,Granule Activation Region,颗粒活化区域,颗粒活化区域,顆粒活性化領域,Granula-Aktivierungsregion,Région d’activation granulaire,Область активации гранул,Región de activación granular
 TREE_BRANCH_BALLISTICS,Endoplasmic Factory,内质网工厂,内质网工厂,小胞体工場,Endoplasma-Fabrik,Usine endoplasmique,Эндоплазматическая фабрика,Fábrica endoplasmática
 TREE_BRANCH_VITALITY,Monocyte Giantization Region,单核巨化区域,单核巨化区域,単球巨大化領域,Monozyten-Gigantisierungsregion,Région de gigantisation monocytaire,Область гигантизации моноцитов,Región de gigantismo monocitario
 TREE_BRANCH_CORE,Hematopoietic Core,造血核心区,造血核心区,造血コア,Hämatopoetischer Kern,Noyau hématopoïétique,Гемопоэтическое ядро,Núcleo hematopoyético
-TREE_RING_NUCLEUS,Core Layer · L1,核区 · L1,核区 · L1,核区 · L1,Kernschicht · L1,Couche nucléaire · L1,Ядерный слой · L1,Capa nuclear · L1
-TREE_RING_CYTOPLASM,Cytoplasmic Matrix · L2-L3,胞质基质 · L2-L3,胞质基质 · L2-L3,細胞質基質 · L2-L3,Zytoplasmatische Matrix · L2-L3,Matrice cytoplasmique · L2-L3,Цитоплазматический матрикс · L2-L3,Matriz citoplasmática · L2-L3
-TREE_RING_MEMBRANE,Membrane Cortex · L4+,胞膜皮层 · L4+,胞膜皮层 · L4+,膜皮質 · L4+,Membranrinde · L4+,Cortex membranaire · L4+,Мембранный кортекс · L4+,Corteza de membrana · L4+
 TREE_NODE_HSC_NAME,Pluripotent HSC,全能造血干细胞,全能造血干细胞,多能性造血幹細胞,Pluripotente HSZ,CSH pluripotente,Плюрипотентная ГСК,CMH pluripotente
 TREE_NUCLEUS_DESC,The shared hematopoietic stem cell chassis. All five lineage portals radiate from this nucleus.,共享的造血干细胞底盘。五大谱系门户皆由核心向外辐射分化。,共享的造血干细胞底盘。五大谱系门户皆由核心向外辐射分化。,共有造血幹細胞シャーシ。五大系列ポータルがこの核から放射状に分化する。,Gemeinsames hämatopoetisches Stammzell-Chassis. Alle fünf Linienportale strahlen von diesem Kern aus.,Châssis partagé de cellules souches hématopoïétiques. Les cinq portails de lignée en rayonnent.,Общее шасси гемопоэтических стволовых клеток. Все пять порталов линий расходятся от этого ядра.,Chasis compartido de células madre hematopoyéticas. Los cinco portales de linaje irradian de este núcleo.
 TREE_NUCLEUS_INNATE,Innate · always active,先天核心 · 永久生效,先天核心 · 永久生效,先天 · 常時発動,Angeboren · immer aktiv,Inné · toujours actif,Врождённое · всегда активно,Innato · siempre activo
@@ -119,7 +114,6 @@ TREE_OVERLAY_HINT,Press C to toggle this panel.,按 C 切换此面板。,按 C �
 CONTROLS_TREE_DESC,[C]: Toggle the passive-tree stats overlay.,[C]：切换被动树属性面板。,[C]：切换被动树属性面板。,[C]：パッシブツリー統計の表示切替。,[C]: Passivbaum-Statistik ein-/ausblenden.,[C] : afficher/masquer les stats de l’arbre passif.,[C]: показать/скрыть статистику дерева пассивок.,[C]: mostrar/ocultar estadísticas del árbol de pasivas.
 BTN_BACK_TITLE,Back to Title,返回主标题,返回主标题,タイトルに戻る,Zurück zum Titel,Retour au titre,Назад к титулу,Volver al título
 LABEL_ROLE,Role: ,定位：,定位：,役割：,Rolle: ,Rôle : ,Роль: ,Rol: 
-LABEL_TRAIT,Deformation Trait: ,变形特性：,变形特性：,変形特性：,Verformungsmerkmal: ,Trait de déformation : ,Особенность деформации: ,Rasgo de deformación: 
 CLASS_MACROPHAGE_NAME,Macrophage,巨噬细胞,巨噬细胞,マクロファージ,Makrophage,Macrophage,Макрофаг,Macrófago
 CLASS_MACROPHAGE_ROLE,Melee Heavy Tank / Phagocytosis,近战重装 / 吞噬,近战重装 / 吞噬,近接重装 / 貪食,Nahkampf-Panzer / Phagozytose,Tank de mêlée / Phagocytose,Тяжёлый ближний бой / фагоцитоз,Tanque cuerpo a cuerpo / fagocitosis
 CLASS_MACROPHAGE_TRAIT,"Extreme vertex displacement range, fast pseudopod extension speed.",顶点位移幅度极大，伪足延伸速度快。,顶点位移幅度极大，伪足延伸速度快。,頂点変位が極めて大きく、偽足の伸展が速い。,"Extreme Vertexverlagerung, schnelle Pseudopodien-Extension.","Déplacement extrême des sommets, extension rapide des pseudopodes.","Огромная амплитуда смещения вершин, быстрое выдвижение псевдоподий.","Desplazamiento extremo de vértices, extensión rápida de seudópodos."
@@ -458,8 +452,6 @@ RECORDS_DIGESTED,Pathogens Digested,吞噬病原數,吞噬病原數,貪食病原
 RECORDS_POINTS,Passive Points Spent,投入被動點數,投入被動點數,投入被動点,Eingesetzte Passivpunkte,Points passifs investis,Вложено пассивных очков,Puntos pasivos invertidos
 RECORDS_SKILLS,Active Skills,主動技能,主動技能,能動技能,Aktive Skills,Compétences actives,Активные навыки,Habilidades activas
 RECORDS_EMPTY,No runs recorded yet.,尚無病歷記錄。,尚無病歷記錄。,記録なし。,Keine Runs verzeichnet.,Aucune sortie enregistrée.,Забегов пока нет.,Sin misiones registradas.
-RECORDS_CLEAR,Clear Records,清除病歷,清除病歷,記録消去,Berichte löschen,Effacer les relevés,Очистить журнал,Borrar historial
-RECORDS_CLEAR_CONFIRM,Confirm Clear?,確認清除？,確認清除？,消去確認？,Löschen bestätigen?,Confirmer l’effacement ?,Подтвердить очистку?,¿Confirmar borrado?
 RECORDS_LOCK_TOGGLE,Pin / unpin this chart (pinned charts survive auto-trim),锁定/解锁此病历（锁定的病历不受自动清理影响）,鎖定/解鎖此病歷（鎖定的病歷不受自動清理影響）,この記録をロック/解除（ロック中は自動削除対象外）,Akte anheften/lösen (angeheftete Akten bleiben erhalten),Épingler/détacher ce relevé (protégé du nettoyage auto),Закрепить/открепить запись (закреплённые не удаляются),Fijar/liberar este historial (los fijados no se purgan)
 RECORDS_RETRY,Deploy Again,再次出擊,再次出擊,再出撃,Erneut deployen,Relancer,Повторить вылазку,Repetir misión
 RECORDS_MENU,Return to Menu,返回主選單,返回主選單,メニューへ,Zum Menü,Au menu,В меню,Al menú
@@ -527,7 +519,6 @@ RECORDS_TAB_DEFEATS,SIRS Mortality Charts,潰敗陣亡病歷,潰敗陣亡病歷,
 RECORDS_BEST_TAG,★ BEST,★ 最高分,★ 最高分,★ 最高,★ BESTE,★ RECORD,★ ЛУЧШЕЕ,★ RÉCORD
 RECORDS_EMPTY_VICTORIES,No neutralization charts recorded yet.,尚無治癒中和病歷。,尚無治癒中和病歷。,治癒病歴なし。,Keine Heilungsberichte.,Aucun relevé curatif.,Журналов излечения нет.,Sin historiales curativos.
 RECORDS_EMPTY_DEFEATS,No SIRS mortality charts recorded yet.,尚無潰敗陣亡病歷。,尚無潰敗陣亡病歷。,潰敗病歴なし。,Keine SIRS-Berichte.,Aucun relevé SIRS.,Журналов SIRS нет.,Sin historiales SIRS.
-RECORDS_DETAIL_HINT,Select any medical chart below to review its full clinical metrics.,點選下方任一病歷以檢視完整臨床指標。,點選下方任一病歷以檢視完整臨床指標。,病歴を選択し完全臨床指標を閲覧。,Wähle eine Akte für volle Klinikmetriken.,Sélectionnez un relevé pour ses métriques cliniques.,Выберите запись для полных клинических метрик.,Selecciona un historial para sus métricas clínicas.
 RECORDS_CAUSE,Clinical Diagnosis,臨床診斷,臨床診斷,臨床診断,Klinische Diagnose,Diagnostic clinique,Клинический диагноз,Diagnóstico clínico
 RECORDS_DATE,Recorded At,結算時間,結算時間,記録時刻,Erfasst am,Enregistré le,Записано,Registrado el
 CAUSE_SPECIFIC_NEUTRALIZATION,Antigen-specific immunity fully established,抗原特異性免疫完全建立,抗原特異性免疫完全建立,抗原特異免疫が完全成立,Antigenspezifische Immunität voll etabliert,Immunité spécifique d’antigène pleinement établie,Антигенспецифический иммунитет полностью сформирован,Inmunidad específica de antígeno establecida
