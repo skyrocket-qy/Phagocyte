@@ -125,7 +125,6 @@ public partial class RunRecordsModal : ModalBase
     {
         base.UpdateLocalizedTexts();
         if (TitleLabel != null) TitleLabel.Text = Tr("RECORDS_TITLE");
-        if (CloseBtn != null) CloseBtn.Text = Tr("CODEX_BACK");
         if (RetryBtn != null) RetryBtn.Text = Tr("RECORDS_RETRY");
         if (MenuBtn != null) MenuBtn.Text = Tr("RECORDS_MENU");
 

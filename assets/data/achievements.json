@@ -7,7 +7,8 @@
     "reward_key": "",
     "stat_key": "digested",
     "target_value": 1.0,
-    "title_key": "ACH_FIRST_DIGESTION_TITLE"
+    "title_key": "ACH_FIRST_DIGESTION_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_first_digestion.png"
   },
   {
     "desc_key": "ACH_ENGULF_20_DESC",
@@ -17,7 +18,8 @@
     "reward_key": "ACH_ENGULF_20_REWARD",
     "stat_key": "digested",
     "target_value": 200.0,
-    "title_key": "ACH_ENGULF_20_TITLE"
+    "title_key": "ACH_ENGULF_20_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_engulf_20.png"
   },
   {
     "desc_key": "ACH_DEVOUR_50_DESC",
@@ -27,7 +29,8 @@
     "reward_key": "ACH_DEVOUR_50_REWARD",
     "stat_key": "digested",
     "target_value": 500.0,
-    "title_key": "ACH_DEVOUR_50_TITLE"
+    "title_key": "ACH_DEVOUR_50_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_devour_50.png"
   },
   {
     "desc_key": "ACH_REACH_LEVEL_5_DESC",
@@ -37,7 +40,8 @@
     "reward_key": "ACH_REACH_LEVEL_5_REWARD",
     "stat_key": "level",
     "target_value": 15.0,
-    "title_key": "ACH_REACH_LEVEL_5_TITLE"
+    "title_key": "ACH_REACH_LEVEL_5_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_reach_level_5.png"
   },
   {
     "desc_key": "ACH_SURVIVE_180S_DESC",
@@ -47,7 +51,8 @@
     "reward_key": "ACH_SURVIVE_180S_REWARD",
     "stat_key": "survival_time",
     "target_value": 480.0,
-    "title_key": "ACH_SURVIVE_180S_TITLE"
+    "title_key": "ACH_SURVIVE_180S_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_survive_180s.png"
   },
   {
     "desc_key": "ACH_GIANT_VOLUME_DESC",
@@ -57,7 +62,8 @@
     "reward_key": "",
     "stat_key": "radius_ratio",
     "target_value": 2.0,
-    "title_key": "ACH_GIANT_VOLUME_TITLE"
+    "title_key": "ACH_GIANT_VOLUME_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_giant_volume.png"
   },
   {
     "desc_key": "ACH_FULL_ARSENAL_DESC",
@@ -67,7 +73,8 @@
     "reward_key": "",
     "stat_key": "active_skills",
     "target_value": 5.0,
-    "title_key": "ACH_FULL_ARSENAL_TITLE"
+    "title_key": "ACH_FULL_ARSENAL_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_full_arsenal.png"
   },
   {
     "desc_key": "ACH_FIRST_EVOLUTION_DESC",
@@ -77,7 +84,8 @@
     "reward_key": "",
     "stat_key": "first_evolution",
     "target_value": 1.0,
-    "title_key": "ACH_FIRST_EVOLUTION_TITLE"
+    "title_key": "ACH_FIRST_EVOLUTION_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_first_evolution.png"
   },
   {
     "desc_key": "ACH_PRION_CLEARED_DESC",
@@ -87,7 +95,8 @@
     "reward_key": "",
     "stat_key": "prion_cleared",
     "target_value": 1.0,
-    "title_key": "ACH_PRION_CLEARED_TITLE"
+    "title_key": "ACH_PRION_CLEARED_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_prion_cleared.png"
   },
   {
     "desc_key": "ACH_WOUND_CLEAR_DESC",
@@ -102,7 +111,8 @@
     "target_value": 1.0,
     "title_key": "ACH_WOUND_CLEAR_TITLE",
     "unlock_hard_map": "acute_wound",
-    "unlock_map": "alveolar_space"
+    "unlock_map": "alveolar_space",
+    "image_path": "res://assets/sprites/achievements/ach_wound_clear.png"
   },
   {
     "desc_key": "ACH_ALVEOLAR_CLEAR_DESC",
@@ -117,7 +127,8 @@
     "target_value": 1.0,
     "title_key": "ACH_ALVEOLAR_CLEAR_TITLE",
     "unlock_hard_map": "alveolar_space",
-    "unlock_map": "hepatic_sinusoid"
+    "unlock_map": "hepatic_sinusoid",
+    "image_path": "res://assets/sprites/achievements/ach_alveolar_clear.png"
   },
   {
     "desc_key": "ACH_HEPATIC_CLEAR_DESC",
@@ -132,7 +143,8 @@
     "target_value": 1.0,
     "title_key": "ACH_HEPATIC_CLEAR_TITLE",
     "unlock_hard_map": "hepatic_sinusoid",
-    "unlock_map": "gastric_lumen"
+    "unlock_map": "gastric_lumen",
+    "image_path": "res://assets/sprites/achievements/ach_hepatic_clear.png"
   },
   {
     "desc_key": "ACH_GASTRIC_CLEAR_DESC",
@@ -147,7 +159,8 @@
     "target_value": 1.0,
     "title_key": "ACH_GASTRIC_CLEAR_TITLE",
     "unlock_hard_map": "gastric_lumen",
-    "unlock_map": "blood_brain_barrier"
+    "unlock_map": "blood_brain_barrier",
+    "image_path": "res://assets/sprites/achievements/ach_gastric_clear.png"
   },
   {
     "desc_key": "ACH_BBB_CLEAR_DESC",
@@ -161,7 +174,8 @@
     "talent_points": 2,
     "target_value": 1.0,
     "title_key": "ACH_BBB_CLEAR_TITLE",
-    "unlock_hard_map": "blood_brain_barrier"
+    "unlock_hard_map": "blood_brain_barrier",
+    "image_path": "res://assets/sprites/achievements/ach_bbb_clear.png"
   },
   {
     "desc_key": "ACH_WOUND_HARD_CLEAR_DESC",
@@ -175,7 +189,8 @@
     "talent_points": 1,
     "target_value": 1.0,
     "title_key": "ACH_WOUND_HARD_CLEAR_TITLE",
-    "unlock_endless": true
+    "unlock_endless": true,
+    "image_path": "res://assets/sprites/achievements/ach_wound_hard_clear.png"
   },
   {
     "desc_key": "ACH_ALVEOLAR_HARD_CLEAR_DESC",
@@ -188,7 +203,8 @@
     "stat_key": "map_clear_alveolar_space_hard",
     "talent_points": 1,
     "target_value": 1.0,
-    "title_key": "ACH_ALVEOLAR_HARD_CLEAR_TITLE"
+    "title_key": "ACH_ALVEOLAR_HARD_CLEAR_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_alveolar_hard_clear.png"
   },
   {
     "desc_key": "ACH_HEPATIC_HARD_CLEAR_DESC",
@@ -201,7 +217,8 @@
     "stat_key": "map_clear_hepatic_sinusoid_hard",
     "talent_points": 1,
     "target_value": 1.0,
-    "title_key": "ACH_HEPATIC_HARD_CLEAR_TITLE"
+    "title_key": "ACH_HEPATIC_HARD_CLEAR_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_hepatic_hard_clear.png"
   },
   {
     "desc_key": "ACH_GASTRIC_HARD_CLEAR_DESC",
@@ -214,7 +231,8 @@
     "stat_key": "map_clear_gastric_lumen_hard",
     "talent_points": 1,
     "target_value": 1.0,
-    "title_key": "ACH_GASTRIC_HARD_CLEAR_TITLE"
+    "title_key": "ACH_GASTRIC_HARD_CLEAR_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_gastric_hard_clear.png"
   },
   {
     "desc_key": "ACH_BBB_HARD_CLEAR_DESC",
@@ -227,6 +245,7 @@
     "stat_key": "map_clear_blood_brain_barrier_hard",
     "talent_points": 1,
     "target_value": 1.0,
-    "title_key": "ACH_BBB_HARD_CLEAR_TITLE"
+    "title_key": "ACH_BBB_HARD_CLEAR_TITLE",
+    "image_path": "res://assets/sprites/achievements/ach_bbb_hard_clear.png"
   }
 ]

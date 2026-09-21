@@ -138,15 +138,17 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(itemList.GetChildCount() >= 2).IsTrue();
         GD.Print($"[PASS] Codex Pathological Stages tab displays {itemList.GetChildCount()} maps.");
 
-        // Switch to Tab 4 (Achievements)
-        codexModal.SwitchTab(4);
-        AssertThat(itemList.GetChildCount() >= 7).IsTrue();
-        GD.Print($"[PASS] Codex Achievements tab displays {itemList.GetChildCount()} achievements.");
+        // Achievements moved out of the Codex: MainMenu AchievementView owns them.
+        // Maps (Tab 3) is the last Codex tab; out-of-range indices must be ignored.
+        codexModal.SwitchTab(3);
+        AssertThat(codexModal.CurrentTab).IsEqual(3);
+        AssertThat(itemList.GetChildCount() >= 2).IsTrue();
+        GD.Print("[PASS] Codex exposes 4 tabs; achievements live in the MainMenu gallery.");
 
         // Close Codex
         codexModal.CloseCodex();
         AssertThat(codexModal.Visible).IsFalse();
-        GD.Print("[PASS] CodexModal open/close and 5-tab switching verified.");
+        GD.Print("[PASS] CodexModal open/close and 4-tab switching verified.");
 
         // 4. Verify Pause Menu Manual Button
         hud.TogglePause();

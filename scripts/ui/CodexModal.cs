@@ -11,7 +11,6 @@ public partial class CodexModal : ModalBase
     public Button? TabCellsBtn { get; set; }
     public Button? TabPathogensBtn { get; set; }
     public Button? TabMapsBtn { get; set; }
-    public Button? TabAchievementsBtn { get; set; }
 
     public VBoxContainer? ItemList { get; set; }
     public Label? DetailTitle { get; set; }
@@ -37,7 +36,6 @@ public partial class CodexModal : ModalBase
         TabCellsBtn = GetNodeOrNull<Button>("VBox/TabBar/CellsTab");
         TabPathogensBtn = GetNodeOrNull<Button>("VBox/TabBar/PathogensTab");
         TabMapsBtn = GetNodeOrNull<Button>("VBox/TabBar/MapsTab");
-        TabAchievementsBtn = GetNodeOrNull<Button>("VBox/TabBar/AchievementsTab");
 
         ItemList = GetNodeOrNull<VBoxContainer>("VBox/HBox/Scroll/ItemList");
         DetailTitle = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailTitle");
@@ -54,8 +52,6 @@ public partial class CodexModal : ModalBase
             TabPathogensBtn.Pressed += () => SwitchTab(2);
         if (TabMapsBtn != null)
             TabMapsBtn.Pressed += () => SwitchTab(3);
-        if (TabAchievementsBtn != null)
-            TabAchievementsBtn.Pressed += () => SwitchTab(4);
 
         InitModal();
     }
@@ -130,13 +126,11 @@ public partial class CodexModal : ModalBase
     public override void UpdateLocalizedTexts()
     {
         base.UpdateLocalizedTexts();
-        if (CloseBtn != null) CloseBtn.Text = Tr("CODEX_BACK");
         if (TitleLabel != null) TitleLabel.Text = Tr("CODEX_TITLE");
         if (TabSkillsBtn != null) TabSkillsBtn.Text = Tr("CODEX_TAB_SKILLS");
         if (TabCellsBtn != null) TabCellsBtn.Text = Tr("CODEX_TAB_CELLS");
         if (TabPathogensBtn != null) TabPathogensBtn.Text = Tr("CODEX_TAB_PATHOGENS");
         if (TabMapsBtn != null) TabMapsBtn.Text = Tr("CODEX_TAB_MAPS");
-        if (TabAchievementsBtn != null) TabAchievementsBtn.Text = Tr("CODEX_TAB_ACHIEVEMENTS");
 
         RenderCurrentTab();
     }
@@ -149,7 +143,6 @@ public partial class CodexModal : ModalBase
         UiBuilders.SetTabActive(TabCellsBtn, tabIdx == 1);
         UiBuilders.SetTabActive(TabPathogensBtn, tabIdx == 2);
         UiBuilders.SetTabActive(TabMapsBtn, tabIdx == 3);
-        UiBuilders.SetTabActive(TabAchievementsBtn, tabIdx == 4);
 
         ActiveItemKey = "";
         RenderCurrentTab();
@@ -180,9 +173,6 @@ public partial class CodexModal : ModalBase
                 break;
             case 3:
                 RenderMapsTab();
-                break;
-            case 4:
-                RenderAchievementsTab();
                 break;
         }
     }
@@ -380,62 +370,4 @@ public partial class CodexModal : ModalBase
         RefreshItemSelection();
     }
 
-    private void RenderAchievementsTab()
-    {
-        if (ItemList == null)
-            return;
-
-        var achList = AchievementManager.GetAllAchievements();
-        string firstId = "";
-        foreach (var ach in achList)
-        {
-            string aid = ach["id"].AsString();
-            if (firstId == "")
-                firstId = aid;
-            bool unlocked = ach["unlocked"].AsBool();
-            var btn = MakeItemButton((unlocked ? " ✅ " : " 🔒 ") + ach["title"].AsString());
-            string localAid = aid;
-            btn.Pressed += () => SelectAchievement(localAid);
-            ItemList.AddChild(btn);
-            _itemButtons[localAid] = btn;
-        }
-
-        string target = ActiveItemKey != "" && AchievementManager.Achievements.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstId;
-        if (target != "")
-        {
-            SelectAchievement(target);
-        }
-    }
-
-    private void SelectAchievement(string achId)
-    {
-        ActiveItemKey = achId;
-        var d = AchievementManager.GetAchievementInfo(achId);
-        bool unlocked = d["unlocked"].AsBool();
-        if (DetailTitle != null) DetailTitle.Text = d["title"].AsString();
-        if (DetailBadge != null)
-        {
-            DetailBadge.Text = "[ " + (unlocked ? Tr("STATUS_ACH_COMPLETED") : Tr("STATUS_ACH_LOCKED")) + " ]";
-            DetailBadge.Modulate = unlocked ? new Color(0.3f, 1.0f, 0.4f) : new Color(0.9f, 0.6f, 0.2f);
-        }
-
-        float curVal = d["current_value"].AsSingle();
-        float targetVal = d["target_value"].AsSingle();
-        string curValStr = targetVal >= 1.0f ? ((int)curVal).ToString() : curVal.ToString("F1");
-        string targetValStr = targetVal >= 1.0f ? ((int)targetVal).ToString() : targetVal.ToString("F1");
-        int pct = (int)(d["progress_ratio"].AsSingle() * 100);
-
-        if (DetailStats != null)
-        {
-            DetailStats.Text = $"{(unlocked ? Tr("STATUS_ACH_COMPLETED") : Tr("STATUS_ACH_LOCKED"))}: {curValStr} / {targetValStr} ({pct}%)";
-        }
-
-        if (DetailDesc != null) DetailDesc.Text = Tr("LABEL_UNLOCK_REQ") + "\n" + d["desc"].AsString();
-        if (DetailBio != null)
-        {
-            string reward = d["reward"].AsString();
-            DetailBio.Text = !string.IsNullOrEmpty(reward) ? Tr("LABEL_REWARD") + "\n" + reward : "";
-        }
-        RefreshItemSelection();
-    }
 }

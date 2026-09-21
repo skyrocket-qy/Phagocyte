@@ -145,6 +145,14 @@ public static class CatalogBuilders
                 { "target_value", CatalogLoader.GetFloat(row, "target_value", 1.0f) },
                 { "stat_key", CatalogLoader.GetString(row, "stat_key") }
             };
+            // Achievement artwork: local Texture path mirroring the Steam
+            // Partner-uploaded icon (naming = lowercase API id + .png).
+            // Missing files fall back to the emoji icon at render time.
+            string imagePath = CatalogLoader.GetString(row, "image_path");
+            if (string.IsNullOrEmpty(imagePath) && !string.IsNullOrEmpty(id))
+                imagePath = $"res://assets/sprites/achievements/{id}.png";
+            if (!string.IsNullOrEmpty(imagePath))
+                entry["image_path"] = imagePath;
             // Map-clear chain extras (absent on generic achievements).
             foreach (string opt in new[] { "map_id", "difficulty", "unlock_map", "unlock_hard_map" })
             {

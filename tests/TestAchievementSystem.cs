@@ -13,7 +13,6 @@ public partial class TestAchievementSystem : TestHarness
 {
     private int _phase = 0;
     private int _frameCount = 0;
-    private CodexModal? _codexInstance = null;
     private MainMenu? _menuInstance = null;
 
     public override void _Initialize()
@@ -210,22 +209,41 @@ public partial class TestAchievementSystem : TestHarness
 
                 GD.Print("[PASS] Step 4b: Organ map unlock chain, +2 talent points and Endless unlock verified.");
 
-                // --- Step 5: Codex Modal Tab 4 (Achievements) UI ---
-                var codexScene = GD.Load<PackedScene>("res://scenes/ui/codex_modal.tscn");
-                AssertThat(codexScene).IsNotNull();
-                _codexInstance = codexScene!.Instantiate<CodexModal>();
-                Root.AddChild(_codexInstance);
-                _codexInstance.OpenCodex(4); // Open to achievements tab
+                // --- Step 5: MainMenu Achievement Gallery (independent fifth view) ---
+                // Achievements no longer live in Codex Tab 4; the gallery owns them.
+                var galleryScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+                AssertThat(galleryScene).IsNotNull();
+                var galleryMenu = galleryScene!.Instantiate<MainMenu>();
+                Root.AddChild(galleryMenu);
+                AssertThat(galleryMenu.AchievementsBtn).IsNotNull();
+                AssertThat(galleryMenu.AchievementView).IsNotNull();
 
-                AssertThat(_codexInstance.CurrentTab).IsEqual(4);
-                AssertThat(_codexInstance.ItemList!.GetChildCount()).IsEqual(AchievementManager.Achievements.Count);
-                AssertThat(string.IsNullOrEmpty(_codexInstance.DetailTitle!.Text)).IsFalse();
-                AssertThat(_codexInstance.DetailBadge!.Text.Contains("COMPLETED") || _codexInstance.DetailBadge.Text.Contains("达成")).IsTrue();
-                GD.Print("[PASS] Step 5: CodexModal Tab 4 (Achievements) UI rendering verified.");
+                // Open via the dedicated MainMenu button (same path as a player click)
+                galleryMenu.AchievementsBtn!.EmitSignal(Button.SignalName.Pressed);
+                AssertThat(galleryMenu.AchievementView!.Visible).IsTrue();
+                AssertThat(galleryMenu.AchievementView.CardCount).IsEqual(AchievementManager.Achievements.Count);
+                AssertThat(string.IsNullOrEmpty(galleryMenu.AchievementView.DetailTitle!.Text)).IsFalse();
+
+                // Three-state filter partitions the full set (all == unlocked + locked)
+                galleryMenu.AchievementView.SetFilter(AchievementGalleryView.FilterUnlocked);
+                int unlockedShown = galleryMenu.AchievementView.CardCount;
+                galleryMenu.AchievementView.SetFilter(AchievementGalleryView.FilterLocked);
+                int lockedShown = galleryMenu.AchievementView.CardCount;
+                AssertThat(unlockedShown + lockedShown).IsEqual(AchievementManager.Achievements.Count);
+                galleryMenu.AchievementView.SetFilter(AchievementGalleryView.FilterAll);
+                AssertThat(galleryMenu.AchievementView.CardCount).IsEqual(AchievementManager.Achievements.Count);
+
+                // Steam-mirrored artwork fields exist; missing files fall back cleanly
+                var galleryInfo = AchievementManager.GetAchievementInfo("ach_engulf_20");
+                AssertThat(galleryInfo.ContainsKey("image_path")).IsTrue();
+                AssertThat(galleryInfo.ContainsKey("steam_api_name")).IsTrue();
+                AssertThat(galleryInfo["steam_api_name"].AsString()).IsEqual("ACH_ENGULF_20");
+                AssertThat(AchievementGalleryView.TryLoadAchievementTexture(galleryInfo["image_path"].AsString()) == null).IsTrue();
+                GD.Print("[PASS] Step 5: AchievementGallery fifth-view rendering, 3-state filter and Steam art fallback verified.");
 
                 // --- Step 6: Main Menu Locked Cell Status & Confirm Button Test ---
                 AchievementManager.ResetAll(); // Reset so cells are locked again
-                _codexInstance.QueueFree();
+                galleryMenu.QueueFree();
 
                 var menuScene = GD.Load<PackedScene>("scenes/ui/main_menu.tscn");
                 AssertThat(menuScene).IsNotNull();

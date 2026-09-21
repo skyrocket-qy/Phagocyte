@@ -167,11 +167,13 @@ public partial class TestSettingsAndSlots : TestHarness
 
         var closeBtn = hudSettingsModal.GetNodeOrNull<Button>("VBox/Header/CloseButton");
         AssertThat(closeBtn).IsNotNull();
-        AssertThat(closeBtn!.Text).IsEqual("✕");
+        // Unified top-left back: first header child with the NAV_BACK label
+        AssertThat(closeBtn!.GetIndex()).IsEqual(0);
+        AssertThat(closeBtn.Text.Contains("返回") || closeBtn.Text.Contains("Back") || closeBtn.Text.Contains("Zurück")).IsTrue();
 
         closeBtn.EmitSignal(Button.SignalName.Pressed);
         AssertThat(hudSettingsModal.Visible).IsFalse();
-        GD.Print("[PASS] 7. SettingsModal in in-game Pause Menu opens and closes via '✕' button.");
+        GD.Print("[PASS] 7. SettingsModal in in-game Pause Menu opens and closes via top-left back button.");
 
         // =========================================================================
         // TEST 7: SettingsModal in Main Menu
@@ -214,7 +216,7 @@ public partial class TestSettingsAndSlots : TestHarness
         AssertThat(menuCloseBtn).IsNotNull();
         menuCloseBtn!.EmitSignal(Button.SignalName.Pressed);
         AssertThat(menuSettingsModal.Visible).IsFalse();
-        GD.Print("[PASS] 8. Main Menu Settings button, tabs (Controls/Audio/Graphics), and '✕' close button verified.");
+        GD.Print("[PASS] 8. Main Menu Settings button, tabs (Controls/Audio/Graphics), and top-left back button verified.");
 
         menuNode.QueueFree();
         main.QueueFree();

@@ -613,3 +613,14 @@ TREE_PROFILE_3,Build 3,配置三,配置三,ビルド3,Build 3,Build 3,Сборк
 TREE_PROFILE_ADD,+,+,+,＋,+,+,+,+
 TREE_PROFILE_DELETE,Delete,刪除,刪除,削除,Löschen,Supprimer,Удалить,Eliminar
 TREE_OVERLAY_PROFILE,Build: %s,配置：%s,配置：%s,ビルド：%s,Build: %s,Build : %s,Сборка: %s,Configuración: %s
+BTN_ACHIEVEMENTS,Achievement Gallery,成就收藏,成就收藏,実績コレクション,Erfolgsgalerie,Galerie des hauts faits,Галерея достижений,Galería de logros
+HEADER_ACHIEVEMENTS,Achievement Gallery,成就收藏馆,成就收藏館,実績ギャラリー,Erfolgsgalerie,Galerie des hauts faits,Галерея достижений,Galería de logros
+ACH_FILTER_ALL,All,全部,全部,全て,Alle,Tous,Все,Todos
+ACH_FILTER_UNLOCKED,Unlocked,已解锁,已解鎖,解除済み,Freigeschaltet,Débloqués,Открытые,Desbloqueados
+ACH_FILTER_LOCKED,Locked,未解锁,未解鎖,未解除,Gesperrt,Verrouillés,Закрытые,Bloqueados
+ACH_PROGRESS_FMT,%d / %d unlocked,已解锁 %d / %d,已解鎖 %d / %d,解除済み %d / %d,%d / %d freigeschaltet,%d / %d débloqués,Открыто %d / %d,%d / %d desbloqueados
+ACH_EMPTY_FILTER,No achievements in this view.,此筛选下暂无成就。,此篩選下暫無成就。,この絞り込みに該当する実績はありません。,Keine Erfolge in dieser Ansicht.,Aucun haut fait dans cette vue.,В этом фильтре достижений нет.,No hay logros en esta vista.
+ACH_STEAM_SYNCED,Synced to Steam,已同步至 Steam,已同步至 Steam,Steamに同期済み,Mit Steam synchronisiert,Synchronisé avec Steam,Синхронизировано со Steam,Sincronizado con Steam
+ACH_STEAM_LOCAL_ONLY,Local only (offline),仅本地（离线）,僅本地（離線）,ローカルのみ（オフライン）,Nur lokal (offline),Local uniquement (hors ligne),Только локально (офлайн),Solo local (sin conexión)
+ACH_STEAM_ID_FMT,Steam: %s,Steam：%s,Steam：%s,Steam：%s,Steam: %s,Steam : %s,Steam: %s,Steam: %s
+NAV_BACK,‹ Back,‹ 返回,‹ 返回,‹ 戻る,‹ Zurück,‹ Retour,‹ Назад,‹ Atrás

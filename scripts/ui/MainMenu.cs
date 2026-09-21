@@ -12,6 +12,7 @@ public partial class MainMenu : Control
     public Control? ClassView { get; set; }
     public Control? PassiveView { get; set; }
     public Control? MapView { get; set; }
+    public AchievementGalleryView? AchievementView { get; set; }
     public CodexModal? CellCodexModal { get; set; }
     public SettingsModal? CellSettingsModal { get; set; }
     public RunRecordsModal? RecordsModal { get; set; }
@@ -24,6 +25,14 @@ public partial class MainMenu : Control
     public Button? StartBtn { get; set; }
     public Button? CodexBtn { get; set; }
     public Button? RecordsBtn { get; set; }
+    public Button? AchievementsBtn { get; set; }
+
+    /// <summary>
+    /// Shared top-left back button: the only back affordance across all five
+    /// views. Hidden on the title view; per-view target resolved by
+    /// <see cref="OnGlobalBackPressed"/> from <c>_currentView</c>.
+    /// </summary>
+    public Button? GlobalBackBtn { get; set; }
     public Button? SettingsBtn { get; set; }
     public Button? QuitBtn { get; set; }
 
@@ -40,7 +49,6 @@ public partial class MainMenu : Control
     public Label? ClassSkillLbl { get; set; }
     public Label? ClassStatusLbl { get; set; }
     public Button? ClassConfirmBtn { get; set; }
-    public Button? ClassBackBtn { get; set; }
 
     // Passive Tree View Controls
     public Label? PassiveHeaderLbl { get; set; }
@@ -55,7 +63,6 @@ public partial class MainMenu : Control
 
     /// <summary>Number of build-profile tab buttons currently shown.</summary>
     public int ProfileTabCount => _profileTabBtns.Count;
-    public Button? PassiveBackBtn { get; set; }
     public Button? PassiveResetBtn { get; set; }
     public Button? PassiveConfirmBtn { get; set; }
     public Button? TreeZoomOutBtn { get; set; }
@@ -76,7 +83,6 @@ public partial class MainMenu : Control
     public Button? DeployBtn { get; set; }
     public Button? EndlessBtn { get; set; }
     public OptionButton? DifficultyToggle { get; set; }
-    public Button? MapBackBtn { get; set; }
 
     public string ActiveClassKey { get; set; } = "macrophage";
     public string ActiveTreeClassKey { get; set; } = "macrophage";
@@ -93,6 +99,9 @@ public partial class MainMenu : Control
         GD.Load<LabelSettings>("res://assets/fonts/TitleZhLabelSettings.tres");
 
     private Callable _langCallback;
+
+    /// <summary>View most recently shown by <see cref="SwitchToView"/>; drives the global back target.</summary>
+    private Control? _currentView;
 
     /// <summary>GFP watermark pulse state (alpha 0.2-0.3 breathing + slow drift).</summary>
     public TextureRect? Watermark { get; set; }
@@ -118,6 +127,7 @@ public partial class MainMenu : Control
         ClassView = GetNodeOrNull<Control>("ClassView");
         PassiveView = GetNodeOrNull<Control>("PassiveView");
         MapView = GetNodeOrNull<Control>("MapView");
+        AchievementView = GetNodeOrNull<AchievementGalleryView>("AchievementView");
         CellCodexModal = GetNodeOrNull<CodexModal>("CodexModal");
         CellSettingsModal = GetNodeOrNull<SettingsModal>("SettingsModal");
         RecordsModal = GetNodeOrNull<RunRecordsModal>("RunRecordsModal");
@@ -130,6 +140,8 @@ public partial class MainMenu : Control
         StartBtn = GetNodeOrNull<Button>("TitleView/VBox/StartButton");
         CodexBtn = GetNodeOrNull<Button>("TitleView/VBox/CodexButton");
         RecordsBtn = GetNodeOrNull<Button>("TitleView/VBox/RecordsButton");
+        AchievementsBtn = GetNodeOrNull<Button>("TitleView/VBox/AchievementsButton");
+        GlobalBackBtn = GetNodeOrNull<Button>("GlobalBackButton");
         SettingsBtn = GetNodeOrNull<Button>("TitleView/VBox/SettingsButton");
         QuitBtn = GetNodeOrNull<Button>("TitleView/VBox/QuitButton");
 
@@ -145,13 +157,11 @@ public partial class MainMenu : Control
         ClassSkillLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassSkillLabel");
         ClassStatusLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatusLabel");
         ClassConfirmBtn = GetNodeOrNull<Button>("ClassView/Buttons/ConfirmButton");
-        ClassBackBtn = GetNodeOrNull<Button>("ClassView/Buttons/BackButton");
 
         PassiveHeaderLbl = GetNodeOrNull<Label>("PassiveView/HeaderLabel");
         TreeLevelLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreeLevelLabel");
         TreePointsLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreePointsLabel");
         TreeCanvas = GetNodeOrNull<PassiveTreeView>("PassiveView/ContentHBox/TreeView");
-        PassiveBackBtn = GetNodeOrNull<Button>("PassiveView/Buttons/BackButton");
         PassiveResetBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ResetButton");
         PassiveConfirmBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ConfirmButton");
         TreeZoomOutBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ZoomOutButton");
@@ -169,7 +179,6 @@ public partial class MainMenu : Control
         MapThreatLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapThreatLabel");
         HoloScanner = GetNodeOrNull<HoloBodyScanner>("MapView/HBox/HoloBodyScanner");
         DeployBtn = GetNodeOrNull<Button>("MapView/Buttons/DeployButton");
-        MapBackBtn = GetNodeOrNull<Button>("MapView/Buttons/BackButton");
 
         // Endless Cytokine Storm entry (docs/endgame.md §2), injected beside Deploy.
         // Stays locked until any organ has been cleared on Hard.
@@ -255,13 +264,22 @@ public partial class MainMenu : Control
             CodexBtn.Pressed += () => CellCodexModal?.OpenCodex(0);
         if (RecordsBtn != null)
             RecordsBtn.Pressed += () => RecordsModal?.OpenHistory();
+        if (AchievementsBtn != null)
+            AchievementsBtn.Pressed += () =>
+            {
+                if (AchievementView != null)
+                {
+                    SwitchToView(AchievementView);
+                    AchievementView.Open();
+                }
+            };
+        if (GlobalBackBtn != null)
+            GlobalBackBtn.Pressed += OnGlobalBackPressed;
         if (SettingsBtn != null)
             SettingsBtn.Pressed += () => CellSettingsModal?.OpenSettings(0);
         if (QuitBtn != null)
             QuitBtn.Pressed += () => GetTree().Quit();
 
-        if (ClassBackBtn != null)
-            ClassBackBtn.Pressed += () => { if (TitleView != null) SwitchToView(TitleView); };
         if (ClassConfirmBtn != null)
             ClassConfirmBtn.Pressed += OnClassConfirmPressed;
 
@@ -319,8 +337,6 @@ public partial class MainMenu : Control
             TreeLevelLbl.SizeFlagsHorizontal = Control.SizeFlags.Fill;
             TreePointsLbl.SizeFlagsHorizontal = Control.SizeFlags.Fill;
         }
-        if (PassiveBackBtn != null)
-            PassiveBackBtn.Pressed += () => { if (ClassView != null) SwitchToView(ClassView); };
         if (PassiveResetBtn != null)
             PassiveResetBtn.Pressed += OnTreeResetPressed;
         if (PassiveConfirmBtn != null)
@@ -330,8 +346,6 @@ public partial class MainMenu : Control
         if (TreeZoomInBtn != null)
             TreeZoomInBtn.Pressed += () => TreeCanvas?.ZoomStep(1.2f);
 
-        if (MapBackBtn != null)
-            MapBackBtn.Pressed += () => { if (PassiveView != null) { SelectPassiveBuild(ActiveTreeClassKey); SwitchToView(PassiveView); } };
         if (DeployBtn != null)
             DeployBtn.Pressed += OnDeployPressed;
 
@@ -355,14 +369,14 @@ public partial class MainMenu : Control
         if (StartBtn != null) StartBtn.Text = Tr("BTN_START");
         if (CodexBtn != null) CodexBtn.Text = Tr("BTN_CODEX");
         if (RecordsBtn != null) RecordsBtn.Text = Tr("BTN_RECORDS");
+        if (AchievementsBtn != null) AchievementsBtn.Text = Tr("BTN_ACHIEVEMENTS");
+        if (GlobalBackBtn != null) GlobalBackBtn.Text = Tr("NAV_BACK");
         if (SettingsBtn != null) SettingsBtn.Text = Tr("BTN_SETTINGS");
         if (QuitBtn != null) QuitBtn.Text = Tr("BTN_QUIT");
 
         if (ClassHeaderLbl != null) ClassHeaderLbl.Text = Tr("HEADER_SELECT_CLASS");
-        if (ClassBackBtn != null) ClassBackBtn.Text = Tr("BTN_BACK_TITLE");
 
         if (PassiveHeaderLbl != null) PassiveHeaderLbl.Text = Tr("HEADER_SELECT_PASSIVE");
-        if (PassiveBackBtn != null) PassiveBackBtn.Text = Tr("BTN_BACK_CLASS");
         if (PassiveResetBtn != null) PassiveResetBtn.Text = Tr("TREE_RESET");
         if (PassiveConfirmBtn != null) PassiveConfirmBtn.Text = Tr("BTN_CONFIRM_MAP");
         if (TreeZoomOutBtn != null) TreeZoomOutBtn.Text = Tr("TREE_ZOOM_OUT");
@@ -370,7 +384,6 @@ public partial class MainMenu : Control
         if (TreeZoomInBtn != null) TreeZoomInBtn.Text = Tr("TREE_ZOOM_IN");
 
         if (MapHeaderLbl != null) MapHeaderLbl.Text = Tr("HEADER_SELECT_MAP");
-        if (MapBackBtn != null) MapBackBtn.Text = Tr("BTN_BACK_PASSIVE");
         if (DeployBtn != null) DeployBtn.Text = Tr("BTN_DEPLOY");
         if (DifficultyToggle != null)
         {
@@ -393,11 +406,36 @@ public partial class MainMenu : Control
 
     private void SwitchToView(Control targetView)
     {
-        Control?[] views = { TitleView, ClassView, PassiveView, MapView };
+        Control?[] views = { TitleView, ClassView, PassiveView, MapView, AchievementView };
         foreach (var view in views)
         {
             if (view != null)
                 view.Visible = view == targetView;
+        }
+        _currentView = targetView;
+        if (GlobalBackBtn != null)
+            GlobalBackBtn.Visible = targetView != TitleView;
+    }
+
+    /// <summary>
+    /// The single back affordance for all five views. Targets mirror the
+    /// removed per-view buttons: Map re-enters the passive build (refreshing
+    /// the tree), Passive returns to class selection, everything else to title.
+    /// </summary>
+    public void OnGlobalBackPressed()
+    {
+        if (_currentView == MapView && PassiveView != null)
+        {
+            SelectPassiveBuild(ActiveTreeClassKey);
+            SwitchToView(PassiveView);
+        }
+        else if (_currentView == PassiveView && ClassView != null)
+        {
+            SwitchToView(ClassView);
+        }
+        else if (TitleView != null)
+        {
+            SwitchToView(TitleView);
         }
     }
 
