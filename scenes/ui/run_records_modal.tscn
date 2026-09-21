@@ -1,38 +1,43 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/RunRecordsModal.cs" id="1_records"]
+[ext_resource type="Font" path="res://assets/fonts/BodyMediumFont.tres" id="3_btn_font"]
+[ext_resource type="Shader" path="res://shaders/codex_grid_bg.gdshader" id="4_grid_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
+shader = ExtResource("4_grid_shader")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
-bg_color = Color(0.05, 0.08, 0.14, 0.97)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.65, 0.85, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-content_margin_left = 24.0
-content_margin_top = 20.0
-content_margin_right = 24.0
-content_margin_bottom = 20.0
+bg_color = Color(0.03, 0.06, 0.1, 1)
+border_width_left = 0
+border_width_top = 0
+border_width_right = 0
+border_width_bottom = 0
+content_margin_left = 36.0
+content_margin_top = 24.0
+content_margin_right = 36.0
+content_margin_bottom = 24.0
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_sep"]
+color = Color(0, 0.9, 1, 0.25)
+thickness = 1
 
 [node name="RunRecordsModal" type="PanelContainer"]
 z_index = 60
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -460.0
-offset_top = -320.0
-offset_right = 460.0
-offset_bottom = 320.0
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
 script = ExtResource("1_records")
+
+[node name="GridBg" type="ColorRect" parent="."]
+layout_mode = 2
+mouse_filter = 2
+material = SubResource("ShaderMaterial_grid")
+color = Color(0, 0, 0, 0)
 
 [node name="VBox" type="VBoxContainer" parent="."]
 layout_mode = 2
@@ -46,14 +51,17 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 1)
 theme_override_font_sizes/font_size = 20
-text = "📋 病歷記錄"
+text = "病歷記錄"
 
 [node name="CloseButton" type="Button" parent="VBox/Header"]
-custom_minimum_size = Vector2(36, 32)
+custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 16
-text = "✕"
+theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_fonts/font = ExtResource("3_btn_font")
+theme_override_font_sizes/font_size = 14
+text = "返回"
 
 [node name="Banner" type="Label" parent="VBox"]
 visible = false
@@ -68,12 +76,13 @@ theme_override_constants/separation = 6
 
 [node name="Separator" type="HSeparator" parent="VBox"]
 layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_sep")
 
 [node name="HistoryHeader" type="Label" parent="VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.85, 0.55, 1)
 theme_override_font_sizes/font_size = 15
-text = "📊 歷史病歷"
+text = "歷史病歷"
 
 [node name="Scroll" type="ScrollContainer" parent="VBox"]
 layout_mode = 2
