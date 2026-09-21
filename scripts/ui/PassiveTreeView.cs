@@ -570,8 +570,8 @@ public partial class PassiveTreeView : Control
         button.AddThemeFontOverride("font", ThemeDB.FallbackFont);
         button.AddThemeFontSizeOverride("font_size", Mathf.RoundToInt(radius * (node.Rarity == PassiveTreeManager.TreeRarity.Unique ? 0.95f : 0.82f)));
         Color iconColor = stacks > 0 ? new Color(1, 1, 1, 1)
-            : available ? new Color(0.88f, 0.98f, 1.0f, 1.0f)
-            : new Color(0.60f, 0.68f, 0.78f, 1.0f);
+            : available ? new Color(0.42f, 0.50f, 0.60f, 1.0f)
+            : new Color(0.30f, 0.36f, 0.43f, 1.0f);
         button.AddThemeColorOverride("font_color", iconColor);
         button.AddThemeColorOverride("font_hover_color", Colors.White);
         button.AddThemeColorOverride("font_pressed_color", Colors.White);
@@ -949,16 +949,17 @@ public partial class PassiveTreeView : Control
             // Breathing vesicle glow: same-rarity nodes share one glow color;
             // lit nodes pulse stronger than dormant ones.
             float breath = 0.75f + 0.25f * Mathf.Sin(_time * (stacks > 0 ? 2.0f : 1.2f) + wobblePhase);
-            float halo = (stacks > 0 ? 0.34f : 0.13f) * breath;
+            float halo = (stacks > 0 ? 0.34f : 0.06f) * breath;
             layer.DrawCircle(position, radius + 7.0f + (stacks > 0 ? 1.6f * breath : 0.0f),
                 new Color(rarityColor.R, rarityColor.G, rarityColor.B, halo));
 
             Color fill = stacks > 0
                 ? new Color(rarityColor.R, rarityColor.G, rarityColor.B, 0.34f)
                 : new Color(0.035f, 0.065f, 0.11f, 0.90f);
+            Color dormantEdge = rarityColor.Darkened(0.45f);
             Color edge = stacks > 0
                 ? rarityColor.Lightened(0.25f)
-                : rarityColor.Darkened(hovered ? -0.05f : 0.18f);
+                : new Color(dormantEdge.R, dormantEdge.G, dormantEdge.B, hovered ? 0.75f : 0.5f);
 
             layer.DrawColoredPolygon(NodeShape(node, radius, wobblePhase), fill);
             layer.DrawPolyline(ClosedShape(node, radius, wobblePhase), edge,
