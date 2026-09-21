@@ -104,16 +104,16 @@ public partial class CodexModal : ModalBase
     }
 
     /// <summary>
-    /// Tall two-line archive entry: display name + specimen code.
+    /// Compact single-line archive entry: glyph + display name.
     /// Code-built (not tscn) so all five tabs share one style.
     /// </summary>
-    private static Button MakeItemButton(string line1, string specimenCode)
+    private static Button MakeItemButton(string line1)
     {
         var btn = new Button
         {
-            CustomMinimumSize = new Vector2(0, 60),
+            CustomMinimumSize = new Vector2(0, 40),
             Alignment = HorizontalAlignment.Left,
-            Text = line1 + "\n" + specimenCode
+            Text = line1
         };
         btn.AddThemeFontOverride("font", ItemFont);
         btn.AddThemeFontSizeOverride("font_size", 14);
@@ -199,9 +199,7 @@ public partial class CodexModal : ModalBase
             if (firstKey == "")
                 firstKey = key;
             var skillInfo = GameManager.GetSkillInfo(key);
-            var btn = MakeItemButton(
-                " " + UiBuilders.IconGlyph(skillInfo["icon"].AsString()) + " " + skillInfo["name"].AsString(),
-                "SPEC // " + key.ToUpper());
+            var btn = MakeItemButton(" " + skillInfo["name"].AsString());
             string localKey = key;
             btn.Pressed += () => SelectSkill(localKey);
             ItemList.AddChild(btn);
@@ -219,7 +217,7 @@ public partial class CodexModal : ModalBase
     {
         ActiveItemKey = key;
         var d = GameManager.GetSkillInfo(key);
-        if (DetailTitle != null) DetailTitle.Text = UiBuilders.IconGlyph(d["icon"].AsString()) + " " + d["name"].AsString();
+        if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
 
         string type = d["type"].AsString();
         UiBuilders.BuildSkillBadge(type, d["cooldown"].AsSingle(), 1, d["max_level"].AsInt32(),
@@ -249,9 +247,7 @@ public partial class CodexModal : ModalBase
                 firstKey = key;
             var d = GameManager.GetClassInfo(key);
             bool unlocked = d["unlocked"].AsBool();
-            var btn = MakeItemButton(
-                (unlocked ? " ✅ " : " 🔒 ") + d["name"].AsString(),
-                "SPEC // " + key.ToUpper());
+            var btn = MakeItemButton((unlocked ? " ✅ " : " 🔒 ") + d["name"].AsString());
             string localKey = key;
             btn.Pressed += () => SelectCell(localKey);
             ItemList.AddChild(btn);
@@ -271,7 +267,7 @@ public partial class CodexModal : ModalBase
         var d = GameManager.GetClassInfo(key);
         bool unlocked = d["unlocked"].AsBool();
 
-        if (DetailTitle != null) DetailTitle.Text = "🛡️ " + d["name"].AsString();
+        if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
         if (DetailBadge != null)
         {
             DetailBadge.Text = "[ " + (unlocked ? Tr("STATUS_UNLOCKED") : Tr("STATUS_LOCKED")) + " ]";
@@ -310,9 +306,7 @@ public partial class CodexModal : ModalBase
             if (firstKey == "")
                 firstKey = key;
             var d = GameManager.GetPathogenInfo(key);
-            var btn = MakeItemButton(
-                " " + UiBuilders.IconGlyph(d["icon"].AsString()) + " " + d["name"].AsString(),
-                "SPEC // " + key.ToUpper());
+            var btn = MakeItemButton(" " + d["name"].AsString());
             string localKey = key;
             btn.Pressed += () => SelectPathogen(localKey);
             ItemList.AddChild(btn);
@@ -330,7 +324,7 @@ public partial class CodexModal : ModalBase
     {
         ActiveItemKey = key;
         var d = GameManager.GetPathogenInfo(key);
-        if (DetailTitle != null) DetailTitle.Text = UiBuilders.IconGlyph(d["icon"].AsString()) + " " + d["name"].AsString();
+        if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
 
         string dangerLv = d.TryGetValue("danger_level", out var dlVal) ? dlVal.AsString() : (d.TryGetValue("threat_level", out var tlVal) ? tlVal.AsString() : "I");
         if (DetailBadge != null)
@@ -356,9 +350,7 @@ public partial class CodexModal : ModalBase
             if (firstKey == "")
                 firstKey = key;
             var d = GameManager.GetMapInfo(key);
-            var btn = MakeItemButton(
-                " " + UiBuilders.IconGlyph("🌐") + " " + d["name"].AsString(),
-                "SPEC // " + key.ToUpper());
+            var btn = MakeItemButton(" " + d["name"].AsString());
             string localKey = key;
             btn.Pressed += () => SelectMap(localKey);
             ItemList.AddChild(btn);
@@ -376,7 +368,7 @@ public partial class CodexModal : ModalBase
     {
         ActiveItemKey = key;
         var d = GameManager.GetMapInfo(key);
-        if (DetailTitle != null) DetailTitle.Text = UiBuilders.IconGlyph("🌐") + " " + d["name"].AsString();
+        if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
         if (DetailBadge != null)
         {
             DetailBadge.Text = "[ " + Tr("CODEX_STAGE_STATUS_OPEN") + " ]";
@@ -401,9 +393,7 @@ public partial class CodexModal : ModalBase
             if (firstId == "")
                 firstId = aid;
             bool unlocked = ach["unlocked"].AsBool();
-            var btn = MakeItemButton(
-                (unlocked ? " ✅ " : " 🔒 ") + UiBuilders.IconGlyph(ach["icon"].AsString()) + " " + ach["title"].AsString(),
-                "SPEC // " + aid.ToUpper());
+            var btn = MakeItemButton((unlocked ? " ✅ " : " 🔒 ") + ach["title"].AsString());
             string localAid = aid;
             btn.Pressed += () => SelectAchievement(localAid);
             ItemList.AddChild(btn);
@@ -422,7 +412,7 @@ public partial class CodexModal : ModalBase
         ActiveItemKey = achId;
         var d = AchievementManager.GetAchievementInfo(achId);
         bool unlocked = d["unlocked"].AsBool();
-        if (DetailTitle != null) DetailTitle.Text = UiBuilders.IconGlyph(d["icon"].AsString()) + " " + d["title"].AsString();
+        if (DetailTitle != null) DetailTitle.Text = d["title"].AsString();
         if (DetailBadge != null)
         {
             DetailBadge.Text = "[ " + (unlocked ? Tr("STATUS_ACH_COMPLETED") : Tr("STATUS_ACH_LOCKED")) + " ]";

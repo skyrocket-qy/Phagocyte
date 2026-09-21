@@ -67,14 +67,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 1)
 theme_override_font_sizes/font_size = 20
-text = "🔬 微观档案馆与免疫手册"
-
-[node name="SpecLabel" type="Label" parent="VBox/Header"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.6, 0.7, 0.8)
-theme_override_font_sizes/font_size = 12
-text = "ARCHIVE // PROTOCOL v1.04"
-horizontal_alignment = 2
+text = "微观档案馆与免疫手册"
 
 [node name="CloseButton" type="Button" parent="VBox/Header"]
 custom_minimum_size = Vector2(140, 36)
@@ -84,7 +77,7 @@ theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
 theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 14
-text = "[ESC] 返回"
+text = "返回"
 
 [node name="TabBar" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
@@ -99,7 +92,7 @@ theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
 theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 14
-text = "⚡ 技能与生化因子"
+text = "技能与生化因子"
 
 [node name="CellsTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(150, 36)
@@ -110,7 +103,7 @@ theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
 theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 14
-text = "🛡️ 免疫防御细胞"
+text = "免疫防御细胞"
 
 [node name="PathogensTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(150, 36)
@@ -121,7 +114,7 @@ theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
 theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 14
-text = "🦠 病原体图鉴"
+text = "病原体图鉴"
 
 [node name="MapsTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(150, 36)
@@ -132,7 +125,7 @@ theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
 theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 14
-text = "🌐 病理战场"
+text = "病理战场"
 
 [node name="AchievementsTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(150, 36)
@@ -143,7 +136,7 @@ theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
 theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 14
-text = "🎖️ 成就系统"
+text = "成就系统"
 
 [node name="HBox" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
@@ -151,10 +144,8 @@ size_flags_vertical = 3
 theme_override_constants/separation = 16
 
 [node name="Scroll" type="ScrollContainer" parent="VBox/HBox"]
-custom_minimum_size = Vector2(280, 0)
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
-size_flags_horizontal = 3
-stretch_ratio = 30.0
 horizontal_scroll_mode = 0
 
 [node name="ItemList" type="VBoxContainer" parent="VBox/HBox/Scroll"]
@@ -165,7 +156,7 @@ theme_override_constants/separation = 6
 [node name="DetailPanel" type="PanelContainer" parent="VBox/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-stretch_ratio = 70.0
+stretch_ratio = 80.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_detail")
 
 [node name="VBox" type="VBoxContainer" parent="VBox/HBox/DetailPanel"]
