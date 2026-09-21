@@ -611,5 +611,5 @@ TREE_PROFILE_1,Build 1,配置一,配置一,ビルド1,Build 1,Build 1,Сборк
 TREE_PROFILE_2,Build 2,配置二,配置二,ビルド2,Build 2,Build 2,Сборка 2,Configuración 2
 TREE_PROFILE_3,Build 3,配置三,配置三,ビルド3,Build 3,Build 3,Сборка 3,Configuración 3
 TREE_PROFILE_ADD,+,+,+,＋,+,+,+,+
-TREE_PROFILE_DELETE,Delete build,刪除此配置,刪除此配置,このビルドを削除,Build löschen,Supprimer ce build,Удалить сборку,Eliminar configuración
+TREE_PROFILE_DELETE,Delete,刪除,刪除,削除,Löschen,Supprimer,Удалить,Eliminar
 TREE_OVERLAY_PROFILE,Build: %s,配置：%s,配置：%s,ビルド：%s,Build: %s,Build : %s,Сборка: %s,Configuración: %s

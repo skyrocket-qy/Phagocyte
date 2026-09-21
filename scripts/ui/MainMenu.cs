@@ -272,30 +272,43 @@ public partial class MainMenu : Control
             TreeCanvas.TreeNodeRefundRequested += OnTreeNodeRefundRequested;
         }
         // Build-profile tabs (docs/passivetree.md §5.4): dynamic slots, up to MaxProfiles.
-        if (TreeLevelLbl != null && TreeLevelLbl.GetParent() is Container infoRow)
+        // Docked flush against the tree canvas top-left edge so the tabs read as
+        // attached to the panel instead of floating in the info row.
+        if (PassiveView != null)
         {
             _profileButtonGroup = new ButtonGroup { AllowUnpress = false };
             ProfileHBox = new HBoxContainer
             {
                 Name = "ProfileHBox",
-                Alignment = BoxContainer.AlignmentMode.Begin
+                MouseFilter = Control.MouseFilterEnum.Pass,
+                AnchorLeft = 0.5f,
+                AnchorTop = 0.5f,
+                AnchorRight = 0.5f,
+                AnchorBottom = 0.5f,
+                OffsetLeft = -590.0f,
+                OffsetTop = -332.0f,
+                OffsetRight = -30.0f,
+                OffsetBottom = -290.0f
             };
+            ProfileHBox.AddThemeConstantOverride("separation", 8);
             ProfileAddBtn = new Button
             {
                 Name = "ProfileAddButton",
-                CustomMinimumSize = new Vector2(56, 40)
+                CustomMinimumSize = new Vector2(56, 40),
+                MouseDefaultCursorShape = Control.CursorShape.PointingHand
             };
             ProfileAddBtn.Pressed += OnProfileAddPressed;
             ProfileDeleteBtn = new Button
             {
                 Name = "ProfileDeleteButton",
-                CustomMinimumSize = new Vector2(96, 40)
+                CustomMinimumSize = new Vector2(96, 40),
+                MouseDefaultCursorShape = Control.CursorShape.PointingHand
             };
+            ProfileDeleteBtn.AddThemeColorOverride("font_color", new Color(1.0f, 0.45f, 0.4f));
             ProfileDeleteBtn.Pressed += OnProfileDeletePressed;
             ProfileHBox.AddChild(ProfileAddBtn);
             ProfileHBox.AddChild(ProfileDeleteBtn);
-            infoRow.AddChild(ProfileHBox);
-            infoRow.MoveChild(ProfileHBox, 0);
+            PassiveView.AddChild(ProfileHBox);
         }
         if (PassiveBackBtn != null)
             PassiveBackBtn.Pressed += () => { if (ClassView != null) SwitchToView(ClassView); };
@@ -559,6 +572,36 @@ public partial class MainMenu : Control
         RefreshProfileTabs();
     }
 
+    private static readonly StyleBoxFlat ProfileTabActiveStyle = MakeProfileTabStyle(true, false);
+    private static readonly StyleBoxFlat ProfileTabInactiveStyle = MakeProfileTabStyle(false, false);
+    private static readonly StyleBoxFlat ProfileTabHoverStyle = MakeProfileTabStyle(false, true);
+    private static readonly Color ProfileTabActiveFont = new(0.94f, 0.99f, 0.98f);
+    private static readonly Color ProfileTabInactiveFont = new(0.55f, 0.62f, 0.72f);
+
+    /// <summary>
+    /// Connected-tab look: square bottom corners and a background close to the
+    /// tree canvas top, so the active tab merges into the panel. The active tab
+    /// additionally drops its bottom border; inactive tabs keep a dim one.
+    /// </summary>
+    private static StyleBoxFlat MakeProfileTabStyle(bool active, bool hover)
+    {
+        float alpha = active ? 0.5f : 0.22f;
+        var style = new StyleBoxFlat
+        {
+            BgColor = active || hover
+                ? new Color(0.032f, 0.068f, 0.118f, 1.0f)
+                : new Color(0.014f, 0.030f, 0.052f, 1.0f),
+            BorderColor = new Color(0.35f, 0.92f, 1.0f, hover ? 0.65f : alpha)
+        };
+        style.SetBorderWidthAll(1);
+        if (active)
+            style.BorderWidthBottom = 0;
+        style.SetCornerRadiusAll(6);
+        style.CornerRadiusBottomLeft = 0;
+        style.CornerRadiusBottomRight = 0;
+        return style;
+    }
+
     private void RefreshProfileTabs()
     {
         if (ProfileHBox == null)
@@ -585,8 +628,17 @@ public partial class MainMenu : Control
                 CustomMinimumSize = new Vector2(120, 40),
                 ToggleMode = true,
                 ButtonGroup = _profileButtonGroup,
-                ButtonPressed = index == active
+                ButtonPressed = index == active,
+                MouseDefaultCursorShape = Control.CursorShape.PointingHand
             };
+            tab.AddThemeStyleboxOverride("normal", ProfileTabInactiveStyle);
+            tab.AddThemeStyleboxOverride("pressed", ProfileTabActiveStyle);
+            tab.AddThemeStyleboxOverride("hover", ProfileTabHoverStyle);
+            tab.AddThemeStyleboxOverride("focus", new StyleBoxEmpty());
+            tab.AddThemeFontSizeOverride("font_size", 13);
+            tab.AddThemeColorOverride("font_color", ProfileTabInactiveFont);
+            tab.AddThemeColorOverride("font_hover_color", ProfileTabActiveFont);
+            tab.AddThemeColorOverride("font_pressed_color", ProfileTabActiveFont);
             tab.Pressed += () => OnProfileTabPressed(index);
             _profileTabBtns.Add(tab);
             ProfileHBox.AddChild(tab);
