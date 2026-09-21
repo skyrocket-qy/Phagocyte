@@ -256,6 +256,7 @@ public partial class RunRecordManager : Node
             { "rank", rank },
             { "points_spent", pointsSpent },
             { "active_skills", skills },
+            { "locked", false },
             { "victory_criteria", new Dictionary
                 {
                     { "survived_full_time", survivedFullTime },
@@ -267,13 +268,42 @@ public partial class RunRecordManager : Node
         };
 
         Records.Insert(0, record);
-        while (Records.Count > MaxRecords)
-        {
-            Records.RemoveAt(Records.Count - 1);
-        }
+        TrimToCapacity();
 
         SaveToDisk();
         return record;
+    }
+
+    /// <summary>Archived (pinned) charts survive automatic FIFO eviction.</summary>
+    public static bool IsLocked(Dictionary rec) => rec.GetValueOrDefault("locked", false).AsBool();
+
+    public static void SetLocked(Dictionary rec, bool locked)
+    {
+        rec["locked"] = locked;
+        SaveToDisk();
+    }
+
+    /// <summary>
+    /// FIFO cap: evict the oldest unlocked chart first. Locked charts are
+    /// immune; when every chart is locked the overflow is kept as-is.
+    /// </summary>
+    public static void TrimToCapacity()
+    {
+        while (Records.Count > MaxRecords)
+        {
+            int victim = -1;
+            for (int i = Records.Count - 1; i >= 0; i--)
+            {
+                if (!IsLocked(Records[i]))
+                {
+                    victim = i;
+                    break;
+                }
+            }
+            if (victim < 0)
+                break;
+            Records.RemoveAt(victim);
+        }
     }
 
     public static Array<Dictionary> GetAll()

@@ -446,6 +446,7 @@ RECORDS_SKILLS,Active Skills,主動技能,主動技能,能動技能,Aktive Skill
 RECORDS_EMPTY,No runs recorded yet.,尚無病歷記錄。,尚無病歷記錄。,記録なし。,Keine Runs verzeichnet.,Aucune sortie enregistrée.,Забегов пока нет.,Sin misiones registradas.
 RECORDS_CLEAR,Clear Records,清除病歷,清除病歷,記録消去,Berichte löschen,Effacer les relevés,Очистить журнал,Borrar historial
 RECORDS_CLEAR_CONFIRM,Confirm Clear?,確認清除？,確認清除？,消去確認？,Löschen bestätigen?,Confirmer l’effacement ?,Подтвердить очистку?,¿Confirmar borrado?
+RECORDS_LOCK_TOGGLE,Pin / unpin this chart (pinned charts survive auto-trim),锁定/解锁此病历（锁定的病历不受自动清理影响）,鎖定/解鎖此病歷（鎖定的病歷不受自動清理影響）,この記録をロック/解除（ロック中は自動削除対象外）,Akte anheften/lösen (angeheftete Akten bleiben erhalten),Épingler/détacher ce relevé (protégé du nettoyage auto),Закрепить/открепить запись (закреплённые не удаляются),Fijar/liberar este historial (los fijados no se purgan)
 RECORDS_RETRY,Deploy Again,再次出擊,再次出擊,再出撃,Erneut deployen,Relancer,Повторить вылазку,Repetir misión
 RECORDS_MENU,Return to Menu,返回主選單,返回主選單,メニューへ,Zum Menü,Au menu,В меню,Al menú
 RECORDS_VICTORY_TAG,VICTORY,通關,通關,通関,SIEG,VICTOIRE,ПОБЕДА,VICTORIA

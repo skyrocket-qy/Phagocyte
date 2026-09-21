@@ -19,7 +19,6 @@ public partial class RunRecordsModal : ModalBase
     public VBoxContainer? HistoryList { get; set; }
     public ScrollContainer? HistoryScroll { get; set; }
     public TabBar? HistoryTabs { get; set; }
-    public Button? ClearBtn { get; set; }
     public Button? RetryBtn { get; set; }
     public Button? MenuBtn { get; set; }
 
@@ -33,7 +32,6 @@ public partial class RunRecordsModal : ModalBase
 
     private VBoxContainer? _rootBox = null;
     private Dictionary? _record = null;
-    private bool _clearArmed = false;
 
     public override void _Ready()
     {
@@ -42,15 +40,12 @@ public partial class RunRecordsModal : ModalBase
         HistoryHeader = GetNodeOrNull<Label>("VBox/HistoryHeader");
         HistoryScroll = GetNodeOrNull<ScrollContainer>("VBox/Scroll");
         HistoryList = GetNodeOrNull<VBoxContainer>("VBox/Scroll/HistoryList");
-        ClearBtn = GetNodeOrNull<Button>("VBox/Buttons/ClearButton");
         RetryBtn = GetNodeOrNull<Button>("VBox/Buttons/RetryButton");
         MenuBtn = GetNodeOrNull<Button>("VBox/Buttons/MenuButton");
         _rootBox = GetNodeOrNull<VBoxContainer>("VBox");
 
         SetupHistoryTabs();
 
-        if (ClearBtn != null)
-            ClearBtn.Pressed += OnClearPressed;
         if (RetryBtn != null)
             RetryBtn.Pressed += OnRetryPressed;
         if (MenuBtn != null)
@@ -79,7 +74,6 @@ public partial class RunRecordsModal : ModalBase
         _record = record;
         SettlementMode = true;
         SelectedRecord = null;
-        _clearArmed = false;
         Visible = true;
         UpdateLocalizedTexts();
     }
@@ -89,7 +83,6 @@ public partial class RunRecordsModal : ModalBase
         _record = null;
         SettlementMode = false;
         SelectedRecord = null;
-        _clearArmed = false;
         if (HistoryTabs != null)
             HistoryTabs.CurrentTab = 0;
         Visible = true;
@@ -151,14 +144,7 @@ public partial class RunRecordsModal : ModalBase
                 RunRecordManager.FormatTime(RunRecordManager.GetBestSurvivalTime()));
         }
 
-        if (ClearBtn != null)
-        {
-            _clearArmed = false;
-            ClearBtn.Text = Tr("RECORDS_CLEAR");
-        }
-
         if (CloseBtn != null) CloseBtn.Visible = !SettlementMode;
-        if (ClearBtn != null) ClearBtn.Visible = !SettlementMode;
         if (RetryBtn != null) RetryBtn.Visible = SettlementMode;
         if (MenuBtn != null) MenuBtn.Visible = SettlementMode;
 
@@ -182,18 +168,7 @@ public partial class RunRecordsModal : ModalBase
         if (detail == null)
         {
             if (BannerLabel != null)
-            {
-                if (!SettlementMode)
-                {
-                    BannerLabel.Visible = true;
-                    BannerLabel.Text = Tr("RECORDS_DETAIL_HINT");
-                    BannerLabel.Modulate = new Color(0.55f, 0.65f, 0.75f);
-                }
-                else
-                {
-                    BannerLabel.Visible = false;
-                }
-            }
+                BannerLabel.Visible = false;
             SummaryBox.Visible = false;
             return;
         }
@@ -470,6 +445,18 @@ public partial class RunRecordsModal : ModalBase
         };
         meta.AddChild(stats);
 
+        bool locked = RunRecordManager.IsLocked(rec);
+        var lockBtn = new Button
+        {
+            Text = "🔒",
+            Modulate = locked ? new Color(1.0f, 0.84f, 0.35f) : new Color(0.35f, 0.42f, 0.5f),
+            MouseDefaultCursorShape = CursorShape.PointingHand,
+            FocusMode = FocusModeEnum.None,
+            TooltipText = Tr("RECORDS_LOCK_TOGGLE")
+        };
+        lockBtn.Pressed += () => ToggleRecordLock(rec);
+        meta.AddChild(lockBtn);
+
         vbox.AddChild(meta);
 
         row.AddChild(vbox);
@@ -563,18 +550,15 @@ public partial class RunRecordsModal : ModalBase
         return names.Count > 0 ? string.Join(" · ", names) : "-";
     }
 
-    private void OnClearPressed()
+    /// <summary>
+    /// Archive lock (docs/record.md §5): pinned charts are immune to FIFO
+    /// auto-trim. The row button consumes its own click so toggling never
+    /// triggers SelectRecord on the parent row.
+    /// </summary>
+    private void ToggleRecordLock(Dictionary rec)
     {
-        if (!_clearArmed)
-        {
-            _clearArmed = true;
-            if (ClearBtn != null) ClearBtn.Text = Tr("RECORDS_CLEAR_CONFIRM");
-            return;
-        }
-
-        RunRecordManager.ClearRecords();
-        SelectedRecord = null;
-        UpdateLocalizedTexts();
+        RunRecordManager.SetLocked(rec, !RunRecordManager.IsLocked(rec));
+        RenderHistory();
     }
 
     private void OnRetryPressed()

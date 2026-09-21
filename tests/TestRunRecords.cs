@@ -197,6 +197,46 @@ public partial class TestRunRecords : TestHarness
         AssertThat(RunRecordManager.Records[0]["survival_time"].AsSingle()).IsEqualApprox(
             RunRecordManager.MaxRecords + 4, 0.01f);
 
+        // Archive lock (docs/record.md §5): new charts default to unlocked,
+        // and a pinned chart survives FIFO auto-trim while its oldest
+        // unlocked neighbour is evicted instead.
+        RunRecordManager.ClearRecords();
+        for (int i = 0; i < RunRecordManager.MaxRecords; i++)
+        {
+            RunRecordManager.RecordRun(
+                RunRecordManager.ResultDefeat, "neutrophil", "gastric_lumen",
+                i, 2, i, 0, Array.Empty<string>());
+        }
+        AssertThat(RunRecordManager.IsLocked(RunRecordManager.Records[0])).IsFalse();
+        RunRecordManager.SetLocked(RunRecordManager.Records[RunRecordManager.MaxRecords - 1], true);
+        RunRecordManager.RecordRun(
+            RunRecordManager.ResultDefeat, "macrophage", "acute_wound",
+            999.0f, 2, 0, 0, Array.Empty<string>());
+        AssertThat(RunRecordManager.GetRunCount()).IsEqual(RunRecordManager.MaxRecords);
+        AssertThat(RunRecordManager.Records[0]["survival_time"].AsSingle()).IsEqualApprox(999.0f, 0.01f);
+        bool lockedSurvives = false;
+        bool oldestUnlockedEvicted = true;
+        foreach (var rec in RunRecordManager.Records)
+        {
+            float t = rec["survival_time"].AsSingle();
+            if (t < 0.01f && RunRecordManager.IsLocked(rec))
+                lockedSurvives = true;
+            if (t > 0.99f && t < 1.01f)
+                oldestUnlockedEvicted = false;
+        }
+        AssertThat(lockedSurvives).IsTrue();
+        AssertThat(oldestUnlockedEvicted).IsTrue();
+
+        // The pin survives a save/load round-trip
+        RunRecordManager.LoadFromDisk();
+        bool pinPersisted = false;
+        foreach (var rec in RunRecordManager.Records)
+        {
+            if (rec["survival_time"].AsSingle() < 0.01f && RunRecordManager.IsLocked(rec))
+                pinPersisted = true;
+        }
+        AssertThat(pinPersisted).IsTrue();
+
         // An unearned victory claim is downgraded to defeat by the manager guard
         var rejected = RunRecordManager.RecordRun(
             RunRecordManager.ResultVictory, "macrophage", "acute_wound",
@@ -259,6 +299,24 @@ public partial class TestRunRecords : TestHarness
 
         // Switching tabs clears the review selection
         modal.SetHistoryTab(0);
+        AssertThat(modal.SelectedRecord).IsNull();
+
+        // Manual purge is removed from the archive: no clear button exists
+        AssertThat(modal.GetNodeOrNull<Button>("VBox/Buttons/ClearButton")).IsNull();
+
+        // Every chart row carries an archive-lock toggle (docs/record.md §5)
+        var firstRow = modal.HistoryList!.GetChild(0);
+        var lockBtns = firstRow.FindChildren("*", "Button", true, false);
+        AssertThat(lockBtns.Count).IsEqual(1);
+        var lockBtn = lockBtns[0] as Button;
+        AssertThat(lockBtn).IsNotNull();
+        AssertThat(lockBtn!.Text).IsEqual("🔒");
+
+        // Toggling the pin flips the archived flag (button consumes its own click)
+        var target = modal.PinnedBest!;
+        AssertThat(RunRecordManager.IsLocked(target)).IsFalse();
+        lockBtn.EmitSignal(Button.SignalName.Pressed);
+        AssertThat(RunRecordManager.IsLocked(target)).IsTrue();
         AssertThat(modal.SelectedRecord).IsNull();
 
         // Settlement mode owns the summary area; history selection is locked
