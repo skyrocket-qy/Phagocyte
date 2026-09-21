@@ -92,7 +92,8 @@ public partial class TestMenuFlow : TestHarness
             // Detail dossier: badge + bio + baseline vitals + innate skill
             AssertThat(menu.ClassBadgeLbl!.Text.StartsWith("[ ")).IsTrue();
             AssertThat(menu.ClassBioLbl!.Text.Length).IsGreater(10);
-            AssertThat(menu.ClassStatsLbl!.Text.Contains("◆")).IsTrue();
+            AssertThat(menu.ClassStatsLbl!.Text.Contains("◆")).IsFalse();
+            AssertThat(menu.ClassStatsLbl!.Text.Contains("\n")).IsTrue();
             AssertThat(menu.ClassSkillLbl!.Text.Contains("\n")).IsTrue();
         }
         GD.Print("[PASS] All 5 immune defense cells selectable and confirmed unlocked via achievements.");

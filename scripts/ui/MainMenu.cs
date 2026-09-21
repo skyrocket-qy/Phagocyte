@@ -431,8 +431,8 @@ public partial class MainMenu : Control
     }
 
     /// <summary>
-    /// Baseline vitals block: HP / speed / armor as 5-cell relative bars
-    /// (normalized across all classes) plus the class signature stat.
+    /// Baseline vitals block: raw HP / speed / armor numbers plus the class
+    /// signature stat with a plain-language label (no academic stat names).
     /// </summary>
     private string BuildClassVitalsText(Dictionary data)
     {
@@ -440,43 +440,34 @@ public partial class MainMenu : Control
         float speed = data.TryGetValue("base_speed", out Variant spVal) ? spVal.AsSingle() : 230.0f;
         float armor = data.TryGetValue("base_armor", out Variant arVal) ? arVal.AsSingle() : 0.0f;
 
-        float minHp = float.MaxValue, maxHp = float.MinValue;
-        float minSp = float.MaxValue, maxSp = float.MinValue;
-        float minAr = float.MaxValue, maxAr = float.MinValue;
-        foreach (string id in GameManager.ClassData.Keys)
-        {
-            var d = (Dictionary)GameManager.ClassData[id];
-            float h = d.TryGetValue("base_hp", out Variant hv) ? hv.AsSingle() : 100.0f;
-            float s = d.TryGetValue("base_speed", out Variant sv) ? sv.AsSingle() : 230.0f;
-            float a = d.TryGetValue("base_armor", out Variant av) ? av.AsSingle() : 0.0f;
-            minHp = Mathf.Min(minHp, h); maxHp = Mathf.Max(maxHp, h);
-            minSp = Mathf.Min(minSp, s); maxSp = Mathf.Max(maxSp, s);
-            minAr = Mathf.Min(minAr, a); maxAr = Mathf.Max(maxAr, a);
-        }
-
         var lines = new System.Collections.Generic.List<string>
         {
-            $"{PassiveTreeManager.GetStatLabel("max_health")} {VitalsBar(hp, minHp, maxHp)}",
-            $"{PassiveTreeManager.GetStatLabel("move_speed")} {VitalsBar(speed, minSp, maxSp)}",
-            $"{PassiveTreeManager.GetStatLabel("armor")} {VitalsBar(armor, minAr, maxAr)}"
+            $"{PassiveTreeManager.GetStatLabel("max_health")} {hp:F0}",
+            $"{PassiveTreeManager.GetStatLabel("move_speed")} {speed:F0}",
+            $"{PassiveTreeManager.GetStatLabel("armor")} {armor:F0}"
         };
 
         string sigStat = data.TryGetValue("trait_stat", out Variant sigVal) ? sigVal.AsString() : "";
         if (!string.IsNullOrEmpty(sigStat))
         {
             float sigNum = data.TryGetValue("trait_stat_value", out Variant signVal) ? signVal.AsSingle() : 0.0f;
-            lines.Add($"{PassiveTreeManager.GetStatLabel(sigStat)} {FormatSignatureStat(sigStat, sigNum)}");
+            lines.Add($"{SignatureStatLabel(sigStat)} {FormatSignatureStat(sigStat, sigNum)}");
         }
         return string.Join("\n", lines);
     }
 
-    private static string VitalsBar(float value, float min, float max)
+    private string SignatureStatLabel(string stat)
     {
-        int cells = 3;
-        if (max > min)
-            cells = 1 + Mathf.RoundToInt(4.0f * (value - min) / (max - min));
-        cells = Mathf.Clamp(cells, 1, 5);
-        return new string('◆', cells) + new string('◇', 5 - cells);
+        string key = stat switch
+        {
+            "block" => "CLASS_SIG_BLOCK",
+            "crit_chance" => "CLASS_SIG_CRIT",
+            "might" => "CLASS_SIG_MIGHT",
+            "projectile_speed" => "CLASS_SIG_PROJSPEED",
+            "magnet" => "CLASS_SIG_MAGNET",
+            _ => ""
+        };
+        return string.IsNullOrEmpty(key) ? PassiveTreeManager.GetStatLabel(stat) : Tr(key);
     }
 
     private static string FormatSignatureStat(string stat, float value) => stat switch

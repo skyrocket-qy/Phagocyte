@@ -144,6 +144,11 @@ CLASS_BADGE_READY,READY,就绪,就緒,出撃可能,BEREIT,PRÊT,ГОТОВ,LISTA
 CLASS_BADGE_LOCKED,LOCKED,未解锁,未解鎖,未解放,GESPERRT,VERROUILLÉ,ЗАКРЫТО,BLOQUEADA
 CLASS_STATS_HEADER,【 Baseline Vitals 】,【 初始生化指标 】,【 初始生化指標 】,【 初期バイタル 】,【 Basis-Vitalwerte 】,【 Constantes initiales 】,【 Исходные витальные показатели 】,【 Constantes basales 】
 CLASS_SKILL_HEADER,【 Innate Skill 】,【 固有技能 】,【 固有技能 】,【 固有スキル 】,【 Innate Fähigkeit 】,【 Compétence innée 】,【 Врождённый навык 】,【 Habilidad innata 】
+CLASS_SIG_BLOCK,Block,格挡,格擋,ブロック,Block,Blocage,Блок,Bloqueo
+CLASS_SIG_CRIT,Crit,暴击,暴擊,会心,Krit,Crit,Крит,Crít
+CLASS_SIG_MIGHT,Damage,伤害,傷害,攻撃,Schaden,Dégâts,Урон,Daño
+CLASS_SIG_PROJSPEED,Projectile Speed,弹速,彈速,弾速,Projektiltempo,Vitesse des projectiles,Скорость снарядов,Velocidad de proyectil
+CLASS_SIG_MAGNET,Pickup Range,拾取范围,拾取範圍,拾取範囲,Sammelradius,Rayon de collecte,Радиус сбора,Radio de recogida
 HEADER_SELECT_MAP,Select Pathological Stage,选择病理战场,选择病理战场,病理ステージを選択,Pathologische Bühne wählen,Sélectionnez le stade pathologique,Выберите патологическую арену,Elige el escenario patológico
 BTN_DEPLOY,🚀 Deploy into Battle,🚀 开始出击,🚀 开始出击,🚀 出撃開始,🚀 In den Kampf,🚀 Déployer au combat,🚀 В бой,🚀 Entrar en combate
 BTN_BACK_CLASS,Back to Cell Selection,返回选择细胞,返回选择细胞,細胞選択に戻る,Zurück zur Zellauswahl,Retour à la sélection cellulaire,Назад к выбору клетки,Volver a la selección de célula
