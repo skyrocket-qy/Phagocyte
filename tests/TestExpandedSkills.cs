@@ -18,17 +18,18 @@ public partial class TestExpandedSkills : SceneTree
     public override void _Initialize()
     {
         GD.Print("==================================================================");
-        GD.Print(">>> STARTING EXPANDED 16 ACTIVE + 13 PASSIVE SKILL VERIFICATION <<<");
+        GD.Print(">>> STARTING EXPANDED 17 ACTIVE + 13 PASSIVE SKILL VERIFICATION <<<");
         GD.Print("==================================================================");
 
         // --- 1. Verify Catalog Counts ---
-        AssertThat(UpgradeManager.ActiveCatalog.Count).IsEqual(16);
+        AssertThat(UpgradeManager.ActiveCatalog.Count).IsEqual(17);
         AssertThat(UpgradeManager.PassiveCatalog.Count).IsEqual(13);
-        GD.Print("[PASS] Step 1: UpgradeManager.ActiveCatalog has 16 items and PassiveCatalog has 13 items.");
+        GD.Print("[PASS] Step 1: UpgradeManager.ActiveCatalog has 17 items and PassiveCatalog has 13 items.");
 
         // --- 2. Verify Every Active Skill Instantiation & Metadata ---
         var activeTypes = new Type[]
         {
+            typeof(PhagocyticGraspSkill),
             typeof(RosTorrentSkill),
             typeof(PerforinLanceSkill),
             typeof(ComplementCascadeSkill),
@@ -213,7 +214,7 @@ public partial class TestExpandedSkills : SceneTree
             AssertThat(c.ContainsKey("desc")).IsTrue();
             AssertThat(c.ContainsKey("icon")).IsTrue();
         }
-        GD.Print("[PASS] Step 6: UpgradeManager generates diverse cards from the 16+13 pool.");
+        GD.Print("[PASS] Step 6: UpgradeManager generates diverse cards from the 17+13 pool.");
 
         GD.Print("==================================================================");
         GD.Print(">>> ALL EXPANDED SKILL TESTS PASSED CLEANLY! <<<");

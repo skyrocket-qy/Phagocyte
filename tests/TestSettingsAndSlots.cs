@@ -89,7 +89,10 @@ public partial class TestSettingsAndSlots : TestHarness
         hud.OnSlotMouseEntered(5, card5);
         AssertThat(hud.SkillTooltip != null && hud.SkillTooltip.Visible).IsTrue();
         string badgeText = hud.TooltipBadge?.Text ?? "";
-        AssertThat(badgeText.Contains("\u56FA\u6709") || badgeText.Contains("INNATE")).IsTrue();
+        // Passive slots start empty (the innate start-hub trait applies as a stat
+        // modifier, not a slotted skill — see TestSkillSystem/TestTalentPipeline),
+        // so the hover badge shows the empty-passive tag, not the innate tag.
+        AssertThat(badgeText.Contains("被动") || badgeText.Contains("PASSIVE")).IsTrue();
 
         hud.OnSlotMouseExited(5);
         AssertThat(hud.SkillTooltip != null && hud.SkillTooltip.Visible).IsFalse();
