@@ -33,6 +33,12 @@ public partial class PassiveTreeView : Control
     private const float MaxZoom = 1.75f;
     private const float WorldSize = 4800.0f;
 
+    /// <summary>
+    /// Initial framing zooms slightly past an exact fit so the board fills
+    /// more of the view on open.
+    /// </summary>
+    private const float FitZoomBoost = 1.15f;
+
     private static readonly Color BackgroundColor = new(0.020f, 0.043f, 0.078f, 1.0f);
     private static readonly Color PlasmaCyan = new(0.35f, 0.92f, 1.00f, 1.0f);
 
@@ -288,7 +294,7 @@ public partial class PassiveTreeView : Control
         if (Size.X <= 0.0f || Size.Y <= 0.0f || bounds.Size.X <= 0.0f || bounds.Size.Y <= 0.0f)
             return false;
 
-        _zoom = Mathf.Clamp(Mathf.Min(Size.X / bounds.Size.X, Size.Y / bounds.Size.Y), MinZoom, MaxZoom);
+        _zoom = Mathf.Clamp(Mathf.Min(Size.X / bounds.Size.X, Size.Y / bounds.Size.Y) * FitZoomBoost, MinZoom, MaxZoom);
         _camera = bounds.GetCenter();
         _needsFit = false;
         ClampCamera();

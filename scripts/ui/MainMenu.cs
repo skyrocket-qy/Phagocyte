@@ -310,6 +310,15 @@ public partial class MainMenu : Control
             ProfileHBox.AddChild(ProfileDeleteBtn);
             PassiveView.AddChild(ProfileHBox);
         }
+        // Level + points readouts share the top-right corner, clear of the
+        // profile tabs docked at the tree canvas top-left.
+        if (TreeLevelLbl?.GetParent() is HBoxContainer infoRow
+            && TreePointsLbl != null)
+        {
+            infoRow.Alignment = BoxContainer.AlignmentMode.End;
+            TreeLevelLbl.SizeFlagsHorizontal = Control.SizeFlags.Fill;
+            TreePointsLbl.SizeFlagsHorizontal = Control.SizeFlags.Fill;
+        }
         if (PassiveBackBtn != null)
             PassiveBackBtn.Pressed += () => { if (ClassView != null) SwitchToView(ClassView); };
         if (PassiveResetBtn != null)

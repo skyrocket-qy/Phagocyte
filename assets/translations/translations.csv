@@ -14,12 +14,12 @@ BTN_BACK_PASSIVE,Back to Passive Tree,返回被动树,返回被动树,パッシ�
 BTN_CONFIRM_CLASS_LOCKED,Not Yet Unlocked,尚未解锁,尚未解锁,まだ解放されていない,Noch nicht freigeschaltet,Pas encore débloqué,Пока заблокировано,Aún bloqueada
 HEADER_SELECT_PASSIVE,Select Talent Tree,天赋树选择,天賦樹選擇,タレントツリーを選択,Talentbaum wählen,Sélectionnez l’arbre de talents,Выберите дерево талантов,Elige el árbol de talentos
 TREE_LEVEL,Cell Level: %d,细胞等级：%d,细胞等级：%d,細胞レベル：%d,Zellstufe: %d,Niveau cellulaire : %d,Уровень клетки: %d,Nivel celular: %d
-TREE_POINTS,Passive Points: %d available (%d spent),被动点数：可用 %d（已用 %d）,被动点数：可用 %d（已用 %d）,パッシブポイント：残り%d（使用%d）,Passive Punkte: %d verfügbar (%d ausgegeben),Points passifs : %d dispo. (%d dépensés),Пассивные очки: доступно %d (потрачено %d),Puntos pasivos: %d disponibles (%d gastados)
+TREE_POINTS,Talent Points: %d available (%d spent),天赋点数：可用 %d（已用 %d）,天賦點數：可用 %d（已用 %d）,タレントポイント：残り%d（使用%d）,Talentpunkte: %d verfügbar (%d ausgegeben),Points de talent : %d dispo. (%d dépensés),Очки талантов: доступно %d (потрачено %d),Puntos de talento: %d disponibles (%d gastados)
 TREE_START_NODE,Start node.,起始节点。,起始节点。,開始ノード。,Startknoten.,Nœud de départ.,Стартовый узел.,Nodo inicial.
 TREE_NODE_STACKS,Stacks: %d/%d,层数：%d/%d,层数：%d/%d,スタック：%d/%d,Stapel: %d/%d,Charges : %d/%d,Стаки: %d/%d,Acumulaciones: %d/%d
 TREE_PURCHASE_HINT,Left-click a glowing node to purchase. Right-click an owned node to refund.,左键点击发光节点购买，右键点击已拥有节点返还。,左键点击发光节点购买，右键点击已拥有节点返还。,発光ノード左クリックで購入。所有ノード右クリックで返金。,Leuchtenden Knoten linksklicken zum Kaufen. Eigenen Knoten rechtsklicken zum Erstatten.,Clic gauche sur un nœud lumineux pour acheter. Clic droit sur un nœud possédé pour rembourser.,ЛКМ по светящемуся узлу — купить. ПКМ по купленному — вернуть.,Clic izquierdo en nodo brillante para comprar. Clic derecho en nodo propio para reembolsar.
 TREE_LOCKED,Requires a connected purchased node.,需要与已购买节点相连。,需要与已购买节点相连。,購入済みの隣接ノードが必要。,Benötigt einen verbundenen gekauften Knoten.,Nécessite un nœud acheté adjacent.,Требуется соединённый купленный узел.,Requiere un nodo comprado adyacente.
-TREE_NO_POINTS,No passive points available.,目前没有可用的被动点数。,目前没有可用的被动点数。,使用可能なパッシブポイントがない。,Keine passiven Punkte verfügbar.,Aucun point passif disponible.,Нет доступных пассивных очков.,No hay puntos pasivos disponibles.
+TREE_NO_POINTS,No talent points available.,目前没有可用的天赋点数。,目前沒有可用的天賦點數。,使用可能なタレントポイントがない。,Keine Talentpunkte verfügbar.,Aucun point de talent disponible.,Нет доступных очков талантов.,No hay puntos de talento disponibles.
 TREE_MAXED,This node is fully stacked.,该节点已达上限。,该节点已达上限。,このノードは上限に達した。,Dieser Knoten ist voll gestapelt.,Ce nœud est au maximum.,Узел полностью прокачан.,Este nodo está al máximo.
 TREE_RESET,Reset Tree,重置天赋树,重置天赋树,ツリーをリセット,Baum zurücksetzen,Réinitialiser l’arbre,Сбросить дерево,Restablecer árbol
 TREE_RARITY_NORMAL,Normal,普通,普通,通常,Normal,Normal,Обычный,Normal
@@ -445,7 +445,7 @@ RECORDS_MAP,Host Region,宿主區域,宿主區域,宿主領域,Wirtsregion,Régi
 RECORDS_TIME,Survival Time,存活時間,存活時間,生存時間,Überlebenszeit,Temps de survie,Время выживания,Tiempo de supervivencia
 RECORDS_LEVEL,Level,等級,等級,レベル,Stufe,Niveau,Уровень,Nivel
 RECORDS_DIGESTED,Pathogens Digested,吞噬病原數,吞噬病原數,貪食病原数,Verdaute Pathogene,Pathogènes digérés,Переварено патогенов,Patógenos digeridos
-RECORDS_POINTS,Passive Points Spent,投入被動點數,投入被動點數,投入被動点,Eingesetzte Passivpunkte,Points passifs investis,Вложено пассивных очков,Puntos pasivos invertidos
+RECORDS_POINTS,Talent Points Spent,投入天赋点数,投入天賦點數,投入タレント点,Eingesetzte Talentpunkte,Points de talent investis,Вложено очков талантов,Puntos de talento invertidos
 RECORDS_SKILLS,Active Skills,主動技能,主動技能,能動技能,Aktive Skills,Compétences actives,Активные навыки,Habilidades activas
 RECORDS_EMPTY,No runs recorded yet.,尚無病歷記錄。,尚無病歷記錄。,記録なし。,Keine Runs verzeichnet.,Aucune sortie enregistrée.,Забегов пока нет.,Sin misiones registradas.
 RECORDS_LOCK_TOGGLE,Pin / unpin this chart (pinned charts survive auto-trim),锁定/解锁此病历（锁定的病历不受自动清理影响）,鎖定/解鎖此病歷（鎖定的病歷不受自動清理影響）,この記録をロック/解除（ロック中は自動削除対象外）,Akte anheften/lösen (angeheftete Akten bleiben erhalten),Épingler/détacher ce relevé (protégé du nettoyage auto),Закрепить/открепить запись (закреплённые не удаляются),Fijar/liberar este historial (los fijados no se purgan)
