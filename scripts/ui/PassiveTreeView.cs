@@ -966,19 +966,19 @@ public partial class PassiveTreeView : Control
             float radius = GetNodeRadius(node);
             float wobblePhase = Hash(node.Id) * Mathf.Tau;
             Color rarityColor = GetRarityColor(node.Rarity);
-            Color branchColor = GetBranchColor(node.Branch, 1.0f);
 
             if (hovered)
                 layer.DrawCircle(position, radius + 18.0f, new Color(1, 1, 1, 0.08f));
 
-            // Breathing vesicle glow: lit nodes pulse stronger than dormant ones.
+            // Breathing vesicle glow: same-rarity nodes share one glow color;
+            // lit nodes pulse stronger than dormant ones.
             float breath = 0.75f + 0.25f * Mathf.Sin(_time * (stacks > 0 ? 2.0f : 1.2f) + wobblePhase);
             float halo = (stacks > 0 ? 0.34f : 0.13f) * breath;
             layer.DrawCircle(position, radius + 7.0f + (stacks > 0 ? 1.6f * breath : 0.0f),
-                new Color(branchColor.R, branchColor.G, branchColor.B, halo));
+                new Color(rarityColor.R, rarityColor.G, rarityColor.B, halo));
 
             Color fill = stacks > 0
-                ? new Color(branchColor.R, branchColor.G, branchColor.B, 0.34f)
+                ? new Color(rarityColor.R, rarityColor.G, rarityColor.B, 0.34f)
                 : new Color(0.035f, 0.065f, 0.11f, 0.90f);
             Color edge = stacks > 0
                 ? rarityColor.Lightened(0.25f)
@@ -1125,19 +1125,18 @@ public partial class PassiveTreeView : Control
         };
     }
 
+    /// <summary>
+    /// Single unified edge color: only lit (both ends owned) vs unlit is
+    /// distinguished. Hovered edges flash white; width already encodes lit
+    /// state at the call site.
+    /// </summary>
+    private static readonly Color EdgeBaseColor = new(0.34f, 0.48f, 0.66f, 1.0f);
+
     private static Color GetEdgeColor(string fromId, string toId, bool lit, bool highlighted)
     {
-        Color rarity = new Color(0.34f, 0.48f, 0.66f, 1.0f);
-        if (PassiveTreeManager.TryGetNode(fromId, out var from) && PassiveTreeManager.TryGetNode(toId, out var to))
-        {
-            if (from.Branch == to.Branch)
-                rarity = GetBranchColor(from.Branch, 1.0f);
-            else
-                rarity = GetBranchColor(from.Branch, 1.0f).Lerp(GetBranchColor(to.Branch, 1.0f), 0.5f);
-        }
         if (!lit)
-            return new Color(rarity.R, rarity.G, rarity.B, 0.26f);
-        Color litColor = highlighted ? Colors.White : rarity.Lightened(0.18f);
+            return new Color(EdgeBaseColor.R, EdgeBaseColor.G, EdgeBaseColor.B, 0.26f);
+        Color litColor = highlighted ? Colors.White : EdgeBaseColor.Lightened(0.18f);
         return new Color(litColor.R, litColor.G, litColor.B, highlighted ? 0.98f : 0.80f);
     }
 }
