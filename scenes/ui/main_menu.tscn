@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/ui/HoloBodyScanner.cs" id="4_scanner"]
 [ext_resource type="Script" path="res://scripts/ui/PassiveTreeView.cs" id="5_tree"]
 [ext_resource type="LabelSettings" path="res://assets/fonts/TitleLabelSettings.tres" id="7_title_ls"]
+[ext_resource type="Font" path="res://assets/fonts/BodyMediumFont.tres" id="8_btn_font"]
 
 [sub_resource type="Curve" id="Curve_menu_ambient"]
 _data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.5, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -47,37 +48,41 @@ content_margin_top = 25.0
 content_margin_right = 30.0
 content_margin_bottom = 25.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lang_btn"]
-bg_color = Color(0.1, 0.18, 0.26, 0.9)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.08, 0.13, 0.18, 0.9)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.3, 0.6, 0.8, 0.9)
+border_color = Color(0.25, 0.45, 0.6, 0.7)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lang_btn_hover"]
-bg_color = Color(0.18, 0.32, 0.46, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.12, 0.22, 0.32, 0.95)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.4, 0.8, 1, 1)
+border_color = Color(0, 0.9, 1, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.05, 0.1, 0.15, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0.7, 0.85, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -157,35 +162,75 @@ theme_override_constants/separation = 16
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.88, 0.97, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0, 0.9, 1, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "开始免疫行动"
 
 [node name="CodexButton" type="Button" parent="TitleView/VBox"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.88, 0.97, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0, 0.9, 1, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "微观档案馆 (Codex)"
 
 [node name="RecordsButton" type="Button" parent="TitleView/VBox"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.88, 0.97, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0, 0.9, 1, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 16
-text = "病歷記錄"
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "病历记录"
 
 [node name="SettingsButton" type="Button" parent="TitleView/VBox"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.88, 0.97, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0, 0.9, 1, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 16
-text = "系統設定"
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "系统设置"
 
 [node name="QuitButton" type="Button" parent="TitleView/VBox"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.88, 0.97, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0, 0.9, 1, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
 theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "退出游戏"
 
 [node name="ClassView" type="Control" parent="."]
@@ -598,21 +643,3 @@ visible = false
 
 [node name="RunRecordsModal" parent="." instance=ExtResource("6_records")]
 visible = false
-
-[node name="LangButton" type="Button" parent="."]
-z_index = 10
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -170.0
-offset_top = 20.0
-offset_right = -24.0
-offset_bottom = 64.0
-grow_horizontal = 0
-mouse_filter = 0
-mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_lang_btn")
-theme_override_styles/hover = SubResource("StyleBoxFlat_lang_btn_hover")
-theme_override_font_sizes/font_size = 15
-text = "English"

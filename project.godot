@@ -89,7 +89,7 @@ squeeze_mode={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://assets/translations/translations.en.translation", "res://assets/translations/translations.zh_CN.translation")
+locale/translations=PackedStringArray("res://assets/translations/translations.en.translation", "res://assets/translations/translations.zh_CN.translation", "res://assets/translations/translations.zh_TW.translation")
 
 [layer_names]
 

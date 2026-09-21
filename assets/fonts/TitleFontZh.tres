@@ -1,0 +1,10 @@
+[gd_resource type="FontVariation" load_steps=3 format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/Orbitron-Display.ttf" id="1_orbitron"]
+[ext_resource type="FontFile" path="res://assets/fonts/SmileySans-Title.ttf" id="2_smiley"]
+
+[resource]
+base_font = ExtResource("1_orbitron")
+fallbacks = Array[Font]([ExtResource("2_smiley")])
+spacing_glyph = 9
+variation_opentype = {"wght": 800}

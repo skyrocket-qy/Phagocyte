@@ -6,10 +6,10 @@ uid="uid://ksirrkopbu6r"
 
 [deps]
 
-files=["res://assets/translations/translations.en.translation", "res://assets/translations/translations.zh_CN.translation"]
+files=["res://assets/translations/translations.en.translation", "res://assets/translations/translations.zh_CN.translation", "res://assets/translations/translations.zh_TW.translation"]
 
 source_file="res://assets/translations/translations.csv"
-dest_files=["res://assets/translations/translations.en.translation", "res://assets/translations/translations.zh_CN.translation"]
+dest_files=["res://assets/translations/translations.en.translation", "res://assets/translations/translations.zh_CN.translation", "res://assets/translations/translations.zh_TW.translation"]
 
 [params]
 

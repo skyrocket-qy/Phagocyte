@@ -16,8 +16,7 @@ public partial class MainMenu : Control
     public RunRecordsModal? RecordsModal { get; set; }
     public EndgameSetupModal? EndlessSetupModal { get; set; }
 
-    // Language Switcher
-    public Button? LangBtn { get; set; }
+    // Title View Controls
 
     // Title View Controls
     public Label? TitleLbl { get; set; }
@@ -76,6 +75,12 @@ public partial class MainMenu : Control
     /// <summary>True when the currently inspected organ map is still locked.</summary>
     public bool IsActiveMapLocked => !GameManager.IsMapUnlocked(ActiveMapKey);
 
+    // Title LabelSettings per locale: EN tracking 6px, ZH tracking 9px.
+    private static readonly LabelSettings TitleSettingsEn =
+        GD.Load<LabelSettings>("res://assets/fonts/TitleLabelSettings.tres");
+    private static readonly LabelSettings TitleSettingsZh =
+        GD.Load<LabelSettings>("res://assets/fonts/TitleZhLabelSettings.tres");
+
     private Callable _langCallback;
 
     public override void _Ready()
@@ -87,8 +92,6 @@ public partial class MainMenu : Control
         CellCodexModal = GetNodeOrNull<CodexModal>("CodexModal");
         CellSettingsModal = GetNodeOrNull<SettingsModal>("SettingsModal");
         RecordsModal = GetNodeOrNull<RunRecordsModal>("RunRecordsModal");
-
-        LangBtn = GetNodeOrNull<Button>("LangButton");
 
         TitleLbl = GetNodeOrNull<Label>("TitleView/TitleLabel");
         StartBtn = GetNodeOrNull<Button>("TitleView/VBox/StartButton");
@@ -208,9 +211,6 @@ public partial class MainMenu : Control
 
         AudioManager.Instance?.PlayBgm("menu");
 
-        if (LangBtn != null)
-            LangBtn.Pressed += OnLangTogglePressed;
-
         _langCallback = Callable.From((string _) => UpdateAllTexts());
         GameManager.AddLanguageListener(_langCallback);
 
@@ -262,17 +262,15 @@ public partial class MainMenu : Control
         GameManager.RemoveLanguageListener(_langCallback);
     }
 
-    private void OnLangTogglePressed()
-    {
-        GameManager.ToggleLanguage();
-    }
-
     public void UpdateAllTexts()
     {
-        if (LangBtn != null)
-            LangBtn.Text = GameManager.CurrentLanguage == "zh_CN" ? "English" : "简体中文";
-
-        if (TitleLbl != null) TitleLbl.Text = Tr("TITLE_MAIN");
+        if (TitleLbl != null)
+        {
+            TitleLbl.Text = Tr("TITLE_MAIN");
+            TitleLbl.LabelSettings = GameManager.CurrentLanguage == "en"
+                ? TitleSettingsEn
+                : TitleSettingsZh;
+        }
         if (StartBtn != null) StartBtn.Text = Tr("BTN_START");
         if (CodexBtn != null) CodexBtn.Text = Tr("BTN_CODEX");
         if (RecordsBtn != null) RecordsBtn.Text = Tr("BTN_RECORDS");

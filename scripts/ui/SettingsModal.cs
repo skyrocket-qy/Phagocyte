@@ -36,6 +36,13 @@ public partial class SettingsModal : ModalBase
     public CheckBox? FullscreenCheck { get; set; }
     public CheckBox? VsyncCheck { get; set; }
 
+    public Label? LangTitleLbl { get; set; }
+    public OptionButton? LangOption { get; set; }
+
+    /// <summary>Dropdown order: English, 简体中文, 繁體中文.</summary>
+    private static readonly string[] LangLocales = { "en", "zh_CN", "zh_TW" };
+    private static readonly string[] LangNames = { "English", "简体中文", "繁體中文" };
+
     public int CurrentTab { get; set; } = 0;
 
     public override void _Ready()
@@ -69,6 +76,9 @@ public partial class SettingsModal : ModalBase
         FullscreenCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/FullscreenCheck");
         VsyncCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/VSyncCheck");
 
+        LangTitleLbl = GetNodeOrNull<Label>("VBox/LanguageRow/LangLabel");
+        LangOption = GetNodeOrNull<OptionButton>("VBox/LanguageRow/LangOption");
+
         if (TabControlsBtn != null)
             TabControlsBtn.Pressed += () => SwitchTab(0);
         if (TabAudioBtn != null)
@@ -89,6 +99,15 @@ public partial class SettingsModal : ModalBase
             FullscreenCheck.Toggled += OnFullscreenToggled;
         if (VsyncCheck != null)
             VsyncCheck.Toggled += OnVsyncToggled;
+
+        // Language dropdown (native names, never translated)
+        if (LangOption != null)
+        {
+            LangOption.Clear();
+            for (int i = 0; i < LangNames.Length; i++)
+                LangOption.AddItem(LangNames[i], i);
+            LangOption.ItemSelected += OnLanguageSelected;
+        }
 
         SyncUiFromSettings();
         InitModal();
@@ -149,6 +168,26 @@ public partial class SettingsModal : ModalBase
             FullscreenCheck.ButtonPressed = SettingsManager.Fullscreen;
         if (VsyncCheck != null)
             VsyncCheck.ButtonPressed = SettingsManager.Vsync;
+
+        RefreshLanguageOption();
+    }
+
+    /// <summary>Selects the dropdown entry matching the current locale.</summary>
+    public void RefreshLanguageOption()
+    {
+        if (LangOption == null)
+            return;
+        int idx = Array.IndexOf(LangLocales, GameManager.CurrentLanguage);
+        LangOption.Selected = idx >= 0 ? idx : 1;
+    }
+
+    private void OnLanguageSelected(long index)
+    {
+        if (index < 0 || index >= LangLocales.Length)
+            return;
+        string locale = LangLocales[index];
+        if (locale != GameManager.CurrentLanguage)
+            GameManager.SetLanguage(locale);
     }
 
     private void OnMasterSliderChanged(double val)
@@ -203,5 +242,8 @@ public partial class SettingsModal : ModalBase
 
         if (FullscreenCheck != null) FullscreenCheck.Text = Tr("SETTINGS_FULLSCREEN");
         if (VsyncCheck != null) VsyncCheck.Text = Tr("SETTINGS_VSYNC");
+
+        if (LangTitleLbl != null) LangTitleLbl.Text = Tr("SETTINGS_LANGUAGE");
+        RefreshLanguageOption();
     }
 }

@@ -70,10 +70,17 @@ public partial class TestI18n : TestHarness
         AssertThat(mapEn["name"].AsString().Contains("Acute Wound")).IsTrue();
         GD.Print("[PASS] Class and Map metadata translations verified.");
 
-        // 4. Test Toggle Functionality
+        // 4. Test Toggle Functionality (zh_CN -> zh_TW -> en -> zh_CN)
         string newLang = GameManager.ToggleLanguage();
         AssertThat(newLang).IsEqual("zh_CN");
         AssertThat(GameManager.CurrentLanguage).IsEqual("zh_CN");
+
+        newLang = GameManager.ToggleLanguage();
+        AssertThat(newLang).IsEqual("zh_TW");
+        AssertThat(GameManager.CurrentLanguage).IsEqual("zh_TW");
+        menu.UpdateAllTexts();
+        AssertThat(menu.StartBtn?.Text.Contains("開始免疫行動") ?? false).IsTrue();
+        GD.Print("[PASS] Traditional Chinese (zh_TW) text rendering verified.");
 
         newLang = GameManager.ToggleLanguage();
         AssertThat(newLang).IsEqual("en");
