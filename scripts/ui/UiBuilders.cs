@@ -94,4 +94,81 @@ public static class UiBuilders
 
         return style;
     }
+
+    private static readonly System.Text.RegularExpressions.Regex BioPrefixRegex =
+        new(@"^\s*[^：:\n]{2,30}[：:]\s*", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    /// <summary>
+    /// Strips a redundant leading "Biochem: / 生物机制：" style label from
+    /// biochemistry body text. Call sites prepend their own section header,
+    /// so without this the label renders twice (e.g. codex detail + tooltip).
+    /// Only the first short "Label:" run is removed; body text is untouched.
+    /// </summary>
+    public static string StripLeadingLabel(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+            return text;
+        return BioPrefixRegex.Replace(text, "", 1);
+    }
+
+    /// <summary>
+    /// Maps a colorful emoji icon to a monochrome geometric glyph for the
+    /// archive terminal (codex list + detail titles). HUD and map views keep
+    /// the original emoji for at-a-glance readability. Unknown icons fall
+    /// back to ◆. All glyphs verified present in NotoSansSC-Body.
+    /// </summary>
+    public static string IconGlyph(string icon)
+    {
+        string key = (icon ?? "").Replace("️", "");
+        return key switch
+        {
+            "🦠" => "◉",
+            "🧪" => "△",
+            "🧫" => "□",
+            "🧬" => "◇",
+            "🩸" => "●",
+            "💉" => "▲",
+            "💨" => "○",
+            "🗡" => "▲",
+            "💥" => "★",
+            "🏹" => "◆",
+            "🥊" => "■",
+            "⭕" => "○",
+            "⛓" => "⬚",
+            "🌊" => "○",
+            "🛢" => "■",
+            "⚡" => "★",
+            "🧲" => "◊",
+            "🛡" => "□",
+            "🎯" => "◉",
+            "🔄" => "○",
+            "🍬" => "●",
+            "🛤" => "▪",
+            "⏳" => "◊",
+            "🎲" => "□",
+            "🧱" => "■",
+            "☣" => "✚",
+            "🌀" => "○",
+            "🍄" => "●",
+            "🐍" => "▲",
+            "👻" => "◊",
+            "💎" => "◇",
+            "🔥" => "▲",
+            "🦟" => "▲",
+            "🧠" => "◉",
+            "🌋" => "▲",
+            "🩹" => "✚",
+            "🫀" => "●",
+            "🫁" => "●",
+            "🌟" => "★",
+            "🌪" => "○",
+            "🌬" => "○",
+            "📍" => "◆",
+            "🌐" => "◆",
+            "🌌" => "★",
+            "🏆" => "★",
+            "🎖" => "◆",
+            _ => "◆",
+        };
+    }
 }

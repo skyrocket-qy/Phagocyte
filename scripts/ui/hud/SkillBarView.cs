@@ -295,7 +295,7 @@ public partial class SkillBarView : Node
             if (TooltipBio != null)
             {
                 string bioText = data.TryGetValue("biochemistry", out var bioVal) ? bioVal.AsString() : "";
-                TooltipBio.Text = Tr("CODEX_HEADER_BIO") + "\n" + bioText;
+                TooltipBio.Text = Tr("CODEX_HEADER_BIO") + "\n" + UiBuilders.StripLeadingLabel(bioText);
                 TooltipBio.Visible = !string.IsNullOrEmpty(bioText);
             }
         }

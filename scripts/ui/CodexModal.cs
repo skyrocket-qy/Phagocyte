@@ -23,6 +23,14 @@ public partial class CodexModal : ModalBase
     public int CurrentTab { get; set; } = 0;
     public string ActiveItemKey { get; set; } = "";
 
+    private static readonly Font ItemFont =
+        GD.Load<Font>("res://assets/fonts/BodyMediumFont.tres");
+    private static readonly Color ItemFontColor = new Color(0.94f, 0.99f, 0.98f);
+    private static readonly Color ItemHoverColor = new Color(0.39f, 1.0f, 0.85f);
+
+    /// <summary>Tab item buttons by catalog key, for active-selection highlight.</summary>
+    private readonly System.Collections.Generic.Dictionary<string, Button> _itemButtons = new();
+
     public override void _Ready()
     {
         TabSkillsBtn = GetNodeOrNull<Button>("VBox/TabBar/SkillsTab");
@@ -63,9 +71,66 @@ public partial class CodexModal : ModalBase
         CloseModal();
     }
 
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        if (!Visible)
+            return;
+        bool esc = @event.IsActionPressed("toggle_pause")
+            || (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo && keyEvent.Keycode == Key.Escape);
+        if (esc)
+        {
+            CloseCodex();
+            GetViewport().SetInputAsHandled();
+        }
+    }
+
+    /// <summary>
+    /// Paints the active entry GFP so selection never reads as "select A, view B".
+    /// Called at the end of every Select* method.
+    /// </summary>
+    private void RefreshItemSelection()
+    {
+        foreach (var kv in _itemButtons)
+            kv.Value.AddThemeColorOverride("font_color",
+                kv.Key == ActiveItemKey ? ItemHoverColor : ItemFontColor);
+    }
+
+    private static StyleBoxFlat MakePlate(Color bg, Color border)
+    {
+        var sb = new StyleBoxFlat { BgColor = bg, BorderColor = border };
+        sb.SetBorderWidthAll(1);
+        sb.SetCornerRadiusAll(6);
+        return sb;
+    }
+
+    /// <summary>
+    /// Tall two-line archive entry: display name + specimen code.
+    /// Code-built (not tscn) so all five tabs share one style.
+    /// </summary>
+    private static Button MakeItemButton(string line1, string specimenCode)
+    {
+        var btn = new Button
+        {
+            CustomMinimumSize = new Vector2(0, 60),
+            Alignment = HorizontalAlignment.Left,
+            Text = line1 + "\n" + specimenCode
+        };
+        btn.AddThemeFontOverride("font", ItemFont);
+        btn.AddThemeFontSizeOverride("font_size", 14);
+        btn.AddThemeColorOverride("font_color", ItemFontColor);
+        btn.AddThemeColorOverride("font_hover_color", ItemHoverColor);
+        btn.AddThemeColorOverride("font_pressed_color", new Color(0f, 0.79f, 0.33f));
+        btn.AddThemeStyleboxOverride("normal",
+            MakePlate(new Color(0.07f, 0.12f, 0.18f, 0.9f), new Color(0.25f, 0.45f, 0.6f, 0.7f)));
+        btn.AddThemeStyleboxOverride("hover",
+            MakePlate(new Color(0.07f, 0.2f, 0.16f, 0.95f), new Color(0.39f, 1.0f, 0.85f, 1.0f)));
+        return btn;
+    }
+
     public override void UpdateLocalizedTexts()
     {
         base.UpdateLocalizedTexts();
+        if (CloseBtn != null) CloseBtn.Text = Tr("CODEX_BACK");
         if (TitleLabel != null) TitleLabel.Text = Tr("CODEX_TITLE");
         if (TabSkillsBtn != null) TabSkillsBtn.Text = Tr("CODEX_TAB_SKILLS");
         if (TabCellsBtn != null) TabCellsBtn.Text = Tr("CODEX_TAB_CELLS");
@@ -95,6 +160,7 @@ public partial class CodexModal : ModalBase
         if (ItemList == null)
             return;
 
+        _itemButtons.Clear();
         foreach (var child in ItemList.GetChildren())
         {
             ItemList.RemoveChild(child);
@@ -133,15 +199,13 @@ public partial class CodexModal : ModalBase
             if (firstKey == "")
                 firstKey = key;
             var skillInfo = GameManager.GetSkillInfo(key);
-            var btn = new Button
-            {
-                CustomMinimumSize = new Vector2(230, 42),
-                Alignment = HorizontalAlignment.Left,
-                Text = " " + skillInfo["icon"].AsString() + " " + skillInfo["name"].AsString()
-            };
+            var btn = MakeItemButton(
+                " " + UiBuilders.IconGlyph(skillInfo["icon"].AsString()) + " " + skillInfo["name"].AsString(),
+                "SPEC // " + key.ToUpper());
             string localKey = key;
             btn.Pressed += () => SelectSkill(localKey);
             ItemList.AddChild(btn);
+            _itemButtons[localKey] = btn;
         }
 
         string target = ActiveItemKey != "" && GameManager.SkillCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
@@ -155,7 +219,7 @@ public partial class CodexModal : ModalBase
     {
         ActiveItemKey = key;
         var d = GameManager.GetSkillInfo(key);
-        if (DetailTitle != null) DetailTitle.Text = d["icon"].AsString() + " " + d["name"].AsString();
+        if (DetailTitle != null) DetailTitle.Text = UiBuilders.IconGlyph(d["icon"].AsString()) + " " + d["name"].AsString();
 
         string type = d["type"].AsString();
         UiBuilders.BuildSkillBadge(type, d["cooldown"].AsSingle(), 1, d["max_level"].AsInt32(),
@@ -168,7 +232,8 @@ public partial class CodexModal : ModalBase
         if (DetailStats != null) DetailStats.Text = statsText;
 
         if (DetailDesc != null) DetailDesc.Text = Tr("CODEX_HEADER_TACTICAL") + "\n" + d["description"].AsString();
-        if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_BIO") + "\n" + d["biochemistry"].AsString();
+        if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_BIO") + "\n" + UiBuilders.StripLeadingLabel(d["biochemistry"].AsString());
+        RefreshItemSelection();
     }
 
     private void RenderCellsTab()
@@ -184,15 +249,13 @@ public partial class CodexModal : ModalBase
                 firstKey = key;
             var d = GameManager.GetClassInfo(key);
             bool unlocked = d["unlocked"].AsBool();
-            var btn = new Button
-            {
-                CustomMinimumSize = new Vector2(230, 42),
-                Alignment = HorizontalAlignment.Left,
-                Text = (unlocked ? " ✅ " : " 🔒 ") + d["name"].AsString()
-            };
+            var btn = MakeItemButton(
+                (unlocked ? " ✅ " : " 🔒 ") + d["name"].AsString(),
+                "SPEC // " + key.ToUpper());
             string localKey = key;
             btn.Pressed += () => SelectCell(localKey);
             ItemList.AddChild(btn);
+            _itemButtons[localKey] = btn;
         }
 
         string target = ActiveItemKey != "" && GameManager.ClassData.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
@@ -232,6 +295,7 @@ public partial class CodexModal : ModalBase
         {
             DetailBio.Text = "";
         }
+        RefreshItemSelection();
     }
 
     private void RenderPathogensTab()
@@ -246,15 +310,13 @@ public partial class CodexModal : ModalBase
             if (firstKey == "")
                 firstKey = key;
             var d = GameManager.GetPathogenInfo(key);
-            var btn = new Button
-            {
-                CustomMinimumSize = new Vector2(230, 42),
-                Alignment = HorizontalAlignment.Left,
-                Text = " " + d["icon"].AsString() + " " + d["name"].AsString()
-            };
+            var btn = MakeItemButton(
+                " " + UiBuilders.IconGlyph(d["icon"].AsString()) + " " + d["name"].AsString(),
+                "SPEC // " + key.ToUpper());
             string localKey = key;
             btn.Pressed += () => SelectPathogen(localKey);
             ItemList.AddChild(btn);
+            _itemButtons[localKey] = btn;
         }
 
         string target = ActiveItemKey != "" && GameManager.PathogenCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
@@ -268,7 +330,7 @@ public partial class CodexModal : ModalBase
     {
         ActiveItemKey = key;
         var d = GameManager.GetPathogenInfo(key);
-        if (DetailTitle != null) DetailTitle.Text = d["icon"].AsString() + " " + d["name"].AsString();
+        if (DetailTitle != null) DetailTitle.Text = UiBuilders.IconGlyph(d["icon"].AsString()) + " " + d["name"].AsString();
 
         string dangerLv = d.TryGetValue("danger_level", out var dlVal) ? dlVal.AsString() : (d.TryGetValue("threat_level", out var tlVal) ? tlVal.AsString() : "I");
         if (DetailBadge != null)
@@ -279,6 +341,7 @@ public partial class CodexModal : ModalBase
         if (DetailStats != null) DetailStats.Text = d["trait"].AsString();
         if (DetailDesc != null) DetailDesc.Text = Tr("CODEX_HEADER_PATHOGEN_TRAIT") + "\n" + d["description"].AsString();
         if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_TACTIC_ADVICE") + "\n" + Tr("CODEX_PATHOGEN_ADVICE_DEFAULT");
+        RefreshItemSelection();
     }
 
     private void RenderMapsTab()
@@ -293,15 +356,13 @@ public partial class CodexModal : ModalBase
             if (firstKey == "")
                 firstKey = key;
             var d = GameManager.GetMapInfo(key);
-            var btn = new Button
-            {
-                CustomMinimumSize = new Vector2(230, 42),
-                Alignment = HorizontalAlignment.Left,
-                Text = " 🌐 " + d["name"].AsString()
-            };
+            var btn = MakeItemButton(
+                " " + UiBuilders.IconGlyph("🌐") + " " + d["name"].AsString(),
+                "SPEC // " + key.ToUpper());
             string localKey = key;
             btn.Pressed += () => SelectMap(localKey);
             ItemList.AddChild(btn);
+            _itemButtons[localKey] = btn;
         }
 
         string target = ActiveItemKey != "" && GameManager.MapData.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
@@ -315,7 +376,7 @@ public partial class CodexModal : ModalBase
     {
         ActiveItemKey = key;
         var d = GameManager.GetMapInfo(key);
-        if (DetailTitle != null) DetailTitle.Text = "🌐 " + d["name"].AsString();
+        if (DetailTitle != null) DetailTitle.Text = UiBuilders.IconGlyph("🌐") + " " + d["name"].AsString();
         if (DetailBadge != null)
         {
             DetailBadge.Text = "[ " + Tr("CODEX_STAGE_STATUS_OPEN") + " ]";
@@ -324,6 +385,7 @@ public partial class CodexModal : ModalBase
         if (DetailStats != null) DetailStats.Text = Tr("LABEL_ENV") + d["environment"].AsString();
         if (DetailDesc != null) DetailDesc.Text = Tr("CODEX_HEADER_MECH") + "\n" + d["mechanic"].AsString();
         if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_THREAT") + "\n" + d["threat"].AsString();
+        RefreshItemSelection();
     }
 
     private void RenderAchievementsTab()
@@ -339,15 +401,13 @@ public partial class CodexModal : ModalBase
             if (firstId == "")
                 firstId = aid;
             bool unlocked = ach["unlocked"].AsBool();
-            var btn = new Button
-            {
-                CustomMinimumSize = new Vector2(230, 42),
-                Alignment = HorizontalAlignment.Left,
-                Text = (unlocked ? " ✅ " : " 🔒 ") + ach["icon"].AsString() + " " + ach["title"].AsString()
-            };
+            var btn = MakeItemButton(
+                (unlocked ? " ✅ " : " 🔒 ") + UiBuilders.IconGlyph(ach["icon"].AsString()) + " " + ach["title"].AsString(),
+                "SPEC // " + aid.ToUpper());
             string localAid = aid;
             btn.Pressed += () => SelectAchievement(localAid);
             ItemList.AddChild(btn);
+            _itemButtons[localAid] = btn;
         }
 
         string target = ActiveItemKey != "" && AchievementManager.Achievements.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstId;
@@ -362,7 +422,7 @@ public partial class CodexModal : ModalBase
         ActiveItemKey = achId;
         var d = AchievementManager.GetAchievementInfo(achId);
         bool unlocked = d["unlocked"].AsBool();
-        if (DetailTitle != null) DetailTitle.Text = d["icon"].AsString() + " " + d["title"].AsString();
+        if (DetailTitle != null) DetailTitle.Text = UiBuilders.IconGlyph(d["icon"].AsString()) + " " + d["title"].AsString();
         if (DetailBadge != null)
         {
             DetailBadge.Text = "[ " + (unlocked ? Tr("STATUS_ACH_COMPLETED") : Tr("STATUS_ACH_LOCKED")) + " ]";
@@ -386,5 +446,6 @@ public partial class CodexModal : ModalBase
             string reward = d["reward"].AsString();
             DetailBio.Text = !string.IsNullOrEmpty(reward) ? Tr("LABEL_REWARD") + "\n" + reward : "";
         }
+        RefreshItemSelection();
     }
 }
