@@ -52,6 +52,16 @@ public partial class TestSurvivorHudUx : TestHarness
             player.ExpToNextLevel = 30.0f;
             player.Health = player.MaxHealth;
         }
+        // The bar renders a cached snapshot fed by the ExpChanged signal, so a
+        // direct player reset alone leaves stale values on screen: reset the
+        // snapshot through its public setters and refresh the display.
+        var hud = main.GetNodeOrNull<Hud>("HUD");
+        if (hud != null)
+        {
+            hud.LastCurrentExp = 0.0f;
+            hud.LastExpToNext = 30.0f;
+            hud.UpdateExpDisplay();
+        }
     }
 
     private static void ClearArenaEntities(Node root)

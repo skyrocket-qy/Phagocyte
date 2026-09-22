@@ -14,7 +14,7 @@ public partial class ToastView : Node
     public PanelContainer? AchievementBanner { get; set; }
     public Label? AchBannerTitle { get; set; }
     public Label? AchBannerDesc { get; set; }
-    public Label? AchBannerIcon { get; set; }
+    public TextureRect? AchBannerIcon { get; set; }
     public Tween? AchTween { get; set; }
 
     private Callable _achUnlockCallback;
@@ -48,11 +48,13 @@ public partial class ToastView : Node
         hbox.AddThemeConstantOverride("separation", 14);
         AchievementBanner.AddChild(hbox);
 
-        AchBannerIcon = new Label
+        AchBannerIcon = new TextureRect
         {
-            Text = "🏆"
+            CustomMinimumSize = new Vector2(40, 40),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            MouseFilter = Control.MouseFilterEnum.Ignore
         };
-        AchBannerIcon.AddThemeFontSizeOverride("font_size", 28);
         hbox.AddChild(AchBannerIcon);
 
         var vbox = new VBoxContainer
@@ -92,12 +94,12 @@ public partial class ToastView : Node
     /// <summary>Endless overdrive tier alert reusing the achievement toast (docs/endgame.md §3.2).</summary>
     public void ShowOverdriveAlert(string title, string desc)
     {
-        PlayToastBanner("☣️", title, desc, new Color(1.0f, 0.72f, 0.25f));
+        PlayToastBanner(AssetPaths.UiIcon("status_overclock"), title, desc, new Color(1.0f, 0.72f, 0.25f));
     }
 
     public void OnAchievementUnlocked(string _achId, Dictionary achInfo)
     {
-        string icon = achInfo.TryGetValue("icon", out var icVal) ? icVal.AsString() : "🏆";
+        string imagePath = achInfo.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "";
         string title = Tr("TOAST_ACH_UNLOCKED") + " " + (achInfo.TryGetValue("title", out var ttVal) ? ttVal.AsString() : "");
 
         string subText = achInfo.TryGetValue("desc", out var dsVal) ? dsVal.AsString() : "";
@@ -115,15 +117,17 @@ public partial class ToastView : Node
             subText = reward;
         }
 
-        PlayToastBanner(icon, title, subText, null);
+        PlayToastBanner(imagePath, title, subText, null);
     }
 
-    public void PlayToastBanner(string icon, string title, string desc, Color? titleColor)
+    public void PlayToastBanner(string imagePath, string title, string desc, Color? titleColor)
     {
         if (AchievementBanner == null)
             return;
 
-        if (AchBannerIcon != null) AchBannerIcon.Text = icon;
+        if (AchBannerIcon != null)
+            AchBannerIcon.Texture = AssetLoader.TryLoad<Texture2D>(imagePath)
+                ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
         if (AchBannerTitle != null)
         {
             AchBannerTitle.Text = title;

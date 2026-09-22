@@ -140,10 +140,25 @@ public partial class SkillBarView : Node
             if (!string.IsNullOrEmpty(id))
             {
                 if (iconLbl != null)
+                    iconLbl.Visible = false;
+                var iconTex = slotCard.GetNodeOrNull<TextureRect>("IconTexture");
+                if (iconTex == null)
                 {
-                    iconLbl.Text = data.TryGetValue("icon", out var icVal) ? icVal.AsString() : "";
-                    iconLbl.Modulate = new Color(1, 1, 1, 1);
+                    iconTex = new TextureRect
+                    {
+                        Name = "IconTexture",
+                        CustomMinimumSize = new Vector2(44, 44),
+                        ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+                        StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+                        MouseFilter = Control.MouseFilterEnum.Ignore
+                    };
+                    slotCard.AddChild(iconTex);
+                    slotCard.MoveChild(iconTex, 0);
                 }
+                string slotImagePath = data.TryGetValue("image_path", out var sipVal) ? sipVal.AsString() : "";
+                iconTex.Texture = AssetLoader.TryLoad<Texture2D>(slotImagePath)
+                    ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+                iconTex.Modulate = new Color(1, 1, 1, 1);
                 if (badgeLbl != null)
                 {
                     bool isInnate = data.TryGetValue("is_innate", out var innVal) && innVal.AsBool();
@@ -177,15 +192,27 @@ public partial class SkillBarView : Node
             }
             else
             {
-                // Empty Slot
+                // Empty Slot: placeholder texture, no emoji.
                 if (iconLbl != null)
+                    iconLbl.Visible = false;
+                var emptyTex = slotCard.GetNodeOrNull<TextureRect>("IconTexture");
+                if (emptyTex == null)
                 {
-                    iconLbl.Text = "+";
-                    if (i >= 5)
-                        iconLbl.Modulate = new Color(0.65f, 0.55f, 0.8f, 0.5f);
-                    else
-                        iconLbl.Modulate = new Color(0.4f, 0.5f, 0.6f, 0.6f);
+                    emptyTex = new TextureRect
+                    {
+                        Name = "IconTexture",
+                        CustomMinimumSize = new Vector2(44, 44),
+                        ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+                        StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+                        MouseFilter = Control.MouseFilterEnum.Ignore
+                    };
+                    slotCard.AddChild(emptyTex);
+                    slotCard.MoveChild(emptyTex, 0);
                 }
+                emptyTex.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+                emptyTex.Modulate = i >= 5
+                    ? new Color(0.65f, 0.55f, 0.8f, 0.5f)
+                    : new Color(0.4f, 0.5f, 0.6f, 0.6f);
                 if (badgeLbl != null)
                 {
                     badgeLbl.Text = "";
@@ -265,7 +292,31 @@ public partial class SkillBarView : Node
 
         if (!string.IsNullOrEmpty(id))
         {
-            if (TooltipIcon != null) TooltipIcon.Text = data.TryGetValue("icon", out var icVal) ? icVal.AsString() : "";
+            if (TooltipIcon != null) TooltipIcon.Visible = false;
+            var tipTex = SkillTooltip?.GetNodeOrNull<TextureRect>("VBox/HeaderHBox/TooltipIconTexture");
+            if (tipTex == null)
+            {
+                var header = SkillTooltip?.GetNodeOrNull<HBoxContainer>("VBox/HeaderHBox");
+                if (header != null)
+                {
+                    tipTex = new TextureRect
+                    {
+                        Name = "TooltipIconTexture",
+                        CustomMinimumSize = new Vector2(48, 48),
+                        ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+                        StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+                        MouseFilter = Control.MouseFilterEnum.Ignore
+                    };
+                    header.AddChild(tipTex);
+                    header.MoveChild(tipTex, 0);
+                }
+            }
+            if (tipTex != null)
+            {
+                string tipImagePath = data.TryGetValue("image_path", out var tipIpVal) ? tipIpVal.AsString() : "";
+                tipTex.Texture = AssetLoader.TryLoad<Texture2D>(tipImagePath)
+                    ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+            }
             if (TooltipTitle != null) TooltipTitle.Text = data.TryGetValue("name", out var nmVal) ? nmVal.AsString() : "";
 
             string badgeText;
@@ -301,7 +352,10 @@ public partial class SkillBarView : Node
         }
         else
         {
-            if (TooltipIcon != null) TooltipIcon.Text = "+";
+            if (TooltipIcon != null) TooltipIcon.Visible = false;
+            var emptyTipTex = SkillTooltip?.GetNodeOrNull<TextureRect>("VBox/HeaderHBox/TooltipIconTexture");
+            if (emptyTipTex != null)
+                emptyTipTex.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
             if (TooltipTitle != null) TooltipTitle.Text = Tr("TOOLTIP_EMPTY_TITLE");
             if (TooltipBadge != null)
             {
@@ -318,7 +372,7 @@ public partial class SkillBarView : Node
             }
             if (TooltipStats != null)
             {
-                TooltipStats.Text = slotIdx >= 5 ? "🧬 " + Tr("TOOLTIP_EMPTY_PASSIVE") : Tr("SKILL_BAR_TITLE");
+                TooltipStats.Text = slotIdx >= 5 ? Tr("TOOLTIP_EMPTY_PASSIVE") : Tr("SKILL_BAR_TITLE");
             }
             if (TooltipDesc != null) TooltipDesc.Text = Tr("TOOLTIP_EMPTY_DESC");
             if (TooltipBio != null)

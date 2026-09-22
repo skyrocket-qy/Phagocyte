@@ -224,6 +224,7 @@ public partial class SkillManager : Node2D
             ["description"] = "",
             ["biochemistry"] = "",
             ["icon"] = "+",
+            ["image_path"] = "",
             ["level"] = 0,
             ["max_level"] = 0,
             ["is_passive"] = isPass,

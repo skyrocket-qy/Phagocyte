@@ -47,14 +47,21 @@ public partial class AchievementToast : PanelContainer
         hbox.AddThemeConstantOverride("separation", 12);
         AddChild(hbox);
 
-        string icon = achData.TryGetValue("icon", out var iVal) ? iVal.AsString() : "🧬";
-        var iconLabel = new Label
+        string imagePath = achData.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "";
+        Texture2D? tex = AssetLoader.TryLoad<Texture2D>(imagePath)
+            ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+        if (tex != null)
         {
-            Text = icon,
-            VerticalAlignment = VerticalAlignment.Center
-        };
-        iconLabel.AddThemeFontSizeOverride("font_size", 24);
-        hbox.AddChild(iconLabel);
+            var iconTexture = new TextureRect
+            {
+                Texture = tex,
+                CustomMinimumSize = new Vector2(40, 40),
+                ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+                StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+            hbox.AddChild(iconTexture);
+        }
 
         var vbox = new VBoxContainer();
         vbox.SizeFlagsHorizontal = SizeFlags.ExpandFill;

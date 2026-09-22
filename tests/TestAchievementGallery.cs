@@ -77,10 +77,10 @@ public partial class TestAchievementGallery : TestHarness
             .IsEqual(new Color(1.0f, 0.84f, 0.35f));
         GD.Print("[PASS] Category accent colors verified.");
 
-        // Missing art falls back cleanly (no art shipped yet — every load is null, never throws)
+        // Art ships from assets/gen: every achievement resolves to a texture.
         AssertThat(AssetLoader.TryLoad<Texture2D>("") == null).IsTrue();
-        AssertThat(AssetLoader.TryLoad<Texture2D>("res://assets/gen/achievement/engulf_20.png") == null).IsTrue();
-        GD.Print("[PASS] Missing-artwork fallback verified (emoji plates until PNGs land).");
+        AssertThat(AssetLoader.TryLoad<Texture2D>("res://assets/gen/achievement/engulf_20.png") != null).IsTrue();
+        GD.Print("[PASS] Achievement artwork resolves from assets/gen.");
     }
 
     private MainMenu RunMenuTests()

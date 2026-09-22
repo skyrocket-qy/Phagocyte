@@ -26,6 +26,9 @@ public static class AssetPaths
     /// <summary>UI icon: res://assets/gen/ui/{id}.png.</summary>
     public static string UiIcon(string uiName) => $"{GenRoot}/ui/{uiName}.png";
 
+    /// <summary>Placeholder texture shown when art is missing (no emoji fallback).</summary>
+    public static string PlaceholderIcon => $"{GenRoot}/ui/frame_organelle.png";
+
     /// <summary>Candidate files for a BGM track, in probe order.</summary>
     public static IEnumerable<string> BgmCandidates(string trackName)
     {

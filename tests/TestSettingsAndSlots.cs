@@ -117,12 +117,12 @@ public partial class TestSettingsAndSlots : TestHarness
 
         hud.UpdateSkillSlots();
         var card6 = slotsContainer.GetChild<Control>(6);
-        var slot6Icon = card6.GetNodeOrNull<Label>("IconLabel");
+        var slot6Tex = card6.GetNodeOrNull<TextureRect>("IconTexture");
         var slot6Badge = card6.GetNodeOrNull<Label>("BadgeLabel");
         var slot6Cd = card6.GetNodeOrNull<ProgressBar>("CooldownBar");
 
-        AssertThat(slot6Icon).IsNotNull();
-        AssertThat(slot6Icon!.Text).IsEqual("⚡");
+        AssertThat(slot6Tex).IsNotNull();
+        AssertThat(slot6Tex!.Texture).IsNotNull();
         AssertThat(slot6Badge).IsNotNull();
         AssertThat(slot6Badge!.Text.Contains("1")).IsTrue();
         if (slot6Cd != null)

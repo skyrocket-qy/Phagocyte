@@ -65,6 +65,7 @@ public partial class UpgradeManager : RefCounted
             { "name", info["name_key"] },
             { "desc", info["desc_key"] },
             { "icon", info["icon"] },
+            { "image_path", AssetPaths.SkillIcon(id) },
             { "class_type", skillType.AssemblyQualifiedName ?? "" },
             { "class_id", info["class_id"] }
         };
@@ -169,6 +170,7 @@ public partial class UpgradeManager : RefCounted
                         { "id", skill.SkillId },
                         { "name", !string.IsNullOrEmpty(skill.NameKey) ? skill.NameKey : skill.SkillId },
                         { "icon", skill.IconSymbol },
+                        { "image_path", AssetPaths.SkillIcon(skill.SkillId) },
                         { "level", skill.Level + 1 },
                         { "badge", "BADGE_UPGRADE" },
                         { "desc", !string.IsNullOrEmpty(skill.DescKey) ? skill.DescKey : "UPGRADE_TO_LV" },
@@ -195,6 +197,7 @@ public partial class UpgradeManager : RefCounted
                         { "id", skill.SkillId },
                         { "name", !string.IsNullOrEmpty(skill.NameKey) ? skill.NameKey : skill.SkillId },
                         { "icon", skill.IconSymbol },
+                        { "image_path", AssetPaths.SkillIcon(skill.SkillId) },
                         { "level", skill.Level + 1 },
                         { "badge", "BADGE_UPGRADE" },
                         { "desc", !string.IsNullOrEmpty(skill.DescKey) ? skill.DescKey : "UPGRADE_TO_LV" },
@@ -227,6 +230,7 @@ public partial class UpgradeManager : RefCounted
                         { "id", item["id"] },
                         { "name", item["name"] },
                         { "icon", item["icon"] },
+                        { "image_path", item.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : AssetPaths.SkillIcon(item["id"].AsString()) },
                         { "level", 1 },
                         { "badge", "BADGE_NEW_ACTIVE" },
                         { "desc", item["desc"] },
@@ -251,6 +255,7 @@ public partial class UpgradeManager : RefCounted
                         { "id", item["id"] },
                         { "name", item["name"] },
                         { "icon", item["icon"] },
+                        { "image_path", item.TryGetValue("image_path", out var ipVal2) ? ipVal2.AsString() : AssetPaths.SkillIcon(item["id"].AsString()) },
                         { "level", 1 },
                         { "badge", "BADGE_NEW_PASSIVE" },
                         { "desc", item["desc"] },
@@ -281,6 +286,7 @@ public partial class UpgradeManager : RefCounted
                 { "id", "heal_fallback" },
                 { "name", "HEAL_FALLBACK_NAME" },
                 { "icon", "💚" },
+                { "image_path", AssetPaths.UiIcon("badge_atp") },
                 { "level", 0 },
                 { "badge", "BADGE_HEAL" },
                 { "desc", "HEAL_FALLBACK_DESC" }

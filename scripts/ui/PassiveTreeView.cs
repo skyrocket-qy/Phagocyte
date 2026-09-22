@@ -583,10 +583,28 @@ public partial class PassiveTreeView : Control
             FocusMode = FocusModeEnum.None,
             MouseFilter = MouseFilterEnum.Stop,
             MouseDefaultCursorShape = (stacks > 0 || available) ? CursorShape.PointingHand : CursorShape.Arrow,
-            Text = node.Icon,
+            Text = "",
             ClipText = true,
             Alignment = HorizontalAlignment.Center
         };
+        // Inset art so the canvas-drawn rarity frame (size/shape/color by
+        // trait rarity) stays visible around it instead of being covered.
+        float artSide = Mathf.Max(radius * 2.0f - 12.0f, 16.0f);
+        var art = new TextureRect
+        {
+            Name = "NodeArt",
+            Position = (size - new Vector2(artSide, artSide)) * 0.5f,
+            CustomMinimumSize = new Vector2(artSide, artSide),
+            Size = new Vector2(artSide, artSide),
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        Texture2D? nodeTex = AssetLoader.TryLoad<Texture2D>(AssetPaths.TraitIcon(node.TraitId))
+            ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+        if (nodeTex != null)
+            art.Texture = nodeTex;
+        button.AddChild(art);
 
         var transparent = new StyleBoxEmpty();
         button.AddThemeStyleboxOverride("normal", transparent);
@@ -594,16 +612,10 @@ public partial class PassiveTreeView : Control
         button.AddThemeStyleboxOverride("pressed", transparent);
         button.AddThemeStyleboxOverride("disabled", transparent);
         button.AddThemeStyleboxOverride("focus", transparent);
-        button.AddThemeFontOverride("font", ThemeDB.FallbackFont);
-        button.AddThemeFontSizeOverride("font_size", Mathf.RoundToInt(radius * (node.Rarity == PassiveTreeManager.TreeRarity.Unique ? 0.95f : 0.82f)));
-        Color iconColor = stacks > 0 ? new Color(1, 1, 1, 1)
-            : available ? new Color(0.42f, 0.50f, 0.60f, 1.0f)
-            : new Color(0.30f, 0.36f, 0.43f, 1.0f);
-        button.AddThemeColorOverride("font_color", iconColor);
-        button.AddThemeColorOverride("font_hover_color", Colors.White);
-        button.AddThemeColorOverride("font_pressed_color", Colors.White);
-        button.AddThemeColorOverride("font_disabled_color", iconColor);
-        button.AddThemeConstantOverride("outline_size", 8);
+        // Locked-state readability rides on the art texture via Modulate.
+        button.Modulate = stacks > 0 ? Colors.White
+            : available ? Colors.White
+            : new Color(0.45f, 0.50f, 0.58f, 1.0f);
         button.AddThemeColorOverride("font_outline_color", new Color(0, 0, 0, 0.9f));
 
         string localId = node.Id;
@@ -951,7 +963,7 @@ public partial class PassiveTreeView : Control
 
             layer.DrawColoredPolygon(NodeShape(node, radius, wobblePhase), fill);
             layer.DrawPolyline(ClosedShape(node, radius, wobblePhase), edge,
-                node.Rarity == PassiveTreeManager.TreeRarity.Unique ? 4.6f : 2.8f, true);
+                node.Rarity == PassiveTreeManager.TreeRarity.Unique ? 7.0f : 5.0f, true);
 
             if (isStart)
             {
@@ -971,11 +983,11 @@ public partial class PassiveTreeView : Control
     {
         return node.Rarity switch
         {
-            PassiveTreeManager.TreeRarity.Unique => 42.0f,
-            PassiveTreeManager.TreeRarity.Start => 40.0f,
+            PassiveTreeManager.TreeRarity.Unique => 52.0f,
+            PassiveTreeManager.TreeRarity.Start => 38.0f,
             PassiveTreeManager.TreeRarity.Rare => 38.0f,
-            PassiveTreeManager.TreeRarity.Magic => 32.0f,
-            _ => 25.0f
+            PassiveTreeManager.TreeRarity.Magic => 26.0f,
+            _ => 16.0f
         };
     }
 
@@ -992,21 +1004,9 @@ public partial class PassiveTreeView : Control
 
     private static Vector2[] NodeShape(PassiveTreeManager.TreeNode node, float radius, float wobblePhase)
     {
-        return node.Rarity switch
-        {
-            PassiveTreeManager.TreeRarity.Rare => Wobble(new[]
-            {
-                node.Position + new Vector2(0, -radius),
-                node.Position + new Vector2(radius, 0),
-                node.Position + new Vector2(0, radius),
-                node.Position + new Vector2(-radius, 0)
-            }, node.Position, wobblePhase),
-            PassiveTreeManager.TreeRarity.Unique => Wobble(PolygonPoints(node.Position, radius, 6, 0.0f), node.Position, wobblePhase),
-            // Start hubs are axis-aligned squares: corners at distance √2·radius
-            // so the half side matches the given radius.
-            PassiveTreeManager.TreeRarity.Start => Wobble(PolygonPoints(node.Position, radius * 1.4142f, 4, Mathf.Pi / 4.0f), node.Position, wobblePhase),
-            _ => Wobble(PolygonPoints(node.Position, radius, 40, 0.0f), node.Position, wobblePhase)
-        };
+        // All rarities share one circular frame; rarity reads from size + color.
+        // No wobble here: the distortion made circles read as lumpy.
+        return PolygonPoints(node.Position, radius, 48, 0.0f);
     }
 
     private static Vector2[] Wobble(Vector2[] points, Vector2 center, float phase)

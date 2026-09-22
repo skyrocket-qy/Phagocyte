@@ -270,7 +270,7 @@ public static class PassiveTreeManager
 
         int stacks = GetNodeStacks(cellId, nodeId);
         var text = new StringBuilder();
-        text.AppendLine("[b]" + node.Icon + " " + TranslationServer.Translate(node.NameKey) + "[/b]");
+        text.AppendLine("[b][img=40x40]" + AssetPaths.TraitIcon(node.TraitId) + "[/img] " + TranslationServer.Translate(node.NameKey) + "[/b]");
         if (IsInnateStartNode(cellId, nodeId))
             text.AppendLine(TranslationServer.Translate("TREE_START_INNATE"));
         text.AppendLine(GetNodeDescription(nodeId));

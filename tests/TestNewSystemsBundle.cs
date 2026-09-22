@@ -59,6 +59,7 @@ public partial class TestNewSystemsBundle : SceneTree
         {
             { "id", "toast_test" },
             { "icon", "🧬" },
+            { "image_path", AssetPaths.SkillIcon("actin") },
             { "title_key", "ACH_ENGULF_20_TITLE" },
             { "desc_key", "ACH_ENGULF_20_DESC" },
             { "reward_cell", "ctl" }

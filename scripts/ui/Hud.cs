@@ -116,7 +116,7 @@ public partial class Hud : CanvasLayer
     public PanelContainer? AchievementBanner { get => _toast?.AchievementBanner; set { if (_toast != null) _toast.AchievementBanner = value; } }
     public Label? AchBannerTitle { get => _toast?.AchBannerTitle; set { if (_toast != null) _toast.AchBannerTitle = value; } }
     public Label? AchBannerDesc { get => _toast?.AchBannerDesc; set { if (_toast != null) _toast.AchBannerDesc = value; } }
-    public Label? AchBannerIcon { get => _toast?.AchBannerIcon; set { if (_toast != null) _toast.AchBannerIcon = value; } }
+    public TextureRect? AchBannerIcon { get => _toast?.AchBannerIcon; set { if (_toast != null) _toast.AchBannerIcon = value; } }
     public Tween? AchTween { get => _toast?.AchTween; set { if (_toast != null) _toast.AchTween = value; } }
 
     public override void _Ready()

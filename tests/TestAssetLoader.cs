@@ -36,6 +36,7 @@ public partial class TestAssetLoader : TestHarness
         {
             RunLoaderTests();
             RunPathTests();
+            RunCatalogArtTests();
             GD.Print("==================================================================");
             GD.Print(">>> ALL ASSET LOADER TESTS PASSED SUCCESSFULLY! <<<");
             GD.Print("==================================================================");
@@ -165,6 +166,36 @@ public partial class TestAssetLoader : TestHarness
         AssertThat(AssetPaths.TraitIcon("adaptive_overdrive")).IsEqual("res://assets/gen/passive_tree/adaptive_overdrive.png");
         AssertThat(AssetPaths.TraitIcon("small_might")).IsEqual("res://assets/gen/passive_tree/small_might.png");
         AssertThat(AssetPaths.UiIcon("reticle_target")).IsEqual("res://assets/gen/ui/reticle_target.png");
+        AssertThat(AssetPaths.AchievementSpriteUnachieved("engulf_20"))
+            .IsEqual("res://assets/gen/achievement/engulf_20_unachieved.png");
+        AssertThat(AssetPaths.PlaceholderIcon).IsEqual("res://assets/gen/ui/frame_organelle.png");
         GD.Print("[PASS] AssetPaths mapping verified.");
+    }
+
+    private static void RunCatalogArtTests()
+    {
+        // Every skill carries a derived image_path (passives use skill/ own copy).
+        foreach (string skillId in GameManager.SkillCatalog.Keys)
+        {
+            var entry = GameManager.SkillCatalog[skillId].AsGodotDictionary();
+            AssertThat(entry.ContainsKey("image_path")).IsTrue();
+            AssertThat(entry["image_path"].AsString()).IsEqual(AssetPaths.SkillIcon(skillId));
+        }
+        GD.Print($"[PASS] All {GameManager.SkillCatalog.Count} skills carry image_path.");
+
+        // Every achievement carries a derived image_path.
+        foreach (string achId in AchievementManager.Achievements.Keys)
+        {
+            var info = AchievementManager.GetAchievementInfo(achId);
+            AssertThat(info["image_path"].AsString()).IsEqual(AssetPaths.AchievementSprite(achId));
+        }
+        GD.Print($"[PASS] All {AchievementManager.Achievements.Count} achievements carry image_path.");
+
+        // Every tree trait resolves to its own file stem (no prefixes).
+        foreach (var trait in PassiveTreeManager.Traits.Values)
+        {
+            AssertThat(AssetPaths.TraitIcon(trait.Id)).IsEqual($"res://assets/gen/passive_tree/{trait.Id}.png");
+        }
+        GD.Print($"[PASS] All {PassiveTreeManager.Traits.Count} traits resolve to assets/gen.");
     }
 }

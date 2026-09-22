@@ -233,12 +233,12 @@ public partial class TestAchievementSystem : TestHarness
                 galleryMenu.AchievementView.SetFilter(AchievementGalleryView.FilterAll);
                 AssertThat(galleryMenu.AchievementView.CardCount).IsEqual(AchievementManager.Achievements.Count);
 
-                // Steam-mirrored artwork fields exist; missing files fall back cleanly
+                // Artwork resolves from assets/gen (no emoji fallback).
                 var galleryInfo = AchievementManager.GetAchievementInfo("engulf_20");
                 AssertThat(galleryInfo.ContainsKey("image_path")).IsTrue();
                 AssertThat(galleryInfo.ContainsKey("steam_api_name")).IsTrue();
                 AssertThat(galleryInfo["steam_api_name"].AsString()).IsEqual("ENGULF_20");
-                AssertThat(AssetLoader.TryLoad<Texture2D>(galleryInfo["image_path"].AsString()) == null).IsTrue();
+                AssertThat(AssetLoader.TryLoad<Texture2D>(galleryInfo["image_path"].AsString()) != null).IsTrue();
                 GD.Print("[PASS] Step 5: AchievementGallery fifth-view rendering, 3-state filter and Steam art fallback verified.");
 
                 // --- Step 6: Main Menu Locked Cell Status & Confirm Button Test ---

@@ -105,12 +105,36 @@ public partial class UpgradeModal : ModalBase
                 card.Visible = true;
 
                 var iconLbl = card.GetNodeOrNull<Label>("VBox/IconLabel");
+                var iconTex = card.GetNodeOrNull<TextureRect>("VBox/IconTexture");
+                if (iconTex == null)
+                {
+                    var vbox = card.GetNodeOrNull<VBoxContainer>("VBox");
+                    iconTex = new TextureRect
+                    {
+                        Name = "IconTexture",
+                        CustomMinimumSize = new Vector2(64, 64),
+                        ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+                        StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+                        MouseFilter = MouseFilterEnum.Ignore
+                    };
+                    if (vbox != null)
+                    {
+                        vbox.AddChild(iconTex);
+                        vbox.MoveChild(iconTex, 0);
+                    }
+                }
                 var titleLbl = card.GetNodeOrNull<Label>("VBox/TitleLabel");
                 var badgeLbl = card.GetNodeOrNull<Label>("VBox/BadgeLabel");
                 var descLbl = card.GetNodeOrNull<Label>("VBox/DescLabel");
 
                 if (iconLbl != null)
-                    iconLbl.Text = choice.TryGetValue("icon", out var iconVal) ? iconVal.AsString() : "⚡";
+                    iconLbl.Visible = false;
+                if (iconTex != null)
+                {
+                    string imagePath = choice.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "";
+                    iconTex.Texture = AssetLoader.TryLoad<Texture2D>(imagePath)
+                        ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+                }
                 if (titleLbl != null)
                 {
                     string nameKey = choice.TryGetValue("name", out var nVal) ? nVal.AsString() : "";

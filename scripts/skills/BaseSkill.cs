@@ -282,6 +282,7 @@ public partial class BaseSkill : Node2D
             ["description"] = !string.IsNullOrEmpty(DescKey) ? Tr(DescKey) : "",
             ["biochemistry"] = !string.IsNullOrEmpty(BioKey) ? Tr(BioKey) : "",
             ["icon"] = IconSymbol,
+            ["image_path"] = AssetPaths.SkillIcon(SkillId),
             ["level"] = Level,
             ["max_level"] = MaxLevel,
             ["is_passive"] = IsPassive,

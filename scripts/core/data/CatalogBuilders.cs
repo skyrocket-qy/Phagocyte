@@ -32,7 +32,8 @@ public static class CatalogBuilders
                 { "type", CatalogLoader.GetString(row, "type") },
                 { "class_id", CatalogLoader.GetString(row, "class_id") },
                 { "cooldown", CatalogLoader.GetFloat(row, "cooldown") },
-                { "max_level", CatalogLoader.GetInt(row, "max_level", 5) }
+                { "max_level", CatalogLoader.GetInt(row, "max_level", 5) },
+                { "image_path", AssetPaths.SkillIcon(id) }
             };
         }
         GD.Print($"[Catalog] Loaded {table.Count} skills.");

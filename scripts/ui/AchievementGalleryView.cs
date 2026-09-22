@@ -67,6 +67,11 @@ public partial class AchievementGalleryView : Control
 
         DetailImage = GetNodeOrNull<TextureRect>("HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailImageWrap/DetailImage");
         DetailFallbackIcon = GetNodeOrNull<Label>("HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailImageWrap/DetailFallbackIcon");
+        // Card thumbnails already show the art; the detail-side image is
+        // redundant, so collapse the whole wrap instead of rendering it.
+        var detailWrap = GetNodeOrNull<Control>("HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailImageWrap");
+        if (detailWrap != null)
+            detailWrap.Visible = false;
         DetailTitle = GetNodeOrNull<Label>("HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailTitleVBox/DetailTitle");
         DetailBadge = GetNodeOrNull<Label>("HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailTitleVBox/DetailBadge");
         DetailProgressLabel = GetNodeOrNull<Label>("HBox/DetailPanel/DetailVBox/DetailProgressLabel");
@@ -207,34 +212,12 @@ public partial class AchievementGalleryView : Control
         bool unlocked = d["unlocked"].AsBool();
         Color accent = CategoryColor(d);
 
-        Texture2D? tex = AssetLoader.TryLoad<Texture2D>(d.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "");
+        // Detail-side art retired: the card thumbnail on the left already
+        // shows it. Keep the nodes hidden if the scene provides them.
         if (DetailImage != null)
-        {
-            if (tex != null)
-            {
-                DetailImage.Texture = tex;
-                DetailImage.Visible = true;
-                DetailImage.Modulate = unlocked ? Colors.White : LockedDim;
-            }
-            else
-            {
-                DetailImage.Visible = false;
-            }
-        }
+            DetailImage.Visible = false;
         if (DetailFallbackIcon != null)
-        {
-            string icon = d.TryGetValue("icon", out var icVal) ? icVal.AsString() : "🏆";
-            if (tex != null)
-            {
-                DetailFallbackIcon.Visible = false;
-            }
-            else
-            {
-                DetailFallbackIcon.Visible = true;
-                DetailFallbackIcon.Text = icon;
-                DetailFallbackIcon.Modulate = unlocked ? accent : LockedDim;
-            }
-        }
+            DetailFallbackIcon.Visible = false;
 
         if (DetailTitle != null)
             DetailTitle.Text = d["title"].AsString();
@@ -357,7 +340,8 @@ public partial class AchievementGalleryView : Control
         thumbWrap.MouseFilter = MouseFilterEnum.Ignore;
         hbox.AddChild(thumbWrap);
 
-        Texture2D? tex = AssetLoader.TryLoad<Texture2D>(ach.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "");
+        Texture2D? tex = AssetLoader.TryLoad<Texture2D>(ach.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "")
+            ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
         if (tex != null)
         {
             var thumb = new TextureRect
@@ -372,21 +356,6 @@ public partial class AchievementGalleryView : Control
             if (!unlocked)
                 thumb.Modulate = LockedDim;
             thumbWrap.AddChild(thumb);
-        }
-        else
-        {
-            var fallback = new Label
-            {
-                Text = ach.TryGetValue("icon", out var icVal) ? icVal.AsString() : "🏆",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                AnchorRight = 1.0f,
-                AnchorBottom = 1.0f,
-                MouseFilter = MouseFilterEnum.Ignore
-            };
-            fallback.AddThemeFontSizeOverride("font_size", 36);
-            fallback.AddThemeColorOverride("font_color", unlocked ? accent : LockedDim);
-            thumbWrap.AddChild(fallback);
         }
 
         var vbox = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };

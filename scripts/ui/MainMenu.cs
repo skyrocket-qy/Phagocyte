@@ -495,7 +495,29 @@ public partial class MainMenu : Control
         if (ClassSkillHeaderLbl != null)
             ClassSkillHeaderLbl.Text = Tr("CLASS_SKILL_HEADER");
         if (ClassSkillLbl != null)
-            ClassSkillLbl.Text = BuildClassSkillText(key);
+        {
+            var (skillText, skillImagePath) = BuildClassSkillText(key);
+            ClassSkillLbl.Text = skillText;
+            var parent = ClassSkillLbl.GetParent() as VBoxContainer;
+            var skillIconTex = parent?.GetNodeOrNull<TextureRect>("ClassSkillTexture");
+            if (skillIconTex == null && parent != null)
+            {
+                skillIconTex = new TextureRect
+                {
+                    Name = "ClassSkillTexture",
+                    CustomMinimumSize = new Vector2(48, 48),
+                    ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+                    StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+                    SizeFlagsHorizontal = SizeFlags.ShrinkBegin,
+                    MouseFilter = MouseFilterEnum.Ignore
+                };
+                parent.AddChild(skillIconTex);
+                parent.MoveChild(skillIconTex, ClassSkillLbl.GetIndex());
+            }
+            if (skillIconTex != null)
+                skillIconTex.Texture = AssetLoader.TryLoad<Texture2D>(skillImagePath)
+                    ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+        }
 
         if (ClassStatusLbl != null)
         {
@@ -565,8 +587,8 @@ public partial class MainMenu : Control
         _ => value % 1.0f == 0.0f ? $"{value:F0}" : $"{value:F1}"
     };
 
-    /// <summary>Innate skill line: icon + name + full description from the skill catalog.</summary>
-    private string BuildClassSkillText(string classKey)
+    /// <summary>Innate skill line: name + full description from the skill catalog (art goes to ClassSkillTexture).</summary>
+    private (string Text, string ImagePath) BuildClassSkillText(string classKey)
     {
         foreach (string id in GameManager.SkillCatalog.Keys)
         {
@@ -574,13 +596,13 @@ public partial class MainMenu : Control
             if (s.TryGetValue("type", out Variant typeVal) && typeVal.AsString() == "innate"
                 && s.TryGetValue("class_id", out Variant cidVal) && cidVal.AsString() == classKey)
             {
-                string icon = s.TryGetValue("icon", out Variant iconVal) ? iconVal.AsString() : "";
                 string nameKey = s.TryGetValue("name_key", out Variant nVal) ? nVal.AsString() : "";
                 string descKey = s.TryGetValue("desc_key", out Variant dVal) ? dVal.AsString() : "";
-                return $"{icon} {Tr(nameKey)}\n{Tr(descKey)}";
+                string imagePath = s.TryGetValue("image_path", out Variant ipVal) ? ipVal.AsString() : AssetPaths.SkillIcon(id);
+                return ($"{Tr(nameKey)}\n{Tr(descKey)}", imagePath);
             }
         }
-        return "-";
+        return ("-", "");
     }
 
     public void OnStartPressed()

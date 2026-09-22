@@ -180,9 +180,8 @@ public partial class PauseMenuView : Node
                 if (!allocation.TryGetValue(node.Id, out int stacks))
                     continue;
 
-                string icon = PassiveTreeManager.GetNodeIcon(node.Id);
                 string nodeName = PassiveTreeManager.GetNodeName(node.Id);
-                text.AppendLine(icon + " " + nodeName);
+                text.AppendLine("[img=32x32]" + AssetPaths.TraitIcon(node.TraitId) + "[/img] " + nodeName);
                 string description = PassiveTreeManager.GetNodeDescription(node.Id);
                 if (!string.IsNullOrEmpty(description))
                 {

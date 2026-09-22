@@ -81,29 +81,34 @@ public partial class TestCodexAndTooltip : TestHarness
         hud.OnSlotMouseEntered(0, card0);
         AssertThat(skillTooltip!.Visible).IsTrue();
 
-        var tIcon = hud.TooltipIcon?.Text ?? "";
         var tTitle = hud.TooltipTitle?.Text ?? "";
         var tBadge = hud.TooltipBadge?.Text ?? "";
-        AssertThat(tIcon).IsEqual("\U0001F9A0");
+        var tTex = skillTooltip!.GetNodeOrNull<TextureRect>("VBox/HeaderHBox/TooltipIconTexture");
+        AssertThat(tTex).IsNotNull();
+        AssertThat(tTex!.Texture).IsNotNull();
         AssertThat(tBadge.Contains("\u56FA\u6709") || tBadge.Contains("INNATE")).IsTrue();
-        GD.Print($"[PASS] Slot 0 Innate Active Tooltip verified: '{tIcon} {tTitle}' ({tBadge})");
+        GD.Print($"[PASS] Slot 0 Innate Active Tooltip verified: '{tTitle}' ({tBadge})");
 
         // Test Hover Slot 1 (Drafted Active Weapon)
         var card1 = slotsContainer!.GetChild<Control>(1);
         hud.OnSlotMouseEntered(1, card1);
         AssertThat(skillTooltip.Visible).IsTrue();
-        AssertThat(hud.TooltipIcon?.Text).IsEqual("\U0001F4A8");
+        var tTex1 = skillTooltip.GetNodeOrNull<TextureRect>("VBox/HeaderHBox/TooltipIconTexture");
+        AssertThat(tTex1).IsNotNull();
+        AssertThat(tTex1!.Texture).IsNotNull();
         var activeBadge = hud.TooltipBadge?.Text ?? "";
         AssertThat(activeBadge.Contains("\u4E3B\u52A8") || activeBadge.Contains("ACTIVE")).IsTrue();
         AssertThat(hud.TooltipStats?.Text.Contains("3.2") ?? false).IsTrue();
-        GD.Print($"[PASS] Slot 1 Active Weapon Tooltip verified: '{hud.TooltipIcon?.Text} {hud.TooltipTitle?.Text}' ({activeBadge})");
+        GD.Print($"[PASS] Slot 1 Active Weapon Tooltip verified: '{hud.TooltipTitle?.Text}' ({activeBadge})");
 
         // Test Hover Slot 2 (Empty Slot)
         var card2 = slotsContainer.GetChild<Control>(2);
         hud.OnSlotMouseEntered(2, card2);
-        AssertThat(hud.TooltipIcon?.Text).IsEqual("+");
+        var tTex2 = skillTooltip.GetNodeOrNull<TextureRect>("VBox/HeaderHBox/TooltipIconTexture");
+        AssertThat(tTex2).IsNotNull();
+        AssertThat(tTex2!.Texture).IsNotNull();
         AssertThat(hud.TooltipBio != null && hud.TooltipBio.Visible).IsFalse();
-        GD.Print($"[PASS] Slot 2 Empty Slot Tooltip verified: '{hud.TooltipIcon?.Text} {hud.TooltipTitle?.Text}'");
+        GD.Print($"[PASS] Slot 2 Empty Slot Tooltip verified: '{hud.TooltipTitle?.Text}'");
 
         // Test Mouse Exited
         hud.OnSlotMouseExited(2);
