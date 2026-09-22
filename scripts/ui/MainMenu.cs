@@ -961,7 +961,10 @@ public partial class MainMenu : Control
 
     /// <summary>
     /// Endless availability readout: requires the Hard clear achievement
-    /// (ach_wound_hard_clear) and an unlocked organ.
+    /// (ach_wound_hard_clear) and an unlocked organ. The tooltip always
+    /// explains something: the unlock requirement when locked, the organ
+    /// lock reason when the map itself is locked, and a one-line mode
+    /// summary once the button is actually usable.
     /// </summary>
     private void UpdateEndlessAvailability()
     {
@@ -970,6 +973,11 @@ public partial class MainMenu : Control
 
         bool endlessReady = GameManager.IsEndlessAvailable();
         EndlessBtn.Disabled = !endlessReady || IsActiveMapLocked;
-        EndlessBtn.TooltipText = endlessReady ? "" : Tr("ENDLESS_LOCKED_HINT");
+        if (!endlessReady)
+            EndlessBtn.TooltipText = Tr("ENDLESS_LOCKED_HINT");
+        else if (IsActiveMapLocked)
+            EndlessBtn.TooltipText = Tr("MAP_LOCKED_DEPLOY");
+        else
+            EndlessBtn.TooltipText = Tr("ENDLESS_ABOUT_HINT");
     }
 }
