@@ -45,14 +45,26 @@ public partial class TestAchievementPreview : TestHarness
                     if (!Gate(ref _frame, 6))
                         return false;
                     CaptureScreenshot("title_view.png");
-                    _menu!.AchievementsBtn!.EmitSignal(Button.SignalName.Pressed);
-                    AssertThat(_menu.AchievementView!.Visible).IsTrue();
-                    AchievementManager.Unlock("engulf_20");
-                    AchievementManager.Unlock("first_digestion");
+                    _menu!.EndlessSetupModal!.OpenSetup();
                     _frame = 0;
                     _stage = 2;
                     return false;
                 case 2:
+                    // Endgame affliction modal lives on the menu: capture, then close.
+                    if (!Gate(ref _frame, 6))
+                        return false;
+                    AssertThat(_menu!.EndlessSetupModal!.Visible).IsTrue();
+                    AssertThat(_menu.EndlessSetupModal.ConfirmBtn).IsNotNull();
+                    CaptureScreenshot("endgame_setup.png");
+                    _menu.EndlessSetupModal.CancelBtn!.EmitSignal(Button.SignalName.Pressed);
+                    _menu.AchievementsBtn!.EmitSignal(Button.SignalName.Pressed);
+                    AssertThat(_menu.AchievementView!.Visible).IsTrue();
+                    AchievementManager.Unlock("engulf_20");
+                    AchievementManager.Unlock("first_digestion");
+                    _frame = 0;
+                    _stage = 3;
+                    return false;
+                case 3:
                     // Let layout + textures settle before capturing.
                     if (!Gate(ref _frame, 6))
                         return false;
@@ -60,14 +72,31 @@ public partial class TestAchievementPreview : TestHarness
                     CaptureScreenshot("gallery_all.png");
                     _menu.AchievementView.SetFilter(AchievementGalleryView.FilterLocked);
                     _frame = 0;
-                    _stage = 3;
+                    _stage = 4;
                     return false;
-                case 3:
+                case 4:
                     if (!Gate(ref _frame, 4))
                         return false;
                     AssertThat(_menu!.AchievementView!.CardCount).IsEqual(AchievementManager.Achievements.Count - 2);
                     CaptureScreenshot("gallery_locked.png");
                     FreeMenu();
+                    ShowSampleToast();
+                    _frame = 0;
+                    _stage = 5;
+                    return false;
+                case 5:
+                    if (!Gate(ref _frame, 4))
+                        return false;
+                    CaptureScreenshot("toast_banner.png");
+                    ShowSampleAchievementToast();
+                    _frame = 0;
+                    _stage = 6;
+                    return false;
+                case 6:
+                    // Let the slide-down tween finish for a settled shot.
+                    if (!Gate(ref _frame, 30))
+                        return false;
+                    CaptureScreenshot("achievement_toast.png");
                     GD.Print(">>> ACHIEVEMENT GALLERY PREVIEW PASSED SUCCESSFULLY! <<<");
                     Quit(0);
                     return true;
@@ -102,5 +131,46 @@ public partial class TestAchievementPreview : TestHarness
             _menu.Free();
             _menu = null;
         }
+    }
+
+    /// <summary>Shows the toast banner standalone (no HUD needed) for capture.</summary>
+    private void ShowSampleToast()
+    {
+        var banner = AssetLoader.Load<PackedScene>("res://scenes/ui/toast_banner.tscn").Instantiate<PanelContainer>();
+        banner.Name = "PreviewToast";
+        Root.AddChild(banner);
+        var icon = banner.GetNodeOrNull<TextureRect>("HBox/Icon");
+        if (icon != null)
+            icon.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+        var title = banner.GetNodeOrNull<Label>("HBox/VBox/Title");
+        if (title != null)
+            title.Text = "Preview toast title";
+        var desc = banner.GetNodeOrNull<Label>("HBox/VBox/Desc");
+        if (desc != null)
+            desc.Text = "Preview toast description";
+        banner.Visible = true;
+        AssertThat(banner.Visible).IsTrue();
+    }
+
+    /// <summary>Shows the unlock toast standalone (no HUD needed) for capture.</summary>
+    private void ShowSampleAchievementToast()
+    {
+        // Clear the previous banner stage so captures don't overlap.
+        var old = Root.GetNodeOrNull("PreviewToast");
+        if (old != null)
+        {
+            Root.RemoveChild(old);
+            old.Free();
+        }
+        var dummyAch = new Godot.Collections.Dictionary
+        {
+            { "id", "toast_preview" },
+            { "image_path", AssetPaths.SkillIcon("actin") },
+            { "title_key", "ACH_ENGULF_20_TITLE" },
+            { "desc_key", "ACH_ENGULF_20_DESC" },
+            { "reward_cell", "ctl" }
+        };
+        AchievementToast.ShowToast(Root, dummyAch);
+        AssertThat(Root.GetChildCount() >= 1).IsTrue();
     }
 }

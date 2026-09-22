@@ -64,6 +64,17 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
 
 ## Scenes (Godot idioms enforced here)
 
+### Scene-vs-code rule (don't re-litigate this)
+
+- Fixed node set → `.tscn` (static shell, editor-adjustable).
+- Count varies with data → container in `.tscn` + item scene + code loop.
+- Geometry computed at runtime (tree layout, data-driven positions) → code,
+  tuned via exported constants. Preview with the harness, not the inspector.
+- Sole exception: transient effect nodes (spawn → animate → `QueueFree`,
+  e.g. damage numbers) stay in code — nothing to adjust in the editor.
+- Prototype debt is real: code-built static UI must be converted to scenes
+  when the design stabilizes, not "later".
+
 - One reusable UI per `.tscn`; big scenes compose via `instance=ExtResource`
   (`main_menu.tscn` is a pure assembly file — keep it that way).
 - NEVER rename nodes or restructure internal paths: `MainMenu.cs` and tests

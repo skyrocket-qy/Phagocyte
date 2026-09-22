@@ -3,6 +3,22 @@
 [ext_resource type="Script" path="res://scripts/ui/PassiveTreeView.cs" id="5_tree"]
 [ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tree_tooltip"]
+bg_color = Color(0.02, 0.05, 0.09, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.92, 1, 0.55)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+
 [node name="PassiveView" type="Control"]
 visible = false
 layout_mode = 1
@@ -75,6 +91,24 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 clip_contents = true
 script = ExtResource("5_tree")
+
+[node name="TreeTooltip" type="PanelContainer" parent="ContentHBox/TreeView"]
+visible = false
+z_index = 20
+custom_minimum_size = Vector2(330, 0)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tree_tooltip")
+
+[node name="TreeTooltipText" type="RichTextLabel" parent="ContentHBox/TreeView/TreeTooltip"]
+layout_mode = 2
+custom_minimum_size = Vector2(302, 0)
+mouse_filter = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 3
+theme_override_font_sizes/normal_font_size = 13
+theme_override_font_sizes/bold_font_size = 14
 
 [node name="Buttons" type="HBoxContainer" parent="."]
 layout_mode = 1

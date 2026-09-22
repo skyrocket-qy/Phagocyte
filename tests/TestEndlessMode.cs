@@ -209,7 +209,10 @@ public partial class TestEndlessMode : TestHarness
         main.EnvironmentTime = 1620.0f;
         var player = main.GetNodeOrNull<BaseCell>("Macrophage");
         AssertThat(player).IsNotNull();
-        player!.GlobalPosition = new Vector2(1500.0f, 0.0f);
+        // Zero the block/evasion rolls so the acid-tick and kill-blow asserts below are deterministic.
+        player!.Stats!.SetBase("block", 0.0f);
+        player.Stats.SetBase("evasion", 0.0f);
+        player.GlobalPosition = new Vector2(1500.0f, 0.0f);
         float hpBeforeTide = player.Health;
         main._PhysicsProcess(1.2f); // one full acid tick outside the safe zone
         AssertThat(player.Health).IsLess(hpBeforeTide);

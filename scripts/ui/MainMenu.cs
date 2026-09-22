@@ -221,7 +221,8 @@ public partial class MainMenu : Control
         }
 
         // Pre-run affliction setup for the endless overdrive (docs/endgame.md §4).
-        EndlessSetupModal = new EndgameSetupModal { Name = "EndgameSetupModal" };
+        EndlessSetupModal = AssetLoader.Load<PackedScene>("res://scenes/ui/endgame_setup_modal.tscn").Instantiate<EndgameSetupModal>();
+        EndlessSetupModal.Name = "EndgameSetupModal";
         AddChild(EndlessSetupModal);
 
         // Lock status readout injected under the threat rows (MapData-driven)

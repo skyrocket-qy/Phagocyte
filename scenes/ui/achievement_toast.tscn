@@ -1,0 +1,59 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/AchievementToast.cs" id="1_toast"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ach_toast"]
+bg_color = Color(0.06, 0.09, 0.14, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.72, 0.35, 0.95)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+
+[node name="AchievementToast" type="PanelContainer"]
+process_mode = 3
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -170.0
+offset_top = -90.0
+offset_right = 170.0
+offset_bottom = -26.0
+z_index = 120
+theme_override_styles/panel = SubResource("StyleBoxFlat_ach_toast")
+script = ExtResource("1_toast")
+
+[node name="HBox" type="HBoxContainer" parent="."]
+theme_override_constants/separation = 12
+
+[node name="Icon" type="TextureRect" parent="HBox"]
+custom_minimum_size = Vector2(40, 40)
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="HBox"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="Header" type="Label" parent="HBox/VBox"]
+theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
+theme_override_font_sizes/font_size = 11
+horizontal_alignment = 0
+
+[node name="Title" type="Label" parent="HBox/VBox"]
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 0
+
+[node name="Desc" type="Label" parent="HBox/VBox"]
+theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 0

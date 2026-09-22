@@ -57,7 +57,7 @@ public partial class PauseMenuView : Node
         if (RestartBtn != null) RestartBtn.Pressed += OnRestartPressed;
         if (MenuBtn != null) MenuBtn.Pressed += OnMenuPressed;
 
-        SetupTreeOverlay();
+        SetupTreeOverlay(root);
     }
 
     public void UpdateLocalizedTexts()
@@ -227,42 +227,13 @@ public partial class PauseMenuView : Node
         };
     }
 
-    private void SetupTreeOverlay()
+    private void SetupTreeOverlay(Node root)
     {
-        TreeOverlayPanel = new PanelContainer
-        {
-            Name = "TreeOverlayPanel",
-            Visible = false,
-            MouseFilter = Control.MouseFilterEnum.Ignore,
-            CustomMinimumSize = new Vector2(400, 480),
-            AnchorLeft = 1.0f,
-            AnchorRight = 1.0f,
-            AnchorTop = 0.0f,
-            AnchorBottom = 0.0f,
-            OffsetLeft = -420.0f,
-            OffsetRight = -20.0f,
-            OffsetTop = 80.0f,
-            OffsetBottom = 620.0f
-        };
-
-        var style = UiBuilders.PanelStyle(
-            new Color(0.05f, 0.08f, 0.13f, 0.95f),
-            border: new Color(0.45f, 0.85f, 0.65f, 0.9f),
-            borderWidth: 2, cornerRadius: 10, marginH: 16, marginV: 12);
-        TreeOverlayPanel.AddThemeStyleboxOverride("panel", style);
-
-        TreeOverlayText = new RichTextLabel
-        {
-            Name = "TreeOverlayText",
-            BbcodeEnabled = true,
-            ScrollActive = true,
-            AutowrapMode = TextServer.AutowrapMode.WordSmart,
-            MouseFilter = Control.MouseFilterEnum.Ignore
-        };
-        TreeOverlayText.AddThemeFontSizeOverride("normal_font_size", 13);
-        TreeOverlayText.AddThemeFontSizeOverride("bold_font_size", 14);
-        TreeOverlayPanel.AddChild(TreeOverlayText);
-        AddChild(TreeOverlayPanel);
+        // Overlay shell lives in hud.tscn (after SettingsModal); only the text is dynamic.
+        TreeOverlayPanel = root.GetNodeOrNull<PanelContainer>("TreeOverlayPanel");
+        TreeOverlayText = root.GetNodeOrNull<RichTextLabel>("TreeOverlayPanel/TreeOverlayText");
+        if (TreeOverlayPanel == null || TreeOverlayText == null)
+            return;
         RefreshTreeOverlay();
     }
 }

@@ -27,55 +27,27 @@ public partial class EndgameSetupModal : ModalBase
 
     public override void _Ready()
     {
-        ZIndex = 70;
-        MouseFilter = MouseFilterEnum.Stop;
-        SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        // Static shell (FullRect + gold panel + labels + buttons) lives in
+        // endgame_setup_modal.tscn; only the affliction rows are code-built.
+        TitleLabel = GetNodeOrNull<Label>("Center/Box/VBox/Title");
+        HintLabel = GetNodeOrNull<Label>("Center/Box/VBox/Hint");
+        AfflictionList = GetNodeOrNull<VBoxContainer>("Center/Box/VBox/AfflictionList");
+        TotalLabel = GetNodeOrNull<Label>("Center/Box/VBox/Total");
+        CancelBtn = GetNodeOrNull<Button>("Center/Box/VBox/Buttons/Cancel");
+        ConfirmBtn = GetNodeOrNull<Button>("Center/Box/VBox/Buttons/Confirm");
+        if (CancelBtn != null)
+            CancelBtn.Pressed += OnCancelPressed;
+        if (ConfirmBtn != null)
+            ConfirmBtn.Pressed += OnConfirmPressed;
 
-        AddThemeStyleboxOverride("panel", UiBuilders.PanelStyle(
-            new Color(0.02f, 0.03f, 0.06f, 0.82f)));
-
-        BuildLayout();
+        BuildRows();
         InitModal();
     }
 
-    private void BuildLayout()
+    private void BuildRows()
     {
-        var center = new CenterContainer();
-        AddChild(center);
-
-        var box = new PanelContainer { CustomMinimumSize = new Vector2(720, 0) };
-        box.AddThemeStyleboxOverride("panel", UiBuilders.PanelStyle(
-            new Color(0.05f, 0.05f, 0.09f, 0.98f),
-            border: new Color(1.0f, 0.72f, 0.25f, 0.9f),
-            borderWidth: 2, cornerRadius: 10, marginH: 24, marginV: 20));
-        center.AddChild(box);
-
-        var vbox = new VBoxContainer();
-        vbox.AddThemeConstantOverride("separation", 10);
-        box.AddChild(vbox);
-
-        TitleLabel = new Label
-        {
-            HorizontalAlignment = HorizontalAlignment.Center,
-            Modulate = new Color(1.0f, 0.78f, 0.35f)
-        };
-        TitleLabel.AddThemeFontSizeOverride("font_size", 22);
-        vbox.AddChild(TitleLabel);
-
-        HintLabel = new Label
-        {
-            HorizontalAlignment = HorizontalAlignment.Center,
-            AutowrapMode = TextServer.AutowrapMode.WordSmart,
-            Modulate = new Color(0.72f, 0.78f, 0.85f)
-        };
-        HintLabel.AddThemeFontSizeOverride("font_size", 13);
-        vbox.AddChild(HintLabel);
-
-        vbox.AddChild(new HSeparator());
-
-        AfflictionList = new VBoxContainer();
-        AfflictionList.AddThemeConstantOverride("separation", 8);
-        vbox.AddChild(AfflictionList);
+        if (AfflictionList == null)
+            return;
 
         foreach (var def in AfflictionManager.Definitions)
         {
@@ -102,30 +74,6 @@ public partial class EndgameSetupModal : ModalBase
 
             AfflictionList.AddChild(row);
         }
-
-        vbox.AddChild(new HSeparator());
-
-        TotalLabel = new Label
-        {
-            HorizontalAlignment = HorizontalAlignment.Center,
-            Modulate = new Color(1.0f, 0.85f, 0.45f)
-        };
-        TotalLabel.AddThemeFontSizeOverride("font_size", 16);
-        vbox.AddChild(TotalLabel);
-
-        var buttons = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
-        buttons.AddThemeConstantOverride("separation", 16);
-
-        CancelBtn = new Button { CustomMinimumSize = new Vector2(180, 40) };
-        CancelBtn.Pressed += OnCancelPressed;
-        buttons.AddChild(CancelBtn);
-
-        ConfirmBtn = new Button { CustomMinimumSize = new Vector2(230, 40) };
-        ConfirmBtn.AddThemeColorOverride("font_color", new Color(1.0f, 0.78f, 0.35f));
-        ConfirmBtn.Pressed += OnConfirmPressed;
-        buttons.AddChild(ConfirmBtn);
-
-        vbox.AddChild(buttons);
     }
 
     /// <summary>Opens the setup, restoring the previous selection state.</summary>

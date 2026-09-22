@@ -153,34 +153,9 @@ public partial class PassiveTreeView : Control
         };
         _zoomRoot.AddChild(_graphLayer);
 
-        _tooltipPanel = new PanelContainer
-        {
-            Name = "TreeTooltip",
-            Visible = false,
-            MouseFilter = MouseFilterEnum.Ignore,
-            ZIndex = 20,
-            CustomMinimumSize = new Vector2(330, 0)
-        };
-        var tooltipStyle = UiBuilders.PanelStyle(
-            new Color(0.02f, 0.05f, 0.09f, 0.96f),
-            border: new Color(0.35f, 0.92f, 1.0f, 0.55f),
-            borderWidth: 1, cornerRadius: 8, marginH: 14, marginV: 10);
-        _tooltipPanel.AddThemeStyleboxOverride("panel", tooltipStyle);
-
-        _tooltipText = new RichTextLabel
-        {
-            Name = "TreeTooltipText",
-            BbcodeEnabled = true,
-            FitContent = true,
-            ScrollActive = false,
-            AutowrapMode = TextServer.AutowrapMode.WordSmart,
-            MouseFilter = MouseFilterEnum.Ignore,
-            CustomMinimumSize = new Vector2(302, 0)
-        };
-        _tooltipText.AddThemeFontSizeOverride("normal_font_size", 13);
-        _tooltipText.AddThemeFontSizeOverride("bold_font_size", 14);
-        _tooltipPanel.AddChild(_tooltipText);
-        AddChild(_tooltipPanel);
+        // Tooltip shell lives in passive_view.tscn under TreeView; only text/position are dynamic.
+        _tooltipPanel = GetNodeOrNull<PanelContainer>("TreeTooltip");
+        _tooltipText = GetNodeOrNull<RichTextLabel>("TreeTooltip/TreeTooltipText");
 
         MouseExited += () =>
         {

@@ -18,90 +18,38 @@ public partial class AchievementToast : PanelContainer
         if (parent == null || !GodotObject.IsInstanceValid(parent))
             return;
 
-        var toast = new AchievementToast();
+        // Shell lives in achievement_toast.tscn (off-screen start pose included).
+        var toast = AssetLoader.Load<PackedScene>("res://scenes/ui/achievement_toast.tscn").Instantiate<AchievementToast>();
         parent.AddChild(toast);
         toast.Initialize(achData);
     }
 
     public void Initialize(Godot.Collections.Dictionary achData)
     {
-        ProcessMode = ProcessModeEnum.Always;
-
-        AnchorLeft = 0.5f;
-        AnchorRight = 0.5f;
-        AnchorTop = 0.0f;
-        AnchorBottom = 0.0f;
-        OffsetLeft = -170.0f;
-        OffsetRight = 170.0f;
-        OffsetTop = -90.0f; // Start off-screen
-        OffsetBottom = -26.0f;
-        ZIndex = 120;
-
-        var style = UiBuilders.PanelStyle(
-            new Color(0.06f, 0.09f, 0.14f, 0.94f),
-            border: new Color(0.85f, 0.72f, 0.35f, 0.95f),
-            borderWidth: 2, cornerRadius: 8, marginH: 14, marginV: 8);
-        AddThemeStyleboxOverride("panel", style);
-
-        var hbox = new HBoxContainer();
-        hbox.AddThemeConstantOverride("separation", 12);
-        AddChild(hbox);
-
         string imagePath = achData.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "";
         Texture2D? tex = AssetLoader.TryLoad<Texture2D>(imagePath)
             ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
-        if (tex != null)
-        {
-            var iconTexture = new TextureRect
-            {
-                Texture = tex,
-                CustomMinimumSize = new Vector2(40, 40),
-                ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-                StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-                MouseFilter = MouseFilterEnum.Ignore
-            };
-            hbox.AddChild(iconTexture);
-        }
-
-        var vbox = new VBoxContainer();
-        vbox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        vbox.AddThemeConstantOverride("separation", 2);
-        hbox.AddChild(vbox);
+        var icon = GetNodeOrNull<TextureRect>("HBox/Icon");
+        if (tex != null && icon != null)
+            icon.Texture = tex;
 
         string titleKey = achData.TryGetValue("title_key", out var tVal) ? tVal.AsString() : "ACH_TITLE";
         string descKey = achData.TryGetValue("desc_key", out var dVal) ? dVal.AsString() : "ACH_DESC";
         string rewardCell = achData.TryGetValue("reward_cell", out var rVal) ? rVal.AsString() : "";
 
-        string headerText = !string.IsNullOrEmpty(rewardCell)
-            ? Tr("ACH_HEADER_ARCHETYPE")
-            : Tr("ACH_HEADER_MILESTONE");
+        var header = GetNodeOrNull<Label>("HBox/VBox/Header");
+        if (header != null)
+            header.Text = !string.IsNullOrEmpty(rewardCell)
+                ? Tr("ACH_HEADER_ARCHETYPE")
+                : Tr("ACH_HEADER_MILESTONE");
 
-        var headerLabel = new Label
-        {
-            Text = headerText,
-            HorizontalAlignment = HorizontalAlignment.Left
-        };
-        headerLabel.AddThemeColorOverride("font_color", new Color(1.0f, 0.85f, 0.35f));
-        headerLabel.AddThemeFontSizeOverride("font_size", 11);
-        vbox.AddChild(headerLabel);
+        var titleLabel = GetNodeOrNull<Label>("HBox/VBox/Title");
+        if (titleLabel != null)
+            titleLabel.Text = Tr(titleKey);
 
-        var titleLabel = new Label
-        {
-            Text = Tr(titleKey),
-            HorizontalAlignment = HorizontalAlignment.Left
-        };
-        titleLabel.AddThemeColorOverride("font_color", Colors.White);
-        titleLabel.AddThemeFontSizeOverride("font_size", 13);
-        vbox.AddChild(titleLabel);
-
-        var descLabel = new Label
-        {
-            Text = Tr(descKey),
-            HorizontalAlignment = HorizontalAlignment.Left
-        };
-        descLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.75f, 0.85f));
-        descLabel.AddThemeFontSizeOverride("font_size", 10);
-        vbox.AddChild(descLabel);
+        var descLabel = GetNodeOrNull<Label>("HBox/VBox/Desc");
+        if (descLabel != null)
+            descLabel.Text = Tr(descKey);
 
         // Slide down tween
         var tween = CreateTween();
