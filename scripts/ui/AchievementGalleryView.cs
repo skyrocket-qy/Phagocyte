@@ -358,7 +358,11 @@ public partial class AchievementGalleryView : Control
             thumbWrap.AddChild(thumb);
         }
 
-        var vbox = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        var vbox = new VBoxContainer
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            Alignment = BoxContainer.AlignmentMode.Center
+        };
         vbox.AddThemeConstantOverride("separation", 4);
         vbox.MouseFilter = MouseFilterEnum.Ignore;
         hbox.AddChild(vbox);
@@ -383,16 +387,6 @@ public partial class AchievementGalleryView : Control
             MouseFilter = MouseFilterEnum.Ignore
         };
         vbox.AddChild(mini);
-
-        var sub = new Label
-        {
-            Text = $"{pct}% · {ach["desc"].AsString()}",
-            AutowrapMode = TextServer.AutowrapMode.WordSmart,
-            MouseFilter = MouseFilterEnum.Ignore
-        };
-        sub.AddThemeFontSizeOverride("font_size", 12);
-        sub.AddThemeColorOverride("font_color", new Color(0.6f, 0.68f, 0.76f));
-        vbox.AddChild(sub);
 
         _cards[aid] = card;
         return card;
