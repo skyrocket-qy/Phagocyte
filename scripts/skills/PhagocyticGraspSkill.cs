@@ -91,22 +91,18 @@ public partial class PhagocyticGraspSkill : BaseSkill
                 if (enemy.IsBeingEaten)
                     return;
 
-                // Drag back into the cell body, then attempt engulfment.
+                // Engulf in place: the envelope already closed over the prey,
+                // so digestion starts where it stands — no drag-back slide.
                 // Non-engulfable foes (TB wax, anthrax shell, prions, bosses)
-                // keep the damage and the pull, but BeEngulfed refuses them.
-                var tween = Host.CreateTween();
-                tween.TweenProperty(enemy, "global_position", Host.GlobalPosition, 0.15f);
-                tween.TweenCallback(Callable.From(() =>
+                // keep the damage; BeEngulfed refuses them internally.
+                if (enemy is IEngulfable engulfable)
                 {
-                    if (enemy != null && GodotObject.IsInstanceValid(enemy) && enemy is IEngulfable engulfable)
-                    {
-                        engulfable.BeEngulfed(Host);
-                    }
-                    else if (enemy != null && GodotObject.IsInstanceValid(enemy) && enemy.HasMethod("be_engulfed"))
-                    {
-                        enemy.Call("be_engulfed", Host!);
-                    }
-                }));
+                    engulfable.BeEngulfed(Host);
+                }
+                else if (enemy.HasMethod("be_engulfed"))
+                {
+                    enemy.Call("be_engulfed", Host!);
+                }
             };
             Host.GetParent().AddChild(chain);
         }

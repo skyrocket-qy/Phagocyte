@@ -1,6 +1,6 @@
 using Godot;
 using System;
-using Phagocyte.Combat;
+using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
 
@@ -28,7 +28,10 @@ public partial class PseudopodChainVisual : Node2D
     public Color? ChainEdgeColor { get; set; }
 
     private const int RibbonSegments = 6;
-    private const float FlashDuration = 0.22f;
+    private const float FlashDuration = 0.28f;
+    private const float FlashCoreDuration = 0.15f;
+    private const float EnvelopDuration = 0.26f;
+    private const float EnvelopSnapDuration = 0.08f;
 
     private enum Phase { Extend, Hold, Retract, Done }
 
@@ -40,6 +43,9 @@ public partial class PseudopodChainVisual : Node2D
     private float _age;
     private float _flashAge = 999.0f;
     private Vector2 _flashLocal = Vector2.Zero;
+    private float _envelopAge = 999.0f;
+    private Vector2 _envelopLocal = Vector2.Zero;
+    private float _envelopRadius = 36.0f;
     private bool _arrivedFired;
     private Color _fill;
     private Color _edge;
@@ -138,6 +144,7 @@ public partial class PseudopodChainVisual : Node2D
         }
 
         _flashAge += dt;
+        _envelopAge += dt;
         QueueRedraw();
     }
 
@@ -152,9 +159,16 @@ public partial class PseudopodChainVisual : Node2D
     private void FireArrival()
     {
         Vector2 tipGlobal = GlobalPosition + _dir * _tipDist;
-        VfxManager.Instance?.Play(VfxType.CytoplasmSplatter, tipGlobal);
         _flashAge = 0.0f;
         _flashLocal = ToLocal(tipGlobal);
+        // Envelope stamp: sized to the prey's body so the fleshy circle
+        // visibly swallows it whole.
+        float bodyR = Target is BaseEnemy foe && GodotObject.IsInstanceValid(foe)
+            ? foe.BodyRadius
+            : 26.0f;
+        _envelopAge = 0.0f;
+        _envelopLocal = ToLocal(tipGlobal);
+        _envelopRadius = bodyR + 10.0f;
         if (!_arrivedFired)
         {
             _arrivedFired = true;
@@ -176,12 +190,12 @@ public partial class PseudopodChainVisual : Node2D
         float ang = _dir.Angle();
         DrawSetTransform(Vector2.Zero, ang, Vector2.One);
 
-        float wRoot = BaseHalfWidth * 0.45f;
-        const float wTip = 2.5f;
+        float wRoot = BaseHalfWidth * 0.35f;
+        const float wTip = 4.0f;
 
-        // Tapered flesh ribbon: halo, fill, core, edge.
+        // Near-uniform flesh ribbon: halo, fill, core, edge.
         Vector2[] ribbon = BuildRibbon(_tipDist, wRoot, wTip, 1.0f);
-        DrawOutline(ribbon, new Color(_edge.R, _edge.G, _edge.B, _edge.A * 0.20f * fadeIn), wRoot + 3.0f);
+        DrawOutline(ribbon, new Color(_edge.R, _edge.G, _edge.B, _edge.A * 0.20f * fadeIn), wRoot * 0.6f + 2.0f);
         DrawColoredPolygon(ribbon, new Color(_fill.R, _fill.G, _fill.B, _fill.A * fadeIn));
         DrawColoredPolygon(BuildRibbon(_tipDist, wRoot, wTip, 0.5f), new Color(_core.R, _core.G, _core.B, _core.A * 0.8f * fadeIn));
         DrawOutline(ribbon, new Color(_edge.R, _edge.G, _edge.B, _edge.A * fadeIn), 2.0f);
@@ -197,8 +211,36 @@ public partial class PseudopodChainVisual : Node2D
         if (_flashAge < FlashDuration)
         {
             float ft = _flashAge / FlashDuration;
-            DrawArc(_flashLocal.Rotated(-ang), Mathf.Lerp(6.0f, 30.0f, ft), 0.0f, Mathf.Tau, 32,
-                new Color(1.0f, 1.0f, 1.0f, (1.0f - ft) * 0.8f), 3.0f * (1.0f - ft) + 1.0f);
+            DrawArc(_flashLocal.Rotated(-ang), Mathf.Lerp(8.0f, 46.0f, ft), 0.0f, Mathf.Tau, 32,
+                new Color(1.0f, 1.0f, 1.0f, (1.0f - ft) * 0.8f), 4.0f * (1.0f - ft) + 1.5f);
+        }
+        if (_flashAge < FlashCoreDuration)
+        {
+            float ct = _flashAge / FlashCoreDuration;
+            DrawCircle(_flashLocal.Rotated(-ang), Mathf.Lerp(12.0f, 0.0f, ct),
+                new Color(1.0f, 1.0f, 1.0f, (1.0f - ct) * 0.9f));
+        }
+
+        // Envelope: a fleshy circle snaps shut over the prey, then winks
+        // out — the visible "one bite". Sized to the prey's body.
+        if (_envelopAge < EnvelopDuration)
+        {
+            Vector2 ep = _envelopLocal.Rotated(-ang);
+            if (_envelopAge < EnvelopSnapDuration)
+            {
+                DrawCircle(ep, _envelopRadius,
+                    new Color(_fill.R, _fill.G, _fill.B, _fill.A * fadeIn));
+                DrawArc(ep, _envelopRadius, 0.0f, Mathf.Tau, 32,
+                    new Color(_edge.R, _edge.G, _edge.B, _edge.A * fadeIn), 3.0f);
+            }
+            else
+            {
+                float et = (_envelopAge - EnvelopSnapDuration) / (EnvelopDuration - EnvelopSnapDuration);
+                DrawCircle(ep, _envelopRadius * (1.0f - et),
+                    new Color(_fill.R, _fill.G, _fill.B, _fill.A * (1.0f - et) * fadeIn));
+                DrawArc(ep, _envelopRadius * (1.0f - et), 0.0f, Mathf.Tau, 32,
+                    new Color(_edge.R, _edge.G, _edge.B, _edge.A * (1.0f - et) * fadeIn), 3.0f * (1.0f - et) + 1.0f);
+            }
         }
 
         DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);

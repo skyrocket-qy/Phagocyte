@@ -125,6 +125,9 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         return 16.0f;
     }
 
+    /// <summary>Public body radius for hit-presentation (envelope sizing).</summary>
+    public float BodyRadius => GetCollisionRadius();
+
     /// <summary>
     /// True when this enemy overlaps a live player cell, using the player's
     /// current radius plus <paramref name="margin"/>. Shared by contact effects.
@@ -489,7 +492,6 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
     public virtual void Die(Node2D? killer)
     {
         AudioManager.Instance?.PlayEnemyDeath();
-        VfxManager.Instance?.Play(VfxType.CytoplasmSplatter, GlobalPosition);
         AchievementManager.RecordEvent("pathogen_killed", EnemyId);
         RunTelemetryManager.Instance?.RecordKill(BaseScore);
         EmitSignal(SignalName.EnemyDied, this);
