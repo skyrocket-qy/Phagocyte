@@ -20,7 +20,7 @@ def check_duplicates(root_dir: Path = Path(".")) -> List[str]:
     hash_to_files: Dict[str, List[Path]] = defaultdict(list)
     stem_to_files: Dict[str, List[Path]] = defaultdict(list)
 
-    scan_dirs = [root_dir / "gen", root_dir / "assets" / "gen"]
+    scan_dirs = [root_dir / "gen"]
 
     for base_dir in scan_dirs:
         if not base_dir.exists():
