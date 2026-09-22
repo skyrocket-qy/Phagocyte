@@ -20,8 +20,6 @@
     symbiotic_flora(-1,移速-30%/might-15%)／phage_fragment(-1,max_health-20%/CDR+0.05)
 - [x] `DataPaths.Organelles`＋`CatalogBuilders.BuildOrganelles()`（判重id、cost越界、stat合法、發電必有drawback）
 - [x] `GameManager.OrganelleCatalog`（仿SkillCatalog懶載入＋EnsureValidated）
-- [ ] `DataValidator` 追加：translation缺鍵warn、圖標缺失warn（佔位合法）※organelle→stat校驗已在BuildOrganelles fail-fast，無需重複
-- [ ] `SkillIds.cs` 追加12常量；`AssetPaths.OrganelleIcon(id)`（後者已完成）
 - [x] 資料契約測試 `tests/TestOrganelleCatalog.cs`（12件／6類×2／cost域／發電必有drawback／stat合法，headless 綠燈）
 - [ ] `scripts/core/OrganelleChamber.cs`（新，Node2D，掛玩家下與SkillManager並列）
   - 常數 MaxSlots=4／BaseEnergy=6／MaxGenerators=2／BackpackCap=12；信號 ChamberChanged

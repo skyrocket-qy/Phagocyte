@@ -121,6 +121,9 @@ public partial class BaseCell : CharacterBody2D
     public Area2D? EngulfArea { get; set; }
     public SkillManager? CellSkillManager { get; set; }
 
+    /// <summary>2x2 organelle equipment chamber (TODO Phase 0), parallel to SkillManager.</summary>
+    public OrganelleChamber? CellOrganelleChamber { get; set; }
+
     public CellStats? Stats { get; set; }
 
     public partial class GranuleCanvas : Node2D
@@ -235,6 +238,16 @@ public partial class BaseCell : CharacterBody2D
             CellSkillManager.Setup(this);
             SetupInitialSkills();
         }
+
+        // Initialize Organelle Chamber (2x2 equipment; code fallback when the
+        // scene does not carry the node, mirroring the CellStats pattern).
+        CellOrganelleChamber = GetNodeOrNull<OrganelleChamber>("OrganelleChamber");
+        if (CellOrganelleChamber == null)
+        {
+            CellOrganelleChamber = new OrganelleChamber { Name = "OrganelleChamber" };
+            AddChild(CellOrganelleChamber);
+        }
+        CellOrganelleChamber.Setup(this);
 
         // Initial deformation tick
         UpdatePseudopodDeformation(0.016f);
