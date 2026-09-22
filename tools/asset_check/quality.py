@@ -70,11 +70,13 @@ def check_border_leaking(img: Image.Image) -> Optional[str]:
 
 
 def check_image_quality(root_dir: Path = Path(".")) -> Tuple[List[str], Dict[str, any]]:
-    """Scan all assets in gen/ and assets/gen/ for visual quality defects."""
+    """Scan all source assets in gen/ for visual quality defects."""
     issues: List[str] = []
     stats = {"scanned": 0, "issues": 0}
 
-    scan_dirs = [root_dir / "gen", root_dir / "assets" / "gen"]
+    # Source of truth is gen/ for achievement/skill/passive_tree/ui.
+    # assets/gen/ holds pipeline-processed artifacts, so it is skipped.
+    scan_dirs = [root_dir / "gen"]
 
     for base_dir in scan_dirs:
         if not base_dir.exists():

@@ -10,7 +10,9 @@ SNAKE_CASE_PATTERN = re.compile(r"^[a-z0-9_]+$")
 
 def check_naming_conventions(root_dir: Path = Path(".")) -> List[str]:
     issues: List[str] = []
-    scan_dirs = [root_dir / "gen", root_dir / "assets" / "gen"]
+    # Source of truth is gen/ for achievement/skill/passive_tree/ui.
+    # assets/gen/ holds pipeline-processed artifacts, so it is skipped.
+    scan_dirs = [root_dir / "gen"]
 
     for base_dir in scan_dirs:
         if not base_dir.exists():
