@@ -75,13 +75,25 @@
   - `TestMapEnvironments`：酸潮傷害斷言前歸零 `block`／`evasion`（巨噬底盤自帶 8% 格擋，原會 ~8% 機率假失敗）；12/12 穩定
 - [x] 連續兩輪全量掃描 44/44 綠燈
 
-## Phase 2 — 局內獲取＋背包籤UI
+## Phase 2 — 局內獲取＋換/丟（✅ 完成）
 
-- [ ] `UpgradeManager` 新增 `new_organelle` 卡型（含energy_cost/category/image_path；去重已裝＋已擁有）
-- [ ] `UpgradeModal` 右側「活性胞器裝配區」＋新卡渲染（圓框＋cost角標＋種類色；沿用UiBuilders.PanelStyle）
-- [ ] `organelle_backpack.tscn`（籤列＋GridContainer）＋`organelle_slot.tscn`（TextureRect64＋Cost角標＋種類色邊框；空位frame_organelle半透明）
-- [ ] `organelle_chamber.tscn`（PanelContainer→VBox標題＋能量HBox pips＋GridContainer columns=2）
-- [ ] HUD能量條（已用/上限＋超載紅閃；擴容7/7光暈tween）；新場景ExtResource同文件自包含；按鈕沿用menu_buttons.tres
+- 設計變更：不再另開「背包籤UI」頁；胞器取得走**升級三選一**，滿槽時在**同一 modal 內**做換裝
+- [x] `UpgradeManager` 新增 `new_organelle` 卡型：僅**已解鎖且未擁有**才進池，且每輪最多 **1 張**胞器卡（保證只有一件待安置物）
+  - `ApplyChoice`：先入 run 背包，再 best-effort 裝入首個「空且合法」槽；重複／未解鎖拒收
+- [x] `UpgradeModal` 滿槽換裝步驟（`SwapPanel`，全在 upgrade_modal.tscn 內）：
+  - 標題／候選（名稱＋能量）／能量列（`EnergyPips`，發電點紅）／4 個槽位卡／提示／三鍵：存入背包、丟棄＋回血、返回三選一
+  - 「替換」＝點槽位卡：`chamber.Equip(id, slot)`（自動退還舊件）；超載/發電上限等以 hint 顯示原因並留在換裝中
+  - 「丟棄＋回血」＝`chamber.Discard` ＋ `Heal(maxHp × 15%)`；「取消」回三選一（遊戲維持暫停，不消耗等級）
+  - 新增公開 API：`EnterSwapMode／OnSwapSlotPressed／OnSwapStorePressed／OnSwapDiscardPressed／OnSwapCancelPressed／SwapHintText／PendingOrganelle`（另接受卡片字典的 `player` 作為 owner 覆寫，供腳本化流程／測試）
+- [x] 卡面渲染：`BADGE_NEW_ORGANELLE` 標籤 ＋ 描述下方附「能量: N」（工具提示沿用 LOADOUT_COST_LABEL）
+- [x] HUD 腔室能量列（`SkillBarView`，code-built 免改共用 hud.tscn）：`⚡ 已用/上限`＋pip 列；**裝了/持有胞器才顯示**，超載轉紅
+- [x] translations：`BADGE_NEW_ORGANELLE`＋`SWAP_TITLE/STORE/DISCARD/CANCEL/HINT`（8 語言）
+- [x] 測試（`TestOrganelleChamber` 再增）：
+  - Draft：只出已解鎖＋未擁有／每輪≤1 張／收取即自動上陣／重複與未解鎖拒收
+  - Swap：滿槽開啟換裝／替換成功（退還舊件＋能量重算）／超載拒絕並顯示 overload hint／取消回卡片且仍暫停／存入保留／丟棄移除
+  - Discard & HUD：僅能丟未裝備件／HUD 列未互動隱藏、裝備後顯示 `1 / 6`
+- [x] 視覺驗收：headed 截圖確認換裝步驟（候選＋5/7 能量 pips 含紅點＋4 槽位＋三鍵）與 HUD 列（`⚡ 5 / 7`）
+- [x] 全量掃描 44/44 綠燈
 
 ## Phase 3 — 美術管線
 
@@ -97,8 +109,9 @@
 - [ ] 文檔：spec.md §5（5+5+腔室4槽位圖）／skill.md §4（六類表）／stat.md（能量註記：約束層非第19屬性）／cell.md（外掛胞器段）
 - [x] `tests/TestOrganelleChamber.cs`（已建；Phase 0 邏輯項全綠）
   - 已完成：常數／能量超載拒絕／發電擴容6→7／發電負面生效＋卸下回滾／替換語義／去重（max_copies）／能量只算已裝／CanEquip reason token／雙發電上限／UiData／Discard／_ExitTree／5角色卡接線＋code fallback／翻譯鍵解析
-  - 待補（依賴後續Phase）：籤過濾／滿槽滿包draft換丟分支（Phase 2）
+  - 待補（依賴後續Phase）：籤過濾（分類籤已存在於配裝頁；draft 不需籤）
   - 已完成（Phase 1）：Loadout preset存取隔離／開局生效／非法profile拒絕／預設空裝／頁面裝卸持久化
+  - 已完成（Phase 2）：draft 候選／收取自動上陣／滿槽換裝／超載拒絕／存入／丟棄＋回血／取消／HUD 能量列
   - 註：BackpackCap=12 與 MaxGenerators=2 在現有12件×max_copies=1資料下為結構性守衛（不可達）；已由去重/copy_cap覆蓋等效行為
 
 ## Phase 5 — 全量迴歸＋視覺驗收（可選/後續）

@@ -363,6 +363,8 @@ public partial class UpgradeModal : ModalBase
     /// </summary>
     public void OnOrganelleCardClicked(Dictionary choice)
     {
+        if (choice.TryGetValue("player", out var playerVal) && playerVal.AsGodotObject() is Node2D explicitPlayer)
+            _playerRef = explicitPlayer;
         string id = choice.TryGetValue("id", out var idVal) ? idVal.AsString() : "";
         var chamber = ResolveChamber();
         if (_playerRef == null || chamber == null || string.IsNullOrEmpty(id))
@@ -371,16 +373,18 @@ public partial class UpgradeModal : ModalBase
             return;
         }
 
-        if (!OrganelleUnlockManager.IsUnlocked(id))
+        UpgradeManager.ApplyChoice(_playerRef, choice);
+
+        if (chamber.Owns(id) && IsEquipped(chamber, id))
         {
             ResolveChoice(choice);
             return;
         }
 
-        UpgradeManager.ApplyChoice(_playerRef, choice);
-
-        if (IsEquipped(chamber, id))
+        if (!chamber.Owns(id))
         {
+            // The item was not even acquired (backpack full of other copies):
+            // resolve like any other choice and let the player keep the card.
             ResolveChoice(choice);
             return;
         }
@@ -472,7 +476,7 @@ public partial class UpgradeModal : ModalBase
     public bool OnSwapSlotPressed(int slot)
     {
         var chamber = ResolveChamber();
-        if (chamber == null || string.IsNullOrEmpty(_pendingOrganelle))
+        if (chamber == null || string.IsNullOrEmpty(_pendingOrganelle) || !chamber.Owns(_pendingOrganelle))
             return false;
 
         if (!chamber.Equip(_pendingOrganelle, slot))
