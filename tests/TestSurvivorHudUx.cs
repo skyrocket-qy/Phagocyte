@@ -26,14 +26,32 @@ public partial class TestSurvivorHudUx : TestHarness
         AssertThat(mainScene).IsNotNull();
         var main = mainScene.Instantiate();
         Root.AddChild(main);
+    }
 
-        // Isolate the arena: Main._Ready spawns a 35-enemy wave and neutral
-        // matter at unseeded RNG positions; anything reaching the player would
-        // grant ambient EXP/damage and break the pristine-baseline asserts.
-        // Freeze the spawner driver and clear what already spawned, before
-        // the first frame runs. HUD/player nodes are untouched and live.
+    private bool _isolated = false;
+
+    /// <summary>
+    /// Freeze the spawner driver, clear everything Main._Ready spawned and
+    /// restore the pristine player baseline. Must run on a live frame: nodes
+    /// added during MainLoop._Initialize don't enter the tree (no _Ready)
+    /// until the first iteration, so _Initialize-time isolation is a no-op.
+    /// Afterwards nothing can accrue ambient EXP/damage/kills.
+    /// </summary>
+    private void IsolateArena()
+    {
+        var main = Root.GetNodeOrNull<Main>("Main");
+        if (main == null)
+            return;
         main.SetPhysicsProcess(false);
         ClearArenaEntities(main);
+        var player = main.GetNodeOrNull<Macrophage>("Macrophage");
+        if (player != null)
+        {
+            player.CurrentLevel = 1;
+            player.CurrentExp = 0.0f;
+            player.ExpToNextLevel = 30.0f;
+            player.Health = player.MaxHealth;
+        }
     }
 
     private static void ClearArenaEntities(Node root)
@@ -51,6 +69,12 @@ public partial class TestSurvivorHudUx : TestHarness
     {
         if (_testDone)
             return true;
+
+        if (!_isolated)
+        {
+            _isolated = true;
+            IsolateArena();
+        }
 
         _framesWaited++;
         if (_framesWaited < 5)

@@ -854,8 +854,6 @@ public partial class BaseCell : CharacterBody2D
 
     public void AddExp(float amount)
     {
-        if (System.Environment.GetEnvironmentVariable("PHAGOCYTE_TRACE_EXP") == "1")
-            GD.Print($"TRACE AddExp({amount}) current={CurrentExp}\n{System.Environment.StackTrace}");
         CurrentExp += amount;
         while (CurrentExp >= ExpToNextLevel)
         {

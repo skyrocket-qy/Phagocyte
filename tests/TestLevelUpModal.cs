@@ -17,6 +17,7 @@ public partial class TestLevelUpModal : TestHarness
 {
     private int _frameCount = 0;
     private bool _testDone = false;
+    private bool _arenaIsolated = false;
 
     public override void _Initialize()
     {
@@ -143,14 +144,6 @@ public partial class TestLevelUpModal : TestHarness
         }
         var main = mainScene.Instantiate();
         Root.AddChild(main);
-
-        // Isolate the arena: Main._Ready spawns a 35-enemy wave, tutorial
-        // guides and neutral matter at unseeded RNG positions; anything
-        // landing on the player would grant ambient EXP and break the
-        // zero-baseline asserts below. Freeze the spawner driver and clear
-        // what already spawned, synchronously before any frame runs.
-        main.SetPhysicsProcess(false);
-        ClearArenaEntities(main);
     }
 
     private static void ClearArenaEntities(Node root)
@@ -164,10 +157,40 @@ public partial class TestLevelUpModal : TestHarness
         }
     }
 
+    /// <summary>
+    /// Freeze the spawner driver, clear everything Main._Ready spawned and
+    /// restore the pristine player baseline. Must run on a live frame: nodes
+    /// added during MainLoop._Initialize don't enter the tree (no _Ready)
+    /// until the first iteration, so _Initialize-time isolation is a no-op.
+    /// Afterwards nothing can accrue ambient EXP/damage/kills.
+    /// </summary>
+    private void IsolateArena()
+    {
+        var main = Root.GetNodeOrNull<Main>("Main");
+        if (main == null)
+            return;
+        main.SetPhysicsProcess(false);
+        ClearArenaEntities(main);
+        var player = (main.Player ?? main.GetNodeOrNull<BaseCell>("Macrophage")) as BaseCell;
+        if (player != null)
+        {
+            player.CurrentLevel = 1;
+            player.CurrentExp = 0.0f;
+            player.ExpToNextLevel = 30.0f;
+            player.Health = player.MaxHealth;
+        }
+    }
+
     public override bool _Process(double delta)
     {
         if (_testDone)
             return true;
+
+        if (!_arenaIsolated)
+        {
+            _arenaIsolated = true;
+            IsolateArena();
+        }
 
         _frameCount++;
         if (_frameCount < 4)
