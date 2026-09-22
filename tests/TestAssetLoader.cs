@@ -139,10 +139,10 @@ public partial class TestAssetLoader : TestHarness
 
         // Preload warms the cache and silently skips missing files.
         AssetLoader.Clear();
-        int before = fake.LoadCalls;
         AssetLoader.Preload<Texture2D>("res://fake/icon.png", "res://fake/nope.png");
+        int before = fake.LoadCalls;
         AssetLoader.Load<Texture2D>("res://fake/icon.png");
-        AssertThat(fake.LoadCalls - before).IsEqual(1);
+        AssertThat(fake.LoadCalls - before).IsEqual(0);
         GD.Print("[PASS] AssetLoader.Preload verified.");
 
         // Clear + ResetProvider restore production behavior hooks.
