@@ -27,7 +27,7 @@ $$R(\theta, t) = R_{\text{base}} \times \left(1.0 + \text{Amplitude} \times \tex
 
 ### 1.3 外掛式細胞器（Modular Organelles）
 超出主網格拓撲範圍的特殊構造，封裝為獨立的子節點（PackedScene）：
-- **偽足捕捉爪（`PseudopodLimb.tscn`）**：基於 2D 骨骼逆向運動學（IK Chain），平時縮入質內，主動攻擊時彈射向外抓取病原體拖回胞體。
+- **吞噬偽足鏈式打擊（`PseudopodChainVisual`）**：吞噬偽足發射的暫態鏈式偽足，沿用宿主細胞配色，以鏈射→杯口閉合→拖回三段命中；舊 `PseudopodLimb` IK 捕捉爪器官已併入此機制並刪除。
 - **受體棘刺陣列（`ReceptorSpikes.tscn`）**：圍繞細胞邊緣排列的環狀旋轉受體，提供化學感應、接觸反傷與旋轉攔截。
 
 ---

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using Phagocyte.Enemies;
-using Phagocyte.Organelles;
 using Phagocyte.Player;
 using Phagocyte.Skills;
 
@@ -12,7 +11,7 @@ namespace Phagocyte.Tests;
 /// <summary>
 /// Visual-effect presence tests for the four restored skills:
 /// MAC assembly mine + detonation blast, Y-missile flight,
-/// lance beam + pore decals, grasp arm. Spawned visuals assert
+/// lance beam + pore decals, grasp chain. Spawned visuals assert
 /// synchronously; timer-gated ones fast-forward deterministically.
 /// </summary>
 [TestSuite]
@@ -96,13 +95,13 @@ public partial class TestSkillVisuals : TestHarness
                 AssertThat(Collect<PerforinLanceSkill.PoreDecal>(_arena!).Count).IsGreater(0);
                 GD.Print("[PASS] Test 4: perforin lance beam + pore decals spawned on strike.");
 
-                // Grasp arm spawns synchronously per grabbed target.
+                // Grasp chain spawns synchronously per grabbed target.
                 Spawn<TbEnemy>(new Vector2(100, 0));
                 var grasp = _player.CellSkillManager.GetActiveSlot(0) as PhagocyticGraspSkill;
                 AssertThat(grasp).IsNotNull();
                 grasp!.Trigger();
-                AssertThat(Collect<PseudopodArmVisual>(_arena!).Count).IsGreater(0);
-                GD.Print("[PASS] Test 5: pseudopod grasp arm visual spawned on grab.");
+                AssertThat(Collect<PseudopodChainVisual>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 5: pseudopod grasp chain visual spawned on grab.");
 
                 Finish(true, "ALL SKILL VISUAL EFFECT TESTS");
                 return true;
@@ -137,11 +136,6 @@ public partial class TestSkillVisuals : TestHarness
         _player.Health = 999999.0f;
         _player.SetPhysicsProcess(false);
 
-        foreach (var child in _player.GetChildren())
-        {
-            if (child is PseudopodLimb limb)
-                limb.CombatEnabled = false;
-        }
         return true;
     }
 

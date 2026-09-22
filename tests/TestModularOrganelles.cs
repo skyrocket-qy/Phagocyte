@@ -9,7 +9,9 @@ using Phagocyte.Player;
 namespace Phagocyte.Tests;
 
 /// <summary>
-/// Verifies the Modular Organelles (PseudopodLimb IK grabber + ReceptorSpikes ring).
+/// Verifies the Modular Organelles (ReceptorSpikes ring).
+/// The PseudopodLimb IK grabber was merged into Phagocytic Grasp's
+/// chain-strike delivery and deleted.
 /// </summary>
 [TestSuite]
 public partial class TestModularOrganelles : SceneTree
@@ -58,69 +60,16 @@ public partial class TestModularOrganelles : SceneTree
         _container = new Node2D { Name = "OrganelleTestContainer" };
         Root.AddChild(_container);
 
-        var limbScene = GD.Load<PackedScene>("res://scenes/skills/PseudopodLimb.tscn");
         var spikeScene = GD.Load<PackedScene>("res://scenes/skills/ReceptorSpikes.tscn");
-        AssertThat(limbScene).IsNotNull();
         AssertThat(spikeScene).IsNotNull();
 
         var cell = new BaseCell { Name = "OrganelleHost", GlobalPosition = new Vector2(500, 500) };
         _container!.AddChild(cell);
         AssertThat(cell.Stats).IsNotNull();
 
-        TestPseudopodLimb(limbScene!, cell);
         TestReceptorSpikes(spikeScene!, cell);
 
         _container.QueueFree();
-    }
-
-    private void TestPseudopodLimb(PackedScene scene, BaseCell cell)
-    {
-        var limb = scene.Instantiate<PseudopodLimb>();
-        cell.AddChild(limb);
-        limb.AttachTo(cell);
-
-        AssertThat(limb.IsAttached).IsTrue();
-        AssertThat(limb.Host).IsEqual(cell);
-        AssertThat(limb.State).IsEqual(PseudopodLimb.LimbState.Retracted);
-        AssertThat(limb.GetNodeOrNull<Line2D>("Chain")).IsNotNull();
-
-        limb.BaseDamage = 0.1f;
-
-        var enemy = new StaphEnemy
-        {
-            GlobalPosition = cell.GlobalPosition + new Vector2(120.0f, 0.0f)
-        };
-        _container!.AddChild(enemy);
-
-        limb.ForceLaunch(enemy);
-        AssertThat(limb.State).IsEqual(PseudopodLimb.LimbState.Extending);
-
-        bool grabbed = false;
-        float maxTipDistance = 0.0f;
-        for (int i = 0; i < 180 && !grabbed; i++)
-        {
-            limb._PhysicsProcess(1.0 / 60.0);
-            maxTipDistance = Mathf.Max(maxTipDistance, limb.TipDistance);
-            grabbed = limb.GrabbedTarget == enemy;
-        }
-
-        AssertThat(grabbed).IsTrue();
-        AssertThat(maxTipDistance).IsGreater(cell.CurrentRadius);
-        GD.Print($"[PASS] PseudopodLimb IK chain extended to {maxTipDistance:F1}px and grabbed a pathogen.");
-
-        bool engulfed = false;
-        for (int i = 0; i < 240 && !engulfed; i++)
-        {
-            limb._PhysicsProcess(1.0 / 60.0);
-            engulfed = enemy.IsBeingEaten || !GodotObject.IsInstanceValid(enemy);
-        }
-
-        AssertThat(engulfed).IsTrue();
-        AssertThat(limb.State).IsEqual(PseudopodLimb.LimbState.Cooldown);
-        AssertThat(limb.CooldownTimer).IsGreater(0.0f);
-        GD.Print("[PASS] PseudopodLimb dragged the grabbed pathogen back into the cell body and entered cooldown.");
-
-        limb.Detach();
     }
 
     private void TestReceptorSpikes(PackedScene scene, BaseCell cell)

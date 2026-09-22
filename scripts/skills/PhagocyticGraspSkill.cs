@@ -67,39 +67,48 @@ public partial class PhagocyticGraspSkill : BaseSkill
             if (!GodotObject.IsInstanceValid(target))
                 continue;
 
-            CombatHelper.DealDamage(target, dmg, Host, isCrit);
-
-            // Lamellipodial sheet + phagocytic cup over the drag.
-            var arm = new PseudopodArmVisual
+            // Chain-strike delivery (merged from the retired PseudopodLimb
+            // organelle): the chain visibly travels out, and damage + drag
+            // start exactly on contact instead of instantly.
+            var chain = new PseudopodChainVisual
             {
                 GlobalPosition = Host.GlobalPosition,
                 Host = Host,
                 Target = target,
-                BaseHalfWidth = 24.0f * areaScale
+                BaseHalfWidth = 16.0f * areaScale,
+                ExtendSpeed = 1250.0f,
+                HoldDuration = 0.30f
             };
-            Host.GetParent().AddChild(arm);
-
-            if (!GodotObject.IsInstanceValid(target))
-                continue;
-            if (target.IsBeingEaten)
-                continue;
-
-            // Drag back into the cell body, then attempt engulfment.
-            // Non-engulfable foes (TB wax, anthrax shell, prions, bosses)
-            // keep the damage and the pull, but BeEngulfed refuses them.
-            var tween = Host.CreateTween();
-            tween.TweenProperty(target, "global_position", Host.GlobalPosition, 0.15f);
-            tween.TweenCallback(Callable.From(() =>
+            chain.Arrived += (Node2D arrived) =>
             {
-                if (target != null && GodotObject.IsInstanceValid(target) && target is IEngulfable engulfable)
+                if (arrived is not BaseEnemy enemy || !GodotObject.IsInstanceValid(enemy))
+                    return;
+
+                CombatHelper.DealDamage(enemy, dmg, Host, isCrit);
+
+                if (!GodotObject.IsInstanceValid(enemy))
+                    return;
+                if (enemy.IsBeingEaten)
+                    return;
+
+                // Drag back into the cell body, then attempt engulfment.
+                // Non-engulfable foes (TB wax, anthrax shell, prions, bosses)
+                // keep the damage and the pull, but BeEngulfed refuses them.
+                var tween = Host.CreateTween();
+                tween.TweenProperty(enemy, "global_position", Host.GlobalPosition, 0.15f);
+                tween.TweenCallback(Callable.From(() =>
                 {
-                    engulfable.BeEngulfed(Host);
-                }
-                else if (target != null && GodotObject.IsInstanceValid(target) && target.HasMethod("be_engulfed"))
-                {
-                    target.Call("be_engulfed", Host!);
-                }
-            }));
+                    if (enemy != null && GodotObject.IsInstanceValid(enemy) && enemy is IEngulfable engulfable)
+                    {
+                        engulfable.BeEngulfed(Host);
+                    }
+                    else if (enemy != null && GodotObject.IsInstanceValid(enemy) && enemy.HasMethod("be_engulfed"))
+                    {
+                        enemy.Call("be_engulfed", Host!);
+                    }
+                }));
+            };
+            Host.GetParent().AddChild(chain);
         }
     }
 }

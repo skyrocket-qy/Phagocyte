@@ -49,15 +49,18 @@ public partial class PseudopodLungeSkill : BaseSkill
 
             CombatHelper.DealDamage(n, dmg, Host, isCrit);
 
-            // Lamellipodial sheet + phagocytic cup over the drag.
-            var arm = new PseudopodArmVisual
+            // Chain-strike presentation: same visual language as the grasp.
+            // Mechanics stay instant (whip); the chain is pure presentation.
+            var chain = new PseudopodChainVisual
             {
                 GlobalPosition = Host.GlobalPosition,
                 Host = Host,
                 Target = n,
-                BaseHalfWidth = 24.0f * GetCalculatedArea(1.0f)
+                BaseHalfWidth = 16.0f * GetCalculatedArea(1.0f),
+                ExtendSpeed = 1800.0f,
+                HoldDuration = 0.15f
             };
-            Host.GetParent().AddChild(arm);
+            Host.GetParent().AddChild(chain);
 
             // Pull pathogen rapidly toward player
             var tween = Host.CreateTween();

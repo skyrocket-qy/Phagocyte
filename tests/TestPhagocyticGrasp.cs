@@ -2,7 +2,6 @@ using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using Phagocyte.Enemies;
-using Phagocyte.Organelles;
 using Phagocyte.Player;
 using Phagocyte.Skills;
 
@@ -156,14 +155,6 @@ public partial class TestPhagocyticGrasp : TestHarness
         // Freeze the host: manual Trigger() calls below are the only
         // firings under test (no auto-fire loop, no drift).
         _player.SetPhysicsProcess(false);
-
-        // Park the mounted IK limb: ambient coils only, so it cannot
-        // steal the scripted targets.
-        foreach (var child in _player.GetChildren())
-        {
-            if (child is PseudopodLimb limb)
-                limb.CombatEnabled = false;
-        }
 
         _grasp = _player.CellSkillManager.GetActiveSlot(0) as PhagocyticGraspSkill;
         if (_grasp == null)
