@@ -93,20 +93,22 @@ def check_image_quality(root_dir: Path = Path(".")) -> Tuple[List[str], Dict[str
 
                 file_path = Path(root) / f
                 stats["scanned"] += 1
+                # Project-root relative path (e.g. gen/ui/xxx.png)
+                display = Path("gen") / rel_dir / f
 
                 try:
                     with Image.open(file_path) as img:
                         corner_err = check_corner_artifacts(img)
                         if corner_err:
-                            issues.append(f"[Quality: Corner] {rel_dir / f}: {corner_err}")
+                            issues.append(f"[Quality: Corner] {display}: {corner_err}")
                             stats["issues"] += 1
 
                         border_err = check_border_leaking(img)
                         if border_err:
-                            issues.append(f"[Quality: Border] {rel_dir / f}: {border_err}")
+                            issues.append(f"[Quality: Border] {display}: {border_err}")
                             stats["issues"] += 1
                 except Exception as e:
-                    issues.append(f"[Quality: Read Error] {rel_dir / f}: {e}")
+                    issues.append(f"[Quality: Read Error] {display}: {e}")
                     stats["issues"] += 1
 
     return issues, stats

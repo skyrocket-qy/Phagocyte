@@ -57,6 +57,8 @@ def check_asset_resolutions(root_dir: Path = Path(".")) -> Tuple[List[str], Dict
 
             file_path = Path(root) / f
             stats["total_scanned"] += 1
+            # Project-root relative path (e.g. gen/ui/xxx.png)
+            display = Path("gen") / rel_dir / f
 
             try:
                 with Image.open(file_path) as img:
@@ -65,7 +67,7 @@ def check_asset_resolutions(root_dir: Path = Path(".")) -> Tuple[List[str], Dict
                     # Check 1: Minimum dimensions
                     if w < min_w or h < min_h:
                         violations.append(
-                            f"[Low Resolution] {rel_dir / f}: {w}x{h} px (Minimum required for '{cat_key}' is {min_w}x{min_h} px)"
+                            f"[Low Resolution] {display}: {w}x{h} px (Minimum required for '{cat_key}' is {min_w}x{min_h} px)"
                         )
                         stats["sub_minimum"] += 1
                         continue
@@ -73,13 +75,13 @@ def check_asset_resolutions(root_dir: Path = Path(".")) -> Tuple[List[str], Dict
                     # Check 2: 1:1 Aspect Ratio (Square)
                     if require_square and w != h:
                         violations.append(
-                            f"[Non-Square Aspect Ratio] {rel_dir / f}: {w}x{h} px (1:1 square strictly required for '{cat_key}')"
+                            f"[Non-Square Aspect Ratio] {display}: {w}x{h} px (1:1 square strictly required for '{cat_key}')"
                         )
                         stats["non_square"] += 1
                         continue
 
                     stats["valid"] += 1
             except Exception as e:
-                violations.append(f"[Corrupt Image] {rel_dir / f}: Failed to open ({e})")
+                violations.append(f"[Corrupt Image] {display}: Failed to open ({e})")
 
     return violations, stats

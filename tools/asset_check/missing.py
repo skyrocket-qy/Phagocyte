@@ -17,13 +17,32 @@ def _load_json(file_path: Path) -> Any:
         return None
 
 
+# Source filenames under gen/ carry no category prefix; registered data IDs do.
+# Maps gen/ subdirectory -> ID prefix stripped when resolving source filenames.
+CATEGORY_PREFIXES: Dict[str, str] = {
+    "achievement": "ach_",
+    "skill": "",
+    "passive_tree": "trait_",
+    "ui": "ui_",
+}
+
+
+def _source_stem(category: str, name: str) -> str:
+    """Map a registered data ID to its prefix-free source file stem in gen/."""
+    prefix = CATEGORY_PREFIXES.get(category, "")
+    if prefix and name.startswith(prefix):
+        return name[len(prefix):]
+    return name
+
+
 def check_missing_assets(
     root_dir: Path = Path("."),
     target_category: Optional[str] = None
 ) -> Tuple[Dict[str, List[str]], List[str], Dict[str, int]]:
     """
     Bidirectional Asset Integrity Verification across active categories.
-    Source of truth is gen/ (raw generated assets before pipeline processing):
+    Source of truth is gen/ (raw generated assets before pipeline processing).
+    Source filenames carry no category prefix (e.g. gen/achievement/<id without ach_>.png):
     - Achievement (19 items from achievements.json -> gen/achievement/)
     - Skill (31 items from skills.json -> gen/skill/)
     - PassiveTree (54 items from passive_traits.json -> gen/passive_tree/)
@@ -46,12 +65,14 @@ def check_missing_assets(
     assets_dir = root_dir / "assets"
     gen_dir = root_dir / "gen"
 
-    registered_ids: Set[str] = set()
+    # Per-category expected source stems (prefix-free) for reverse checks.
+    expected_stems: Dict[str, Set[str]] = {}
 
     # ── 1. Achievements (19 items) ──────────────────────────────────────────
-    # Source files live in gen/achievement/. The *_unachieved.png Steam locked
-    # variants are derived artifacts produced by the to_target_asset pipeline
-    # into assets/gen/achievement/, so only the base <id>.png is required here.
+    # Source files live prefix-free in gen/achievement/ (e.g. ach_first_digestion
+    # -> first_digestion.png). The *_unachieved.png Steam locked variants are
+    # derived artifacts produced by the to_target_asset pipeline into
+    # assets/gen/achievement/, so only the base source is required here.
     achievements_file = assets_dir / "data" / "achievements.json"
     ach_data = _load_json(achievements_file) or []
     for item in ach_data:
@@ -59,14 +80,14 @@ def check_missing_assets(
         if not ach_id:
             continue
 
-        registered_ids.add(ach_id)
-        registered_ids.add(f"{ach_id}_unachieved")
+        stem = _source_stem("achievement", ach_id)
+        expected_stems.setdefault("achievement", set()).update([stem, f"{stem}_unachieved"])
         category_counts["Achievement"] = category_counts.get("Achievement", 0) + 1
 
-        # Check source in gen/achievement/
-        gen_path = gen_dir / "achievement" / f"{ach_id}.png"
+        # Check prefix-free source in gen/achievement/
+        gen_path = gen_dir / "achievement" / f"{stem}.png"
         if not gen_path.exists():
-            missing_by_cat["Achievement"].append(f"{ach_id}.png")
+            missing_by_cat["Achievement"].append(f"gen/achievement/{stem}.png")
 
     # ── 2. Skills (31 items) ────────────────────────────────────────────────
     skills_file = assets_dir / "data" / "skills.json"
@@ -76,13 +97,14 @@ def check_missing_assets(
         if not skill_id:
             continue
 
-        registered_ids.add(skill_id)
+        stem = _source_stem("skill", skill_id)
+        expected_stems.setdefault("skill", set()).add(stem)
         category_counts["Skill"] = category_counts.get("Skill", 0) + 1
 
         # Check source in gen/skill/
-        gen_path = gen_dir / "skill" / f"{skill_id}.png"
+        gen_path = gen_dir / "skill" / f"{stem}.png"
         if not gen_path.exists():
-            missing_by_cat["Skill"].append(f"{skill_id}.png")
+            missing_by_cat["Skill"].append(f"gen/skill/{stem}.png")
 
     # ── 3. Passive Tree Traits (54 items) ───────────────────────────────────
     traits_file = assets_dir / "data" / "passive_traits.json"
@@ -93,39 +115,40 @@ def check_missing_assets(
         if not trait_id:
             continue
 
-        registered_ids.add(trait_id)
+        stem = _source_stem("passive_tree", trait_id)
+        expected_stems.setdefault("passive_tree", set()).add(stem)
         category_counts["PassiveTree"] = category_counts.get("PassiveTree", 0) + 1
 
-        # Check source in gen/passive_tree/
-        gen_path = gen_dir / "passive_tree" / f"{trait_id}.png"
+        # Check prefix-free source in gen/passive_tree/
+        gen_path = gen_dir / "passive_tree" / f"{stem}.png"
         if not gen_path.exists():
-            missing_by_cat["PassiveTree"].append(f"{trait_id}.png")
+            missing_by_cat["PassiveTree"].append(f"gen/passive_tree/{stem}.png")
 
-    # ── 4. UI: check expected icons exist as source in gen/ui/ ──────────────
+    # ── 4. UI: check expected prefix-free icons exist in gen/ui/ ───────────
     expected_ui_assets = [
-        "ui_reticle_target.png",
-        "ui_reticle_danger.png",
-        "ui_reticle_scan.png",
-        "ui_frame_organelle.png",
-        "ui_card_mutation.png",
-        "ui_card_superweapon.png",
-        "ui_badge_atp.png",
-        "ui_badge_antigen.png",
-        "ui_meter_ph.png",
-        "ui_meter_temp.png",
-        "ui_button_pause.png",
-        "ui_button_settings.png",
-        "ui_status_inflamed.png",
-        "ui_status_buffered.png",
-        "ui_status_overclock.png",
-        "ui_status_exhausted.png",
+        "reticle_target.png",
+        "reticle_danger.png",
+        "reticle_scan.png",
+        "frame_organelle.png",
+        "card_mutation.png",
+        "card_superweapon.png",
+        "badge_atp.png",
+        "badge_antigen.png",
+        "meter_ph.png",
+        "meter_temp.png",
+        "button_pause.png",
+        "button_settings.png",
+        "status_inflamed.png",
+        "status_buffered.png",
+        "status_overclock.png",
+        "status_exhausted.png",
     ]
     category_counts["UI"] = len(expected_ui_assets)
     for ui_name in expected_ui_assets:
-        registered_ids.add(Path(ui_name).stem)
+        expected_stems.setdefault("ui", set()).add(Path(ui_name).stem)
         gen_path = gen_dir / "ui" / ui_name
         if not gen_path.exists():
-            missing_by_cat["UI"].append(f"{ui_name} (missing source in gen/ui/)")
+            missing_by_cat["UI"].append(f"gen/ui/{ui_name}")
 
     # ── 5. Reverse Reference Checks (Disk -> Data, gen/ only) ───────────────
     # Only gen/ is scanned: it is the source of truth for
@@ -147,8 +170,8 @@ def check_missing_assets(
                 if "sheet" in f.lower():
                     continue
                 stem = Path(f).stem
-                if stem not in registered_ids:
-                    unmapped.append(f"[{cat}] Unmapped file on disk not registered in data: {rel_root / f}")
+                if stem not in expected_stems.get(cat, set()):
+                    unmapped.append(f"[{cat}] Unmapped file on disk not registered in data: gen/{rel_root / f}")
 
     # Filter by target_category if specified
     if target_category:

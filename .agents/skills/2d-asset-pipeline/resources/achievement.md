@@ -10,23 +10,23 @@ Output: Produces `<id>.png` and `<id>_unachieved.png` in `assets/gen/achievement
 
 ### Item Mapping (Row by Row)
 - **Row 1**:
-  - `ach_first_digestion`: Green glowing phagosome enveloping a small bacterium
-  - `ach_engulf_20`: Mass phagocytosis vortex pulling multiple glowing bacterial rods
-  - `ach_devour_50`: Overloaded macrophage bursting with fluorescent cytoplasmic enzymes
-  - `ach_reach_level_5`: DNA double helix splitting and radiating bioluminescent mutation energy
+  - `first_digestion`: Green glowing phagosome enveloping a small bacterium
+  - `engulf_20`: Mass phagocytosis vortex pulling multiple glowing bacterial rods
+  - `devour_50`: Overloaded macrophage bursting with fluorescent cytoplasmic enzymes
+  - `reach_level_5`: DNA double helix splitting and radiating bioluminescent mutation energy
 - **Row 2**:
-  - `ach_survive_180s`: White blood cell anchored firmly inside microcapillary flow
-  - `ach_giant_volume`: Massive hypertrophic phagocyte with thick pseudopods dominating the frame
-  - `ach_full_arsenal`: 5 distinct molecular weapons orbiting a glowing cell nucleus
-  - `ach_first_evolution`: Two glowing biomolecules fusing into a blazing epigenetic superweapon
+  - `survive_180s`: White blood cell anchored firmly inside microcapillary flow
+  - `giant_volume`: Massive hypertrophic phagocyte with thick pseudopods dominating the frame
+  - `full_arsenal`: 5 distinct molecular weapons orbiting a glowing cell nucleus
+  - `first_evolution`: Two glowing biomolecules fusing into a blazing epigenetic superweapon
 - **Row 3**:
-  - `ach_prion_cleared`: Misfolded beta-sheet prion protein being fractured and dissolved by enzymes
-  - `ach_wound_clear`: Skin epidermal layer regenerating with fibrin mesh settling into peace
-  - `ach_alveolar_clear`: Deep cyan pulmonary alveolus open and clean with pristine gas exchange
-  - `ach_hepatic_clear`: Hepatic sinusoid blood vessel with Kupffer cell clearing toxins
+  - `prion_cleared`: Misfolded beta-sheet prion protein being fractured and dissolved by enzymes
+  - `wound_clear`: Skin epidermal layer regenerating with fibrin mesh settling into peace
+  - `alveolar_clear`: Deep cyan pulmonary alveolus open and clean with pristine gas exchange
+  - `hepatic_clear`: Hepatic sinusoid blood vessel with Kupffer cell clearing toxins
 - **Row 4**:
-  - `ach_gastric_clear`: Gastric mucosa layer protected by thick glowing mucus shield from gastric acid
-  - `ach_bbb_clear`: Astrocyte end-feet tightly sealing blood-brain barrier capillaries
+  - `gastric_clear`: Gastric mucosa layer protected by thick glowing mucus shield from gastric acid
+  - `bbb_clear`: Astrocyte end-feet tightly sealing blood-brain barrier capillaries
   - `skip`: Skip cell
   - `skip`: Skip cell
 
@@ -40,7 +40,7 @@ Confocal laser scanning microscopy style sprite sheet of 16 biological immunolog
 python3 tools/slice/main.py grid \
   --input gen/achievement/achievement_sheet_01.png \
   --rows 4 --cols 4 \
-  --names "ach_first_digestion,ach_engulf_20,ach_devour_50,ach_reach_level_5,ach_survive_180s,ach_giant_volume,ach_full_arsenal,ach_first_evolution,ach_prion_cleared,ach_wound_clear,ach_alveolar_clear,ach_hepatic_clear,ach_gastric_clear,ach_bbb_clear,skip,skip" \
+  --names "first_digestion,engulf_20,devour_50,reach_level_5,survive_180s,giant_volume,full_arsenal,first_evolution,prion_cleared,wound_clear,alveolar_clear,hepatic_clear,gastric_clear,bbb_clear,skip,skip" \
   --output gen/achievement
 ```
 
@@ -49,8 +49,8 @@ python3 tools/slice/main.py grid \
 ## Batch 2: Hard Difficulty Clears (5 Items)
 
 ### Item Mapping
-- `ach_wound_hard_clear`: Crimson inflamed wound erupting with purulent exudate pacified
-- `ach_alveolar_hard_clear`: Choking toxic alveolar fog dispersed by surfactant waves
-- `ach_hepatic_hard_clear`: Fibrotic liver cirrhosis tissue restored to healthy cellular matrix
-- `ach_gastric_hard_clear`: Caustic gastric acid abyss neutralized by heavy bicarbonate buffer
-- `ach_bbb_hard_clear`: Severe encephalitis storm in brain tissue subdued by T-cell surveillance
+- `wound_hard_clear`: Crimson inflamed wound erupting with purulent exudate pacified
+- `alveolar_hard_clear`: Choking toxic alveolar fog dispersed by surfactant waves
+- `hepatic_hard_clear`: Fibrotic liver cirrhosis tissue restored to healthy cellular matrix
+- `gastric_hard_clear`: Caustic gastric acid abyss neutralized by heavy bicarbonate buffer
+- `bbb_hard_clear`: Severe encephalitis storm in brain tissue subdued by T-cell surveillance

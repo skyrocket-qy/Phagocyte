@@ -9,25 +9,25 @@ Runtime resolution: $128 \times 128$ px circular icon (with circular mask step a
 
 ### Item Mapping (Row by Row)
 - **Row 1**:
-  - `trait_passive_actin`: Polymerizing actin microfilaments forming dense meshwork lattice
-  - `trait_passive_autophagy`: Double-membrane autophagosome engulfing damaged organelle
-  - `trait_passive_bilayer`: Fluid mosaic lipid bilayer with transmembrane protein channels
-  - `trait_passive_chemokine`: Chemokine receptor cluster bound to glowing ligand molecules
+  - `passive_actin`: Polymerizing actin microfilaments forming dense meshwork lattice
+  - `passive_autophagy`: Double-membrane autophagosome engulfing damaged organelle
+  - `passive_bilayer`: Fluid mosaic lipid bilayer with transmembrane protein channels
+  - `passive_chemokine`: Chemokine receptor cluster bound to glowing ligand molecules
 - **Row 2**:
-  - `trait_passive_mitochondria`: Mitochondrion with intricate folded cristae radiating golden ATP energy
-  - `trait_passive_ribosome`: Ribosome complex translating mRNA strand into polypeptide chain
-  - `trait_passive_endoplasmic`: Rough endoplasmic reticulum sheets studded with glowing ribosomal dots
-  - `trait_passive_centrosome`: Pair of perpendicular centrioles projecting dynamic microtubule asters
+  - `passive_mitochondria`: Mitochondrion with intricate folded cristae radiating golden ATP energy
+  - `passive_ribosome`: Ribosome complex translating mRNA strand into polypeptide chain
+  - `passive_endoplasmic`: Rough endoplasmic reticulum sheets studded with glowing ribosomal dots
+  - `passive_centrosome`: Pair of perpendicular centrioles projecting dynamic microtubule asters
 - **Row 3**:
-  - `trait_passive_nucleus`: Dense eukaryotic cell nucleus with coiled chromatin and prominent nucleolus
-  - `trait_passive_opsonin`: Complement receptor binding opsonized antigen with high affinity
-  - `trait_passive_tcr`: T-cell receptor (TCR) engaging MHC peptide complex with golden spark
-  - `trait_passive_nadph`: Membrane-bound NADPH oxidase complex transferring electron cascade
+  - `passive_nucleus`: Dense eukaryotic cell nucleus with coiled chromatin and prominent nucleolus
+  - `passive_opsonin`: Complement receptor binding opsonized antigen with high affinity
+  - `passive_tcr`: T-cell receptor (TCR) engaging MHC peptide complex with golden spark
+  - `passive_nadph`: Membrane-bound NADPH oxidase complex transferring electron cascade
 - **Row 4**:
-  - `trait_passive_toll`: Toll-like receptor (TLR) horseshoe leucine-rich repeat domain
-  - `trait_passive_integrin`: High-affinity integrin anchor clasping endothelial extracellular matrix
-  - `trait_passive_selectin`: Selectin carbohydrate-binding domain mediating cellular rolling
-  - `trait_passive_calcium`: Endoplasmic reticulum releasing intense wave of green calcium ions
+  - `passive_toll`: Toll-like receptor (TLR) horseshoe leucine-rich repeat domain
+  - `passive_integrin`: High-affinity integrin anchor clasping endothelial extracellular matrix
+  - `passive_selectin`: Selectin carbohydrate-binding domain mediating cellular rolling
+  - `passive_calcium`: Endoplasmic reticulum releasing intense wave of green calcium ions
 
 ### Generation Prompt
 ```text
@@ -39,6 +39,6 @@ Fluorescence microscopy style sprite sheet of 16 cellular organelles and molecul
 python3 tools/slice/main.py grid \
   --input gen/passive_tree/passive_tree_sheet_01.png \
   --rows 4 --cols 4 \
-  --names "trait_passive_actin,trait_passive_autophagy,trait_passive_bilayer,trait_passive_chemokine,trait_passive_mitochondria,trait_passive_ribosome,trait_passive_endoplasmic,trait_passive_centrosome,trait_passive_nucleus,trait_passive_opsonin,trait_passive_tcr,trait_passive_nadph,trait_passive_toll,trait_passive_integrin,trait_passive_selectin,trait_passive_calcium" \
+  --names "passive_actin,passive_autophagy,passive_bilayer,passive_chemokine,passive_mitochondria,passive_ribosome,passive_endoplasmic,passive_centrosome,passive_nucleus,passive_opsonin,passive_tcr,passive_nadph,passive_toll,passive_integrin,passive_selectin,passive_calcium" \
   --output gen/passive_tree
 ```
