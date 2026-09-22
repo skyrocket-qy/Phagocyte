@@ -68,10 +68,16 @@ visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
+autowrap_mode = 2
 
-[node name="SummaryBox" type="VBoxContainer" parent="VBox"]
+[node name="SummaryScroll" type="ScrollContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SummaryBox" type="VBoxContainer" parent="VBox/SummaryScroll"]
 visible = false
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
 [node name="Separator" type="HSeparator" parent="VBox"]

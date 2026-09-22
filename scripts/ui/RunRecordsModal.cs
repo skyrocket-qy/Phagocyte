@@ -15,6 +15,8 @@ public partial class RunRecordsModal : ModalBase
 {
     public Label? BannerLabel { get; set; }
     public VBoxContainer? SummaryBox { get; set; }
+    public ScrollContainer? SummaryScroll { get; set; }
+    public HSeparator? SectionSeparator { get; set; }
     public Label? HistoryHeader { get; set; }
     public VBoxContainer? HistoryList { get; set; }
     public ScrollContainer? HistoryScroll { get; set; }
@@ -36,7 +38,9 @@ public partial class RunRecordsModal : ModalBase
     public override void _Ready()
     {
         BannerLabel = GetNodeOrNull<Label>("VBox/Banner");
-        SummaryBox = GetNodeOrNull<VBoxContainer>("VBox/SummaryBox");
+        SummaryBox = GetNodeOrNull<VBoxContainer>("VBox/SummaryScroll/SummaryBox");
+        SummaryScroll = GetNodeOrNull<ScrollContainer>("VBox/SummaryScroll");
+        SectionSeparator = GetNodeOrNull<HSeparator>("VBox/Separator");
         HistoryHeader = GetNodeOrNull<Label>("VBox/HistoryHeader");
         HistoryScroll = GetNodeOrNull<ScrollContainer>("VBox/Scroll");
         HistoryList = GetNodeOrNull<VBoxContainer>("VBox/Scroll/HistoryList");
@@ -147,6 +151,14 @@ public partial class RunRecordsModal : ModalBase
         if (RetryBtn != null) RetryBtn.Visible = SettlementMode;
         if (MenuBtn != null) MenuBtn.Visible = SettlementMode;
 
+        // Settlement mode owns the whole panel: the archive list stays
+        // rendered (tests read it) but hidden, so the ~20-row summary plus
+        // buttons always fit inside the viewport.
+        if (HistoryHeader != null) HistoryHeader.Visible = !SettlementMode;
+        if (HistoryTabs != null) HistoryTabs.Visible = !SettlementMode;
+        if (HistoryScroll != null) HistoryScroll.Visible = !SettlementMode;
+        if (SectionSeparator != null) SectionSeparator.Visible = !SettlementMode;
+
         RefreshSummary();
         RenderHistory();
     }
@@ -169,6 +181,8 @@ public partial class RunRecordsModal : ModalBase
             if (BannerLabel != null)
                 BannerLabel.Visible = false;
             SummaryBox.Visible = false;
+            if (SummaryScroll != null)
+                SummaryScroll.Visible = false;
             return;
         }
 
@@ -191,6 +205,8 @@ public partial class RunRecordsModal : ModalBase
         }
 
         SummaryBox.Visible = true;
+        if (SummaryScroll != null)
+            SummaryScroll.Visible = true;
         string classId = detail.GetValueOrDefault("class_id", "").AsString();
         string mapId = detail.GetValueOrDefault("map_id", "").AsString();
         string rank = GetRank(detail);
