@@ -1,0 +1,190 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/PassiveTreeView.cs" id="5_tree"]
+[ext_resource type="Font" path="res://assets/fonts/BodyMediumFont.tres" id="8_btn_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.05, 0.09, 0.14, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.45, 0.6, 0.7)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.07, 0.2, 0.16, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.39, 1, 0.85, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.05, 0.1, 0.15, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0.7, 0.85, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="PassiveView" type="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HeaderLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 8.0
+offset_right = 300.0
+offset_bottom = 38.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "天赋树选择"
+horizontal_alignment = 1
+
+[node name="InfoHBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -460.0
+offset_top = 42.0
+offset_right = 460.0
+offset_bottom = 64.0
+grow_horizontal = 2
+theme_override_constants/separation = 24
+
+[node name="TreeLevelLabel" type="Label" parent="InfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "天赋等级：1"
+
+[node name="TreePointsLabel" type="Label" parent="InfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
+theme_override_font_sizes/font_size = 12
+text = "被动点数：0"
+horizontal_alignment = 2
+
+[node name="ContentHBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -590.0
+offset_top = -246.0
+offset_right = 590.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="TreeView" type="Control" parent="ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+clip_contents = true
+script = ExtResource("5_tree")
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -76.0
+offset_right = 400.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="ResetButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "重置天赋树"
+
+[node name="ConfirmButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(190, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "下一步：选择病理战场"
+
+[node name="ZoomOutButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "缩小"
+
+[node name="ZoomInButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "放大"
+
