@@ -598,7 +598,9 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(PassiveTreeView.HitTestWorldPosition(new Vector2(-1000, -1000))).IsNull();
         var startButton = _menu.TreeCanvas.GetNodeOrNull<Button>("ZoomRoot/TreeNode_lysosome");
         AssertThat(startButton).IsNotNull();
-        AssertThat(startButton!.Text.Contains("🧪")).IsTrue();
+        // Node buttons render trait art (TextureRect) instead of emoji text now;
+        // the texture itself is optional until pipeline art ships.
+        AssertThat(startButton!.GetNodeOrNull<TextureRect>("NodeArt")).IsNotNull();
 
         _menu.OnTreeNodeActivated("thick_cytoplasm");
         AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "thick_cytoplasm")).IsEqual(1);

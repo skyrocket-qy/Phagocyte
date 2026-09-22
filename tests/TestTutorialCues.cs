@@ -80,6 +80,11 @@ public partial class TestTutorialCues : TestHarness
         Root.AddChild(cell);
         AssertThat(cell.Stats).IsNotNull();
 
+        // Zero the innate block/evasion rolls so the damage asserts below are
+        // deterministic (a Connector proc would fully negate TakeDamage).
+        cell.Stats!.SetBase("block", 0.0f);
+        cell.Stats.SetBase("evasion", 0.0f);
+
         cell._PhysicsProcess(0.02);
         AssertThat(cell.IsDodging).IsFalse();
         AssertThat(cell.DodgeCharges).IsEqualApprox(1.0f, 0.001f);
