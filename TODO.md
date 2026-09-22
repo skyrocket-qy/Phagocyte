@@ -8,7 +8,7 @@
 > 出戰流程：選細胞→選配裝（可預配多套）→選天賦→選地圖。背包：6種類籤、上限12（＝首批全圖鑑）、run-scoped。
 > 工程量大，分期交付，每期獨立可測。規約見 AGENTS.md（warnaserror、AssetLoader唯一入口、場景純淨、測試隔離）。
 
-## Phase 0 — 數據＋邏輯核心（無UI，純邏輯可測）
+## Phase 0 — 數據＋邏輯核心（無UI，純邏輯可測）✅ 完成
 
 - [x] `assets/data/organelles.json`（頂層array，12件：6類×2＝1高費核心＋1低費/發電對照）
   - 欄位：id／category（metabolism/digestion/cytoskeleton/synthesis/sensing/symbiosis）
@@ -21,12 +21,13 @@
 - [x] `DataPaths.Organelles`＋`CatalogBuilders.BuildOrganelles()`（判重id、cost越界、stat合法、發電必有drawback）
 - [x] `GameManager.OrganelleCatalog`（仿SkillCatalog懶載入＋EnsureValidated）
 - [x] 資料契約測試 `tests/TestOrganelleCatalog.cs`（12件／6類×2／cost域／發電必有drawback／stat合法，headless 綠燈）
-- [ ] `scripts/core/OrganelleChamber.cs`（新，Node2D，掛玩家下與SkillManager並列）
+- [x] `scripts/core/OrganelleChamber.cs`（新，Node2D，掛玩家下與SkillManager並列）
   - 常數 MaxSlots=4／BaseEnergy=6／MaxGenerators=2／BackpackCap=12；信號 ChamberChanged
   - API：Slots[4]／Backpack List／UsedEnergy／MaxEnergy／CanEquip＋reason／Equip／Unequip／Swap／Discard／GetUiData
   - 經CellStats.Add/RemoveModifier（仿被動特質模式），卸下/替換精確回滾，_ExitTree清理
   - 5張角色卡加子節點（純加節點不改名）；BaseCell._Ready接線（仿CellStats缺失fallback模式）
-- [ ] translations.csv：ORGANELLE_*_NAME/DESC/BIO 12套（8欄，缺欄只warn）
+- [x] translations.csv：ORGANELLE_*_NAME/DESC/BIO 12套（8欄，缺欄只warn）
+- [x] `tests/TestOrganelleChamber.cs`（17項：常數／超載拒絕／發電擴容6→7／負面生效與回滾／替換語義／背包去重／能量只算已裝／reason token／雙發電上限8／UiData／Discard／_ExitTree／5角色卡接線＋code fallback／翻譯解析，headless 綠燈）
 
 ## Phase 1 — 出戰配裝頁＋預設套組
 
@@ -51,16 +52,18 @@
 
 - [x] `asset_check` 註冊 organelle 類別（missing雙向檢查＋unmapped／resolution 128x128＋1:1／`--category organelle`）
 - [x] `to_target_asset` registry 加 organelle pipeline（128x128＋圓形遮罩，同 passive_tree）
-- [x] SKILL.md 目錄架構補 `organelle/`；現況：0/12 ready（12 missing，待生圖）
-- [ ] `gen/organelle/` 12張（前綴-free，stems＝id；熒光顯微＋純黑底＋1:1）
-- [ ] `make check-assets` 綠燈；缺圖回退frame_organelle但排版正確（佔位驗收）
+- [x] SKILL.md 目錄架構補 `organelle/`
+- [x] `gen/organelle/` 12張（前綴-free，stems＝id；熒光顯微＋純黑底＋1:1）＋`assets/gen/organelle/` 已處理
+- [x] `make check-assets` 綠燈：Organelle 12/12 ready，無 naming／orphan／resolution／unmapped 問題
 
 ## Phase 4 — 平衡＋文檔＋新測試
 
 - [ ] P4平衡回測：開局配裝對前三分鐘波次影響；發電雙解強度（殘廢流vs血換電）；amount+1鎖4費複查；CDR/閃避/格擋硬上限複查
 - [ ] 文檔：spec.md §5（5+5+腔室4槽位圖）／skill.md §4（六類表）／stat.md（能量註記：約束層非第19屬性）／cell.md（外掛胞器段）
-- [ ] 新 `tests/TestOrganelleChamber.cs`（仿TestLevelUpModal骨架＋Gate＋IsolateSaves＋block/evasion歸零＋正對照）
-  - 槽上限／能量超載拒絕／發電擴容6/6→6/7／發電負面生效＋卸下回滾／背包上限13拒絕／去重／能量只算已裝／籤過濾／Loadout preset存取隔離／開局生效／滿槽滿包draft換丟分支／非法profile拒絕
+- [x] `tests/TestOrganelleChamber.cs`（已建；Phase 0 邏輯項全綠）
+  - 已完成：常數／能量超載拒絕／發電擴容6→7／發電負面生效＋卸下回滾／替換語義／去重（max_copies）／能量只算已裝／CanEquip reason token／雙發電上限／UiData／Discard／_ExitTree／5角色卡接線＋code fallback／翻譯鍵解析
+  - 待補（依賴後續Phase）：籤過濾／Loadout preset存取隔離／開局生效／滿槽滿包draft換丟分支／非法profile拒絕
+  - 註：BackpackCap=12 與 MaxGenerators=2 在現有12件×max_copies=1資料下為結構性守衛（不可達）；已由去重/copy_cap覆蓋等效行為
 
 ## Phase 5 — 全量迴歸＋視覺驗收（可選/後續）
 
