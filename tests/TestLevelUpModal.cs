@@ -178,7 +178,26 @@ public partial class TestLevelUpModal : TestHarness
             player.CurrentExp = 0.0f;
             player.ExpToNextLevel = 30.0f;
             player.Health = player.MaxHealth;
+            // The cell's own physics ticks auto-firing skills; a kill would
+            // award ambient EXP and open the draft modal behind the scripted one.
+            player.SetPhysicsProcess(false);
         }
+
+        // A level-up racing in before this frame would have opened the draft
+        // modal, paused the tree and dropped time scale into bullet time;
+        // restore the pristine pre-run state so the scripted draft is the first.
+        var hud = main.HudNode ?? main.GetNodeOrNull<Hud>("HUD");
+        if (hud?.CellUpgradeModal != null)
+            hud.CellUpgradeModal.Visible = false;
+        hud?.ResetTutorialCues();
+        if (hud != null)
+        {
+            hud.LastCurrentExp = 0.0f;
+            hud.LastExpToNext = 30.0f;
+            hud.LastLevel = 1;
+        }
+        Paused = false;
+        Engine.TimeScale = 1.0;
     }
 
     public override bool _Process(double delta)
@@ -197,6 +216,10 @@ public partial class TestLevelUpModal : TestHarness
             return false;
 
         _testDone = true;
+        // Repeat the isolation at the assertion frame: a neutral-matter payout
+        // tweened during the settle frames would otherwise level the cell up
+        // before the scripted draft (docs/AGENTS.md determinism rules).
+        IsolateArena();
         var main = Root.GetNodeOrNull<Main>("Main");
         if (main == null)
         {

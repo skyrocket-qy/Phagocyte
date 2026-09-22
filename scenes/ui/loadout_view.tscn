@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/LoadoutView.cs" id="1_loadout"]
+[ext_resource type="Script" path="res://scripts/ui/EnergyPips.cs" id="2_pips"]
 [ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
@@ -18,24 +19,6 @@ content_margin_left = 20.0
 content_margin_top = 16.0
 content_margin_right = 20.0
 content_margin_bottom = 16.0
-
-[sub_resource type="StyleBoxLine" id="StyleBoxLine_sep"]
-color = Color(0, 0.9, 1, 0.25)
-thickness = 1
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_energy_bg"]
-bg_color = Color(0.04, 0.07, 0.11, 0.9)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_energy_fill"]
-bg_color = Color(0.2, 0.78, 0.95, 0.95)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 
 [node name="LoadoutView" type="Control"]
 visible = false
@@ -105,40 +88,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 24
 
-[node name="BackpackPanel" type="PanelContainer" parent="MainHBox"]
-custom_minimum_size = Vector2(520, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="VBox" type="VBoxContainer" parent="MainHBox/BackpackPanel"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="BackpackHeader" type="Label" parent="MainHBox/BackpackPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.7, 0.8, 1)
-theme_override_font_sizes/font_size = 14
-text = "胞器库存"
-
-[node name="CategoryTabBar" type="HBoxContainer" parent="MainHBox/BackpackPanel/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="BackpackGrid" type="GridContainer" parent="MainHBox/BackpackPanel/VBox"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/h_separation = 10
-theme_override_constants/v_separation = 10
-columns = 4
-
-[node name="HintLabel" type="Label" parent="MainHBox/BackpackPanel/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.72, 0.82, 0.9, 0.85)
-theme_override_font_sizes/font_size = 12
-text = "点击胞器装备；再次点击已装备的胞器可卸下。"
-autowrap_mode = 3
-
 [node name="ChamberPanel" type="PanelContainer" parent="MainHBox"]
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
@@ -171,14 +120,14 @@ theme_override_colors/font_color = Color(0.45, 1, 0.72, 1)
 theme_override_font_sizes/font_size = 12
 text = "发电单元：0 / 2"
 
-[node name="EnergyBar" type="ProgressBar" parent="MainHBox/ChamberPanel/VBox"]
-custom_minimum_size = Vector2(0, 12)
+[node name="EnergyBar" type="Control" parent="MainHBox/ChamberPanel/VBox"]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_energy_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_energy_fill")
-max_value = 6.0
-value = 0.0
-show_percentage = false
+mouse_filter = 2
+script = ExtResource("2_pips")
+MaxDiameter = 20.0
+Gap = 6.0
+AlignLeft = true
 
 [node name="ChamberGrid" type="GridContainer" parent="MainHBox/ChamberPanel/VBox"]
 layout_mode = 2
@@ -192,6 +141,40 @@ size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.78, 0.86, 0.94, 0.9)
 theme_override_font_sizes/font_size = 12
 text = "将鼠标移到胞器上查看详情。"
+autowrap_mode = 3
+
+[node name="BackpackPanel" type="PanelContainer" parent="MainHBox"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="MainHBox/BackpackPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BackpackHeader" type="Label" parent="MainHBox/BackpackPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "胞器库存"
+
+[node name="CategoryTabBar" type="HBoxContainer" parent="MainHBox/BackpackPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BackpackGrid" type="GridContainer" parent="MainHBox/BackpackPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 4
+
+[node name="HintLabel" type="Label" parent="MainHBox/BackpackPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.82, 0.9, 0.85)
+theme_override_font_sizes/font_size = 12
+text = "点击胞器装备；再次点击已装备的胞器可卸下。"
 autowrap_mode = 3
 
 [node name="Buttons" type="HBoxContainer" parent="."]

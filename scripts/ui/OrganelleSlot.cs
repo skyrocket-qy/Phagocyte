@@ -11,7 +11,7 @@ namespace Phagocyte.UI;
 public partial class OrganelleSlot : Button
 {
     public TextureRect? IconTexture { get; private set; }
-    public Label? CostLabel { get; private set; }
+    public EnergyPips? CostPips { get; private set; }
     public Label? NameLabel { get; private set; }
     public Label? StateLabel { get; private set; }
     public ColorRect? CategoryStrip { get; private set; }
@@ -21,6 +21,7 @@ public partial class OrganelleSlot : Button
 
     private static readonly Color EmptyIconTint = new(1, 1, 1, 0.28f);
     private static readonly Color EquippedIconTint = new(1, 1, 1, 0.45f);
+    private static readonly Color LockedIconTint = new(0.42f, 0.46f, 0.52f, 0.5f);
 
     public override void _Ready()
     {
@@ -30,7 +31,7 @@ public partial class OrganelleSlot : Button
     public void Bind()
     {
         IconTexture ??= GetNodeOrNull<TextureRect>("IconTexture");
-        CostLabel ??= GetNodeOrNull<Label>("CostLabel");
+        CostPips ??= GetNodeOrNull<EnergyPips>("CostPips");
         NameLabel ??= GetNodeOrNull<Label>("NameLabel");
         StateLabel ??= GetNodeOrNull<Label>("StateLabel");
         CategoryStrip ??= GetNodeOrNull<ColorRect>("CategoryStrip");
@@ -52,7 +53,7 @@ public partial class OrganelleSlot : Button
     }
 
     /// <summary>Renders an organelle (or an empty chamber slot when id is "").</summary>
-    public void ShowOrganelle(string id, bool equipped)
+    public void ShowOrganelle(string id, bool equipped, bool unlocked = true)
     {
         Bind();
         OrganelleId = id ?? "";
@@ -64,8 +65,8 @@ public partial class OrganelleSlot : Button
                 IconTexture.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
                 IconTexture.Modulate = EmptyIconTint;
             }
-            if (CostLabel != null)
-                CostLabel.Text = "";
+            if (CostPips != null)
+                CostPips.Configure(0, 0, 0);
             if (StateLabel != null)
                 StateLabel.Text = "";
             if (CategoryStrip != null)
@@ -94,28 +95,53 @@ public partial class OrganelleSlot : Button
         {
             IconTexture.Texture = AssetLoader.TryLoad<Texture2D>(entry["image_path"].AsString())
                 ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
-            IconTexture.Modulate = equipped ? EquippedIconTint : Colors.White;
+            IconTexture.Modulate = !unlocked
+                ? LockedIconTint
+                : equipped ? EquippedIconTint : Colors.White;
         }
-        if (CostLabel != null)
+        if (CostPips != null)
         {
-            CostLabel.Text = cost < 0 ? $"+{-cost}" : cost.ToString();
-            CostLabel.Modulate = cost < 0
-                ? new Color(0.45f, 1.0f, 0.72f)
-                : cost >= 4 ? new Color(1.0f, 0.55f, 0.45f) : new Color(0.85f, 0.92f, 1.0f);
+            if (!unlocked)
+            {
+                CostPips.Configure(0, 0, 0);
+            }
+            else if (cost < 0)
+            {
+                // Generator: the granted energy point renders red.
+                CostPips.Configure(-cost, 0, -cost);
+            }
+            else
+            {
+                CostPips.Configure(cost, cost, 0);
+            }
         }
         if (CategoryStrip != null)
-            CategoryStrip.Color = CategoryColor(entry["category"].AsString());
+            CategoryStrip.Color = unlocked
+                ? CategoryColor(entry["category"].AsString())
+                : new Color(0.4f, 0.45f, 0.5f, 0.5f);
         if (NameLabel != null)
         {
             NameLabel.Text = Tr(nameKey);
-            NameLabel.Modulate = equipped ? new Color(0.75f, 0.8f, 0.88f, 0.85f) : Colors.White;
+            NameLabel.Modulate = !unlocked
+                ? new Color(0.55f, 0.6f, 0.68f, 0.8f)
+                : equipped ? new Color(0.75f, 0.8f, 0.88f, 0.85f) : Colors.White;
         }
         if (StateLabel != null)
         {
-            StateLabel.Text = equipped ? Tr("LOADOUT_EQUIPPED_TAG") : "";
-            StateLabel.Visible = equipped;
+            if (!unlocked)
+                StateLabel.Text = Tr("LOADOUT_LOCKED_TAG");
+            else
+                StateLabel.Text = equipped ? Tr("LOADOUT_EQUIPPED_TAG") : "";
+            StateLabel.Visible = !unlocked || equipped;
+            StateLabel.Modulate = unlocked
+                ? new Color(0.45f, 1.0f, 0.72f)
+                : new Color(1.0f, 0.72f, 0.35f);
         }
 
-        TooltipText = Tr(nameKey) + "\n" + Tr(descKey) + "\n" + UiBuilders.StripLeadingLabel(Tr(bioKey));
+        string costText = cost < 0 ? $"+{-cost}" : cost.ToString();
+        TooltipText = unlocked
+            ? Tr(nameKey) + "   " + Tr("LOADOUT_COST_LABEL") + ": " + costText
+                + "\n" + Tr(descKey) + "\n" + UiBuilders.StripLeadingLabel(Tr(bioKey))
+            : Tr(nameKey) + "\n" + Tr("LOADOUT_DETAIL_LOCKED");
     }
 }

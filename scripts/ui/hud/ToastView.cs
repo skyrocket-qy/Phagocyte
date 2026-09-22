@@ -18,6 +18,7 @@ public partial class ToastView : Node
     public Tween? AchTween { get; set; }
 
     private Callable _achUnlockCallback;
+    private Callable _organelleUnlockCallback;
 
     /// <summary>Builds the banner and subscribes to achievement unlocks. Call once from Hud._Ready.</summary>
     public void Bind()
@@ -35,12 +36,28 @@ public partial class ToastView : Node
 
         _achUnlockCallback = Callable.From((string a, Dictionary b) => OnAchievementUnlocked(a, b));
         AchievementManager.AddUnlockListener(_achUnlockCallback);
+
+        _organelleUnlockCallback = Callable.From((string id, Dictionary entry) => OnOrganelleUnlocked(id, entry));
+        OrganelleUnlockManager.AddUnlockListener(_organelleUnlockCallback);
     }
 
     /// <summary>Removes the achievement listener. Call from Hud._ExitTree.</summary>
     public void Unbind()
     {
         AchievementManager.RemoveUnlockListener(_achUnlockCallback);
+        OrganelleUnlockManager.RemoveUnlockListener(_organelleUnlockCallback);
+    }
+
+    /// <summary>Organelle drop collected: same banner, chamber-green accent.</summary>
+    public void OnOrganelleUnlocked(string _organelleId, Dictionary entry)
+    {
+        string imagePath = entry.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "";
+        string nameKey = entry.TryGetValue("name_key", out var nkVal) ? nkVal.AsString() : "";
+        string descKey = entry.TryGetValue("desc_key", out var dkVal) ? dkVal.AsString() : "";
+        PlayToastBanner(imagePath,
+            Tr("TOAST_ORGANELLE_UNLOCKED") + " " + Tr(nameKey),
+            Tr(descKey),
+            new Color(0.45f, 1.0f, 0.72f));
     }
 
     /// <summary>Endless overdrive tier alert reusing the achievement toast (docs/endgame.md §3.2).</summary>

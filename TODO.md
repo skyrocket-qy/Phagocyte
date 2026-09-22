@@ -43,6 +43,29 @@
 - [x] translations.csv：LOADOUT_*/ORGANELLE_CAT_* 鍵（27條×8語言）
 - [x] 視覺驗收：headed 截圖確認版面（標題／profile籤／6籤庫存／2x2腔室／能量條／拒絕提示）
 
+### Phase 1 修訂（使用者要求）
+
+- 版面：**裝備欄（2x2腔室）在左、胞器庫存在右**
+- 取得方式：**胞器改為打怪掉落解鎖**（基礎機率 2%，刻意偏低）；庫存預設**全鎖**
+- [x] 新 `scripts/core/OrganelleUnlockManager.cs`（static＋JsonStore "organelle_unlocks.json"；IsUnlocked／Unlock／RollLockedId／TrySpawnDrop／UnlockAll／listener 通知）
+  - 可調 seam：`DropChance`（預設 0.02）、`DropsEnabled`（測試關閉以求確定性）
+- [x] 新 `scripts/core/OrganelleDrop.cs`（code-only 瞬態拾取物：脈衝光環＋圖示→磁吸（吃 `magnet` stat）→拾取→解鎖→toast）
+- [x] 掉落入口單一化：`BaseEnemy.Die()`（所有死亡皆經此），掠過非真正掉落
+- [x] 三重解鎖閘：`LoadoutManager.ParseRow`（讀檔剝離）／`LoadoutManager.SetSlots`（寫入拒絕）／`Main.ApplyChamberLoadout`（開局略過）
+- [x] UI：鎖定卡片灰階＋「未解鎖」橙標＋無費用角標；詳情顯示「尚未解鎖」；庫存標題帶進度「已解鎖 n/12」
+- [x] `ToastView` 新增胞器解鎖 banner（綠 accent，共用現有 toast_banner.tscn）
+- [x] translations：LOADOUT_LOCKED_TAG／LOADOUT_HINT_LOCKED／LOADOUT_DETAIL_LOCKED／LOADOUT_VAULT_PROGRESS／TOAST_ORGANELLE_UNLOCKED
+- [x] 測試：`TestOrganelleChamber` 增 7 項（全鎖起始／解鎖冪等＋持久化／只滾鎖定id／suite 預設關掉落／機率1→生成→拾取解鎖／全解鎖停止掉落／鎖定項被 profile 拒絕與剝離）
+- [x] 順帶修復既有 flake：`TestLevelUpModal` 在斷言前重跑隔離（凍結玩家 physics＋關閉殘留 modal＋重置 HUD 快照），20/20 穩定
+
+### Phase 1 修訂 2（能量圖形化）
+
+- [x] 新 `scripts/ui/EnergyPips.cs`（Control＋`_Draw`）：一顆圓點＝1 點能量；已消耗＝青色實心、未用＝暗色空心、**發電增益＝紅色**；`MaxDiameter/Gap/AlignLeft` 為 `[Export]`，圓徑自動縮放以適配卡片與腔室列
+- [x] 卡片費用角標改為 pip 列（`organelle_slot.tscn` 的 `CostPips`）：cost N → N 青點；發電件 → 1 紅點；未解鎖 → 不顯示；tooltip 保留數字（`LOADOUT_COST_LABEL`）
+- [x] 腔室能量條由 ProgressBar 改為 pip 列（6~8 顆）：尾端發電增益點為紅
+- [x] 清理：移除已無引用的能量 StyleBox 與舊 CostLabel；`LOADOUT_COST_LABEL` 8 語言
+- [x] 視覺驗收：headed 截圖確認（4 青＋2 暗＋1 紅＝4/7 含 1 發電；卡片費用 pip 與未解鎖空白）
+
 ## Phase 2 — 局內獲取＋背包籤UI
 
 - [ ] `UpgradeManager` 新增 `new_organelle` 卡型（含energy_cost/category/image_path；去重已裝＋已擁有）

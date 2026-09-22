@@ -568,6 +568,9 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         var player = PlayerRef;
         if (player != null && GodotObject.IsInstanceValid(player))
             player.AddExp(AtpValue);
+        // Organelle chamber equipment drops here too: one low-chance roll per
+        // kill, spawned as a collectable pickup (TODO Phase 1 revision).
+        OrganelleUnlockManager.TrySpawnDrop(GlobalPosition, GetParent(), player);
         AchievementManager.RecordEvent("pathogen_killed", EnemyId);
         RunTelemetryManager.Instance?.RecordKill(BaseScore);
         EmitSignal(SignalName.EnemyDied, this);

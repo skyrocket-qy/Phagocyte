@@ -109,10 +109,21 @@ public partial class TestMenuFlow : TestHarness
         AssertThat(GameManager.SelectedClass).IsEqual("macrophage");
         GD.Print("[PASS] Transition to LoadoutView with GameManager.selected_class = 'macrophage' verified.");
 
-        // Phase 1: the page offers the full vault but the cell deploys bare.
+        // Phase 1: the page offers the vault but the cell deploys bare, and the
+        // vault is locked until pathogen drops unlock organelles.
+        OrganelleUnlockManager.ResetAll();
+        menu.RefreshLoadoutView();
         AssertThat(menu.LoadoutView.Chamber).IsNotNull();
         AssertThat(menu.LoadoutView.Chamber!.EquippedCount).IsEqual(0);
-        AssertThat(menu.LoadoutView.Chamber.Backpack.Count).IsEqual(12);
+        AssertThat(menu.LoadoutView.Chamber.Backpack.Count).IsEqual(0);
+        AssertThat(menu.LoadoutView.ToggleOrganelle("mitochondria_mkii")).IsFalse();
+        AssertThat(menu.LoadoutView.Chamber.EquippedCount).IsEqual(0);
+        GD.Print("[PASS] Loadout page starts with an empty, fully locked vault.");
+
+        OrganelleUnlockManager.UnlockAll();
+        menu.RefreshLoadoutView();
+        AssertThat(menu.LoadoutView.Chamber!.Backpack.Count).IsEqual(12);
+        GD.Print("[PASS] Unlocking the vault makes every organelle equippable.");
 
         AssertThat(menu.LoadoutView.ToggleOrganelle("mitochondria_mkii")).IsTrue();
         AssertThat(menu.LoadoutView.Chamber.GetSlot(0)).IsEqual("mitochondria_mkii");

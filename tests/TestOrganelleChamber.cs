@@ -40,6 +40,7 @@ public partial class TestOrganelleChamber : TestHarness
             RunChamberLogicTests();
             RunSceneWiringTests();
             RunTranslationTests();
+            RunUnlockManagerTests();
             RunLoadoutManagerTests();
             RunApplyLoadoutTests();
             Finish(true, "ALL ORGANELLE CHAMBER TESTS");
@@ -256,7 +257,9 @@ public partial class TestOrganelleChamber : TestHarness
             "LOADOUT_GENERATOR_FMT", "LOADOUT_CONFIRM", "LOADOUT_RESET", "LOADOUT_CATEGORY_ALL",
             "LOADOUT_EQUIPPED_TAG", "LOADOUT_EMPTY_SLOT", "LOADOUT_DETAIL_EMPTY", "LOADOUT_HINT_DEFAULT",
             "LOADOUT_HINT_SLOTS_FULL", "LOADOUT_HINT_OVERLOAD", "LOADOUT_HINT_GENERATOR_CAP",
-            "LOADOUT_HINT_COPY_CAP", "LOADOUT_HINT_UNKNOWN", "LOADOUT_HINT_BAD_SLOT"
+            "LOADOUT_HINT_COPY_CAP", "LOADOUT_HINT_UNKNOWN", "LOADOUT_HINT_BAD_SLOT",
+            "LOADOUT_VAULT_PROGRESS", "LOADOUT_LOCKED_TAG", "LOADOUT_HINT_LOCKED",
+            "LOADOUT_DETAIL_LOCKED", "TOAST_ORGANELLE_UNLOCKED", "LOADOUT_COST_LABEL"
         })
         {
             AssertThat(TranslationServer.Translate(key)).IsNotEqual(key);
@@ -267,6 +270,66 @@ public partial class TestOrganelleChamber : TestHarness
             AssertThat(TranslationServer.Translate(key)).IsNotEqual(key);
         }
         GD.Print("[PASS] Loadout page and category keys resolve through translations.csv.");
+    }
+
+    /// <summary>Phase 1 revision: the vault starts locked and only drops unlock it.</summary>
+    private void RunUnlockManagerTests()
+    {
+        OrganelleUnlockManager.ResetCache();
+        OrganelleUnlockManager.ResetAll();
+
+        // Fresh profile: nothing is unlocked (the vault is earned, not given).
+        AssertThat(OrganelleUnlockManager.UnlockedCount).IsEqual(0);
+        AssertThat(OrganelleUnlockManager.LockedCount).IsEqual(GameManager.OrganelleCatalog.Count);
+        AssertThat(OrganelleUnlockManager.IsUnlocked("mitochondria_mkii")).IsFalse();
+        GD.Print("[PASS] Organelle vault starts fully locked.");
+
+        // Unlock is idempotent, validated and persisted.
+        AssertThat(OrganelleUnlockManager.Unlock("mitochondria_mkii")).IsTrue();
+        AssertThat(OrganelleUnlockManager.Unlock("mitochondria_mkii")).IsFalse();
+        AssertThat(OrganelleUnlockManager.Unlock("not_a_real_organelle")).IsFalse();
+        OrganelleUnlockManager.ResetCache();
+        AssertThat(OrganelleUnlockManager.IsUnlocked("mitochondria_mkii")).IsTrue();
+        AssertThat(OrganelleUnlockManager.UnlockedCount).IsEqual(1);
+        GD.Print("[PASS] Unlocks are idempotent, validated and persisted (isolated save).");
+
+        // Roll selection only ever returns a locked id.
+        string rolled = OrganelleUnlockManager.RollLockedId();
+        AssertThat(rolled).IsNotEmpty();
+        AssertThat(OrganelleUnlockManager.IsUnlocked(rolled)).IsFalse();
+        GD.Print("[PASS] Drop roll only selects still-locked organelles.");
+
+        // Suites run with drops disabled so kills can never unlock unscripted.
+        AssertThat(OrganelleUnlockManager.DropsEnabled).IsFalse();
+        var host = new Node2D { Name = "DropHost" };
+        Root.AddChild(host);
+        AssertThat(OrganelleUnlockManager.TrySpawnDrop(Vector2.Zero, host, null)).IsNull();
+        GD.Print("[PASS] Suite default: organelle drops are disabled for determinism.");
+
+        // Explicit roll spawns a pickup; collecting it is what unlocks.
+        OrganelleUnlockManager.DropsEnabled = true;
+        OrganelleUnlockManager.DropChance = 1.0f;
+        var drop = OrganelleUnlockManager.TrySpawnDrop(new Vector2(10, 20), host, null);
+        AssertThat(drop).IsNotNull();
+        string droppedId = drop!.OrganelleId;
+        AssertThat(droppedId).IsNotEmpty();
+        AssertThat(OrganelleUnlockManager.IsUnlocked(droppedId)).IsFalse();
+        drop.CollectForTest();
+        AssertThat(OrganelleUnlockManager.IsUnlocked(droppedId)).IsTrue();
+        AssertThat(drop.IsQueuedForDeletion()).IsTrue();
+        GD.Print("[PASS] A rolled drop spawns as a pickup and unlocks on collect.");
+
+        // No locked organelles left -> no drops at all.
+        OrganelleUnlockManager.UnlockAll();
+        AssertThat(OrganelleUnlockManager.LockedCount).IsEqual(0);
+        AssertThat(OrganelleUnlockManager.RollLockedId()).IsEqual("");
+        AssertThat(OrganelleUnlockManager.TrySpawnDrop(Vector2.Zero, host, null)).IsNull();
+        GD.Print("[PASS] A complete collection stops spawning drops.");
+
+        host.Free();
+        OrganelleUnlockManager.DropsEnabled = false;
+        OrganelleUnlockManager.DropChance = OrganelleUnlockManager.DefaultDropChance;
+        AssertThat(OrganelleUnlockManager.DropChance).IsEqual(OrganelleUnlockManager.DefaultDropChance);
     }
 
     /// <summary>Phase 1: pre-run loadout profiles (default = no equipment).</summary>
@@ -280,6 +343,14 @@ public partial class TestOrganelleChamber : TestHarness
         foreach (string id in LoadoutManager.GetActiveSlots(cell))
             AssertThat(id).IsEqual("");
         GD.Print("[PASS] Default loadout profile is a single build with 4 empty slots (no equipment).");
+
+        // Locked organelles can never enter a profile.
+        OrganelleUnlockManager.ResetCache();
+        OrganelleUnlockManager.ResetAll();
+        AssertThat(LoadoutManager.SetSlots(cell, 0, new[] { "mitochondria_mkii", "", "", "" })).IsFalse();
+        AssertThat(LoadoutManager.GetSlots(cell, 0)[0]).IsEqual("");
+        OrganelleUnlockManager.UnlockAll();
+        GD.Print("[PASS] Locked organelles are refused by the loadout manager.");
 
         // Legal set persists and round-trips through disk.
         string[] legal = { "mitochondria_mkii", "chemokine_patch", "", "" };
@@ -401,6 +472,33 @@ public partial class TestOrganelleChamber : TestHarness
         FreeMain(fallbackRun);
         GD.Print("[PASS] An illegal on-disk profile sanitizes and the run still deploys.");
 
+        // Locked organelles are stripped on load: a run never equips what has not dropped.
+        OrganelleUnlockManager.ResetCache();
+        OrganelleUnlockManager.ResetAll();
+        var lockedPayload = new Godot.Collections.Dictionary
+        {
+            { "profiles", new Godot.Collections.Dictionary
+                {
+                    { cell, new Godot.Collections.Array
+                        {
+                            new Godot.Collections.Array<string> { "mitochondria_mkii", "", "", "" }
+                        }
+                    }
+                }
+            },
+            { "active_profiles", new Godot.Collections.Dictionary { { cell, 0 } } }
+        };
+        JsonStore.Write(LoadoutManager.SavePath, lockedPayload);
+        LoadoutManager.ResetCache();
+        AssertThat(LoadoutManager.GetSlots(cell, 0)[0]).IsEqual("");
+        var lockedRun = InstantiateMain(cell);
+        var lockedPlayer = lockedRun.Player as BaseCell;
+        AssertThat(lockedPlayer).IsNotNull();
+        AssertThat(lockedPlayer!.CellOrganelleChamber!.EquippedCount).IsEqual(0);
+        FreeMain(lockedRun);
+        GD.Print("[PASS] Locked organelles are stripped from profiles and never deploy.");
+
+        OrganelleUnlockManager.UnlockAll();
         LoadoutManager.ResetCache();
         LoadoutManager.SetSlots(cell, 0, LoadoutManager.EmptySlots());
     }

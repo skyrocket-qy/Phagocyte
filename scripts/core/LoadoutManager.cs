@@ -170,7 +170,8 @@ public static class LoadoutManager
 
     /// <summary>
     /// Replaces one profile. Refused when the set breaks the chamber contract
-    /// (overload / generator cap / duplicate copies / unknown ids).
+    /// (overload / generator cap / duplicate copies / unknown ids) or references
+    /// an organelle that has not dropped yet.
     /// </summary>
     public static bool SetSlots(string cellId, int profileIndex, IReadOnlyList<string> slots)
     {
@@ -179,6 +180,11 @@ public static class LoadoutManager
             return false;
         if (!OrganelleChamber.ValidateSlots(slots, out _))
             return false;
+        foreach (string id in slots)
+        {
+            if (!string.IsNullOrEmpty(id) && !OrganelleUnlockManager.IsUnlocked(id))
+                return false;
+        }
         var list = GetProfileList(cellId);
         if (profileIndex < 0 || profileIndex >= list.Count)
             return false;
@@ -277,8 +283,9 @@ public static class LoadoutManager
     }
 
     /// <summary>
-    /// Sanitizes one persisted row: unknown ids are dropped and an illegal set
-    /// (hand-edited file) falls back to empty rather than blocking deployment.
+    /// Sanitizes one persisted row: unknown or still-locked ids are dropped and
+    /// an illegal set (hand-edited file) falls back to empty rather than
+    /// blocking deployment.
     /// </summary>
     private static string[] ParseRow(Godot.Collections.Array raw)
     {
@@ -286,8 +293,11 @@ public static class LoadoutManager
         for (int i = 0; i < SlotCount && i < raw.Count; i++)
         {
             string id = raw[i].AsString();
-            if (!string.IsNullOrEmpty(id) && GameManager.OrganelleCatalog.ContainsKey(id))
+            if (!string.IsNullOrEmpty(id) && GameManager.OrganelleCatalog.ContainsKey(id)
+                && OrganelleUnlockManager.IsUnlocked(id))
+            {
                 row[i] = id;
+            }
         }
 
         if (!OrganelleChamber.ValidateSlots(row, out string reason))

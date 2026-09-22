@@ -35,7 +35,7 @@ public partial class LoadoutView : Control
     public Label? ChamberHeaderLabel { get; set; }
     public Label? EnergyLabel { get; set; }
     public Label? GeneratorLabel { get; set; }
-    public ProgressBar? EnergyBar { get; set; }
+    public EnergyPips? EnergyBar { get; set; }
     public GridContainer? ChamberGrid { get; set; }
     public Label? DetailLabel { get; set; }
     public Button? ResetButton { get; set; }
@@ -65,7 +65,7 @@ public partial class LoadoutView : Control
         ChamberHeaderLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/ChamberHeader");
         EnergyLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/EnergyHBox/EnergyLabel");
         GeneratorLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/EnergyHBox/GeneratorLabel");
-        EnergyBar = GetNodeOrNull<ProgressBar>("MainHBox/ChamberPanel/VBox/EnergyBar");
+        EnergyBar = GetNodeOrNull<EnergyPips>("MainHBox/ChamberPanel/VBox/EnergyBar");
         ChamberGrid = GetNodeOrNull<GridContainer>("MainHBox/ChamberPanel/VBox/ChamberGrid");
         DetailLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/DetailLabel");
         ResetButton = GetNodeOrNull<Button>("Buttons/ResetButton");
@@ -108,7 +108,6 @@ public partial class LoadoutView : Control
     public void UpdateLocalizedTexts()
     {
         if (HeaderLabel != null) HeaderLabel.Text = Tr("LOADOUT_HEADER");
-        if (BackpackHeaderLabel != null) BackpackHeaderLabel.Text = Tr("LOADOUT_BACKPACK_HEADER");
         if (ChamberHeaderLabel != null) ChamberHeaderLabel.Text = Tr("LOADOUT_CHAMBER_HEADER");
         if (ResetButton != null) ResetButton.Text = Tr("LOADOUT_RESET");
         if (ConfirmButton != null) ConfirmButton.Text = Tr("LOADOUT_CONFIRM");
@@ -233,9 +232,12 @@ public partial class LoadoutView : Control
         AddChild(_scratchHost);
         _chamber.Setup(_scratchHost);
 
-        // Phase 1: the whole catalog is unlocked; the vault offers all 12.
+        // Only unlocked organelles are owned; the vault shows the rest as locked.
         foreach (string id in GameManager.OrganelleCatalog.Keys)
-            _chamber.AddToBackpack(id);
+        {
+            if (OrganelleUnlockManager.IsUnlocked(id))
+                _chamber.AddToBackpack(id);
+        }
 
         string[] slots = LoadoutManager.GetSlots(_classKey, LoadoutManager.GetActiveProfile(_classKey));
         for (int i = 0; i < slots.Length && i < OrganelleChamber.MaxSlots; i++)
@@ -265,12 +267,19 @@ public partial class LoadoutView : Control
     /// <summary>
     /// Equips an organelle into the first free slot, or unequips it when already
     /// equipped. Returns true when the chamber changed; refusals surface through
-    /// the hint label (overload / generator cap / full slots).
+    /// the hint label (locked / overload / generator cap / full slots).
     /// </summary>
     public bool ToggleOrganelle(string id)
     {
         if (_chamber == null || string.IsNullOrEmpty(id))
             return false;
+
+        if (!OrganelleUnlockManager.IsUnlocked(id))
+        {
+            ShowHint("LOADOUT_HINT_LOCKED");
+            FlashEnergy(new Color(1.0f, 0.72f, 0.35f));
+            return false;
+        }
 
         // Already equipped: the click unequips it.
         for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
@@ -385,6 +394,17 @@ public partial class LoadoutView : Control
         RefreshEnergy();
         RefreshBackpackCards();
         RefreshCategoryTabs();
+        RefreshVaultHeader();
+    }
+
+    /// <summary>Vault header carries the collection progress (unlocked / total).</summary>
+    private void RefreshVaultHeader()
+    {
+        if (BackpackHeaderLabel == null)
+            return;
+        BackpackHeaderLabel.Text = Tr("LOADOUT_BACKPACK_HEADER") + "   "
+            + TextFormatter.Format(Tr("LOADOUT_VAULT_PROGRESS"),
+                OrganelleUnlockManager.UnlockedCount, GameManager.OrganelleCatalog.Count);
     }
 
     private void RefreshProfileTabs()
@@ -469,8 +489,9 @@ public partial class LoadoutView : Control
             GeneratorLabel.Text = TextFormatter.Format(Tr("LOADOUT_GENERATOR_FMT"), generators, OrganelleChamber.MaxGenerators);
         if (EnergyBar != null)
         {
-            EnergyBar.MaxValue = max;
-            EnergyBar.Value = used;
+            // One disc per energy point: consumed discs filled, the trailing
+            // generator-granted discs red.
+            EnergyBar.Configure(max, used, generators);
         }
     }
 
@@ -497,7 +518,7 @@ public partial class LoadoutView : Control
                     }
                 }
             }
-            _backpackCards[i].ShowOrganelle(id, equipped);
+            _backpackCards[i].ShowOrganelle(id, equipped, OrganelleUnlockManager.IsUnlocked(id));
         }
     }
 
@@ -530,6 +551,12 @@ public partial class LoadoutView : Control
         }
 
         var entry = entryVar.AsGodotDictionary();
+        if (!OrganelleUnlockManager.IsUnlocked(id))
+        {
+            DetailLabel.Text = Tr(entry["name_key"].AsString()) + "\n" + Tr("LOADOUT_DETAIL_LOCKED");
+            return;
+        }
+
         DetailLabel.Text = Tr(entry["name_key"].AsString())
             + "\n" + Tr(entry["desc_key"].AsString())
             + "\n" + UiBuilders.StripLeadingLabel(Tr(entry["bio_key"].AsString()));

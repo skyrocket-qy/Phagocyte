@@ -324,8 +324,8 @@ public partial class Main : Node2D, IRunContext
 
     /// <summary>
     /// Deploys the cell's active organelle loadout (TODO Phase 1). A fresh cell
-    /// has no equipment: an empty profile simply equips nothing. Illegitimate
-    /// entries (stale ids, energy overflow) are skipped, never fatal.
+    /// has no equipment: an empty profile simply equips nothing. Entries that
+    /// are stale, still locked or energy-illegal are skipped, never fatal.
     /// </summary>
     private void ApplyChamberLoadout()
     {
@@ -338,7 +338,7 @@ public partial class Main : Node2D, IRunContext
         for (int i = 0; i < slots.Length && i < OrganelleChamber.MaxSlots; i++)
         {
             string id = slots[i];
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(id) || !OrganelleUnlockManager.IsUnlocked(id))
                 continue;
             if (!chamber.AddToBackpack(id))
                 continue;

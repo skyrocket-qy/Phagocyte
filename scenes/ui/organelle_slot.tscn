@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/OrganelleSlot.cs" id="1_slot"]
+[ext_resource type="Script" path="res://scripts/ui/EnergyPips.cs" id="2_pips"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot_normal"]
 bg_color = Color(0.07, 0.11, 0.17, 0.9)
@@ -72,9 +73,9 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 4.0
-offset_top = -38.0
+offset_top = -40.0
 offset_right = -4.0
-offset_bottom = -18.0
+offset_bottom = -22.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
@@ -85,23 +86,21 @@ vertical_alignment = 1
 autowrap_mode = 3
 text_overrun_behavior = 3
 
-[node name="CostLabel" type="Label" parent="."]
+[node name="CostPips" type="Control" parent="."]
 layout_mode = 1
-anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -44.0
-offset_top = -20.0
+offset_left = 6.0
+offset_top = -22.0
 offset_right = -6.0
-offset_bottom = -2.0
-grow_horizontal = 0
+offset_bottom = -4.0
+grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
-theme_override_font_sizes/font_size = 12
-text = "4"
-horizontal_alignment = 2
-vertical_alignment = 1
+script = ExtResource("2_pips")
+MaxDiameter = 15.0
+Gap = 3.0
 
 [node name="StateLabel" type="Label" parent="."]
 visible = false
