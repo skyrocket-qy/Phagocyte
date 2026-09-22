@@ -132,21 +132,28 @@ public partial class TestSurvivorHudUx : TestHarness
         GD.Print("[PASS] 2. Center-top stopwatch capsule & kill count anchor verified.");
 
         // =====================================================================
-        // TEST 3: Cell Dynamic Arc Health Bar & Hit Flash
+        // TEST 3: Top-Left HUD Health Bar & Dodge Ring (no follower arc)
         // =====================================================================
-        var arcBar = player.GetNodeOrNull<Node2D>("ArcHealthBar");
-        AssertThat(arcBar).IsNotNull();
+        var dodgeRing = player.GetNodeOrNull<Node2D>("DodgeRing");
+        AssertThat(dodgeRing).IsNotNull();
+        AssertThat(player.GetNodeOrNull<Node2D>("ArcHealthBar")).IsNull();
 
-        // Health at 100% -> Arc bar is calm / invisible
+        // HUD bar is wired and shows full health.
+        AssertThat(hud.HpBar).IsNotNull();
+        AssertThat(hud.HpLabel).IsNotNull();
         AssertThat(player.Health).IsEqual(140.0f);
+        AssertThat(hud.HpBar!.MaxValue).IsEqual(140.0f);
+        AssertThat(hud.HpBar.Value).IsEqual(140.0f);
 
-        // Take damage -> Arc bar triggered & hit flash (Armor 10 => 10/60 DR)
+        // Take damage -> HUD bar drops & hit flash (Armor 10 => 10/60 DR)
         // Zero the innate block/evasion roll so the DR math below is deterministic.
         player.Stats!.SetBase("block", 0.0f);
         player.Stats.SetBase("evasion", 0.0f);
         player.TakeDamage(20.0f);
         AssertThat(player.Health).IsEqualApprox(140.0f - 20.0f * (1.0f - 10.0f / 60.0f), 0.01f);
-        GD.Print("[PASS] 3. Under-cell dynamic arc health bar and hit strobe flash verified.");
+        AssertThat(hud.HpBar.Value).IsEqualApprox(player.Health, 0.01f);
+        AssertThat(hud.HpBar.MaxValue).IsEqual(140.0f);
+        GD.Print("[PASS] 3. Top-left HUD health bar tracks damage; dodge ring kept, follower arc removed.");
 
         // =====================================================================
         // TEST 4: Critical HP (<30%) Vignette Heartbeat Pulse

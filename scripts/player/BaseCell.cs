@@ -153,123 +153,39 @@ public partial class BaseCell : CharacterBody2D
         }
     }
 
-    public partial class ArcHealthBar : Node2D
+    /// <summary>
+    /// Dodge-roll burst ring around the membrane mid-dash
+    /// (docs/skill.md §6 / tutorial.md cue 3). The HP readout moved to the
+    /// top-left HUD bar (VitalsView.HpBar); this node draws no health arc.
+    /// </summary>
+    public partial class DodgeRing : Node2D
     {
         public BaseCell? Host { get; set; }
-        public float DisplayAlpha { get; set; } = 0.0f;
-        public float TargetAlpha { get; set; } = 0.0f;
-        public float CalmTimer { get; set; } = 0.0f;
-        public float PulsePhase { get; set; } = 0.0f;
-
-        public void NotifyDamageOrState()
-        {
-            CalmTimer = 3.0f;
-            TargetAlpha = 1.0f;
-        }
 
         public override void _Process(double delta)
         {
             if (Host == null || !GodotObject.IsInstanceValid(Host))
+            {
+                Visible = false;
                 return;
-
-            float dt = (float)delta;
-            float maxHp = Host.Stats != null ? Host.Stats.GetStat("max_health") : Host.MaxHealth;
-            float hpRatio = maxHp > 0.0f ? Mathf.Clamp(Host.Health / maxHp, 0.0f, 1.0f) : 1.0f;
-
-            PulsePhase += dt * 6.0f;
-
-            if (hpRatio >= 0.999f)
-            {
-                // Full HP: hide
-                TargetAlpha = 0.0f;
             }
-            else if (hpRatio < 0.3f)
-            {
-                // Critical low HP: permanent pulsating visibility
-                TargetAlpha = 0.75f + 0.25f * Mathf.Sin(PulsePhase);
-            }
-            else
-            {
-                // Damaged but > 30%
-                if (CalmTimer > 0.0f)
-                {
-                    CalmTimer -= dt;
-                    TargetAlpha = 1.0f;
-                }
-                else
-                {
-                    TargetAlpha = 0.0f;
-                }
-            }
-
-            DisplayAlpha = Mathf.MoveToward(DisplayAlpha, TargetAlpha, dt * 4.0f);
-            Visible = DisplayAlpha > 0.01f || (Host != null && GodotObject.IsInstanceValid(Host) && Host.IsDodging);
-            QueueRedraw();
+            Visible = Host.IsDodging;
+            if (Visible)
+                QueueRedraw();
         }
 
         public override void _Draw()
         {
-            // Dodge roll: bright burst ring around the membrane mid-dash
-            // (docs/skill.md §6 / tutorial.md cue 3).
-            if (Host != null && Host.IsDodging && GodotObject.IsInstanceValid(Host))
-            {
-                float dashRadius = Host.CurrentRadius + 9.0f;
-                DrawArc(Vector2.Zero, dashRadius, 0.0f, Mathf.Tau, 48,
-                    new Color(0.55f, 1.0f, 0.95f, 0.9f), 3.2f, true);
-            }
-
-            if (Host == null || DisplayAlpha <= 0.01f)
+            if (Host == null || !GodotObject.IsInstanceValid(Host) || !Host.IsDodging)
                 return;
-
-            float maxHp = Host.Stats != null ? Host.Stats.GetStat("max_health") : Host.MaxHealth;
-            float hpRatio = maxHp > 0.0f ? Mathf.Clamp(Host.Health / maxHp, 0.0f, 1.0f) : 1.0f;
-
-            // Radius hugs current cell radius
-            float radius = Host.CurrentRadius + 14.0f;
-            float width = 3.6f;
-
-            // Arc covers bottom 130° (from 25° to 155° downward)
-            float startAngle = Mathf.DegToRad(25.0f);
-            float endAngle = Mathf.DegToRad(155.0f);
-            float totalAngle = endAngle - startAngle;
-
-            // Draw track background
-            Color trackColor = new Color(0.05f, 0.1f, 0.16f, 0.45f * DisplayAlpha);
-            DrawArc(Vector2.Zero, radius, startAngle, endAngle, 32, trackColor, width, true);
-
-            // Draw health fill
-            if (hpRatio > 0.001f)
-            {
-                float fillEndAngle = startAngle + totalAngle * hpRatio;
-
-                // Color gradient: Green (>60%) -> Amber (30%-60%) -> Crimson (<30%)
-                Color fillColor;
-                if (hpRatio > 0.6f)
-                {
-                    fillColor = new Color(0.2f, 0.92f, 0.48f, 0.95f * DisplayAlpha);
-                }
-                else if (hpRatio > 0.3f)
-                {
-                    float t = (hpRatio - 0.3f) / 0.3f;
-                    fillColor = new Color(0.2f, 0.92f, 0.48f).Lerp(new Color(1.0f, 0.78f, 0.2f), 1.0f - t);
-                    fillColor.A = 0.95f * DisplayAlpha;
-                }
-                else
-                {
-                    fillColor = new Color(0.95f, 0.18f, 0.24f, 0.95f * DisplayAlpha);
-                }
-
-                DrawArc(Vector2.Zero, radius, startAngle, fillEndAngle, 32, fillColor, width, true);
-
-                // Subtle glowing head dot
-                Vector2 headPos = new Vector2(Mathf.Cos(fillEndAngle), Mathf.Sin(fillEndAngle)) * radius;
-                DrawCircle(headPos, 3.0f, new Color(fillColor.R * 1.2f, fillColor.G * 1.2f, fillColor.B * 1.2f, 0.9f * DisplayAlpha));
-            }
+            float dashRadius = Host.CurrentRadius + 9.0f;
+            DrawArc(Vector2.Zero, dashRadius, 0.0f, Mathf.Tau, 48,
+                new Color(0.55f, 1.0f, 0.95f, 0.9f), 3.2f, true);
         }
     }
 
     private GranuleCanvas? _granuleCanvas;
-    private ArcHealthBar? _underCellArcBar;
+    private DodgeRing? _dodgeRing;
     private Tween? _hitFlashTween;
 
     public override void _Ready()
@@ -323,8 +239,8 @@ public partial class BaseCell : CharacterBody2D
         // Initial deformation tick
         UpdatePseudopodDeformation(0.016f);
 
-        _underCellArcBar = new ArcHealthBar { Name = "ArcHealthBar", Host = this, ZIndex = 3 };
-        AddChild(_underCellArcBar);
+        _dodgeRing = new DodgeRing { Name = "DodgeRing", Host = this, ZIndex = 3 };
+        AddChild(_dodgeRing);
 
         EmitStatsSignal();
     }
@@ -870,7 +786,6 @@ public partial class BaseCell : CharacterBody2D
     {
         float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
         Health = Mathf.Clamp(Health + amount, 0.0f, maxHp);
-        _underCellArcBar?.NotifyDamageOrState();
         EmitStatsSignal();
     }
 
@@ -946,7 +861,6 @@ public partial class BaseCell : CharacterBody2D
             CameraFollow.Instance?.AddTrauma(finalDmg >= 15.0f ? 0.35f : 0.15f);
         }
 
-        _underCellArcBar?.NotifyDamageOrState();
 
         if (Cytoplasm != null && finalDmg > 0.1f && Health > 0.0f)
         {

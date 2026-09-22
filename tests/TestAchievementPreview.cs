@@ -2,7 +2,10 @@ using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
+using Phagocyte.Enemies;
+using Phagocyte.Player;
 using Phagocyte.UI;
 
 namespace Phagocyte.Tests;
@@ -97,6 +100,14 @@ public partial class TestAchievementPreview : TestHarness
                     if (!Gate(ref _frame, 30))
                         return false;
                     CaptureScreenshot("achievement_toast.png");
+                    OpenHudRun();
+                    _frame = 0;
+                    _stage = 7;
+                    return false;
+                case 7:
+                    if (!Gate(ref _frame, 8))
+                        return false;
+                    CaptureScreenshot("hud_hp.png");
                     GD.Print(">>> ACHIEVEMENT GALLERY PREVIEW PASSED SUCCESSFULLY! <<<");
                     Quit(0);
                     return true;
@@ -172,5 +183,41 @@ public partial class TestAchievementPreview : TestHarness
         };
         AchievementToast.ShowToast(Root, dummyAch);
         AssertThat(Root.GetChildCount() >= 1).IsTrue();
+    }
+
+    /// <summary>Opens a frozen run, damages the player once, for the HP capture.</summary>
+    private void OpenHudRun()
+    {
+        foreach (var child in Root.GetChildren())
+        {
+            if (child is PanelContainer || child is AchievementToast)
+            {
+                Root.RemoveChild(child);
+                child.Free();
+            }
+        }
+        var main = InstantiateMain();
+        ClearArenaEntities(main);
+        var player = main.GetNodeOrNull<Macrophage>("Macrophage");
+        AssertThat(player).IsNotNull();
+        player!.Stats!.SetBase("block", 0.0f);
+        player.Stats.SetBase("evasion", 0.0f);
+        player.Health = player.MaxHealth;
+        var hud = main.GetNodeOrNull<Hud>("HUD");
+        AssertThat(hud).IsNotNull();
+        hud!.ConnectPlayer(player);
+        player.TakeDamage(20.0f);
+        AssertThat(hud.HpBar).IsNotNull();
+    }
+
+    private static void ClearArenaEntities(Node root)
+    {
+        foreach (var child in root.GetChildren())
+        {
+            if (child is BaseEnemy || child is SenescentRBC || child is DormantToxinVesicle || child is BioHazardArea)
+                child.Free();
+            else
+                ClearArenaEntities(child);
+        }
     }
 }
