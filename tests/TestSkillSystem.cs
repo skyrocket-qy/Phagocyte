@@ -7,6 +7,8 @@ using Phagocyte.Skills;
 using Phagocyte.Enemies;
 using Phagocyte.UI;
 
+using Phagocyte.Core;
+
 namespace Phagocyte.Tests;
 
 [TestSuite]
@@ -18,7 +20,7 @@ public partial class TestSkillSystem : TestHarness
     public override void _Initialize()
     {
         GD.Print("--- BEGINNING 5+5 SKILL SYSTEM AUTOMATED VERIFICATION ---");
-        var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
+        var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         AssertThat(mainScene).IsNotNull();
         var main = mainScene.Instantiate();
         Root.AddChild(main);
@@ -83,7 +85,7 @@ public partial class TestSkillSystem : TestHarness
         // 6. Test ROS Torrent auto-targeting & firing (drafted into active slot 1; slot 0 is the innate)
         var ros = new RosTorrentSkill();
         AssertThat(sm.EquipActive(ros, 1)).IsTrue();
-        var staphScene = GD.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
+        var staphScene = AssetLoader.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
         var enemy = staphScene.Instantiate<StaphEnemy>();
         enemy.GlobalPosition = player.GlobalPosition + new Vector2(150, 0);
         enemyContainer!.AddChild(enemy);

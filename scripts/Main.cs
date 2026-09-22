@@ -23,8 +23,7 @@ namespace Phagocyte;
 /// </summary>
 public partial class Main : Node2D, IRunContext
 {
-    private static PackedScene? _defaultStaphScene;
-    public static PackedScene DefaultStaphScene => _defaultStaphScene ??= GD.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
+    public static PackedScene DefaultStaphScene => AssetLoader.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
 
     [Export] public PackedScene? StaphScene { get; set; }
     [Export] public int ScreenCapNormal { get; set; } = PathogenSpawner.MaxActiveNormal;

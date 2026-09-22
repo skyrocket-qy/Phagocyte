@@ -93,7 +93,7 @@ public partial class TestEnemyEcosystem : SceneTree
         // -------------------------------------------------------------
         // TEST 3: Staph Fibrin Armor Shield
         // -------------------------------------------------------------
-        var playerScene = GD.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+        var playerScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
         var player = playerScene.Instantiate<BaseCell>();
         testContainer.AddChild(player);
 

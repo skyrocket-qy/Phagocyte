@@ -6,6 +6,8 @@ using Phagocyte.Enemies;
 using Phagocyte.Player;
 using Phagocyte.Skills;
 
+using Phagocyte.Core;
+
 namespace Phagocyte.Tests;
 
 /// <summary>
@@ -115,7 +117,7 @@ public partial class TestSkillVisuals : TestHarness
         _arena = new Node2D { Name = "VisualArena" };
         Root.AddChild(_arena);
 
-        var playerScene = GD.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+        var playerScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
         if (playerScene == null)
         {
             GD.PrintErr("[DIAG] macrophage.tscn failed to load.");

@@ -146,7 +146,7 @@ public partial class TestDifficultyTracks : TestHarness
         GameManager.ResetMapUnlocks();
         GameManager.SelectedDifficulty = RunRecordManager.DifficultyNormal;
 
-        var menu = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn").Instantiate<MainMenu>();
+        var menu = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn").Instantiate<MainMenu>();
         Root.AddChild(menu);
 
         AssertThat(menu.DifficultyToggle).IsNotNull();

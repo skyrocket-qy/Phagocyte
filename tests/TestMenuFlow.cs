@@ -17,7 +17,7 @@ public partial class TestMenuFlow : TestHarness
         GD.Print("--- BEGINNING MENU & SELECTION FLOW AUTOMATED TEST ---");
         IsolateSaves("menu_flow");
 
-        var menuScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+        var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         if (menuScene == null)
         {
             GD.PrintErr("Failed to load main_menu.tscn");
@@ -162,7 +162,7 @@ public partial class TestMenuFlow : TestHarness
         menu.QueueFree();
 
         GameManager.SelectedMap = "hepatic_sinusoid";
-        var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
+        var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         AssertThat(mainScene).IsNotNull();
         var main = mainScene!.Instantiate<Main>();
         Root.AddChild(main);

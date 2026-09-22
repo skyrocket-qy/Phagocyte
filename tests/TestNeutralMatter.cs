@@ -203,7 +203,7 @@ public partial class TestNeutralMatter : TestHarness
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = "acute_wound";
 
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
         Root.AddChild(main);
         main.SetPhysicsProcess(false);
 

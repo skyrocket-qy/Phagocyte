@@ -39,7 +39,7 @@ public partial class GameManager : Node
                     var d = (Dictionary)ClassData[key];
                     string path = d.TryGetValue("scene_path", out Variant v) ? v.AsString() : "";
                     if (!string.IsNullOrEmpty(path))
-                        _cellScenes[key] = GD.Load<PackedScene>(path);
+                        _cellScenes[key] = AssetLoader.Load<PackedScene>(path);
                 }
             }
             return _cellScenes;

@@ -342,7 +342,7 @@ public partial class AchievementManager : Node
             { "reward", rewardText },
             { "reward_cell", raw.GetValueOrDefault("reward_cell", "") },
             { "icon", raw.GetValueOrDefault("icon", "🏆") },
-            { "image_path", raw.GetValueOrDefault("image_path", $"res://assets/sprites/achievements/{achId}.png") },
+            { "image_path", raw.GetValueOrDefault("image_path", AssetPaths.AchievementSprite(achId)) },
             { "steam_api_name", SteamBridge.GetSteamApiName(achId) },
             { "unlocked", unlocked },
             { "current_value", currentVal },

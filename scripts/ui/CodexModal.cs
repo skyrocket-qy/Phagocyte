@@ -23,7 +23,7 @@ public partial class CodexModal : ModalBase
     public string ActiveItemKey { get; set; } = "";
 
     private static readonly Font ItemFont =
-        GD.Load<Font>("res://assets/fonts/BodyMediumFont.tres");
+        AssetLoader.Load<Font>("res://assets/fonts/BodyMediumFont.tres");
     private static readonly Color ItemFontColor = new Color(0.94f, 0.99f, 0.98f);
     private static readonly Color ItemHoverColor = new Color(0.39f, 1.0f, 0.85f);
 

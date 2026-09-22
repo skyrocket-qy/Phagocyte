@@ -17,7 +17,7 @@ public partial class TestSettingsAndSlots : TestHarness
     {
         GD.Print("--- BEGINNING SETTINGS & DUAL-ROW SLOTS AUTOMATED VERIFICATION ---");
         IsolateSaves("settings_slots");
-        var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
+        var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         if (mainScene == null)
         {
             GD.PrintErr("[FAIL] Failed to load main.tscn");
@@ -178,7 +178,7 @@ public partial class TestSettingsAndSlots : TestHarness
         // =========================================================================
         // TEST 7: SettingsModal in Main Menu
         // =========================================================================
-        var menuScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+        var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         AssertThat(menuScene).IsNotNull();
         var menuNode = menuScene!.Instantiate<MainMenu>();
         Root.AddChild(menuNode);

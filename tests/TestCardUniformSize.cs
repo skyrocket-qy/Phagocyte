@@ -4,6 +4,8 @@ using Phagocyte.UI;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
+using Phagocyte.Core;
+
 namespace Phagocyte.Tests;
 
 public partial class TestCardUniformSize : SceneTree
@@ -14,7 +16,7 @@ public partial class TestCardUniformSize : SceneTree
     public override void _Initialize()
     {
         GD.Print("--- TESTING UPGRADE MODAL CARD SIZE UNIFORMITY ---");
-        var modalScene = GD.Load<PackedScene>("res://scenes/ui/upgrade_modal.tscn");
+        var modalScene = AssetLoader.Load<PackedScene>("res://scenes/ui/upgrade_modal.tscn");
         if (modalScene == null)
         {
             GD.PrintErr("Failed to load upgrade_modal.tscn");

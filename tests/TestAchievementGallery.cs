@@ -78,14 +78,14 @@ public partial class TestAchievementGallery : TestHarness
         GD.Print("[PASS] Category accent colors verified.");
 
         // Missing art falls back cleanly (no art shipped yet — every load is null, never throws)
-        AssertThat(AchievementGalleryView.TryLoadAchievementTexture("") == null).IsTrue();
-        AssertThat(AchievementGalleryView.TryLoadAchievementTexture("res://assets/sprites/achievements/ach_engulf_20.png") == null).IsTrue();
+        AssertThat(AssetLoader.TryLoad<Texture2D>("") == null).IsTrue();
+        AssertThat(AssetLoader.TryLoad<Texture2D>("res://assets/sprites/achievements/ach_engulf_20.png") == null).IsTrue();
         GD.Print("[PASS] Missing-artwork fallback verified (emoji plates until PNGs land).");
     }
 
     private MainMenu RunMenuTests()
     {
-        var menuScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+        var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         AssertThat(menuScene).IsNotNull();
         var menu = menuScene!.Instantiate<MainMenu>();
         Root.AddChild(menu);

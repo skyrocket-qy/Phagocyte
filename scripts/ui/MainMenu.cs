@@ -94,9 +94,9 @@ public partial class MainMenu : Control
 
     // Title LabelSettings per locale: EN tracking 6px, ZH tracking 9px.
     private static readonly LabelSettings TitleSettingsEn =
-        GD.Load<LabelSettings>("res://assets/fonts/TitleLabelSettings.tres");
+        AssetLoader.Load<LabelSettings>("res://assets/fonts/TitleLabelSettings.tres");
     private static readonly LabelSettings TitleSettingsZh =
-        GD.Load<LabelSettings>("res://assets/fonts/TitleZhLabelSettings.tres");
+        AssetLoader.Load<LabelSettings>("res://assets/fonts/TitleZhLabelSettings.tres");
 
     private Callable _langCallback;
 

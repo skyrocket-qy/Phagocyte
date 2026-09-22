@@ -1,6 +1,4 @@
 using Godot;
-using System;
-using System.Collections.Generic;
 
 namespace Phagocyte.Core;
 
@@ -19,9 +17,6 @@ public partial class AudioManager : Node
     private AudioStreamPlayer? _bgmPlayer;
     private Tween? _bgmTween;
     private string _currentBgmTrack = "";
-
-    // Stream cache for zero runtime IO latency
-    private readonly Dictionary<string, AudioStream> _audioCache = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Volume state is single-sourced in <see cref="SettingsManager"/> (Phase 3):
@@ -72,77 +67,26 @@ public partial class AudioManager : Node
     private void PreloadCommonAudio()
     {
         // Core SFX
-        CacheResource("hit", "res://assets/audio/sfx/hit.mp3");
-        CacheResource("hit_crit", "res://assets/audio/sfx/hit_crit.mp3");
-        CacheResource("death", "res://assets/audio/sfx/death.wav");
-        CacheResource("explosion", "res://assets/audio/sfx/explosion.mp3");
-        CacheResource("player_hit", "res://assets/audio/sfx/combat/hit_sword_small.mp3");
-        CacheResource("player_death", "res://assets/audio/sfx/combat/die_hero.mp3");
-        CacheResource("level_up", "res://assets/audio/sfx/level_upgrade.mp3");
-        CacheResource("ui_click", "res://assets/audio/sfx/ui/ui_click.mp3");
-        CacheResource("ui_confirm", "res://assets/audio/sfx/ui/ui_confirm.mp3");
-        CacheResource("pickup", "res://assets/audio/sfx/ui/item_pickup.mp3");
-        CacheResource("wave_complete", "res://assets/audio/sfx/wave_complete.mp3");
-        CacheResource("game_over", "res://assets/audio/sfx/game_over.mp3");
-        CacheResource("shoot", "res://assets/audio/sfx/combat/shoot.mp3");
-
-        // Common BGMs
-        CacheResource("menu", "res://assets/audio/bgm/menu.mp3");
-        CacheResource("battle_bgm", "res://assets/audio/bgm/battle_bgm.mp3");
-        CacheResource("boss", "res://assets/audio/bgm/boss.mp3");
-        CacheResource("victory", "res://assets/audio/bgm/victory.mp3");
-        CacheResource("defeat", "res://assets/audio/bgm/defeat.mp3");
-    }
-
-    private void CacheResource(string key, string path)
-    {
-        if (ResourceLoader.Exists(path))
-        {
-            var stream = GD.Load<AudioStream>(path);
-            if (stream != null)
-            {
-                _audioCache[key] = stream;
-            }
-        }
-    }
-
-    private AudioStream? ResolveAudioStream(string name, bool isBgm = false)
-    {
-        if (_audioCache.TryGetValue(name, out var cached))
-            return cached;
-
-        // Try direct file paths
-        string[] candidates = isBgm ? new[]
-        {
-            $"res://assets/audio/bgm/{name}.mp3",
-            $"res://assets/audio/bgm/{name}.ogg",
-            $"res://assets/audio/bgm/{name}.wav"
-        } : new[]
-        {
-            $"res://assets/audio/sfx/{name}.mp3",
-            $"res://assets/audio/sfx/{name}.wav",
-            $"res://assets/audio/sfx/combat/{name}.mp3",
-            $"res://assets/audio/sfx/combat/{name}.wav",
-            $"res://assets/audio/sfx/ui/{name}.mp3",
-            $"res://assets/audio/sfx/ui/{name}.wav",
-            $"res://assets/audio/sfx/gem/{name}.mp3",
-            $"res://assets/audio/sfx/gem/{name}.wav"
-        };
-
-        foreach (var path in candidates)
-        {
-            if (ResourceLoader.Exists(path))
-            {
-                var stream = GD.Load<AudioStream>(path);
-                if (stream != null)
-                {
-                    _audioCache[name] = stream;
-                    return stream;
-                }
-            }
-        }
-
-        return null;
+        AssetLoader.Preload<AudioStream>(
+            "res://assets/audio/sfx/hit.mp3",
+            "res://assets/audio/sfx/hit_crit.mp3",
+            "res://assets/audio/sfx/death.wav",
+            "res://assets/audio/sfx/explosion.mp3",
+            "res://assets/audio/sfx/combat/hit_sword_small.mp3",
+            "res://assets/audio/sfx/combat/die_hero.mp3",
+            "res://assets/audio/sfx/level_upgrade.mp3",
+            "res://assets/audio/sfx/ui/ui_click.mp3",
+            "res://assets/audio/sfx/ui/ui_confirm.mp3",
+            "res://assets/audio/sfx/ui/item_pickup.mp3",
+            "res://assets/audio/sfx/wave_complete.mp3",
+            "res://assets/audio/sfx/game_over.mp3",
+            "res://assets/audio/sfx/combat/shoot.mp3",
+            // Common BGMs
+            "res://assets/audio/bgm/menu.mp3",
+            "res://assets/audio/bgm/battle_bgm.mp3",
+            "res://assets/audio/bgm/boss.mp3",
+            "res://assets/audio/bgm/victory.mp3",
+            "res://assets/audio/bgm/defeat.mp3");
     }
 
     // ==========================================
@@ -157,7 +101,7 @@ public partial class AudioManager : Node
         if (_currentBgmTrack == trackName && _bgmPlayer.Playing)
             return;
 
-        var stream = ResolveAudioStream(trackName, isBgm: true);
+        var stream = AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.BgmCandidates(trackName));
         if (stream == null)
         {
             GD.PushWarning($"AudioManager: BGM track '{trackName}' not found.");
@@ -221,7 +165,7 @@ public partial class AudioManager : Node
 
     public void PlaySfx(string soundName, float pitchRandomness = 0.08f, float volumeDbOffset = 0.0f)
     {
-        var stream = ResolveAudioStream(soundName, isBgm: false);
+        var stream = AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.SfxCandidates(soundName));
         if (stream == null)
             return;
 

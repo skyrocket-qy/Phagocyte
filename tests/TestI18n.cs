@@ -16,7 +16,7 @@ public partial class TestI18n : TestHarness
     {
         GD.Print("--- BEGINNING BILINGUAL I18N AUTOMATED VERIFICATION ---");
 
-        var menuScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+        var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         if (menuScene == null)
         {
             GD.PrintErr("Failed to load main_menu.tscn");
@@ -101,7 +101,7 @@ public partial class TestI18n : TestHarness
         // 5. Test In-Game HUD Localization
         menu.QueueFree();
 
-        var hudScene = GD.Load<PackedScene>("res://scenes/ui/hud.tscn");
+        var hudScene = AssetLoader.Load<PackedScene>("res://scenes/ui/hud.tscn");
         AssertThat(hudScene).IsNotNull();
         var hud = hudScene!.Instantiate<Hud>();
         Root.AddChild(hud);

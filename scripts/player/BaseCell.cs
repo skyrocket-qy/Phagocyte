@@ -446,18 +446,15 @@ public partial class BaseCell : CharacterBody2D
             Nucleus.UV = uvs;
             Nucleus.ZIndex = 0;
 
-            var shader = GD.Load<Shader>("res://shaders/nucleus_sphere.gdshader");
-            if (shader != null)
-            {
-                var nMat = new ShaderMaterial { Shader = shader };
-                nMat.SetShaderParameter("radius", nRadius);
-                nMat.SetShaderParameter("core_color", Nucleus.Color);
-                Color edgeCol = new Color(Nucleus.Color.R * 0.28f, Nucleus.Color.G * 0.15f, Nucleus.Color.B * 0.32f, 1.0f);
-                nMat.SetShaderParameter("edge_color", edgeCol);
-                Color highlightCol = new Color(Mathf.Min(1.0f, Nucleus.Color.R * 1.45f), Mathf.Min(1.0f, Nucleus.Color.G * 1.45f), Mathf.Min(1.0f, Nucleus.Color.B * 1.45f), 1.0f);
-                nMat.SetShaderParameter("highlight_color", highlightCol);
-                Nucleus.Material = nMat;
-            }
+            var shader = AssetLoader.Load<Shader>("res://shaders/nucleus_sphere.gdshader");
+            var nMat = new ShaderMaterial { Shader = shader };
+            nMat.SetShaderParameter("radius", nRadius);
+            nMat.SetShaderParameter("core_color", Nucleus.Color);
+            Color edgeCol = new Color(Nucleus.Color.R * 0.28f, Nucleus.Color.G * 0.15f, Nucleus.Color.B * 0.32f, 1.0f);
+            nMat.SetShaderParameter("edge_color", edgeCol);
+            Color highlightCol = new Color(Mathf.Min(1.0f, Nucleus.Color.R * 1.45f), Mathf.Min(1.0f, Nucleus.Color.G * 1.45f), Mathf.Min(1.0f, Nucleus.Color.B * 1.45f), 1.0f);
+            nMat.SetShaderParameter("highlight_color", highlightCol);
+            Nucleus.Material = nMat;
         }
         if (Cytoplasm != null)
         {
@@ -473,9 +470,7 @@ public partial class BaseCell : CharacterBody2D
     {
         if (Cytoplasm == null)
             return;
-        var shader = GD.Load<Shader>("res://shaders/cytoplasm_gel.gdshader");
-        if (shader == null)
-            return;
+        var shader = AssetLoader.Load<Shader>("res://shaders/cytoplasm_gel.gdshader");
         var mat = new ShaderMaterial { Shader = shader };
         Color baseCol = Cytoplasm.Color;
         mat.SetShaderParameter("tint_color", baseCol);

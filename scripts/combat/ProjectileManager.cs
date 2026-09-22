@@ -114,9 +114,9 @@ public partial class ProjectileManager : Node2D
         _typeKeyToIndex[key] = newIndex;
 
         Texture2D? tex = null;
-        if (!string.IsNullOrEmpty(texturePath) && ResourceLoader.Exists(texturePath))
+        if (!string.IsNullOrEmpty(texturePath))
         {
-            tex = GD.Load<Texture2D>(texturePath);
+            tex = AssetLoader.TryLoad<Texture2D>(texturePath);
         }
         tex ??= GetOrCreateBulletTexture();
 

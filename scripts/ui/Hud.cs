@@ -16,8 +16,7 @@ namespace Phagocyte.UI;
 /// </summary>
 public partial class Hud : CanvasLayer
 {
-    private static PackedScene? _upgradeModalScene;
-    public static PackedScene UpgradeModalScene => _upgradeModalScene ??= GD.Load<PackedScene>("res://scenes/ui/upgrade_modal.tscn");
+    public static PackedScene UpgradeModalScene => AssetLoader.Load<PackedScene>("res://scenes/ui/upgrade_modal.tscn");
 
     // --- First-run micro-cues (docs/tutorial.md §2) ---
     public const float MoveCueSeconds = 5.0f;

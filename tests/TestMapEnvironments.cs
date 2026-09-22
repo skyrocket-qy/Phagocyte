@@ -93,7 +93,7 @@ public partial class TestMapEnvironments : TestHarness
         Cleanup();
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = mapId;
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
         _main = main;
         Root.AddChild(main);
         main.SetPhysicsProcess(false);

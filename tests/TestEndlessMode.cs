@@ -292,7 +292,7 @@ public partial class TestEndlessMode : TestHarness
         AssertThat(SteamBridge.GetLocalBestSurvivalSeconds()).IsEqualApprox(1900.0f, 0.01f);
 
         // Golden chronic chart: settlement banner switches to the chronic diagnosis
-        var menuScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+        var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         var menu = menuScene.Instantiate<MainMenu>();
         Root.AddChild(menu);
         var modal = menu.RecordsModal;

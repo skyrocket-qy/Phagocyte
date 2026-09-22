@@ -207,7 +207,7 @@ public partial class AchievementGalleryView : Control
         bool unlocked = d["unlocked"].AsBool();
         Color accent = CategoryColor(d);
 
-        Texture2D? tex = TryLoadAchievementTexture(d.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "");
+        Texture2D? tex = AssetLoader.TryLoad<Texture2D>(d.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "");
         if (DetailImage != null)
         {
             if (tex != null)
@@ -301,17 +301,6 @@ public partial class AchievementGalleryView : Control
     }
 
     /// <summary>
-    /// Loads the Steam-mirrored artwork. Returns null when the file is absent
-    /// so callers render the emoji fallback plate instead. Never throws.
-    /// </summary>
-    public static Texture2D? TryLoadAchievementTexture(string imagePath)
-    {
-        if (string.IsNullOrEmpty(imagePath) || !ResourceLoader.Exists(imagePath))
-            return null;
-        return ResourceLoader.Load<Texture2D>(imagePath);
-    }
-
-    /// <summary>
     /// Accent color by achievement family: Hard clears read red, cell-unlock
     /// rewards green, normal map clears blue, generic milestones gold.
     /// Derived from the info dict so no extra catalog lookups are needed.
@@ -368,7 +357,7 @@ public partial class AchievementGalleryView : Control
         thumbWrap.MouseFilter = MouseFilterEnum.Ignore;
         hbox.AddChild(thumbWrap);
 
-        Texture2D? tex = TryLoadAchievementTexture(ach.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "");
+        Texture2D? tex = AssetLoader.TryLoad<Texture2D>(ach.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "");
         if (tex != null)
         {
             var thumb = new TextureRect

@@ -262,7 +262,7 @@ public partial class TestRunRecords : TestHarness
 
     private void PhaseHistoryModal()
     {
-        var menuScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+        var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         var menu = menuScene.Instantiate<MainMenu>();
         Root.AddChild(menu);
 
@@ -332,7 +332,7 @@ public partial class TestRunRecords : TestHarness
 
     private void PhaseDeathAndRevival()
     {
-        var cellScene = GD.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+        var cellScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
 
         var doomed = cellScene.Instantiate<Macrophage>();
         Root.AddChild(doomed);
@@ -363,7 +363,7 @@ public partial class TestRunRecords : TestHarness
 
     private void PhaseStartMainScene()
     {
-        _main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        _main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
         Root.AddChild(_main);
         AssertThat(_main.RunGoalSeconds).IsGreater(0.0f);
         AssertThat(_main.RunEnded).IsFalse();
@@ -411,7 +411,7 @@ public partial class TestRunRecords : TestHarness
 
     private void PhaseDefeatSettlement()
     {
-        var main2 = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main2 = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
         Root.AddChild(main2);
 
         var player = main2.GetNodeOrNull<BaseCell>("Macrophage");

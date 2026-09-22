@@ -17,7 +17,7 @@ public partial class TestCodexAndTooltip : TestHarness
     public override void _Initialize()
     {
         GD.Print("--- BEGINNING CODEX & TOOLTIP AUTOMATED VERIFICATION ---");
-        var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
+        var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         if (mainScene == null)
         {
             GD.PrintErr("[FAIL] Failed to load main.tscn");

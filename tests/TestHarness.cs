@@ -111,7 +111,7 @@ public abstract partial class TestHarness : SceneTree
         GameManager.SelectedDifficulty = difficulty;
         GameManager.EndlessMode = endless;
 
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
         Root.AddChild(main);
         main.SetPhysicsProcess(false);
         return main;

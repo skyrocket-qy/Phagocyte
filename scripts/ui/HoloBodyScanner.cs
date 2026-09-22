@@ -76,7 +76,7 @@ public partial class HoloBodyScanner : Control
         AddChild(_bodyContainer);
 
         // 2. High-precision base transparent human silhouette texture
-        var baseTex = GD.Load<Texture2D>("res://assets/sprites/ui/hologram/holo_body_base.png");
+        var baseTex = AssetLoader.Load<Texture2D>("res://assets/sprites/ui/hologram/holo_body_base.png");
         _baseTextureRect = new TextureRect
         {
             Name = "BaseBody",
@@ -99,7 +99,7 @@ public partial class HoloBodyScanner : Control
 
         foreach (var (key, path) in overlayConfigs)
         {
-            var tex = GD.Load<Texture2D>(path);
+            var tex = AssetLoader.Load<Texture2D>(path);
             var addMat = new CanvasItemMaterial
             {
                 BlendMode = CanvasItemMaterial.BlendModeEnum.Add

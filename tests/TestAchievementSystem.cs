@@ -211,7 +211,7 @@ public partial class TestAchievementSystem : TestHarness
 
                 // --- Step 5: MainMenu Achievement Gallery (independent fifth view) ---
                 // Achievements no longer live in Codex Tab 4; the gallery owns them.
-                var galleryScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+                var galleryScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
                 AssertThat(galleryScene).IsNotNull();
                 var galleryMenu = galleryScene!.Instantiate<MainMenu>();
                 Root.AddChild(galleryMenu);
@@ -238,14 +238,14 @@ public partial class TestAchievementSystem : TestHarness
                 AssertThat(galleryInfo.ContainsKey("image_path")).IsTrue();
                 AssertThat(galleryInfo.ContainsKey("steam_api_name")).IsTrue();
                 AssertThat(galleryInfo["steam_api_name"].AsString()).IsEqual("ACH_ENGULF_20");
-                AssertThat(AchievementGalleryView.TryLoadAchievementTexture(galleryInfo["image_path"].AsString()) == null).IsTrue();
+                AssertThat(AssetLoader.TryLoad<Texture2D>(galleryInfo["image_path"].AsString()) == null).IsTrue();
                 GD.Print("[PASS] Step 5: AchievementGallery fifth-view rendering, 3-state filter and Steam art fallback verified.");
 
                 // --- Step 6: Main Menu Locked Cell Status & Confirm Button Test ---
                 AchievementManager.ResetAll(); // Reset so cells are locked again
                 galleryMenu.QueueFree();
 
-                var menuScene = GD.Load<PackedScene>("scenes/ui/main_menu.tscn");
+                var menuScene = AssetLoader.Load<PackedScene>("scenes/ui/main_menu.tscn");
                 AssertThat(menuScene).IsNotNull();
                 _menuInstance = menuScene!.Instantiate<MainMenu>();
                 Root.AddChild(_menuInstance);

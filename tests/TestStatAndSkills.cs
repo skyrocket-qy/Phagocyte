@@ -148,7 +148,7 @@ public partial class TestStatAndSkills : TestHarness
         mockHost.QueueFree();
 
         // Now load the actual game scene to test complete runtime integration
-        var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
+        var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         AssertThat(mainScene).IsNotNull();
         var mainInstance = mainScene!.Instantiate();
         Root.AddChild(mainInstance);

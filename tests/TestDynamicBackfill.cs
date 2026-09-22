@@ -77,7 +77,7 @@ public partial class TestDynamicBackfill : TestHarness
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = "acute_wound";
 
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
         main.ScreenCapNormal = 10;
         main.ScreenCapSwarm = 14;
         Root.AddChild(main);

@@ -150,7 +150,7 @@ public static class CatalogBuilders
             // Missing files fall back to the emoji icon at render time.
             string imagePath = CatalogLoader.GetString(row, "image_path");
             if (string.IsNullOrEmpty(imagePath) && !string.IsNullOrEmpty(id))
-                imagePath = $"res://assets/sprites/achievements/{id}.png";
+                imagePath = AssetPaths.AchievementSprite(id);
             if (!string.IsNullOrEmpty(imagePath))
                 entry["image_path"] = imagePath;
             // Map-clear chain extras (absent on generic achievements).

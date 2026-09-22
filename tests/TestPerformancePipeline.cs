@@ -183,7 +183,7 @@ public partial class TestPerformancePipeline : TestHarness
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = "acute_wound";
 
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
         _main = main;
         Root.AddChild(main);
         main.SetPhysicsProcess(false);

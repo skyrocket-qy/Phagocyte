@@ -132,7 +132,7 @@ public partial class TestLevelUpModal : TestHarness
         mockPlayer.QueueFree();
 
         // --- Test 5: In-game Runtime Integration with Main Scene ---
-        var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
+        var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         if (mainScene == null)
         {
             GD.PrintErr("[FAIL] Could not load main.tscn");

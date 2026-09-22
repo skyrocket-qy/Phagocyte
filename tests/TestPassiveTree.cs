@@ -572,7 +572,7 @@ public partial class TestPassiveTree : TestHarness
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = "acute_wound";
 
-        var menuScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+        var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         AssertThat(menuScene).IsNotNull();
         _menu = menuScene!.Instantiate<MainMenu>();
         Root.AddChild(_menu);
@@ -682,7 +682,7 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(PassiveTreeManager.Purchase("ctl", "tree_precise_edge")).IsTrue();
 
         GameManager.SelectedClass = "ctl";
-        var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
+        var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         AssertThat(mainScene).IsNotNull();
         _main = mainScene!.Instantiate<Main>();
         Root.AddChild(_main);

@@ -20,7 +20,7 @@ public partial class TestSurvivorHudUx : TestHarness
         GD.Print(">>> STARTING SURVIVOR-LIKE HUD & UX OVERHAUL VERIFICATION <<<");
         GD.Print("==================================================================");
 
-        var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
+        var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         AssertThat(mainScene).IsNotNull();
         var main = mainScene.Instantiate();
         Root.AddChild(main);

@@ -133,7 +133,7 @@ public partial class TestAfflictions : TestHarness
 
     private void RunPlayerEffectTests()
     {
-        var cellScene = GD.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+        var cellScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
 
         // Endotoxemia: pathogen damage +50%, environmental damage unaffected
         AfflictionManager.SetSelection(new[] { AfflictionManager.Endotoxemia });

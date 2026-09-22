@@ -54,7 +54,7 @@ public partial class TestMapLockUi : TestHarness
 
     private void RunTests()
     {
-        var menuScene = GD.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
+        var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         AssertThat(menuScene).IsNotNull();
         var menu = menuScene!.Instantiate<MainMenu>();
         Root.AddChild(menu);

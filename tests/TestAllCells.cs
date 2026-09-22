@@ -134,7 +134,7 @@ public partial class TestAllCells : TestHarness
 
                 // --- Phase 1: In-Game Runtime Instantiation with CTL selected ---
                 GameManager.SelectedClass = "ctl";
-                var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
+                var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
                 AssertThat(mainScene).IsNotNull();
                 _mainInstance = mainScene!.Instantiate();
                 Root.AddChild(_mainInstance);

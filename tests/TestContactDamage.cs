@@ -5,6 +5,8 @@ using Phagocyte.Enemies;
 using Phagocyte.Player;
 using Phagocyte.Skills;
 
+using Phagocyte.Core;
+
 namespace Phagocyte.Tests;
 
 /// <summary>
@@ -82,7 +84,7 @@ public partial class TestContactDamage : TestHarness
         _arena = new Node2D { Name = "ContactArena" };
         Root.AddChild(_arena);
 
-        var playerScene = GD.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+        var playerScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
         if (playerScene == null)
             return false;
         _player = playerScene.Instantiate<Macrophage>();

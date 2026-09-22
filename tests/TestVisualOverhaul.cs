@@ -19,7 +19,7 @@ public partial class TestVisualOverhaul : TestHarness
         GD.Print("==================================================================");
         GD.Print(">>> STARTING COMMERCIAL-GRADE VISUAL OVERHAUL AUTOMATED TEST <<<");
         GD.Print("==================================================================");
-        var mainScene = GD.Load<PackedScene>("res://scenes/main.tscn");
+        var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         if (mainScene == null)
         {
             GD.PrintErr("[FAIL] Failed to load main.tscn");
@@ -135,7 +135,7 @@ public partial class TestVisualOverhaul : TestHarness
         // =========================================================================
         // TEST 7: Pathogen Breathing Oscillation & 3D Shading
         // =========================================================================
-        var staphScene = GD.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
+        var staphScene = AssetLoader.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
         AssertThat(staphScene).IsNotNull();
         var staph = staphScene!.Instantiate<StaphEnemy>();
         main.AddChild(staph);

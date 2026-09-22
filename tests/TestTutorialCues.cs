@@ -75,7 +75,7 @@ public partial class TestTutorialCues : TestHarness
     {
         AfflictionManager.Clear();
 
-        var cellScene = GD.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+        var cellScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
         var cell = cellScene.Instantiate<Macrophage>();
         Root.AddChild(cell);
         AssertThat(cell.Stats).IsNotNull();
@@ -177,7 +177,7 @@ public partial class TestTutorialCues : TestHarness
             }
         };
 
-        var modalScene = GD.Load<PackedScene>("res://scenes/ui/upgrade_modal.tscn");
+        var modalScene = AssetLoader.Load<PackedScene>("res://scenes/ui/upgrade_modal.tscn");
         var modal = modalScene.Instantiate<UpgradeModal>();
         Root.AddChild(modal);
         modal.ShowChoices(choices);
@@ -208,7 +208,7 @@ public partial class TestTutorialCues : TestHarness
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = "acute_wound";
 
-        var main = GD.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
         _main = main;
         Root.AddChild(main);
         main.SetPhysicsProcess(false);

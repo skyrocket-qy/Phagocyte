@@ -7,8 +7,7 @@ namespace Phagocyte.Skills;
 
 public partial class RosTorrentSkill : BaseSkill
 {
-    private static PackedScene? _jetScene;
-    public static PackedScene JetScene => _jetScene ??= GD.Load<PackedScene>("res://scenes/skills/ros_jet.tscn");
+    public static PackedScene JetScene => AssetLoader.Load<PackedScene>("res://scenes/skills/ros_jet.tscn");
 
     [Export] public float BaseDamage { get; set; } = 25.0f;
     [Export] public float AttackRange { get; set; } = 650.0f;

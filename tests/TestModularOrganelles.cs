@@ -6,6 +6,8 @@ using Phagocyte.Enemies;
 using Phagocyte.Organelles;
 using Phagocyte.Player;
 
+using Phagocyte.Core;
+
 namespace Phagocyte.Tests;
 
 /// <summary>
@@ -60,7 +62,7 @@ public partial class TestModularOrganelles : SceneTree
         _container = new Node2D { Name = "OrganelleTestContainer" };
         Root.AddChild(_container);
 
-        var spikeScene = GD.Load<PackedScene>("res://scenes/skills/ReceptorSpikes.tscn");
+        var spikeScene = AssetLoader.Load<PackedScene>("res://scenes/skills/ReceptorSpikes.tscn");
         AssertThat(spikeScene).IsNotNull();
 
         var cell = new BaseCell { Name = "OrganelleHost", GlobalPosition = new Vector2(500, 500) };

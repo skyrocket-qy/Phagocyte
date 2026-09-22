@@ -43,7 +43,7 @@ public static class DataValidator
             if (!string.IsNullOrEmpty(ach) && !AchievementManager.Achievements.ContainsKey(ach))
                 errors.Add($"Class '{classId}' references achievement '{ach}' missing from achievements.json.");
             string scene = CatalogLoader.GetString(entry, "scene_path");
-            if (!string.IsNullOrEmpty(scene) && !ResourceLoader.Exists(scene))
+            if (!string.IsNullOrEmpty(scene) && !AssetLoader.Exists(scene))
                 errors.Add($"Class '{classId}' references scene '{scene}' which does not exist.");
         }
 
