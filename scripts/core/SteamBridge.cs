@@ -152,10 +152,4 @@ public static class SteamBridge
     {
         return RunRecordManager.GetBestEndlessSurvivalTime();
     }
-
-    /// <summary>Offline fallback for the reserved global score board.</summary>
-    public static int GetLocalBestScore()
-    {
-        return RunRecordManager.GetBestEndlessScore();
-    }
 }

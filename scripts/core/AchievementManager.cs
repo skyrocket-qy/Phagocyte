@@ -406,20 +406,6 @@ public partial class AchievementManager : Node
     }
 
     /// <summary>
-    /// Helper: Get the prerequisite achievement id that unlocks an organ map, or "".
-    /// </summary>
-    public static string GetMapUnlockAchievementId(string mapId)
-    {
-        foreach (string achId in Achievements.Keys)
-        {
-            var ach = Achievements[achId].AsGodotDictionary();
-            if (ach.GetValueOrDefault("unlock_map", "").AsString() == mapId)
-                return achId;
-        }
-        return "";
-    }
-
-    /// <summary>
     /// Save achievement state to disk
     /// </summary>
     public static void SaveToDisk()

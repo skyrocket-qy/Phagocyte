@@ -16,12 +16,6 @@ public static class TargetingService
         return node is Node2D n && GodotObject.IsInstanceValid(n);
     }
 
-    /// <summary>True when the node can be hit (valid, not currently being engulfed).</summary>
-    public static bool IsTargetable(Node? node)
-    {
-        return IsValidTarget(node) && !(node is BaseEnemy be && be.IsBeingEaten);
-    }
-
     /// <summary>
     /// True when the node is a valid, living pathogen that accepts damage or
     /// engulfment. Used by organelles that scan for contact targets.

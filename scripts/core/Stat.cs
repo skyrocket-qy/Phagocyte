@@ -40,10 +40,4 @@ public class Stat
     {
         BaseValue = val;
     }
-
-    public void ResetModifiers()
-    {
-        FlatBonus = 0.0f;
-        PercentBonus = 0.0f;
-    }
 }

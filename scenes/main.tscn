@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://scripts/directors/NeutralMatterManager.cs" id="11_neutral"]
 [ext_resource type="Script" path="res://scripts/directors/OrganEnvironmentSystem.cs" id="12_organ"]
 [ext_resource type="Script" path="res://scripts/directors/RunSettlementService.cs" id="13_settlement"]
+[ext_resource type="Script" path="res://scripts/player/CameraFollow.cs" id="14_camerafollow"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
 shader = ExtResource("2_bg_shader")
@@ -145,6 +146,10 @@ script = ExtResource("13_settlement")
 [node name="Macrophage" parent="." instance=ExtResource("3_macrophage")]
 
 [node name="Camera2D" type="Camera2D" parent="Macrophage"]
+script = ExtResource("14_camerafollow")
+DefaultZoomScale = 0.5
+MapWidth = 4800.0
+MapHeight = 4800.0
 zoom = Vector2(0.5, 0.5)
 limit_left = -2400
 limit_top = -2400

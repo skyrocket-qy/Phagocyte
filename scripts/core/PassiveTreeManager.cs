@@ -213,21 +213,6 @@ public static class PassiveTreeManager
 
     public static System.Collections.Generic.IReadOnlyDictionary<string, string> StatLabelValues => StatLabels;
 
-
-
-
-    public static string GetRarityName(TreeRarity rarity)
-    {
-        return rarity switch
-        {
-            TreeRarity.Magic => TranslationServer.Translate("TREE_RARITY_MAGIC"),
-            TreeRarity.Rare => TranslationServer.Translate("TREE_RARITY_RARE"),
-            TreeRarity.Unique => TranslationServer.Translate("TREE_RARITY_UNIQUE"),
-            TreeRarity.Start => TranslationServer.Translate("TREE_RARITY_START"),
-            _ => TranslationServer.Translate("TREE_RARITY_NORMAL")
-        };
-    }
-
     public static string GetStatLabel(string stat)
     {
         return StatLabels.TryGetValue(stat, out var key) ? TranslationServer.Translate(key) : stat;

@@ -7,9 +7,7 @@ public enum DamageNumberType
 {
     EnemyDamage,
     PlayerDamage,
-    Heal,
-    Evaded,
-    Blocked
+    Heal
 }
 
 /// <summary>
@@ -116,18 +114,6 @@ public partial class DamageNumberSpawner : CanvasLayer
                 text = $"+{Mathf.RoundToInt(amount)} HP";
                 color = new Color(0.35f, 0.95f, 0.55f); // Bio-green
                 fontSize = 13;
-                break;
-
-            case DamageNumberType.Evaded:
-                text = TranslationServer.Translate("COMBAT_EVADED");
-                color = new Color(0.25f, 0.95f, 0.55f);
-                fontSize = 14;
-                break;
-
-            case DamageNumberType.Blocked:
-                text = TranslationServer.Translate("COMBAT_BLOCKED");
-                color = new Color(0.35f, 0.75f, 1.0f);
-                fontSize = 14;
                 break;
 
             default:
