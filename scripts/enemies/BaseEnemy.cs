@@ -397,7 +397,8 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         {
             PlayDigestionVfx(predPos);
             EmitSignal(SignalName.Digested, this);
-            QueueFree();
+            // Route through death: kill credit + EXP, same as any other kill.
+            Die(predator);
         }));
     }
 
@@ -417,6 +418,66 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
 
     /// <summary>Contact damage dealt to a cell whose engulf attempt bounces off.</summary>
     protected virtual float EngulfContactDamage => 0.0f;
+
+    /// <summary>Per-enemy contact damage table (survivor-like touch damage).</summary>
+    private static readonly Dictionary<string, float> ContactDamageByEnemyId = new()
+    {
+        ["staph"] = 3.0f,
+        ["tb"] = 5.0f,
+        ["e_coli"] = 4.0f,
+        ["candida"] = 5.0f,
+        ["pseudomonas"] = 4.0f,
+        ["ebola"] = 6.0f,
+        ["h_pylori"] = 4.0f,
+        ["flu_drift"] = 5.0f,
+        ["tetanus"] = 4.0f,
+        ["plasmodium"] = 5.0f,
+        ["plasmodium_merozoite"] = 3.0f,
+        ["malignant_cell"] = 6.0f,
+        ["toxoplasma"] = 4.0f,
+        ["hiv"] = 4.0f,
+        ["s_virus"] = 4.0f,
+        ["norovirus"] = 3.0f,
+        ["varicella_zoster"] = 4.0f,
+        ["rabies"] = 5.0f,
+        ["anthrax_spore"] = 4.0f,
+        ["anthrax_bacillus"] = 5.0f,
+        ["aspergillus"] = 5.0f,
+        ["prion"] = 12.0f,
+        ["prion_fragment"] = 8.0f,
+    };
+
+    /// <summary>
+    /// Contact damage dealt to a cell on touch. One-directional by design:
+    /// monsters hurt the cell; the cell never hurts monsters by touching.
+    /// Boss families override with their own values.
+    /// </summary>
+    protected virtual float ContactDamage => ContactDamageByEnemyId.TryGetValue(EnemyId, out float dmg) ? dmg : 3.0f;
+
+    /// <summary>Seconds between contact ticks against the same cell.</summary>
+    protected virtual float ContactTickInterval => 1.0f;
+
+    /// <summary>Next allowed contact-tick timestamp (msec).</summary>
+    public double NextContactTickMsec { get; set; }
+
+    /// <summary>
+    /// Survivor-like contact strike: at most one hit per
+    /// <see cref="ContactTickInterval"/>. Routes through the cell's
+    /// evasion/block/armor pipeline.
+    /// </summary>
+    public bool TryContactStrike(BaseCell cell)
+    {
+        if (cell == null || !GodotObject.IsInstanceValid(cell) || cell.IsDead)
+            return false;
+        if (IsBeingEaten || CurrentHealth <= 0.0f)
+            return false;
+        double now = Time.GetTicksMsec();
+        if (now < NextContactTickMsec)
+            return false;
+        NextContactTickMsec = now + ContactTickInterval * 1000.0;
+        cell.TakeDamage(ContactDamage);
+        return true;
+    }
 
     /// <summary>Knockback impulse applied to a cell whose engulf attempt bounces off.</summary>
     protected virtual float EngulfRepelForce => 0.0f;
@@ -492,6 +553,12 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
     public virtual void Die(Node2D? killer)
     {
         AudioManager.Instance?.PlayEnemyDeath();
+        // All progression EXP flows through death, regardless of what
+        // killed it (skills, DoT, hazards). Engulfed prey routes here too
+        // at digestion end — never grant EXP anywhere else for enemies.
+        var player = PlayerRef;
+        if (player != null && GodotObject.IsInstanceValid(player))
+            player.AddExp(AtpValue);
         AchievementManager.RecordEvent("pathogen_killed", EnemyId);
         RunTelemetryManager.Instance?.RecordKill(BaseScore);
         EmitSignal(SignalName.EnemyDied, this);

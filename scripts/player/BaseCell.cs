@@ -284,11 +284,9 @@ public partial class BaseCell : CharacterBody2D
 
         Stats.StatChanged += OnStatChanged;
 
-        // Connect engulfment signals
-        if (EngulfArea != null)
-        {
-            EngulfArea.AreaEntered += OnEngulfAreaEntered;
-        }
+        // EngulfArea doubles as the contact-damage sensor: overlapping
+        // monsters are polled every physics tick (see ProcessContactDamage).
+        // Touching no longer engulfs — eating is skills-only now.
 
         SetupGranuleCanvas();
         SetupNucleusShape();
@@ -344,6 +342,7 @@ public partial class BaseCell : CharacterBody2D
         HandleRegen(dt);
         UpdateSqueezeState();
         HandleMovement(dt);
+        ProcessContactDamage();
         UpdatePseudopodDeformation(dt);
 
         if (CellSkillManager != null)
@@ -771,16 +770,20 @@ public partial class BaseCell : CharacterBody2D
         Nucleus.Position = NucleusOffset;
     }
 
-    private void OnEngulfAreaEntered(Area2D area)
+    /// <summary>
+    /// Survivor-like contact damage (one-directional): overlapping monsters
+    /// hurt the cell on a per-enemy tick. The cell never damages monsters
+    /// by touching — eating is skills-only now.
+    /// </summary>
+    private void ProcessContactDamage()
     {
-        var enemy = area.GetParent();
-        if (enemy is IEngulfable)
+        if (EngulfArea == null || IsDead)
+            return;
+        foreach (var area in EngulfArea.GetOverlappingAreas())
         {
-            ConsumePathogen((Node2D)enemy);
-        }
-        else if (enemy != null && enemy.HasMethod("be_engulfed"))
-        {
-            ConsumePathogen((Node2D)enemy);
+            if (area.GetParent() is not BaseEnemy enemy)
+                continue;
+            enemy.TryContactStrike(this);
         }
     }
 
@@ -818,12 +821,11 @@ public partial class BaseCell : CharacterBody2D
                 enemy.Call("BeEngulfed", this);
         }
 
+        // No EXP here: enemies grant it in Die() at digestion end, harvests
+        // grant it on completion. Touching/starting never pays out.
         DigestedCount += 1;
 
         OnPathogenConsumed(enemy, atp);
-
-        float finalAtp = atp;
-        AddExp(finalAtp);
 
         EmitSignal(SignalName.PathogenDigested, enemy, atp);
         EmitStatsSignal();

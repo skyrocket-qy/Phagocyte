@@ -20,7 +20,7 @@ public abstract partial class TerminalBossEnemy : BaseEnemy
 
     public override bool CanBeEngulfed => false;
 
-    protected virtual float ContactDamage => 26.0f;
+    protected override float ContactDamage => 26.0f;
     protected virtual float TelegraphScale => 1.35f;
     protected virtual float TelegraphDamage => 24.0f;
 

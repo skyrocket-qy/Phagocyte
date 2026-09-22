@@ -18,9 +18,12 @@ namespace Phagocyte.Tests;
 public partial class TestNeutralMatter : TestHarness
 {
     private int _frame = 0;
+    private int _phase = 0;
     private bool _done = false;
     private Node2D? _container;
     private BaseCell? _player;
+    private float _rbcExpBefore;
+    private int _rbcKillsBefore;
 
     public override bool _Process(double delta)
     {
@@ -31,10 +34,28 @@ public partial class TestNeutralMatter : TestHarness
         if (_frame < 3)
             return false;
 
-        _done = true;
         try
         {
-            RunTests();
+            if (_phase == 0)
+            {
+                RunSetupAndRbcConsume();
+                _phase = 1;
+                _frame = 0;
+                return false;
+            }
+
+            // RBC harvest tween (0.18s) pays out on completion.
+            if (_frame < 20)
+                return false;
+
+            AssertSenescentRbc();
+            TestPelletCover();
+            TestToxinVesicle();
+            TestUlcerationMeter();
+            TestMainIntegration();
+
+            _container!.QueueFree();
+            _done = true;
         }
         catch (Exception ex)
         {
@@ -50,7 +71,7 @@ public partial class TestNeutralMatter : TestHarness
         return true;
     }
 
-    private void RunTests()
+    private void RunSetupAndRbcConsume()
     {
         EnemySteering.ConfigureArena(new Vector2(2000, 2000));
         HostUlceration.Reset();
@@ -60,16 +81,10 @@ public partial class TestNeutralMatter : TestHarness
         _player = new BaseCell { Name = "NeutralMatterHost", GlobalPosition = new Vector2(500, 500) };
         _container.AddChild(_player);
 
-        TestSenescentRbc();
-        TestPelletCover();
-        TestToxinVesicle();
-        TestUlcerationMeter();
-        TestMainIntegration();
-
-        _container.QueueFree();
+        ConsumeSenescentRbc();
     }
 
-    private void TestSenescentRbc()
+    private void ConsumeSenescentRbc()
     {
         var rbc = new SenescentRBC { GlobalPosition = new Vector2(700, 700) };
         _container!.AddChild(rbc);
@@ -80,13 +95,17 @@ public partial class TestNeutralMatter : TestHarness
         AssertThat(rbc.GetAtpValue()).IsEqual(25.0f);
         AssertThat(rbc.GetBaseScore()).IsEqual(0);
 
-        int killsBefore = _player!.DigestedCount;
-        float expBefore = _player.CurrentExp;
+        _rbcKillsBefore = _player!.DigestedCount;
+        _rbcExpBefore = _player.CurrentExp;
         _player.ConsumePathogen(rbc);
 
         AssertThat(rbc.IsConsumed).IsTrue();
-        AssertThat(_player.DigestedCount).IsEqual(killsBefore + 1);
-        AssertThat(_player.CurrentExp).IsGreater(expBefore);
+    }
+
+    private void AssertSenescentRbc()
+    {
+        AssertThat(_player!.DigestedCount).IsEqual(_rbcKillsBefore + 1);
+        AssertThat(_player.CurrentExp).IsGreater(_rbcExpBefore);
         GD.Print("[PASS] Senescent RBC is neutral cover and only yields ATP/kill when engulfed.");
     }
 

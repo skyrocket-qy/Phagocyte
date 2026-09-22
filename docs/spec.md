@@ -23,7 +23,7 @@
 
 ```mermaid
 graph TD
-    A["走位與誘捕 (Navigating & Luring)<br>利用動態偽足邊界包裹病原體"] --> B["接觸吞噬與儲能 (Phagocytosis & EXP)<br>病原體入體消化，轉化為免疫經驗"]
+    A["走位與誘捕 (Navigating & Luring)<br>利用動態走位保持距離、拉扯怪群"] --> B["擊殺吞噬與儲能 (Kills & EXP)<br>擊殺或技能吞噬，轉化為免疫經驗"]
     B --> C["抗原採樣與過載 (Antigen Sampling & Burst)<br>達閾值觸發全自動技能齊射"]
     C --> D["表觀遺傳質變 (Epigenetic Mutations)<br>局內三選一：升級主動5/被動5與超武二合一融合"]
     D --> E["病理波次結算 (Wave Clear & Differentiation)<br>獲得微管天賦點，點亮造血幹細胞天賦星盤"]
@@ -72,7 +72,7 @@ graph TD
 
 ### 動態體積與範圍縮放機制（Volume & Area Scaling）
 
-在「接觸吞噬」為核心的機制下，體積大小嚴格遵循直覺且純粹的 **Area 範圍等比縮放機制**（類似《流亡黯道 PoE》的 AoE 縮放），不引入繁複的慣性與額外發射點運算，保持戰鬥手感輕快純粹：
+在「碰撞傷害＋擊殺經驗」為核心的機制下，體積大小嚴格遵循直覺且純粹的 **Area 範圍等比縮放機制**（類似《流亡黯道 PoE》的 AoE 縮放），不引入繁複的慣性與額外發射點運算，保持戰鬥手感輕快純粹：
 
 #### 體積動態聯動公式
 
@@ -397,7 +397,7 @@ func update_all_skills(delta: float) -> void:
 
 ### Phase 2: 吞噬循環與戰鬥手感 (Combat & Phagocytosis Loop)
 - [x] 實現吞噬病原體入體轉化為免疫經驗（EXP）計量
-- [ ] 實現按住空白鍵「脫水穿梭（Squeeze Mode）」避險機制（體積壓縮 40%，關閉吞噬，移速提升）
+- [ ] 實現按住空白鍵「脫水穿梭（Squeeze Mode）」避險機制（體積壓縮 40%，移速提升）
 - [x] 實現局內三選一升級抽取介面（主動 / 被動 / 質變突變卡）
 
 ### Phase 3: 五大白血球形態與細胞核 (Immune Cell Morphology)

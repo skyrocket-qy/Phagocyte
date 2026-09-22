@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
 
@@ -107,7 +108,13 @@ public partial class SenescentRBC : Node2D
             .SetTrans(Tween.TransitionType.Back)
             .SetEase(Tween.EaseType.In);
         tween.TweenProperty(this, "modulate:a", 0.0f, 0.18);
-        tween.Chain().TweenCallback(Callable.From(QueueFree));
+        tween.Chain().TweenCallback(Callable.From(() =>
+        {
+            // Harvest resolution pays out: neutral matter has no Die().
+            if (predator is BaseCell cell && GodotObject.IsInstanceValid(cell))
+                cell.AddExp(GetAtpValue());
+            QueueFree();
+        }));
     }
 
     /// <summary>

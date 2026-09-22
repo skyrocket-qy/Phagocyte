@@ -19,7 +19,7 @@ public abstract partial class SubBossEnemy : BaseEnemy
 
     public override bool CanBeEngulfed => false;
 
-    protected virtual float ContactDamage => 16.0f;
+    protected override float ContactDamage => 16.0f;
 
     // Engulf attempts bounce off and damage the cell (repel handled by BaseEnemy).
     protected override float EngulfContactDamage => ContactDamage;
