@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/ui/AchievementGalleryView.cs" id="1_gallery"]
 
-[ext_resource type="Font" path="res://assets/fonts/BodyMediumFont.tres" id="8_btn_font"]
+[ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.07, 0.11, 0.16, 0.85)
@@ -19,42 +19,6 @@ content_margin_left = 20.0
 content_margin_top = 20.0
 content_margin_right = 20.0
 content_margin_bottom = 20.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
-bg_color = Color(0.05, 0.09, 0.14, 0.92)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.25, 0.45, 0.6, 0.7)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-bg_color = Color(0.07, 0.2, 0.16, 0.95)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.39, 1, 0.85, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
-bg_color = Color(0.05, 0.1, 0.15, 0.95)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0, 0.7, 0.85, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 
 [node name="AchievementView" type="Control"]
 visible = false
@@ -126,45 +90,24 @@ alignment = 1
 custom_minimum_size = Vector2(200, 34)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
-theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
-theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
-theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
-theme_override_fonts/font = ExtResource("8_btn_font")
+theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 14
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "全部"
 
 [node name="FilterUnlockedButton" type="Button" parent="FilterHBox"]
 custom_minimum_size = Vector2(200, 34)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
-theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
-theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
-theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
-theme_override_fonts/font = ExtResource("8_btn_font")
+theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 14
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "已解锁"
 
 [node name="FilterLockedButton" type="Button" parent="FilterHBox"]
 custom_minimum_size = Vector2(200, 34)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
-theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
-theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
-theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
-theme_override_fonts/font = ExtResource("8_btn_font")
+theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 14
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "未解锁"
 
 [node name="HBox" type="HBoxContainer" parent="."]

@@ -8,11 +8,11 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/class_view.tscn" id="14_class"]
 [ext_resource type="PackedScene" path="res://scenes/ui/passive_view.tscn" id="15_passive"]
 [ext_resource type="PackedScene" path="res://scenes/ui/map_view.tscn" id="16_map"]
-[ext_resource type="Font" path="res://assets/fonts/BodyMediumFont.tres" id="8_btn_font"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/menu/background.jpeg" id="9_menu_bg"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/menu/cell.jpeg" id="10_menu_cell"]
 [ext_resource type="Shader" path="res://shaders/menu_watermark_blend.gdshader" id="11_wm_shader"]
 [ext_resource type="PackedScene" path="res://scenes/ui/achievement_gallery.tscn" id="12_gallery"]
+[ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 
 [sub_resource type="Curve" id="Curve_menu_ambient"]
 _data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(0.5, 0.8), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -57,42 +57,6 @@ content_margin_left = 30.0
 content_margin_top = 25.0
 content_margin_right = 30.0
 content_margin_bottom = 25.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
-bg_color = Color(0.05, 0.09, 0.14, 0.92)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.25, 0.45, 0.6, 0.7)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
-bg_color = Color(0.07, 0.2, 0.16, 0.95)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.39, 1, 0.85, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
-bg_color = Color(0.05, 0.1, 0.15, 0.95)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0, 0.7, 0.85, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_sep"]
 color = Color(0, 0.9, 1, 0.25)
@@ -183,15 +147,8 @@ offset_top = 24.0
 offset_right = 164.0
 offset_bottom = 64.0
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
-theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
-theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
-theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
-theme_override_fonts/font = ExtResource("8_btn_font")
+theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
 text = "‹ 返回"
 
 [node name="CodexModal" parent="." instance=ExtResource("2_codex")]

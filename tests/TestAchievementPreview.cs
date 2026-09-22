@@ -36,11 +36,23 @@ public partial class TestAchievementPreview : TestHarness
                 case 0:
                     if (!Gate(ref _frame, 2))
                         return false;
-                    OpenGalleryWithSamples();
+                    OpenMenu();
                     _frame = 0;
                     _stage = 1;
                     return false;
                 case 1:
+                    // Title view is the menu's initial state: capture it before navigating.
+                    if (!Gate(ref _frame, 6))
+                        return false;
+                    CaptureScreenshot("title_view.png");
+                    _menu!.AchievementsBtn!.EmitSignal(Button.SignalName.Pressed);
+                    AssertThat(_menu.AchievementView!.Visible).IsTrue();
+                    AchievementManager.Unlock("engulf_20");
+                    AchievementManager.Unlock("first_digestion");
+                    _frame = 0;
+                    _stage = 2;
+                    return false;
+                case 2:
                     // Let layout + textures settle before capturing.
                     if (!Gate(ref _frame, 6))
                         return false;
@@ -48,9 +60,9 @@ public partial class TestAchievementPreview : TestHarness
                     CaptureScreenshot("gallery_all.png");
                     _menu.AchievementView.SetFilter(AchievementGalleryView.FilterLocked);
                     _frame = 0;
-                    _stage = 2;
+                    _stage = 3;
                     return false;
-                case 2:
+                case 3:
                     if (!Gate(ref _frame, 4))
                         return false;
                     AssertThat(_menu!.AchievementView!.CardCount).IsEqual(AchievementManager.Achievements.Count - 2);
@@ -72,19 +84,13 @@ public partial class TestAchievementPreview : TestHarness
         }
     }
 
-    private void OpenGalleryWithSamples()
+    private void OpenMenu()
     {
         var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         AssertThat(menuScene).IsNotNull();
         _menu = menuScene!.Instantiate<MainMenu>();
         Root.AddChild(_menu);
-
-        // Representative samples: two unlocked (one with art path, one milestone),
-        // the rest stay locked.
-        _menu.AchievementsBtn!.EmitSignal(Button.SignalName.Pressed);
-        AssertThat(_menu.AchievementView!.Visible).IsTrue();
-        AchievementManager.Unlock("engulf_20");
-        AchievementManager.Unlock("first_digestion");
+        AssertThat(_menu.AchievementView!.Visible).IsFalse();
     }
 
     private void FreeMenu()
