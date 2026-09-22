@@ -961,7 +961,7 @@ public partial class MainMenu : Control
 
     /// <summary>
     /// Endless availability readout: requires the Hard clear achievement
-    /// (ach_wound_hard_clear) and an unlocked organ. The tooltip always
+    /// (wound_hard_clear) and an unlocked organ. The tooltip always
     /// explains something: the unlock requirement when locked, the organ
     /// lock reason when the map itself is locked, and a one-line mode
     /// summary once the button is actually usable.

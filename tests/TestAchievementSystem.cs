@@ -78,19 +78,19 @@ public partial class TestAchievementSystem : TestHarness
                 // --- Step 3: Event-Driven Achievement Unlocks & Cell Rewards ---
                 // Calibrated thresholds: sub-threshold values must stay locked
                 AchievementManager.RecordEvent("pathogen_digested", 199);
-                AssertThat(AchievementManager.IsUnlocked("ach_engulf_20")).IsFalse();
+                AssertThat(AchievementManager.IsUnlocked("engulf_20")).IsFalse();
                 AchievementManager.RecordEvent("level_up", 14);
-                AssertThat(AchievementManager.IsUnlocked("ach_reach_level_5")).IsFalse();
+                AssertThat(AchievementManager.IsUnlocked("reach_level_5")).IsFalse();
                 AchievementManager.RecordEvent("survival_time", 479.0f);
-                AssertThat(AchievementManager.IsUnlocked("ach_survive_180s")).IsFalse();
+                AssertThat(AchievementManager.IsUnlocked("survive_180s")).IsFalse();
                 AchievementManager.RecordEvent("active_skills_count", 4);
-                AssertThat(AchievementManager.IsUnlocked("ach_full_arsenal")).IsFalse();
+                AssertThat(AchievementManager.IsUnlocked("full_arsenal")).IsFalse();
                 GD.Print("[PASS] Step 3: Calibrated thresholds reject sub-threshold progress.");
 
                 // Test 3a: Digestion 200 -> Unlocks CTL and Perforin Lance
                 AchievementManager.RecordEvent("pathogen_digested", 200);
-                AssertThat(AchievementManager.IsUnlocked("ach_first_digestion")).IsTrue();
-                AssertThat(AchievementManager.IsUnlocked("ach_engulf_20")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("first_digestion")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("engulf_20")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("ctl")).IsTrue();
 
                 // Now perforin_lance should be allowed in the candidate pool
@@ -113,39 +113,39 @@ public partial class TestAchievementSystem : TestHarness
 
                 // Test 3b: Devour 500 -> Unlocks Neutrophil
                 AchievementManager.RecordEvent("pathogen_digested", 500);
-                AssertThat(AchievementManager.IsUnlocked("ach_devour_50")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("devour_50")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsTrue();
                 GD.Print("[PASS] Step 3b: Devouring 500 pathogens unlocks Neutrophil.");
 
                 // Test 3c: Level 15 -> Unlocks B-Cell
                 AchievementManager.RecordEvent("level_up", 15);
-                AssertThat(AchievementManager.IsUnlocked("ach_reach_level_5")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("reach_level_5")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("b_cell")).IsTrue();
                 GD.Print("[PASS] Step 3c: Level 15 unlocks B-Cell.");
 
                 // Test 3d: Survival 480s -> Unlocks Dendritic Cell
                 AchievementManager.RecordEvent("survival_time", 485.0f);
-                AssertThat(AchievementManager.IsUnlocked("ach_survive_180s")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("survive_180s")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("dendritic")).IsTrue();
                 GD.Print("[PASS] Step 3d: Survival 480s unlocks Dendritic Cell.");
 
                 // Test 3e: Full 5-active loadout -> Metabolic Arsenal
                 AchievementManager.RecordEvent("active_skills_count", 5);
-                AssertThat(AchievementManager.IsUnlocked("ach_full_arsenal")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("full_arsenal")).IsTrue();
                 GD.Print("[PASS] Step 3e: Five simultaneous active skills unlock Metabolic Arsenal.");
 
                 // Test 3f: First ultimate epigenetic fusion
-                AssertThat(AchievementManager.IsUnlocked("ach_first_evolution")).IsFalse();
+                AssertThat(AchievementManager.IsUnlocked("first_evolution")).IsFalse();
                 AchievementManager.RecordEvent("first_evolution");
-                AssertThat(AchievementManager.IsUnlocked("ach_first_evolution")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("first_evolution")).IsTrue();
                 GD.Print("[PASS] Step 3f: First epigenetic evolution fusion recorded.");
 
                 // Test 3g: PrPsc amyloid crystal shattered (non-prion kills must not count)
-                AssertThat(AchievementManager.IsUnlocked("ach_prion_cleared")).IsFalse();
+                AssertThat(AchievementManager.IsUnlocked("prion_cleared")).IsFalse();
                 AchievementManager.RecordEvent("pathogen_killed", "tachyzoite");
-                AssertThat(AchievementManager.IsUnlocked("ach_prion_cleared")).IsFalse();
+                AssertThat(AchievementManager.IsUnlocked("prion_cleared")).IsFalse();
                 AchievementManager.RecordEvent("pathogen_killed", "prpsc_amyloid_aggregate");
-                AssertThat(AchievementManager.IsUnlocked("ach_prion_cleared")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("prion_cleared")).IsTrue();
                 GD.Print("[PASS] Step 3g: Shattering a PrPsc amyloid crystal unlocks Protein Scavenger.");
 
                 mockPlayer.QueueFree();
@@ -156,13 +156,13 @@ public partial class TestAchievementSystem : TestHarness
                 AchievementManager.ProgressData.Clear();
                 AchievementManager.LoadFromDisk();
 
-                AssertThat(AchievementManager.IsUnlocked("ach_engulf_20")).IsTrue();
-                AssertThat(AchievementManager.IsUnlocked("ach_devour_50")).IsTrue();
-                AssertThat(AchievementManager.IsUnlocked("ach_reach_level_5")).IsTrue();
-                AssertThat(AchievementManager.IsUnlocked("ach_survive_180s")).IsTrue();
-                AssertThat(AchievementManager.IsUnlocked("ach_full_arsenal")).IsTrue();
-                AssertThat(AchievementManager.IsUnlocked("ach_first_evolution")).IsTrue();
-                AssertThat(AchievementManager.IsUnlocked("ach_prion_cleared")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("engulf_20")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("devour_50")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("reach_level_5")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("survive_180s")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("full_arsenal")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("first_evolution")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("prion_cleared")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("ctl")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("b_cell")).IsTrue();
@@ -171,12 +171,12 @@ public partial class TestAchievementSystem : TestHarness
 
                 // --- Step 4b: Organ Map Unlock Chain (docs/achievement.md §2) ---
                 AchievementManager.RecordMapClear("acute_wound");
-                AssertThat(AchievementManager.IsUnlocked("ach_wound_clear")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("wound_clear")).IsTrue();
                 AssertThat(GameManager.IsMapUnlocked("alveolar_space")).IsTrue();
                 AssertThat(GameManager.IsMapHardUnlocked("acute_wound")).IsTrue();
 
                 AchievementManager.RecordMapClear("alveolar_space");
-                AssertThat(AchievementManager.IsUnlocked("ach_alveolar_clear")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("alveolar_clear")).IsTrue();
                 AssertThat(GameManager.IsMapUnlocked("hepatic_sinusoid")).IsTrue();
                 AssertThat(GameManager.IsMapHardUnlocked("alveolar_space")).IsTrue();
 
@@ -190,13 +190,13 @@ public partial class TestAchievementSystem : TestHarness
 
                 int bonusBefore = PassiveTreeManager.BonusPoints;
                 AchievementManager.RecordMapClear("blood_brain_barrier");
-                AssertThat(AchievementManager.IsUnlocked("ach_bbb_clear")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("bbb_clear")).IsTrue();
                 AssertThat(GameManager.IsMapHardUnlocked("blood_brain_barrier")).IsTrue();
                 AssertThat(PassiveTreeManager.BonusPoints).IsEqual(bonusBefore + 2);
 
                 AssertThat(AchievementManager.IsEndlessUnlocked()).IsFalse();
                 AchievementManager.RecordMapClear("acute_wound", true);
-                AssertThat(AchievementManager.IsUnlocked("ach_wound_hard_clear")).IsTrue();
+                AssertThat(AchievementManager.IsUnlocked("wound_hard_clear")).IsTrue();
                 AssertThat(AchievementManager.IsEndlessUnlocked()).IsTrue();
 
                 // Map lock state is derived from the achievement save and survives a reload
@@ -234,10 +234,10 @@ public partial class TestAchievementSystem : TestHarness
                 AssertThat(galleryMenu.AchievementView.CardCount).IsEqual(AchievementManager.Achievements.Count);
 
                 // Steam-mirrored artwork fields exist; missing files fall back cleanly
-                var galleryInfo = AchievementManager.GetAchievementInfo("ach_engulf_20");
+                var galleryInfo = AchievementManager.GetAchievementInfo("engulf_20");
                 AssertThat(galleryInfo.ContainsKey("image_path")).IsTrue();
                 AssertThat(galleryInfo.ContainsKey("steam_api_name")).IsTrue();
-                AssertThat(galleryInfo["steam_api_name"].AsString()).IsEqual("ACH_ENGULF_20");
+                AssertThat(galleryInfo["steam_api_name"].AsString()).IsEqual("ENGULF_20");
                 AssertThat(AssetLoader.TryLoad<Texture2D>(galleryInfo["image_path"].AsString()) == null).IsTrue();
                 GD.Print("[PASS] Step 5: AchievementGallery fifth-view rendering, 3-state filter and Steam art fallback verified.");
 
@@ -270,7 +270,7 @@ public partial class TestAchievementSystem : TestHarness
                 AssertThat(_menuInstance.ClassConfirmBtn.Disabled).IsFalse();
 
                 // Unlock CTL and refresh
-                AchievementManager.Unlock("ach_engulf_20");
+                AchievementManager.Unlock("engulf_20");
                 _menuInstance.UpdateAllTexts();
                 _menuInstance.SelectClass("ctl");
                 AssertThat(_menuInstance.ClassConfirmBtn.Disabled).IsFalse();

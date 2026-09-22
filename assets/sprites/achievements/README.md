@@ -1,36 +1,40 @@
-# Achievement artwork — local files ↔ Steamworks Partner icons
+# Achievement artwork — local files ↔ Steamworks Partner icons (LEGACY)
+
+> Runtime now resolves via `AssetPaths.AchievementSprite(id)` =
+> `res://assets/gen/achievement/<id>.png` (id == file stem, no `ach_` prefix).
+> This folder is kept for Steam Partner upload reference only.
 
 ## Naming rule (single source of truth)
 
-Local file name = lowercase achievement id + `.png`:
+Runtime file = achievement id + `.png`:
 
 ```
-assets/sprites/achievements/<achievement_id>.png
+assets/gen/achievement/<achievement_id>.png
 ```
 
 Steam **API Name** = uppercase id (`SteamBridge.GetSteamApiName()`):
 
 | Local file | Steam API Name |
 |---|---|
-| `ach_first_digestion.png` | `ACH_FIRST_DIGESTION` |
-| `ach_engulf_20.png` | `ACH_ENGULF_20` |
-| `ach_devour_50.png` | `ACH_DEVOUR_50` |
-| `ach_reach_level_5.png` | `ACH_REACH_LEVEL_5` |
-| `ach_survive_180s.png` | `ACH_SURVIVE_180S` |
-| `ach_giant_volume.png` | `ACH_GIANT_VOLUME` |
-| `ach_full_arsenal.png` | `ACH_FULL_ARSENAL` |
-| `ach_first_evolution.png` | `ACH_FIRST_EVOLUTION` |
-| `ach_prion_cleared.png` | `ACH_PRION_CLEARED` |
-| `ach_wound_clear.png` | `ACH_WOUND_CLEAR` |
-| `ach_alveolar_clear.png` | `ACH_ALVEOLAR_CLEAR` |
-| `ach_hepatic_clear.png` | `ACH_HEPATIC_CLEAR` |
-| `ach_gastric_clear.png` | `ACH_GASTRIC_CLEAR` |
-| `ach_bbb_clear.png` | `ACH_BBB_CLEAR` |
-| `ach_wound_hard_clear.png` | `ACH_WOUND_HARD_CLEAR` |
-| `ach_alveolar_hard_clear.png` | `ACH_ALVEOLAR_HARD_CLEAR` |
-| `ach_hepatic_hard_clear.png` | `ACH_HEPATIC_HARD_CLEAR` |
-| `ach_gastric_hard_clear.png` | `ACH_GASTRIC_HARD_CLEAR` |
-| `ach_bbb_hard_clear.png` | `ACH_BBB_HARD_CLEAR` |
+| `first_digestion.png` | `FIRST_DIGESTION` |
+| `engulf_20.png` | `ENGULF_20` |
+| `devour_50.png` | `DEVOUR_50` |
+| `reach_level_5.png` | `REACH_LEVEL_5` |
+| `survive_180s.png` | `SURVIVE_180S` |
+| `giant_volume.png` | `GIANT_VOLUME` |
+| `full_arsenal.png` | `FULL_ARSENAL` |
+| `first_evolution.png` | `FIRST_EVOLUTION` |
+| `prion_cleared.png` | `PRION_CLEARED` |
+| `wound_clear.png` | `WOUND_CLEAR` |
+| `alveolar_clear.png` | `ALVEOLAR_CLEAR` |
+| `hepatic_clear.png` | `HEPATIC_CLEAR` |
+| `gastric_clear.png` | `GASTRIC_CLEAR` |
+| `bbb_clear.png` | `BBB_CLEAR` |
+| `wound_hard_clear.png` | `WOUND_HARD_CLEAR` |
+| `alveolar_hard_clear.png` | `ALVEOLAR_HARD_CLEAR` |
+| `hepatic_hard_clear.png` | `HEPATIC_HARD_CLEAR` |
+| `gastric_hard_clear.png` | `GASTRIC_HARD_CLEAR` |
+| `bbb_hard_clear.png` | `BBB_HARD_CLEAR` |
 
 ## Art guidance
 

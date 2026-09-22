@@ -264,11 +264,11 @@ graph LR
 ### 難度雙軌制與成就解鎖鏈 (Achievement Map Unlocks)
 - **解鎖哲學**：除初始地圖「皮下創口」外，後續所有人體器官微觀地圖與「急性危象（Hard）」難度均需透過達成對應的臨床通關成就解鎖。
 - **解鎖鏈條**：
-  1. 通關【皮下創口 (`acute_wound`)】Normal（成就：`ach_wound_clear`）$\to$ 解鎖【肺泡氣體微腔 (`alveolar_space`)】Normal 及創口 Hard 難度。
-  2. 通關【肺泡微腔 (`alveolar_space`)】Normal（成就：`ach_alveolar_clear`）$\to$ 解鎖【肝血竇微循環 (`hepatic_sinusoid`)】Normal 及肺泡 Hard 難度。
-  3. 通關【肝血竇微循環 (`hepatic_sinusoid`)】Normal（成就：`ach_hepatic_clear`）$\to$ 解鎖【胃腔極酸黏膜 (`gastric_lumen`)】Normal 及肝血竇 Hard 難度。
-  4. 通關【胃腔極酸黏膜 (`gastric_lumen`)】Normal（成就：`ach_gastric_clear`）$\to$ 解鎖【血腦屏障毛細血管 (`blood_brain_barrier`)】Normal 及胃黏膜 Hard 難度。
-  5. 通關【血腦屏障 (`blood_brain_barrier`)】Normal（成就：`ach_bbb_clear`）$\to$ 解鎖血腦屏障 Hard 難度與通關紀念獎勵。
+  1. 通關【皮下創口 (`acute_wound`)】Normal（成就：`wound_clear`）$\to$ 解鎖【肺泡氣體微腔 (`alveolar_space`)】Normal 及創口 Hard 難度。
+  2. 通關【肺泡微腔 (`alveolar_space`)】Normal（成就：`alveolar_clear`）$\to$ 解鎖【肝血竇微循環 (`hepatic_sinusoid`)】Normal 及肺泡 Hard 難度。
+  3. 通關【肝血竇微循環 (`hepatic_sinusoid`)】Normal（成就：`hepatic_clear`）$\to$ 解鎖【胃腔極酸黏膜 (`gastric_lumen`)】Normal 及肝血竇 Hard 難度。
+  4. 通關【胃腔極酸黏膜 (`gastric_lumen`)】Normal（成就：`gastric_clear`）$\to$ 解鎖【血腦屏障毛細血管 (`blood_brain_barrier`)】Normal 及胃黏膜 Hard 難度。
+  5. 通關【血腦屏障 (`blood_brain_barrier`)】Normal（成就：`bbb_clear`）$\to$ 解鎖血腦屏障 Hard 難度與通關紀念獎勵。
 
 ### 5 大動態病理器官關卡與流體力學
 - **01. 表皮裂口 (Acute Wound)**：微血管破裂，週期性產生指向傷口外緣的強大組織液吸力；地面覆蓋血纖維蛋白網，阻礙常規移動。

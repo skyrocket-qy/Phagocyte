@@ -2,107 +2,98 @@
   {
     "desc_key": "ACH_FIRST_DIGESTION_DESC",
     "icon": "🦠",
-    "id": "ach_first_digestion",
+    "id": "first_digestion",
     "reward_cell": "",
     "reward_key": "",
     "stat_key": "digested",
     "target_value": 1.0,
-    "title_key": "ACH_FIRST_DIGESTION_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_first_digestion.png"
+    "title_key": "ACH_FIRST_DIGESTION_TITLE"
   },
   {
     "desc_key": "ACH_ENGULF_20_DESC",
     "icon": "⚡",
-    "id": "ach_engulf_20",
+    "id": "engulf_20",
     "reward_cell": "ctl",
     "reward_key": "ACH_ENGULF_20_REWARD",
     "stat_key": "digested",
     "target_value": 200.0,
-    "title_key": "ACH_ENGULF_20_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_engulf_20.png"
+    "title_key": "ACH_ENGULF_20_TITLE"
   },
   {
     "desc_key": "ACH_DEVOUR_50_DESC",
     "icon": "🌪️",
-    "id": "ach_devour_50",
+    "id": "devour_50",
     "reward_cell": "neutrophil",
     "reward_key": "ACH_DEVOUR_50_REWARD",
     "stat_key": "digested",
     "target_value": 500.0,
-    "title_key": "ACH_DEVOUR_50_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_devour_50.png"
+    "title_key": "ACH_DEVOUR_50_TITLE"
   },
   {
     "desc_key": "ACH_REACH_LEVEL_5_DESC",
     "icon": "🏹",
-    "id": "ach_reach_level_5",
+    "id": "reach_level_5",
     "reward_cell": "b_cell",
     "reward_key": "ACH_REACH_LEVEL_5_REWARD",
     "stat_key": "level",
     "target_value": 15.0,
-    "title_key": "ACH_REACH_LEVEL_5_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_reach_level_5.png"
+    "title_key": "ACH_REACH_LEVEL_5_TITLE"
   },
   {
     "desc_key": "ACH_SURVIVE_180S_DESC",
     "icon": "📍",
-    "id": "ach_survive_180s",
+    "id": "survive_180s",
     "reward_cell": "dendritic",
     "reward_key": "ACH_SURVIVE_180S_REWARD",
     "stat_key": "survival_time",
     "target_value": 480.0,
-    "title_key": "ACH_SURVIVE_180S_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_survive_180s.png"
+    "title_key": "ACH_SURVIVE_180S_TITLE"
   },
   {
     "desc_key": "ACH_GIANT_VOLUME_DESC",
     "icon": "🌟",
-    "id": "ach_giant_volume",
+    "id": "giant_volume",
     "reward_cell": "",
     "reward_key": "",
     "stat_key": "radius_ratio",
     "target_value": 2.0,
-    "title_key": "ACH_GIANT_VOLUME_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_giant_volume.png"
+    "title_key": "ACH_GIANT_VOLUME_TITLE"
   },
   {
     "desc_key": "ACH_FULL_ARSENAL_DESC",
     "icon": "🛡️",
-    "id": "ach_full_arsenal",
+    "id": "full_arsenal",
     "reward_cell": "",
     "reward_key": "",
     "stat_key": "active_skills",
     "target_value": 5.0,
-    "title_key": "ACH_FULL_ARSENAL_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_full_arsenal.png"
+    "title_key": "ACH_FULL_ARSENAL_TITLE"
   },
   {
     "desc_key": "ACH_FIRST_EVOLUTION_DESC",
     "icon": "🧬",
-    "id": "ach_first_evolution",
+    "id": "first_evolution",
     "reward_cell": "",
     "reward_key": "",
     "stat_key": "first_evolution",
     "target_value": 1.0,
-    "title_key": "ACH_FIRST_EVOLUTION_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_first_evolution.png"
+    "title_key": "ACH_FIRST_EVOLUTION_TITLE"
   },
   {
     "desc_key": "ACH_PRION_CLEARED_DESC",
     "icon": "💎",
-    "id": "ach_prion_cleared",
+    "id": "prion_cleared",
     "reward_cell": "",
     "reward_key": "",
     "stat_key": "prion_cleared",
     "target_value": 1.0,
-    "title_key": "ACH_PRION_CLEARED_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_prion_cleared.png"
+    "title_key": "ACH_PRION_CLEARED_TITLE"
   },
   {
     "desc_key": "ACH_WOUND_CLEAR_DESC",
     "difficulty": "normal",
     "icon": "🩹",
-    "id": "ach_wound_clear",
+    "id": "wound_clear",
     "map_id": "acute_wound",
     "reward_cell": "",
     "reward_key": "ACH_WOUND_CLEAR_REWARD",
@@ -111,14 +102,13 @@
     "target_value": 1.0,
     "title_key": "ACH_WOUND_CLEAR_TITLE",
     "unlock_hard_map": "acute_wound",
-    "unlock_map": "alveolar_space",
-    "image_path": "res://assets/sprites/achievements/ach_wound_clear.png"
+    "unlock_map": "alveolar_space"
   },
   {
     "desc_key": "ACH_ALVEOLAR_CLEAR_DESC",
     "difficulty": "normal",
     "icon": "🫁",
-    "id": "ach_alveolar_clear",
+    "id": "alveolar_clear",
     "map_id": "alveolar_space",
     "reward_cell": "",
     "reward_key": "ACH_ALVEOLAR_CLEAR_REWARD",
@@ -127,14 +117,13 @@
     "target_value": 1.0,
     "title_key": "ACH_ALVEOLAR_CLEAR_TITLE",
     "unlock_hard_map": "alveolar_space",
-    "unlock_map": "hepatic_sinusoid",
-    "image_path": "res://assets/sprites/achievements/ach_alveolar_clear.png"
+    "unlock_map": "hepatic_sinusoid"
   },
   {
     "desc_key": "ACH_HEPATIC_CLEAR_DESC",
     "difficulty": "normal",
     "icon": "🫀",
-    "id": "ach_hepatic_clear",
+    "id": "hepatic_clear",
     "map_id": "hepatic_sinusoid",
     "reward_cell": "",
     "reward_key": "ACH_HEPATIC_CLEAR_REWARD",
@@ -143,14 +132,13 @@
     "target_value": 1.0,
     "title_key": "ACH_HEPATIC_CLEAR_TITLE",
     "unlock_hard_map": "hepatic_sinusoid",
-    "unlock_map": "gastric_lumen",
-    "image_path": "res://assets/sprites/achievements/ach_hepatic_clear.png"
+    "unlock_map": "gastric_lumen"
   },
   {
     "desc_key": "ACH_GASTRIC_CLEAR_DESC",
     "difficulty": "normal",
     "icon": "🌋",
-    "id": "ach_gastric_clear",
+    "id": "gastric_clear",
     "map_id": "gastric_lumen",
     "reward_cell": "",
     "reward_key": "ACH_GASTRIC_CLEAR_REWARD",
@@ -159,14 +147,13 @@
     "target_value": 1.0,
     "title_key": "ACH_GASTRIC_CLEAR_TITLE",
     "unlock_hard_map": "gastric_lumen",
-    "unlock_map": "blood_brain_barrier",
-    "image_path": "res://assets/sprites/achievements/ach_gastric_clear.png"
+    "unlock_map": "blood_brain_barrier"
   },
   {
     "desc_key": "ACH_BBB_CLEAR_DESC",
     "difficulty": "normal",
     "icon": "🧠",
-    "id": "ach_bbb_clear",
+    "id": "bbb_clear",
     "map_id": "blood_brain_barrier",
     "reward_cell": "",
     "reward_key": "ACH_BBB_CLEAR_REWARD",
@@ -174,14 +161,13 @@
     "talent_points": 2,
     "target_value": 1.0,
     "title_key": "ACH_BBB_CLEAR_TITLE",
-    "unlock_hard_map": "blood_brain_barrier",
-    "image_path": "res://assets/sprites/achievements/ach_bbb_clear.png"
+    "unlock_hard_map": "blood_brain_barrier"
   },
   {
     "desc_key": "ACH_WOUND_HARD_CLEAR_DESC",
     "difficulty": "hard",
     "icon": "☣️",
-    "id": "ach_wound_hard_clear",
+    "id": "wound_hard_clear",
     "map_id": "acute_wound",
     "reward_cell": "",
     "reward_key": "ACH_WOUND_HARD_CLEAR_REWARD",
@@ -189,63 +175,58 @@
     "talent_points": 1,
     "target_value": 1.0,
     "title_key": "ACH_WOUND_HARD_CLEAR_TITLE",
-    "unlock_endless": true,
-    "image_path": "res://assets/sprites/achievements/ach_wound_hard_clear.png"
+    "unlock_endless": true
   },
   {
     "desc_key": "ACH_ALVEOLAR_HARD_CLEAR_DESC",
     "difficulty": "hard",
     "icon": "🌬️",
-    "id": "ach_alveolar_hard_clear",
+    "id": "alveolar_hard_clear",
     "map_id": "alveolar_space",
     "reward_cell": "",
     "reward_key": "ACH_ALVEOLAR_HARD_CLEAR_REWARD",
     "stat_key": "map_clear_alveolar_space_hard",
     "talent_points": 1,
     "target_value": 1.0,
-    "title_key": "ACH_ALVEOLAR_HARD_CLEAR_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_alveolar_hard_clear.png"
+    "title_key": "ACH_ALVEOLAR_HARD_CLEAR_TITLE"
   },
   {
     "desc_key": "ACH_HEPATIC_HARD_CLEAR_DESC",
     "difficulty": "hard",
     "icon": "🩸",
-    "id": "ach_hepatic_hard_clear",
+    "id": "hepatic_hard_clear",
     "map_id": "hepatic_sinusoid",
     "reward_cell": "",
     "reward_key": "ACH_HEPATIC_HARD_CLEAR_REWARD",
     "stat_key": "map_clear_hepatic_sinusoid_hard",
     "talent_points": 1,
     "target_value": 1.0,
-    "title_key": "ACH_HEPATIC_HARD_CLEAR_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_hepatic_hard_clear.png"
+    "title_key": "ACH_HEPATIC_HARD_CLEAR_TITLE"
   },
   {
     "desc_key": "ACH_GASTRIC_HARD_CLEAR_DESC",
     "difficulty": "hard",
     "icon": "🔥",
-    "id": "ach_gastric_hard_clear",
+    "id": "gastric_hard_clear",
     "map_id": "gastric_lumen",
     "reward_cell": "",
     "reward_key": "ACH_GASTRIC_HARD_CLEAR_REWARD",
     "stat_key": "map_clear_gastric_lumen_hard",
     "talent_points": 1,
     "target_value": 1.0,
-    "title_key": "ACH_GASTRIC_HARD_CLEAR_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_gastric_hard_clear.png"
+    "title_key": "ACH_GASTRIC_HARD_CLEAR_TITLE"
   },
   {
     "desc_key": "ACH_BBB_HARD_CLEAR_DESC",
     "difficulty": "hard",
     "icon": "🧬",
-    "id": "ach_bbb_hard_clear",
+    "id": "bbb_hard_clear",
     "map_id": "blood_brain_barrier",
     "reward_cell": "",
     "reward_key": "ACH_BBB_HARD_CLEAR_REWARD",
     "stat_key": "map_clear_blood_brain_barrier_hard",
     "talent_points": 1,
     "target_value": 1.0,
-    "title_key": "ACH_BBB_HARD_CLEAR_TITLE",
-    "image_path": "res://assets/sprites/achievements/ach_bbb_hard_clear.png"
+    "title_key": "ACH_BBB_HARD_CLEAR_TITLE"
   }
 ]

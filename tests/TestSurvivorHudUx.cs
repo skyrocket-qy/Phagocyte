@@ -2,7 +2,9 @@ using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Core;
+using Phagocyte.Enemies;
 using Phagocyte.Player;
 using Phagocyte.UI;
 
@@ -24,6 +26,25 @@ public partial class TestSurvivorHudUx : TestHarness
         AssertThat(mainScene).IsNotNull();
         var main = mainScene.Instantiate();
         Root.AddChild(main);
+
+        // Isolate the arena: Main._Ready spawns a 35-enemy wave and neutral
+        // matter at unseeded RNG positions; anything reaching the player would
+        // grant ambient EXP/damage and break the pristine-baseline asserts.
+        // Freeze the spawner driver and clear what already spawned, before
+        // the first frame runs. HUD/player nodes are untouched and live.
+        main.SetPhysicsProcess(false);
+        ClearArenaEntities(main);
+    }
+
+    private static void ClearArenaEntities(Node root)
+    {
+        foreach (var child in root.GetChildren())
+        {
+            if (child is BaseEnemy || child is SenescentRBC || child is DormantToxinVesicle || child is BioHazardArea)
+                child.Free();
+            else
+                ClearArenaEntities(child);
+        }
     }
 
     public override bool _Process(double delta)

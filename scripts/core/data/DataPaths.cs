@@ -17,6 +17,7 @@ public static class DataPaths
     public const string Achievements = $"{Root}/achievements.json";
     public const string PassiveTree = $"{Root}/passive_tree.json";
     public const string PassiveTraits = $"{Root}/passive_traits.json";
+    public const string Ui = $"{Root}/ui.json";
     public const string StatLabels = $"{Root}/stat_labels.json";
 
     public const string TranslationsCsv = "res://assets/translations/translations.csv";

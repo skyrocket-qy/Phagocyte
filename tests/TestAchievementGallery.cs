@@ -55,31 +55,31 @@ public partial class TestAchievementGallery : TestHarness
 
     private static void RunDataTests()
     {
-        // Every achievement exposes a Steam-mirrored image path + API name
+        // Every achievement exposes a derived image path + API name
         foreach (string achId in AchievementManager.Achievements.Keys)
         {
             var info = AchievementManager.GetAchievementInfo(achId);
             AssertThat(info.ContainsKey("image_path")).IsTrue();
             AssertThat(info.ContainsKey("steam_api_name")).IsTrue();
-            AssertThat(info["image_path"].AsString()).IsEqual($"res://assets/sprites/achievements/{achId}.png");
+            AssertThat(info["image_path"].AsString()).IsEqual($"res://assets/gen/achievement/{achId}.png");
             AssertThat(info["steam_api_name"].AsString()).IsEqual(achId.ToUpperInvariant());
         }
         GD.Print($"[PASS] All {AchievementManager.Achievements.Count} achievements carry image_path + steam_api_name.");
 
         // Category accents: hard = red, cell unlocks = green, map clears = blue, milestones = gold
-        AssertThat(AchievementGalleryView.CategoryColor(AchievementManager.GetAchievementInfo("ach_wound_hard_clear")))
+        AssertThat(AchievementGalleryView.CategoryColor(AchievementManager.GetAchievementInfo("wound_hard_clear")))
             .IsEqual(new Color(1.0f, 0.45f, 0.4f));
-        AssertThat(AchievementGalleryView.CategoryColor(AchievementManager.GetAchievementInfo("ach_engulf_20")))
+        AssertThat(AchievementGalleryView.CategoryColor(AchievementManager.GetAchievementInfo("engulf_20")))
             .IsEqual(new Color(0.3f, 1.0f, 0.4f));
-        AssertThat(AchievementGalleryView.CategoryColor(AchievementManager.GetAchievementInfo("ach_wound_clear")))
+        AssertThat(AchievementGalleryView.CategoryColor(AchievementManager.GetAchievementInfo("wound_clear")))
             .IsEqual(new Color(0.4f, 0.8f, 1.0f));
-        AssertThat(AchievementGalleryView.CategoryColor(AchievementManager.GetAchievementInfo("ach_first_digestion")))
+        AssertThat(AchievementGalleryView.CategoryColor(AchievementManager.GetAchievementInfo("first_digestion")))
             .IsEqual(new Color(1.0f, 0.84f, 0.35f));
         GD.Print("[PASS] Category accent colors verified.");
 
         // Missing art falls back cleanly (no art shipped yet — every load is null, never throws)
         AssertThat(AssetLoader.TryLoad<Texture2D>("") == null).IsTrue();
-        AssertThat(AssetLoader.TryLoad<Texture2D>("res://assets/sprites/achievements/ach_engulf_20.png") == null).IsTrue();
+        AssertThat(AssetLoader.TryLoad<Texture2D>("res://assets/gen/achievement/engulf_20.png") == null).IsTrue();
         GD.Print("[PASS] Missing-artwork fallback verified (emoji plates until PNGs land).");
     }
 
@@ -105,14 +105,14 @@ public partial class TestAchievementGallery : TestHarness
         AssertThat(menu.AchievementView.CardCount).IsEqual(AchievementManager.Achievements.Count);
 
         // Detail selection renders title, progress and the Steam API audit row
-        menu.AchievementView.SelectAchievement("ach_engulf_20");
-        AssertThat(menu.AchievementView.ActiveAchievementId).IsEqual("ach_engulf_20");
+        menu.AchievementView.SelectAchievement("engulf_20");
+        AssertThat(menu.AchievementView.ActiveAchievementId).IsEqual("engulf_20");
         AssertThat(string.IsNullOrEmpty(menu.AchievementView.DetailTitle!.Text)).IsFalse();
-        AssertThat(menu.AchievementView.DetailSteam!.Text.Contains("ACH_ENGULF_20")).IsTrue();
+        AssertThat(menu.AchievementView.DetailSteam!.Text.Contains("ENGULF_20")).IsTrue();
         GD.Print("[PASS] Gallery opens from its own button with full card set + Steam audit row.");
 
         // Unlocking mid-session refreshes the gallery without reopening
-        AchievementManager.Unlock("ach_engulf_20");
+        AchievementManager.Unlock("engulf_20");
         AssertThat(menu.AchievementView.CardCount).IsEqual(AchievementManager.Achievements.Count);
         menu.AchievementView.SetFilter(AchievementGalleryView.FilterUnlocked);
         AssertThat(menu.AchievementView.CardCount >= 1).IsTrue();

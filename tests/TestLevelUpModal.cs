@@ -2,7 +2,9 @@
 using Godot.Collections;
 using System;
 using System.Collections.Generic;
+using Phagocyte.Combat;
 using Phagocyte.Core;
+using Phagocyte.Enemies;
 using Phagocyte.Player;
 using Phagocyte.Skills;
 using Phagocyte.UI;
@@ -64,13 +66,13 @@ public partial class TestLevelUpModal : TestHarness
         var newPassiveChoice = new Dictionary
         {
             { "type", "new_passive" },
-            { "id", "passive_actin" },
+            { "id", "actin" },
             { "skill_class", typeof(PassiveActinPolymerization).AssemblyQualifiedName ?? "" }
         };
         bool resPassive = UpgradeManager.ApplyChoice(mockPlayer, newPassiveChoice);
         AssertThat(resPassive).IsTrue();
         AssertThat(sm.GetPassiveSlot(0)).IsNotNull();
-        AssertThat(sm.GetPassiveSlot(0)!.SkillId).IsEqual("passive_actin");
+        AssertThat(sm.GetPassiveSlot(0)!.SkillId).IsEqual("actin");
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("area"), 1.12f)).IsTrue();
         GD.Print("[PASS] Test 2: Applying new active and new passive choices successfully updates slots & stats.");
 
@@ -78,7 +80,7 @@ public partial class TestLevelUpModal : TestHarness
         var upgradeChoice = new Dictionary
         {
             { "type", "upgrade_passive" },
-            { "id", "passive_actin" },
+            { "id", "actin" },
             { "skill_ref", sm.GetPassiveSlot(0)! }
         };
         bool resUp = UpgradeManager.ApplyChoice(mockPlayer, upgradeChoice);
@@ -141,6 +143,25 @@ public partial class TestLevelUpModal : TestHarness
         }
         var main = mainScene.Instantiate();
         Root.AddChild(main);
+
+        // Isolate the arena: Main._Ready spawns a 35-enemy wave, tutorial
+        // guides and neutral matter at unseeded RNG positions; anything
+        // landing on the player would grant ambient EXP and break the
+        // zero-baseline asserts below. Freeze the spawner driver and clear
+        // what already spawned, synchronously before any frame runs.
+        main.SetPhysicsProcess(false);
+        ClearArenaEntities(main);
+    }
+
+    private static void ClearArenaEntities(Node root)
+    {
+        foreach (var child in root.GetChildren())
+        {
+            if (child is BaseEnemy || child is SenescentRBC || child is DormantToxinVesicle || child is BioHazardArea)
+                child.Free();
+            else
+                ClearArenaEntities(child);
+        }
     }
 
     public override bool _Process(double delta)

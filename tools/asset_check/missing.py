@@ -17,30 +17,21 @@ def _load_json(file_path: Path) -> Any:
         return None
 
 
-# Source filenames under gen/ carry no category prefix; registered data IDs do.
-# Maps gen/ subdirectory -> ID prefixes stripped (in order, repeatedly) when
-# resolving source filenames. E.g. trait_passive_actin -> actin.
-CATEGORY_PREFIXES: Dict[str, List[str]] = {
-    "achievement": ["ach_"],
-    "skill": ["passive_"],
-    "passive_tree": ["trait_", "passive_", "tree_"],
-    "ui": ["ui_"],
-}
-
-
-def _source_stem(category: str, name: str) -> str:
-    """Map a registered data ID to its prefix-free source file stem in gen/."""
-    prefixes = CATEGORY_PREFIXES.get(category, [])
-    stripped = name
-    changed = True
-    while changed:
-        changed = False
-        for prefix in prefixes:
-            if prefix and stripped.startswith(prefix):
-                stripped = stripped[len(prefix):]
-                changed = True
-                break
-    return stripped
+def _extract_ids(data: Any) -> List[str]:
+    """Accept [{id}], {traits: [{id}]}, or plain [id-strings]."""
+    if isinstance(data, list):
+        ids = []
+        for item in data:
+            if isinstance(item, str) and item:
+                ids.append(item)
+            elif isinstance(item, dict) and item.get("id"):
+                ids.append(item["id"])
+        return ids
+    if isinstance(data, dict):
+        traits = data.get("traits", [])
+        if isinstance(traits, list):
+            return [t.get("id") for t in traits if isinstance(t, dict) and t.get("id")]
+    return []
 
 
 def check_missing_assets(
@@ -49,12 +40,11 @@ def check_missing_assets(
 ) -> Tuple[Dict[str, List[str]], List[str], Dict[str, int]]:
     """
     Bidirectional Asset Integrity Verification across active categories.
-    Source of truth is gen/ (raw generated assets before pipeline processing).
-    Source filenames carry no category prefix (e.g. gen/achievement/<id without ach_>.png):
-    - Achievement (19 items from achievements.json -> gen/achievement/)
-    - Skill (31 items from skills.json -> gen/skill/)
-    - PassiveTree (54 items from passive_traits.json -> gen/passive_tree/)
-    - UI (16 items expected in gen/ui/)
+    Ids equal gen/ file stems (no prefixes, Vistrace-style):
+    - Achievement (from achievements.json -> gen/achievement/{id}.png)
+    - Skill (from skills.json -> gen/skill/{id}.png)
+    - PassiveTree (from passive_traits.json -> gen/passive_tree/{id}.png)
+    - UI (from ui.json -> gen/ui/{id}.png)
 
     Returns:
         missing_by_cat: Dict mapping category name to list of missing asset paths/names
@@ -73,90 +63,51 @@ def check_missing_assets(
     assets_dir = root_dir / "assets"
     gen_dir = root_dir / "gen"
 
-    # Per-category expected source stems (prefix-free) for reverse checks.
+    # Per-category expected stems (id == stem) for reverse checks.
     expected_stems: Dict[str, Set[str]] = {}
 
-    # ── 1. Achievements (19 items) ──────────────────────────────────────────
-    # Source files live prefix-free in gen/achievement/ (e.g. ach_first_digestion
-    # -> first_digestion.png). The *_unachieved.png Steam locked variants are
-    # derived artifacts produced by the to_target_asset pipeline into
-    # assets/gen/achievement/, so only the base source is required here.
+    # ── 1. Achievements ───────────────────────────────────────────────────
+    # The *_unachieved.png locked variants are derived artifacts produced by
+    # the to_target_asset pipeline into assets/gen/achievement/, so only the
+    # base source is required here.
     achievements_file = assets_dir / "data" / "achievements.json"
-    ach_data = _load_json(achievements_file) or []
-    for item in ach_data:
-        ach_id = item.get("id")
-        if not ach_id:
-            continue
-
-        stem = _source_stem("achievement", ach_id)
-        expected_stems.setdefault("achievement", set()).update([stem, f"{stem}_unachieved"])
+    for ach_id in _extract_ids(_load_json(achievements_file) or []):
+        expected_stems.setdefault("achievement", set()).update([ach_id, f"{ach_id}_unachieved"])
         category_counts["Achievement"] = category_counts.get("Achievement", 0) + 1
 
-        # Check prefix-free source in gen/achievement/
-        gen_path = gen_dir / "achievement" / f"{stem}.png"
+        gen_path = gen_dir / "achievement" / f"{ach_id}.png"
         if not gen_path.exists():
-            missing_by_cat["Achievement"].append(f"gen/achievement/{stem}.png")
+            missing_by_cat["Achievement"].append(f"gen/achievement/{ach_id}.png")
 
-    # ── 2. Skills (31 items) ────────────────────────────────────────────────
+    # ── 2. Skills ─────────────────────────────────────────────────────────
     skills_file = assets_dir / "data" / "skills.json"
-    skill_data = _load_json(skills_file) or []
-    for item in skill_data:
-        skill_id = item.get("id")
-        if not skill_id:
-            continue
-
-        stem = _source_stem("skill", skill_id)
-        expected_stems.setdefault("skill", set()).add(stem)
+    for skill_id in _extract_ids(_load_json(skills_file) or []):
+        expected_stems.setdefault("skill", set()).add(skill_id)
         category_counts["Skill"] = category_counts.get("Skill", 0) + 1
 
-        # Check source in gen/skill/
-        gen_path = gen_dir / "skill" / f"{stem}.png"
+        gen_path = gen_dir / "skill" / f"{skill_id}.png"
         if not gen_path.exists():
-            missing_by_cat["Skill"].append(f"gen/skill/{stem}.png")
+            missing_by_cat["Skill"].append(f"gen/skill/{skill_id}.png")
 
-    # ── 3. Passive Tree Traits (54 items) ───────────────────────────────────
+    # ── 3. Passive Tree Traits ────────────────────────────────────────────
     traits_file = assets_dir / "data" / "passive_traits.json"
-    traits_json = _load_json(traits_file) or {}
-    traits_list = traits_json.get("traits", []) if isinstance(traits_json, dict) else traits_json
-    for item in traits_list:
-        trait_id = item.get("id")
-        if not trait_id:
-            continue
-
-        stem = _source_stem("passive_tree", trait_id)
-        expected_stems.setdefault("passive_tree", set()).add(stem)
+    for trait_id in _extract_ids(_load_json(traits_file) or {}):
+        expected_stems.setdefault("passive_tree", set()).add(trait_id)
         category_counts["PassiveTree"] = category_counts.get("PassiveTree", 0) + 1
 
-        # Check prefix-free source in gen/passive_tree/
-        gen_path = gen_dir / "passive_tree" / f"{stem}.png"
+        gen_path = gen_dir / "passive_tree" / f"{trait_id}.png"
         if not gen_path.exists():
-            missing_by_cat["PassiveTree"].append(f"gen/passive_tree/{stem}.png")
+            missing_by_cat["PassiveTree"].append(f"gen/passive_tree/{trait_id}.png")
 
-    # ── 4. UI: check expected prefix-free icons exist in gen/ui/ ───────────
-    expected_ui_assets = [
-        "reticle_target.png",
-        "reticle_danger.png",
-        "reticle_scan.png",
-        "frame_organelle.png",
-        "card_mutation.png",
-        "card_superweapon.png",
-        "badge_atp.png",
-        "badge_antigen.png",
-        "meter_ph.png",
-        "meter_temp.png",
-        "button_pause.png",
-        "button_settings.png",
-        "status_inflamed.png",
-        "status_buffered.png",
-        "status_overclock.png",
-        "status_exhausted.png",
-    ]
-    category_counts["UI"] = len(expected_ui_assets)
-    for ui_name in expected_ui_assets:
-        expected_stems.setdefault("ui", set()).add(Path(ui_name).stem)
-        gen_path = gen_dir / "ui" / ui_name
+    # ── 4. UI (registry: assets/data/ui.json) ────────────────────────────
+    ui_file = assets_dir / "data" / "ui.json"
+    for ui_id in _extract_ids(_load_json(ui_file) or []):
+        expected_stems.setdefault("ui", set()).add(ui_id)
+        category_counts["UI"] = category_counts.get("UI", 0) + 1
+
+        gen_path = gen_dir / "ui" / f"{ui_id}.png"
         if not gen_path.exists():
-            missing_by_cat["UI"].append(f"gen/ui/{ui_name}")
+            missing_by_cat["UI"].append(f"gen/ui/{ui_id}.png")
 
     # ── 5. Reverse Reference Checks (Disk -> Data, gen/ only) ───────────────
     # Only gen/ is scanned: it is the source of truth for

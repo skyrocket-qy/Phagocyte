@@ -44,8 +44,10 @@ public partial class TestNeutralMatter : TestHarness
                 return false;
             }
 
-            // RBC harvest tween (0.18s) pays out on completion.
-            if (_frame < 20)
+            // RBC harvest tween (0.18s) pays out on completion: wait for the
+            // payout (bounded) instead of a fixed frame count, so the suite is
+            // robust at any frame rate (uncapped headless deltas are tiny).
+            if (_player!.CurrentExp <= _rbcExpBefore && _frame < 600)
                 return false;
 
             AssertSenescentRbc();

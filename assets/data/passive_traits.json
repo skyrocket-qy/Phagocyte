@@ -3,7 +3,7 @@
     {
       "desc_key": "",
       "icon": "🧬",
-      "id": "trait_passive_actin",
+      "id": "actin",
       "modifiers": [],
       "name_key": "SKILL_ACTIN_NAME",
       "rarity": "start"
@@ -11,7 +11,7 @@
     {
       "desc_key": "SKILL_AUTOPHAGY_DESC",
       "icon": "🔄",
-      "id": "trait_passive_autophagy",
+      "id": "autophagy",
       "modifiers": [
         {
           "stat": "health_regen",
@@ -25,7 +25,7 @@
     {
       "desc_key": "SKILL_BILAYER_DESC",
       "icon": "🛡️",
-      "id": "trait_passive_bilayer",
+      "id": "bilayer",
       "modifiers": [
         {
           "stat": "max_health",
@@ -44,7 +44,7 @@
     {
       "desc_key": "",
       "icon": "🧲",
-      "id": "trait_passive_chemokine",
+      "id": "chemokine",
       "modifiers": [],
       "name_key": "SKILL_CHEMOKINE_NAME",
       "rarity": "start"
@@ -52,7 +52,7 @@
     {
       "desc_key": "SKILL_ENDOTOXIN_DESC",
       "icon": "🧱",
-      "id": "trait_passive_endotoxin",
+      "id": "endotoxin",
       "modifiers": [
         {
           "stat": "armor",
@@ -71,7 +71,7 @@
     {
       "desc_key": "SKILL_GLYCOLYSIS_DESC",
       "icon": "🍬",
-      "id": "trait_passive_glycolysis",
+      "id": "glycolysis",
       "modifiers": [
         {
           "stat": "move_speed",
@@ -90,7 +90,7 @@
     {
       "desc_key": "SKILL_HEMATOPOIETIC_DESC",
       "icon": "🩸",
-      "id": "trait_passive_hematopoietic",
+      "id": "hematopoietic",
       "modifiers": [
         {
           "stat": "max_health",
@@ -109,7 +109,7 @@
     {
       "desc_key": "",
       "icon": "🛤️",
-      "id": "trait_passive_kinesin",
+      "id": "kinesin",
       "modifiers": [],
       "name_key": "SKILL_KINESIN_NAME",
       "rarity": "start"
@@ -117,7 +117,7 @@
     {
       "desc_key": "SKILL_LONGEVITY_DESC",
       "icon": "⏳",
-      "id": "trait_passive_longevity",
+      "id": "longevity",
       "modifiers": [
         {
           "stat": "duration",
@@ -136,7 +136,7 @@
     {
       "desc_key": "",
       "icon": "🧪",
-      "id": "trait_passive_lysosome",
+      "id": "lysosome",
       "modifiers": [],
       "name_key": "TREE_NODE_LYSOSOME_NAME",
       "rarity": "start"
@@ -144,7 +144,7 @@
     {
       "desc_key": "SKILL_MITOCHONDRIA_DESC",
       "icon": "⚡",
-      "id": "trait_passive_mitochondria",
+      "id": "mitochondria",
       "modifiers": [
         {
           "stat": "cooldown_reduction",
@@ -163,7 +163,7 @@
     {
       "desc_key": "",
       "icon": "🎯",
-      "id": "trait_passive_opsonin",
+      "id": "opsonin",
       "modifiers": [],
       "name_key": "SKILL_OPSONIN_NAME",
       "rarity": "start"
@@ -171,7 +171,7 @@
     {
       "desc_key": "SKILL_VDJ_DESC",
       "icon": "🎲",
-      "id": "trait_passive_vdj",
+      "id": "vdj",
       "modifiers": [
         {
           "stat": "crit_damage",
@@ -190,7 +190,7 @@
     {
       "desc_key": "",
       "icon": "🌀",
-      "id": "trait_small_area",
+      "id": "small_area",
       "modifiers": [
         {
           "stat": "area",
@@ -204,7 +204,7 @@
     {
       "desc_key": "",
       "icon": "🧲",
-      "id": "trait_small_magnet",
+      "id": "small_magnet",
       "modifiers": [
         {
           "stat": "magnet",
@@ -218,7 +218,7 @@
     {
       "desc_key": "",
       "icon": "⚔️",
-      "id": "trait_small_might",
+      "id": "small_might",
       "modifiers": [
         {
           "stat": "might",
@@ -232,7 +232,7 @@
     {
       "desc_key": "",
       "icon": "💨",
-      "id": "trait_small_move_speed",
+      "id": "small_move_speed",
       "modifiers": [
         {
           "stat": "move_speed",
@@ -246,7 +246,7 @@
     {
       "desc_key": "",
       "icon": "🚀",
-      "id": "trait_small_projectile_speed",
+      "id": "small_projectile_speed",
       "modifiers": [
         {
           "stat": "projectile_speed",
@@ -260,7 +260,7 @@
     {
       "desc_key": "",
       "icon": "🚀",
-      "id": "trait_tree_adaptive_overdrive",
+      "id": "adaptive_overdrive",
       "modifiers": [
         {
           "stat": "might",
@@ -279,7 +279,7 @@
     {
       "desc_key": "",
       "icon": "🏃",
-      "id": "trait_tree_aerobic_sprint",
+      "id": "aerobic_sprint",
       "modifiers": [
         {
           "stat": "move_speed",
@@ -293,7 +293,7 @@
     {
       "desc_key": "",
       "icon": "🌾",
-      "id": "trait_tree_antigen_harvest",
+      "id": "antigen_harvest",
       "modifiers": [
         {
           "stat": "magnet",
@@ -307,7 +307,7 @@
     {
       "desc_key": "",
       "icon": "⚔️",
-      "id": "trait_tree_assassins_mandate",
+      "id": "assassins_mandate",
       "modifiers": [
         {
           "stat": "crit_chance",
@@ -321,7 +321,7 @@
     {
       "desc_key": "",
       "icon": "🧵",
-      "id": "trait_tree_ballistic_threads",
+      "id": "ballistic_threads",
       "modifiers": [
         {
           "stat": "projectile_speed",
@@ -335,7 +335,7 @@
     {
       "desc_key": "",
       "icon": "🩸",
-      "id": "trait_tree_blood_price",
+      "id": "blood_price",
       "modifiers": [
         {
           "stat": "might",
@@ -349,7 +349,7 @@
     {
       "desc_key": "",
       "icon": "🌋",
-      "id": "trait_tree_contained_fury",
+      "id": "contained_fury",
       "modifiers": [
         {
           "stat": "might",
@@ -363,7 +363,7 @@
     {
       "desc_key": "",
       "icon": "🌀",
-      "id": "trait_tree_cytoskeletal_drift",
+      "id": "cytoskeletal_drift",
       "modifiers": [
         {
           "stat": "move_speed",
@@ -377,7 +377,7 @@
     {
       "desc_key": "",
       "icon": "🩹",
-      "id": "trait_tree_deep_wound",
+      "id": "deep_wound",
       "modifiers": [
         {
           "stat": "crit_damage",
@@ -391,7 +391,7 @@
     {
       "desc_key": "",
       "icon": "🥾",
-      "id": "trait_tree_enduring_march",
+      "id": "enduring_march",
       "modifiers": [
         {
           "stat": "move_speed",
@@ -405,7 +405,7 @@
     {
       "desc_key": "",
       "icon": "⏱️",
-      "id": "trait_tree_execution_tempo",
+      "id": "execution_tempo",
       "modifiers": [
         {
           "stat": "crit_damage",
@@ -419,7 +419,7 @@
     {
       "desc_key": "",
       "icon": "⏳",
-      "id": "trait_tree_extended_chambers",
+      "id": "extended_chambers",
       "modifiers": [
         {
           "stat": "duration",
@@ -433,7 +433,7 @@
     {
       "desc_key": "",
       "icon": "🔭",
-      "id": "trait_tree_far_sense",
+      "id": "far_sense",
       "modifiers": [
         {
           "stat": "magnet",
@@ -447,7 +447,7 @@
     {
       "desc_key": "",
       "icon": "🛰️",
-      "id": "trait_tree_guided_salvo",
+      "id": "guided_salvo",
       "modifiers": [
         {
           "stat": "projectile_speed",
@@ -461,7 +461,7 @@
     {
       "desc_key": "",
       "icon": "♾️",
-      "id": "trait_tree_immortal_culture",
+      "id": "immortal_culture",
       "modifiers": [
         {
           "stat": "health_regen",
@@ -480,7 +480,7 @@
     {
       "desc_key": "",
       "icon": "🦾",
-      "id": "trait_tree_iron_membrane",
+      "id": "iron_membrane",
       "modifiers": [
         {
           "stat": "armor",
@@ -494,7 +494,7 @@
     {
       "desc_key": "",
       "icon": "🪽",
-      "id": "trait_tree_lightfooted_killer",
+      "id": "lightfooted_killer",
       "modifiers": [
         {
           "stat": "move_speed",
@@ -508,7 +508,7 @@
     {
       "desc_key": "",
       "icon": "🍀",
-      "id": "trait_tree_lucky_mutation",
+      "id": "lucky_mutation",
       "modifiers": [
         {
           "stat": "evasion",
@@ -522,7 +522,7 @@
     {
       "desc_key": "",
       "icon": "🧿",
-      "id": "trait_tree_marked_core",
+      "id": "marked_core",
       "modifiers": [
         {
           "stat": "crit_chance",
@@ -536,7 +536,7 @@
     {
       "desc_key": "",
       "icon": "🌌",
-      "id": "trait_tree_omnipotent_cytoplasm",
+      "id": "omnipotent_cytoplasm",
       "modifiers": [
         {
           "stat": "area",
@@ -570,7 +570,7 @@
     {
       "desc_key": "",
       "icon": "🏹",
-      "id": "trait_tree_overdrawn_strings",
+      "id": "overdrawn_strings",
       "modifiers": [
         {
           "stat": "might",
@@ -584,7 +584,7 @@
     {
       "desc_key": "",
       "icon": "🔥",
-      "id": "trait_tree_oxidative_pace",
+      "id": "oxidative_pace",
       "modifiers": [
         {
           "stat": "cooldown_reduction",
@@ -598,7 +598,7 @@
     {
       "desc_key": "",
       "icon": "🦉",
-      "id": "trait_tree_patient_observer",
+      "id": "patient_observer",
       "modifiers": [
         {
           "stat": "duration",
@@ -612,7 +612,7 @@
     {
       "desc_key": "",
       "icon": "📌",
-      "id": "trait_tree_piercing_filaments",
+      "id": "piercing_filaments",
       "modifiers": [
         {
           "stat": "pierce",
@@ -626,7 +626,7 @@
     {
       "desc_key": "",
       "icon": "🔍",
-      "id": "trait_tree_precise_edge",
+      "id": "precise_edge",
       "modifiers": [
         {
           "stat": "crit_chance",
@@ -640,7 +640,7 @@
     {
       "desc_key": "",
       "icon": "🏇",
-      "id": "trait_tree_pseudopod_marathon",
+      "id": "pseudopod_marathon",
       "modifiers": [
         {
           "stat": "move_speed",
@@ -654,7 +654,7 @@
     {
       "desc_key": "",
       "icon": "🩺",
-      "id": "trait_tree_rapid_clotting",
+      "id": "rapid_clotting",
       "modifiers": [
         {
           "stat": "armor",
@@ -668,7 +668,7 @@
     {
       "desc_key": "",
       "icon": "🧭",
-      "id": "trait_tree_rapid_reposition",
+      "id": "rapid_reposition",
       "modifiers": [
         {
           "stat": "move_speed",
@@ -682,7 +682,7 @@
     {
       "desc_key": "",
       "icon": "⚖️",
-      "id": "trait_tree_risk_assessment",
+      "id": "risk_assessment",
       "modifiers": [
         {
           "stat": "cooldown_reduction",
@@ -696,7 +696,7 @@
     {
       "desc_key": "",
       "icon": "🌩️",
-      "id": "trait_tree_rolling_thunder",
+      "id": "rolling_thunder",
       "modifiers": [
         {
           "stat": "projectile_speed",
@@ -710,7 +710,7 @@
     {
       "desc_key": "",
       "icon": "🗺️",
-      "id": "trait_tree_scavenger_field",
+      "id": "scavenger_field",
       "modifiers": [
         {
           "stat": "magnet",
@@ -724,7 +724,7 @@
     {
       "desc_key": "",
       "icon": "🌬️",
-      "id": "trait_tree_second_wind",
+      "id": "second_wind",
       "modifiers": [
         {
           "stat": "health_regen",
@@ -738,7 +738,7 @@
     {
       "desc_key": "",
       "icon": "💨",
-      "id": "trait_tree_slipstream",
+      "id": "slipstream",
       "modifiers": [
         {
           "stat": "move_speed",
@@ -752,7 +752,7 @@
     {
       "desc_key": "",
       "icon": "🔱",
-      "id": "trait_tree_splitting_volley",
+      "id": "splitting_volley",
       "modifiers": [
         {
           "stat": "amount",
@@ -766,7 +766,7 @@
     {
       "desc_key": "",
       "icon": "📡",
-      "id": "trait_tree_swarm_cartography",
+      "id": "swarm_cartography",
       "modifiers": [
         {
           "stat": "magnet",
@@ -780,7 +780,7 @@
     {
       "desc_key": "",
       "icon": "🫧",
-      "id": "trait_tree_thick_cytoplasm",
+      "id": "thick_cytoplasm",
       "modifiers": [
         {
           "stat": "max_health",

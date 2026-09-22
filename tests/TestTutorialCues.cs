@@ -120,11 +120,34 @@ public partial class TestTutorialCues : TestHarness
         Input.ActionRelease("move_left");
         Input.ActionRelease("dodge");
 
-        // Microtubule Sclerosis (endless affliction) hard-disables the dodge.
+        // Let the steering dash expire and the charge refill: the affliction
+        // block below must be what stops the dodge, not an in-flight dash or
+        // an empty charge. Sanity-check first that a fresh press with full
+        // charge and no affliction does start a dash.
+        for (int i = 0; i < 60 && cell.IsDodging; i++)
+            cell._PhysicsProcess(0.02);
+        for (int i = 0; i < 140; i++)
+            cell._PhysicsProcess(0.02);
+        AssertThat(cell.IsDodging).IsFalse();
+        AssertThat(cell.DodgeCharges).IsEqualApprox(1.0f, 0.001f);
+        Input.ActionPress("dodge");
+        cell._PhysicsProcess(0.02);
+        AssertThat(cell.IsDodging).IsTrue();
+        Input.ActionRelease("dodge");
+        for (int i = 0; i < 60 && cell.IsDodging; i++)
+            cell._PhysicsProcess(0.02);
+        for (int i = 0; i < 140; i++)
+            cell._PhysicsProcess(0.02);
+        AssertThat(cell.IsDodging).IsFalse();
+        AssertThat(cell.DodgeCharges).IsEqualApprox(1.0f, 0.001f);
+
+        // Microtubule Sclerosis (endless affliction) hard-disables the dodge:
+        // genuine press edge, full charge stays unspent, no dash starts.
         AfflictionManager.SetSelection(new[] { AfflictionManager.MicrotubuleSclerosis });
         Input.ActionPress("dodge");
         cell._PhysicsProcess(0.02);
         AssertThat(cell.IsDodging).IsFalse();
+        AssertThat(cell.DodgeCharges).IsEqualApprox(1.0f, 0.001f);
         Input.ActionRelease("dodge");
         AfflictionManager.Clear();
         cell.QueueFree();
@@ -144,21 +167,21 @@ public partial class TestTutorialCues : TestHarness
         var lance = new PerforinLanceSkill();
         AssertThat(sm.EquipActive(lance)).IsTrue();
 
-        AssertThat(UpgradeManager.IsCatalystReady(probe, "passive_lysosome", out _)).IsFalse();
+        AssertThat(UpgradeManager.IsCatalystReady(probe, "lysosome", out _)).IsFalse();
         while (lance.Level < UpgradeManager.CatalystActiveLevel)
             lance.Upgrade();
 
         AssertThat(lance.Level).IsEqual(UpgradeManager.CatalystActiveLevel);
-        AssertThat(UpgradeManager.IsCatalystReady(probe, "passive_lysosome", out string pairedActive)).IsTrue();
+        AssertThat(UpgradeManager.IsCatalystReady(probe, "lysosome", out string pairedActive)).IsTrue();
         AssertThat(pairedActive).IsEqual("perforin_lance");
-        AssertThat(UpgradeManager.IsCatalystReady(probe, "passive_actin", out _)).IsFalse();
+        AssertThat(UpgradeManager.IsCatalystReady(probe, "actin", out _)).IsFalse();
 
         // The corresponding passive card renders the golden aura + catalyst tag
         var choices = new Array<Dictionary>
         {
             new Dictionary
             {
-                { "type", "new_passive" }, { "id", "passive_lysosome" },
+                { "type", "new_passive" }, { "id", "lysosome" },
                 { "name", "TREE_NODE_LYSOSOME_NAME" }, { "icon", "ðŸ§ª" },
                 { "level", 1 }, { "badge", "NEW PASSIVE" },
                 { "desc", "TREE_NODE_LYSOSOME_DESC" }, { "catalyst", true }

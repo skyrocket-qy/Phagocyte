@@ -203,7 +203,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_ACTIN_DESC",
     "icon": "🧬",
-    "id": "passive_actin",
+    "id": "actin",
     "max_level": 5,
     "name_key": "SKILL_ACTIN_NAME",
     "type": "passive"
@@ -214,7 +214,7 @@
     "cooldown": 0.0,
     "desc_key": "TREE_NODE_LYSOSOME_DESC",
     "icon": "🧪",
-    "id": "passive_lysosome",
+    "id": "lysosome",
     "max_level": 5,
     "name_key": "TREE_NODE_LYSOSOME_NAME",
     "type": "passive"
@@ -225,7 +225,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_MITOCHONDRIA_DESC",
     "icon": "⚡",
-    "id": "passive_mitochondria",
+    "id": "mitochondria",
     "max_level": 5,
     "name_key": "SKILL_MITOCHONDRIA_NAME",
     "type": "passive"
@@ -236,7 +236,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_OPSONIN_DESC",
     "icon": "🎯",
-    "id": "passive_opsonin",
+    "id": "opsonin",
     "max_level": 5,
     "name_key": "SKILL_OPSONIN_NAME",
     "type": "passive"
@@ -247,7 +247,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_CHEMOKINE_DESC",
     "icon": "🧲",
-    "id": "passive_chemokine",
+    "id": "chemokine",
     "max_level": 5,
     "name_key": "SKILL_CHEMOKINE_NAME",
     "type": "passive"
@@ -258,7 +258,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_BILAYER_DESC",
     "icon": "🛡️",
-    "id": "passive_bilayer",
+    "id": "bilayer",
     "max_level": 5,
     "name_key": "SKILL_BILAYER_NAME",
     "type": "passive"
@@ -269,7 +269,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_AUTOPHAGY_DESC",
     "icon": "🔄",
-    "id": "passive_autophagy",
+    "id": "autophagy",
     "max_level": 5,
     "name_key": "SKILL_AUTOPHAGY_NAME",
     "type": "passive"
@@ -280,7 +280,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_GLYCOLYSIS_DESC",
     "icon": "🍬",
-    "id": "passive_glycolysis",
+    "id": "glycolysis",
     "max_level": 5,
     "name_key": "SKILL_GLYCOLYSIS_NAME",
     "type": "passive"
@@ -291,7 +291,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_KINESIN_DESC",
     "icon": "🛤️",
-    "id": "passive_kinesin",
+    "id": "kinesin",
     "max_level": 5,
     "name_key": "SKILL_KINESIN_NAME",
     "type": "passive"
@@ -302,7 +302,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_LONGEVITY_DESC",
     "icon": "⏳",
-    "id": "passive_longevity",
+    "id": "longevity",
     "max_level": 5,
     "name_key": "SKILL_LONGEVITY_NAME",
     "type": "passive"
@@ -313,7 +313,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_VDJ_DESC",
     "icon": "🎲",
-    "id": "passive_vdj",
+    "id": "vdj",
     "max_level": 5,
     "name_key": "SKILL_VDJ_NAME",
     "type": "passive"
@@ -324,7 +324,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_ENDOTOXIN_DESC",
     "icon": "🧱",
-    "id": "passive_endotoxin",
+    "id": "endotoxin",
     "max_level": 5,
     "name_key": "SKILL_ENDOTOXIN_NAME",
     "type": "passive"
@@ -335,7 +335,7 @@
     "cooldown": 0.0,
     "desc_key": "SKILL_HEMATOPOIETIC_DESC",
     "icon": "🩸",
-    "id": "passive_hematopoietic",
+    "id": "hematopoietic",
     "max_level": 5,
     "name_key": "SKILL_HEMATOPOIETIC_NAME",
     "type": "passive"

@@ -77,7 +77,7 @@ public partial class TestMenuFlow : TestHarness
         GD.Print("[PASS] Initial lock state enforced: Macrophage unlocked, other 4 cells locked.");
 
         // Unlock remaining cells via achievements and verify they become confirmable
-        string[] achs = { "ach_engulf_20", "ach_devour_50", "ach_reach_level_5", "ach_survive_180s" };
+        string[] achs = { "engulf_20", "devour_50", "reach_level_5", "survive_180s" };
         foreach (var ach in achs)
         {
             AchievementManager.Unlock(ach);

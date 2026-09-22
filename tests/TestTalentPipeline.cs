@@ -118,7 +118,7 @@ public partial class TestTalentPipeline : TestHarness
         AssertThat(hardClears).IsEqual(5);
 
         // The final organ clear carries its documented +2 capstone reward.
-        var bbb = AchievementManager.Achievements["ach_bbb_clear"].AsGodotDictionary();
+        var bbb = AchievementManager.Achievements["bbb_clear"].AsGodotDictionary();
         AssertThat(bbb.GetValueOrDefault("talent_points", 0).AsInt32()).IsEqual(2);
 
         // First clears grant points exactly once each.
@@ -131,7 +131,7 @@ public partial class TestTalentPipeline : TestHarness
 
         AchievementManager.RecordMapClear("alveolar_space", true);
         AssertThat(PassiveTreeManager.BonusPoints).IsEqual(2);
-        AssertThat(AchievementManager.IsUnlocked("ach_alveolar_hard_clear")).IsTrue();
+        AssertThat(AchievementManager.IsUnlocked("alveolar_hard_clear")).IsTrue();
 
         AchievementManager.RecordMapClear("blood_brain_barrier");
         AssertThat(PassiveTreeManager.BonusPoints).IsEqual(4);
@@ -189,7 +189,7 @@ public partial class TestTalentPipeline : TestHarness
         AssertThat(player).IsNotNull();
 
         // The innate hub is instantiated for free but carries no stat effects.
-        AssertThat(player!.GetNodeOrNull<Node>("TreeLoadout_passive_lysosome")).IsNotNull();
+        AssertThat(player!.GetNodeOrNull<Node>("TreeLoadout_lysosome")).IsNotNull();
         AssertThat(player.Stats).IsNotNull();
         AssertThat(player.Stats!.GetStat("might")).IsEqualApprox(1.0f, 0.001f);
         AssertThat(PassiveTreeManager.GetSpentPoints("macrophage")).IsEqual(0);

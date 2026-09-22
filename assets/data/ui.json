@@ -1,0 +1,50 @@
+[
+  {
+    "id": "badge_antigen"
+  },
+  {
+    "id": "badge_atp"
+  },
+  {
+    "id": "button_pause"
+  },
+  {
+    "id": "button_settings"
+  },
+  {
+    "id": "card_mutation"
+  },
+  {
+    "id": "card_superweapon"
+  },
+  {
+    "id": "frame_organelle"
+  },
+  {
+    "id": "meter_ph"
+  },
+  {
+    "id": "meter_temp"
+  },
+  {
+    "id": "reticle_danger"
+  },
+  {
+    "id": "reticle_scan"
+  },
+  {
+    "id": "reticle_target"
+  },
+  {
+    "id": "status_buffered"
+  },
+  {
+    "id": "status_exhausted"
+  },
+  {
+    "id": "status_inflamed"
+  },
+  {
+    "id": "status_overclock"
+  }
+]

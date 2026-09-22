@@ -1,864 +1,864 @@
 {
   "edges": [
     [
-      "tree_motility_f01",
-      "tree_enduring_march"
+      "motility_f01",
+      "enduring_march"
     ],
     [
-      "tree_motility_f01",
-      "tree_oxidative_pace"
+      "motility_f01",
+      "oxidative_pace"
     ],
     [
-      "tree_oxidative_pace",
-      "passive_actin"
+      "oxidative_pace",
+      "actin"
     ],
     [
-      "tree_oxidative_pace",
-      "tree_rapid_reposition"
+      "oxidative_pace",
+      "rapid_reposition"
     ],
     [
-      "tree_rapid_reposition",
-      "tree_pseudopod_marathon"
+      "rapid_reposition",
+      "pseudopod_marathon"
     ],
     [
-      "tree_rapid_reposition",
-      "tree_patient_observer"
+      "rapid_reposition",
+      "patient_observer"
     ],
     [
-      "tree_patient_observer",
-      "tree_swarm_cartography"
+      "patient_observer",
+      "swarm_cartography"
     ],
     [
-      "tree_patient_observer",
-      "tree_lucky_mutation"
+      "patient_observer",
+      "lucky_mutation"
     ],
     [
-      "tree_lucky_mutation",
-      "passive_chemokine"
+      "lucky_mutation",
+      "chemokine"
     ],
     [
-      "tree_lucky_mutation",
-      "tree_scavenger_field"
+      "lucky_mutation",
+      "scavenger_field"
     ],
     [
-      "tree_scavenger_field",
-      "tree_far_sense"
+      "scavenger_field",
+      "far_sense"
     ],
     [
-      "tree_scavenger_field",
-      "passive_endotoxin"
+      "scavenger_field",
+      "endotoxin"
     ],
     [
-      "passive_endotoxin",
-      "tree_second_wind"
+      "endotoxin",
+      "second_wind"
     ],
     [
-      "passive_endotoxin",
-      "tree_contained_fury"
+      "endotoxin",
+      "contained_fury"
     ],
     [
-      "tree_contained_fury",
-      "passive_lysosome"
+      "contained_fury",
+      "lysosome"
     ],
     [
-      "tree_contained_fury",
-      "passive_autophagy"
+      "contained_fury",
+      "autophagy"
     ],
     [
-      "passive_autophagy",
-      "tree_iron_membrane"
+      "autophagy",
+      "iron_membrane"
     ],
     [
-      "tree_enduring_march",
-      "tree_aerobic_sprint"
+      "enduring_march",
+      "aerobic_sprint"
     ],
     [
-      "tree_enduring_march",
-      "passive_actin"
+      "enduring_march",
+      "actin"
     ],
     [
-      "passive_actin",
-      "tree_cytoskeletal_drift"
+      "actin",
+      "cytoskeletal_drift"
     ],
     [
-      "passive_actin",
-      "tree_pseudopod_marathon"
+      "actin",
+      "pseudopod_marathon"
     ],
     [
-      "tree_pseudopod_marathon",
-      "tree_slipstream"
+      "pseudopod_marathon",
+      "slipstream"
     ],
     [
-      "tree_pseudopod_marathon",
-      "tree_swarm_cartography"
+      "pseudopod_marathon",
+      "swarm_cartography"
     ],
     [
-      "tree_swarm_cartography",
-      "tree_senses_f01"
+      "swarm_cartography",
+      "senses_f01"
     ],
     [
-      "tree_swarm_cartography",
-      "passive_chemokine"
+      "swarm_cartography",
+      "chemokine"
     ],
     [
-      "passive_chemokine",
-      "tree_risk_assessment"
+      "chemokine",
+      "risk_assessment"
     ],
     [
-      "passive_chemokine",
-      "tree_far_sense"
+      "chemokine",
+      "far_sense"
     ],
     [
-      "tree_far_sense",
-      "tree_antigen_harvest"
+      "far_sense",
+      "antigen_harvest"
     ],
     [
-      "tree_far_sense",
-      "tree_second_wind"
+      "far_sense",
+      "second_wind"
     ],
     [
-      "tree_second_wind",
-      "tree_rapid_clotting"
+      "second_wind",
+      "rapid_clotting"
     ],
     [
-      "tree_second_wind",
-      "passive_lysosome"
+      "second_wind",
+      "lysosome"
     ],
     [
-      "passive_lysosome",
-      "tree_thick_cytoplasm"
+      "lysosome",
+      "thick_cytoplasm"
     ],
     [
-      "passive_lysosome",
-      "tree_iron_membrane"
+      "lysosome",
+      "iron_membrane"
     ],
     [
-      "tree_iron_membrane",
-      "passive_bilayer"
+      "iron_membrane",
+      "bilayer"
     ],
     [
-      "tree_aerobic_sprint",
-      "tree_ballistics_f01"
+      "aerobic_sprint",
+      "ballistics_f01"
     ],
     [
-      "tree_aerobic_sprint",
-      "tree_cytoskeletal_drift"
+      "aerobic_sprint",
+      "cytoskeletal_drift"
     ],
     [
-      "tree_cytoskeletal_drift",
-      "tree_splitting_volley"
+      "cytoskeletal_drift",
+      "splitting_volley"
     ],
     [
-      "tree_cytoskeletal_drift",
-      "tree_slipstream"
+      "cytoskeletal_drift",
+      "slipstream"
     ],
     [
-      "tree_slipstream",
-      "tree_extended_chambers"
+      "slipstream",
+      "extended_chambers"
     ],
     [
-      "tree_slipstream",
-      "tree_senses_f01"
+      "slipstream",
+      "senses_f01"
     ],
     [
-      "tree_senses_f01",
-      "passive_hematopoietic"
+      "senses_f01",
+      "hematopoietic"
     ],
     [
-      "tree_senses_f01",
-      "tree_risk_assessment"
+      "senses_f01",
+      "risk_assessment"
     ],
     [
-      "tree_risk_assessment",
-      "passive_longevity"
+      "risk_assessment",
+      "longevity"
     ],
     [
-      "tree_risk_assessment",
-      "tree_antigen_harvest"
+      "risk_assessment",
+      "antigen_harvest"
     ],
     [
-      "tree_antigen_harvest",
-      "tree_core_f01"
+      "antigen_harvest",
+      "core_f01"
     ],
     [
-      "tree_antigen_harvest",
-      "tree_rapid_clotting"
+      "antigen_harvest",
+      "rapid_clotting"
     ],
     [
-      "tree_rapid_clotting",
-      "tree_execution_tempo"
+      "rapid_clotting",
+      "execution_tempo"
     ],
     [
-      "tree_rapid_clotting",
-      "tree_thick_cytoplasm"
+      "rapid_clotting",
+      "thick_cytoplasm"
     ],
     [
-      "tree_thick_cytoplasm",
-      "tree_precise_edge"
+      "thick_cytoplasm",
+      "precise_edge"
     ],
     [
-      "tree_thick_cytoplasm",
-      "passive_bilayer"
+      "thick_cytoplasm",
+      "bilayer"
     ],
     [
-      "passive_bilayer",
-      "tree_marked_core"
+      "bilayer",
+      "marked_core"
     ],
     [
-      "tree_ballistics_f01",
-      "tree_piercing_filaments"
+      "ballistics_f01",
+      "piercing_filaments"
     ],
     [
-      "tree_ballistics_f01",
-      "tree_splitting_volley"
+      "ballistics_f01",
+      "splitting_volley"
     ],
     [
-      "tree_splitting_volley",
-      "passive_kinesin"
+      "splitting_volley",
+      "kinesin"
     ],
     [
-      "tree_splitting_volley",
-      "tree_extended_chambers"
+      "splitting_volley",
+      "extended_chambers"
     ],
     [
-      "tree_extended_chambers",
-      "tree_rolling_thunder"
+      "extended_chambers",
+      "rolling_thunder"
     ],
     [
-      "tree_extended_chambers",
-      "passive_hematopoietic"
+      "extended_chambers",
+      "hematopoietic"
     ],
     [
-      "passive_hematopoietic",
-      "passive_glycolysis"
+      "hematopoietic",
+      "glycolysis"
     ],
     [
-      "passive_hematopoietic",
-      "passive_longevity"
+      "hematopoietic",
+      "longevity"
     ],
     [
-      "passive_longevity",
-      "tree_immortal_culture"
+      "longevity",
+      "immortal_culture"
     ],
     [
-      "passive_longevity",
-      "tree_core_f01"
+      "longevity",
+      "core_f01"
     ],
     [
-      "tree_core_f01",
-      "tree_omnipotent_cytoplasm"
+      "core_f01",
+      "omnipotent_cytoplasm"
     ],
     [
-      "tree_core_f01",
-      "tree_execution_tempo"
+      "core_f01",
+      "execution_tempo"
     ],
     [
-      "tree_execution_tempo",
-      "tree_blood_price"
+      "execution_tempo",
+      "blood_price"
     ],
     [
-      "tree_execution_tempo",
-      "tree_precise_edge"
+      "execution_tempo",
+      "precise_edge"
     ],
     [
-      "tree_precise_edge",
-      "passive_opsonin"
+      "precise_edge",
+      "opsonin"
     ],
     [
-      "tree_precise_edge",
-      "tree_marked_core"
+      "precise_edge",
+      "marked_core"
     ],
     [
-      "tree_marked_core",
-      "tree_lightfooted_killer"
+      "marked_core",
+      "lightfooted_killer"
     ],
     [
-      "tree_piercing_filaments",
-      "tree_overdrawn_strings"
+      "piercing_filaments",
+      "overdrawn_strings"
     ],
     [
-      "tree_piercing_filaments",
-      "passive_kinesin"
+      "piercing_filaments",
+      "kinesin"
     ],
     [
-      "passive_kinesin",
-      "tree_ballistic_threads"
+      "kinesin",
+      "ballistic_threads"
     ],
     [
-      "passive_kinesin",
-      "tree_rolling_thunder"
+      "kinesin",
+      "rolling_thunder"
     ],
     [
-      "tree_rolling_thunder",
-      "tree_guided_salvo"
+      "rolling_thunder",
+      "guided_salvo"
     ],
     [
-      "tree_rolling_thunder",
-      "passive_glycolysis"
+      "rolling_thunder",
+      "glycolysis"
     ],
     [
-      "passive_glycolysis",
-      "tree_core_f02"
+      "glycolysis",
+      "core_f02"
     ],
     [
-      "passive_glycolysis",
-      "tree_immortal_culture"
+      "glycolysis",
+      "immortal_culture"
     ],
     [
-      "tree_immortal_culture",
-      "tree_adaptive_overdrive"
+      "immortal_culture",
+      "adaptive_overdrive"
     ],
     [
-      "tree_immortal_culture",
-      "tree_omnipotent_cytoplasm"
+      "immortal_culture",
+      "omnipotent_cytoplasm"
     ],
     [
-      "tree_omnipotent_cytoplasm",
-      "passive_mitochondria"
+      "omnipotent_cytoplasm",
+      "mitochondria"
     ],
     [
-      "tree_omnipotent_cytoplasm",
-      "tree_blood_price"
+      "omnipotent_cytoplasm",
+      "blood_price"
     ],
     [
-      "tree_blood_price",
-      "tree_deep_wound"
+      "blood_price",
+      "deep_wound"
     ],
     [
-      "tree_blood_price",
-      "passive_opsonin"
+      "blood_price",
+      "opsonin"
     ],
     [
-      "passive_opsonin",
-      "passive_vdj"
+      "opsonin",
+      "vdj"
     ],
     [
-      "passive_opsonin",
-      "tree_lightfooted_killer"
+      "opsonin",
+      "lightfooted_killer"
     ],
     [
-      "tree_lightfooted_killer",
-      "tree_assassins_mandate"
+      "lightfooted_killer",
+      "assassins_mandate"
     ],
     [
-      "tree_overdrawn_strings",
-      "tree_ballistic_threads"
+      "overdrawn_strings",
+      "ballistic_threads"
     ],
     [
-      "tree_ballistic_threads",
-      "tree_guided_salvo"
+      "ballistic_threads",
+      "guided_salvo"
     ],
     [
-      "tree_guided_salvo",
-      "tree_core_f02"
+      "guided_salvo",
+      "core_f02"
     ],
     [
-      "tree_core_f02",
-      "tree_adaptive_overdrive"
+      "core_f02",
+      "adaptive_overdrive"
     ],
     [
-      "tree_adaptive_overdrive",
-      "passive_mitochondria"
+      "adaptive_overdrive",
+      "mitochondria"
     ],
     [
-      "passive_mitochondria",
-      "tree_deep_wound"
+      "mitochondria",
+      "deep_wound"
     ],
     [
-      "tree_deep_wound",
-      "passive_vdj"
+      "deep_wound",
+      "vdj"
     ],
     [
-      "passive_vdj",
-      "tree_assassins_mandate"
+      "vdj",
+      "assassins_mandate"
     ]
   ],
   "nodes": [
     {
       "branch": "vitality",
       "col": -2,
-      "id": "passive_lysosome",
+      "id": "lysosome",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 2,
-      "trait": "trait_passive_lysosome"
+      "trait": "lysosome"
     },
     {
       "branch": "vitality",
       "col": -1,
-      "id": "tree_thick_cytoplasm",
+      "id": "thick_cytoplasm",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 2,
-      "trait": "trait_tree_thick_cytoplasm"
+      "trait": "thick_cytoplasm"
     },
     {
       "branch": "vitality",
       "col": -1,
-      "id": "passive_bilayer",
+      "id": "bilayer",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 3,
-      "trait": "trait_passive_bilayer"
+      "trait": "bilayer"
     },
     {
       "branch": "vitality",
       "col": -2,
-      "id": "tree_iron_membrane",
+      "id": "iron_membrane",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 3,
-      "trait": "trait_tree_iron_membrane"
+      "trait": "iron_membrane"
     },
     {
       "branch": "vitality",
       "col": -1,
-      "id": "tree_rapid_clotting",
+      "id": "rapid_clotting",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 1,
-      "trait": "trait_tree_rapid_clotting"
+      "trait": "rapid_clotting"
     },
     {
       "branch": "vitality",
       "col": -2,
-      "id": "tree_second_wind",
+      "id": "second_wind",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 1,
-      "trait": "trait_tree_second_wind"
+      "trait": "second_wind"
     },
     {
       "branch": "vitality",
       "col": -3,
-      "id": "passive_endotoxin",
+      "id": "endotoxin",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 1,
-      "trait": "trait_passive_endotoxin"
+      "trait": "endotoxin"
     },
     {
       "branch": "vitality",
       "col": -3,
-      "id": "tree_contained_fury",
+      "id": "contained_fury",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 2,
-      "trait": "trait_tree_contained_fury"
+      "trait": "contained_fury"
     },
     {
       "branch": "vitality",
       "col": -3,
-      "id": "passive_autophagy",
+      "id": "autophagy",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 3,
-      "trait": "trait_passive_autophagy"
+      "trait": "autophagy"
     },
     {
       "branch": "precision",
       "col": 1,
-      "id": "passive_opsonin",
+      "id": "opsonin",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 2,
-      "trait": "trait_passive_opsonin"
+      "trait": "opsonin"
     },
     {
       "branch": "precision",
       "col": 2,
-      "id": "passive_vdj",
+      "id": "vdj",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 2,
-      "trait": "trait_passive_vdj"
+      "trait": "vdj"
     },
     {
       "branch": "precision",
       "col": 2,
-      "id": "tree_assassins_mandate",
+      "id": "assassins_mandate",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 3,
-      "trait": "trait_tree_assassins_mandate"
+      "trait": "assassins_mandate"
     },
     {
       "branch": "precision",
       "col": 0,
-      "id": "tree_precise_edge",
+      "id": "precise_edge",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 2,
-      "trait": "trait_tree_precise_edge"
+      "trait": "precise_edge"
     },
     {
       "branch": "precision",
       "col": 0,
-      "id": "tree_marked_core",
+      "id": "marked_core",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 3,
-      "trait": "trait_tree_marked_core"
+      "trait": "marked_core"
     },
     {
       "branch": "precision",
       "col": 0,
-      "id": "tree_execution_tempo",
+      "id": "execution_tempo",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 1,
-      "trait": "trait_tree_execution_tempo"
+      "trait": "execution_tempo"
     },
     {
       "branch": "precision",
       "col": 1,
-      "id": "tree_blood_price",
+      "id": "blood_price",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 1,
-      "trait": "trait_tree_blood_price"
+      "trait": "blood_price"
     },
     {
       "branch": "precision",
       "col": 2,
-      "id": "tree_deep_wound",
+      "id": "deep_wound",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 1,
-      "trait": "trait_tree_deep_wound"
+      "trait": "deep_wound"
     },
     {
       "branch": "precision",
       "col": 1,
-      "id": "tree_lightfooted_killer",
+      "id": "lightfooted_killer",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 3,
-      "trait": "trait_tree_lightfooted_killer"
+      "trait": "lightfooted_killer"
     },
     {
       "branch": "senses",
       "col": -2,
-      "id": "passive_chemokine",
+      "id": "chemokine",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -1,
-      "trait": "trait_passive_chemokine"
+      "trait": "chemokine"
     },
     {
       "branch": "senses",
       "col": -2,
-      "id": "tree_far_sense",
+      "id": "far_sense",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 0,
-      "trait": "trait_tree_far_sense"
+      "trait": "far_sense"
     },
     {
       "branch": "senses",
       "col": -1,
-      "id": "tree_antigen_harvest",
+      "id": "antigen_harvest",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 0,
-      "trait": "trait_tree_antigen_harvest"
+      "trait": "antigen_harvest"
     },
     {
       "branch": "senses",
       "col": -3,
-      "id": "tree_scavenger_field",
+      "id": "scavenger_field",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 0,
-      "trait": "trait_tree_scavenger_field"
+      "trait": "scavenger_field"
     },
     {
       "branch": "senses",
       "col": -3,
-      "id": "tree_lucky_mutation",
+      "id": "lucky_mutation",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -1,
-      "trait": "trait_tree_lucky_mutation"
+      "trait": "lucky_mutation"
     },
     {
       "branch": "senses",
       "col": -3,
-      "id": "tree_patient_observer",
+      "id": "patient_observer",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -2,
-      "trait": "trait_tree_patient_observer"
+      "trait": "patient_observer"
     },
     {
       "branch": "senses",
       "col": -2,
-      "id": "tree_swarm_cartography",
+      "id": "swarm_cartography",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -2,
-      "trait": "trait_tree_swarm_cartography"
+      "trait": "swarm_cartography"
     },
     {
       "branch": "senses",
       "col": -1,
-      "id": "tree_risk_assessment",
+      "id": "risk_assessment",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -1,
-      "trait": "trait_tree_risk_assessment"
+      "trait": "risk_assessment"
     },
     {
       "branch": "senses",
       "col": -1,
-      "id": "tree_senses_f01",
+      "id": "senses_f01",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -2,
-      "trait": "trait_small_magnet"
+      "trait": "small_magnet"
     },
     {
       "branch": "core",
       "col": 0,
-      "id": "passive_longevity",
+      "id": "longevity",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -1,
-      "trait": "trait_passive_longevity"
+      "trait": "longevity"
     },
     {
       "branch": "core",
       "col": 1,
-      "id": "tree_immortal_culture",
+      "id": "immortal_culture",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -1,
-      "trait": "trait_tree_immortal_culture"
+      "trait": "immortal_culture"
     },
     {
       "branch": "core",
       "col": 1,
-      "id": "passive_glycolysis",
+      "id": "glycolysis",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -2,
-      "trait": "trait_passive_glycolysis"
+      "trait": "glycolysis"
     },
     {
       "branch": "core",
       "col": 2,
-      "id": "passive_mitochondria",
+      "id": "mitochondria",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 0,
-      "trait": "trait_passive_mitochondria"
+      "trait": "mitochondria"
     },
     {
       "branch": "core",
       "col": 2,
-      "id": "tree_adaptive_overdrive",
+      "id": "adaptive_overdrive",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -1,
-      "trait": "trait_tree_adaptive_overdrive"
+      "trait": "adaptive_overdrive"
     },
     {
       "branch": "core",
       "col": 1,
-      "id": "tree_omnipotent_cytoplasm",
+      "id": "omnipotent_cytoplasm",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 0,
-      "trait": "trait_tree_omnipotent_cytoplasm"
+      "trait": "omnipotent_cytoplasm"
     },
     {
       "branch": "core",
       "col": 0,
-      "id": "passive_hematopoietic",
+      "id": "hematopoietic",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -2,
-      "trait": "trait_passive_hematopoietic"
+      "trait": "hematopoietic"
     },
     {
       "branch": "core",
       "col": 0,
-      "id": "tree_core_f01",
+      "id": "core_f01",
       "max_stacks": 1,
       "point_cost": 1,
       "row": 0,
-      "trait": "trait_small_might"
+      "trait": "small_might"
     },
     {
       "branch": "core",
       "col": 2,
-      "id": "tree_core_f02",
+      "id": "core_f02",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -2,
-      "trait": "trait_small_area"
+      "trait": "small_area"
     },
     {
       "branch": "motility",
       "col": -2,
-      "id": "passive_actin",
+      "id": "actin",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -4,
-      "trait": "trait_passive_actin"
+      "trait": "actin"
     },
     {
       "branch": "motility",
       "col": -1,
-      "id": "tree_cytoskeletal_drift",
+      "id": "cytoskeletal_drift",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -4,
-      "trait": "trait_tree_cytoskeletal_drift"
+      "trait": "cytoskeletal_drift"
     },
     {
       "branch": "motility",
       "col": -1,
-      "id": "tree_slipstream",
+      "id": "slipstream",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -3,
-      "trait": "trait_tree_slipstream"
+      "trait": "slipstream"
     },
     {
       "branch": "motility",
       "col": -3,
-      "id": "tree_oxidative_pace",
+      "id": "oxidative_pace",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -4,
-      "trait": "trait_tree_oxidative_pace"
+      "trait": "oxidative_pace"
     },
     {
       "branch": "motility",
       "col": -3,
-      "id": "tree_rapid_reposition",
+      "id": "rapid_reposition",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -3,
-      "trait": "trait_tree_rapid_reposition"
+      "trait": "rapid_reposition"
     },
     {
       "branch": "motility",
       "col": -1,
-      "id": "tree_aerobic_sprint",
+      "id": "aerobic_sprint",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -5,
-      "trait": "trait_tree_aerobic_sprint"
+      "trait": "aerobic_sprint"
     },
     {
       "branch": "motility",
       "col": -2,
-      "id": "tree_pseudopod_marathon",
+      "id": "pseudopod_marathon",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -3,
-      "trait": "trait_tree_pseudopod_marathon"
+      "trait": "pseudopod_marathon"
     },
     {
       "branch": "motility",
       "col": -2,
-      "id": "tree_enduring_march",
+      "id": "enduring_march",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -5,
-      "trait": "trait_tree_enduring_march"
+      "trait": "enduring_march"
     },
     {
       "branch": "motility",
       "col": -3,
-      "id": "tree_motility_f01",
+      "id": "motility_f01",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -5,
-      "trait": "trait_small_move_speed"
+      "trait": "small_move_speed"
     },
     {
       "branch": "ballistics",
       "col": 1,
-      "id": "passive_kinesin",
+      "id": "kinesin",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -4,
-      "trait": "trait_passive_kinesin"
+      "trait": "kinesin"
     },
     {
       "branch": "ballistics",
       "col": 1,
-      "id": "tree_rolling_thunder",
+      "id": "rolling_thunder",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -3,
-      "trait": "trait_tree_rolling_thunder"
+      "trait": "rolling_thunder"
     },
     {
       "branch": "ballistics",
       "col": 2,
-      "id": "tree_ballistic_threads",
+      "id": "ballistic_threads",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -4,
-      "trait": "trait_tree_ballistic_threads"
+      "trait": "ballistic_threads"
     },
     {
       "branch": "ballistics",
       "col": 0,
-      "id": "tree_splitting_volley",
+      "id": "splitting_volley",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -4,
-      "trait": "trait_tree_splitting_volley"
+      "trait": "splitting_volley"
     },
     {
       "branch": "ballistics",
       "col": 1,
-      "id": "tree_piercing_filaments",
+      "id": "piercing_filaments",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -5,
-      "trait": "trait_tree_piercing_filaments"
+      "trait": "piercing_filaments"
     },
     {
       "branch": "ballistics",
       "col": 2,
-      "id": "tree_guided_salvo",
+      "id": "guided_salvo",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -3,
-      "trait": "trait_tree_guided_salvo"
+      "trait": "guided_salvo"
     },
     {
       "branch": "ballistics",
       "col": 0,
-      "id": "tree_extended_chambers",
+      "id": "extended_chambers",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -3,
-      "trait": "trait_tree_extended_chambers"
+      "trait": "extended_chambers"
     },
     {
       "branch": "ballistics",
       "col": 2,
-      "id": "tree_overdrawn_strings",
+      "id": "overdrawn_strings",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -5,
-      "trait": "trait_tree_overdrawn_strings"
+      "trait": "overdrawn_strings"
     },
     {
       "branch": "ballistics",
       "col": 0,
-      "id": "tree_ballistics_f01",
+      "id": "ballistics_f01",
       "max_stacks": 1,
       "point_cost": 1,
       "row": -5,
-      "trait": "trait_small_projectile_speed"
+      "trait": "small_projectile_speed"
     }
   ],
   "regions": [
@@ -894,10 +894,10 @@
     }
   ],
   "start_nodes": {
-    "b_cell": "passive_kinesin",
-    "ctl": "passive_opsonin",
-    "dendritic": "passive_chemokine",
-    "macrophage": "passive_lysosome",
-    "neutrophil": "passive_actin"
+    "b_cell": "kinesin",
+    "ctl": "opsonin",
+    "dendritic": "chemokine",
+    "macrophage": "lysosome",
+    "neutrophil": "actin"
   }
 }

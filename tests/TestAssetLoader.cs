@@ -154,17 +154,17 @@ public partial class TestAssetLoader : TestHarness
 
     private static void RunPathTests()
     {
-        // Steam-mirrored achievement sprites keep the full id.
-        AssertThat(AssetPaths.AchievementSprite("ach_engulf_20"))
-            .IsEqual("res://assets/sprites/achievements/ach_engulf_20.png");
+        // Ids equal gen/ file stems; paths derived per category.
+        AssertThat(AssetPaths.AchievementSprite("engulf_20"))
+            .IsEqual("res://assets/gen/achievement/engulf_20.png");
 
-        // gen/ sources are prefix-free.
-        AssertThat(AssetPaths.SkillIcon("passive_actin")).IsEqual("res://assets/gen/skill/actin.png");
+        // Ids equal file stems (no prefix stripping).
+        AssertThat(AssetPaths.SkillIcon("actin")).IsEqual("res://assets/gen/skill/actin.png");
         AssertThat(AssetPaths.SkillIcon("ros_torrent")).IsEqual("res://assets/gen/skill/ros_torrent.png");
-        AssertThat(AssetPaths.TraitIcon("trait_passive_actin")).IsEqual("res://assets/gen/passive_tree/actin.png");
-        AssertThat(AssetPaths.TraitIcon("trait_tree_adaptive_overdrive")).IsEqual("res://assets/gen/passive_tree/adaptive_overdrive.png");
-        AssertThat(AssetPaths.TraitIcon("trait_small_might")).IsEqual("res://assets/gen/passive_tree/small_might.png");
-        AssertThat(AssetPaths.UiIcon("ui_reticle_target")).IsEqual("res://assets/gen/ui/reticle_target.png");
+        AssertThat(AssetPaths.TraitIcon("actin")).IsEqual("res://assets/gen/passive_tree/actin.png");
+        AssertThat(AssetPaths.TraitIcon("adaptive_overdrive")).IsEqual("res://assets/gen/passive_tree/adaptive_overdrive.png");
+        AssertThat(AssetPaths.TraitIcon("small_might")).IsEqual("res://assets/gen/passive_tree/small_might.png");
+        AssertThat(AssetPaths.UiIcon("reticle_target")).IsEqual("res://assets/gen/ui/reticle_target.png");
         GD.Print("[PASS] AssetPaths mapping verified.");
     }
 }

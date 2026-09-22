@@ -26,17 +26,17 @@ public static class SkillIds
     public const string HistamineSurge = "histamine_surge";
 
     // --- Passive organelle traits ---
-    public const string PassiveActin = "passive_actin";
-    public const string PassiveLysosome = "passive_lysosome";
-    public const string PassiveMitochondria = "passive_mitochondria";
-    public const string PassiveOpsonin = "passive_opsonin";
-    public const string PassiveChemokine = "passive_chemokine";
-    public const string PassiveBilayer = "passive_bilayer";
-    public const string PassiveAutophagy = "passive_autophagy";
-    public const string PassiveGlycolysis = "passive_glycolysis";
-    public const string PassiveKinesin = "passive_kinesin";
-    public const string PassiveLongevity = "passive_longevity";
-    public const string PassiveVdj = "passive_vdj";
-    public const string PassiveEndotoxin = "passive_endotoxin";
-    public const string PassiveHematopoietic = "passive_hematopoietic";
+    public const string PassiveActin = "actin";
+    public const string PassiveLysosome = "lysosome";
+    public const string PassiveMitochondria = "mitochondria";
+    public const string PassiveOpsonin = "opsonin";
+    public const string PassiveChemokine = "chemokine";
+    public const string PassiveBilayer = "bilayer";
+    public const string PassiveAutophagy = "autophagy";
+    public const string PassiveGlycolysis = "glycolysis";
+    public const string PassiveKinesin = "kinesin";
+    public const string PassiveLongevity = "longevity";
+    public const string PassiveVdj = "vdj";
+    public const string PassiveEndotoxin = "endotoxin";
+    public const string PassiveHematopoietic = "hematopoietic";
 }

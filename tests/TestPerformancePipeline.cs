@@ -244,6 +244,16 @@ public partial class TestPerformancePipeline : TestHarness
     {
         AssertThat(_main).IsNotNull();
         var main = _main!;
+
+        // Isolate a clean arena: phase 2 leaves its 40 batched noroviruses in
+        // the container, and a pierce-0 projectile dies on the first leftover
+        // it touches, so the target would never take the hit without this reset.
+        foreach (var child in main.EnemyContainer!.GetChildren())
+        {
+            if (child is BaseEnemy)
+                child.Free();
+        }
+
         var renderer = main.SwarmRenderer!;
 
         // Batched (invisible) micro virus must still collide with projectiles.

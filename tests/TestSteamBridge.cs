@@ -58,29 +58,29 @@ public partial class TestSteamBridge : TestHarness
         AssertThat(SteamBridge.IsAvailable).IsFalse();
         SteamBridge.Initialize();
         AssertThat(SteamBridge.IsAvailable).IsFalse();
-        SteamBridge.PushUnlock("ach_engulf_20");
-        SteamBridge.PushUnlocks(new List<string> { "ach_engulf_20", "ach_devour_50" });
-        AssertThat(SteamBridge.PullUnlocked(new List<string> { "ach_engulf_20" }).Count).IsEqual(0);
+        SteamBridge.PushUnlock("engulf_20");
+        SteamBridge.PushUnlocks(new List<string> { "engulf_20", "devour_50" });
+        AssertThat(SteamBridge.PullUnlocked(new List<string> { "engulf_20" }).Count).IsEqual(0);
         SteamBridge.Shutdown();
         GD.Print("[PASS] Steam bridge is a safe no-op when USE_STEAMWORKS is undefined.");
 
         // Steam API naming mirrors the local ids (docs/achievement.md §3)
-        AssertThat(SteamBridge.GetSteamApiName("ach_engulf_20")).IsEqual("ACH_ENGULF_20");
-        AssertThat(SteamBridge.GetSteamApiName("ach_prpsc_amyloid")).IsEqual("ACH_PRPSC_AMYLOID");
+        AssertThat(SteamBridge.GetSteamApiName("engulf_20")).IsEqual("ENGULF_20");
+        AssertThat(SteamBridge.GetSteamApiName("prpsc_amyloid")).IsEqual("PRPSC_AMYLOID");
         AssertThat(SteamBridge.GetSteamApiName("")).IsEqual("");
         GD.Print("[PASS] Steam API name normalization verified.");
 
         // Two-way sync degrades to 0 offline and local unlocks still persist
         AssertThat(AchievementManager.SyncWithSteam()).IsEqual(0);
-        AssertThat(AchievementManager.Unlock("ach_engulf_20")).IsTrue();
-        AssertThat(AchievementManager.IsUnlocked("ach_engulf_20")).IsTrue();
-        AssertThat(AchievementManager.IsUnlocked("ach_devour_50")).IsFalse();
+        AssertThat(AchievementManager.Unlock("engulf_20")).IsTrue();
+        AssertThat(AchievementManager.IsUnlocked("engulf_20")).IsTrue();
+        AssertThat(AchievementManager.IsUnlocked("devour_50")).IsFalse();
 
         // Persisted unlocks survive a reload (offline catch-up source of truth)
         AchievementManager.SaveToDisk();
         AchievementManager.UnlockedIds.Clear();
         AchievementManager.LoadFromDisk();
-        AssertThat(AchievementManager.IsUnlocked("ach_engulf_20")).IsTrue();
+        AssertThat(AchievementManager.IsUnlocked("engulf_20")).IsTrue();
         GD.Print("[PASS] Offline persistence and unlock flow work with the bridge disabled.");
     }
 

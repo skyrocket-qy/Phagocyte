@@ -132,7 +132,7 @@ public partial class TestDifficultyTracks : TestHarness
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(1);
         AssertThat(RunRecordManager.Records[0]["difficulty"].AsString()).IsEqual(RunRecordManager.DifficultyHard);
         AssertThat(RunRecordManager.Records[0]["result"].AsString()).IsEqual(RunRecordManager.ResultVictory);
-        AssertThat(AchievementManager.IsUnlocked("ach_wound_hard_clear")).IsTrue();
+        AssertThat(AchievementManager.IsUnlocked("wound_hard_clear")).IsTrue();
         AssertThat(PassiveTreeManager.BonusPoints).IsEqual(bonusBefore + 1);
 
         GD.Print("[PASS] Hard runs flag the spawner, the environment and settle as a Hard record with rewards.");

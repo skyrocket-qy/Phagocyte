@@ -6,7 +6,7 @@ namespace Phagocyte.UI;
 /// <summary>
 /// Full-screen achievement gallery: the fifth MainMenu view (Title → Achievements).
 /// Card list + detail panel with per-achievement artwork. Artwork resolves from
-/// the Steam-mirrored <c>image_path</c> (see assets/sprites/achievements/README.md);
+/// <c>AssetPaths.AchievementSprite(id)</c> (res://assets/gen/achievement/{id}.png);
 /// missing files fall back to the emoji <c>icon</c> on a category-tinted plate,
 /// so shipping art later requires zero code changes.
 /// Filter is intentionally three-state only: all / unlocked / locked.

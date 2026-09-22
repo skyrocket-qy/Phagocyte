@@ -57,7 +57,7 @@ public partial class TestNewSystemsBundle : SceneTree
         // --- 1. AchievementToast Verification ---
         var dummyAch = new Godot.Collections.Dictionary
         {
-            { "id", "ach_test" },
+            { "id", "toast_test" },
             { "icon", "🧬" },
             { "title_key", "ACH_ENGULF_20_TITLE" },
             { "desc_key", "ACH_ENGULF_20_DESC" },

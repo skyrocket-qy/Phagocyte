@@ -323,7 +323,7 @@ public partial class GameManager : Node
 
     /// <summary>
     /// Endless Cytokine Storm entry (docs/endgame.md §2): unlocked by clearing any
-    /// organ map on Hard (achievement ach_wound_hard_clear).
+    /// organ map on Hard (achievement wound_hard_clear).
     /// </summary>
     public static bool IsEndlessAvailable()
     {

@@ -143,38 +143,38 @@ public partial class AchievementManager : Node
             case "pathogen_digested":
                 float count = value.Obj != null ? value.AsSingle() : (ProgressData.GetValueOrDefault("digested", 0.0f).AsSingle() + 1.0f);
                 ProgressData["digested"] = Mathf.Max(ProgressData.GetValueOrDefault("digested", 0.0f).AsSingle(), count);
-                EvaluateThreshold("ach_first_digestion");
-                EvaluateThreshold("ach_engulf_20");
-                EvaluateThreshold("ach_devour_50");
+                EvaluateThreshold("first_digestion");
+                EvaluateThreshold("engulf_20");
+                EvaluateThreshold("devour_50");
                 break;
 
             case "level_up":
                 float lvl = value.Obj != null ? value.AsSingle() : 1.0f;
                 ProgressData["level"] = Mathf.Max(ProgressData.GetValueOrDefault("level", 1.0f).AsSingle(), lvl);
-                EvaluateThreshold("ach_reach_level_5");
+                EvaluateThreshold("reach_level_5");
                 break;
 
             case "survival_time":
                 float st = value.Obj != null ? value.AsSingle() : 0.0f;
                 ProgressData["survival_time"] = Mathf.Max(ProgressData.GetValueOrDefault("survival_time", 0.0f).AsSingle(), st);
-                EvaluateThreshold("ach_survive_180s");
+                EvaluateThreshold("survive_180s");
                 break;
 
             case "radius_ratio":
                 float rr = value.Obj != null ? value.AsSingle() : 1.0f;
                 ProgressData["radius_ratio"] = Mathf.Max(ProgressData.GetValueOrDefault("radius_ratio", 1.0f).AsSingle(), rr);
-                EvaluateThreshold("ach_giant_volume");
+                EvaluateThreshold("giant_volume");
                 break;
 
             case "active_skills_count":
                 float cnt = value.Obj != null ? value.AsSingle() : 1.0f;
                 ProgressData["active_skills"] = Mathf.Max(ProgressData.GetValueOrDefault("active_skills", 1.0f).AsSingle(), cnt);
-                EvaluateThreshold("ach_full_arsenal");
+                EvaluateThreshold("full_arsenal");
                 break;
 
             case "first_evolution":
                 ProgressData["first_evolution"] = 1.0f;
-                Unlock("ach_first_evolution");
+                Unlock("first_evolution");
                 break;
 
             case "pathogen_killed":
@@ -183,7 +183,7 @@ public partial class AchievementManager : Node
                 if (enemyId == "prion" || enemyId == "prpsc_amyloid_aggregate")
                 {
                     ProgressData["prion_cleared"] = 1.0f;
-                    Unlock("ach_prion_cleared");
+                    Unlock("prion_cleared");
                 }
                 break;
         }
@@ -236,7 +236,7 @@ public partial class AchievementManager : Node
     /// </summary>
     public static bool IsEndlessUnlocked()
     {
-        return IsUnlocked("ach_wound_hard_clear");
+        return IsUnlocked("wound_hard_clear");
     }
 
     private static void ApplyMapRewards(Godot.Collections.Dictionary achievementData)
@@ -342,7 +342,7 @@ public partial class AchievementManager : Node
             { "reward", rewardText },
             { "reward_cell", raw.GetValueOrDefault("reward_cell", "") },
             { "icon", raw.GetValueOrDefault("icon", "🏆") },
-            { "image_path", raw.GetValueOrDefault("image_path", AssetPaths.AchievementSprite(achId)) },
+            { "image_path", AssetPaths.AchievementSprite(achId) },
             { "steam_api_name", SteamBridge.GetSteamApiName(achId) },
             { "unlocked", unlocked },
             { "current_value", currentVal },
@@ -447,10 +447,10 @@ public partial class AchievementManager : Node
 
         // Legacy migration: the retired "Metabolic Storm" burst achievement
         // is superseded by the 50-devoured survivor goal for the same reward.
-        if (UnlockedIds.ContainsKey("ach_trigger_burst") && UnlockedIds["ach_trigger_burst"].AsBool()
-            && !UnlockedIds.ContainsKey("ach_devour_50"))
+        if (UnlockedIds.ContainsKey("trigger_burst") && UnlockedIds["trigger_burst"].AsBool()
+            && !UnlockedIds.ContainsKey("devour_50"))
         {
-            UnlockedIds["ach_devour_50"] = true;
+            UnlockedIds["devour_50"] = true;
         }
 
         SyncUnlockedClasses();
