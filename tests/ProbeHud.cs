@@ -11,24 +11,30 @@ public partial class ProbeHud : SceneTree
 {
     private int _frame;
     private BaseCell? _player;
+    private ulong _mainId;
 
     public override void _Initialize()
     {
         var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         var main = mainScene.Instantiate<Main>();
         Root.AddChild(main);
+        _mainId = main.GetInstanceId();
         main.SetPhysicsProcess(false);
         ClearArenaEntities(main);
         GD.Print($"PROBE after clear: enemies={Count<BaseEnemy>(main)} rbc={Count<SenescentRBC>(main)} ves={Count<DormantToxinVesicle>(main)} haz={Count<BioHazardArea>(main)}");
         _player = main.GetNodeOrNull<Macrophage>("Macrophage");
         GD.Print($"PROBE player found: {_player != null}, exp0={_player?.CurrentExp}");
+        GD.Print($"PROBE main id={main.GetInstanceId()} rootKids={Root.GetChildCount()}");
+        foreach (var kid in Root.GetChildren())
+            GD.Print($"PROBE   root kid: {kid.Name} ({kid.GetType().Name})");
     }
 
     public override bool _Process(double delta)
     {
         _frame++;
         var main = Root.GetNodeOrNull<Main>("Main");
-        GD.Print($"PROBE f{_frame}: exp={_player?.CurrentExp} enemies={Count<BaseEnemy>(main!)} rbc={Count<SenescentRBC>(main!)} ves={Count<DormantToxinVesicle>(main!)} haz={Count<BioHazardArea>(main!)} hp={_player?.Health}");
+        int containerKids = (main?.EnemyContainer != null) ? main.EnemyContainer.GetChildCount() : -1;
+        GD.Print($"PROBE f{_frame}: exp={_player?.CurrentExp} enemies={Count<BaseEnemy>(main!)} containerKids={containerKids} mainIdMatch={main != null && _mainId == main.GetInstanceId()} physFrames={Engine.GetPhysicsFrames()} procFrames={Engine.GetProcessFrames()} mainPhys={main!.IsPhysicsProcessing()}");
         if (_frame >= 6)
         {
             Quit(0);
