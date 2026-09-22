@@ -108,7 +108,7 @@ public partial class TestAfflictions : TestHarness
         AssertThat(AfflictionManager.ScoreMultiplier).IsEqualApprox(2.75f, 0.0001f);
         AssertThat(AfflictionManager.IncomingDamageMultiplier).IsEqualApprox(1.5f, 0.0001f);
         AssertThat(AfflictionManager.BlocksHealthRegen).IsTrue();
-        AssertThat(AfflictionManager.SqueezeModeDisabled).IsTrue();
+        AssertThat(AfflictionManager.DodgeDisabled).IsTrue();
         AssertThat(AfflictionManager.MoveSpeedPercentPenalty).IsEqualApprox(-0.25f, 0.0001f);
 
         // Score: (900×10 + 50,000 + 40×100) × 1.5 (Hard) × 2.75

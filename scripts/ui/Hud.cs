@@ -21,9 +21,9 @@ public partial class Hud : CanvasLayer
 
     // --- First-run micro-cues (docs/tutorial.md §2) ---
     public const float MoveCueSeconds = 5.0f;
-    public const float SqueezeHintSeconds = 6.0f;
-    public const int SqueezeHintNearbyThreshold = 15;
-    public const float SqueezeHintNearbyRadius = 300.0f;
+    public const float DodgeHintSeconds = 6.0f;
+    public const int DodgeHintNearbyThreshold = 15;
+    public const float DodgeHintNearbyRadius = 300.0f;
 
     private VitalsView? _vitals;
     private SkillBarView? _skills;
@@ -109,7 +109,7 @@ public partial class Hud : CanvasLayer
     public TutorialOverlay? TutorialOverlayNode { get => _tutorial?.TutorialOverlayNode; set { if (_tutorial != null) _tutorial.TutorialOverlayNode = value; } }
     public bool FirstLevelUpCuePlayed => _tutorial?.FirstLevelUpCuePlayed ?? false;
     public bool IsBulletTimeActive => _tutorial?.IsBulletTimeActive ?? false;
-    public bool SqueezeHintShownOnce => _tutorial?.SqueezeHintShownOnce ?? false;
+    public bool DodgeHintShownOnce => _tutorial?.DodgeHintShownOnce ?? false;
     public float LevelUpBulletTimeSeconds { get => _tutorial?.LevelUpBulletTimeSeconds ?? 0.5f; set { if (_tutorial != null) _tutorial.LevelUpBulletTimeSeconds = value; } }
     public bool SkipLevelUpBulletTime { get => _tutorial?.SkipLevelUpBulletTime ?? false; set { if (_tutorial != null) _tutorial.SkipLevelUpBulletTime = value; } }
 
@@ -282,9 +282,9 @@ public partial class Hud : CanvasLayer
         _pause?.RefreshTreeOverlay();
     }
 
-    public void ShowSqueezeHint()
+    public void ShowDodgeHint()
     {
-        _tutorial?.ShowSqueezeHint();
+        _tutorial?.ShowDodgeHint();
     }
 
     public void ResetTutorialCues()

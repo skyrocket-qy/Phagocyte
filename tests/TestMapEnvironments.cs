@@ -219,7 +219,7 @@ public partial class TestMapEnvironments : TestHarness
         // Sinusoid flow drag also drives the pathogen current.
         AssertThat(environment.FluidVector.LengthSquared()).IsGreater(0.0f);
 
-        // Endothelial fenestrae block enlarged cells; Squeeze Mode fits the pore.
+        // Endothelial fenestrae block enlarged cells; dodging never phases terrain.
         environment.Tick(main, HepaticEnvironment.FenestraInterval + 1.0f);
         FenestraWall? wall = null;
         foreach (var child in main.EnemyContainer!.GetChildren())
@@ -233,26 +233,26 @@ public partial class TestMapEnvironments : TestHarness
         AssertThat(wall).IsNotNull();
         _fenestraWall = wall;
 
-        Input.ActionRelease("squeeze_mode");
+        Input.ActionRelease("dodge");
         player.EnvironmentDrift = Vector2.Zero;
         wall!._PhysicsProcess(0.02);
         AssertThat(((CollisionShape2D)wall.GetChild(0)).Disabled).IsFalse();
 
-        // Squeeze on: the wall disables its shapes via SetDeferred, so the
-        // assertion is deferred to the next frame in Part 2.
-        Input.ActionPress("squeeze_mode");
+        // Dodge on: the dash grants i-frames but the wall stays solid.
+        Input.ActionPress("dodge");
         player._PhysicsProcess(0.02);
-        AssertThat(player.IsSqueezing).IsTrue();
+        AssertThat(player.IsDodging).IsTrue();
         wall._PhysicsProcess(0.02);
+        AssertThat(((CollisionShape2D)wall.GetChild(0)).Disabled).IsFalse();
+        Input.ActionRelease("dodge");
     }
 
     private void RunHepaticTestsPart2()
     {
         var wall = _fenestraWall;
         AssertThat(wall).IsNotNull();
-        AssertThat(((CollisionShape2D)wall!.GetChild(0)).Disabled).IsTrue();
+        AssertThat(((CollisionShape2D)wall!.GetChild(0)).Disabled).IsFalse();
 
-        Input.ActionRelease("squeeze_mode");
         GD.Print("[PASS] Hepatic bile-acid armor strip and fenestra pore gating verified.");
     }
 
@@ -340,7 +340,7 @@ public partial class TestMapEnvironments : TestHarness
     private void Cleanup()
     {
         Paused = false;
-        Input.ActionRelease("squeeze_mode");
+        Input.ActionRelease("dodge");
 
         if (_main != null && IsInstanceValid(_main))
         {

@@ -363,11 +363,6 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         if (IsBeingEaten)
             return;
 
-        // Squeezing cells cannot engulf, so the lock applies to skill
-        // engulfs too (touching never engulfs anymore).
-        if (predator is BaseCell squeezing && squeezing.IsSqueezing)
-            return;
-
         if (!CanBeEngulfed)
         {
             OnEngulfAttemptFailed(predator);

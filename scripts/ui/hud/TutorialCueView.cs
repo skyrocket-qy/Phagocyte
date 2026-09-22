@@ -6,7 +6,7 @@ using Phagocyte.Player;
 namespace Phagocyte.UI;
 
 /// <summary>
-/// First-run micro-cues: WASD breathing ring, one-shot Squeeze hint,
+/// First-run micro-cues: WASD breathing ring, one-shot dodge hint,
 /// fluid-shear arrows and the first level-up bullet-time (docs/tutorial.md §2).
 /// Driven explicitly by <see cref="Hud"/> (no <c>_Process</c> of its own).
 /// </summary>
@@ -18,8 +18,8 @@ public partial class TutorialCueView : Node
     public UpgradeModal? CellUpgradeModal { get; set; }
 
     private float _moveCueTimer = 0.0f;
-    private float _squeezeHintTimer = 0.0f;
-    private bool _squeezeHintShown = false;
+    private float _dodgeHintTimer = 0.0f;
+    private bool _dodgeHintShown = false;
     private float _nearbyCheckTimer = 0.0f;
     private bool _firstLevelUpCuePlayed = false;
     private Tween? _bulletTimeTween = null;
@@ -30,8 +30,8 @@ public partial class TutorialCueView : Node
     /// <summary>True while the 0.5s bullet-time transition is running.</summary>
     public bool IsBulletTimeActive => _bulletTimeTween != null;
 
-    /// <summary>True once the Squeeze Mode hint has been shown (once per run).</summary>
-    public bool SqueezeHintShownOnce => _squeezeHintShown;
+    /// <summary>True once the Dodge roll hint has been shown (once per run).</summary>
+    public bool DodgeHintShownOnce => _dodgeHintShown;
 
     /// <summary>Bullet-time ease duration for the first level-up cue (docs: 0.5s).</summary>
     public float LevelUpBulletTimeSeconds { get; set; } = 0.5f;
@@ -69,7 +69,7 @@ public partial class TutorialCueView : Node
 
     /// <summary>
     /// Drives the non-intrusive micro-cues (docs/tutorial.md §2): the opening
-    /// WASD ring, the one-shot Squeeze hint and the fluid-shear arrow trails.
+    /// WASD ring, the one-shot dodge hint and the fluid-shear arrow trails.
     /// </summary>
     public void UpdateTutorialCues(float delta, Vector2 fluidVector)
     {
@@ -84,56 +84,56 @@ public partial class TutorialCueView : Node
         TutorialOverlayNode.ShowMoveCue = _moveCueTimer > 0.0f && PlayerRef != null;
         TutorialOverlayNode.MoveCueProgress = _moveCueTimer / Hud.MoveCueSeconds;
 
-        // Cue 3: first damage or >15 nearby pathogens -> floating squeeze hint
-        if (!_squeezeHintShown)
+        // Cue 3: first damage or >15 nearby pathogens -> floating dodge hint
+        if (!_dodgeHintShown)
         {
             _nearbyCheckTimer -= delta;
             if (_nearbyCheckTimer <= 0.0f)
             {
                 _nearbyCheckTimer = 0.25f;
                 bool hurt = PlayerRef is BaseCell hurtCell && hurtCell.HasTakenDamage;
-                if (hurt || CountNearbyPathogens(Hud.SqueezeHintNearbyRadius) > Hud.SqueezeHintNearbyThreshold)
-                    ShowSqueezeHint();
+                if (hurt || CountNearbyPathogens(Hud.DodgeHintNearbyRadius) > Hud.DodgeHintNearbyThreshold)
+                    ShowDodgeHint();
             }
         }
 
-        if (_squeezeHintTimer > 0.0f)
-            _squeezeHintTimer = Mathf.Max(0.0f, _squeezeHintTimer - delta);
+        if (_dodgeHintTimer > 0.0f)
+            _dodgeHintTimer = Mathf.Max(0.0f, _dodgeHintTimer - delta);
 
-        TutorialOverlayNode.ShowSqueezeHint = _squeezeHintTimer > 0.0f;
-        TutorialOverlayNode.SqueezeHintText = _squeezeHintShown ? LocalizedSqueezeHint() : "";
-        TutorialOverlayNode.SqueezeHintAlpha = Mathf.Min(1.0f, _squeezeHintTimer);
+        TutorialOverlayNode.ShowDodgeHint = _dodgeHintTimer > 0.0f;
+        TutorialOverlayNode.DodgeHintText = _dodgeHintShown ? LocalizedDodgeHint() : "";
+        TutorialOverlayNode.DodgeHintAlpha = Mathf.Min(1.0f, _dodgeHintTimer);
 
         // Cue 5: fluid-shear arrow trails while an environmental field is active
         TutorialOverlayNode.FluidVector = fluidVector;
         TutorialOverlayNode.FluidFieldActive = fluidVector.LengthSquared() > 0.01f;
     }
 
-    public void ShowSqueezeHint()
+    public void ShowDodgeHint()
     {
-        if (_squeezeHintShown)
+        if (_dodgeHintShown)
             return;
 
-        _squeezeHintShown = true;
-        _squeezeHintTimer = Hud.SqueezeHintSeconds;
-        GD.Print("[Tutorial] Squeeze Mode hint shown.");
+        _dodgeHintShown = true;
+        _dodgeHintTimer = Hud.DodgeHintSeconds;
+        GD.Print("[Tutorial] Dodge roll hint shown.");
     }
 
     /// <summary>Resets the per-run micro-cue state and restarts the move cue window.</summary>
     public void ResetTutorialCues()
     {
         _moveCueTimer = Hud.MoveCueSeconds;
-        _squeezeHintTimer = 0.0f;
-        _squeezeHintShown = false;
+        _dodgeHintTimer = 0.0f;
+        _dodgeHintShown = false;
         _nearbyCheckTimer = 0.0f;
         _firstLevelUpCuePlayed = false;
         Engine.TimeScale = 1.0;
     }
 
-    private static string LocalizedSqueezeHint()
+    private static string LocalizedDodgeHint()
     {
         bool gamepad = Input.GetConnectedJoypads().Count > 0;
-        return TranslationServer.Translate(gamepad ? "HUD_SQUEEZE_HINT_PAD" : "HUD_SQUEEZE_HINT");
+        return TranslationServer.Translate(gamepad ? "HUD_DODGE_HINT_PAD" : "HUD_DODGE_HINT");
     }
 
     public int CountNearbyPathogens(float radius)

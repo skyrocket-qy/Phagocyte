@@ -6,8 +6,8 @@ namespace Phagocyte.Environment;
 /// <summary>
 /// 03. 肝血竇微循環 (hepatic_sinusoid) — slow sinusoidal flow drags the cell;
 /// the bile-acid hydrolysis surge periodically strips the whole arena's armor for
-/// 3 seconds; endothelial fenestrae are narrow pores that only fit a compressed
-/// (Squeeze Mode) cell (docs/map.md §3).
+/// 3 seconds; endothelial fenestrae are narrow pores that only fit a small
+/// cell — dodging never phases terrain (docs/map.md §3).
 /// </summary>
 public sealed class HepaticEnvironment : MapEnvironment
 {

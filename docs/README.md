@@ -15,7 +15,7 @@ docs/
 ├── real.md           # 生物擬真與遊戲化設計哲學（寓教於樂、機制直覺性與反枯燥心流）
 ├── cell.md           # 五大白血球形態學與底盤系統（微絲微管底盤、動態噪聲與細胞核物理）
 ├── stat.md           # 全域通用 Stat 數值系統規格書（100%通用屬性池、標準雙軌計算模型、零複雜Scaling）
-├── skill.md          # 技能系統、超武體系與微操規格書（主動5+被動5、超武二合一融合、脫水穿梭Squeeze）
+ ├── skill.md          # 技能系統、超武體系與微操規格書（主動5+被動5、超武二合一融合、翻滾閃避）
 ├── map.md            # 關卡病理環境、流體力學與波次導演（5大人體器官、吸力/剪切流、難度雙軌制）
 ├── pathogen.md       # 病原體圖鑑與免疫對抗機制（20+種細菌、病毒、真菌、寄生蟲、朊病毒、癌細胞）
 ├── passivetree.md    # 造血幹細胞正交天賦星盤（DBD血網轉化、90度正交微管、四階稀有度、五大分化譜系）
@@ -40,7 +40,7 @@ graph TD
     subgraph PlayerSystems [玩家實體與戰鬥構築]
         CELL["cell.md<br>五大白血球形態學與底盤"]
         STAT["stat.md<br>全域通用 Stat 數值系統<br>(100% 通用 · 零複雜 Scaling)"]
-        SKILL["skill.md<br>技能系統與超武體系<br>(主動 5 ＋ 被動 5 · 脫水穿梭)"]
+         SKILL["skill.md<br>技能系統與超武體系<br>(主動 5 ＋ 被動 5 · 翻滾閃避)"]
         TREE["passivetree.md<br>造血幹細胞正交天賦星盤<br>(5 大獨立起點中心)"]
     end
 
@@ -80,7 +80,7 @@ graph TD
 ### 🧬 細胞與戰鬥構築
 - **[cell.md](file:///Users/zelin/project/Phagocyte/docs/cell.md)**：解密「底盤 ＋ 形態參數模組 ＋ 外掛細胞器」解耦架構，詳述巨噬細胞、殺手 T、嗜中性球、B 細胞與樹突狀細胞的顯微鏡特徵與平衡性。
 - **[stat.md](file:///Users/zelin/project/Phagocyte/docs/stat.md)**：規範全域 100% 通用 Stat 數值矩陣（17 項通用屬性）、純雙軌標準計算模型、零二次 Scaling 與動態物理幾何聯動。
-- **[skill.md](file:///Users/zelin/project/Phagocyte/docs/skill.md)**：「主動 5 ＋ 被動 5」經典閉環槽位、5 大主動技能、5 大被動代謝特質、5 大表觀遺傳超武二合一融合機制，以及脫水穿梭避險模式（Squeeze Mode）。
+- **[skill.md](file:///Users/zelin/project/Phagocyte/docs/skill.md)**：「主動 5 ＋ 被動 5」經典閉環槽位、5 大主動技能、5 大被動代謝特質、5 大表觀遺傳超武二合一融合機制，以及翻滾閃避微操（Dodge Roll）。
 - **[passivetree.md](file:///Users/zelin/project/Phagocyte/docs/passivetree.md)**：融合 DBD 血網與 PoE 星盤靈感的 90 度正交微管棋盤系統，詳解五大細胞獨立起點中心、曼哈頓層級與零 Scaling 純屬性節點。
 
 ### 🦠 關卡與病原體

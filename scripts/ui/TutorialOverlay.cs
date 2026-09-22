@@ -5,7 +5,7 @@ namespace Phagocyte.UI;
 
 /// <summary>
 /// Screen-space overlay for the first-run micro-cues (docs/tutorial.md §2):
-/// the WASD breathing ring, the Squeeze Mode hint above the cell, and the
+/// the WASD breathing ring, the dodge roll hint above the cell, and the
 /// microscopic fluid-shear arrow trails at the screen edges. Drawn behind the
 /// HUD panels (ZIndex = -1) so it never blocks interaction.
 /// </summary>
@@ -17,10 +17,10 @@ public partial class TutorialOverlay : Control
     public bool ShowMoveCue { get; set; }
     public float MoveCueProgress { get; set; } = 0.0f; // 1 -> 0 over the cue window
 
-    /// <summary>Cue 3: floating squeeze hint above the cell.</summary>
-    public bool ShowSqueezeHint { get; set; }
-    public string SqueezeHintText { get; set; } = "";
-    public float SqueezeHintAlpha { get; set; } = 1.0f;
+    /// <summary>Cue 3: floating dodge hint above the cell.</summary>
+    public bool ShowDodgeHint { get; set; }
+    public string DodgeHintText { get; set; } = "";
+    public float DodgeHintAlpha { get; set; } = 1.0f;
 
     /// <summary>Cue 5: fluid field arrows at the screen edges.</summary>
     public bool FluidFieldActive { get; set; }
@@ -51,8 +51,8 @@ public partial class TutorialOverlay : Control
         if (ShowMoveCue)
             DrawMoveCue(cellScreen);
 
-        if (ShowSqueezeHint)
-            DrawSqueezeHint(cellScreen);
+        if (ShowDodgeHint)
+            DrawDodgeHint(cellScreen);
 
         if (FluidFieldActive)
             DrawFluidTrails();
@@ -87,19 +87,19 @@ public partial class TutorialOverlay : Control
             HorizontalAlignment.Left, -1, fontSize, color);
     }
 
-    private void DrawSqueezeHint(Vector2 center)
+    private void DrawDodgeHint(Vector2 center)
     {
         var font = GetThemeDefaultFont();
         int fontSize = 17;
-        float alpha = Mathf.Clamp(SqueezeHintAlpha, 0.0f, 1.0f);
+        float alpha = Mathf.Clamp(DodgeHintAlpha, 0.0f, 1.0f);
         var color = new Color(0.75f, 1.0f, 0.96f, alpha);
-        Vector2 textSize = font.GetStringSize(SqueezeHintText, HorizontalAlignment.Left, -1, fontSize);
+        Vector2 textSize = font.GetStringSize(DodgeHintText, HorizontalAlignment.Left, -1, fontSize);
         Vector2 pos = center + new Vector2(-textSize.X * 0.5f, -152.0f);
 
         var box = new Rect2(pos - new Vector2(14.0f, 8.0f), textSize + new Vector2(28.0f, 18.0f));
         DrawRect(box, new Color(0.02f, 0.09f, 0.11f, 0.88f * alpha));
         DrawRect(box, new Color(0.45f, 1.0f, 0.92f, 0.9f * alpha), false, 1.8f);
-        DrawString(font, pos, SqueezeHintText, HorizontalAlignment.Left, -1, fontSize, color);
+        DrawString(font, pos, DodgeHintText, HorizontalAlignment.Left, -1, fontSize, color);
     }
 
     private void DrawFluidTrails()

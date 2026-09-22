@@ -166,8 +166,8 @@ public static class AfflictionManager
     /// <summary>自噬衰竭: global health_regen forced to zero.</summary>
     public static bool BlocksHealthRegen => IsActive(AutophagicFailure);
 
-    /// <summary>微管硬化: Squeeze Mode (脫水穿梭避險) disabled.</summary>
-    public static bool SqueezeModeDisabled => IsActive(MicrotubuleSclerosis);
+    /// <summary>微管硬化: dodge roll (翻滾) disabled.</summary>
+    public static bool DodgeDisabled => IsActive(MicrotubuleSclerosis);
 
     /// <summary>極限黏滯: base move speed -25% (applied as a percent modifier at run start).</summary>
     public static float MoveSpeedPercentPenalty => IsActive(ExtremeViscosity) ? ViscosityMoveSpeedPenalty : 0.0f;

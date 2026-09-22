@@ -148,8 +148,8 @@ public partial class HyperoxicPocket : Node2D
 
 /// <summary>
 /// 03. 肝血竇內皮窗孔篩選 fenestra wall (docs/map.md §3): a narrow endothelial
-/// pore that blocks enlarged cells. Holding Squeeze Mode (or being small enough)
-/// disables the collision so the cell can slip through.
+/// pore that blocks enlarged cells. Only a small-enough cell slips through —
+/// dodging never phases terrain.
 /// </summary>
 public partial class FenestraWall : StaticBody2D
 {
@@ -186,7 +186,7 @@ public partial class FenestraWall : StaticBody2D
     {
         var player = GetTree().GetFirstNodeInGroup("player") as BaseCell;
         bool passable = player != null && GodotObject.IsInstanceValid(player)
-            && (player.IsSqueezing || player.CurrentRadius <= FitRadius);
+            && player.CurrentRadius <= FitRadius;
 
         foreach (var shape in _shapes)
         {

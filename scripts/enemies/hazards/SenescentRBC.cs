@@ -93,10 +93,9 @@ public partial class SenescentRBC : Node2D
         if (IsConsumed || IsQueuedForDeletion())
             return;
 
-        // Squeezing cells cannot harvest (same lock as enemy engulfs).
         BaseCell? host = predator as BaseCell;
-        if (host != null && (!GodotObject.IsInstanceValid(host) || host.IsSqueezing))
-            return;
+        if (host != null && !GodotObject.IsInstanceValid(host))
+            host = null;
 
         IsConsumed = true;
         _leaving = true;

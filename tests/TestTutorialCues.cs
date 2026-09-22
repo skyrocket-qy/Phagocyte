@@ -14,8 +14,8 @@ namespace Phagocyte.Tests;
 
 /// <summary>
 /// Verifies the five first-run micro-cues and their supporting systems
-/// (docs/tutorial.md Â§2): Squeeze Mode, catalyst resonance pairing, opening
-/// guide pathogens, WASD ring timing, squeeze hint and fluid arrow field data.
+/// (docs/tutorial.md §2): dodge roll, catalyst resonance pairing, opening
+/// guide pathogens, WASD ring timing, dodge hint and fluid arrow field data.
 /// </summary>
 [TestSuite]
 public partial class TestTutorialCues : TestHarness
@@ -42,7 +42,7 @@ public partial class TestTutorialCues : TestHarness
                 _phase++;
                 return false; // let the scene tree settle
             case 1:
-                RunSqueezeModeTests();
+                RunDodgeModeTests();
                 _phase++;
                 return false;
             case 2:
@@ -71,7 +71,7 @@ public partial class TestTutorialCues : TestHarness
         }
     }
 
-    private void RunSqueezeModeTests()
+    private void RunDodgeModeTests()
     {
         AfflictionManager.Clear();
 
@@ -81,41 +81,55 @@ public partial class TestTutorialCues : TestHarness
         AssertThat(cell.Stats).IsNotNull();
 
         cell._PhysicsProcess(0.02);
-        AssertThat(cell.IsSqueezing).IsFalse();
+        AssertThat(cell.IsDodging).IsFalse();
+        AssertThat(cell.DodgeCharges).IsEqualApprox(1.0f, 0.001f);
 
-        float baseSpeed = cell.Stats!.GetStat("move_speed");
-        float baseRadius = cell.BaseRadius * cell.Stats.GetStat("area");
+        Vector2 startPos = cell.GlobalPosition;
+        float hpBefore = cell.Health;
 
-        // Hold Space -> compress 40%, +25% speed, engulf disabled
-        Input.ActionPress("squeeze_mode");
+        // Tap dodge with no move input: bursts along +X, spends the charge.
+        Input.ActionPress("dodge");
         cell._PhysicsProcess(0.02);
-        AssertThat(cell.IsSqueezing).IsTrue();
-        AssertThat(cell.CurrentRadius).IsEqualApprox(baseRadius * BaseCell.SqueezeRadiusFactor, 0.5f);
-        AssertThat(cell.CurrentSpeed).IsEqualApprox(baseSpeed * (1.0f + BaseCell.SqueezeSpeedBonus), 0.5f);
+        AssertThat(cell.DodgeCharges).IsEqualApprox(0.0f, 0.001f);
+        AssertThat(cell.IsDodging).IsTrue();
+        AssertThat(cell.IsInvulnerable).IsTrue();
+        AssertThat(cell.GlobalPosition.X).IsGreater(startPos.X);
 
-        var dummy = new StaphEnemy { GlobalPosition = cell.GlobalPosition, FibrinShield = 0 };
-        Root.AddChild(dummy);
-        int digestedBefore = cell.DigestedCount;
-        dummy.BeEngulfed(cell);
-        AssertThat(cell.DigestedCount).IsEqual(digestedBefore);
+        // Damage mid-dash is negated outright.
+        cell.TakeDamage(20.0f);
+        AssertThat(cell.Health).IsEqual(hpBefore);
+        Input.ActionRelease("dodge");
 
-        // Release -> restore
-        Input.ActionRelease("squeeze_mode");
+        // Let the dash expire and the charge refill (0.18s dash + 2.5s recharge).
+        for (int i = 0; i < 140; i++)
+            cell._PhysicsProcess(0.02);
+        AssertThat(cell.IsDodging).IsFalse();
+        AssertThat(cell.IsInvulnerable).IsFalse();
+        AssertThat(cell.DodgeCharges).IsEqualApprox(1.0f, 0.001f);
+
+        // Damage lands again once the window closes.
+        cell.TakeDamage(20.0f);
+        AssertThat(cell.Health).IsLess(hpBefore);
+
+        // Dodge steers along the move input (holding left rolls left).
+        Input.ActionPress("move_left");
+        Input.ActionPress("dodge");
         cell._PhysicsProcess(0.02);
-        AssertThat(cell.IsSqueezing).IsFalse();
-        AssertThat(cell.CurrentRadius).IsEqualApprox(baseRadius, 0.5f);
-        dummy.QueueFree();
+        AssertThat(cell.DodgeDirection.X).IsLess(0.0f);
+        AssertThat(cell.DodgeCharges).IsEqualApprox(0.0f, 0.001f);
+        Input.ActionRelease("move_left");
+        Input.ActionRelease("dodge");
 
-        // Microtubule Sclerosis (endless affliction) hard-disables the mode
+        // Microtubule Sclerosis (endless affliction) hard-disables the dodge.
         AfflictionManager.SetSelection(new[] { AfflictionManager.MicrotubuleSclerosis });
-        Input.ActionPress("squeeze_mode");
+        Input.ActionPress("dodge");
         cell._PhysicsProcess(0.02);
-        AssertThat(cell.IsSqueezing).IsFalse();
-        Input.ActionRelease("squeeze_mode");
+        AssertThat(cell.IsDodging).IsFalse();
+        Input.ActionRelease("dodge");
         AfflictionManager.Clear();
         cell.QueueFree();
 
-        GD.Print("[PASS] Squeeze Mode compress/speed/engulf-lock and affliction override verified.");
+        GD.Print("[PASS] Dodge roll charges/dash/i-frames/recharge/steering and affliction override verified.");
     }
 
     private void RunCatalystResonanceTests()
@@ -224,15 +238,15 @@ public partial class TestTutorialCues : TestHarness
         hud._Process(Hud.MoveCueSeconds);
         AssertThat(hud.TutorialOverlayNode.ShowMoveCue).IsFalse();
 
-        // Cue 3: squeeze hint fires once per run
+        // Cue 3: dodge hint fires once per run
         hud.ResetTutorialCues();
-        AssertThat(hud.SqueezeHintShownOnce).IsFalse();
-        hud.ShowSqueezeHint();
-        AssertThat(hud.SqueezeHintShownOnce).IsTrue();
-        hud.ShowSqueezeHint();
-        AssertThat(hud.SqueezeHintShownOnce).IsTrue();
+        AssertThat(hud.DodgeHintShownOnce).IsFalse();
+        hud.ShowDodgeHint();
+        AssertThat(hud.DodgeHintShownOnce).IsTrue();
+        hud.ShowDodgeHint();
+        AssertThat(hud.DodgeHintShownOnce).IsTrue();
 
-        GD.Print("[PASS] Guide pathogens, WASD cue window, squeeze hint and fluid field verified.");
+        GD.Print("[PASS] Guide pathogens, WASD cue window, dodge hint and fluid field verified.");
     }
 
     private void Cleanup()
@@ -240,7 +254,7 @@ public partial class TestTutorialCues : TestHarness
         Paused = false;
         Engine.TimeScale = 1.0;
         AfflictionManager.Clear();
-        Input.ActionRelease("squeeze_mode");
+        Input.ActionRelease("dodge");
 
         if (_main != null && IsInstanceValid(_main))
         {

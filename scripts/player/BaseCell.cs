@@ -59,17 +59,39 @@ public partial class BaseCell : CharacterBody2D
     // Digestion tracking
     public int DigestedCount { get; set; } = 0;
 
-    // --- Squeeze Mode micro-control (docs/skill.md §6) ---
-    /// <summary>Cell radius factor while dehydrated/squeezing (α → 0.6α).</summary>
-    public const float SqueezeRadiusFactor = 0.6f;
+    // --- Dodge roll micro-control (docs/skill.md §6) ---
+    /// <summary>Maximum dodge charges (one agile burst each).</summary>
+    public const int MaxDodgeCharges = 1;
 
-    /// <summary>Move speed bonus while squeezing (+25%).</summary>
-    public const float SqueezeSpeedBonus = 0.25f;
+    /// <summary>Seconds to recharge one dodge charge.</summary>
+    public const float DodgeRechargeSeconds = 2.5f;
 
-    /// <summary>True while the player holds the squeeze input (disabled by Microtubule Sclerosis).</summary>
-    public bool IsSqueezing { get; private set; } = false;
+    /// <summary>Dash travel time per dodge (seconds).</summary>
+    public const float DodgeDuration = 0.18f;
 
-    /// <summary>Set on the first real HP loss — drives the Squeeze tutorial cue.</summary>
+    /// <summary>Invulnerability window per dodge (dash + grace).</summary>
+    public const float DodgeInvulnSeconds = 0.22f;
+
+    /// <summary>Dash speed multiplier over current move speed.</summary>
+    public const float DodgeSpeedMultiplier = 3.2f;
+
+    /// <summary>Remaining dodge charges (fractional while recharging).</summary>
+    public float DodgeCharges { get; private set; } = MaxDodgeCharges;
+
+    /// <summary>True while the dash burst is travelling.</summary>
+    public bool IsDodging => DodgeTimer > 0.0f;
+
+    /// <summary>True while dodge invulnerability holds (damage negated).</summary>
+    public bool IsInvulnerable => InvulnTimer > 0.0f;
+
+    public float DodgeTimer { get; private set; }
+    public float InvulnTimer { get; private set; }
+    public Vector2 DodgeDirection { get; private set; } = Vector2.Right;
+    public float DodgeDashSpeed { get; private set; }
+
+    private bool _dodgePressedPrev;
+
+    /// <summary>Set on the first real HP loss — drives the dodge tutorial cue.</summary>
     public bool HasTakenDamage { get; private set; } = false;
 
     /// <summary>
@@ -181,20 +203,19 @@ public partial class BaseCell : CharacterBody2D
             }
 
             DisplayAlpha = Mathf.MoveToward(DisplayAlpha, TargetAlpha, dt * 4.0f);
-            Visible = DisplayAlpha > 0.01f || (Host != null && GodotObject.IsInstanceValid(Host) && Host.IsSqueezing);
+            Visible = DisplayAlpha > 0.01f || (Host != null && GodotObject.IsInstanceValid(Host) && Host.IsDodging);
             QueueRedraw();
         }
 
         public override void _Draw()
         {
-            // Squeeze Mode: pale-cyan tension glow around the compressed membrane
+            // Dodge roll: bright burst ring around the membrane mid-dash
             // (docs/skill.md §6 / tutorial.md cue 3).
-            if (Host != null && Host.IsSqueezing && GodotObject.IsInstanceValid(Host))
+            if (Host != null && Host.IsDodging && GodotObject.IsInstanceValid(Host))
             {
-                float squeezeRadius = Host.CurrentRadius + 9.0f;
-                float tension = 0.55f + 0.25f * Mathf.Sin(PulsePhase * 1.6f);
-                DrawArc(Vector2.Zero, squeezeRadius, 0.0f, Mathf.Tau, 48,
-                    new Color(0.45f, 1.0f, 0.92f, tension), 2.4f, true);
+                float dashRadius = Host.CurrentRadius + 9.0f;
+                DrawArc(Vector2.Zero, dashRadius, 0.0f, Mathf.Tau, 48,
+                    new Color(0.55f, 1.0f, 0.95f, 0.9f), 3.2f, true);
             }
 
             if (Host == null || DisplayAlpha <= 0.01f)
@@ -340,7 +361,7 @@ public partial class BaseCell : CharacterBody2D
         }
 
         HandleRegen(dt);
-        UpdateSqueezeState();
+        UpdateDodgeState(dt);
         HandleMovement(dt);
         ProcessContactDamage();
         UpdatePseudopodDeformation(dt);
@@ -495,35 +516,24 @@ public partial class BaseCell : CharacterBody2D
 
     private void HandleMovement(float delta)
     {
-        Vector2 inputVec = Vector2.Zero;
-        if (StunTimer <= 0.0f)
-        {
-            if (Input.IsActionPressed("move_left") || Input.IsKeyPressed(Key.A) || Input.IsKeyPressed(Key.Left))
-                inputVec.X -= 1.0f;
-            if (Input.IsActionPressed("move_right") || Input.IsKeyPressed(Key.D) || Input.IsKeyPressed(Key.Right))
-                inputVec.X += 1.0f;
-            if (Input.IsActionPressed("move_up") || Input.IsKeyPressed(Key.W) || Input.IsKeyPressed(Key.Up))
-                inputVec.Y -= 1.0f;
-            if (Input.IsActionPressed("move_down") || Input.IsKeyPressed(Key.S) || Input.IsKeyPressed(Key.Down))
-                inputVec.Y += 1.0f;
-
-            if (InvertControlsTimer > 0.0f)
-            {
-                inputVec = -inputVec;
-            }
-        }
+        Vector2 inputVec = ReadMoveInput();
 
         float targetSpeed = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
         if (SlowTimer > 0.0f)
         {
             targetSpeed *= SlowFactor;
         }
-        if (IsSqueezing)
-        {
-            targetSpeed *= 1.0f + SqueezeSpeedBonus;
-        }
 
         CurrentSpeed = targetSpeed;
+
+        if (IsDodging)
+        {
+            // Dodge roll: locked-direction burst, no steering mid-dash.
+            Velocity = DodgeDirection * DodgeDashSpeed + EnvironmentDrift;
+            NucleusTargetOffset = -DodgeDirection * (CurrentRadius * 0.28f);
+            MoveAndSlide();
+            return;
+        }
 
         if (inputVec != Vector2.Zero)
         {
@@ -547,18 +557,66 @@ public partial class BaseCell : CharacterBody2D
         MoveAndSlide();
     }
 
-    /// <summary>
-    /// Evaluates the Squeeze Mode input (hold Space / L2). Microtubule Sclerosis
-    /// (docs/endgame.md §4) hard-disables the mode.
-    /// </summary>
-    private void UpdateSqueezeState()
+    /// <summary>Normalized WASD/arrows/stick vector (zero while stunned).</summary>
+    private Vector2 ReadMoveInput()
     {
-        IsSqueezing = !AfflictionManager.SqueezeModeDisabled && IsSqueezeInputPressed();
+        Vector2 inputVec = Vector2.Zero;
+        if (StunTimer <= 0.0f)
+        {
+            if (Input.IsActionPressed("move_left") || Input.IsKeyPressed(Key.A) || Input.IsKeyPressed(Key.Left))
+                inputVec.X -= 1.0f;
+            if (Input.IsActionPressed("move_right") || Input.IsKeyPressed(Key.D) || Input.IsKeyPressed(Key.Right))
+                inputVec.X += 1.0f;
+            if (Input.IsActionPressed("move_up") || Input.IsKeyPressed(Key.W) || Input.IsKeyPressed(Key.Up))
+                inputVec.Y -= 1.0f;
+            if (Input.IsActionPressed("move_down") || Input.IsKeyPressed(Key.S) || Input.IsKeyPressed(Key.Down))
+                inputVec.Y += 1.0f;
+
+            if (InvertControlsTimer > 0.0f)
+            {
+                inputVec = -inputVec;
+            }
+        }
+        return inputVec;
     }
 
-    private static bool IsSqueezeInputPressed()
+    /// <summary>
+    /// Dodge roll state (press Space / L2 for one agile burst).
+    /// Microtubule Sclerosis (docs/endgame.md §4) hard-disables it.
+    /// </summary>
+    private void UpdateDodgeState(float delta)
     {
-        if (Input.IsActionPressed("squeeze_mode"))
+        if (DodgeTimer > 0.0f)
+            DodgeTimer = Mathf.Max(0.0f, DodgeTimer - delta);
+        if (InvulnTimer > 0.0f)
+            InvulnTimer = Mathf.Max(0.0f, InvulnTimer - delta);
+        if (DodgeCharges < MaxDodgeCharges && !IsDead)
+            DodgeCharges = Mathf.Min((float)MaxDodgeCharges, DodgeCharges + delta / DodgeRechargeSeconds);
+
+        bool pressed = ReadDodgePressedRaw();
+        bool justPressed = pressed && !_dodgePressedPrev;
+        _dodgePressedPrev = pressed;
+
+        if (IsDead || StunTimer > 0.0f || AfflictionManager.DodgeDisabled)
+            return;
+
+        if (justPressed && DodgeCharges >= 1.0f && !IsDodging)
+        {
+            DodgeCharges -= 1.0f;
+            Vector2 dir = ReadMoveInput();
+            if (dir == Vector2.Zero)
+                dir = Velocity.Length() > 20.0f ? Velocity.Normalized() : Vector2.Right;
+            DodgeDirection = dir.Normalized();
+            float baseSpeed = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
+            DodgeDashSpeed = baseSpeed * DodgeSpeedMultiplier;
+            DodgeTimer = DodgeDuration;
+            InvulnTimer = DodgeInvulnSeconds;
+        }
+    }
+
+    private static bool ReadDodgePressedRaw()
+    {
+        if (Input.IsActionPressed("dodge"))
             return true;
 
         if (Input.IsKeyPressed(Key.Space))
@@ -579,7 +637,7 @@ public partial class BaseCell : CharacterBody2D
 
         float areaScale = Stats != null ? Stats.GetStat("area") : 1.0f;
 
-        float curR = BaseRadius * areaScale * (IsSqueezing ? SqueezeRadiusFactor : 1.0f);
+        float curR = BaseRadius * areaScale;
         CurrentDeformationMag = BaseDeformationMag * areaScale;
 
         CurrentRadius = curR;
@@ -610,7 +668,15 @@ public partial class BaseCell : CharacterBody2D
                 forwardBias = dot * (CurrentDeformationMag * 0.85f);
             }
 
-            float r = curR + ((nVal1 + nVal2) * CurrentDeformationMag) + forwardBias;
+            // Dodge stretch: elongate along travel, pinch the flanks.
+            float dashStretch = 1.0f;
+            if (IsDodging && moveDir != Vector2.Zero)
+            {
+                float align = dir.Dot(moveDir);
+                dashStretch = 1.0f + 0.25f * align - 0.15f * (1.0f - Mathf.Abs(align));
+            }
+
+            float r = (curR + ((nVal1 + nVal2) * CurrentDeformationMag) + forwardBias) * dashStretch;
             // Biological lipid bilayer clamp: never collapse into negative spikes
             rawRadii[i] = Mathf.Max(curR * 0.65f, r);
         }
@@ -835,6 +901,14 @@ public partial class BaseCell : CharacterBody2D
     {
         if (IsDead)
             return;
+
+        // Stage 0: Dodge invulnerability (翻滾無敵 takes precedence over
+        // everything, including environmental damage).
+        if (IsInvulnerable)
+        {
+            DamageNumberSpawner.ShowEvaded(GlobalPosition);
+            return;
+        }
 
         // Stage 1: Fluid deformation evasion (閃避判定)
         if (Stats is CellStats cs && cs.RollEvasion())
