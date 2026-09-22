@@ -11,6 +11,7 @@ public static class DataPaths
     private const string Root = "res://assets/data";
 
     public const string Skills = $"{Root}/skills.json";
+    public const string Organelles = $"{Root}/organelles.json";
     public const string Pathogens = $"{Root}/pathogens.json";
     public const string Maps = $"{Root}/maps.json";
     public const string Classes = $"{Root}/classes.json";

@@ -60,6 +60,16 @@ CATEGORY_PIPELINES: Dict[str, Pipeline] = {
         step_quality_check()
     ]),
 
+    # Organelle chamber equipment specimens: 128x128 with circular mask
+    # (same specimen-box treatment as passive_tree traits)
+    "organelle": Pipeline([
+        step_remove_bg(tolerance=28),
+        step_apply_mask(margin=0.05),
+        step_guided_filter(radius=2),
+        step_resize(128, 128, mode="inter_area"),
+        step_quality_check()
+    ]),
+
     # UI elements & badges: Kuwahara smoothing + quality check
     "ui": Pipeline([
         step_kuwahara_filter(radius=2),

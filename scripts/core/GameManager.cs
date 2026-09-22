@@ -95,6 +95,19 @@ public partial class GameManager : Node
         }
     }
 
+    // Organelle chamber catalog (TODO Phase 0): 2x2 equipment definitions
+    // (data-owned: assets/data/organelles.json).
+    private static Dictionary? _organelleCatalog;
+    public static Dictionary OrganelleCatalog
+    {
+        get
+        {
+            _organelleCatalog ??= CatalogBuilders.BuildOrganelles();
+            DataValidator.EnsureValidated();
+            return _organelleCatalog;
+        }
+    }
+
     // Pathogen Catalog for Codex
     // Pathogen Catalog for Codex (data-owned: assets/data/pathogens.json).
     private static Dictionary? _pathogenCatalog;

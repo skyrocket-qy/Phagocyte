@@ -23,6 +23,9 @@ public static class AssetPaths
     /// <summary>Passive-tree trait icon: res://assets/gen/passive_tree/{id}.png.</summary>
     public static string TraitIcon(string traitId) => $"{GenRoot}/passive_tree/{traitId}.png";
 
+    /// <summary>Organelle chamber equipment icon: res://assets/gen/organelle/{id}.png.</summary>
+    public static string OrganelleIcon(string organelleId) => $"{GenRoot}/organelle/{organelleId}.png";
+
     /// <summary>UI icon: res://assets/gen/ui/{id}.png.</summary>
     public static string UiIcon(string uiName) => $"{GenRoot}/ui/{uiName}.png";
 

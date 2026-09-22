@@ -52,9 +52,9 @@ AI image models frequently attempt to draw text labels, names, or captions under
 ## Directory Architecture
 
 - **Source Art Tier (`gen/`)**: Stores source assets (either raw 1024x1024 sheets or $256 \times 256$ sliced sprites). Contains `gen/.gdignore` to prevent Godot from importing unoptimized source art.
-  - Active categories: `achievement/`, `skill/`, `passive_tree/`, `ui/`.
+  - Active categories: `achievement/`, `skill/`, `passive_tree/`, `organelle/`, `ui/`.
 - **Runtime Game Tier (`assets/gen/`)**: Stores runtime-optimized, transparent, edge-inpainted, Guided/Kuwahara-filtered game textures referenced by Godot scenes and JSON configurations.
-  - Active categories: `achievement/` (with `*_unachieved.png` Steam variants), `skill/`, `passive_tree/`, `ui/`.
+  - Active categories: `achievement/` (with `*_unachieved.png` Steam variants), `skill/`, `passive_tree/`, `organelle/`, `ui/`.
 
 ---
 

@@ -1,0 +1,284 @@
+[
+  {
+    "bio_key": "ORGANELLE_MITO_MKII_BIO",
+    "category": "metabolism",
+    "desc_key": "ORGANELLE_MITO_MKII_DESC",
+    "drawback": [],
+    "energy_cost": 4,
+    "icon": "⚡",
+    "id": "mitochondria_mkii",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "cooldown_reduction",
+        "unit": "percentagepoints",
+        "value": 0.16
+      },
+      {
+        "stat": "duration",
+        "unit": "percent",
+        "value": 0.1
+      }
+    ],
+    "name_key": "ORGANELLE_MITO_MKII_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_GLYCOLYTIC_BYPASS_BIO",
+    "category": "metabolism",
+    "desc_key": "ORGANELLE_GLYCOLYTIC_BYPASS_DESC",
+    "drawback": [],
+    "energy_cost": 1,
+    "icon": "🍬",
+    "id": "glycolytic_bypass",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "cooldown_reduction",
+        "unit": "percentagepoints",
+        "value": 0.05
+      },
+      {
+        "stat": "move_speed",
+        "unit": "percent",
+        "value": 0.03
+      }
+    ],
+    "name_key": "ORGANELLE_GLYCOLYTIC_BYPASS_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_ACIDIC_LYSOSOME_BIO",
+    "category": "digestion",
+    "desc_key": "ORGANELLE_ACIDIC_LYSOSOME_DESC",
+    "drawback": [],
+    "energy_cost": 3,
+    "icon": "🧪",
+    "id": "acidic_lysosome",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "might",
+        "unit": "percent",
+        "value": 0.12
+      },
+      {
+        "stat": "ailment_damage",
+        "unit": "percent",
+        "value": 0.15
+      }
+    ],
+    "name_key": "ORGANELLE_ACIDIC_LYSOSOME_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_PROTEASOME_SIEVE_BIO",
+    "category": "digestion",
+    "desc_key": "ORGANELLE_PROTEASOME_SIEVE_DESC",
+    "drawback": [],
+    "energy_cost": 1,
+    "icon": "🧫",
+    "id": "proteasome_sieve",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "ailment_damage",
+        "unit": "percent",
+        "value": 0.08
+      },
+      {
+        "stat": "health_regen",
+        "unit": "flat",
+        "value": 0.3
+      }
+    ],
+    "name_key": "ORGANELLE_PROTEASOME_SIEVE_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_FLAGELLAR_BASE_BIO",
+    "category": "cytoskeleton",
+    "desc_key": "ORGANELLE_FLAGELLAR_BASE_DESC",
+    "drawback": [],
+    "energy_cost": 3,
+    "icon": "🌀",
+    "id": "flagellar_base",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "move_speed",
+        "unit": "percent",
+        "value": 0.12
+      },
+      {
+        "stat": "knockback",
+        "unit": "percent",
+        "value": 0.2
+      }
+    ],
+    "name_key": "ORGANELLE_FLAGELLAR_BASE_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_MICROTUBULE_ANCHOR_BIO",
+    "category": "cytoskeleton",
+    "desc_key": "ORGANELLE_MICROTUBULE_ANCHOR_DESC",
+    "drawback": [],
+    "energy_cost": 1,
+    "icon": "🔗",
+    "id": "microtubule_anchor",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "move_speed",
+        "unit": "percent",
+        "value": 0.04
+      },
+      {
+        "stat": "area",
+        "unit": "percent",
+        "value": 0.04
+      }
+    ],
+    "name_key": "ORGANELLE_MICROTUBULE_ANCHOR_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_ROUGH_ER_BIO",
+    "category": "synthesis",
+    "desc_key": "ORGANELLE_ROUGH_ER_DESC",
+    "drawback": [],
+    "energy_cost": 4,
+    "icon": "🏭",
+    "id": "rough_er",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "amount",
+        "unit": "flat",
+        "value": 1.0
+      },
+      {
+        "stat": "projectile_speed",
+        "unit": "percent",
+        "value": 0.08
+      }
+    ],
+    "name_key": "ORGANELLE_ROUGH_ER_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_RIBOSOME_CLUSTER_BIO",
+    "category": "synthesis",
+    "desc_key": "ORGANELLE_RIBOSOME_CLUSTER_DESC",
+    "drawback": [],
+    "energy_cost": 2,
+    "icon": "🧬",
+    "id": "ribosome_cluster",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "projectile_speed",
+        "unit": "percent",
+        "value": 0.08
+      },
+      {
+        "stat": "duration",
+        "unit": "percent",
+        "value": 0.08
+      }
+    ],
+    "name_key": "ORGANELLE_RIBOSOME_CLUSTER_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_ION_CHANNEL_ARRAY_BIO",
+    "category": "sensing",
+    "desc_key": "ORGANELLE_ION_CHANNEL_ARRAY_DESC",
+    "drawback": [],
+    "energy_cost": 3,
+    "icon": "📡",
+    "id": "ion_channel_array",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "armor",
+        "unit": "flat",
+        "value": 3.0
+      },
+      {
+        "stat": "block",
+        "unit": "flat",
+        "value": 0.04
+      },
+      {
+        "stat": "magnet",
+        "unit": "percent",
+        "value": 0.15
+      }
+    ],
+    "name_key": "ORGANELLE_ION_CHANNEL_ARRAY_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_CHEMOKINE_PATCH_BIO",
+    "category": "sensing",
+    "desc_key": "ORGANELLE_CHEMOKINE_PATCH_DESC",
+    "drawback": [],
+    "energy_cost": 1,
+    "icon": "🧲",
+    "id": "chemokine_patch",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "magnet",
+        "unit": "percent",
+        "value": 0.2
+      },
+      {
+        "stat": "evasion",
+        "unit": "flat",
+        "value": 0.02
+      }
+    ],
+    "name_key": "ORGANELLE_CHEMOKINE_PATCH_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_SYMBIOTIC_FLORA_BIO",
+    "category": "symbiosis",
+    "desc_key": "ORGANELLE_SYMBIOTIC_FLORA_DESC",
+    "drawback": [
+      {
+        "stat": "move_speed",
+        "unit": "percent",
+        "value": -0.3
+      },
+      {
+        "stat": "might",
+        "unit": "percent",
+        "value": -0.15
+      }
+    ],
+    "energy_cost": -1,
+    "icon": "🦠",
+    "id": "symbiotic_flora",
+    "max_copies": 1,
+    "modifiers": [],
+    "name_key": "ORGANELLE_SYMBIOTIC_FLORA_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_PHAGE_FRAGMENT_BIO",
+    "category": "symbiosis",
+    "desc_key": "ORGANELLE_PHAGE_FRAGMENT_DESC",
+    "drawback": [
+      {
+        "stat": "max_health",
+        "unit": "percent",
+        "value": -0.2
+      }
+    ],
+    "energy_cost": -1,
+    "icon": "👾",
+    "id": "phage_fragment",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "cooldown_reduction",
+        "unit": "percentagepoints",
+        "value": 0.05
+      }
+    ],
+    "name_key": "ORGANELLE_PHAGE_FRAGMENT_NAME"
+  }
+]

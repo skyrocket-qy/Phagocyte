@@ -10,7 +10,7 @@
 
 ## Phase 0 — 數據＋邏輯核心（無UI，純邏輯可測）
 
-- [ ] `assets/data/organelles.json`（頂層array，12件：6類×2＝1高費核心＋1低費/發電對照）
+- [x] `assets/data/organelles.json`（頂層array，12件：6類×2＝1高費核心＋1低費/發電對照）
   - 欄位：id／category（metabolism/digestion/cytoskeleton/synthesis/sensing/symbiosis）
     ／energy_cost(-1~4)／max_copies=1／modifiers[{stat,value,unit}]／drawback[]／
     name_key/desc_key/bio_key／icon
@@ -18,10 +18,11 @@
     proteasome_sieve(1)／flagellar_base(3)／microtubule_anchor(1)／rough_er(4,唯一amount+1)／
     ribosome_cluster(2)／ion_channel_array(3)／chemokine_patch(1)／
     symbiotic_flora(-1,移速-30%/might-15%)／phage_fragment(-1,max_health-20%/CDR+0.05)
-- [ ] `DataPaths.Organelles`＋`CatalogBuilders.BuildOrganelles()`（判重id、cost越界、stat合法、發電必有drawback）
-- [ ] `GameManager.OrganelleCatalog`（仿SkillCatalog懶載入＋EnsureValidated）
-- [ ] `DataValidator` 追加：organelle→stat校驗、translation缺鍵warn、圖標缺失warn（佔位合法）
-- [ ] `SkillIds.cs` 追加12常量；`AssetPaths.OrganelleIcon(id)`
+- [x] `DataPaths.Organelles`＋`CatalogBuilders.BuildOrganelles()`（判重id、cost越界、stat合法、發電必有drawback）
+- [x] `GameManager.OrganelleCatalog`（仿SkillCatalog懶載入＋EnsureValidated）
+- [ ] `DataValidator` 追加：translation缺鍵warn、圖標缺失warn（佔位合法）※organelle→stat校驗已在BuildOrganelles fail-fast，無需重複
+- [ ] `SkillIds.cs` 追加12常量；`AssetPaths.OrganelleIcon(id)`（後者已完成）
+- [x] 資料契約測試 `tests/TestOrganelleCatalog.cs`（12件／6類×2／cost域／發電必有drawback／stat合法，headless 綠燈）
 - [ ] `scripts/core/OrganelleChamber.cs`（新，Node2D，掛玩家下與SkillManager並列）
   - 常數 MaxSlots=4／BaseEnergy=6／MaxGenerators=2／BackpackCap=12；信號 ChamberChanged
   - API：Slots[4]／Backpack List／UsedEnergy／MaxEnergy／CanEquip＋reason／Equip／Unequip／Swap／Discard／GetUiData
@@ -50,6 +51,9 @@
 
 ## Phase 3 — 美術管線
 
+- [x] `asset_check` 註冊 organelle 類別（missing雙向檢查＋unmapped／resolution 128x128＋1:1／`--category organelle`）
+- [x] `to_target_asset` registry 加 organelle pipeline（128x128＋圓形遮罩，同 passive_tree）
+- [x] SKILL.md 目錄架構補 `organelle/`；現況：0/12 ready（12 missing，待生圖）
 - [ ] `gen/organelle/` 12張（前綴-free，stems＝id；熒光顯微＋純黑底＋1:1）
 - [ ] `make check-assets` 綠燈；缺圖回退frame_organelle但排版正確（佔位驗收）
 
