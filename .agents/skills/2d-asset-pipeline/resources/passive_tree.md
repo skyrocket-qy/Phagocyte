@@ -9,25 +9,25 @@ Runtime resolution: $128 \times 128$ px circular icon (with circular mask step a
 
 ### Item Mapping (Row by Row)
 - **Row 1**:
-  - `passive_actin`: Polymerizing actin microfilaments forming dense meshwork lattice
-  - `passive_autophagy`: Double-membrane autophagosome engulfing damaged organelle
-  - `passive_bilayer`: Fluid mosaic lipid bilayer with transmembrane protein channels
-  - `passive_chemokine`: Chemokine receptor cluster bound to glowing ligand molecules
+  - `actin`: Polymerizing actin microfilaments forming dense meshwork lattice
+  - `autophagy`: Double-membrane autophagosome engulfing damaged organelle
+  - `bilayer`: Fluid mosaic lipid bilayer with transmembrane protein channels
+  - `chemokine`: Chemokine receptor cluster bound to glowing ligand molecules
 - **Row 2**:
-  - `passive_mitochondria`: Mitochondrion with intricate folded cristae radiating golden ATP energy
-  - `passive_ribosome`: Ribosome complex translating mRNA strand into polypeptide chain
-  - `passive_endoplasmic`: Rough endoplasmic reticulum sheets studded with glowing ribosomal dots
-  - `passive_centrosome`: Pair of perpendicular centrioles projecting dynamic microtubule asters
+  - `mitochondria`: Mitochondrion with intricate folded cristae radiating golden ATP energy
+  - `ribosome`: Ribosome complex translating mRNA strand into polypeptide chain
+  - `endoplasmic`: Rough endoplasmic reticulum sheets studded with glowing ribosomal dots
+  - `centrosome`: Pair of perpendicular centrioles projecting dynamic microtubule asters
 - **Row 3**:
-  - `passive_nucleus`: Dense eukaryotic cell nucleus with coiled chromatin and prominent nucleolus
-  - `passive_opsonin`: Complement receptor binding opsonized antigen with high affinity
-  - `passive_tcr`: T-cell receptor (TCR) engaging MHC peptide complex with golden spark
-  - `passive_nadph`: Membrane-bound NADPH oxidase complex transferring electron cascade
+  - `nucleus`: Dense eukaryotic cell nucleus with coiled chromatin and prominent nucleolus
+  - `opsonin`: Complement receptor binding opsonized antigen with high affinity
+  - `tcr`: T-cell receptor (TCR) engaging MHC peptide complex with golden spark
+  - `nadph`: Membrane-bound NADPH oxidase complex transferring electron cascade
 - **Row 4**:
-  - `passive_toll`: Toll-like receptor (TLR) horseshoe leucine-rich repeat domain
-  - `passive_integrin`: High-affinity integrin anchor clasping endothelial extracellular matrix
-  - `passive_selectin`: Selectin carbohydrate-binding domain mediating cellular rolling
-  - `passive_calcium`: Endoplasmic reticulum releasing intense wave of green calcium ions
+  - `toll`: Toll-like receptor (TLR) horseshoe leucine-rich repeat domain
+  - `integrin`: High-affinity integrin anchor clasping endothelial extracellular matrix
+  - `selectin`: Selectin carbohydrate-binding domain mediating cellular rolling
+  - `calcium`: Endoplasmic reticulum releasing intense wave of green calcium ions
 
 ### Generation Prompt
 ```text
@@ -39,6 +39,6 @@ Fluorescence microscopy style sprite sheet of 16 cellular organelles and molecul
 python3 tools/slice/main.py grid \
   --input gen/passive_tree/passive_tree_sheet_01.png \
   --rows 4 --cols 4 \
-  --names "passive_actin,passive_autophagy,passive_bilayer,passive_chemokine,passive_mitochondria,passive_ribosome,passive_endoplasmic,passive_centrosome,passive_nucleus,passive_opsonin,passive_tcr,passive_nadph,passive_toll,passive_integrin,passive_selectin,passive_calcium" \
+  --names "actin,autophagy,bilayer,chemokine,mitochondria,ribosome,endoplasmic,centrosome,nucleus,opsonin,tcr,nadph,toll,integrin,selectin,calcium" \
   --output gen/passive_tree
 ```

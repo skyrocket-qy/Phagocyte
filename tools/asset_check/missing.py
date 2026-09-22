@@ -18,21 +18,29 @@ def _load_json(file_path: Path) -> Any:
 
 
 # Source filenames under gen/ carry no category prefix; registered data IDs do.
-# Maps gen/ subdirectory -> ID prefix stripped when resolving source filenames.
-CATEGORY_PREFIXES: Dict[str, str] = {
-    "achievement": "ach_",
-    "skill": "",
-    "passive_tree": "trait_",
-    "ui": "ui_",
+# Maps gen/ subdirectory -> ID prefixes stripped (in order, repeatedly) when
+# resolving source filenames. E.g. trait_passive_actin -> actin.
+CATEGORY_PREFIXES: Dict[str, List[str]] = {
+    "achievement": ["ach_"],
+    "skill": ["passive_"],
+    "passive_tree": ["trait_", "passive_", "tree_"],
+    "ui": ["ui_"],
 }
 
 
 def _source_stem(category: str, name: str) -> str:
     """Map a registered data ID to its prefix-free source file stem in gen/."""
-    prefix = CATEGORY_PREFIXES.get(category, "")
-    if prefix and name.startswith(prefix):
-        return name[len(prefix):]
-    return name
+    prefixes = CATEGORY_PREFIXES.get(category, [])
+    stripped = name
+    changed = True
+    while changed:
+        changed = False
+        for prefix in prefixes:
+            if prefix and stripped.startswith(prefix):
+                stripped = stripped[len(prefix):]
+                changed = True
+                break
+    return stripped
 
 
 def check_missing_assets(
