@@ -93,8 +93,21 @@ public partial class SenescentRBC : Node2D
         if (IsConsumed || IsQueuedForDeletion())
             return;
 
+        // Squeezing cells cannot harvest (same lock as enemy engulfs).
+        BaseCell? host = predator as BaseCell;
+        if (host != null && (!GodotObject.IsInstanceValid(host) || host.IsSqueezing))
+            return;
+
         IsConsumed = true;
         _leaving = true;
+
+        // Harvest bookkeeping (mirrors BaseEnemy.BeEngulfed counting).
+        if (host != null)
+        {
+            host.DigestedCount += 1;
+            host.OnPathogenConsumed(this, GetAtpValue());
+            host.EmitSignal(BaseCell.SignalName.PathogenDigested, this, GetAtpValue());
+        }
 
         Vector2 target = predator != null && GodotObject.IsInstanceValid(predator)
             ? predator.GlobalPosition

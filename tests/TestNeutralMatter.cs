@@ -97,7 +97,7 @@ public partial class TestNeutralMatter : TestHarness
 
         _rbcKillsBefore = _player!.DigestedCount;
         _rbcExpBefore = _player.CurrentExp;
-        _player.ConsumePathogen(rbc);
+        rbc.BeEngulfed(_player);
 
         AssertThat(rbc.IsConsumed).IsTrue();
     }

@@ -363,6 +363,11 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         if (IsBeingEaten)
             return;
 
+        // Squeezing cells cannot engulf, so the lock applies to skill
+        // engulfs too (touching never engulfs anymore).
+        if (predator is BaseCell squeezing && squeezing.IsSqueezing)
+            return;
+
         if (!CanBeEngulfed)
         {
             OnEngulfAttemptFailed(predator);
@@ -371,6 +376,15 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
 
         IsBeingEaten = true;
         OnEngulfedBy(predator);
+
+        // Centralized engulf bookkeeping: every successful engulf counts
+        // here, exactly once (IsBeingEaten guards re-entry).
+        if (predator is BaseCell cell && GodotObject.IsInstanceValid(cell))
+        {
+            cell.DigestedCount += 1;
+            cell.OnPathogenConsumed(this, GetAtpValue());
+            cell.EmitSignal(BaseCell.SignalName.PathogenDigested, this, GetAtpValue());
+        }
 
         if (HitArea != null)
         {

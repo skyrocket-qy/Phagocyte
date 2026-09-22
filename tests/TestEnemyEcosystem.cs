@@ -103,13 +103,13 @@ public partial class TestEnemyEcosystem : SceneTree
         AssertThat(staph.CanBeEngulfed).IsFalse();
 
         // First attempt breaks shield
-        player.ConsumePathogen(staph);
+        staph.BeEngulfed(player);
         AssertThat(staph.FibrinShield).IsEqual(0);
         AssertThat(staph.IsBeingEaten).IsFalse();
         AssertThat(staph.CanBeEngulfed).IsTrue();
 
         // Second attempt digests successfully
-        player.ConsumePathogen(staph);
+        staph.BeEngulfed(player);
         AssertThat(staph.IsBeingEaten).IsTrue();
         GD.Print("[PASS] Test 3: Staph fibrin microthrombi armor & shield breaking verified.");
 

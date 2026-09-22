@@ -96,7 +96,7 @@ public partial class TestTutorialCues : TestHarness
         var dummy = new StaphEnemy { GlobalPosition = cell.GlobalPosition, FibrinShield = 0 };
         Root.AddChild(dummy);
         int digestedBefore = cell.DigestedCount;
-        cell.ConsumePathogen(dummy);
+        dummy.BeEngulfed(cell);
         AssertThat(cell.DigestedCount).IsEqual(digestedBefore);
 
         // Release -> restore

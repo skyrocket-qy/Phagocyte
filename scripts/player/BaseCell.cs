@@ -787,50 +787,6 @@ public partial class BaseCell : CharacterBody2D
         }
     }
 
-    public void ConsumePathogen(Node2D enemy)
-    {
-        if (enemy == null || enemy.IsQueuedForDeletion())
-            return;
-
-        // Squeeze Mode disables active engulfment (docs/skill.md §6).
-        if (IsSqueezing)
-            return;
-
-        if (enemy is IEngulfable blockable && !blockable.CanBeEngulfed)
-        {
-            blockable.OnEngulfAttemptFailed(this);
-            return;
-        }
-
-        float atp = 12.0f;
-        if (enemy is IEngulfable engulfable)
-        {
-            atp = engulfable.GetAtpValue();
-            engulfable.BeEngulfed(this);
-        }
-        else
-        {
-            if (enemy.HasMethod("get_atp_value"))
-                atp = (float)enemy.Call("get_atp_value");
-            else if (enemy.HasMethod("GetAtpValue"))
-                atp = (float)enemy.Call("GetAtpValue");
-
-            if (enemy.HasMethod("be_engulfed"))
-                enemy.Call("be_engulfed", this);
-            else if (enemy.HasMethod("BeEngulfed"))
-                enemy.Call("BeEngulfed", this);
-        }
-
-        // No EXP here: enemies grant it in Die() at digestion end, harvests
-        // grant it on completion. Touching/starting never pays out.
-        DigestedCount += 1;
-
-        OnPathogenConsumed(enemy, atp);
-
-        EmitSignal(SignalName.PathogenDigested, enemy, atp);
-        EmitStatsSignal();
-    }
-
     public virtual void OnPathogenConsumed(Node2D enemy, float atp)
     {
     }

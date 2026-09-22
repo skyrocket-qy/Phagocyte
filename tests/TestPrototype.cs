@@ -68,7 +68,7 @@ public partial class TestPrototype : TestHarness
             enemyContainer!.AddChild(staph);
 
             // Simulate engulfment
-            player.ConsumePathogen(staph);
+            staph.BeEngulfed(player);
             _phase = 1;
             return false;
         }
