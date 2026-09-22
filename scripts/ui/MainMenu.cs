@@ -290,8 +290,10 @@ public partial class MainMenu : Control
             TreeCanvas.TreeNodeRefundRequested += OnTreeNodeRefundRequested;
         }
         // Build-profile tabs (docs/passivetree.md §5.4): dynamic slots, up to MaxProfiles.
-        // Docked flush against the tree canvas top-left edge so the tabs read as
-        // attached to the panel instead of floating in the info row.
+        // Shifted right (+130px) so the tabs clear the shared top-left
+        // GlobalBackButton (24,24)-(164,64), and shifted down (+40px) so the
+        // tabs sit below HeaderLabel (8-38) + InfoHBox (42-64) instead of
+        // overlapping the title row.
         if (PassiveView != null)
         {
             _profileButtonGroup = new ButtonGroup { AllowUnpress = false };
@@ -303,10 +305,10 @@ public partial class MainMenu : Control
                 AnchorTop = 0.5f,
                 AnchorRight = 0.5f,
                 AnchorBottom = 0.5f,
-                OffsetLeft = -590.0f,
-                OffsetTop = -332.0f,
-                OffsetRight = -30.0f,
-                OffsetBottom = -290.0f
+                OffsetLeft = -460.0f,
+                OffsetTop = -292.0f,
+                OffsetRight = 100.0f,
+                OffsetBottom = -250.0f
             };
             ProfileHBox.AddThemeConstantOverride("separation", 8);
             ProfileAddBtn = new Button

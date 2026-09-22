@@ -419,6 +419,7 @@ offset_bottom = -50.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 40
+alignment = 1
 
 [node name="ConfirmButton" type="Button" parent="ClassView/Buttons"]
 custom_minimum_size = Vector2(240, 46)
@@ -494,7 +495,7 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -590.0
-offset_top = -290.0
+offset_top = -246.0
 offset_right = 590.0
 offset_bottom = 250.0
 grow_horizontal = 2
@@ -522,6 +523,7 @@ offset_bottom = -40.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 12
+alignment = 1
 
 [node name="ResetButton" type="Button" parent="PassiveView/Buttons"]
 custom_minimum_size = Vector2(130, 36)
@@ -710,6 +712,7 @@ offset_bottom = -50.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 40
+alignment = 1
 
 [node name="DeployButton" type="Button" parent="MapView/Buttons"]
 custom_minimum_size = Vector2(220, 46)
@@ -970,6 +973,7 @@ offset_bottom = -50.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 40
+alignment = 1
 
 [node name="GlobalBackButton" type="Button" parent="."]
 visible = false
