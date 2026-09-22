@@ -59,17 +59,14 @@ def check_missing_assets(
         registered_ids.add(f"{ach_id}_unachieved")
         category_counts["Achievement"] = category_counts.get("Achievement", 0) + 1
 
-        # Check in assets/gen/achievement/ or assets/sprites/achievements/
+        # Strictly check assets/gen/achievement/
         gen_path = assets_gen_dir / "achievement" / f"{ach_id}.png"
-        sprite_path = assets_dir / "sprites" / "achievements" / f"{ach_id}.png"
-
-        if not (gen_path.exists() or sprite_path.exists()):
+        if not gen_path.exists():
             missing_by_cat["Achievement"].append(f"{ach_id}.png")
         else:
             # Check for Steam unachieved variant
             gen_unach = assets_gen_dir / "achievement" / f"{ach_id}_unachieved.png"
-            sprite_unach = assets_dir / "sprites" / "achievements" / f"{ach_id}_unachieved.png"
-            if not (gen_unach.exists() or sprite_unach.exists()):
+            if not gen_unach.exists():
                 missing_by_cat["Achievement"].append(f"{ach_id}_unachieved.png (Steam locked variant)")
 
     # ── 2. Skills (31 items) ────────────────────────────────────────────────
@@ -83,9 +80,9 @@ def check_missing_assets(
         registered_ids.add(skill_id)
         category_counts["Skill"] = category_counts.get("Skill", 0) + 1
 
+        # Strictly check assets/gen/skill/
         gen_path = assets_gen_dir / "skill" / f"{skill_id}.png"
-        sprite_path = assets_dir / "sprites" / "skills" / f"{skill_id}.png"
-        if not (gen_path.exists() or sprite_path.exists()):
+        if not gen_path.exists():
             missing_by_cat["Skill"].append(f"{skill_id}.png")
 
     # ── 3. Passive Tree Traits (54 items) ───────────────────────────────────
@@ -100,9 +97,9 @@ def check_missing_assets(
         registered_ids.add(trait_id)
         category_counts["PassiveTree"] = category_counts.get("PassiveTree", 0) + 1
 
+        # Strictly check assets/gen/passive_tree/
         gen_path = assets_gen_dir / "passive_tree" / f"{trait_id}.png"
-        sprite_path = assets_dir / "sprites" / "passive_tree" / f"{trait_id}.png"
-        if not (gen_path.exists() or sprite_path.exists()):
+        if not gen_path.exists():
             missing_by_cat["PassiveTree"].append(f"{trait_id}.png")
 
     # ── 4. UI: check if source in gen/ui not compiled to assets/gen/ui ──────
