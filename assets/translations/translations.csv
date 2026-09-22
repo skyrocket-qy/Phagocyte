@@ -661,3 +661,27 @@ ORGANELLE_SYMBIOTIC_FLORA_BIO,"Biochem: Nitrogen-fixing endosymbionts export ext
 ORGANELLE_PHAGE_FRAGMENT_NAME,Phage Fragment,噬菌体片段,噬菌體片段,ファージ断片,Phagen-Fragment,Fragment de phage,Фрагмент фага,Fragmento de fago
 ORGANELLE_PHAGE_FRAGMENT_DESC,"Generator (+1 Energy), Cooldown Reduction +5%. Cost: Max Health -20%.","发电（能量 +1），冷却缩减 +5%。代价：最大生命 -20%。","發電（能量 +1），冷卻縮減 +5%。代價：最大生命 -20%。","発電（エネルギー+1）、冷却短縮+5%。代償：最大体力-20%。","Generator (+1 Energie), Abklingzeitreduktion +5 %. Preis: max. Gesundheit -20 %.","Générateur (+1 énergie), réduction de recharge +5 %. Coût : santé max -20 %.","Генератор (+1 энергии), сокращение перезарядки +5 %. Цена: макс. здоровье -20 %.","Generador (+1 energía), reducción de recarga +5 %. Coste: salud máx. -20 %."
 ORGANELLE_PHAGE_FRAGMENT_BIO,"Biochem: Temperate phage genes reroute host metabolism toward ATP, at the cost of membrane integrity.","生物机制：温和噬菌体基因重编宿主代谢转向 ATP 产出，代价是膜结构完整性。","生物機制：溫和噬菌體基因重編宿主代謝轉向 ATP 產出，代價是膜結構完整性。","生化学：温和ファージ遺伝子が宿主代謝をATP産生へ転換し膜強度を犠牲にする。","Biochemie: Phagengene lenken den Wirtsstoffwechsel auf ATP um — auf Kosten der Membran.","Biochimie : les gènes de phage tempéré détournent le métabolisme vers l’ATP au prix de la membrane.","Биохимия: гены умеренного фага перенаправляют метаболизм на АТФ ценой целостности мембраны.","Bioquímica: los genes de fago atemperado desvían el metabolismo al ATP a costa de la membrana."
+ORGANELLE_CAT_METABOLISM,Metabolism,能量代谢,能量代謝,エネルギー代謝,Energiestoffwechsel,Métabolisme énergétique,Энергообмен,Metabolismo energético
+ORGANELLE_CAT_DIGESTION,Digestion,分解消化,分解消化,分解消化,Verdauung,Digestion,Пищеварение,Digestión
+ORGANELLE_CAT_CYTOSKELETON,Cytoskeleton,运动骨架,運動骨架,細胞骨格,Zytoskelett,Cytosquelette,Цитоскелет,Citoesqueleto
+ORGANELLE_CAT_SYNTHESIS,Synthesis,合成加工,合成加工,合成加工,Synthese,Synthèse,Синтез,Síntesis
+ORGANELLE_CAT_SENSING,Sensing,感应光环,感應光環,センシング,Wahrnehmung,Détection,Сенсорика,Detección
+ORGANELLE_CAT_SYMBIOSIS,Symbiosis,外源共生,外源共生,外来共生,Symbiose,Symbiose,Симбиоз,Simbiosis
+LOADOUT_HEADER,Organelle Chamber Loadout,活性胞器装配,活性胞器裝配,オルガネラ装備,Organellen-Bestückung,Équipement d’organites,Сборка органелл,Ejército de orgánulos
+LOADOUT_BACKPACK_HEADER,Organelle Vault,胞器库存,胞器庫存,オルガネラ保管庫,Organellen-Tresor,Coffre d’organites,Хранилище органелл,Almacén de orgánulos
+LOADOUT_CHAMBER_HEADER,Active Chamber (2x2),活性胞器腔室 (2x2),活性胞器腔室 (2x2),活性チャンバー (2x2),Aktive Kammer (2x2),Chambre active (2x2),Активная камера (2x2),Cámara activa (2x2)
+LOADOUT_ENERGY_FMT,%d / %d,%d / %d,%d / %d,%d / %d,%d / %d,%d / %d,%d / %d,%d / %d
+LOADOUT_GENERATOR_FMT,"Generators: %d / %d","发电单元：%d / %d","發電單元：%d / %d","発電ユニット：%d / %d","Generatoren: %d / %d","Générateurs : %d / %d","Генераторы: %d / %d","Generadores: %d / %d"
+LOADOUT_CONFIRM,Next: Talent Tree,下一步：天赋树,下一步：天賦樹,次へ：タレントツリー,Weiter: Talentbaum,Suivant : arbre de talents,Далее: дерево талантов,Siguiente: árbol de talentos
+LOADOUT_RESET,Clear Chamber,清空腔室,清空腔室,チャンバーを空にする,Kammer leeren,Vider la chambre,Очистить камеру,Vaciar cámara
+LOADOUT_CATEGORY_ALL,All,全部,全部,全て,Alle,Tous,Все,Todos
+LOADOUT_EQUIPPED_TAG,EQUIPPED,已装,已裝,装備中,AUSGERÜSTET,ÉQUIPÉ,СНАРЯЖЕНО,EQUIPADO
+LOADOUT_EMPTY_SLOT,Empty,空槽,空槽,空き,Leer,Vide,Пусто,Vacío
+LOADOUT_DETAIL_EMPTY,Hover an organelle to inspect it.,将鼠标移到胞器上查看详情。,將滑鼠移到胞器上查看詳情。,オルガネラにカーソルを合わせて詳細表示。,Fahre über eine Organelle für Details.,Survolez un organite pour l’inspecter.,Наведите курсор на органеллу для деталей.,Pasa el cursor sobre un orgánulo para inspeccionarlo.
+LOADOUT_HINT_DEFAULT,Click an organelle to equip it; click an equipped one to remove it.,点击胞器装备；再次点击已装备的胞器可卸下。,點擊胞器裝備；再次點擊已裝備的胞器可卸下。,クリックで装備、装備済みを再クリックで解除。,Klicke eine Organelle zum Ausrüsten; erneut klicken zum Entfernen.,Cliquez un organite pour l’équiper ; recliquez pour le retirer.,Нажмите на органеллу чтобы надеть; повторно — снять.,Haz clic en un orgánulo para equiparlo; vuelve a hacer clic para quitarlo.
+LOADOUT_HINT_SLOTS_FULL,"All 4 slots are occupied — remove one first.","槽位已满，请先卸下一件。","槽位已滿，請先卸下一件。","4スロットが満杯です。先に1つ外してください。","Alle 4 Plätze belegt — zuerst eine entfernen.","Les 4 emplacements sont occupés — retirez-en un.","Все 4 слота заняты — сначала снимите одну.","Los 4 espacios están ocupados: quita uno primero."
+LOADOUT_HINT_OVERLOAD,"Overloaded: energy used exceeds the cap.","能量超载：已用超过上限。","能量超載：已用超過上限。","過負荷：使用エネルギーが上限を超えています。","Überlastet: Verbrauch über der Kapazität.","Surcharge : consommation au-dessus de la capacité.","Перегрузка: расход превышает лимит.","Sobrecarga: el consumo supera la capacidad."
+LOADOUT_HINT_GENERATOR_CAP,Generator limit reached (max 2).,发电单元已达上限（最多 2）。,發電單元已達上限（最多 2）。,発電ユニットの上限（最大2）に達しました。,Generator-Limit erreicht (max. 2).,Limite de générateurs atteinte (max 2).,Достигнут лимит генераторов (макс. 2).,Límite de generadores alcanzado (máx. 2).
+LOADOUT_HINT_COPY_CAP,Already owned or equipped.,已拥有或已装备。,已擁有或已裝備。,既に所持または装備済みです。,Bereits besessen oder ausgerüstet.,Déjà possédé ou équipé.,Уже есть или надето.,Ya lo posees o está equipado.
+LOADOUT_HINT_UNKNOWN,Unknown organelle.,未知胞器。,未知胞器。,不明なオルガネラ。,Unbekannte Organelle.,Organite inconnu.,Неизвестная органелла.,Orgánulo desconocido.
+LOADOUT_HINT_BAD_SLOT,Invalid slot.,无效槽位。,無效槽位。,無効なスロット。,Ungültiger Platz.,Emplacement invalide.,Неверный слот.,Espacio no válido.

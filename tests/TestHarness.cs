@@ -59,17 +59,20 @@ public abstract partial class TestHarness : SceneTree
         AchievementManager.SavePath = $"user://test_{tag}_achievements.json";
         RunRecordManager.SavePath = $"user://test_{tag}_records.json";
         SettingsManager.SavePath = $"user://test_{tag}_settings.json";
+        LoadoutManager.SavePath = $"user://test_{tag}_loadouts.json";
 
         // Clear leftovers from crashed earlier runs with the same tag.
         DeleteIfExists(PassiveTreeManager.SavePath);
         DeleteIfExists(AchievementManager.SavePath);
         DeleteIfExists(RunRecordManager.SavePath);
         DeleteIfExists(SettingsManager.SavePath);
+        DeleteIfExists(LoadoutManager.SavePath);
 
         _isolatedPaths.Add(PassiveTreeManager.SavePath);
         _isolatedPaths.Add(AchievementManager.SavePath);
         _isolatedPaths.Add(RunRecordManager.SavePath);
         _isolatedPaths.Add(SettingsManager.SavePath);
+        _isolatedPaths.Add(LoadoutManager.SavePath);
     }
 
     /// <summary>Restores the real save paths and removes the isolated files.</summary>
@@ -80,6 +83,8 @@ public abstract partial class TestHarness : SceneTree
         AchievementManager.SavePath = "";
         RunRecordManager.SavePath = "";
         SettingsManager.SavePath = "";
+        LoadoutManager.SavePath = "";
+        LoadoutManager.ResetCache();
     }
 
     private static void DeleteIsolatedFiles()

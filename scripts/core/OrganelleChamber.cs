@@ -205,6 +205,63 @@ public partial class OrganelleChamber : Node2D
         return true;
     }
 
+    /// <summary>
+    /// Validates a whole slot set (empty strings allowed) against the chamber
+    /// rules. Shared by the pre-run loadout manager and the UI so both apply
+    /// exactly the same legality contract as <see cref="CanEquip"/>.
+    /// <paramref name="reason"/> tokens: bad_slot / unknown / copy_cap /
+    /// generator_cap / overload.
+    /// </summary>
+    public static bool ValidateSlots(IReadOnlyList<string> slots, out string reason)
+    {
+        reason = "";
+        if (slots == null || slots.Count > MaxSlots)
+        {
+            reason = "bad_slot";
+            return false;
+        }
+
+        int used = 0;
+        int generators = 0;
+        var copies = new System.Collections.Generic.Dictionary<string, int>();
+        foreach (string id in slots)
+        {
+            if (string.IsNullOrEmpty(id))
+                continue;
+            if (!GameManager.OrganelleCatalog.ContainsKey(id))
+            {
+                reason = "unknown";
+                return false;
+            }
+
+            copies.TryGetValue(id, out int seen);
+            copies[id] = seen + 1;
+            if (copies[id] > MaxCopiesOf(id))
+            {
+                reason = "copy_cap";
+                return false;
+            }
+
+            int cost = EnergyCostOf(id);
+            if (cost < 0)
+                generators++;
+            else
+                used += cost;
+        }
+
+        if (generators > MaxGenerators)
+        {
+            reason = "generator_cap";
+            return false;
+        }
+        if (used > BaseEnergy + generators)
+        {
+            reason = "overload";
+            return false;
+        }
+        return true;
+    }
+
     // ------------------------------------------------------------------
     // Mutations
     // ------------------------------------------------------------------

@@ -98,15 +98,52 @@ public partial class TestMenuFlow : TestHarness
         }
         GD.Print("[PASS] All 5 immune defense cells selectable and confirmed unlocked via achievements.");
 
-        // Re-select Macrophage and proceed through the passive tree
+        // Re-select Macrophage and proceed through the organelle loadout
         menu.SelectClass("macrophage");
         menu.OnClassConfirmPressed();
         AssertThat(menu.ClassView.Visible).IsFalse();
-        AssertThat(menu.PassiveView != null && menu.PassiveView.Visible).IsTrue();
+        AssertThat(menu.LoadoutView).IsNotNull();
+        AssertThat(menu.LoadoutView!.Visible).IsTrue();
+        AssertThat(menu.PassiveView != null && menu.PassiveView.Visible).IsFalse();
         AssertThat(menu.MapView != null && menu.MapView.Visible).IsFalse();
         AssertThat(GameManager.SelectedClass).IsEqual("macrophage");
+        GD.Print("[PASS] Transition to LoadoutView with GameManager.selected_class = 'macrophage' verified.");
+
+        // Phase 1: the page offers the full vault but the cell deploys bare.
+        AssertThat(menu.LoadoutView.Chamber).IsNotNull();
+        AssertThat(menu.LoadoutView.Chamber!.EquippedCount).IsEqual(0);
+        AssertThat(menu.LoadoutView.Chamber.Backpack.Count).IsEqual(12);
+
+        AssertThat(menu.LoadoutView.ToggleOrganelle("mitochondria_mkii")).IsTrue();
+        AssertThat(menu.LoadoutView.Chamber.GetSlot(0)).IsEqual("mitochondria_mkii");
+        AssertThat(menu.LoadoutView.Chamber.UsedEnergy).IsEqual(4);
+        AssertThat(LoadoutManager.GetSlots("macrophage", 0)[0]).IsEqual("mitochondria_mkii");
+
+        // Overload (4+3 > 6) is refused by the page.
+        AssertThat(menu.LoadoutView.ToggleOrganelle("acidic_lysosome")).IsFalse();
+        AssertThat(menu.LoadoutView.Chamber.EquippedCount).IsEqual(1);
+
+        // A generator raises the cap and the 3-cost then fits.
+        AssertThat(menu.LoadoutView.ToggleOrganelle("symbiotic_flora")).IsTrue();
+        AssertThat(menu.LoadoutView.Chamber.MaxEnergy).IsEqual(7);
+        AssertThat(menu.LoadoutView.ToggleOrganelle("acidic_lysosome")).IsTrue();
+        AssertThat(menu.LoadoutView.Chamber.UsedEnergy).IsEqual(7);
+
+        // Toggling an equipped organelle removes it and persists.
+        AssertThat(menu.LoadoutView.ToggleOrganelle("acidic_lysosome")).IsTrue();
+        AssertThat(menu.LoadoutView.Chamber.EquippedCount).IsEqual(2);
+        AssertThat(LoadoutManager.GetSlots("macrophage", 0)[2]).IsEqual("");
+
+        menu.LoadoutView.ResetLoadout();
+        AssertThat(menu.LoadoutView.Chamber.EquippedCount).IsEqual(0);
+        AssertThat(LoadoutManager.GetSlots("macrophage", 0)[0]).IsEqual("");
+        GD.Print("[PASS] Loadout page equips/unequips, refuses overload, and persists every change.");
+
+        menu.OnLoadoutConfirmPressed();
+        AssertThat(menu.LoadoutView.Visible).IsFalse();
+        AssertThat(menu.PassiveView != null && menu.PassiveView.Visible).IsTrue();
         AssertThat(menu.ActiveTreeClassKey).IsEqual("macrophage");
-        GD.Print("[PASS] Transition to PassiveView with GameManager.selected_class = 'macrophage' verified.");
+        GD.Print("[PASS] Transition from LoadoutView to PassiveView verified.");
 
         AssertThat(menu.ProfileHBox).IsNotNull();
         AssertThat(menu.ProfileAddBtn).IsNotNull();

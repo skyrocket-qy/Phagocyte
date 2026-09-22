@@ -31,18 +31,21 @@
 
 ## Phase 1 — 出戰配裝頁＋預設套組
 
-- [ ] 新 `LoadoutManager`（static＋JsonStore "organelle_loadouts.json"，每細胞多套預設；仿PassiveTree profile機制）
-- [ ] `TestHarness.IsolateSaves` 追加 loadout 隔離路徑（唯一要動的測試腳手架，先標記）
-- [ ] 新 `scenes/ui/loadout_view.tscn`：左6籤背包（全12件試穿）＋右2x2上陣＋能量條已用/上限；超載紅閃拒絕
-- [ ] `main_menu.tscn` 流程插入：ClassView→LoadoutView→PassiveView→MapView（SwitchToView；組裝檔保持純組裝）
-- [ ] `Main.ApplyChamberLoadout()`（仿ApplyTreeLoadout，開局讀active profile 0~4件；Phase1全12件默認解鎖；StartingSlots常數預留，平衡不對可先限2件）
-- [ ] translations.csv：CHAMBER_*/LOADOUT_* 鍵
+- 設計定案：**細胞預設沒有任何裝備（裸裝開局）**；配裝頁可預先配置，預設 profile 為 4 空槽
+- [x] 新 `LoadoutManager`（static＋JsonStore "organelle_loadouts.json"，每細胞多套預設；仿PassiveTree profile機制）
+- [x] `TestHarness.IsolateSaves` 追加 loadout 隔離路徑（唯一要動的測試腳手架，先標記）
+- [x] 新 `scenes/ui/loadout_view.tscn`：左6籤背包（全12件試穿）＋右2x2上陣＋能量條已用/上限；超載紅閃拒絕
+  - 互動：點擊胞器裝入首個空槽／再點已裝者卸下；超載/發電上限/滿槽以 hint＋能量條紅閃拒絕（拖放留 Phase2+）
+  - 場景拆分：`loadout_view.tscn`（殼）＋`organelle_slot.tscn`（item，code loop 生成12+4張）
+- [x] `main_menu.tscn` 流程插入：ClassView→LoadoutView→PassiveView→MapView（SwitchToView；組裝檔保持純組裝）
+  - 返回鍵鏈更新為 Map→Passive→Loadout→Class→Title（`TestMenuFlow`／`TestPassiveTree`／`TestAchievementGallery` 同步更新）
+- [x] `Main.ApplyChamberLoadout()`（仿ApplyTreeLoadout，開局讀active profile；預設空＝不裝備，非法項略過）
+- [x] translations.csv：LOADOUT_*/ORGANELLE_CAT_* 鍵（27條×8語言）
+- [x] 視覺驗收：headed 截圖確認版面（標題／profile籤／6籤庫存／2x2腔室／能量條／拒絕提示）
 
-## Phase 2 — 局內獲取＋換/丟＋背包籤UI
+## Phase 2 — 局內獲取＋背包籤UI
 
 - [ ] `UpgradeManager` 新增 `new_organelle` 卡型（含energy_cost/category/image_path；去重已裝＋已擁有）
-  - 有空槽＋能量夠→直接上陣；否則進背包；背包滿→換/丟二選一（換：指定替1件；丟：轉小額回血復用heal_fallback）
-  - 超載/滿槽置灰（selectable:false＋reason）而非剔除；滿槽滿被動舊斷言不受影響（只斷言!=new_active/new_passive）
 - [ ] `UpgradeModal` 右側「活性胞器裝配區」＋新卡渲染（圓框＋cost角標＋種類色；沿用UiBuilders.PanelStyle）
 - [ ] `organelle_backpack.tscn`（籤列＋GridContainer）＋`organelle_slot.tscn`（TextureRect64＋Cost角標＋種類色邊框；空位frame_organelle半透明）
 - [ ] `organelle_chamber.tscn`（PanelContainer→VBox標題＋能量HBox pips＋GridContainer columns=2）
@@ -62,7 +65,8 @@
 - [ ] 文檔：spec.md §5（5+5+腔室4槽位圖）／skill.md §4（六類表）／stat.md（能量註記：約束層非第19屬性）／cell.md（外掛胞器段）
 - [x] `tests/TestOrganelleChamber.cs`（已建；Phase 0 邏輯項全綠）
   - 已完成：常數／能量超載拒絕／發電擴容6→7／發電負面生效＋卸下回滾／替換語義／去重（max_copies）／能量只算已裝／CanEquip reason token／雙發電上限／UiData／Discard／_ExitTree／5角色卡接線＋code fallback／翻譯鍵解析
-  - 待補（依賴後續Phase）：籤過濾／Loadout preset存取隔離／開局生效／滿槽滿包draft換丟分支／非法profile拒絕
+  - 待補（依賴後續Phase）：籤過濾／滿槽滿包draft換丟分支（Phase 2）
+  - 已完成（Phase 1）：Loadout preset存取隔離／開局生效／非法profile拒絕／預設空裝／頁面裝卸持久化
   - 註：BackpackCap=12 與 MaxGenerators=2 在現有12件×max_copies=1資料下為結構性守衛（不可達）；已由去重/copy_cap覆蓋等效行為
 
 ## Phase 5 — 全量迴歸＋視覺驗收（可選/後續）

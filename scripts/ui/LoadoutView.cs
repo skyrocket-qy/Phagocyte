@@ -1,0 +1,564 @@
+using Godot;
+using System.Collections.Generic;
+using Phagocyte.Core;
+
+namespace Phagocyte.UI;
+
+/// <summary>
+/// Pre-run loadout page (TODO Phase 1): the 6-category organelle vault on the
+/// left and the 2x2 energy chamber on the right. A fresh cell deploys with no
+/// equipment — the default profile is four empty slots. All legality checks run
+/// through a scratch <see cref="OrganelleChamber"/>, so the page enforces
+/// exactly the same energy/slot contract as the run itself.
+/// </summary>
+public partial class LoadoutView : Control
+{
+    [Signal]
+    public delegate void ConfirmedEventHandler();
+
+    public static PackedScene SlotScene => AssetLoader.Load<PackedScene>("res://scenes/ui/organelle_slot.tscn");
+
+    /// <summary>Category ids in display order (data-owned values from organelles.json).</summary>
+    public static readonly string[] Categories =
+    {
+        "metabolism", "digestion", "cytoskeleton", "synthesis", "sensing", "symbiosis"
+    };
+
+    public Label? HeaderLabel { get; set; }
+    public HBoxContainer? ProfileHBox { get; set; }
+    public Button? ProfileAddButton { get; set; }
+    public Button? ProfileDeleteButton { get; set; }
+    public Label? BackpackHeaderLabel { get; set; }
+    public HBoxContainer? CategoryTabBar { get; set; }
+    public GridContainer? BackpackGrid { get; set; }
+    public Label? HintLabel { get; set; }
+    public Label? ChamberHeaderLabel { get; set; }
+    public Label? EnergyLabel { get; set; }
+    public Label? GeneratorLabel { get; set; }
+    public ProgressBar? EnergyBar { get; set; }
+    public GridContainer? ChamberGrid { get; set; }
+    public Label? DetailLabel { get; set; }
+    public Button? ResetButton { get; set; }
+    public Button? ConfirmButton { get; set; }
+
+    private OrganelleChamber? _chamber;
+    private CharacterBody2D? _scratchHost;
+    private string _classKey = "macrophage";
+    private int _categoryFilter = -1;
+    private ButtonGroup? _profileGroup;
+    private readonly List<Button> _profileTabs = new();
+    private readonly List<Button> _categoryTabs = new();
+    private readonly List<OrganelleSlot> _chamberCards = new();
+    private readonly List<OrganelleSlot> _backpackCards = new();
+    private readonly List<string> _backpackIds = new();
+
+    public override void _Ready()
+    {
+        HeaderLabel = GetNodeOrNull<Label>("HeaderLabel");
+        ProfileHBox = GetNodeOrNull<HBoxContainer>("ProfileHBox");
+        ProfileAddButton = GetNodeOrNull<Button>("ProfileHBox/ProfileAddButton");
+        ProfileDeleteButton = GetNodeOrNull<Button>("ProfileHBox/ProfileDeleteButton");
+        BackpackHeaderLabel = GetNodeOrNull<Label>("MainHBox/BackpackPanel/VBox/BackpackHeader");
+        CategoryTabBar = GetNodeOrNull<HBoxContainer>("MainHBox/BackpackPanel/VBox/CategoryTabBar");
+        BackpackGrid = GetNodeOrNull<GridContainer>("MainHBox/BackpackPanel/VBox/BackpackGrid");
+        HintLabel = GetNodeOrNull<Label>("MainHBox/BackpackPanel/VBox/HintLabel");
+        ChamberHeaderLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/ChamberHeader");
+        EnergyLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/EnergyHBox/EnergyLabel");
+        GeneratorLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/EnergyHBox/GeneratorLabel");
+        EnergyBar = GetNodeOrNull<ProgressBar>("MainHBox/ChamberPanel/VBox/EnergyBar");
+        ChamberGrid = GetNodeOrNull<GridContainer>("MainHBox/ChamberPanel/VBox/ChamberGrid");
+        DetailLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/DetailLabel");
+        ResetButton = GetNodeOrNull<Button>("Buttons/ResetButton");
+        ConfirmButton = GetNodeOrNull<Button>("Buttons/ConfirmButton");
+
+        BuildCategoryTabs();
+        BuildChamberCards();
+        BuildBackpackCards();
+
+        if (ResetButton != null)
+            ResetButton.Pressed += OnResetPressed;
+        if (ConfirmButton != null)
+            ConfirmButton.Pressed += () => EmitSignal(SignalName.Confirmed);
+        if (ProfileAddButton != null)
+            ProfileAddButton.Pressed += OnProfileAddPressed;
+        if (ProfileDeleteButton != null)
+            ProfileDeleteButton.Pressed += OnProfileDeletePressed;
+
+        UpdateLocalizedTexts();
+    }
+
+    // ------------------------------------------------------------------
+    // Public API (MainMenu)
+    // ------------------------------------------------------------------
+
+    /// <summary>Opens the page for a cell, loading its active profile.</summary>
+    public void Open(string classKey)
+    {
+        _classKey = string.IsNullOrEmpty(classKey) ? "macrophage" : classKey;
+        RebuildScratch();
+        RefreshAll();
+    }
+
+    /// <summary>Currently edited cell id.</summary>
+    public string ClassKey => _classKey;
+
+    /// <summary>Chamber snapshot for tests/inspection (never null after _Ready).</summary>
+    public OrganelleChamber? Chamber => _chamber;
+
+    public void UpdateLocalizedTexts()
+    {
+        if (HeaderLabel != null) HeaderLabel.Text = Tr("LOADOUT_HEADER");
+        if (BackpackHeaderLabel != null) BackpackHeaderLabel.Text = Tr("LOADOUT_BACKPACK_HEADER");
+        if (ChamberHeaderLabel != null) ChamberHeaderLabel.Text = Tr("LOADOUT_CHAMBER_HEADER");
+        if (ResetButton != null) ResetButton.Text = Tr("LOADOUT_RESET");
+        if (ConfirmButton != null) ConfirmButton.Text = Tr("LOADOUT_CONFIRM");
+        if (ProfileAddButton != null) ProfileAddButton.Text = Tr("TREE_PROFILE_ADD");
+        if (ProfileDeleteButton != null) ProfileDeleteButton.Text = Tr("TREE_PROFILE_DELETE");
+
+        RefreshCategoryTabs();
+        RefreshAll();
+    }
+
+    // ------------------------------------------------------------------
+    // Build
+    // ------------------------------------------------------------------
+
+    private void BuildCategoryTabs()
+    {
+        if (CategoryTabBar == null)
+            return;
+
+        _categoryTabs.Clear();
+        for (int i = -1; i < Categories.Length; i++)
+        {
+            int filter = i;
+            var tab = new Button
+            {
+                Name = filter < 0 ? "CategoryTabAll" : $"CategoryTab_{Categories[filter]}",
+                ToggleMode = true,
+                CustomMinimumSize = new Vector2(0, 34),
+                MouseDefaultCursorShape = CursorShape.PointingHand
+            };
+            tab.AddThemeFontSizeOverride("font_size", 12);
+            tab.Pressed += () => OnCategoryTabPressed(filter);
+            tab.ButtonPressed = filter == _categoryFilter;
+            _categoryTabs.Add(tab);
+            CategoryTabBar.AddChild(tab);
+        }
+    }
+
+    private void BuildChamberCards()
+    {
+        if (ChamberGrid == null)
+            return;
+
+        _chamberCards.Clear();
+        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+        {
+            int slot = i;
+            var card = SlotScene.Instantiate<OrganelleSlot>();
+            card.Name = $"ChamberSlot{slot}";
+            card.Pressed += () => OnChamberCardPressed(slot);
+            card.MouseEntered += () => ShowDetail(_chamber?.GetSlot(slot) ?? "");
+            ChamberGrid.AddChild(card);
+            _chamberCards.Add(card);
+        }
+    }
+
+    private void BuildBackpackCards()
+    {
+        if (BackpackGrid == null)
+            return;
+
+        _backpackCards.Clear();
+        _backpackIds.Clear();
+
+        // Stable display order: category order, then id.
+        var ids = new List<string>();
+        foreach (string id in GameManager.OrganelleCatalog.Keys)
+            ids.Add(id);
+        ids.Sort((a, b) =>
+        {
+            int catA = CategoryIndex(CategoryOf(a));
+            int catB = CategoryIndex(CategoryOf(b));
+            return catA != catB ? catA.CompareTo(catB) : string.CompareOrdinal(a, b);
+        });
+
+        foreach (string id in ids)
+        {
+            string localId = id;
+            var card = SlotScene.Instantiate<OrganelleSlot>();
+            card.Name = $"BackpackSlot_{localId}";
+            card.Pressed += () => OnBackpackCardPressed(localId);
+            card.MouseEntered += () => ShowDetail(localId);
+            BackpackGrid.AddChild(card);
+            _backpackCards.Add(card);
+            _backpackIds.Add(localId);
+        }
+    }
+
+    private static int CategoryIndex(string category)
+    {
+        for (int i = 0; i < Categories.Length; i++)
+        {
+            if (Categories[i] == category)
+                return i;
+        }
+        return Categories.Length;
+    }
+
+    private static string CategoryOf(string id)
+    {
+        return GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar)
+            ? entryVar.AsGodotDictionary()["category"].AsString()
+            : "";
+    }
+
+    // ------------------------------------------------------------------
+    // Scratch chamber (single source of truth for the rules)
+    // ------------------------------------------------------------------
+
+    private void RebuildScratch()
+    {
+        if (_scratchHost != null && IsInstanceValid(_scratchHost))
+        {
+            RemoveChild(_scratchHost);
+            _scratchHost.Free();
+        }
+
+        _scratchHost = new CharacterBody2D { Name = "LoadoutScratchHost" };
+        _scratchHost.AddChild(new CellStats { Name = "CellStats" });
+        _chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        _scratchHost.AddChild(_chamber);
+        AddChild(_scratchHost);
+        _chamber.Setup(_scratchHost);
+
+        // Phase 1: the whole catalog is unlocked; the vault offers all 12.
+        foreach (string id in GameManager.OrganelleCatalog.Keys)
+            _chamber.AddToBackpack(id);
+
+        string[] slots = LoadoutManager.GetSlots(_classKey, LoadoutManager.GetActiveProfile(_classKey));
+        for (int i = 0; i < slots.Length && i < OrganelleChamber.MaxSlots; i++)
+        {
+            if (string.IsNullOrEmpty(slots[i]))
+                continue;
+            _chamber.Equip(slots[i], i);
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Interactions
+    // ------------------------------------------------------------------
+
+    private void OnCategoryTabPressed(int filter)
+    {
+        _categoryFilter = filter;
+        RefreshCategoryTabs();
+        RefreshBackpackCards();
+    }
+
+    private void OnBackpackCardPressed(string id)
+    {
+        ToggleOrganelle(id);
+    }
+
+    /// <summary>
+    /// Equips an organelle into the first free slot, or unequips it when already
+    /// equipped. Returns true when the chamber changed; refusals surface through
+    /// the hint label (overload / generator cap / full slots).
+    /// </summary>
+    public bool ToggleOrganelle(string id)
+    {
+        if (_chamber == null || string.IsNullOrEmpty(id))
+            return false;
+
+        // Already equipped: the click unequips it.
+        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+        {
+            if (_chamber.GetSlot(i) != id)
+                continue;
+            _chamber.Unequip(i);
+            Persist();
+            RefreshAll();
+            return true;
+        }
+
+        int free = -1;
+        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+        {
+            if (string.IsNullOrEmpty(_chamber.GetSlot(i)))
+            {
+                free = i;
+                break;
+            }
+        }
+        if (free < 0)
+        {
+            ShowHint("LOADOUT_HINT_SLOTS_FULL");
+            FlashEnergy(new Color(1.0f, 0.55f, 0.45f));
+            return false;
+        }
+
+        if (!_chamber.Equip(id, free))
+        {
+            _chamber.CanEquip(id, free, out string reason);
+            ShowHint(ReasonKey(reason));
+            FlashEnergy(new Color(1.0f, 0.35f, 0.35f));
+            return false;
+        }
+
+        ShowHint("LOADOUT_HINT_DEFAULT");
+        Persist();
+        RefreshAll();
+        return true;
+    }
+
+    /// <summary>Unequips every slot and persists the cleared profile.</summary>
+    public void ResetLoadout()
+    {
+        if (_chamber == null)
+            return;
+        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+            _chamber.Unequip(i);
+        Persist();
+        ShowHint("LOADOUT_HINT_DEFAULT");
+        RefreshAll();
+    }
+
+    private void OnChamberCardPressed(int slot)
+    {
+        if (_chamber == null || string.IsNullOrEmpty(_chamber.GetSlot(slot)))
+            return;
+        _chamber.Unequip(slot);
+        Persist();
+        RefreshAll();
+    }
+
+    private void OnResetPressed()
+    {
+        ResetLoadout();
+    }
+
+    private void OnProfileTabPressed(int index)
+    {
+        LoadoutManager.SetActiveProfile(_classKey, index);
+        RebuildScratch();
+        RefreshAll();
+    }
+
+    private void OnProfileAddPressed()
+    {
+        if (!LoadoutManager.AddProfile(_classKey))
+            return;
+        RebuildScratch();
+        RefreshAll();
+    }
+
+    private void OnProfileDeletePressed()
+    {
+        int active = LoadoutManager.GetActiveProfile(_classKey);
+        if (!LoadoutManager.DeleteProfile(_classKey, active))
+            return;
+        RebuildScratch();
+        RefreshAll();
+    }
+
+    private void Persist()
+    {
+        if (_chamber == null)
+            return;
+
+        var slots = new string[OrganelleChamber.MaxSlots];
+        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+            slots[i] = _chamber.GetSlot(i);
+        LoadoutManager.SetSlots(_classKey, LoadoutManager.GetActiveProfile(_classKey), slots);
+    }
+
+    // ------------------------------------------------------------------
+    // Refresh
+    // ------------------------------------------------------------------
+
+    private void RefreshAll()
+    {
+        RefreshProfileTabs();
+        RefreshChamberCards();
+        RefreshEnergy();
+        RefreshBackpackCards();
+        RefreshCategoryTabs();
+    }
+
+    private void RefreshProfileTabs()
+    {
+        if (ProfileHBox == null)
+            return;
+
+        _profileGroup ??= new ButtonGroup { AllowUnpress = false };
+
+        foreach (var old in _profileTabs)
+        {
+            if (IsInstanceValid(old))
+            {
+                ProfileHBox.RemoveChild(old);
+                old.QueueFree();
+            }
+        }
+        _profileTabs.Clear();
+
+        int count = LoadoutManager.GetProfileCount(_classKey);
+        int active = LoadoutManager.GetActiveProfile(_classKey);
+        for (int i = 0; i < count; i++)
+        {
+            int index = i;
+            var tab = new Button
+            {
+                Name = $"ProfileTab{index}",
+                CustomMinimumSize = new Vector2(120, 38),
+                ToggleMode = true,
+                ButtonGroup = _profileGroup,
+                ButtonPressed = index == active,
+                MouseDefaultCursorShape = CursorShape.PointingHand
+            };
+            tab.AddThemeFontSizeOverride("font_size", 13);
+            tab.Pressed += () => OnProfileTabPressed(index);
+            _profileTabs.Add(tab);
+            ProfileHBox.AddChild(tab);
+            ProfileHBox.MoveChild(tab, index);
+        }
+
+        RefreshProfileTexts();
+    }
+
+    private void RefreshProfileTexts()
+    {
+        int count = LoadoutManager.GetProfileCount(_classKey);
+        int active = LoadoutManager.GetActiveProfile(_classKey);
+        for (int i = 0; i < _profileTabs.Count && i < count; i++)
+        {
+            _profileTabs[i].Text = LoadoutManager.GetProfileName(i);
+            _profileTabs[i].ButtonPressed = i == active;
+        }
+        if (ProfileAddButton != null)
+            ProfileAddButton.Visible = count < LoadoutManager.MaxProfiles;
+        if (ProfileDeleteButton != null)
+            ProfileDeleteButton.Disabled = count <= 1;
+    }
+
+    private void RefreshChamberCards()
+    {
+        for (int i = 0; i < _chamberCards.Count; i++)
+        {
+            string id = _chamber?.GetSlot(i) ?? "";
+            _chamberCards[i].ShowOrganelle(id, !string.IsNullOrEmpty(id));
+        }
+    }
+
+    private void RefreshEnergy()
+    {
+        int used = _chamber?.UsedEnergy ?? 0;
+        int max = _chamber?.MaxEnergy ?? OrganelleChamber.BaseEnergy;
+        int generators = _chamber?.GeneratorCount ?? 0;
+
+        if (EnergyLabel != null)
+        {
+            EnergyLabel.Text = TextFormatter.Format(Tr("LOADOUT_ENERGY_FMT"), used, max);
+            EnergyLabel.Modulate = used > max
+                ? new Color(1.0f, 0.45f, 0.45f)
+                : new Color(0.45f, 0.92f, 1.0f);
+        }
+        if (GeneratorLabel != null)
+            GeneratorLabel.Text = TextFormatter.Format(Tr("LOADOUT_GENERATOR_FMT"), generators, OrganelleChamber.MaxGenerators);
+        if (EnergyBar != null)
+        {
+            EnergyBar.MaxValue = max;
+            EnergyBar.Value = used;
+        }
+    }
+
+    private void RefreshBackpackCards()
+    {
+        for (int i = 0; i < _backpackCards.Count; i++)
+        {
+            string id = _backpackIds[i];
+            string category = CategoryOf(id);
+            bool visible = _categoryFilter < 0 || Categories[_categoryFilter] == category;
+            _backpackCards[i].Visible = visible;
+            if (!visible)
+                continue;
+
+            bool equipped = false;
+            if (_chamber != null)
+            {
+                for (int s = 0; s < OrganelleChamber.MaxSlots; s++)
+                {
+                    if (_chamber.GetSlot(s) == id)
+                    {
+                        equipped = true;
+                        break;
+                    }
+                }
+            }
+            _backpackCards[i].ShowOrganelle(id, equipped);
+        }
+    }
+
+    private void RefreshCategoryTabs()
+    {
+        for (int i = 0; i < _categoryTabs.Count; i++)
+        {
+            int filter = i - 1;
+            string text = filter < 0 ? Tr("LOADOUT_CATEGORY_ALL") : Tr("ORGANELLE_CAT_" + Categories[filter].ToUpperInvariant());
+            _categoryTabs[i].Text = text;
+            _categoryTabs[i].ButtonPressed = filter == _categoryFilter;
+            if (filter >= 0)
+            {
+                _categoryTabs[i].AddThemeColorOverride("font_color", OrganelleSlot.CategoryColor(Categories[filter]));
+                _categoryTabs[i].AddThemeColorOverride("font_pressed_color", Colors.White);
+                _categoryTabs[i].AddThemeColorOverride("font_hover_color", Colors.White);
+            }
+        }
+    }
+
+    private void ShowDetail(string id)
+    {
+        if (DetailLabel == null)
+            return;
+
+        if (string.IsNullOrEmpty(id) || !GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar))
+        {
+            DetailLabel.Text = Tr("LOADOUT_DETAIL_EMPTY");
+            return;
+        }
+
+        var entry = entryVar.AsGodotDictionary();
+        DetailLabel.Text = Tr(entry["name_key"].AsString())
+            + "\n" + Tr(entry["desc_key"].AsString())
+            + "\n" + UiBuilders.StripLeadingLabel(Tr(entry["bio_key"].AsString()));
+    }
+
+    private void ShowHint(string key)
+    {
+        if (HintLabel != null)
+            HintLabel.Text = Tr(key);
+    }
+
+    private void FlashEnergy(Color color)
+    {
+        if (EnergyBar == null)
+            return;
+        EnergyBar.Modulate = color;
+        CreateTween().TweenProperty(EnergyBar, "modulate", Colors.White, 0.45f);
+    }
+
+    private static string ReasonKey(string reason)
+    {
+        return reason switch
+        {
+            "overload" => "LOADOUT_HINT_OVERLOAD",
+            "generator_cap" => "LOADOUT_HINT_GENERATOR_CAP",
+            "copy_cap" or "already_equipped" => "LOADOUT_HINT_COPY_CAP",
+            "unknown" => "LOADOUT_HINT_UNKNOWN",
+            "bad_slot" => "LOADOUT_HINT_BAD_SLOT",
+            _ => "LOADOUT_HINT_DEFAULT"
+        };
+    }
+}

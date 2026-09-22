@@ -172,6 +172,7 @@ public partial class Main : Node2D, IRunContext
         {
             Player.AddToGroup("player");
             ApplyTreeLoadout();
+            ApplyChamberLoadout();
             Overdrive?.ApplyAfflictionLoadout();
             if (HudNode != null)
             {
@@ -318,6 +319,30 @@ public partial class Main : Node2D, IRunContext
             skill.Name = "TreeLoadout_" + node.Id;
             bc.AddChild(skill);
             skill.Setup(bc, -1);
+        }
+    }
+
+    /// <summary>
+    /// Deploys the cell's active organelle loadout (TODO Phase 1). A fresh cell
+    /// has no equipment: an empty profile simply equips nothing. Illegitimate
+    /// entries (stale ids, energy overflow) are skipped, never fatal.
+    /// </summary>
+    private void ApplyChamberLoadout()
+    {
+        if (Player is not BaseCell bc || bc.CellOrganelleChamber == null)
+            return;
+
+        string classId = GameManager.SelectedClass;
+        string[] slots = LoadoutManager.GetActiveSlots(classId);
+        var chamber = bc.CellOrganelleChamber;
+        for (int i = 0; i < slots.Length && i < OrganelleChamber.MaxSlots; i++)
+        {
+            string id = slots[i];
+            if (string.IsNullOrEmpty(id))
+                continue;
+            if (!chamber.AddToBackpack(id))
+                continue;
+            chamber.Equip(id, i);
         }
     }
 

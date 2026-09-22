@@ -128,20 +128,23 @@ public partial class TestAchievementGallery : TestHarness
         AssertThat(menu.GlobalBackBtn.Visible).IsFalse();
         GD.Print("[PASS] Shared top-left back returns to TitleView and hides itself.");
 
-        // Per-view back targets: Map -> Passive, Passive -> Class, Class -> Title
+        // Per-view back targets: Map -> Passive -> Loadout -> Class -> Title
         menu.OnStartPressed();
         menu.OnClassConfirmPressed();
+        menu.OnLoadoutConfirmPressed();
         menu.OnPassiveConfirmPressed();
         AssertThat(menu.MapView!.Visible).IsTrue();
         AssertThat(menu.GlobalBackBtn.Visible).IsTrue();
         menu.GlobalBackBtn.EmitSignal(Button.SignalName.Pressed);
         AssertThat(menu.PassiveView!.Visible).IsTrue();
         menu.GlobalBackBtn.EmitSignal(Button.SignalName.Pressed);
+        AssertThat(menu.LoadoutView!.Visible).IsTrue();
+        menu.GlobalBackBtn.EmitSignal(Button.SignalName.Pressed);
         AssertThat(menu.ClassView!.Visible).IsTrue();
         menu.GlobalBackBtn.EmitSignal(Button.SignalName.Pressed);
         AssertThat(menu.TitleView.Visible).IsTrue();
         AssertThat(menu.GlobalBackBtn.Visible).IsFalse();
-        GD.Print("[PASS] Shared back walks Map -> Passive -> Class -> Title.");
+        GD.Print("[PASS] Shared back walks Map -> Passive -> Loadout -> Class -> Title.");
 
         return menu;
     }

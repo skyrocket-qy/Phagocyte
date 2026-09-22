@@ -1,0 +1,226 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/LoadoutView.cs" id="1_loadout"]
+[ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.07, 0.11, 0.16, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.35, 0.5, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 20.0
+content_margin_top = 16.0
+content_margin_right = 20.0
+content_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_sep"]
+color = Color(0, 0.9, 1, 0.25)
+thickness = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_energy_bg"]
+bg_color = Color(0.04, 0.07, 0.11, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_energy_fill"]
+bg_color = Color(0.2, 0.78, 0.95, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="LoadoutView" type="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_loadout")
+
+[node name="HeaderLabel" type="Label" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 18.0
+offset_right = 300.0
+offset_bottom = 54.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 26
+text = "活性胞器装配"
+horizontal_alignment = 1
+
+[node name="ProfileHBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -292.0
+offset_right = 300.0
+offset_bottom = -254.0
+grow_horizontal = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="ProfileAddButton" type="Button" parent="ProfileHBox"]
+custom_minimum_size = Vector2(56, 38)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 13
+text = "+"
+
+[node name="ProfileDeleteButton" type="Button" parent="ProfileHBox"]
+custom_minimum_size = Vector2(96, 38)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 0.45, 0.4, 1)
+theme_override_font_sizes/font_size = 13
+text = "删除"
+
+[node name="MainHBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -560.0
+offset_top = -242.0
+offset_right = 560.0
+offset_bottom = 226.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+
+[node name="BackpackPanel" type="PanelContainer" parent="MainHBox"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="MainHBox/BackpackPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BackpackHeader" type="Label" parent="MainHBox/BackpackPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "胞器库存"
+
+[node name="CategoryTabBar" type="HBoxContainer" parent="MainHBox/BackpackPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BackpackGrid" type="GridContainer" parent="MainHBox/BackpackPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 4
+
+[node name="HintLabel" type="Label" parent="MainHBox/BackpackPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.82, 0.9, 0.85)
+theme_override_font_sizes/font_size = 12
+text = "点击胞器装备；再次点击已装备的胞器可卸下。"
+autowrap_mode = 3
+
+[node name="ChamberPanel" type="PanelContainer" parent="MainHBox"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="MainHBox/ChamberPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ChamberHeader" type="Label" parent="MainHBox/ChamberPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "活性胞器腔室 (2x2)"
+
+[node name="EnergyHBox" type="HBoxContainer" parent="MainHBox/ChamberPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EnergyLabel" type="Label" parent="MainHBox/ChamberPanel/VBox/EnergyHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.45, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "0 / 6"
+
+[node name="GeneratorLabel" type="Label" parent="MainHBox/ChamberPanel/VBox/EnergyHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 1, 0.72, 1)
+theme_override_font_sizes/font_size = 12
+text = "发电单元：0 / 2"
+
+[node name="EnergyBar" type="ProgressBar" parent="MainHBox/ChamberPanel/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_energy_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_energy_fill")
+max_value = 6.0
+value = 0.0
+show_percentage = false
+
+[node name="ChamberGrid" type="GridContainer" parent="MainHBox/ChamberPanel/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 2
+
+[node name="DetailLabel" type="Label" parent="MainHBox/ChamberPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.78, 0.86, 0.94, 0.9)
+theme_override_font_sizes/font_size = 12
+text = "将鼠标移到胞器上查看详情。"
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -260.0
+offset_top = -96.0
+offset_right = 260.0
+offset_bottom = -46.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="ResetButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(200, 46)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme = ExtResource("menu_theme")
+theme_override_font_sizes/font_size = 15
+text = "清空腔室"
+
+[node name="ConfirmButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(240, 46)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme = ExtResource("menu_theme")
+theme_override_font_sizes/font_size = 16
+text = "下一步：天赋树"

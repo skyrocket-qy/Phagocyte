@@ -10,6 +10,7 @@ public partial class MainMenu : Control
     // Views
     public Control? TitleView { get; set; }
     public Control? ClassView { get; set; }
+    public LoadoutView? LoadoutView { get; set; }
     public Control? PassiveView { get; set; }
     public Control? MapView { get; set; }
     public AchievementGalleryView? AchievementView { get; set; }
@@ -125,6 +126,7 @@ public partial class MainMenu : Control
     {
         TitleView = GetNodeOrNull<Control>("TitleView");
         ClassView = GetNodeOrNull<Control>("ClassView");
+        LoadoutView = GetNodeOrNull<LoadoutView>("LoadoutView");
         PassiveView = GetNodeOrNull<Control>("PassiveView");
         MapView = GetNodeOrNull<Control>("MapView");
         AchievementView = GetNodeOrNull<AchievementGalleryView>("AchievementView");
@@ -284,6 +286,9 @@ public partial class MainMenu : Control
         if (ClassConfirmBtn != null)
             ClassConfirmBtn.Pressed += OnClassConfirmPressed;
 
+        if (LoadoutView != null)
+            LoadoutView.Confirmed += OnLoadoutConfirmPressed;
+
         if (TreeCanvas != null)
         {
             TreeCanvas.TreeNodeActivated += OnTreeNodeActivated;
@@ -379,6 +384,8 @@ public partial class MainMenu : Control
 
         if (ClassHeaderLbl != null) ClassHeaderLbl.Text = Tr("HEADER_SELECT_CLASS");
 
+        LoadoutView?.UpdateLocalizedTexts();
+
         if (PassiveHeaderLbl != null) PassiveHeaderLbl.Text = Tr("HEADER_SELECT_PASSIVE");
         if (PassiveResetBtn != null) PassiveResetBtn.Text = Tr("TREE_RESET");
         if (PassiveConfirmBtn != null) PassiveConfirmBtn.Text = Tr("BTN_CONFIRM_MAP");
@@ -404,12 +411,13 @@ public partial class MainMenu : Control
         SetupMapButtons();
         SelectClass(ActiveClassKey);
         RefreshPassiveView();
+        RefreshLoadoutView();
         SelectMap(ActiveMapKey);
     }
 
     private void SwitchToView(Control targetView)
     {
-        Control?[] views = { TitleView, ClassView, PassiveView, MapView, AchievementView };
+        Control?[] views = { TitleView, ClassView, LoadoutView, PassiveView, MapView, AchievementView };
         foreach (var view in views)
         {
             if (view != null)
@@ -421,9 +429,10 @@ public partial class MainMenu : Control
     }
 
     /// <summary>
-    /// The single back affordance for all five views. Targets mirror the
-    /// removed per-view buttons: Map re-enters the passive build (refreshing
-    /// the tree), Passive returns to class selection, everything else to title.
+    /// The single back affordance for all views. Targets mirror the forward
+    /// flow: Map re-enters the passive build (refreshing the tree), Passive
+    /// returns to the organelle loadout, Loadout returns to class selection,
+    /// everything else to title.
     /// </summary>
     public void OnGlobalBackPressed()
     {
@@ -432,7 +441,12 @@ public partial class MainMenu : Control
             SelectPassiveBuild(ActiveTreeClassKey);
             SwitchToView(PassiveView);
         }
-        else if (_currentView == PassiveView && ClassView != null)
+        else if (_currentView == PassiveView && LoadoutView != null)
+        {
+            RefreshLoadoutView();
+            SwitchToView(LoadoutView);
+        }
+        else if (_currentView == LoadoutView && ClassView != null)
         {
             SwitchToView(ClassView);
         }
@@ -617,6 +631,26 @@ public partial class MainMenu : Control
     {
         GameManager.SelectedClass = ActiveClassKey;
         ActiveTreeNodeId = "";
+        RefreshLoadoutView();
+        if (LoadoutView != null)
+        {
+            SwitchToView(LoadoutView);
+            return;
+        }
+        SelectPassiveBuild(ActiveClassKey);
+        if (PassiveView != null)
+            SwitchToView(PassiveView);
+    }
+
+    /// <summary>Loads the active cell's loadout profile into the page.</summary>
+    public void RefreshLoadoutView()
+    {
+        LoadoutView?.Open(ActiveClassKey);
+    }
+
+    /// <summary>Loadout page confirm: advance to the talent tree.</summary>
+    public void OnLoadoutConfirmPressed()
+    {
         SelectPassiveBuild(ActiveClassKey);
         if (PassiveView != null)
             SwitchToView(PassiveView);

@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/class_view.tscn" id="14_class"]
 [ext_resource type="PackedScene" path="res://scenes/ui/passive_view.tscn" id="15_passive"]
 [ext_resource type="PackedScene" path="res://scenes/ui/map_view.tscn" id="16_map"]
+[ext_resource type="PackedScene" path="res://scenes/ui/loadout_view.tscn" id="17_loadout"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/menu/background.jpeg" id="9_menu_bg"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/menu/cell.jpeg" id="10_menu_cell"]
 [ext_resource type="Shader" path="res://shaders/menu_watermark_blend.gdshader" id="11_wm_shader"]
@@ -131,6 +132,8 @@ stretch_mode = 5
 
 [node name="TitleView" parent="." instance=ExtResource("13_title")]
 [node name="ClassView" parent="." instance=ExtResource("14_class")]
+visible = false
+[node name="LoadoutView" parent="." instance=ExtResource("17_loadout")]
 visible = false
 [node name="PassiveView" parent="." instance=ExtResource("15_passive")]
 visible = false

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Phagocyte.Core;
 using Phagocyte.Player;
+using Phagocyte.UI;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
@@ -39,6 +40,8 @@ public partial class TestOrganelleChamber : TestHarness
             RunChamberLogicTests();
             RunSceneWiringTests();
             RunTranslationTests();
+            RunLoadoutManagerTests();
+            RunApplyLoadoutTests();
             Finish(true, "ALL ORGANELLE CHAMBER TESTS");
         }
         catch (Exception ex)
@@ -245,5 +248,160 @@ public partial class TestOrganelleChamber : TestHarness
             }
         }
         GD.Print("[PASS] All organelle name/desc/bio keys resolve through translations.csv.");
+
+        // Phase 1 loadout page keys.
+        foreach (string key in new[]
+        {
+            "LOADOUT_HEADER", "LOADOUT_BACKPACK_HEADER", "LOADOUT_CHAMBER_HEADER", "LOADOUT_ENERGY_FMT",
+            "LOADOUT_GENERATOR_FMT", "LOADOUT_CONFIRM", "LOADOUT_RESET", "LOADOUT_CATEGORY_ALL",
+            "LOADOUT_EQUIPPED_TAG", "LOADOUT_EMPTY_SLOT", "LOADOUT_DETAIL_EMPTY", "LOADOUT_HINT_DEFAULT",
+            "LOADOUT_HINT_SLOTS_FULL", "LOADOUT_HINT_OVERLOAD", "LOADOUT_HINT_GENERATOR_CAP",
+            "LOADOUT_HINT_COPY_CAP", "LOADOUT_HINT_UNKNOWN", "LOADOUT_HINT_BAD_SLOT"
+        })
+        {
+            AssertThat(TranslationServer.Translate(key)).IsNotEqual(key);
+        }
+        foreach (string category in LoadoutView.Categories)
+        {
+            string key = "ORGANELLE_CAT_" + category.ToUpperInvariant();
+            AssertThat(TranslationServer.Translate(key)).IsNotEqual(key);
+        }
+        GD.Print("[PASS] Loadout page and category keys resolve through translations.csv.");
+    }
+
+    /// <summary>Phase 1: pre-run loadout profiles (default = no equipment).</summary>
+    private void RunLoadoutManagerTests()
+    {
+        const string cell = "macrophage";
+
+        // A fresh cell deploys with no equipment at all.
+        AssertThat(LoadoutManager.GetProfileCount(cell)).IsEqual(1);
+        AssertThat(LoadoutManager.GetActiveProfile(cell)).IsEqual(0);
+        foreach (string id in LoadoutManager.GetActiveSlots(cell))
+            AssertThat(id).IsEqual("");
+        GD.Print("[PASS] Default loadout profile is a single build with 4 empty slots (no equipment).");
+
+        // Legal set persists and round-trips through disk.
+        string[] legal = { "mitochondria_mkii", "chemokine_patch", "", "" };
+        AssertThat(LoadoutManager.SetSlots(cell, 0, legal)).IsTrue();
+        LoadoutManager.ResetCache();
+        var reloaded = LoadoutManager.GetSlots(cell, 0);
+        AssertThat(reloaded[0]).IsEqual("mitochondria_mkii");
+        AssertThat(reloaded[1]).IsEqual("chemokine_patch");
+        AssertThat(reloaded[2]).IsEqual("");
+        GD.Print("[PASS] Loadout persists to disk and reloads (isolated save path).");
+
+        // Illegal sets are refused without touching the stored profile.
+        string[] overloaded = { "mitochondria_mkii", "acidic_lysosome", "", "" };
+        AssertThat(LoadoutManager.SetSlots(cell, 0, overloaded)).IsFalse();
+        string[] duplicated = { "mitochondria_mkii", "mitochondria_mkii", "", "" };
+        AssertThat(LoadoutManager.SetSlots(cell, 0, duplicated)).IsFalse();
+        string[] unknown = { "not_a_real_organelle", "", "", "" };
+        AssertThat(LoadoutManager.SetSlots(cell, 0, unknown)).IsFalse();
+        AssertThat(LoadoutManager.GetSlots(cell, 0)[0]).IsEqual("mitochondria_mkii");
+        GD.Print("[PASS] Overload / duplicate / unknown loadout sets are refused (stored profile untouched).");
+
+        // Profile lifecycle.
+        AssertThat(LoadoutManager.AddProfile(cell)).IsTrue();
+        AssertThat(LoadoutManager.GetProfileCount(cell)).IsEqual(2);
+        AssertThat(LoadoutManager.GetActiveProfile(cell)).IsEqual(1);
+        AssertThat(LoadoutManager.GetActiveSlots(cell)[0]).IsEqual("");
+        AssertThat(LoadoutManager.AddProfile(cell)).IsTrue();
+        AssertThat(LoadoutManager.AddProfile(cell)).IsFalse();
+        AssertThat(LoadoutManager.SetActiveProfile(cell, 0)).IsTrue();
+        AssertThat(LoadoutManager.DeleteProfile(cell, 1)).IsTrue();
+        AssertThat(LoadoutManager.GetProfileCount(cell)).IsEqual(2);
+        AssertThat(LoadoutManager.DeleteProfile(cell, 0)).IsTrue();
+        AssertThat(LoadoutManager.GetProfileCount(cell)).IsEqual(1);
+        AssertThat(LoadoutManager.DeleteProfile(cell, 0)).IsFalse();
+        GD.Print("[PASS] Profile add/switch/delete lifecycle capped at 3 builds, last build kept.");
+
+        // Unknown cells are refused.
+        AssertThat(LoadoutManager.SetSlots("not_a_cell", 0, legal)).IsFalse();
+        AssertThat(LoadoutManager.GetProfileCount("not_a_cell")).IsEqual(0);
+        GD.Print("[PASS] Unknown cell ids are refused by the loadout manager.");
+
+        // Hand-edited illegal files are sanitized, not fatal.
+        var payload = new Godot.Collections.Dictionary
+        {
+            { "profiles", new Godot.Collections.Dictionary
+                {
+                    { cell, new Godot.Collections.Array
+                        {
+                            new Godot.Collections.Array<string> { "rough_er", "rough_er", "rough_er", "rough_er" },
+                            new Godot.Collections.Array<string> { "not_a_real_organelle", "", "", "" }
+                        }
+                    }
+                }
+            },
+            { "active_profiles", new Godot.Collections.Dictionary { { cell, 0 } } }
+        };
+        JsonStore.Write(LoadoutManager.SavePath, payload);
+        LoadoutManager.ResetCache();
+        foreach (string id in LoadoutManager.GetSlots(cell, 0))
+            AssertThat(id).IsEqual("");
+        AssertThat(LoadoutManager.GetSlots(cell, 1)[0]).IsEqual("");
+        GD.Print("[PASS] Illegal hand-edited profile rows sanitize to empty instead of blocking deploy.");
+
+        LoadoutManager.ResetCache();
+        LoadoutManager.SetSlots(cell, 0, LoadoutManager.EmptySlots());
+    }
+
+    /// <summary>Phase 1: the run deploys the active profile (empty by default).</summary>
+    private void RunApplyLoadoutTests()
+    {
+        const string cell = "macrophage";
+
+        // Default (no equipment) deployment.
+        LoadoutManager.SetSlots(cell, 0, LoadoutManager.EmptySlots());
+        var emptyRun = InstantiateMain(cell);
+        var emptyPlayer = emptyRun.Player as BaseCell;
+        AssertThat(emptyPlayer).IsNotNull();
+        AssertThat(emptyPlayer!.CellOrganelleChamber).IsNotNull();
+        AssertThat(emptyPlayer.CellOrganelleChamber!.EquippedCount).IsEqual(0);
+        AssertThat(emptyPlayer.CellOrganelleChamber.Backpack.Count).IsEqual(0);
+        FreeMain(emptyRun);
+        GD.Print("[PASS] A run deploys with an empty chamber by default (no starting equipment).");
+
+        // Configured profile is equipped on deploy and its stats land on the cell.
+        AssertThat(LoadoutManager.SetSlots(cell, 0, new[] { "mitochondria_mkii", "symbiotic_flora", "", "" })).IsTrue();
+        var loadedRun = InstantiateMain(cell);
+        var player = loadedRun.Player as BaseCell;
+        AssertThat(player).IsNotNull();
+        var chamber = player!.CellOrganelleChamber;
+        AssertThat(chamber).IsNotNull();
+        AssertThat(chamber!.GetSlot(0)).IsEqual("mitochondria_mkii");
+        AssertThat(chamber.GetSlot(1)).IsEqual("symbiotic_flora");
+        AssertThat(chamber.UsedEnergy).IsEqual(4);
+        AssertThat(chamber.MaxEnergy).IsEqual(7);
+        AssertThat(player.Stats!.GetStat("cooldown_reduction")).IsGreater(0.15f);
+        FreeMain(loadedRun);
+        GD.Print("[PASS] Configured loadout equips on deploy and applies its stat modifiers.");
+
+        // A stale/illegal profile on disk never blocks deployment.
+        var payload = new Godot.Collections.Dictionary
+        {
+            { "profiles", new Godot.Collections.Dictionary
+                {
+                    { cell, new Godot.Collections.Array
+                        {
+                            new Godot.Collections.Array<string> { "mitochondria_mkii", "acidic_lysosome", "rough_er", "" }
+                        }
+                    }
+                }
+            },
+            { "active_profiles", new Godot.Collections.Dictionary { { cell, 0 } } }
+        };
+        JsonStore.Write(LoadoutManager.SavePath, payload);
+        LoadoutManager.ResetCache();
+        var fallbackRun = InstantiateMain(cell);
+        var fallbackPlayer = fallbackRun.Player as BaseCell;
+        AssertThat(fallbackPlayer).IsNotNull();
+        AssertThat(fallbackPlayer!.CellOrganelleChamber).IsNotNull();
+        FreeMain(fallbackRun);
+        GD.Print("[PASS] An illegal on-disk profile sanitizes and the run still deploys.");
+
+        LoadoutManager.ResetCache();
+        LoadoutManager.SetSlots(cell, 0, LoadoutManager.EmptySlots());
     }
 }

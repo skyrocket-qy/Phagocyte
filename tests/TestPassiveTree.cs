@@ -584,6 +584,9 @@ public partial class TestPassiveTree : TestHarness
         _menu!.OnStartPressed();
         _menu.SelectClass("macrophage");
         _menu.OnClassConfirmPressed();
+        // Phase 1: class confirm now lands on the organelle loadout page first.
+        AssertThat(_menu.LoadoutView!.Visible).IsTrue();
+        _menu.OnLoadoutConfirmPressed();
         AssertThat(_menu.PassiveView!.Visible).IsTrue();
         AssertThat(_menu.MapView!.Visible).IsFalse();
 
