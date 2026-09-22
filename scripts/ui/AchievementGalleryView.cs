@@ -51,7 +51,7 @@ public partial class AchievementGalleryView : Control
     private Callable _langCallback;
     private Callable _achUnlockCallback;
 
-    private static readonly Color LockedDim = new(0.45f, 0.47f, 0.55f);
+    internal static readonly Color LockedDim = new(0.45f, 0.47f, 0.55f);
 
     public override void _Ready()
     {
@@ -153,6 +153,7 @@ public partial class AchievementGalleryView : Control
             child.QueueFree();
         }
 
+        var cardScene = AssetLoader.Load<PackedScene>("res://scenes/ui/achievement_card.tscn");
         var all = AchievementManager.GetAllAchievements();
         int unlockedTotal = 0;
         foreach (var ach in all)
@@ -173,7 +174,11 @@ public partial class AchievementGalleryView : Control
                 continue;
             if (firstId == "")
                 firstId = aid;
-            CardList.AddChild(BuildCard(ach));
+            var card = cardScene.Instantiate<AchievementCard>();
+            card.Name = $"AchCard_{aid}";
+            card.OnSelected = SelectAchievement;
+            card.Bind(ach);
+            CardList.AddChild(card);
             shown++;
         }
         CardCount = shown;
@@ -299,97 +304,6 @@ public partial class AchievementGalleryView : Control
         if (id.EndsWith("_clear"))
             return new Color(0.4f, 0.8f, 1.0f);
         return new Color(1.0f, 0.84f, 0.35f);
-    }
-
-    private PanelContainer BuildCard(Godot.Collections.Dictionary ach)
-    {
-        string aid = ach["id"].AsString();
-        bool unlocked = ach["unlocked"].AsBool();
-        Color accent = CategoryColor(ach);
-        int pct = (int)(ach["progress_ratio"].AsSingle() * 100);
-
-        var card = new PanelContainer
-        {
-            Name = $"AchCard_{aid}",
-            MouseFilter = MouseFilterEnum.Stop,
-            MouseDefaultCursorShape = CursorShape.PointingHand
-        };
-        var style = UiBuilders.PanelStyle(
-            unlocked ? new Color(0.07f, 0.12f, 0.18f, 0.92f) : new Color(0.05f, 0.07f, 0.11f, 0.92f),
-            accent, cornerRadius: 8, marginH: 12, marginV: 10);
-        style.BorderWidthLeft = 4;
-        style.BorderWidthTop = 1;
-        style.BorderWidthRight = 1;
-        style.BorderWidthBottom = 1;
-        card.AddThemeStyleboxOverride("panel", style);
-        if (!unlocked)
-            card.Modulate = new Color(0.85f, 0.87f, 0.92f);
-
-        string localAid = aid;
-        card.GuiInput += (InputEvent @event) =>
-        {
-            if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
-                SelectAchievement(localAid);
-        };
-
-        var hbox = new HBoxContainer();
-        hbox.AddThemeConstantOverride("separation", 12);
-        card.AddChild(hbox);
-
-        var thumbWrap = new Control { CustomMinimumSize = new Vector2(64, 64) };
-        thumbWrap.MouseFilter = MouseFilterEnum.Ignore;
-        hbox.AddChild(thumbWrap);
-
-        Texture2D? tex = AssetLoader.TryLoad<Texture2D>(ach.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "")
-            ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
-        if (tex != null)
-        {
-            var thumb = new TextureRect
-            {
-                Texture = tex,
-                ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
-                StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-                AnchorRight = 1.0f,
-                AnchorBottom = 1.0f,
-                MouseFilter = MouseFilterEnum.Ignore
-            };
-            if (!unlocked)
-                thumb.Modulate = LockedDim;
-            thumbWrap.AddChild(thumb);
-        }
-
-        var vbox = new VBoxContainer
-        {
-            SizeFlagsHorizontal = SizeFlags.ExpandFill,
-            Alignment = BoxContainer.AlignmentMode.Center
-        };
-        vbox.AddThemeConstantOverride("separation", 4);
-        vbox.MouseFilter = MouseFilterEnum.Ignore;
-        hbox.AddChild(vbox);
-
-        var title = new Label
-        {
-            Text = (unlocked ? "✅ " : "🔒 ") + ach["title"].AsString(),
-            MouseFilter = MouseFilterEnum.Ignore
-        };
-        title.AddThemeFontSizeOverride("font_size", 15);
-        title.AddThemeColorOverride("font_color",
-            unlocked ? new Color(0.94f, 0.99f, 0.98f) : new Color(0.62f, 0.66f, 0.72f));
-        vbox.AddChild(title);
-
-        var mini = new ProgressBar
-        {
-            MinValue = 0,
-            MaxValue = 100,
-            Value = pct,
-            ShowPercentage = false,
-            CustomMinimumSize = new Vector2(0, 10),
-            MouseFilter = MouseFilterEnum.Ignore
-        };
-        vbox.AddChild(mini);
-
-        _cards[aid] = card;
-        return card;
     }
 
     private void RefreshCardSelection()

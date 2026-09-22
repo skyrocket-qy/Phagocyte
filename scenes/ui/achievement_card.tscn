@@ -1,0 +1,31 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/AchievementCard.cs" id="1_card"]
+
+[node name="AchievementCard" type="PanelContainer"]
+mouse_default_cursor_shape = 2
+script = ExtResource("1_card")
+
+[node name="HBox" type="HBoxContainer" parent="."]
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="ThumbWrap" type="Control" parent="HBox"]
+custom_minimum_size = Vector2(64, 64)
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="HBox"]
+mouse_filter = 2
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="HBox/VBox"]
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+
+[node name="MiniProgress" type="ProgressBar" parent="HBox/VBox"]
+custom_minimum_size = Vector2(0, 10)
+mouse_filter = 2
+max_value = 100.0
+show_percentage = false

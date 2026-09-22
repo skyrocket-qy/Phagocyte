@@ -1,0 +1,303 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/AchievementGalleryView.cs" id="1_gallery"]
+
+[ext_resource type="Font" path="res://assets/fonts/BodyMediumFont.tres" id="8_btn_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.07, 0.11, 0.16, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.35, 0.5, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.05, 0.09, 0.14, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.45, 0.6, 0.7)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+bg_color = Color(0.07, 0.2, 0.16, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.39, 1, 0.85, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.05, 0.1, 0.15, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0.7, 0.85, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="AchievementView" type="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_gallery")
+
+[node name="HeaderLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 24.0
+offset_right = 300.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 26
+text = "成就收藏"
+horizontal_alignment = 1
+
+[node name="ProgressHBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -460.0
+offset_top = 64.0
+offset_right = 460.0
+offset_bottom = 88.0
+grow_horizontal = 2
+theme_override_constants/separation = 12
+
+[node name="ProgressBar" type="ProgressBar" parent="ProgressHBox"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+show_percentage = false
+
+[node name="ProgressLabel" type="Label" parent="ProgressHBox"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
+theme_override_font_sizes/font_size = 13
+text = "0 / 0"
+horizontal_alignment = 2
+
+[node name="FilterHBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -330.0
+offset_top = 94.0
+offset_right = 330.0
+offset_bottom = 130.0
+grow_horizontal = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="FilterAllButton" type="Button" parent="FilterHBox"]
+custom_minimum_size = Vector2(200, 34)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "全部"
+
+[node name="FilterUnlockedButton" type="Button" parent="FilterHBox"]
+custom_minimum_size = Vector2(200, 34)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "已解锁"
+
+[node name="FilterLockedButton" type="Button" parent="FilterHBox"]
+custom_minimum_size = Vector2(200, 34)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
+theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
+theme_override_colors/font_pressed_color = Color(0, 0.79, 0.33, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
+theme_override_fonts/font = ExtResource("8_btn_font")
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+text = "未解锁"
+
+[node name="HBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -590.0
+offset_top = 140.0
+offset_right = 590.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="CardScroll" type="ScrollContainer" parent="HBox"]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="CardList" type="VBoxContainer" parent="HBox/CardScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="DetailPanel" type="PanelContainer" parent="HBox"]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="DetailVBox" type="VBoxContainer" parent="HBox/DetailPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DetailTopHBox" type="HBoxContainer" parent="HBox/DetailPanel/DetailVBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="DetailImageWrap" type="Control" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox"]
+custom_minimum_size = Vector2(192, 192)
+layout_mode = 2
+
+[node name="DetailImage" type="TextureRect" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailImageWrap"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DetailFallbackIcon" type="Label" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailImageWrap"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 96
+text = "🏆"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DetailTitleVBox" type="VBoxContainer" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="DetailTitle" type="Label" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailTitleVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 24
+text = "成就名称"
+autowrap_mode = 3
+
+[node name="DetailBadge" type="Label" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailTitleVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ 进行中 ]"
+
+[node name="DetailProgressLabel" type="Label" parent="HBox/DetailPanel/DetailVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+text = "0 / 1 (0%)"
+
+[node name="DetailProgress" type="ProgressBar" parent="HBox/DetailPanel/DetailVBox"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+max_value = 100.0
+show_percentage = false
+
+[node name="DetailDesc" type="Label" parent="HBox/DetailPanel/DetailVBox"]
+layout_mode = 2
+theme_override_constants/line_spacing = 6
+theme_override_font_sizes/font_size = 14
+text = "达成条件"
+autowrap_mode = 3
+
+[node name="DetailReward" type="Label" parent="HBox/DetailPanel/DetailVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
+theme_override_constants/line_spacing = 6
+theme_override_font_sizes/font_size = 14
+text = "奖励"
+autowrap_mode = 3
+
+[node name="DetailSteam" type="Label" parent="HBox/DetailPanel/DetailVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.62, 0.72, 1)
+theme_override_font_sizes/font_size = 12
+text = "Steam: -"
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -240.0
+offset_top = -100.0
+offset_right = 240.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 40
+alignment = 1
