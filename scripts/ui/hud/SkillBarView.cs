@@ -24,6 +24,11 @@ public partial class SkillBarView : Node
     public Label? TooltipDesc { get; set; }
     public Label? TooltipBio { get; set; }
 
+    /// <summary>Chamber energy row (built once, only shown while the player engages organelles).</summary>
+    public HBoxContainer? ChamberRow { get; set; }
+    public Label? ChamberLabel { get; set; }
+    public EnergyPips? ChamberPips { get; set; }
+
     public int HoveredSlotIdx { get; set; } = -1;
 
     public Node2D? PlayerRef { get; set; }
@@ -44,6 +49,44 @@ public partial class SkillBarView : Node
         TooltipStats = root.GetNodeOrNull<Label>("SkillTooltip/VBox/TooltipStats");
         TooltipDesc = root.GetNodeOrNull<Label>("SkillTooltip/VBox/TooltipDesc");
         TooltipBio = root.GetNodeOrNull<Label>("SkillTooltip/VBox/TooltipBio");
+
+        // Chamber energy row (Phase 2): code-built so the shared hud.tscn
+        // stays untouched; only visible once the player engages organelles.
+        ChamberRow = root.GetNodeOrNull<HBoxContainer>("SkillContainer/VBox/ChamberRow");
+        if (ChamberRow == null)
+        {
+            ChamberRow = new HBoxContainer
+            {
+                Name = "ChamberRow",
+                Alignment = BoxContainer.AlignmentMode.Center,
+                MouseFilter = Control.MouseFilterEnum.Ignore,
+                Visible = false
+            };
+            ChamberRow.AddThemeConstantOverride("separation", 6);
+            ChamberLabel = new Label
+            {
+                Name = "ChamberLabel",
+                MouseFilter = Control.MouseFilterEnum.Ignore
+            };
+            ChamberLabel.AddThemeFontSizeOverride("font_size", 12);
+            ChamberLabel.AddThemeColorOverride("font_color", new Color(0.45f, 0.92f, 1.0f));
+            ChamberPips = new EnergyPips
+            {
+                Name = "ChamberPips",
+                CustomMinimumSize = new Vector2(92, 16),
+                MouseFilter = Control.MouseFilterEnum.Ignore,
+                MaxDiameter = 14.0f,
+                Gap = 3.0f
+            };
+            ChamberRow.AddChild(ChamberLabel);
+            ChamberRow.AddChild(ChamberPips);
+            root.GetNodeOrNull<VBoxContainer>("SkillContainer/VBox")?.AddChild(ChamberRow);
+        }
+        else
+        {
+            ChamberLabel = ChamberRow.GetNodeOrNull<Label>("ChamberLabel");
+            ChamberPips = ChamberRow.GetNodeOrNull<EnergyPips>("ChamberPips");
+        }
     }
 
     /// <summary>Dynamic transparency: 35% in combat, 100% on hover/pause.</summary>
@@ -223,6 +266,39 @@ public partial class SkillBarView : Node
                 }
             }
         }
+
+        UpdateChamberRow();
+    }
+
+    /// <summary>
+    /// Refreshes the chamber energy row from the player's chamber (Phase 2).
+    /// Shown only once the player engages organelles; overloaded states tint red.
+    /// </summary>
+    public void UpdateChamberRow()
+    {
+        OrganelleChamber? chamber = null;
+        if (PlayerRef != null && GodotObject.IsInstanceValid(PlayerRef))
+            chamber = PlayerRef.GetNodeOrNull<OrganelleChamber>("OrganelleChamber");
+
+        int used = chamber?.UsedEnergy ?? 0;
+        int max = chamber?.MaxEnergy ?? OrganelleChamber.BaseEnergy;
+        bool engaged = (chamber?.EquippedCount ?? 0) > 0 || (chamber?.Backpack.Count ?? 0) > 0;
+
+        if (ChamberRow != null)
+            ChamberRow.Visible = engaged;
+        if (!engaged)
+            return;
+
+        if (ChamberLabel != null)
+        {
+            ChamberLabel.Text = "⚡ " + TextFormatter.Format(Tr("LOADOUT_ENERGY_FMT"), used, max);
+            bool overloaded = used > max;
+            ChamberLabel.Modulate = overloaded
+                ? new Color(1.0f, 0.45f, 0.45f)
+                : new Color(0.45f, 0.92f, 1.0f);
+        }
+        if (ChamberPips != null)
+            ChamberPips.Configure(max, used, chamber?.GeneratorCount ?? 0);
     }
 
     /// <summary>Forwarded GDScript <c>level_up</c> signal (coordinator routes it to the tutorial view).</summary>

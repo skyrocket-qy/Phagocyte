@@ -691,3 +691,9 @@ LOADOUT_HINT_LOCKED,Locked — pathogens drop it at a low chance.,尚未解锁�
 LOADOUT_DETAIL_LOCKED,"Locked. Defeat pathogens for a chance to recover it.","尚未解锁。击杀病原体有几率回收。","尚未解鎖。擊殺病原體有機率回收。","未解放。病原体を倒すと低確率で回収できます。","Gesperrt. Besiege Pathogene für eine Chance auf Bergung.","Verrouillé. Vainquez des pathogènes pour le récupérer.","Закрыто. Побеждайте патогены, чтобы найти его.","Bloqueado. Derrota patógenos para recuperarlo."
 TOAST_ORGANELLE_UNLOCKED,🔓 Organelle Recovered!,🔓 胞器回收成功！,🔓 胞器回收成功！,🔓 オルガネラ回収！,🔓 Organelle geborgen!,🔓 Organite récupéré !,🔓 Органелла получена!,¡🔓 Orgánulo recuperado!
 LOADOUT_COST_LABEL,Energy,能量,能量,エネルギー,Energie,Énergie,Энергия,Energía
+BADGE_NEW_ORGANELLE,New Organelle,新胞器,新胞器,新規オルガネラ,Neue Organelle,Nouvel organite,Новая органелла,Nuevo orgánulo
+SWAP_TITLE,Choose a chamber slot to replace,选择要替换的槽位,選擇要替換的槽位,置換するスロットを選択,Zu ersetzenden Kammerplatz wählen,Choisissez l’emplacement à remplacer,Выберите слот для замены,Elige el espacio a reemplazar
+SWAP_STORE,Store in Backpack,存入背包,存入背包,バックパックへ保管,In Rucksack legen,Mettre dans le sac,Положить в сумку,Guardar en la mochila
+SWAP_DISCARD,Discard + Heal,丢弃＋回血,丟棄＋回血,破棄＋回復,Wegwerfen + Heilen,Jeter + soin,Выбросить + лечение,Descartar + curar
+SWAP_CANCEL,Back to 3 Choices,返回三选一,返回三選一,3択に戻る,Zurück zur 3er-Wahl,Retour aux 3 choix,Назад к 3 вариантам,Volver a las 3 opciones
+SWAP_HINT,Click a slot to replace it; store, discard for a heal, or go back.,点击槽位替换；或存入背包、丢弃回血、返回。,點擊槽位替換；或存入背包、丟棄回血、返回。,スロットクリックで置換。保管・破棄（回復）・戻るも可。,Klicke einen Platz zum Ersetzen; lagern, wegwerfen (Heilung) oder zurück.,Cliquez un emplacement pour remplacer ; stockez, jetez (soin) ou revenez.,Нажмите слот для замены; сохраните, выбросьте (лечение) или вернитесь.,Haz clic en un espacio para reemplazar; guarda, descarta (curar) o vuelve.

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://epluj3fksdbj"]
 
 [ext_resource type="Script" path="res://scripts/ui/UpgradeModal.cs" id="1_modal"]
+[ext_resource type="Script" path="res://scripts/ui/EnergyPips.cs" id="2_pips"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg_dim"]
 bg_color = Color(0.02, 0.04, 0.07, 0.78)
@@ -90,6 +91,87 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_constants/separation = 24
 alignment = 1
+
+[node name="SwapPanel" type="VBoxContainer" parent="CenterContainer/VBox"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SwapTitle" type="Label" parent="CenterContainer/VBox/SwapPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "选择要替换的槽位"
+horizontal_alignment = 1
+
+[node name="SwapCandidate" type="Label" parent="CenterContainer/VBox/SwapPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "新胞器"
+horizontal_alignment = 1
+
+[node name="SwapEnergyRow" type="HBoxContainer" parent="CenterContainer/VBox/SwapPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="SwapEnergyLabel" type="Label" parent="CenterContainer/VBox/SwapPanel/SwapEnergyRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "0 / 6"
+
+[node name="SwapEnergyPips" type="Control" parent="CenterContainer/VBox/SwapPanel/SwapEnergyRow"]
+custom_minimum_size = Vector2(168, 20)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("2_pips")
+MaxDiameter = 18.0
+Gap = 5.0
+AlignLeft = false
+
+[node name="SwapSlots" type="GridContainer" parent="CenterContainer/VBox/SwapPanel"]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 4
+alignment = 1
+
+[node name="SwapHint" type="Label" parent="CenterContainer/VBox/SwapPanel"]
+custom_minimum_size = Vector2(560, 22)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.82, 0.9, 0.9)
+theme_override_font_sizes/font_size = 12
+text = "点击槽位替换；或存入背包、丢弃回血。"
+horizontal_alignment = 1
+
+[node name="SwapRow" type="HBoxContainer" parent="CenterContainer/VBox/SwapPanel"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="StoreButton" type="Button" parent="CenterContainer/VBox/SwapPanel/SwapRow"]
+custom_minimum_size = Vector2(170, 42)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "存入背包"
+
+[node name="DiscardButton" type="Button" parent="CenterContainer/VBox/SwapPanel/SwapRow"]
+custom_minimum_size = Vector2(170, 42)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 0.62, 0.55, 1)
+theme_override_font_sizes/font_size = 14
+text = "丢弃＋回血"
+
+[node name="CancelButton" type="Button" parent="CenterContainer/VBox/SwapPanel/SwapRow"]
+custom_minimum_size = Vector2(170, 42)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "返回三选一"
 
 [node name="Card0" type="PanelContainer" parent="CenterContainer/VBox/CardsContainer"]
 custom_minimum_size = Vector2(260, 340)

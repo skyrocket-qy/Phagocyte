@@ -51,6 +51,10 @@ public partial class TestSurvivorHudUx : TestHarness
             player.CurrentExp = 0.0f;
             player.ExpToNextLevel = 30.0f;
             player.Health = player.MaxHealth;
+            // The cell's own physics ticks auto-firing skills; a kill would
+            // award ambient EXP and open the draft modal (pausing the tree),
+            // which flips the HUD back to its hover alpha.
+            player.SetPhysicsProcess(false);
         }
         // The bar renders a cached snapshot fed by the ExpChanged signal, so a
         // direct player reset alone leaves stale values on screen: reset the
@@ -60,8 +64,14 @@ public partial class TestSurvivorHudUx : TestHarness
         {
             hud.LastCurrentExp = 0.0f;
             hud.LastExpToNext = 30.0f;
+            hud.LastLevel = 1;
             hud.UpdateExpDisplay();
+            if (hud.CellUpgradeModal != null)
+                hud.CellUpgradeModal.Visible = false;
+            hud.ResetTutorialCues();
         }
+        Paused = false;
+        Engine.TimeScale = 1.0;
     }
 
     private static void ClearArenaEntities(Node root)
@@ -91,6 +101,10 @@ public partial class TestSurvivorHudUx : TestHarness
             return false;
 
         _testDone = true;
+        // Re-run the isolation at the assertion frame: an ambient level-up
+        // during the settle frames would open the draft modal and pause the
+        // tree before these HUD assertions (docs/AGENTS.md determinism rules).
+        IsolateArena();
         var main = Root.GetNodeOrNull<Node2D>("Main");
         AssertThat(main).IsNotNull();
 

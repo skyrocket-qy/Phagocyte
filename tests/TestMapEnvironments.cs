@@ -280,6 +280,11 @@ public partial class TestMapEnvironments : TestHarness
 
         player.GlobalPosition = surge.GlobalPosition;
         float hpOutside = player.Health;
+        // Zero the defensive RNG before a damage assert (docs/AGENTS.md):
+        // the macrophage chassis ships 8% glycocalyx block, which otherwise
+        // lets the corrosion tick be blocked ~8% of runs.
+        player.Stats!.SetBase("block", 0.0f);
+        player.Stats.SetBase("evasion", 0.0f);
         main.OrganEnvironment.Tick(main, 1.0f);
         AssertThat(player.Health).IsLess(hpOutside);
 

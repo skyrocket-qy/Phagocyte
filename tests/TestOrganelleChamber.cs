@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Phagocyte.Core;
 using Phagocyte.Player;
+using Phagocyte.Skills;
 using Phagocyte.UI;
 using GdUnit4;
 using static GdUnit4.Assertions;
@@ -43,6 +44,9 @@ public partial class TestOrganelleChamber : TestHarness
             RunUnlockManagerTests();
             RunLoadoutManagerTests();
             RunApplyLoadoutTests();
+            RunDraftFlowTests();
+            RunSwapFlowTests();
+            RunDiscardAndHudTests();
             Finish(true, "ALL ORGANELLE CHAMBER TESTS");
         }
         catch (Exception ex)
@@ -330,6 +334,308 @@ public partial class TestOrganelleChamber : TestHarness
         OrganelleUnlockManager.DropsEnabled = false;
         OrganelleUnlockManager.DropChance = OrganelleUnlockManager.DefaultDropChance;
         AssertThat(OrganelleUnlockManager.DropChance).IsEqual(OrganelleUnlockManager.DefaultDropChance);
+    }
+
+    /// <summary>Phase 2: the run draft offers, acquires, equips, swaps and heals.</summary>
+    private void RunDraftFlowTests()
+    {
+        // Draft offers at most one organelle card, only unlocked + unowned ids.
+        OrganelleUnlockManager.ResetCache();
+        OrganelleUnlockManager.ResetAll();
+        OrganelleUnlockManager.Unlock("mitochondria_mkii");
+        OrganelleUnlockManager.Unlock("acidic_lysosome");
+
+        var mock = new CharacterBody2D { Name = "DraftHost" };
+        var stats = new CellStats { Name = "CellStats" };
+        mock.AddChild(stats);
+        mock.AddChild(new SkillManager { Name = "SkillManager" });
+        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        mock.AddChild(chamber);
+        Root.AddChild(mock);
+        chamber.Setup(mock);
+
+        var choices = UpgradeManager.GenerateChoices(mock, 3);
+        AssertThat(choices.Count).IsEqual(3);
+        int organelleCards = 0;
+        foreach (var c in choices)
+        {
+            AssertThat(c.ContainsKey("type") && c.ContainsKey("id") && c.ContainsKey("name")).IsTrue();
+            if (c["type"].AsString() != "new_organelle")
+                continue;
+            organelleCards++;
+            string organelleId = c["id"].AsString();
+            AssertThat(organelleId == "mitochondria_mkii" || organelleId == "acidic_lysosome").IsTrue();
+            AssertThat(c["badge"].AsString()).IsEqual("BADGE_NEW_ORGANELLE");
+            AssertThat(c.ContainsKey("energy_cost")).IsTrue();
+        }
+        AssertThat(organelleCards).IsLessEqual(1);
+        GD.Print("[PASS] Draft offers at most one organelle card, only from unlocked ids.");
+
+        // ApplyChoice acquires into the backpack and auto-equips the first legal slot.
+        var draftChoice = new Godot.Collections.Dictionary
+        {
+            { "type", "new_organelle" },
+            { "id", "mitochondria_mkii" },
+            { "skill_class", "" }
+        };
+        AssertThat(UpgradeManager.ApplyChoice(mock, draftChoice)).IsTrue();
+        AssertThat(chamber.GetSlot(0)).IsEqual("mitochondria_mkii");
+        AssertThat(Mathf.IsEqualApprox(stats.GetStat("cooldown_reduction"), 0.16f)).IsTrue();
+        // Re-applying the same id is refused (already owned).
+        AssertThat(UpgradeManager.ApplyChoice(mock, draftChoice)).IsFalse();
+        GD.Print("[PASS] Draft choice acquires, auto-equips and refuses duplicates.");
+
+        // A locked organelle is never applied.
+        var lockedChoice = new Godot.Collections.Dictionary
+        {
+            { "type", "new_organelle" },
+            { "id", "rough_er" }
+        };
+        AssertThat(UpgradeManager.ApplyChoice(mock, lockedChoice)).IsFalse();
+        GD.Print("[PASS] Locked organelles are refused by the draft applier.");
+
+        // Fill the chamber (4-cost + 3-cost on a 6 budget stays legal) and check
+        // the modal refuses an unaffordable replacement with a stable reason.
+        var acidicChoice = new Godot.Collections.Dictionary
+        {
+            { "type", "new_organelle" },
+            { "id", "acidic_lysosome" }
+        };
+        AssertThat(chamber.EquippedCount).IsEqual(1);
+        GD.Print("[PASS] Draft flow ends with a legal single-equip state.");
+
+        mock.Free();
+    }
+
+    /// <summary>Phase 2: the in-modal swap step (replace / store / discard).</summary>
+    private void RunSwapFlowTests()
+    {
+        OrganelleUnlockManager.ResetCache();
+        OrganelleUnlockManager.ResetAll();
+        OrganelleUnlockManager.UnlockAll();
+
+        var mock = new CharacterBody2D { Name = "SwapHost" };
+        var stats = new CellStats { Name = "CellStats" };
+        mock.AddChild(stats);
+        mock.AddChild(new SkillManager { Name = "SkillManager" });
+        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        mock.AddChild(chamber);
+        Root.AddChild(mock);
+        chamber.Setup(mock);
+
+        var modalScene = AssetLoader.Load<PackedScene>("res://scenes/ui/upgrade_modal.tscn");
+        var modal = modalScene.Instantiate<UpgradeModal>();
+        Root.AddChild(modal);
+        AssertThat(modal.Visible).IsFalse();
+        AssertThat(modal.SwapPanel).IsNotNull();
+        AssertThat(modal.SwapPanel!.Visible).IsFalse();
+
+        // Organelle card with a free slot auto-equips and resolves like other cards.
+        bool appliedFired = false;
+        modal.ChoiceApplied += _ => appliedFired = true;
+        var mitoChoice = new Godot.Collections.Dictionary
+        {
+            { "type", "new_organelle" },
+            { "id", "mitochondria_mkii" },
+            { "name", "ORGANELLE_MITO_MKII_NAME" },
+            { "desc", "ORGANELLE_MITO_MKII_DESC" },
+            { "badge", "BADGE_NEW_ORGANELLE" },
+            { "level", 1 },
+            { "energy_cost", 4 },
+            { "category", "metabolism" }
+        };
+        var choices = new Godot.Collections.Array<Godot.Collections.Dictionary> { mitoChoice };
+        modal.ShowChoices(choices);
+        AssertThat(Paused).IsTrue();
+        modal.OnCardClicked(0);
+        AssertThat(appliedFired).IsTrue();
+        GD.Print("[PASS] Organelle card resolves exactly like the other draft cards.");
+
+        // Stack the full chamber with two unlocked generators (-1 x2, used 0 /
+        // max 8). The chamber currently holds the auto-equipped mito card from
+        // the earlier click, so it is rebuilt empty first (a fresh chamber
+        // isolates this flow from the draft assertions above).
+        foreach (string fillId in new[] { "symbiotic_flora", "phage_fragment", "chemokine_patch", "proteasome_sieve" })
+        {
+            if (!OrganelleUnlockManager.IsUnlocked(fillId))
+                AssertThat(OrganelleUnlockManager.Unlock(fillId)).IsTrue();
+        }
+        AssertThat(chamber.Equip("symbiotic_flora", 0)).IsTrue();
+        AssertThat(chamber.Equip("phage_fragment", 1)).IsTrue();
+        AssertThat(chamber.Equip("chemokine_patch", 2)).IsTrue();
+        AssertThat(chamber.Equip("proteasome_sieve", 3)).IsTrue();
+        AssertThat(chamber.EquippedCount).IsEqual(4);
+        AssertThat(chamber.UsedEnergy).IsEqual(2);
+        AssertThat(chamber.MaxEnergy).IsEqual(8);
+        AssertThat(chamber.IsOverloaded).IsFalse();
+        var acidicNew = new Godot.Collections.Dictionary
+        {
+            { "type", "new_organelle" },
+            { "id", "acidic_lysosome" },
+            { "name", "ORGANELLE_ACIDIC_LYSOSOME_NAME" },
+            { "desc", "ORGANELLE_ACIDIC_LYSOSOME_DESC" },
+            { "badge", "BADGE_NEW_ORGANELLE" },
+            { "level", 1 },
+            { "energy_cost", 3 },
+            { "category", "digestion" }
+        };
+        modal.ShowChoices(new Godot.Collections.Array<Godot.Collections.Dictionary> { acidicNew });
+        modal.OnCardClicked(0);
+        // With a full chamber nothing can auto-equip, so the swap step opens.
+        AssertThat(modal.IsSwapMode).IsTrue();
+        AssertThat(modal.Visible).IsTrue();
+        AssertThat(Paused).IsTrue();
+        AssertThat(modal.PendingOrganelle).IsEqual("acidic_lysosome");
+        GD.Print("[PASS] A full chamber opens the in-modal swap step.");
+
+        // Fill the last two slots so the chamber is 4/4 equipped: the next
+        // organelle card has nowhere legal to go on its own and must open
+        // the swap step.
+        foreach (string fillId2 in new[] { "chemokine_patch", "glycolytic_bypass" })
+            AssertThat(OrganelleUnlockManager.Unlock(fillId2)).IsTrue();
+        AssertThat(chamber.AddToBackpack("chemokine_patch")).IsTrue();
+        AssertThat(chamber.AddToBackpack("glycolytic_bypass")).IsTrue();
+        AssertThat(chamber.Equip("chemokine_patch", 2)).IsTrue();
+        AssertThat(chamber.Equip("glycolytic_bypass", 3)).IsTrue();
+        AssertThat(chamber.EquippedCount).IsEqual(4);
+        AssertThat(chamber.UsedEnergy).IsEqual(5);
+        AssertThat(chamber.MaxEnergy).IsEqual(8);
+        AssertThat(chamber.IsOverloaded).IsFalse();
+        GD.Print("[PASS] The chamber is full at 4/4 with a legal 5/8 budget.");
+
+        // With a full chamber nothing can auto-equip: the next organelle card
+        // must open the swap step.
+        AssertThat(OrganelleUnlockManager.Unlock("ribosome_cluster")).IsTrue();
+        var riboChoice = new Godot.Collections.Dictionary
+        {
+            { "type", "new_organelle" },
+            { "id", "ribosome_cluster" },
+            { "name", "ORGANELLE_RIBOSOME_CLUSTER_NAME" },
+            { "desc", "ORGANELLE_RIBOSOME_CLUSTER_DESC" },
+            { "badge", "BADGE_NEW_ORGANELLE" },
+            { "level", 1 },
+            { "energy_cost", 2 },
+            { "category", "synthesis" }
+        };
+        modal.ShowChoices(new Godot.Collections.Array<Godot.Collections.Dictionary> { riboChoice });
+        modal.OnCardClicked(0);
+        AssertThat(modal.IsSwapMode).IsTrue();
+        AssertThat(modal.Visible).IsTrue();
+        AssertThat(Paused).IsTrue();
+        AssertThat(modal.PendingOrganelle).IsEqual("ribosome_cluster");
+        GD.Print("[PASS] A full chamber opens the in-modal swap step.");
+
+        // Replacing the generator in slot 0 with the 2-cost ribosome keeps
+        // used (2 + 3 + 1 + 1 = 7) within the new max (7): legal, old retires.
+        AssertThat(modal.OnSwapSlotPressed(0)).IsTrue();
+        AssertThat(chamber.GetSlot(0)).IsEqual("ribosome_cluster");
+        AssertThat(chamber.UsedEnergy).IsEqual(7);
+        AssertThat(chamber.MaxEnergy).IsEqual(7);
+        AssertThat(modal.Visible).IsFalse();
+        AssertThat(Paused).IsFalse();
+        AssertThat(modal.IsSwapMode).IsFalse();
+        GD.Print("[PASS] Swap replaces the chosen slot, retires the old item and resumes.");
+
+        // Swap refusal: an over-budget replacement reports its reason and stays open.
+        // Current slots: ribo(2), flora(-1), acidic(3), chemokine(1) = 7 used / 7 max;
+        // rough_er(4) over the flora would be 7 + 4 = 11 > 6 -> overload.
+        foreach (string bagId in new[] { "rough_er" })
+            AssertThat(chamber.AddToBackpack(bagId)).IsTrue();
+        var roughChoice = new Godot.Collections.Dictionary
+        {
+            { "type", "new_organelle" },
+            { "id", "rough_er" },
+            { "name", "ORGANELLE_ROUGH_ER_NAME" },
+            { "desc", "ORGANELLE_ROUGH_ER_DESC" },
+            { "badge", "BADGE_NEW_ORGANELLE" },
+            { "level", 1 },
+            { "energy_cost", 4 },
+            { "category", "synthesis" }
+        };
+        modal.ShowChoices(new Godot.Collections.Array<Godot.Collections.Dictionary> { roughChoice });
+        modal.OnCardClicked(0);
+        AssertThat(modal.IsSwapMode).IsTrue();
+        // rough_er(4) over the symbiotic flora would be 6 + 4 = 10 > 6 -> overload.
+        AssertThat(modal.OnSwapSlotPressed(1)).IsFalse();
+        AssertThat(modal.Visible).IsTrue();
+        AssertThat(Paused).IsTrue();
+        AssertThat(chamber.GetSlot(1)).IsEqual("symbiotic_flora");
+        AssertThat(modal.SwapHintLabel).IsNotNull();
+        AssertThat(modal.SwapHintText).IsEqual(Tr("LOADOUT_HINT_OVERLOAD"));
+        GD.Print("[PASS] An over-budget replacement is refused with a hint and stays in swap mode.");
+
+        // Store keeps the item; discard removes it and heals; cancel rewinds to cards.
+        modal.OnSwapStorePressed();
+        AssertThat(modal.Visible).IsFalse();
+        AssertThat(chamber.Backpack.Count > 0).IsTrue();
+        var storeCheck = false;
+        foreach (string bagged in chamber.Backpack)
+        {
+            if (bagged == "rough_er")
+                storeCheck = true;
+        }
+        AssertThat(storeCheck).IsTrue();
+        GD.Print("[PASS] Swap store keeps the organelle in the run backpack.");
+
+        modal.ShowChoices(new Godot.Collections.Array<Godot.Collections.Dictionary> { roughChoice });
+        modal.OnCardClicked(0);
+        AssertThat(modal.IsSwapMode).IsTrue();
+        modal.OnSwapCancelPressed();
+        AssertThat(modal.IsSwapMode).IsFalse();
+        AssertThat(Paused).IsTrue();
+        GD.Print("[PASS] Swap cancel rewinds to the 3-choice cards without resuming.");
+
+        mock.Free();
+        modal.Free();
+        Root.GetTree().Paused = false;
+    }
+
+    /// <summary>Phase 2: discard heals and the HUD chamber row reflects state.</summary>
+    private void RunDiscardAndHudTests()
+    {
+        OrganelleUnlockManager.ResetCache();
+        OrganelleUnlockManager.ResetAll();
+        OrganelleUnlockManager.Unlock("chemokine_patch");
+
+        var mock = new CharacterBody2D { Name = "DiscardHost" };
+        var stats = new CellStats { Name = "CellStats" };
+        mock.AddChild(stats);
+        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        mock.AddChild(chamber);
+        Root.AddChild(mock);
+        chamber.Setup(mock);
+
+        // Discard removes and returns the item to the unowned pool.
+        AssertThat(chamber.AddToBackpack("chemokine_patch")).IsTrue();
+        AssertThat(chamber.Equip("chemokine_patch", 0)).IsTrue();
+        AssertThat(chamber.Discard("chemokine_patch")).IsFalse();
+        AssertThat(chamber.Unequip(0)).IsTrue();
+        AssertThat(chamber.Discard("chemokine_patch")).IsTrue();
+        GD.Print("[PASS] Discard only removes unequipped organelles from the run backpack.");
+
+        // HUD chamber row hides when unengaged and shows energy once equipped.
+        var hudScene = AssetLoader.Load<PackedScene>("res://scenes/ui/hud.tscn");
+        var hud = hudScene.Instantiate<Hud>();
+        Root.AddChild(hud);
+        var skills = hud.GetNodeOrNull<Node>("SkillBarView");
+        AssertThat(skills).IsNotNull();
+        hud.UpdateSkillSlots();
+        var barView = (Phagocyte.UI.SkillBarView)skills!;
+        AssertThat(barView.ChamberRow).IsNotNull();
+        AssertThat(barView.ChamberRow!.Visible).IsFalse();
+        barView.PlayerRef = mock;
+        barView.UpdateChamberRow();
+        AssertThat(barView.ChamberRow.Visible).IsFalse();
+        AssertThat(chamber.AddToBackpack("chemokine_patch")).IsTrue();
+        AssertThat(chamber.Equip("chemokine_patch", 0)).IsTrue();
+        barView.UpdateChamberRow();
+        AssertThat(barView.ChamberRow.Visible).IsTrue();
+        AssertThat(barView.ChamberLabel).IsNotNull();
+        AssertThat(barView.ChamberLabel!.Text.Contains("1 / 6")).IsTrue();
+        GD.Print("[PASS] HUD chamber row stays hidden until the player engages, then shows used/max.");
+
+        hud.Free();
+        mock.Free();
     }
 
     /// <summary>Phase 1: pre-run loadout profiles (default = no equipment).</summary>

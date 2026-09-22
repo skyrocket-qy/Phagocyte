@@ -267,6 +267,39 @@ public partial class UpgradeManager : RefCounted
             }
         }
 
+        // Organelles (TODO Phase 2): only unlocked and not-yet-owned ids are
+        // offered, and at most one organelle card joins each draft so the swap
+        // flow always resolves a single pending item.
+        var chamberNode = player.GetNodeOrNull<OrganelleChamber>("OrganelleChamber");
+        if (chamberNode != null)
+        {
+            var organelleCandidates = new Array<Dictionary>();
+            foreach (string organelleId in GameManager.OrganelleCatalog.Keys)
+            {
+                if (!OrganelleUnlockManager.IsUnlocked(organelleId))
+                    continue;
+                if (chamberNode.Owns(organelleId))
+                    continue;
+                var organelleEntry = (Dictionary)GameManager.OrganelleCatalog[organelleId];
+                organelleCandidates.Add(new Dictionary
+                {
+                    { "type", "new_organelle" },
+                    { "id", organelleId },
+                    { "name", organelleEntry["name_key"] },
+                    { "icon", organelleEntry["icon"] },
+                    { "image_path", organelleEntry["image_path"] },
+                    { "level", 1 },
+                    { "badge", "BADGE_NEW_ORGANELLE" },
+                    { "desc", organelleEntry["desc_key"] },
+                    { "energy_cost", organelleEntry["energy_cost"] },
+                    { "category", organelleEntry["category"] }
+                });
+            }
+            organelleCandidates.Shuffle();
+            if (organelleCandidates.Count > 0)
+                candidates.Add(organelleCandidates[0]);
+        }
+
         // Shuffle candidates
         candidates.Shuffle();
 
@@ -344,6 +377,32 @@ public partial class UpgradeManager : RefCounted
                     }
                 }
                 break;
+            }
+
+            case "new_organelle":
+            {
+                // Acquires into the run backpack, then best-effort equips into
+                // the first legal free slot. Returns whether anything was
+                // acquired; callers (the draft modal) handle the no-room swap.
+                string organelleId = choice.TryGetValue("id", out var organelleIdVal) ? organelleIdVal.AsString() : "";
+                if (string.IsNullOrEmpty(organelleId) || !OrganelleUnlockManager.IsUnlocked(organelleId))
+                    break;
+                var organelleChamber = player.GetNodeOrNull<OrganelleChamber>("OrganelleChamber");
+                if (organelleChamber == null || organelleChamber.Owns(organelleId))
+                    break;
+                if (!organelleChamber.AddToBackpack(organelleId))
+                    break;
+                for (int slot = 0; slot < OrganelleChamber.MaxSlots; slot++)
+                {
+                    if (!string.IsNullOrEmpty(organelleChamber.GetSlot(slot)))
+                        continue;
+                    if (organelleChamber.CanEquip(organelleId, slot, out _))
+                    {
+                        organelleChamber.Equip(organelleId, slot);
+                        break;
+                    }
+                }
+                return true;
             }
 
             case "upgrade_active":

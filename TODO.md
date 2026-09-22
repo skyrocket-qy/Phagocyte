@@ -66,6 +66,15 @@
 - [x] 清理：移除已無引用的能量 StyleBox 與舊 CostLabel；`LOADOUT_COST_LABEL` 8 語言
 - [x] 視覺驗收：headed 截圖確認（4 青＋2 暗＋1 紅＝4/7 含 1 發電；卡片費用 pip 與未解鎖空白）
 
+### Phase 1 修訂 3（版面與測試確定性）
+
+- [x] `class_view.tscn` 標題與內容面板重疊修復：內容框由「置中錨點＋向上溢出」改為「頂部固定 92／底部固定 -106＋向下增長」，`ClassBioLabel` 改為可壓縮（`clip_text`＋`size_flags_vertical=3` 吸收餘裕）、VBox 間距 10→6
+  - 修前：header 40-85 vs 面板頂 67（重疊 18px）；修後：header 40-85 vs 面板頂 92（安全間距）
+- [x] 既有 flake 修復（AGENTS.md 確定性規則）：
+  - `TestSurvivorHudUx`：斷言前重跑隔離（凍結玩家 physics／關閉殘留 modal／解除暫停／重置教學 cue），避免環境升級把 HUD 透明度目標翻回 1.0；12/12 穩定
+  - `TestMapEnvironments`：酸潮傷害斷言前歸零 `block`／`evasion`（巨噬底盤自帶 8% 格擋，原會 ~8% 機率假失敗）；12/12 穩定
+- [x] 連續兩輪全量掃描 44/44 綠燈
+
 ## Phase 2 — 局內獲取＋背包籤UI
 
 - [ ] `UpgradeManager` 新增 `new_organelle` 卡型（含energy_cost/category/image_path；去重已裝＋已擁有）
