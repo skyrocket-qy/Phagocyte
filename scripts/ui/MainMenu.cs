@@ -58,6 +58,7 @@ public partial class MainMenu : Control
     public Label? TreeLevelLbl { get; set; }
     public Label? TreePointsLbl { get; set; }
     public PassiveTreeView? TreeCanvas { get; set; }
+    public StatPreviewPanel? TreeStatPanel { get; set; }
     public HBoxContainer? ProfileHBox { get; set; }
     public Button? ProfileAddBtn { get; set; }
     public Button? ProfileDeleteBtn { get; set; }
@@ -169,6 +170,7 @@ public partial class MainMenu : Control
         TreeLevelLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreeLevelLabel");
         TreePointsLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreePointsLabel");
         TreeCanvas = GetNodeOrNull<PassiveTreeView>("PassiveView/ContentHBox/TreeView");
+        TreeStatPanel = GetNodeOrNull<StatPreviewPanel>("PassiveView/ContentHBox/StatPreview");
         PassiveResetBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ResetButton");
         PassiveConfirmBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ConfirmButton");
         TreeZoomOutBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ZoomOutButton");
@@ -851,6 +853,7 @@ public partial class MainMenu : Control
         int spent = PassiveTreeManager.GetSpentPoints(ActiveTreeClassKey);
 
         TreeCanvas?.Render(ActiveTreeClassKey);
+        TreeStatPanel?.Refresh(ActiveTreeClassKey);
         if (TreeLevelLbl != null) TreeLevelLbl.Text = TextFormatter.Format(Tr("TREE_LEVEL"), level)
             + (level >= PassiveTreeManager.MaxCellLevel ? " MAX" : "");
         if (TreePointsLbl != null) TreePointsLbl.Text = TextFormatter.Format(Tr("TREE_POINTS"), available, spent);

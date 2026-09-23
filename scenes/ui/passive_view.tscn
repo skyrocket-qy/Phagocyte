@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/ui/PassiveTreeView.cs" id="5_tree"]
 [ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/stat_preview.tscn" id="6_stats"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tree_tooltip"]
 bg_color = Color(0.02, 0.05, 0.09, 0.96)
@@ -84,6 +85,11 @@ offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
+
+[node name="StatPreview" parent="ContentHBox" instance=ExtResource("6_stats")]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+size_flags_vertical = 3
 
 [node name="TreeView" type="Control" parent="ContentHBox"]
 layout_mode = 2

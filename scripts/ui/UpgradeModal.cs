@@ -122,7 +122,7 @@ public partial class UpgradeModal : ModalBase
 
         PopulateCards();
         Visible = true;
-        GetTree().Paused = true;
+        PauseManager.PushHold(GetTree(), PauseManager.UpgradeDraft);
     }
 
     private void PopulateCards()
@@ -344,7 +344,7 @@ public partial class UpgradeModal : ModalBase
         if (CardsContainer != null)
             CardsContainer.Visible = true;
         _pendingOrganelle = "";
-        GetTree().Paused = false;
+        PauseManager.PopHold(GetTree(), PauseManager.UpgradeDraft);
 
         if (_pendingLevels > 0)
         {

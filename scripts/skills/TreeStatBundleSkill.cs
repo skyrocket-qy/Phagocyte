@@ -27,26 +27,18 @@ public partial class TreeStatBundleSkill : BaseSkill
     public override void ApplyPassiveModifiers()
     {
         foreach (var modifier in _modifiers)
-            ApplyStat(modifier.Stat, FlatOf(modifier) * Level, PercentOf(modifier) * Level);
+        {
+            var (flat, pct) = PassiveTreeManager.SplitModifier(modifier, Level);
+            ApplyStat(modifier.Stat, flat, pct);
+        }
     }
 
     public override void RemovePassiveModifiers()
     {
         foreach (var modifier in _modifiers)
-            RemoveStat(modifier.Stat, FlatOf(modifier) * Level, PercentOf(modifier) * Level);
-    }
-
-    private static float FlatOf(PassiveTreeManager.TreeStatModifier modifier)
-    {
-        bool isFlatOrPoints = modifier.Unit is PassiveTreeManager.TreeModifierUnit.Flat
-            or PassiveTreeManager.TreeModifierUnit.PercentagePoints;
-        return isFlatOrPoints ? modifier.Value : 0.0f;
-    }
-
-    private static float PercentOf(PassiveTreeManager.TreeStatModifier modifier)
-    {
-        bool isFlatOrPoints = modifier.Unit is PassiveTreeManager.TreeModifierUnit.Flat
-            or PassiveTreeManager.TreeModifierUnit.PercentagePoints;
-        return isFlatOrPoints ? 0.0f : modifier.Value;
+        {
+            var (flat, pct) = PassiveTreeManager.SplitModifier(modifier, Level);
+            RemoveStat(modifier.Stat, flat, pct);
+        }
     }
 }

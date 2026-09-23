@@ -31,6 +31,23 @@ public static class PassiveTreeManager
     public readonly record struct TreeStatModifier(string Stat, float Value, TreeModifierUnit Unit);
 
     /// <summary>
+    /// Single source of truth for splitting one stack-scaled tree modifier
+    /// into flat/percent channels (mirrors the organelle modifier
+    /// convention: flat/percentage-points go flat, everything else percent).
+    /// Used by both the run-time skill
+    /// (<see cref="Phagocyte.Skills.TreeStatBundleSkill"/>) and the menu
+    /// build preview so the two can never diverge.
+    /// </summary>
+    public static (float Flat, float Pct) SplitModifier(TreeStatModifier modifier, int stacks)
+    {
+        bool isFlatOrPoints = modifier.Unit is TreeModifierUnit.Flat
+            or TreeModifierUnit.PercentagePoints;
+        return isFlatOrPoints
+            ? (modifier.Value * stacks, 0.0f)
+            : (0.0f, modifier.Value * stacks);
+    }
+
+    /// <summary>
     /// Reusable talent trait (docs/passivetree.md §1.2): nodes reference a trait
     /// by id, so identical traits always share one name, icon, rarity and
     /// modifier bundle.

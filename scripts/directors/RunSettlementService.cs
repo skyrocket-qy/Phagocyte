@@ -134,7 +134,7 @@ public partial class RunSettlementService : Node
             if (modal != null)
                 modal.OpenSettlement(record);
 
-            ctxNode.GetTree().Paused = true;
+            PauseManager.PushHold(ctxNode.GetTree(), PauseManager.Settlement);
         }
 
         return true;

@@ -85,6 +85,13 @@ public partial class PauseMenuView : Node
 
         if (@event.IsActionPressed("toggle_pause") || (@event is InputEventKey keyEvent && keyEvent.Pressed && keyEvent.Keycode == Key.Escape))
         {
+            // The C tree overlay behaves like any modal: ESC backs out of it
+            // first (restoring unpaused play) before touching pause.
+            if (TreeOverlayPanel != null && TreeOverlayPanel.Visible)
+            {
+                ToggleTreeOverlay();
+                return;
+            }
             if (CellSettingsModal != null && CellSettingsModal.Visible)
             {
                 CellSettingsModal.CloseSettings();
@@ -101,10 +108,18 @@ public partial class PauseMenuView : Node
 
     public void TogglePause()
     {
-        bool paused = !GetTree().Paused;
-        GetTree().Paused = paused;
-        if (PauseModal != null) PauseModal.Visible = paused;
-        if (!paused)
+        var tree = GetTree();
+        if (PauseModal != null && PauseModal.Visible)
+        {
+            PauseModal.Visible = false;
+            PauseManager.PopHold(tree, PauseManager.PauseMenu);
+        }
+        else
+        {
+            if (PauseModal != null) PauseModal.Visible = true;
+            PauseManager.PushHold(tree, PauseManager.PauseMenu);
+        }
+        if (PauseManager.HoldCount == 0)
         {
             if (CellCodexModal != null) CellCodexModal.Visible = false;
             if (CellSettingsModal != null) CellSettingsModal.Visible = false;
@@ -113,10 +128,13 @@ public partial class PauseMenuView : Node
 
     public void ResumeGame()
     {
-        GetTree().Paused = false;
+        var tree = GetTree();
         if (PauseModal != null) PauseModal.Visible = false;
+        if (TreeOverlayPanel != null) TreeOverlayPanel.Visible = false;
         if (CellCodexModal != null) CellCodexModal.Visible = false;
         if (CellSettingsModal != null) CellSettingsModal.Visible = false;
+        PauseManager.PopHold(tree, PauseManager.PauseMenu);
+        PauseManager.PopHold(tree, PauseManager.TreeOverlay);
     }
 
     public void OnRestartPressed()
@@ -139,6 +157,11 @@ public partial class PauseMenuView : Node
         CellSettingsModal?.OpenSettings(0);
     }
 
+    /// <summary>
+    /// In-run C overlay: opening it fully pauses the run so the build can be
+    /// read safely; closing restores play unless the pause menu owns the
+    /// pause. ESC backs out through <see cref="HandleInput"/>.
+    /// </summary>
     public void ToggleTreeOverlay()
     {
         if (TreeOverlayPanel == null)
@@ -148,6 +171,10 @@ public partial class PauseMenuView : Node
         if (show)
             RefreshTreeOverlay();
         TreeOverlayPanel.Visible = show;
+        if (show)
+            PauseManager.PushHold(GetTree(), PauseManager.TreeOverlay);
+        else
+            PauseManager.PopHold(GetTree(), PauseManager.TreeOverlay);
     }
 
     public void RefreshTreeOverlay()
@@ -192,39 +219,27 @@ public partial class PauseMenuView : Node
         }
 
         text.AppendLine();
-        text.AppendLine("[b]" + Tr("TREE_OVERLAY_STATS") + "[/b]");
         if (PlayerRef is BaseCell bc && bc.Stats != null)
         {
-            string[] statKeys =
-            {
-                "might", "area", "cooldown_reduction", "projectile_speed", "duration", "amount",
-                "pierce", "knockback", "crit_chance", "crit_damage", "ailment_damage",
-                "max_health", "health_regen", "armor", "move_speed", "evasion", "block", "life_steal",
-                "magnet"
-            };
-            foreach (string statKey in statKeys)
-                text.AppendLine(PassiveTreeManager.GetStatLabel(statKey) + ": " + FormatTreeStat(statKey, bc.Stats.GetStat(statKey)));
+            AppendStatGroup(text, "STATS_GROUP_COMBAT", BuildStatsPreview.CombatKeys, bc);
+            AppendStatGroup(text, "STATS_GROUP_DEFENSE", BuildStatsPreview.DefenseKeys, bc);
+            AppendStatGroup(text, "STATS_GROUP_UTILITY", BuildStatsPreview.UtilityKeys, bc);
         }
         else
         {
             text.AppendLine(Tr("TREE_OVERLAY_NO_PLAYER"));
         }
-        text.AppendLine();
         text.AppendLine(Tr("TREE_OVERLAY_HINT"));
 
         TreeOverlayText.Text = text.ToString();
     }
 
-    private static string FormatTreeStat(string statKey, float value)
+    private void AppendStatGroup(StringBuilder text, string titleKey, string[] statKeys, BaseCell bc)
     {
-        return statKey switch
-        {
-            "max_health" or "health_regen" or "move_speed" or "magnet" => $"{value:F1}",
-            "amount" or "pierce" or "armor" => $"{value:F0}",
-            "cooldown_reduction" or "crit_chance" or "evasion" or "block" or "life_steal" => $"{value * 100.0f:F1}%",
-            "might" or "area" or "projectile_speed" or "duration" or "knockback" or "crit_damage" or "ailment_damage" => $"{value * 100.0f:F0}%",
-            _ => $"{value:F2}"
-        };
+        text.AppendLine("[b]◆ " + Tr(titleKey) + "[/b]");
+        foreach (string statKey in statKeys)
+            text.AppendLine(PassiveTreeManager.GetStatLabel(statKey) + ": "
+                + BuildStatsPreview.FormatValue(statKey, bc.Stats!.GetStat(statKey)));
     }
 
     private void SetupTreeOverlay(Node root)

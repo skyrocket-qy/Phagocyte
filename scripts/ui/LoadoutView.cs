@@ -37,6 +37,7 @@ public partial class LoadoutView : Control
     public GridContainer? ChamberGrid { get; set; }
     public Button? ResetButton { get; set; }
     public Button? ConfirmButton { get; set; }
+    public StatPreviewPanel? StatPanel { get; set; }
 
     private OrganelleChamber? _chamber;
     private CharacterBody2D? _scratchHost;
@@ -128,18 +129,19 @@ public partial class LoadoutView : Control
     public override void _Ready()
     {
         HeaderLabel = GetNodeOrNull<Label>("Margin/VBox/TopBar/TitleVBox/HeaderLabel");
-        ProfileHBox = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox");
-        ProfileAddButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox/ProfileAddButton");
-        ProfileDeleteButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox/ProfileDeleteButton");
-        BackpackHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/VaultSide/BackpackHeader");
-        CategoryTabBar = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/VaultSide/CategoryTabBar");
-        BackpackGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/VaultSide/VaultScroll/BackpackGrid");
-        HintLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/VaultSide/HintLabel");
-        ChamberHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/ChamberSide/ChamberHeader");
-        EnergyBar = GetNodeOrNull<EnergyPips>("Margin/VBox/ContentHBox/ChamberSide/EnergyBar");
-        ChamberGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin/ChamberGrid");
+        ProfileHBox = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/RightBox/ChamberSide/ProfileHBox");
+        ProfileAddButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/RightBox/ChamberSide/ProfileHBox/ProfileAddButton");
+        ProfileDeleteButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/RightBox/ChamberSide/ProfileHBox/ProfileDeleteButton");
+        BackpackHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/RightBox/VaultSide/BackpackHeader");
+        CategoryTabBar = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/RightBox/VaultSide/CategoryTabBar");
+        BackpackGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/RightBox/VaultSide/VaultScroll/BackpackGrid");
+        HintLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/RightBox/VaultSide/HintLabel");
+        ChamberHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/RightBox/ChamberSide/ChamberHeader");
+        EnergyBar = GetNodeOrNull<EnergyPips>("Margin/VBox/ContentHBox/RightBox/ChamberSide/EnergyBar");
+        ChamberGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/RightBox/ChamberSide/SocketWell/WellMargin/ChamberGrid");
         ResetButton = GetNodeOrNull<Button>("Margin/VBox/Buttons/ResetButton");
         ConfirmButton = GetNodeOrNull<Button>("Margin/VBox/Buttons/ConfirmButton");
+        StatPanel = GetNodeOrNull<StatPreviewPanel>("Margin/VBox/ContentHBox/StatPreview");
 
         BuildCategoryTabs();
         BuildChamberCards();
@@ -196,6 +198,7 @@ public partial class LoadoutView : Control
         if (ConfirmButton != null) ConfirmButton.Text = Tr("LOADOUT_CONFIRM");
         if (ProfileAddButton != null) ProfileAddButton.Text = Tr("TREE_PROFILE_ADD");
         if (ProfileDeleteButton != null) ProfileDeleteButton.Text = Tr("TREE_PROFILE_DELETE");
+        StatPanel?.UpdateLocalizedTexts();
 
         RefreshCategoryTabs();
         RefreshAll();
@@ -522,6 +525,7 @@ public partial class LoadoutView : Control
         RefreshBackpackCards();
         RefreshCategoryTabs();
         RefreshVaultHeader();
+        StatPanel?.Refresh(_classKey);
     }
 
     /// <summary>Vault header carries the collection progress (unlocked / total).</summary>

@@ -6,6 +6,7 @@
 [ext_resource type="Shader" path="res://shaders/codex_grid_bg.gdshader" id="3_grid_shader"]
 [ext_resource type="Script" path="res://scripts/ui/ChamberLinks.cs" id="4_links"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/menu/cell.jpeg" id="5_cell"]
+[ext_resource type="PackedScene" path="res://scenes/ui/stat_preview.tscn" id="6_stats"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
 shader = ExtResource("3_grid_shader")
@@ -113,25 +114,36 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 28
 
-[node name="ChamberSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox"]
+[node name="StatPreview" parent="Margin/VBox/ContentHBox" instance=ExtResource("6_stats")]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightBox" type="VBoxContainer" parent="Margin/VBox/ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ChamberSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox/RightBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 stretch_ratio = 2.0
 theme_override_constants/separation = 8
 
-[node name="ProfileHBox" type="HBoxContainer" parent="Margin/VBox/ContentHBox/ChamberSide"]
+[node name="ProfileHBox" type="HBoxContainer" parent="Margin/VBox/ContentHBox/RightBox/ChamberSide"]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="ProfileAddButton" type="Button" parent="Margin/VBox/ContentHBox/ChamberSide/ProfileHBox"]
+[node name="ProfileAddButton" type="Button" parent="Margin/VBox/ContentHBox/RightBox/ChamberSide/ProfileHBox"]
 custom_minimum_size = Vector2(48, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
 text = "+"
 
-[node name="ProfileDeleteButton" type="Button" parent="Margin/VBox/ContentHBox/ChamberSide/ProfileHBox"]
+[node name="ProfileDeleteButton" type="Button" parent="Margin/VBox/ContentHBox/RightBox/ChamberSide/ProfileHBox"]
 custom_minimum_size = Vector2(84, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
@@ -139,36 +151,36 @@ theme_override_colors/font_color = Color(1, 0.45, 0.4, 1)
 theme_override_font_sizes/font_size = 14
 text = "删除"
 
-[node name="TopSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
+[node name="TopSpacer" type="Control" parent="Margin/VBox/ContentHBox/RightBox/ChamberSide"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="SocketWell" type="PanelContainer" parent="Margin/VBox/ContentHBox/ChamberSide"]
+[node name="SocketWell" type="PanelContainer" parent="Margin/VBox/ContentHBox/RightBox/ChamberSide"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_well")
 
-[node name="WellMargin" type="MarginContainer" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell"]
+[node name="WellMargin" type="MarginContainer" parent="Margin/VBox/ContentHBox/RightBox/ChamberSide/SocketWell"]
 layout_mode = 2
 theme_override_constants/margin_left = 14
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 14
 
-[node name="ChamberGrid" type="GridContainer" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin"]
+[node name="ChamberGrid" type="GridContainer" parent="Margin/VBox/ContentHBox/RightBox/ChamberSide/SocketWell/WellMargin"]
 layout_mode = 2
 theme_override_constants/h_separation = 18
 theme_override_constants/v_separation = 18
 columns = 2
 alignment = 1
 
-[node name="ChamberLinks" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell"]
+[node name="ChamberLinks" type="Control" parent="Margin/VBox/ContentHBox/RightBox/ChamberSide/SocketWell"]
 layout_mode = 2
 mouse_filter = 2
 script = ExtResource("4_links")
 
-[node name="EnergyBar" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
+[node name="EnergyBar" type="Control" parent="Margin/VBox/ContentHBox/RightBox/ChamberSide"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 mouse_filter = 2
@@ -176,7 +188,7 @@ script = ExtResource("2_pips")
 AlignLeft = false
 MaxDiameter = 26.0
 
-[node name="BottomSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
+[node name="BottomSpacer" type="Control" parent="Margin/VBox/ContentHBox/RightBox/ChamberSide"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
@@ -184,22 +196,23 @@ MaxDiameter = 20.0
 Gap = 7.0
 AlignLeft = true
 
-[node name="VaultSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox"]
+[node name="VaultSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox/RightBox"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 stretch_ratio = 3.0
 theme_override_constants/separation = 10
 
-[node name="CategoryTabBar" type="HBoxContainer" parent="Margin/VBox/ContentHBox/VaultSide"]
+[node name="CategoryTabBar" type="HBoxContainer" parent="Margin/VBox/ContentHBox/RightBox/VaultSide"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="VaultScroll" type="ScrollContainer" parent="Margin/VBox/ContentHBox/VaultSide"]
+[node name="VaultScroll" type="ScrollContainer" parent="Margin/VBox/ContentHBox/RightBox/VaultSide"]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="BackpackGrid" type="GridContainer" parent="Margin/VBox/ContentHBox/VaultSide/VaultScroll"]
+[node name="BackpackGrid" type="GridContainer" parent="Margin/VBox/ContentHBox/RightBox/VaultSide/VaultScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 14

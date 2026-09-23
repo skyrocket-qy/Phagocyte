@@ -481,7 +481,12 @@ public partial class OrganelleChamber : Node2D
         ForEachModifier(id, (stat, flat, pct) => Stats?.RemoveModifier(stat, flat, pct));
     }
 
-    private static void ForEachModifier(string id, Action<string, float, float> action)
+    /// <summary>
+    /// Iterates an organelle's stat entries (modifiers + drawback alike) as
+    /// flat/percent pairs. Public so the menu build preview applies exactly
+    /// the same entries the run-time chamber equips — one rule, two callers.
+    /// </summary>
+    public static void ForEachModifier(string id, Action<string, float, float> action)
     {
         if (string.IsNullOrEmpty(id) || !GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar)
             || entryVar.VariantType != Variant.Type.Dictionary)
