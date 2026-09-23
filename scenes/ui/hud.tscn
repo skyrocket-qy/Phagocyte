@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/codex_modal.tscn" id="2_codex"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_modal.tscn" id="3_settings"]
 [ext_resource type="Shader" path="res://shaders/critical_hp_vignette.gdshader" id="4_vignette"]
+[ext_resource type="Script" path="res://scripts/ui/hud/MembraneGauge.cs" id="5_membrane"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_critical_vignette"]
 shader = ExtResource("4_vignette")
@@ -285,6 +286,7 @@ horizontal_alignment = 2
 [node name="HPBar" type="ProgressBar" parent="MarginContainer/PanelContainer/VBoxContainer/HPContainer"]
 custom_minimum_size = Vector2(260, 16)
 layout_mode = 2
+script = ExtResource("5_membrane")
 theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 max_value = 140.0
 value = 140.0
@@ -365,6 +367,7 @@ text = "100 / 100"
 
 [node name="HPBar" type="ProgressBar" parent="MarginContainer/PanelContainer/VBoxContainer/LegacyBars"]
 layout_mode = 2
+script = ExtResource("5_membrane")
 
 [node name="EXPLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/LegacyBars"]
 layout_mode = 2

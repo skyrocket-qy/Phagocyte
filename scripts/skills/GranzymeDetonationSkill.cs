@@ -107,8 +107,10 @@ public partial class GranzymeDetonationSkill : BaseSkill
         public override void _Draw()
         {
             float pulse = 1.0f + 0.3f * Mathf.Sin(_time);
-            DrawCircle(Vector2.Zero, 12.0f * pulse, new Color(0.85f, 0.2f, 1.0f, 0.4f));
-            DrawArc(Vector2.Zero, 18.0f * pulse, 0.0f, Mathf.Tau, 24, new Color(0.9f, 0.4f, 1.0f, 0.8f), 2.0f);
+            Color halo = SkillAssetPalette.Accent(SkillIds.GranzymeDetonation, new Color(0.9f, 0.4f, 1.0f));
+            Color core = SkillAssetPalette.Core(SkillIds.GranzymeDetonation, new Color(0.85f, 0.2f, 1.0f));
+            DrawCircle(Vector2.Zero, 12.0f * pulse, new Color(core.R, core.G, core.B, 0.4f));
+            DrawArc(Vector2.Zero, 18.0f * pulse, 0.0f, Mathf.Tau, 24, new Color(halo.R, halo.G, halo.B, 0.8f), 2.0f);
         }
     }
 
@@ -131,8 +133,10 @@ public partial class GranzymeDetonationSkill : BaseSkill
             float progress = _age / 0.4f;
             float r = 110.0f * progress;
             float a = 1.0f - progress;
-            DrawCircle(Vector2.Zero, r * 0.7f, new Color(0.7f, 0.1f, 0.9f, a * 0.4f));
-            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 36, new Color(1.0f, 0.3f, 0.95f, a), 3.0f);
+            Color halo = SkillAssetPalette.Accent(SkillIds.GranzymeDetonation, new Color(1.0f, 0.3f, 0.95f));
+            Color core = SkillAssetPalette.Core(SkillIds.GranzymeDetonation, new Color(0.7f, 0.1f, 0.9f));
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, r, halo, core, a, 3.0f);
+            DrawCircle(Vector2.Zero, r * 0.7f, new Color(core.R, core.G, core.B, a * 0.4f));
         }
     }
 }

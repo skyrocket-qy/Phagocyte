@@ -16,6 +16,12 @@ public partial class MicroscopeParallax : Node2D
 
     public Camera2D? CameraRef { get; set; } = null;
 
+    /// <summary>Fluid-current strength applied on top of base drift.</summary>
+    [Export] public float CurrentStrength { get; set; } = 1.0f;
+
+    /// <summary>Lens-dispersion fringe offset in px (red/cyan split).</summary>
+    [Export] public float DispersionOffset { get; set; } = 2.5f;
+
     public record RbcData
     {
         public Vector2 Pos;
@@ -36,6 +42,7 @@ public partial class MicroscopeParallax : Node2D
 
     private readonly List<RbcData> _rbcList = new();
     private readonly List<BokehData> _bokehList = new();
+    private float _age;
 
     public List<RbcData> RbcList => _rbcList;
     public List<BokehData> BokehList => _bokehList;
@@ -98,6 +105,7 @@ public partial class MicroscopeParallax : Node2D
     public override void _Process(double delta)
     {
         float dt = (float)delta;
+        _age += dt;
         if (CameraRef == null || !GodotObject.IsInstanceValid(CameraRef))
         {
             var vp = GetViewport();
@@ -107,9 +115,12 @@ public partial class MicroscopeParallax : Node2D
             }
         }
 
+        // Dynamic fluid current: a slow sinusoidal field over the arena so
+        // RBCs ride visible currents instead of straight-line drift.
         foreach (var rbc in _rbcList)
         {
-            rbc.Pos += rbc.Drift * dt;
+            Vector2 current = CurrentField(rbc.Pos) * CurrentStrength;
+            rbc.Pos += (rbc.Drift + current) * dt;
             rbc.Rotation += rbc.RotSpeed * dt;
             if (rbc.Pos.X > ArenaExtents)
                 rbc.Pos.X = -ArenaExtents;
@@ -158,6 +169,13 @@ public partial class MicroscopeParallax : Node2D
         }
     }
 
+    private Vector2 CurrentField(Vector2 pos)
+    {
+        return new Vector2(
+            Mathf.Sin(pos.Y * 0.004f + _age * 0.6f) * 22.0f,
+            Mathf.Cos(pos.X * 0.003f - _age * 0.4f) * 14.0f);
+    }
+
     private void DrawBlurredErythrocyte(Vector2 pos, float radius, float rot, Color col)
     {
         int layers = 5;
@@ -176,6 +194,12 @@ public partial class MicroscopeParallax : Node2D
         var innerCol = new Color(col.R * 0.4f, col.G * 0.1f, col.B * 0.1f, col.A * 0.2f);
         DrawCircle(Vector2.Zero, radius * 0.32f, innerCol);
         DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
+
+        // Realistic lens dispersion: faint red/cyan split rims.
+        var disperseR = new Color(1.0f, 0.25f, 0.25f, col.A * 0.16f);
+        var disperseC = new Color(0.35f, 0.9f, 1.0f, col.A * 0.16f);
+        DrawArc(pos + new Vector2(DispersionOffset, 0.0f), radius * 0.9f, 0.0f, Mathf.Tau, 40, disperseR, 2.0f);
+        DrawArc(pos - new Vector2(DispersionOffset, 0.0f), radius * 0.9f, 0.0f, Mathf.Tau, 40, disperseC, 2.0f);
     }
 
     private void DrawBlurredBokeh(Vector2 pos, float radius, Color col)

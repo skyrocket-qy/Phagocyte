@@ -1,5 +1,6 @@
 using Godot;
 using Phagocyte.Combat;
+using Phagocyte.Core;
 
 namespace Phagocyte.Skills;
 
@@ -113,8 +114,9 @@ public partial class AntibodyMissile : Area2D
 
     public override void _Draw()
     {
-        // IgG silhouette: two Fab arms + Fc stem, gold-white.
-        Color armColor = new Color(1.0f, 0.88f, 0.55f, _stuck ? 1.0f : 0.9f);
+        // IgG silhouette: two Fab arms + Fc stem, arms tinted from the skill icon.
+        Color accent = SkillAssetPalette.Accent(SkillIds.AntibodySalvo, new Color(1.0f, 0.88f, 0.55f));
+        Color armColor = new Color(accent.R, accent.G, accent.B, _stuck ? 1.0f : 0.9f);
         Color stemColor = new Color(1.0f, 0.95f, 0.8f, 0.95f);
         float armLen = 9.0f;
         float armSpread = 0.6f;
@@ -128,6 +130,6 @@ public partial class AntibodyMissile : Area2D
         DrawLine(Vector2.Zero, new Vector2(-armLen * 1.1f, 0.0f), stemColor, 3.0f);
 
         if (_stuck)
-            DrawArc(Vector2.Zero, 12.0f, 0.0f, Mathf.Tau, 20, new Color(1.0f, 0.85f, 0.4f, 0.6f), 1.5f);
+            DrawArc(Vector2.Zero, 12.0f, 0.0f, Mathf.Tau, 20, new Color(accent.R, accent.G, accent.B, 0.6f), 1.5f);
     }
 }

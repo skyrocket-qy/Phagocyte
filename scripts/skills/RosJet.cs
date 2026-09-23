@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using Phagocyte.Combat;
+using Phagocyte.Core;
 using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
@@ -42,10 +43,11 @@ public partial class RosJet : Area2D
 
     public override void _Draw()
     {
-        // High-pressure peroxide jet stream beam
-        DrawLine(new Vector2(-24, 0), new Vector2(24, 0), new Color(0.9f, 1.0f, 1.0f, 0.95f), 8.0f);
-        DrawLine(new Vector2(-30, 0), new Vector2(30, 0), new Color(0.3f, 0.9f, 1.0f, 0.6f), 14.0f);
-        DrawCircle(new Vector2(20, 0), 6.0f, new Color(1, 1, 1, 0.9f));
+        // High-pressure peroxide jet stream beam, tinted from the skill icon.
+        Color halo = SkillAssetPalette.Accent(SkillIds.RosTorrent, new Color(0.3f, 0.9f, 1.0f));
+        Color core = SkillAssetPalette.Core(SkillIds.RosTorrent, new Color(0.9f, 1.0f, 1.0f));
+        LaserGlow.DrawBeam(this, new Vector2(-30, 0), new Vector2(30, 0), halo, core, 12.0f, 0.9f);
+        LaserGlow.DrawImpactHalo(this, new Vector2(20, 0), 10.0f, halo, core, 0.9f, 2.0f);
     }
 
     private void OnAreaEntered(Area2D area)

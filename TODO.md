@@ -55,19 +55,35 @@ Elevating screens from flat wireframes to high-tech immunobiology interfaces:
 
 ---
 
-## [TODO] Phase 4: Combat Atmosphere, Laser Glow & Shader Polish
+## [COMPLETED] Phase 4: Combat Atmosphere, Laser Glow & Shader Polish
 
-Transforming the in-game action into a visceral microscopic bio-horror battlefield:
+Combat visuals verified live (godot-ai headed screenshots) plus headless suites
+(`TestVisualOverhaul`, `TestSkillVisuals`, `TestSurvivorHudUx`,
+`TestMapEnvironments`, `TestPhagocyticGrasp` green; build zero warnings):
 
-- [ ] **Visceral Capillary & Tissue Arena Floor**:
-  - Enhance arena background with layered microvascular tissue depth, dynamic fluid currents, and drifting out-of-focus RBCs with realistic lens dispersion.
-- [ ] **Confocal Laser Illumination & HDR Bloom**:
-  - Boost emission intensity on weapon skills (Perforin Lance, ROS Torrent, Grasp chains, MAC Detonations) with piercing laser fluorophore halos.
-- [ ] **Organic HUD Health & Vitals Overhaul**:
-  - Replace flat green health bar with a pulsating cellular membrane vital sign gauge that reacts to damage and adrenaline surges.
+- [x] **Visceral Capillary & Tissue Arena Floor**:
+  - New `CapillaryTissueLayer` (`scripts/environment/CapillaryTissueLayer.cs`,
+    seeded 9-vessel branching network with lumen/wall/sheen + drifting
+    fluid-current dashes, 0.55x camera parallax) wired into `main.tscn` as
+    `Background/CapillaryTissue` between the tissue shader and the RBC plane.
+  - `MicroscopeParallax` gained a sinusoidal fluid-current field
+    (`CurrentStrength`) and red/cyan lens-dispersion fringe rims on RBCs.
+- [x] **Confocal Laser Illumination & HDR Bloom**:
+  - `Environment_main` glow boosted (`glow_intensity` 0.85, `glow_bloom` 0.35,
+    HDR threshold 0.85); new shared `LaserGlow` helper
+    (`scripts/combat/LaserGlow.cs`: halo + mid + white-hot core beam passes,
+    impact halos) used by lance, ROS jet, MAC blast and granzyme burst.
+- [x] **Organic HUD Health & Vitals Overhaul**:
+  - New `MembraneGauge : ProgressBar` (`scripts/ui/hud/MembraneGauge.cs`)
+    on both `hud.tscn` HP bars (paths unchanged): breathing pulse, white
+    damage flash on HP drops, red adrenaline surge rim below 30% HP,
+    per-instance fill stylebox; `VitalsView` untouched.
 
 
 - 每個skill視覺設計要跟他的asset圖一樣
+  - New `SkillAssetPalette` (`scripts/skills/SkillAssetPalette.cs`): accents
+    sampled (most-saturated hue) from `gen/skill/<id>.png`; lance/ROS/MAC/
+    granzyme/antibody/pore visuals now tint core+halo from their icons.
 
 ---
 

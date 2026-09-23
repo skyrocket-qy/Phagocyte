@@ -161,8 +161,10 @@ public partial class ComplementCascadeSkill : BaseSkill
             DrawCircle(Vector2.Zero, 7.0f, new Color(0.05f, 0.02f, 0.08f, 0.85f));
             DrawArc(Vector2.Zero, 7.0f, 0.0f, Mathf.Tau, 24, new Color(1.0f, 0.9f, 0.6f, 0.5f), 1.5f);
 
-            // Polymerizing C9 ring: swept arc + joined subunit dots.
-            Color ringColor = new Color(1.0f, 0.82f, 0.35f, 0.95f);
+            // Polymerizing C9 ring: swept arc + joined subunit dots,
+            // tinted from the skill icon.
+            Color ringColor = SkillAssetPalette.Accent(SkillIds.ComplementCascade, new Color(1.0f, 0.82f, 0.35f));
+            ringColor.A = 0.95f;
             DrawArc(Vector2.Zero, ringR, -Mathf.Pi * 0.5f, -Mathf.Pi * 0.5f + progress * Mathf.Tau, 48, ringColor, 3.5f);
             int joined = Mathf.FloorToInt(progress * Subunits);
             for (int i = 0; i < Subunits; i++)
@@ -206,8 +208,10 @@ public partial class ComplementCascadeSkill : BaseSkill
             float t = Mathf.Clamp(_age / Duration, 0.0f, 1.0f);
             float r = BlastRadius * (0.2f + 0.8f * t);
             float a = 1.0f - t;
-            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 48, new Color(1.0f, 0.9f, 0.55f, a * 0.9f), 4.0f * (1.0f - t * 0.5f));
-            DrawCircle(Vector2.Zero, r * 0.55f, new Color(1.0f, 0.85f, 0.4f, a * 0.35f));
+            Color halo = SkillAssetPalette.Accent(SkillIds.ComplementCascade, new Color(1.0f, 0.9f, 0.55f));
+            Color core = SkillAssetPalette.Core(SkillIds.ComplementCascade, new Color(1.0f, 0.85f, 0.4f));
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, r, halo, core, a);
+            DrawCircle(Vector2.Zero, r * 0.55f, new Color(core.R, core.G, core.B, a * 0.35f));
         }
     }
 }

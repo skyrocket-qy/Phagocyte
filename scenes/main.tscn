@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/characters/macrophage.tscn" id="3_macrophage"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="4_hud"]
 [ext_resource type="Script" path="res://scripts/environment/MicroscopeParallax.cs" id="5_parallax"]
+[ext_resource type="Script" path="res://scripts/environment/CapillaryTissueLayer.cs" id="15_tissue"]
 [ext_resource type="Shader" path="res://shaders/microscope_postprocess.gdshader" id="6_postprocess"]
 [ext_resource type="PackedScene" path="res://scenes/ui/run_records_modal.tscn" id="7_records"]
 [ext_resource type="Script" path="res://scripts/directors/WaveDirectorComponent.cs" id="8_wave"]
@@ -43,10 +44,10 @@ glow_levels/1 = 1.0
 glow_levels/2 = 0.8
 glow_levels/3 = 0.6
 glow_levels/5 = 0.2
-glow_intensity = 0.6
-glow_bloom = 0.2
+glow_intensity = 0.85
+glow_bloom = 0.35
 glow_blend_mode = 0
-glow_hdr_threshold = 1.0
+glow_hdr_threshold = 0.85
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_post"]
 shader = ExtResource("6_postprocess")
@@ -80,6 +81,9 @@ color = Color(0.04, 0.075, 0.11, 1)
 
 [node name="MicroscopeParallax" type="Node2D" parent="Background"]
 script = ExtResource("5_parallax")
+
+[node name="CapillaryTissue" type="Node2D" parent="Background"]
+script = ExtResource("15_tissue")
 
 [node name="FluidParticles" type="CPUParticles2D" parent="Background"]
 amount = 128

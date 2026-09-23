@@ -145,9 +145,10 @@ public partial class PerforinLanceSkill : BaseSkill
         public override void _Draw()
         {
             float a = 1.0f - _age / Duration;
-            DrawLine(Vector2.Zero, BeamEnd, new Color(0.6f, 0.3f, 1.0f, a * 0.55f), BeamWidth * 1.6f);
-            DrawLine(Vector2.Zero, BeamEnd, new Color(0.85f, 0.95f, 1.0f, a * 0.95f), BeamWidth * 0.5f);
-            DrawCircle(BeamEnd, BeamWidth * 0.8f * a + 2.0f, new Color(0.9f, 0.95f, 1.0f, a * 0.7f));
+            Color halo = SkillAssetPalette.Accent(SkillIds.PerforinLance, new Color(0.6f, 0.3f, 1.0f));
+            Color core = SkillAssetPalette.Core(SkillIds.PerforinLance, new Color(0.85f, 0.95f, 1.0f));
+            LaserGlow.DrawBeam(this, Vector2.Zero, BeamEnd, halo, core, BeamWidth, a);
+            LaserGlow.DrawImpactHalo(this, BeamEnd, BeamWidth * 0.8f * a + 2.0f, halo, core, a * 0.7f);
         }
     }
 
@@ -193,8 +194,9 @@ public partial class PerforinLanceSkill : BaseSkill
             float fade = 1.0f - Mathf.Clamp((_age - AssembleTime) / (Duration - AssembleTime), 0.0f, 1.0f);
             float sweep = Mathf.Clamp(_age / AssembleTime, 0.0f, 1.0f);
 
-            // Assembling ~20-mer ring pore.
-            Color ringColor = new Color(0.55f, 0.95f, 1.0f, fade);
+            // Assembling ~20-mer ring pore, tinted from the skill icon.
+            Color poreAccent = SkillAssetPalette.Accent(SkillIds.PerforinLance, new Color(0.55f, 0.95f, 1.0f));
+            Color ringColor = new Color(poreAccent.R, poreAccent.G, poreAccent.B, fade);
             DrawArc(Vector2.Zero, 11.0f, -Mathf.Pi * 0.5f, -Mathf.Pi * 0.5f + sweep * Mathf.Tau, 32, ringColor, 2.5f);
             DrawCircle(Vector2.Zero, 5.0f, new Color(0.02f, 0.05f, 0.1f, 0.7f * fade));
 
