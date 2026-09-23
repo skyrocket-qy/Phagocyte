@@ -204,16 +204,12 @@ public partial class SkillBarView : Node
                 iconTex.Modulate = new Color(1, 1, 1, 1);
                 if (badgeLbl != null)
                 {
-                    bool isInnate = data.TryGetValue("is_innate", out var innVal) && innVal.AsBool();
                     bool isPassive = data.TryGetValue("is_passive", out var passVal) && passVal.AsBool();
                     int level = data.TryGetValue("level", out var lvVal) ? lvVal.AsInt32() : 1;
 
-                    if (isInnate)
-                    {
-                        badgeLbl.Text = Tr("SKILL_INNATE_TAG");
-                        badgeLbl.Modulate = new Color(0.4f, 0.95f, 0.8f);
-                    }
-                    else if (isPassive || i >= 5)
+                    // Active/passive only: cell innates are active weapons,
+                    // so they share the gold Lv badge with other actives.
+                    if (isPassive || i >= 5)
                     {
                         badgeLbl.Text = TextFormatter.Format(Tr("SKILL_LV"), level);
                         badgeLbl.Modulate = new Color(0.8f, 0.6f, 1.0f);

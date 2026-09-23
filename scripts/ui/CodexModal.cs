@@ -8,6 +8,7 @@ namespace Phagocyte.UI;
 public partial class CodexModal : ModalBase
 {
     public Button? TabSkillsBtn { get; set; }
+    public Button? TabPassivesBtn { get; set; }
     public Button? TabCellsBtn { get; set; }
     public Button? TabPathogensBtn { get; set; }
     public Button? TabMapsBtn { get; set; }
@@ -31,9 +32,16 @@ public partial class CodexModal : ModalBase
     /// <summary>Tab item buttons by catalog key, for active-selection highlight.</summary>
     private readonly System.Collections.Generic.Dictionary<string, Button> _itemButtons = new();
 
+    public const int TabActives = 0;
+    public const int TabPassives = 1;
+    public const int TabCells = 2;
+    public const int TabPathogens = 3;
+    public const int TabMaps = 4;
+
     public override void _Ready()
     {
         TabSkillsBtn = GetNodeOrNull<Button>("VBox/TabBar/SkillsTab");
+        TabPassivesBtn = GetNodeOrNull<Button>("VBox/TabBar/PassivesTab");
         TabCellsBtn = GetNodeOrNull<Button>("VBox/TabBar/CellsTab");
         TabPathogensBtn = GetNodeOrNull<Button>("VBox/TabBar/PathogensTab");
         TabMapsBtn = GetNodeOrNull<Button>("VBox/TabBar/MapsTab");
@@ -50,13 +58,15 @@ public partial class CodexModal : ModalBase
         DetailBio = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailBio");
 
         if (TabSkillsBtn != null)
-            TabSkillsBtn.Pressed += () => SwitchTab(0);
+            TabSkillsBtn.Pressed += () => SwitchTab(TabActives);
+        if (TabPassivesBtn != null)
+            TabPassivesBtn.Pressed += () => SwitchTab(TabPassives);
         if (TabCellsBtn != null)
-            TabCellsBtn.Pressed += () => SwitchTab(1);
+            TabCellsBtn.Pressed += () => SwitchTab(TabCells);
         if (TabPathogensBtn != null)
-            TabPathogensBtn.Pressed += () => SwitchTab(2);
+            TabPathogensBtn.Pressed += () => SwitchTab(TabPathogens);
         if (TabMapsBtn != null)
-            TabMapsBtn.Pressed += () => SwitchTab(3);
+            TabMapsBtn.Pressed += () => SwitchTab(TabMaps);
 
         InitModal();
     }
@@ -162,7 +172,8 @@ public partial class CodexModal : ModalBase
     {
         base.UpdateLocalizedTexts();
         if (TitleLabel != null) TitleLabel.Text = Tr("CODEX_TITLE");
-        if (TabSkillsBtn != null) TabSkillsBtn.Text = Tr("CODEX_TAB_SKILLS");
+        if (TabSkillsBtn != null) TabSkillsBtn.Text = Tr("CODEX_TAB_ACTIVES");
+        if (TabPassivesBtn != null) TabPassivesBtn.Text = Tr("CODEX_TAB_PASSIVES");
         if (TabCellsBtn != null) TabCellsBtn.Text = Tr("CODEX_TAB_CELLS");
         if (TabPathogensBtn != null) TabPathogensBtn.Text = Tr("CODEX_TAB_PATHOGENS");
         if (TabMapsBtn != null) TabMapsBtn.Text = Tr("CODEX_TAB_MAPS");
@@ -172,12 +183,15 @@ public partial class CodexModal : ModalBase
 
     public void SwitchTab(int tabIdx)
     {
+        if (tabIdx < TabActives || tabIdx > TabMaps)
+            return;
         CurrentTab = tabIdx;
 
-        UiBuilders.SetTabActive(TabSkillsBtn, tabIdx == 0);
-        UiBuilders.SetTabActive(TabCellsBtn, tabIdx == 1);
-        UiBuilders.SetTabActive(TabPathogensBtn, tabIdx == 2);
-        UiBuilders.SetTabActive(TabMapsBtn, tabIdx == 3);
+        UiBuilders.SetTabActive(TabSkillsBtn, tabIdx == TabActives);
+        UiBuilders.SetTabActive(TabPassivesBtn, tabIdx == TabPassives);
+        UiBuilders.SetTabActive(TabCellsBtn, tabIdx == TabCells);
+        UiBuilders.SetTabActive(TabPathogensBtn, tabIdx == TabPathogens);
+        UiBuilders.SetTabActive(TabMapsBtn, tabIdx == TabMaps);
 
         ActiveItemKey = "";
         RenderCurrentTab();
@@ -197,22 +211,29 @@ public partial class CodexModal : ModalBase
 
         switch (CurrentTab)
         {
-            case 0:
-                RenderSkillsTab();
+            case TabActives:
+                RenderSkillsTab(passiveOnly: false);
                 break;
-            case 1:
+            case TabPassives:
+                RenderSkillsTab(passiveOnly: true);
+                break;
+            case TabCells:
                 RenderCellsTab();
                 break;
-            case 2:
+            case TabPathogens:
                 RenderPathogensTab();
                 break;
-            case 3:
+            case TabMaps:
                 RenderMapsTab();
                 break;
         }
     }
 
-    private void RenderSkillsTab()
+    /// <summary>
+    /// Skills are split by function only: actives (active + cell innates,
+    /// which are active weapons) vs passives. No innate/exclusive grouping.
+    /// </summary>
+    private void RenderSkillsTab(bool passiveOnly)
     {
         if (ItemList == null)
             return;
@@ -221,9 +242,12 @@ public partial class CodexModal : ModalBase
         foreach (var keyVar in GameManager.SkillCatalog.Keys)
         {
             string key = keyVar.AsString();
+            var skillInfo = GameManager.GetSkillInfo(key);
+            bool isPassive = skillInfo["type"].AsString() == "passive";
+            if (isPassive != passiveOnly)
+                continue;
             if (firstKey == "")
                 firstKey = key;
-            var skillInfo = GameManager.GetSkillInfo(key);
             var btn = MakeItemButton(" " + skillInfo["name"].AsString());
             string localKey = key;
             btn.Pressed += () => SelectSkill(localKey);

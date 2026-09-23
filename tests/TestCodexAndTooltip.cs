@@ -86,8 +86,8 @@ public partial class TestCodexAndTooltip : TestHarness
         var tTex = skillTooltip!.GetNodeOrNull<TextureRect>("VBox/HeaderHBox/TooltipIconTexture");
         AssertThat(tTex).IsNotNull();
         AssertThat(tTex!.Texture).IsNotNull();
-        AssertThat(tBadge.Contains("\u56FA\u6709") || tBadge.Contains("INNATE")).IsTrue();
-        GD.Print($"[PASS] Slot 0 Innate Active Tooltip verified: '{tTitle}' ({tBadge})");
+        AssertThat(tBadge.Contains("主动") || tBadge.Contains("ACTIVE")).IsTrue();
+        GD.Print($"[PASS] Slot 0 Innate-as-Active Tooltip verified: '{tTitle}' ({tBadge})");
 
         // Test Hover Slot 1 (Drafted Active Weapon)
         var card1 = slotsContainer!.GetChild<Control>(1);
@@ -128,32 +128,36 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(itemList != null && itemList.GetChildCount() >= 9).IsTrue();
         GD.Print($"[PASS] Codex Skill Manual tab displays {itemList!.GetChildCount()} skills.");
 
-        // Switch to Tab 1 (Cells)
-        codexModal.SwitchTab(1);
+        codexModal.SwitchTab(1); // Passives tab
+        AssertThat(itemList.GetChildCount() >= 13).IsTrue();
+        GD.Print($"[PASS] Codex Passive Traits tab displays {itemList.GetChildCount()} passives.");
+
+        // Switch to Tab 2 (Cells)
+        codexModal.SwitchTab(2);
         AssertThat(itemList.GetChildCount() >= 5).IsTrue();
         GD.Print($"[PASS] Codex Immune Cells tab displays {itemList.GetChildCount()} cells.");
 
-        // Switch to Tab 2 (Pathogens)
-        codexModal.SwitchTab(2);
+        // Switch to Tab 3 (Pathogens)
+        codexModal.SwitchTab(3);
         AssertThat(itemList.GetChildCount() >= 4).IsTrue();
         GD.Print($"[PASS] Codex Pathogen Catalog tab displays {itemList.GetChildCount()} pathogens.");
 
-        // Switch to Tab 3 (Maps)
-        codexModal.SwitchTab(3);
+        // Switch to Tab 4 (Maps)
+        codexModal.SwitchTab(4);
         AssertThat(itemList.GetChildCount() >= 2).IsTrue();
         GD.Print($"[PASS] Codex Pathological Stages tab displays {itemList.GetChildCount()} maps.");
 
         // Achievements moved out of the Codex: MainMenu AchievementView owns them.
-        // Maps (Tab 3) is the last Codex tab; out-of-range indices must be ignored.
-        codexModal.SwitchTab(3);
-        AssertThat(codexModal.CurrentTab).IsEqual(3);
+        // Maps (Tab 4) is the last Codex tab; out-of-range indices must be ignored.
+        codexModal.SwitchTab(4);
+        AssertThat(codexModal.CurrentTab).IsEqual(4);
         AssertThat(itemList.GetChildCount() >= 2).IsTrue();
-        GD.Print("[PASS] Codex exposes 4 tabs; achievements live in the MainMenu gallery.");
+        GD.Print("[PASS] Codex exposes 5 tabs; achievements live in the MainMenu gallery.");
 
         // Close Codex
         codexModal.CloseCodex();
         AssertThat(codexModal.Visible).IsFalse();
-        GD.Print("[PASS] CodexModal open/close and 4-tab switching verified.");
+        GD.Print("[PASS] CodexModal open/close and 5-tab switching verified.");
 
         // 4. Verify Pause Menu Manual Button
         hud.TogglePause();
@@ -179,11 +183,11 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(hud.TooltipDesc?.Text.Contains("\u3010\u0020\u6218\u672F\u673A\u5236\u0020\u3011") ?? false).IsFalse();
         hud.OnSlotMouseEntered(0, card0);
         var enInnateBadge = hud.TooltipBadge?.Text ?? "";
-        AssertThat(enInnateBadge.Contains("INNATE")).IsTrue();
+        AssertThat(enInnateBadge.Contains("ACTIVE")).IsTrue();
         AssertThat(hud.TooltipTitle?.Text.Contains("Phagocytic Grasp") ?? false).IsTrue();
 
         // Test Codex in English: ensure NO Chinese headers
-        codexModal.OpenCodex(1); // Cells tab
+        codexModal.OpenCodex(2); // Cells tab
         codexModal.SelectCell("macrophage");
         AssertThat(codexModal.DetailDesc?.Text.Contains("\u53D8\u5F62\u7279\u6027") ?? false).IsFalse();
         AssertThat(codexModal.DetailDesc?.Text.Contains("Deformation Trait") ?? false).IsTrue();
@@ -203,7 +207,7 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(hud.TooltipDesc?.Text.Contains("\u3010\u0020\u6218\u672F\u673A\u5236\u0020\u3011") ?? false).IsTrue();
         hud.OnSlotMouseEntered(0, card0);
         var zhInnateBadge = hud.TooltipBadge?.Text ?? "";
-        AssertThat(zhInnateBadge.Contains("\u56FA\u6709")).IsTrue();
+        AssertThat(zhInnateBadge.Contains("主动")).IsTrue();
         hud.OnSlotMouseExited(0);
         GD.Print("[PASS] Tooltip and Manual dynamic bilingual switching verified without residual Chinese.");
 

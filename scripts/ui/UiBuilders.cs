@@ -49,21 +49,18 @@ public static class UiBuilders
     /// <summary>
     /// Builds the "[ TAG ]" badge, its color and the cooldown/level stats line
     /// shared by the HUD skill tooltip and the codex skill detail pane.
-    /// <paramref name="skillType"/> uses the catalog values
-    /// "innate" | "active" | "passive" (unknown values fall back to active).
+    /// Only the functional split is shown: "passive" renders the passive
+    /// badge, everything else (active + cell innates, which are active
+    /// weapons) renders the active badge. No innate/exclusive wording.
     /// </summary>
     public static void BuildSkillBadge(string skillType, float cooldown, int level, int maxLevel,
         out string badgeText, out Color badgeColor, out string statsText)
     {
         string tag;
-        bool alwaysActive = skillType != "active";
+        bool alwaysActive = skillType != "active" && skillType != "innate";
 
         switch (skillType)
         {
-            case "innate":
-                tag = TranslationServer.Translate("TOOLTIP_TAG_INNATE");
-                badgeColor = BadgeInnateColor;
-                break;
             case "passive":
                 tag = TranslationServer.Translate("TOOLTIP_TAG_PASSIVE");
                 badgeColor = BadgePassiveColor;
