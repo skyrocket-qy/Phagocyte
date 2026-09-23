@@ -545,16 +545,19 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "iron_membrane")).IsEqual(0);
         GD.Print("[PASS] Build profiles persist across save/load with the active index.");
 
-        // Legacy single-slot saves migrate into profile slot 0.
+        // Legacy single-slot saves migrate into profile slot 0. A stale
+        // pre-dynamic "bonus_points" value is ignored: the earned total is
+        // recomputed from unlocks (none here, so zero).
         PassiveTreeManager.ResetAll();
         var legacyPayload = new Godot.Collections.Dictionary
         {
             { "cell_levels", new Godot.Collections.Dictionary { { "macrophage", 4 } } },
             { "allocations", new Godot.Collections.Dictionary { { "macrophage", new Godot.Collections.Dictionary { { "thick_cytoplasm", 1 } } } } },
-            { "bonus_points", 0 }
+            { "bonus_points", 61 }
         };
         JsonStore.Write(PassiveTreeManager.SavePath, legacyPayload);
         PassiveTreeManager.ReloadFromDisk();
+        AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(0);
         AssertThat(PassiveTreeManager.GetProfileCount("macrophage")).IsEqual(1);
         AssertThat(PassiveTreeManager.GetActiveProfile("macrophage")).IsEqual(0);
         AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", "thick_cytoplasm")).IsEqual(1);

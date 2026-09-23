@@ -121,26 +121,29 @@ public partial class TestTalentPipeline : TestHarness
         var bbb = AchievementManager.Achievements["bbb_clear"].AsGodotDictionary();
         AssertThat(bbb.GetValueOrDefault("talent_points", 0).AsInt32()).IsEqual(2);
 
-        // First clears grant points exactly once each.
-        AssertThat(PassiveTreeManager.BonusPoints).IsEqual(0);
+        // First clears grant points exactly once each (derived from unlocks).
+        AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(0);
         AchievementManager.RecordMapClear("acute_wound");
-        AssertThat(PassiveTreeManager.BonusPoints).IsEqual(1);
+        AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(1);
 
         AchievementManager.RecordMapClear("acute_wound");
-        AssertThat(PassiveTreeManager.BonusPoints).IsEqual(1);
+        AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(1);
 
         AchievementManager.RecordMapClear("alveolar_space", true);
-        AssertThat(PassiveTreeManager.BonusPoints).IsEqual(2);
+        AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(2);
         AssertThat(AchievementManager.IsUnlocked("alveolar_hard_clear")).IsTrue();
 
         AchievementManager.RecordMapClear("blood_brain_barrier");
-        AssertThat(PassiveTreeManager.BonusPoints).IsEqual(4);
+        AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(4);
 
         GD.Print("[PASS] 5 organs x Normal/Hard first clears award talent points exactly once.");
     }
 
     private void RunInnateStartHubTests()
     {
+        // Tree reset no longer implies achievement reset (bonus is derived
+        // from unlocks), so re-establish the "no points yet" precondition.
+        AchievementManager.ResetAll();
         PassiveTreeManager.ResetAll();
 
         foreach (string cellId in CellIds)

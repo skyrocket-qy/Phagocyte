@@ -249,9 +249,9 @@ public partial class AchievementManager : Node
         if (!string.IsNullOrEmpty(hardMap))
             GameEvents.RaiseMapHardUnlock(hardMap);
 
-        int talentPoints = achievementData.GetValueOrDefault("talent_points", 0).AsInt32();
-        if (talentPoints > 0)
-            GameEvents.RaiseBonusPoints(talentPoints);
+        // Talent points are NOT granted here: PassiveTreeManager derives the
+        // earned bonus live from unlocks, so rewards apply automatically with
+        // no mutable counter to inflate.
     }
 
     /// <summary>

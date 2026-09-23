@@ -29,16 +29,16 @@ public static class TestCheats
     public const string CheatArgGodmode = "--godmode";
 
     public const int DefaultMetaTreeLevel = 15;
-    public const int DefaultBonusPoints = 50;
     public const int DefaultRunLevel = 30;
     public const int DefaultSkillLevel = 5;
 
     /// <summary>
-    /// Unlocks every achievement (cascades to all classes, maps + Hard modes,
-    /// talent points and Endless), every organelle, max tree levels for every
-    /// cell and a grant of spendable bonus points.
+    /// Unlocks every achievement (cascades to all classes, maps + Hard modes
+    /// and Endless), every organelle and max tree levels for every cell.
+    /// Talent points follow automatically: the earned bonus is derived from
+    /// unlocks, so no point grant is needed (or possible) here.
     /// </summary>
-    public static void UnlockAllMeta(int treeLevel = DefaultMetaTreeLevel, int bonusPoints = DefaultBonusPoints)
+    public static void UnlockAllMeta(int treeLevel = DefaultMetaTreeLevel)
     {
         var ids = new List<string>();
         foreach (string achId in AchievementManager.Achievements.Keys)
@@ -48,7 +48,6 @@ public static class TestCheats
 
         OrganelleUnlockManager.UnlockAll();
         MaxTreeLevels(treeLevel);
-        GrantTreePoints(bonusPoints);
     }
 
     /// <summary>
@@ -72,13 +71,6 @@ public static class TestCheats
     {
         foreach (var keyVar in GameManager.ClassData.Keys)
             PassiveTreeManager.RecordRunLevel(keyVar.AsString(), treeLevel);
-    }
-
-    /// <summary>Grants spendable shared talent points (no-op for non-positive amounts).</summary>
-    public static void GrantTreePoints(int amount = DefaultBonusPoints)
-    {
-        if (amount > 0)
-            PassiveTreeManager.AddBonusPoints(amount);
     }
 
     /// <summary>

@@ -123,7 +123,7 @@ public partial class TestDifficultyTracks : TestHarness
 
         // A Hard clear settles as a Hard record, unlocks its Hard achievement and
         // awards the Hard talent point (docs/map.md §2 / docs/passivetree.md §5.2).
-        int bonusBefore = PassiveTreeManager.BonusPoints;
+        int bonusBefore = PassiveTreeManager.GetEarnedBonusPoints();
         var player = MakePlayerInvulnerable(main);
         AssertThat(player).IsNotNull();
         ForceVictory(main);
@@ -133,7 +133,7 @@ public partial class TestDifficultyTracks : TestHarness
         AssertThat(RunRecordManager.Records[0]["difficulty"].AsString()).IsEqual(RunRecordManager.DifficultyHard);
         AssertThat(RunRecordManager.Records[0]["result"].AsString()).IsEqual(RunRecordManager.ResultVictory);
         AssertThat(AchievementManager.IsUnlocked("wound_hard_clear")).IsTrue();
-        AssertThat(PassiveTreeManager.BonusPoints).IsEqual(bonusBefore + 1);
+        AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(bonusBefore + 1);
 
         GD.Print("[PASS] Hard runs flag the spawner, the environment and settle as a Hard record with rewards.");
         CleanupMain();

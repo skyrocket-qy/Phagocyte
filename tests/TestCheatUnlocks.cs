@@ -114,7 +114,7 @@ public partial class TestCheatUnlocks : TestHarness
         }
         AssertThat(OrganelleUnlockManager.UnlockedCount).IsEqual(0);
         AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(PassiveTreeManager.BaseCellLevel);
-        AssertThat(PassiveTreeManager.BonusPoints).IsEqual(0);
+        AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(0);
         GD.Print($"[PASS] Baseline {stage}: fresh profile (macrophage-only, wound-only, vault locked).");
     }
 
@@ -130,7 +130,20 @@ public partial class TestCheatUnlocks : TestHarness
         AssertThat(AchievementManager.IsEndlessUnlocked()).IsTrue();
         AssertThat(OrganelleUnlockManager.UnlockedCount).IsEqual(GameManager.OrganelleCatalog.Count);
         AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(TestCheats.DefaultMetaTreeLevel);
-        AssertThat(PassiveTreeManager.BonusPoints >= TestCheats.DefaultBonusPoints).IsTrue();
+        // No granted points anymore: the earned bonus is derived from unlocks,
+        // so full unlock yields exactly the catalog total (11 today).
+        int expectedBonus = 0;
+        foreach (var achIdVar in AchievementManager.Achievements.Keys)
+        {
+            var entry = AchievementManager.Achievements[achIdVar].AsGodotDictionary();
+            if (entry.TryGetValue("talent_points", out var tpVar))
+                expectedBonus += tpVar.AsInt32();
+        }
+        AssertThat(expectedBonus).IsEqual(11);
+        AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(expectedBonus);
+        // Re-running the cheat is idempotent: nothing stacks.
+        TestCheats.UnlockAllMeta();
+        AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(expectedBonus);
         GD.Print("[PASS] UnlockAllMeta unlocks all classes, maps+hard, endless, organelles and tree levels.");
     }
 }

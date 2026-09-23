@@ -188,11 +188,11 @@ public partial class TestAchievementSystem : TestHarness
                 AssertThat(GameManager.IsMapUnlocked("blood_brain_barrier")).IsTrue();
                 AssertThat(GameManager.IsMapHardUnlocked("gastric_lumen")).IsTrue();
 
-                int bonusBefore = PassiveTreeManager.BonusPoints;
+                int bonusBefore = PassiveTreeManager.GetEarnedBonusPoints();
                 AchievementManager.RecordMapClear("blood_brain_barrier");
                 AssertThat(AchievementManager.IsUnlocked("bbb_clear")).IsTrue();
                 AssertThat(GameManager.IsMapHardUnlocked("blood_brain_barrier")).IsTrue();
-                AssertThat(PassiveTreeManager.BonusPoints).IsEqual(bonusBefore + 2);
+                AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(bonusBefore + 2);
 
                 AssertThat(AchievementManager.IsEndlessUnlocked()).IsFalse();
                 AchievementManager.RecordMapClear("acute_wound", true);

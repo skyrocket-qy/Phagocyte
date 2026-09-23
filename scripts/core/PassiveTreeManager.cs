@@ -328,19 +328,26 @@ public static class PassiveTreeManager
     public static Dictionary<string, int> ActiveProfiles = new();
 
     /// <summary>
-    /// Extra talent points awarded by meta progression (achievement map clears, etc.).
-    /// Shared across every cell so organ-clear rewards always have a spendable home.
+    /// Extra talent points from meta progression (achievement map clears).
+    /// Derived live from the catalog + unlock state on every read — never
+    /// stored, so no path (cheats included) can inflate the total beyond what
+    /// the unlocked achievements justify. Shared across every cell so
+    /// organ-clear rewards always have a spendable home.
     /// </summary>
-    public static int BonusPoints { get; private set; } = 0;
-
-    public static void AddBonusPoints(int amount)
+    public static int GetEarnedBonusPoints()
     {
-        if (amount <= 0)
-            return;
-
         EnsureLoaded();
-        BonusPoints += amount;
-        SaveToDisk();
+        int total = 0;
+        foreach (var achIdVar in AchievementManager.Achievements.Keys)
+        {
+            string achId = achIdVar.AsString();
+            if (!AchievementManager.IsUnlocked(achId))
+                continue;
+            var data = AchievementManager.Achievements[achId].AsGodotDictionary();
+            if (data.TryGetValue("talent_points", out var tpVar))
+                total += tpVar.AsInt32();
+        }
+        return Math.Max(0, total);
     }
 
     private static bool _loaded;
@@ -675,7 +682,7 @@ public static class PassiveTreeManager
 
     public static int GetPointsAvailable(string cellId)
     {
-        return Math.Max(0, GetCellLevel(cellId) - BaseCellLevel - GetSpentPoints(cellId)) + BonusPoints;
+        return Math.Max(0, GetCellLevel(cellId) - BaseCellLevel - GetSpentPoints(cellId)) + GetEarnedBonusPoints();
     }
 
     public static System.Collections.Generic.List<string> GetNeighbors(string nodeId)
@@ -817,8 +824,7 @@ public static class PassiveTreeManager
         {
             { "cell_levels", levels },
             { "allocations", allocations },
-            { "active_profiles", actives },
-            { "bonus_points", BonusPoints }
+            { "active_profiles", actives }
         };
 
         JsonStore.Write(SavePath, payload);
@@ -845,10 +851,9 @@ public static class PassiveTreeManager
         if (data == null)
             return;
 
-        if (data.TryGetValue("bonus_points", out var bonusVal))
-        {
-            BonusPoints = Math.Max(0, bonusVal.AsInt32());
-        }
+        // Legacy "bonus_points" key (pre-dynamic era) is intentionally not
+        // read: the earned total is recomputed from unlocks on every access,
+        // so stale inflated values evaporate on load.
 
         if (data.TryGetValue("cell_levels", out var levelsVal) && levelsVal.VariantType == Variant.Type.Dictionary)
         {
@@ -930,7 +935,6 @@ public static class PassiveTreeManager
         CellLevels.Clear();
         Allocations.Clear();
         ActiveProfiles.Clear();
-        BonusPoints = 0;
         _loaded = false;
         EnsureLoaded();
     }
@@ -940,7 +944,6 @@ public static class PassiveTreeManager
         CellLevels.Clear();
         Allocations.Clear();
         ActiveProfiles.Clear();
-        BonusPoints = 0;
         _loaded = true;
         JsonStore.Delete(SavePath);
     }

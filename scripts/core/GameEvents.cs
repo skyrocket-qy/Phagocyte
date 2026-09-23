@@ -18,7 +18,6 @@ public static class GameEvents
     public static event Action<string>? MapUnlockRequested;
     public static event Action<string>? MapHardUnlockRequested;
     public static event Action? MapsResetRequested;
-    public static event Action<int>? BonusPointsAwarded;
 
     private static bool _initialized = false;
 
@@ -32,7 +31,6 @@ public static class GameEvents
         MapUnlockRequested += GameManager.UnlockMap;
         MapHardUnlockRequested += GameManager.UnlockMapHard;
         MapsResetRequested += GameManager.ResetMapUnlocks;
-        BonusPointsAwarded += PassiveTreeManager.AddBonusPoints;
     }
 
     public static void RaiseClassUnlock(string classId)
@@ -63,11 +61,5 @@ public static class GameEvents
     {
         EnsureInitialized();
         MapsResetRequested?.Invoke();
-    }
-
-    public static void RaiseBonusPoints(int amount)
-    {
-        EnsureInitialized();
-        BonusPointsAwarded?.Invoke(amount);
     }
 }
