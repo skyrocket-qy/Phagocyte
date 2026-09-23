@@ -39,6 +39,7 @@ public partial class TestOrganelleChamber : TestHarness
         {
             RunConstantsTest();
             RunChamberLogicTests();
+            RunUnequipOverloadTests();
             RunSceneWiringTests();
             RunTranslationTests();
             RunUnlockManagerTests();
@@ -203,6 +204,91 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("might"), 1.0f)).IsTrue();
         mock.Free();
         GD.Print("[PASS] _ExitTree cleanup removes all equipped modifiers (no stat drift).");
+    }
+
+    private void RunUnequipOverloadTests()
+    {
+        OrganelleUnlockManager.ResetCache();
+        OrganelleUnlockManager.ResetAll();
+        OrganelleUnlockManager.UnlockAll();
+
+        var mock = new CharacterBody2D { Name = "UnequipHost" };
+        var stats = new CellStats { Name = "CellStats" };
+        mock.AddChild(stats);
+        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        mock.AddChild(chamber);
+        Root.AddChild(mock);
+        chamber.Setup(mock);
+
+        AssertThat(chamber.AddToBackpack("mitochondria_mkii")).IsTrue();
+        AssertThat(chamber.AddToBackpack("symbiotic_flora")).IsTrue();
+        AssertThat(chamber.AddToBackpack("acidic_lysosome")).IsTrue();
+        AssertThat(chamber.Equip("mitochondria_mkii", 0)).IsTrue();
+        AssertThat(chamber.Equip("symbiotic_flora", 1)).IsTrue();
+        AssertThat(chamber.Equip("acidic_lysosome", 2)).IsTrue();
+        AssertThat(chamber.UsedEnergy).IsEqual(7);
+        AssertThat(chamber.MaxEnergy).IsEqual(7);
+
+        // Positive control: unequipping a consumer works unblocked.
+        AssertThat(chamber.CanUnequip(2, out string consumerReason)).IsTrue();
+        AssertThat(chamber.Unequip(2)).IsTrue();
+        AssertThat(chamber.Equip("acidic_lysosome", 2)).IsTrue();
+
+        // Removing the generator now would strand 7 used on a cap of 6.
+        AssertThat(chamber.CanUnequip(1, out string overloadReason)).IsFalse();
+        AssertThat(overloadReason).IsEqual("overload");
+        AssertThat(chamber.Unequip(1)).IsFalse();
+        AssertThat(chamber.GetSlot(1)).IsEqual("symbiotic_flora");
+        AssertThat(chamber.UsedEnergy).IsEqual(7);
+        AssertThat(chamber.MaxEnergy).IsEqual(7);
+        AssertThat(chamber.IsOverloaded).IsFalse();
+        AssertThat(chamber.CanUnequip(9, out string slotReason)).IsFalse();
+        AssertThat(slotReason).IsEqual("bad_slot");
+        AssertThat(chamber.CanUnequip(3, out string emptyReason)).IsFalse();
+        AssertThat(emptyReason).IsEqual("empty_slot");
+        GD.Print("[PASS] Generator removal is refused while the remaining load would overload; state untouched.");
+
+        // Recovery: shed load first, then the generator leaves.
+        AssertThat(chamber.Unequip(2)).IsTrue();
+        AssertThat(chamber.Unequip(1)).IsTrue();
+        AssertThat(chamber.MaxEnergy).IsEqual(OrganelleChamber.BaseEnergy);
+        AssertThat(BagHas(chamber, "symbiotic_flora")).IsTrue();
+        GD.Print("[PASS] Shedding a consumer first unblocks the generator removal.");
+
+        mock.Free();
+
+        // UI level: the loadout page refuses with the overload hint and still
+        // clears a generator build via ResetLoadout (consumers first).
+        var viewScene = AssetLoader.Load<PackedScene>("res://scenes/ui/loadout_view.tscn");
+        AssertThat(viewScene).IsNotNull();
+        var view = viewScene!.Instantiate<LoadoutView>();
+        Root.AddChild(view);
+        view.Open("macrophage");
+        AssertThat(view.Chamber).IsNotNull();
+
+        AssertThat(view.ToggleOrganelle("mitochondria_mkii")).IsTrue();
+        AssertThat(view.ToggleOrganelle("symbiotic_flora")).IsTrue();
+        AssertThat(view.ToggleOrganelle("acidic_lysosome")).IsTrue();
+        AssertThat(view.Chamber!.UsedEnergy).IsEqual(7);
+
+        AssertThat(view.ToggleOrganelle("symbiotic_flora")).IsFalse();
+        AssertThat(view.Chamber.GetSlot(1)).IsEqual("symbiotic_flora");
+        AssertThat(view.Chamber.IsOverloaded).IsFalse();
+        GD.Print("[PASS] Loadout page refuses the generator removal with the overload hint.");
+
+        AssertThat(view.ToggleOrganelle("acidic_lysosome")).IsTrue();
+        AssertThat(view.ToggleOrganelle("symbiotic_flora")).IsTrue();
+        AssertThat(view.Chamber.GeneratorCount).IsEqual(0);
+
+        AssertThat(view.ToggleOrganelle("mitochondria_mkii")).IsTrue();
+        AssertThat(view.ToggleOrganelle("symbiotic_flora")).IsTrue();
+        AssertThat(view.ToggleOrganelle("acidic_lysosome")).IsTrue();
+        view.ResetLoadout();
+        AssertThat(view.Chamber.EquippedCount).IsEqual(0);
+        AssertThat(view.Chamber.IsOverloaded).IsFalse();
+        GD.Print("[PASS] ResetLoadout clears a generator build (consumers first, generators follow).");
+
+        view.Free();
     }
 
     private void RunSceneWiringTests()

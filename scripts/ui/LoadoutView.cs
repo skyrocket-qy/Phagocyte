@@ -366,12 +366,19 @@ public partial class LoadoutView : Control
             return false;
         }
 
-        // Already equipped: the click unequips it.
+        // Already equipped: the click unequips it. A generator whose removal
+        // would overload is refused with the overload hint (same as equipping).
         for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
         {
             if (_chamber.GetSlot(i) != id)
                 continue;
-            _chamber.Unequip(i);
+            if (!_chamber.Unequip(i))
+            {
+                _chamber.CanUnequip(i, out string unequipReason);
+                ShowHint(ReasonKey(unequipReason));
+                FlashEnergy(new Color(1.0f, 0.35f, 0.35f));
+                return false;
+            }
             Persist();
             RefreshAll();
             return true;
@@ -407,13 +414,28 @@ public partial class LoadoutView : Control
         return true;
     }
 
-    /// <summary>Unequips every slot and persists the cleared profile.</summary>
+    /// <summary>
+    /// Unequips every slot and persists the cleared profile. Generators refuse
+    /// while the remaining load would overload, so sweep until a full pass
+    /// changes nothing (consumers leave first, generators follow).
+    /// </summary>
     public void ResetLoadout()
     {
         if (_chamber == null)
             return;
-        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
-            _chamber.Unequip(i);
+        for (int pass = 0; pass <= OrganelleChamber.MaxSlots; pass++)
+        {
+            bool changed = false;
+            for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+            {
+                if (string.IsNullOrEmpty(_chamber.GetSlot(i)))
+                    continue;
+                if (_chamber.Unequip(i))
+                    changed = true;
+            }
+            if (!changed)
+                break;
+        }
         Persist();
         ShowHint("LOADOUT_HINT_DEFAULT");
         RefreshAll();
@@ -423,7 +445,13 @@ public partial class LoadoutView : Control
     {
         if (_chamber == null || string.IsNullOrEmpty(_chamber.GetSlot(slot)))
             return;
-        _chamber.Unequip(slot);
+        if (!_chamber.Unequip(slot))
+        {
+            _chamber.CanUnequip(slot, out string reason);
+            ShowHint(ReasonKey(reason));
+            FlashEnergy(new Color(1.0f, 0.35f, 0.35f));
+            return;
+        }
         Persist();
         RefreshAll();
     }

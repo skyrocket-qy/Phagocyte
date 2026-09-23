@@ -290,9 +290,39 @@ public partial class OrganelleChamber : Node2D
         return true;
     }
 
+    /// <summary>
+    /// Validates unequipping <paramref name="slot"/>. Removing a generator
+    /// shrinks the cap, so it is refused when the remaining load would
+    /// overload (<paramref name="reason"/> "overload", mirroring
+    /// <see cref="CanEquip"/>). Reason tokens: bad_slot / empty_slot / overload.
+    /// </summary>
+    public bool CanUnequip(int slot, out string reason)
+    {
+        reason = "";
+        if (slot < 0 || slot >= MaxSlots)
+        {
+            reason = "bad_slot";
+            return false;
+        }
+        string id = _slots[slot];
+        if (string.IsNullOrEmpty(id))
+        {
+            reason = "empty_slot";
+            return false;
+        }
+        if (EnergyCostOf(id) < 0 && UsedEnergy > BaseEnergy + GeneratorCount - 1)
+        {
+            reason = "overload";
+            return false;
+        }
+        return true;
+    }
+
     /// <summary>Unequips a slot back into the backpack (never overloads).</summary>
     public bool Unequip(int slot)
     {
+        if (!CanUnequip(slot, out _))
+            return false;
         if (slot < 0 || slot >= MaxSlots)
             return false;
 
