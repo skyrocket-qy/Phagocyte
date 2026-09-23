@@ -639,8 +639,10 @@ public partial class MainMenu : Control
             string bioKey = data.TryGetValue("bio_key", out Variant bioKeyVal) ? bioKeyVal.AsString() : "";
             ClassBioLbl.Text = Tr("CODEX_HEADER_BIO") + "\n" + (string.IsNullOrEmpty(bioKey) ? "" : Tr(bioKey));
         }
-        if (ClassRoleLbl != null && data.TryGetValue("role", out Variant roleVal))
-            ClassRoleLbl.Text = Tr("LABEL_ROLE") + roleVal.AsString();
+        // No explicit cell roles: builds are player-defined, so the role
+        // line stays hidden instead of pinning a fixed positioning.
+        if (ClassRoleLbl != null)
+            ClassRoleLbl.Visible = false;
         if (ClassStatsHeaderLbl != null)
             ClassStatsHeaderLbl.Text = Tr("CLASS_STATS_HEADER");
         if (ClassStatsLbl != null)
