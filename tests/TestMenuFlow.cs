@@ -122,7 +122,7 @@ public partial class TestMenuFlow : TestHarness
 
         OrganelleUnlockManager.UnlockAll();
         menu.RefreshLoadoutView();
-        AssertThat(menu.LoadoutView.Chamber!.Backpack.Count).IsEqual(12);
+        AssertThat(menu.LoadoutView.Chamber!.Backpack.Count).IsEqual(24);
         GD.Print("[PASS] Unlocking the vault makes every organelle equippable.");
 
         AssertThat(menu.LoadoutView.ToggleOrganelle("mitochondria_mkii")).IsTrue();

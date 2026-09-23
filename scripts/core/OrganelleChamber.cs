@@ -22,7 +22,7 @@ public partial class OrganelleChamber : Node2D
     public const int MaxSlots = 4;
     public const int BaseEnergy = 6;
     public const int MaxGenerators = 2;
-    public const int BackpackCap = 12;
+    public const int BackpackCap = 24;
 
     private static readonly string[] ModifierLists = { "modifiers", "drawback" };
 

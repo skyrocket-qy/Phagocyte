@@ -8,7 +8,7 @@ Core: `tests/TestCheats.cs`. Self-check: `tests/TestCheatUnlocks.cs`.
 `TestCheats.UnlockAllMeta()` unlocks:
 
 - All 19 achievements → all 5 cells, all 5 organ maps + Hard modes, Endless mode, talent points
-- All 12 organelles (`OrganelleUnlockManager.UnlockAll()`)
+- All 24 organelles (`OrganelleUnlockManager.UnlockAll()`)
 - Tree level 15 (meta cap) for every cell + 50 spendable bonus points
 
 `TestCheats.MaxOutPlayer(main)` builds the run: level 30, innate kept + 4 actives / 5 passives

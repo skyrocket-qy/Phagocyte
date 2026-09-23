@@ -10,7 +10,7 @@ namespace Phagocyte.Tests;
 
 /// <summary>
 /// Phase 0 data contract for the organelle chamber (TODO.md §Phase 0):
-/// 12 entries, 6 categories x 2, energy cost in [-1, 4], generators carry a
+/// 24 entries, 6 categories x 4, energy cost in [-1, 4], generators carry a
 /// drawback, and every modifier/drawback stat resolves against the universal
 /// stat pool. Runtime chamber behaviour is covered by TestOrganelleChamber.
 /// </summary>
@@ -35,6 +35,7 @@ public partial class TestOrganelleCatalog : TestHarness
         try
         {
             RunCatalogTests();
+            RunEquipSmokeTests();
             Finish(true, "ALL ORGANELLE CATALOG TESTS");
         }
         catch (Exception ex)
@@ -49,7 +50,7 @@ public partial class TestOrganelleCatalog : TestHarness
     {
         var catalog = GameManager.OrganelleCatalog;
 
-        AssertThat(catalog.Count).IsEqual(12);
+        AssertThat(catalog.Count).IsEqual(24);
         GD.Print($"[PASS] Organelle catalog loaded {catalog.Count} entries.");
 
         var perCategory = new System.Collections.Generic.Dictionary<string, int>();
@@ -88,13 +89,13 @@ public partial class TestOrganelleCatalog : TestHarness
                 AssertStatResolves(id, "drawback", mod);
         }
 
-        AssertThat(ids.Count).IsEqual(12);
+        AssertThat(ids.Count).IsEqual(24);
         AssertThat(perCategory.Count).IsEqual(6);
         foreach (var kv in perCategory)
         {
-            AssertThat(kv.Value).IsEqual(2);
+            AssertThat(kv.Value).IsEqual(4);
         }
-        GD.Print("[PASS] 6 categories x 2 entries, unique ids, valid costs and generator drawbacks verified.");
+        GD.Print("[PASS] 6 categories x 4 entries, unique ids, valid costs and generator drawbacks verified.");
 
         int generators = 0;
         foreach (string id in catalog.Keys)
@@ -102,8 +103,39 @@ public partial class TestOrganelleCatalog : TestHarness
             if (catalog[id].AsGodotDictionary()["energy_cost"].AsInt32() < 0)
                 generators++;
         }
-        AssertThat(generators).IsEqual(2);
-        GD.Print("[PASS] Exactly 2 generator organelles (+1 energy) present.");
+        AssertThat(generators).IsEqual(4);
+        GD.Print("[PASS] Exactly 4 generator organelles (+1 energy) present.");
+    }
+
+    /// <summary>
+    /// Every catalog entry equips into a solo slot (single-item load is always
+    /// within budget), proving the data end-to-end at runtime.
+    /// </summary>
+    private void RunEquipSmokeTests()
+    {
+        OrganelleUnlockManager.ResetCache();
+        OrganelleUnlockManager.ResetAll();
+        OrganelleUnlockManager.UnlockAll();
+
+        var mock = new CharacterBody2D { Name = "CatalogSmokeHost" };
+        mock.AddChild(new CellStats { Name = "CellStats" });
+        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        mock.AddChild(chamber);
+        Root.AddChild(mock);
+        chamber.Setup(mock);
+
+        int equipped = 0;
+        foreach (string id in GameManager.OrganelleCatalog.Keys)
+        {
+            AssertThat(chamber.AddToBackpack(id)).IsTrue();
+            AssertThat(chamber.Equip(id, 0)).IsTrue();
+            AssertThat(chamber.GetSlot(0)).IsEqual(id);
+            equipped++;
+        }
+        AssertThat(equipped).IsEqual(GameManager.OrganelleCatalog.Count);
+        GD.Print($"[PASS] All {equipped} catalog organelles equip into a solo slot.");
+
+        mock.Free();
     }
 
     private static void AssertStatResolves(string id, string listName, Dictionary mod)

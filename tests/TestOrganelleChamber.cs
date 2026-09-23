@@ -73,8 +73,8 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(OrganelleChamber.MaxSlots).IsEqual(4);
         AssertThat(OrganelleChamber.BaseEnergy).IsEqual(6);
         AssertThat(OrganelleChamber.MaxGenerators).IsEqual(2);
-        AssertThat(OrganelleChamber.BackpackCap).IsEqual(12);
-        GD.Print("[PASS] Chamber constants: 4 slots / base energy 6 / 2 generators / backpack 12.");
+        AssertThat(OrganelleChamber.BackpackCap).IsEqual(24);
+        GD.Print("[PASS] Chamber constants: 4 slots / base energy 6 / 2 generators / backpack 24.");
     }
 
     private void RunChamberLogicTests()
@@ -96,12 +96,12 @@ public partial class TestOrganelleChamber : TestHarness
         var ids = new List<string>();
         foreach (string id in GameManager.OrganelleCatalog.Keys)
             ids.Add(id);
-        AssertThat(ids.Count).IsEqual(12);
+        AssertThat(ids.Count).IsEqual(24);
         foreach (string id in ids)
             AssertThat(chamber.AddToBackpack(id)).IsTrue();
-        AssertThat(chamber.Backpack.Count).IsEqual(12);
+        AssertThat(chamber.Backpack.Count).IsEqual(24);
         AssertThat(chamber.AddToBackpack(ids[0])).IsFalse();
-        GD.Print("[PASS] Backpack acquires all 12 catalog items; duplicate copies are rejected.");
+        GD.Print("[PASS] Backpack acquires all 24 catalog items; duplicate copies are rejected.");
 
         // --- Overload rejection: 4 + 3 > 6 ---
         AssertThat(chamber.Equip("mitochondria_mkii", 0)).IsTrue();
@@ -111,7 +111,7 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(overloadReason).IsEqual("overload");
         AssertThat(chamber.Equip("acidic_lysosome", 1)).IsFalse();
         AssertThat(chamber.GetSlot(1)).IsEqual("");
-        AssertThat(chamber.Backpack.Count).IsEqual(11);
+        AssertThat(chamber.Backpack.Count).IsEqual(23);
         GD.Print("[PASS] Energy overload (4+3 > 6) rejected; no slot/backpack mutation.");
 
         // --- Generator expands the cap: 6/6 -> 7/7, then the 3-cost fits ---

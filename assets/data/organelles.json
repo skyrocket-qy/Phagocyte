@@ -280,5 +280,298 @@
       }
     ],
     "name_key": "ORGANELLE_PHAGE_FRAGMENT_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_ATP_SHUTTLE_BIO",
+    "category": "metabolism",
+    "desc_key": "ORGANELLE_ATP_SHUTTLE_DESC",
+    "drawback": [],
+    "energy_cost": 2,
+    "icon": "🔋",
+    "id": "atp_shuttle",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "move_speed",
+        "unit": "percent",
+        "value": 0.06
+      },
+      {
+        "stat": "duration",
+        "unit": "percent",
+        "value": 0.06
+      }
+    ],
+    "name_key": "ORGANELLE_ATP_SHUTTLE_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_KREBS_CYCLE_BIO",
+    "category": "metabolism",
+    "desc_key": "ORGANELLE_KREBS_CYCLE_DESC",
+    "drawback": [],
+    "energy_cost": 4,
+    "icon": "♻️",
+    "id": "krebs_cycle",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "cooldown_reduction",
+        "unit": "percentagepoints",
+        "value": 0.1
+      },
+      {
+        "stat": "might",
+        "unit": "percent",
+        "value": 0.1
+      }
+    ],
+    "name_key": "ORGANELLE_KREBS_CYCLE_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_BILE_SALT_POOL_BIO",
+    "category": "digestion",
+    "desc_key": "ORGANELLE_BILE_SALT_POOL_DESC",
+    "drawback": [],
+    "energy_cost": 2,
+    "icon": "🟡",
+    "id": "bile_salt_pool",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "ailment_damage",
+        "unit": "percent",
+        "value": 0.1
+      },
+      {
+        "stat": "health_regen",
+        "unit": "flat",
+        "value": 0.4
+      }
+    ],
+    "name_key": "ORGANELLE_BILE_SALT_POOL_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_PHAGOLYSOSOME_CORE_BIO",
+    "category": "digestion",
+    "desc_key": "ORGANELLE_PHAGOLYSOSOME_CORE_DESC",
+    "drawback": [],
+    "energy_cost": 4,
+    "icon": "🟣",
+    "id": "phagolysosome_core",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "might",
+        "unit": "percent",
+        "value": 0.15
+      },
+      {
+        "stat": "life_steal",
+        "unit": "flat",
+        "value": 0.05
+      }
+    ],
+    "name_key": "ORGANELLE_PHAGOLYSOSOME_CORE_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_ACTIN_MESH_BIO",
+    "category": "cytoskeleton",
+    "desc_key": "ORGANELLE_ACTIN_MESH_DESC",
+    "drawback": [],
+    "energy_cost": 2,
+    "icon": "🕸️",
+    "id": "actin_mesh",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "area",
+        "unit": "percent",
+        "value": 0.08
+      },
+      {
+        "stat": "evasion",
+        "unit": "flat",
+        "value": 0.02
+      }
+    ],
+    "name_key": "ORGANELLE_ACTIN_MESH_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_CENTROSOME_ARRAY_BIO",
+    "category": "cytoskeleton",
+    "desc_key": "ORGANELLE_CENTROSOME_ARRAY_DESC",
+    "drawback": [],
+    "energy_cost": 4,
+    "icon": "🎯",
+    "id": "centrosome_array",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "knockback",
+        "unit": "percent",
+        "value": 0.3
+      },
+      {
+        "stat": "pierce",
+        "unit": "flat",
+        "value": 1.0
+      }
+    ],
+    "name_key": "ORGANELLE_CENTROSOME_ARRAY_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_GOLGI_STACK_BIO",
+    "category": "synthesis",
+    "desc_key": "ORGANELLE_GOLGI_STACK_DESC",
+    "drawback": [],
+    "energy_cost": 2,
+    "icon": "📦",
+    "id": "golgi_stack",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "projectile_speed",
+        "unit": "percent",
+        "value": 0.12
+      },
+      {
+        "stat": "area",
+        "unit": "percent",
+        "value": 0.05
+      }
+    ],
+    "name_key": "ORGANELLE_GOLGI_STACK_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_NUCLEOLUS_PRIME_BIO",
+    "category": "synthesis",
+    "desc_key": "ORGANELLE_NUCLEOLUS_PRIME_DESC",
+    "drawback": [],
+    "energy_cost": 4,
+    "icon": "🌟",
+    "id": "nucleolus_prime",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "amount",
+        "unit": "flat",
+        "value": 1.0
+      },
+      {
+        "stat": "crit_damage",
+        "unit": "percent",
+        "value": 0.15
+      }
+    ],
+    "name_key": "ORGANELLE_NUCLEOLUS_PRIME_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_TOLL_RECEPTOR_BIO",
+    "category": "sensing",
+    "desc_key": "ORGANELLE_TOLL_RECEPTOR_DESC",
+    "drawback": [],
+    "energy_cost": 2,
+    "icon": "🔔",
+    "id": "toll_receptor",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "block",
+        "unit": "flat",
+        "value": 0.03
+      },
+      {
+        "stat": "evasion",
+        "unit": "flat",
+        "value": 0.02
+      }
+    ],
+    "name_key": "ORGANELLE_TOLL_RECEPTOR_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_MEMBRANE_RAFT_BIO",
+    "category": "sensing",
+    "desc_key": "ORGANELLE_MEMBRANE_RAFT_DESC",
+    "drawback": [],
+    "energy_cost": 4,
+    "icon": "🛟",
+    "id": "membrane_raft",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "armor",
+        "unit": "flat",
+        "value": 5.0
+      },
+      {
+        "stat": "block",
+        "unit": "flat",
+        "value": 0.03
+      }
+    ],
+    "name_key": "ORGANELLE_MEMBRANE_RAFT_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_REDOX_SYMBIONT_BIO",
+    "category": "symbiosis",
+    "desc_key": "ORGANELLE_REDOX_SYMBIONT_DESC",
+    "drawback": [
+      {
+        "stat": "armor",
+        "unit": "flat",
+        "value": -3.0
+      },
+      {
+        "stat": "evasion",
+        "unit": "flat",
+        "value": -0.03
+      }
+    ],
+    "energy_cost": -1,
+    "icon": "🪸",
+    "id": "redox_symbiont",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "might",
+        "unit": "percent",
+        "value": 0.1
+      }
+    ],
+    "name_key": "ORGANELLE_REDOX_SYMBIONT_NAME"
+  },
+  {
+    "bio_key": "ORGANELLE_QUORUM_COLONY_BIO",
+    "category": "symbiosis",
+    "desc_key": "ORGANELLE_QUORUM_COLONY_DESC",
+    "drawback": [
+      {
+        "stat": "move_speed",
+        "unit": "percent",
+        "value": -0.15
+      },
+      {
+        "stat": "max_health",
+        "unit": "percent",
+        "value": -0.1
+      }
+    ],
+    "energy_cost": -1,
+    "icon": "🐝",
+    "id": "quorum_colony",
+    "max_copies": 1,
+    "modifiers": [
+      {
+        "stat": "magnet",
+        "unit": "percent",
+        "value": 0.25
+      },
+      {
+        "stat": "health_regen",
+        "unit": "flat",
+        "value": 0.5
+      }
+    ],
+    "name_key": "ORGANELLE_QUORUM_COLONY_NAME"
   }
 ]
