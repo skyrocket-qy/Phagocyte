@@ -77,7 +77,7 @@ public partial class PauseMenuView : Node
         if (PauseInputSuppressed)
             return;
 
-        if (@event.IsActionPressed("toggle_tree") || (@event is InputEventKey treeKey && treeKey.Pressed && treeKey.Keycode == Key.C))
+        if (@event.IsActionPressed("toggle_tree"))
         {
             ToggleTreeOverlay();
             return;

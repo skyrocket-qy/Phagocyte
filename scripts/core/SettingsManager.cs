@@ -77,6 +77,8 @@ public partial class SettingsManager : Node
         var vsyncMode = Vsync ? DisplayServer.VSyncMode.Enabled : DisplayServer.VSyncMode.Disabled;
         DisplayServer.WindowSetVsyncMode(vsyncMode);
 
+        KeyBindings.ApplyAll();
+
         if (Instance != null && IsInstanceValid(Instance))
         {
             Instance.EmitSignal(SignalName.SettingsChanged);
@@ -135,7 +137,8 @@ public partial class SettingsManager : Node
             { "fullscreen", Fullscreen },
             { "vsync", Vsync },
             { "screen_shake", ScreenShake },
-            { "map_effects_enabled", MapEffectsEnabled }
+            { "map_effects_enabled", MapEffectsEnabled },
+            { "keybindings", KeyBindings.ToDict() }
         };
         JsonStore.Write(SavePath, payload);
     }
@@ -153,5 +156,9 @@ public partial class SettingsManager : Node
         Vsync = d.ContainsKey("vsync") ? (bool)d["vsync"] : true;
         ScreenShake = d.ContainsKey("screen_shake") ? (bool)d["screen_shake"] : false;
         MapEffectsEnabled = d.ContainsKey("map_effects_enabled") ? (bool)d["map_effects_enabled"] : false;
+        if (d.TryGetValue("keybindings", out var kbVal) && kbVal.VariantType == Variant.Type.Dictionary)
+            KeyBindings.FromDict(kbVal.AsGodotDictionary());
+        else
+            KeyBindings.ApplyAll();
     }
 }

@@ -9,10 +9,15 @@ public partial class SettingsModal : ModalBase
     public Button? TabControlsBtn { get; set; }
     public Button? TabAudioBtn { get; set; }
     public Button? TabGraphicsBtn { get; set; }
+    public Button? TabKeysBtn { get; set; }
 
     public VBoxContainer? ControlsPanel { get; set; }
     public VBoxContainer? AudioPanel { get; set; }
     public VBoxContainer? GraphicsPanel { get; set; }
+    public VBoxContainer? KeysPanel { get; set; }
+
+    public Label? KeysHintLbl { get; set; }
+    public Button? KeysResetBtn { get; set; }
 
     public Label? ControlsHeaderLbl { get; set; }
     public Label? CtrlMoveLbl { get; set; }
@@ -45,6 +50,15 @@ public partial class SettingsModal : ModalBase
     private static readonly string[] LangNames = { "English", "简体中文", "繁體中文", "日本語", "Deutsch", "Français", "Русский", "Español" };
 
     public int CurrentTab { get; set; } = 0;
+
+    public const int TabControls = 0;
+    public const int TabAudio = 1;
+    public const int TabGraphics = 2;
+    public const int TabKeys = 3;
+
+    /// <summary>Action currently awaiting a replacement key; "" when idle.</summary>
+    public string ListeningAction { get; private set; } = "";
+    private readonly System.Collections.Generic.Dictionary<string, Button> _keyRowButtons = new();
 
     public override void _Ready()
     {
@@ -88,6 +102,8 @@ public partial class SettingsModal : ModalBase
         if (TabGraphicsBtn != null)
             TabGraphicsBtn.Pressed += () => SwitchTab(2);
 
+        BuildKeysTab();
+
         // Audio signals
         if (MasterSlider != null)
             MasterSlider.ValueChanged += OnMasterSliderChanged;
@@ -120,8 +136,16 @@ public partial class SettingsModal : ModalBase
     public void OpenSettings(int targetTab = 0)
     {
         SyncUiFromSettings();
+        ListeningAction = "";
+        RefreshKeysPanel();
         Visible = true;
         SwitchTab(targetTab);
+    }
+
+    public override void CloseModal()
+    {
+        ListeningAction = "";
+        base.CloseModal();
     }
 
     public void CloseSettings()
@@ -136,6 +160,7 @@ public partial class SettingsModal : ModalBase
         UiBuilders.SetTabActive(TabControlsBtn, tabIdx == 0);
         UiBuilders.SetTabActive(TabAudioBtn, tabIdx == 1);
         UiBuilders.SetTabActive(TabGraphicsBtn, tabIdx == 2);
+        UiBuilders.SetTabActive(TabKeysBtn, tabIdx == 3);
 
         if (ControlsPanel != null)
             ControlsPanel.Visible = tabIdx == 0;
@@ -143,6 +168,200 @@ public partial class SettingsModal : ModalBase
             AudioPanel.Visible = tabIdx == 1;
         if (GraphicsPanel != null)
             GraphicsPanel.Visible = tabIdx == 2;
+        if (KeysPanel != null)
+            KeysPanel.Visible = tabIdx == 3;
+    }
+
+    /// <summary>
+    /// Code-built 4th tab: the scene keeps its 3 static tabs/panels, key rows
+    /// vary per action so they are built in code like MainMenu profile tabs.
+    /// </summary>
+    private void BuildKeysTab()
+    {
+        var tabBar = GetNodeOrNull<HBoxContainer>("VBox/TabBar");
+        var content = GetNodeOrNull<Control>("VBox/Content");
+        if (tabBar == null || content == null)
+            return;
+
+        var template = TabControlsBtn;
+        TabKeysBtn = new Button
+        {
+            Name = "KeysTab",
+            CustomMinimumSize = template?.CustomMinimumSize ?? new Vector2(0, 38),
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+            MouseDefaultCursorShape = Control.CursorShape.PointingHand
+        };
+        if (template != null)
+        {
+            TabKeysBtn.AddThemeFontOverride("font", template.GetThemeFont("font"));
+            TabKeysBtn.AddThemeFontSizeOverride("font_size", template.GetThemeFontSize("font_size"));
+        }
+        else
+        {
+            TabKeysBtn.AddThemeFontSizeOverride("font_size", 14);
+        }
+        TabKeysBtn.Pressed += () => SwitchTab(TabKeys);
+        tabBar.AddChild(TabKeysBtn);
+
+        KeysPanel = new VBoxContainer
+        {
+            Name = "KeysPanel",
+            Visible = false
+        };
+        KeysPanel.AddThemeConstantOverride("separation", 10);
+        content.AddChild(KeysPanel);
+
+        KeysHintLbl = new Label
+        {
+            Name = "KeysHint",
+            AutowrapMode = TextServer.AutowrapMode.WordSmart
+        };
+        KeysHintLbl.AddThemeFontSizeOverride("font_size", 13);
+        KeysHintLbl.AddThemeColorOverride("font_color", new Color(0.65f, 0.72f, 0.8f));
+        KeysPanel.AddChild(KeysHintLbl);
+
+        foreach (string action in KeyBindings.Actions)
+        {
+            var row = new HBoxContainer
+            {
+                Name = $"KeyRow_{action}"
+            };
+            row.AddThemeConstantOverride("separation", 12);
+            var nameLbl = new Label
+            {
+                Name = "ActionLabel",
+                CustomMinimumSize = new Vector2(200, 0),
+                SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            nameLbl.AddThemeFontSizeOverride("font_size", 14);
+            row.AddChild(nameLbl);
+            string localAction = action;
+            var rebindBtn = new Button
+            {
+                Name = "RebindButton",
+                CustomMinimumSize = new Vector2(140, 36),
+                MouseDefaultCursorShape = Control.CursorShape.PointingHand
+            };
+            rebindBtn.AddThemeFontSizeOverride("font_size", 14);
+            rebindBtn.Pressed += () => BeginRebind(localAction);
+            row.AddChild(rebindBtn);
+            row.SetMeta("action", action);
+            KeysPanel.AddChild(row);
+            _keyRowButtons[action] = rebindBtn;
+        }
+
+        var fixedRow = new HBoxContainer
+        {
+            Name = "KeyRow_fixed_pause"
+        };
+        fixedRow.AddThemeConstantOverride("separation", 12);
+        var fixedName = new Label
+        {
+            Name = "ActionLabel",
+            CustomMinimumSize = new Vector2(200, 0),
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        fixedName.AddThemeFontSizeOverride("font_size", 14);
+        fixedRow.AddChild(fixedName);
+        var fixedVal = new Label
+        {
+            Name = "FixedValue",
+            CustomMinimumSize = new Vector2(140, 36),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        fixedVal.AddThemeFontSizeOverride("font_size", 14);
+        fixedVal.AddThemeColorOverride("font_color", new Color(0.55f, 0.62f, 0.72f));
+        fixedRow.AddChild(fixedVal);
+        fixedRow.SetMeta("fixed_pause", true);
+        KeysPanel.AddChild(fixedRow);
+
+        KeysResetBtn = new Button
+        {
+            Name = "KeysResetButton",
+            CustomMinimumSize = new Vector2(0, 36),
+            MouseDefaultCursorShape = Control.CursorShape.PointingHand
+        };
+        KeysResetBtn.AddThemeFontSizeOverride("font_size", 14);
+        KeysResetBtn.Pressed += OnKeysResetPressed;
+        KeysPanel.AddChild(KeysResetBtn);
+        RefreshKeysPanel();
+    }
+
+    public void BeginRebind(string action)
+    {
+        ListeningAction = action;
+        RefreshKeysPanel();
+    }
+
+    private void OnKeysResetPressed()
+    {
+        ListeningAction = "";
+        KeyBindings.ResetAll();
+        RefreshKeysPanel();
+    }
+
+    /// <summary>
+    /// Captures the replacement key in _Input (ahead of MainMenu's ESC-back).
+    /// ESC cancels listening; pause itself is fixed and never rebound.
+    /// </summary>
+    public override void _Input(InputEvent @event)
+    {
+        if (string.IsNullOrEmpty(ListeningAction) || !Visible)
+            return;
+        if (@event is not InputEventKey key || !key.Pressed || key.Echo)
+            return;
+        string action = ListeningAction;
+        if (key.Keycode == Key.Escape)
+        {
+            ListeningAction = "";
+            RefreshKeysPanel();
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+        Key code = key.PhysicalKeycode != Key.None ? key.PhysicalKeycode : key.Keycode;
+        if (code == Key.None)
+            return;
+        ListeningAction = "";
+        KeyBindings.SetPrimary(action, code);
+        RefreshKeysPanel();
+        GetViewport().SetInputAsHandled();
+    }
+
+    public void RefreshKeysPanel()
+    {
+        if (KeysPanel == null)
+            return;
+        foreach (var row in KeysPanel.GetChildren())
+        {
+            if (row is HBoxContainer hbox && hbox.HasMeta("fixed_pause"))
+            {
+                var fixedName = hbox.GetNodeOrNull<Label>("ActionLabel");
+                if (fixedName != null)
+                    fixedName.Text = Tr("KEYS_ACTION_TOGGLE_PAUSE");
+                var fixedVal = hbox.GetNodeOrNull<Label>("FixedValue");
+                if (fixedVal != null)
+                    fixedVal.Text = "ESC " + Tr("KEYS_FIXED");
+                continue;
+            }
+            if (row is HBoxContainer hbox2 && hbox2.HasMeta("action"))
+            {
+                string action = hbox2.GetMeta("action").AsString();
+                var nameLbl = hbox2.GetNodeOrNull<Label>("ActionLabel");
+                if (nameLbl != null)
+                    nameLbl.Text = Tr($"KEYS_ACTION_{action.ToUpperInvariant()}");
+                if (_keyRowButtons.TryGetValue(action, out var btn))
+                {
+                    btn.Text = ListeningAction == action
+                        ? Tr("KEYS_PRESS_HINT")
+                        : KeyBindings.KeyText(KeyBindings.GetPrimary(action));
+                }
+            }
+        }
+        if (KeysResetBtn != null)
+            KeysResetBtn.Text = Tr("KEYS_RESET");
     }
 
     public void SyncUiFromSettings()
@@ -240,6 +459,10 @@ public partial class SettingsModal : ModalBase
         if (TabControlsBtn != null) TabControlsBtn.Text = Tr("SETTINGS_TAB_CONTROLS");
         if (TabAudioBtn != null) TabAudioBtn.Text = Tr("SETTINGS_TAB_AUDIO");
         if (TabGraphicsBtn != null) TabGraphicsBtn.Text = Tr("SETTINGS_TAB_GRAPHICS");
+        if (TabKeysBtn != null) TabKeysBtn.Text = Tr("SETTINGS_TAB_KEYS");
+
+        if (KeysHintLbl != null) KeysHintLbl.Text = Tr("KEYS_HINT");
+        RefreshKeysPanel();
 
         if (ControlsHeaderLbl != null) ControlsHeaderLbl.Text = Tr("CONTROLS_TITLE");
         if (CtrlMoveLbl != null) CtrlMoveLbl.Text = Tr("CONTROLS_MOVE_DESC");

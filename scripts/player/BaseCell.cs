@@ -481,19 +481,19 @@ public partial class BaseCell : CharacterBody2D
         MoveAndSlide();
     }
 
-    /// <summary>Normalized WASD/arrows/stick vector (zero while stunned).</summary>
+    /// <summary>Normalized move vector from the InputMap (zero while stunned).</summary>
     private Vector2 ReadMoveInput()
     {
         Vector2 inputVec = Vector2.Zero;
         if (StunTimer <= 0.0f)
         {
-            if (Input.IsActionPressed("move_left") || Input.IsKeyPressed(Key.A) || Input.IsKeyPressed(Key.Left))
+            if (Input.IsActionPressed("move_left"))
                 inputVec.X -= 1.0f;
-            if (Input.IsActionPressed("move_right") || Input.IsKeyPressed(Key.D) || Input.IsKeyPressed(Key.Right))
+            if (Input.IsActionPressed("move_right"))
                 inputVec.X += 1.0f;
-            if (Input.IsActionPressed("move_up") || Input.IsKeyPressed(Key.W) || Input.IsKeyPressed(Key.Up))
+            if (Input.IsActionPressed("move_up"))
                 inputVec.Y -= 1.0f;
-            if (Input.IsActionPressed("move_down") || Input.IsKeyPressed(Key.S) || Input.IsKeyPressed(Key.Down))
+            if (Input.IsActionPressed("move_down"))
                 inputVec.Y += 1.0f;
 
             if (InvertControlsTimer > 0.0f)
@@ -541,9 +541,6 @@ public partial class BaseCell : CharacterBody2D
     private static bool ReadDodgePressedRaw()
     {
         if (Input.IsActionPressed("dodge"))
-            return true;
-
-        if (Input.IsKeyPressed(Key.Space))
             return true;
 
         foreach (int device in Input.GetConnectedJoypads())

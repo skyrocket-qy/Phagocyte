@@ -369,6 +369,18 @@ SETTINGS_LANGUAGE,Language,语言,語言,言語,Sprache,Langue,Язык,Idioma
 SETTINGS_TAB_CONTROLS,🎮 Controls Guide,🎮 操作指南,🎮 操作指南,🎮 操作ガイド,🎮 Steuerungsanleitung,🎮 Guide des contrôles,🎮 Руководство по управлению,🎮 Guía de controles
 SETTINGS_TAB_AUDIO,🔊 Audio & Sound,🔊 聲音音效,🔊 聲音音效,🔊 オーディオ,🔊 Audio & Sound,🔊 Audio et son,🔊 Аудио и звук,🔊 Audio y sonido
 SETTINGS_TAB_GRAPHICS,🖥️ Graphics,🖥️ 畫面顯示,🖥️ 畫面顯示,🖥️ グラフィック,🖥️ Grafik,🖥️ Graphismes,🖥️ Графика,🖥️ Gráficos
+SETTINGS_TAB_KEYS,⌨️ Key Bindings,⌨️ 按键设置,⌨️ 按鍵設定,⌨️ キー設定,⌨️ Tastenbelegung,⌨️ Touches,⌨️ Клавиши,⌨️ Teclas
+KEYS_HINT,Click a key then press its replacement. The old key stops working. ESC is fixed and always backs out.,点击按键后按下新键，旧键随即失效。ESC 固定不变，始终可用作返回。,點擊按鍵後按下新鍵，舊鍵隨即失效。ESC 固定不變，始終可用作返回。,キーをクリックして新しいキーを押す。旧キーは無効化。ESCは固定で常に戻る。,Klicke eine Taste und drücke den Ersatz. Die alte Taste wird ungültig. ESC ist fest und führt immer zurück.,Cliquez une touche puis la remplaçante. L'ancienne touche est désactivée. ESC est fixe et revient toujours.,Нажмите кнопку и новую клавишу. Старая клавиша отключается. ESC закреплён и всегда назад.,Haz clic y pulsa la nueva tecla. La tecla anterior queda desactivada. ESC es fijo y siempre vuelve.
+KEYS_FIXED,(fixed),(固定),(固定),(固定),(fest),(fixe),(закреплена),(fija)
+KEYS_RESET,Reset to Defaults,恢复默认,恢復預設,デフォルトに戻す,Zurücksetzen,Réinitialiser,Сбросить,Restablecer
+KEYS_PRESS_HINT,Press a key…,请按键…,請按鍵…,キーを押して…,Taste drücken…,Touche…,Нажмите…,Pulsa…
+KEYS_ACTION_MOVE_UP,Move Up,上移,上移,上移動,Nach oben,Haut,Вверх,Arriba
+KEYS_ACTION_MOVE_DOWN,Move Down,下移,下移,下移動,Nach unten,Bas,Вниз,Abajo
+KEYS_ACTION_MOVE_LEFT,Move Left,左移,左移,左移動,Nach links,Gauche,Влево,Izquierda
+KEYS_ACTION_MOVE_RIGHT,Move Right,右移,右移,右移動,Nach rechts,Droite,Вправо,Derecha
+KEYS_ACTION_DODGE,Dodge Roll,翻滚闪避,翻滾閃避,回避ロール,Ausweichen,Esquive,Уворот,Esquiva
+KEYS_ACTION_TOGGLE_TREE,Passive Tree Panel,被动树面板,被動樹面板,パッシブツリー表示,Passivbaum-Panel,Panneau arbre,Панель дерева,Panel de árbol
+KEYS_ACTION_TOGGLE_PAUSE,Pause / Back,暂停 / 返回,暫停 / 返回,一時停止／戻る,Pause / Zurück,Pause / Retour,Пауза / Назад,Pausa / Volver
 SETTINGS_MASTER_VOL,Master Volume: ,主音量：,主音量：,マスター音量：,Master-Lautstärke: ,Volume principal : ,Общая громкость: ,Volumen principal: 
 SETTINGS_SFX_VOL,SFX Volume: ,音效音量：,音效音量：,効果音：,SFX-Lautstärke: ,Volume des effets : ,Громкость эффектов: ,Volumen de efectos: 
 SETTINGS_BGM_VOL,Music Volume: ,音樂音量：,音樂音量：,音楽：,Musiklautstärke: ,Volume de la musique : ,Громкость музыки: ,Volumen de música: 

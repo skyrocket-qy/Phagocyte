@@ -372,9 +372,17 @@ public partial class MainMenu : Control
     /// Debug-only test hotkeys (no CLI args needed, so plain editor F5 runs
     /// work): F9 unlocks all meta progression, F10 resets to a fresh
     /// profile. No-op in release builds.
+    /// ESC (toggle_pause) acts as the global back affordance: it closes the
+    /// topmost open modal first, otherwise it triggers <see cref="OnGlobalBackPressed"/>.
     /// </summary>
     public override void _UnhandledKeyInput(InputEvent @event)
     {
+        if (IsEscapePressed(@event))
+        {
+            if (TryHandleEscapeAsBack())
+                GetViewport().SetInputAsHandled();
+            return;
+        }
         if (!OS.IsDebugBuild() || @event is not InputEventKey key || !key.Pressed || key.Echo)
             return;
         if (key.Keycode == Key.F9)
@@ -400,6 +408,52 @@ public partial class MainMenu : Control
             SetupClassButtons();
         if (MapView != null && MapView.Visible)
             SelectMap(ActiveMapKey);
+    }
+
+    private static bool IsEscapePressed(InputEvent @event)
+    {
+        if (@event is InputEventKey echoKey && echoKey.Echo)
+            return false;
+        if (@event.IsActionPressed("toggle_pause"))
+            return true;
+        return @event is InputEventKey key && key.Pressed && key.Keycode == Key.Escape;
+    }
+
+    /// <summary>
+    /// ESC-as-back: close the topmost open modal first; otherwise trigger the
+    /// shared back button when it is visible. Settlement-mode records must pick
+    /// Retry/Menu, so ESC there is consumed without navigating behind the modal.
+    /// Returns true when the key was consumed.
+    /// </summary>
+    public bool TryHandleEscapeAsBack()
+    {
+        if (EndlessSetupModal != null && EndlessSetupModal.Visible)
+        {
+            EndlessSetupModal.CloseModal();
+            return true;
+        }
+        if (CellCodexModal != null && CellCodexModal.Visible)
+        {
+            CellCodexModal.CloseModal();
+            return true;
+        }
+        if (CellSettingsModal != null && CellSettingsModal.Visible)
+        {
+            CellSettingsModal.CloseModal();
+            return true;
+        }
+        if (RecordsModal != null && RecordsModal.Visible)
+        {
+            if (!RecordsModal.SettlementMode)
+                RecordsModal.CloseModal();
+            return true;
+        }
+        if (GlobalBackBtn != null && GlobalBackBtn.Visible)
+        {
+            OnGlobalBackPressed();
+            return true;
+        }
+        return false;
     }
 
     public override void _ExitTree()
