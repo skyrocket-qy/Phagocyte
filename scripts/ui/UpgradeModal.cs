@@ -552,7 +552,6 @@ public partial class UpgradeModal : ModalBase
         return reason switch
         {
             "overload" => "LOADOUT_HINT_OVERLOAD",
-            "generator_cap" => "LOADOUT_HINT_GENERATOR_CAP",
             "copy_cap" or "already_equipped" => "LOADOUT_HINT_COPY_CAP",
             "unknown" => "LOADOUT_HINT_UNKNOWN",
             "bad_slot" => "LOADOUT_HINT_BAD_SLOT",

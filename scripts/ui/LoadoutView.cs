@@ -33,8 +33,6 @@ public partial class LoadoutView : Control
     public GridContainer? BackpackGrid { get; set; }
     public Label? HintLabel { get; set; }
     public Label? ChamberHeaderLabel { get; set; }
-    public Label? EnergyLabel { get; set; }
-    public Label? GeneratorLabel { get; set; }
     public EnergyPips? EnergyBar { get; set; }
     public GridContainer? ChamberGrid { get; set; }
     public Button? ResetButton { get; set; }
@@ -138,8 +136,6 @@ public partial class LoadoutView : Control
         BackpackGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/VaultSide/VaultScroll/BackpackGrid");
         HintLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/VaultSide/HintLabel");
         ChamberHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/ChamberSide/ChamberHeader");
-        EnergyLabel = GetNodeOrNull<Label>("Margin/VBox/TopBar/EnergyVBox/EnergyLabel");
-        GeneratorLabel = GetNodeOrNull<Label>("Margin/VBox/TopBar/EnergyVBox/GeneratorLabel");
         EnergyBar = GetNodeOrNull<EnergyPips>("Margin/VBox/ContentHBox/ChamberSide/EnergyBar");
         ChamberGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin/ChamberGrid");
         ResetButton = GetNodeOrNull<Button>("Margin/VBox/Buttons/ResetButton");
@@ -606,15 +602,6 @@ public partial class LoadoutView : Control
         int max = _chamber?.MaxEnergy ?? OrganelleChamber.BaseEnergy;
         int generators = _chamber?.GeneratorCount ?? 0;
 
-        if (EnergyLabel != null)
-        {
-            EnergyLabel.Text = TextFormatter.Format(Tr("LOADOUT_ENERGY_FMT"), used, max);
-            EnergyLabel.Modulate = used > max
-                ? new Color(1.0f, 0.45f, 0.45f)
-                : new Color(0.45f, 0.92f, 1.0f);
-        }
-        if (GeneratorLabel != null)
-            GeneratorLabel.Text = TextFormatter.Format(Tr("LOADOUT_GENERATOR_FMT"), generators, OrganelleChamber.MaxGenerators);
         if (EnergyBar != null)
         {
             // One disc per energy point: consumed discs filled, the trailing
@@ -687,7 +674,6 @@ public partial class LoadoutView : Control
         return reason switch
         {
             "overload" => "LOADOUT_HINT_OVERLOAD",
-            "generator_cap" => "LOADOUT_HINT_GENERATOR_CAP",
             "copy_cap" or "already_equipped" => "LOADOUT_HINT_COPY_CAP",
             "unknown" => "LOADOUT_HINT_UNKNOWN",
             "bad_slot" => "LOADOUT_HINT_BAD_SLOT",

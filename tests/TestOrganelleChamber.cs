@@ -72,9 +72,8 @@ public partial class TestOrganelleChamber : TestHarness
     {
         AssertThat(OrganelleChamber.MaxSlots).IsEqual(4);
         AssertThat(OrganelleChamber.BaseEnergy).IsEqual(6);
-        AssertThat(OrganelleChamber.MaxGenerators).IsEqual(2);
         AssertThat(OrganelleChamber.BackpackCap).IsEqual(24);
-        GD.Print("[PASS] Chamber constants: 4 slots / base energy 6 / 2 generators / backpack 24.");
+        GD.Print("[PASS] Chamber constants: 4 slots / base energy 6 / backpack 24 (generators uncapped).");
     }
 
     private void RunChamberLogicTests()
@@ -176,6 +175,18 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("max_health"), 100.0f * 0.8f)).IsTrue();
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("cooldown_reduction"), 0.10f)).IsTrue();
         GD.Print("[PASS] Two generators cap at 8 energy; both drawbacks stack on the stat pool.");
+
+        // --- No generator cap: a third generator equips, then the slot is restored ---
+        // (slot 0 currently holds acidic_lysosome after the swap above)
+        AssertThat(chamber.Equip("redox_symbiont", 0)).IsTrue();
+        AssertThat(chamber.GeneratorCount).IsEqual(3);
+        AssertThat(chamber.MaxEnergy).IsEqual(9);
+        AssertThat(chamber.UsedEnergy).IsEqual(1);
+        GD.Print("[PASS] Third generator equips past the removed cap of 2.");
+        AssertThat(chamber.Equip("acidic_lysosome", 0)).IsTrue();
+        AssertThat(chamber.GeneratorCount).IsEqual(2);
+        AssertThat(chamber.MaxEnergy).IsEqual(8);
+        AssertThat(chamber.UsedEnergy).IsEqual(4);
 
         // --- UI payload ---
         var ui = chamber.GetUiData();

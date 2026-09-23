@@ -8,8 +8,8 @@ namespace Phagocyte.Core;
 /// <summary>
 /// Organelle Chamber — the 2x2 equipment system (TODO Phase 0).
 /// Four 1x1 slots under a base 6-point energy budget. Generators
-/// (<c>energy_cost == -1</c>, +1 energy each) raise the cap but are limited to
-/// <see cref="MaxGenerators"/> and must carry a drawback. Owned-but-unequipped
+/// (<c>energy_cost == -1</c>, +1 energy each) raise the cap with no limit
+/// but must carry a drawback. Owned-but-unequipped
 /// organelles live in the run-scoped backpack. Every effect is applied through
 /// the universal <see cref="CellStats"/> pool (modifiers + drawback alike).
 /// Energy model (used/max): used = sum of positive costs, max = base + generators.
@@ -21,7 +21,6 @@ public partial class OrganelleChamber : Node2D
 
     public const int MaxSlots = 4;
     public const int BaseEnergy = 6;
-    public const int MaxGenerators = 2;
     public const int BackpackCap = 24;
 
     private static readonly string[] ModifierLists = { "modifiers", "drawback" };
@@ -139,8 +138,7 @@ public partial class OrganelleChamber : Node2D
     /// Validates placing <paramref name="id"/> into <paramref name="slot"/>
     /// (replace semantics: the slot's current occupant is removed first).
     /// <paramref name="reason"/> is a stable token for UI copy:
-    /// empty_id / unknown / bad_slot / already_equipped / copy_cap /
-    /// generator_cap / overload.
+    /// empty_id / unknown / bad_slot / already_equipped / copy_cap / overload.
     /// </summary>
     public bool CanEquip(string id, int slot, out string reason)
     {
@@ -185,11 +183,6 @@ public partial class OrganelleChamber : Node2D
             generators--;
         if (cost < 0)
             generators++;
-        if (generators > MaxGenerators)
-        {
-            reason = "generator_cap";
-            return false;
-        }
 
         int used = UsedEnergy;
         if (replacedCost > 0)
@@ -209,8 +202,7 @@ public partial class OrganelleChamber : Node2D
     /// Validates a whole slot set (empty strings allowed) against the chamber
     /// rules. Shared by the pre-run loadout manager and the UI so both apply
     /// exactly the same legality contract as <see cref="CanEquip"/>.
-    /// <paramref name="reason"/> tokens: bad_slot / unknown / copy_cap /
-    /// generator_cap / overload.
+    /// <paramref name="reason"/> tokens: bad_slot / unknown / copy_cap / overload.
     /// </summary>
     public static bool ValidateSlots(IReadOnlyList<string> slots, out string reason)
     {
@@ -249,11 +241,6 @@ public partial class OrganelleChamber : Node2D
                 used += cost;
         }
 
-        if (generators > MaxGenerators)
-        {
-            reason = "generator_cap";
-            return false;
-        }
         if (used > BaseEnergy + generators)
         {
             reason = "overload";
