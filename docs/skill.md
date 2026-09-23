@@ -7,7 +7,7 @@
 在《Project: Phagocyte》中，技能系統是玩家戰鬥構築（Build）的核心載體。所有技能嚴格遵守「高內聚、低耦合」的模組化原則：
 
 - **全域通用 Stat 注入**：所有主動技能的冷卻（`cooldown_reduction`）、傷害（`might`）、範圍（`area`）、彈道速度（`projectile_speed`）、發射數量（`amount`）與穿透次數（`pierce`），**100% 動態讀取自全域通用屬性池**，絕不定義私有變數。
-- **全域數值模型專題文檔**：全域 17 項通用屬性定義、標準計算公式與邊界約束，請直接參閱專題文檔 👉 **[`docs/stat.md`](file:///Users/zelin/project/Phagocyte/docs/stat.md)**。
+- **全域數值模型專題文檔**：全域 19 項通用屬性定義、標準計算公式與邊界約束，請直接參閱專題文檔 👉 **[`docs/stat.md`](file:///Users/zelin/project/Phagocyte/docs/stat.md)**。
 - **全自動獨立開火迴圈**：每個主動技能掛載於細胞實體下方，具備獨立的冷卻計時器與索敵邏輯，冷卻就緒時自動觸發，讓玩家專注於走位拉扯與微觀物理微操。
 
 ---
@@ -55,6 +55,19 @@
 | **3. 調理素親和<br>(Opsonin Affinity)** | 表面特異性受體增生 | `crit_chance +5%` / `crit_damage +25%` | 致命弱點暴擊與超額處決 |
 | **4. 線粒體超頻<br>(Mitochondrial Overclock)**| 三羧酸循環 ATP 產能倍增 | `cooldown_reduction +8%` / `duration +10%` | 全技能循環開火加速與留場延長 |
 | **5. 趨化因子受體<br>(Chemokine Receptors)** | 表面高敏化學引力天線 | `magnet +25%` / `move_speed +6%` | 廣域自動吸附與定向趨化游動加速 |
+
+### 4.1 胞器腔室六類（Organelle Chamber 2x2，第三系統）
+
+與主動 5＋被動 5 並存的獨立裝備系統：被動＝通用底盤加成，腔室＝高費極端件＋發電拼圖。2x2＝最多 4 件（全 1x1 無拼接），基礎能量 6，`energy_cost ∈ [-1, 4]`（`-1`＝`+1` 發電且必帶重度負面）。已用＝Σ正成本，上限＝6＋Σ發電量，合法⇔已用≤上限且件數≤4且發電件≤2。取得走打怪掉落解鎖（基礎機率 2%）→升級三選一（每輪最多 1 張胞器卡，滿槽進換裝）→出戰前配裝頁預配（裸裝開局，預設 4 空槽）。
+
+| 類別 | 高費核心 | 低費／發電對照 | 能量 |
+| :--- | :--- | :--- | :--- |
+| **代謝 (metabolism)** | 線粒體 MkII：`CDR +0.16`／`duration +10%` | 糖酵解旁路：`CDR +0.05`／`move_speed +3%` | 4／1 |
+| **消化 (digestion)** | 強酸溶酶體：`might +12%`／`ailment_damage +15%` | 蛋白酶體篩：`ailment_damage +8%`／`health_regen +0.3` | 3／1 |
+| **骨架 (cytoskeleton)** | 鞭毛基座：`move_speed +12%`／`knockback +20%` | 微管錨點：`move_speed +4%`／`area +4%` | 3／1 |
+| **合成 (synthesis)** | 粗面內質網：`amount +1`／`projectile_speed +8%`（唯一 `amount+1`，鎖 4 費） | 核糖體簇：`projectile_speed +8%`／`duration +8%` | 4／2 |
+| **感知 (sensing)** | 離子通道陣列：`armor +3`／`block +0.04`／`magnet +15%` | 趨化貼片：`magnet +20%`／`evasion +0.02` | 3／1 |
+| **共生 (symbiosis，發電件)** | 共生菌群：`+1` 發電，代價 `move_speed -30%`／`might -15%`（殘廢流） | 噬菌體碎片：`+1` 發電／`CDR +0.05`，代價 `max_health -20%`（血換電） | -1／-1 |
 
 ---
 

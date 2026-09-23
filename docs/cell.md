@@ -30,6 +30,14 @@ $$R(\theta, t) = R_{\text{base}} \times \left(1.0 + \text{Amplitude} \times \tex
 - **吞噬偽足鏈式打擊（`PseudopodChainVisual`）**：吞噬偽足發射的暫態鏈式偽足，沿用宿主細胞配色，以鏈射→杯口閉合→拖回三段命中；舊 `PseudopodLimb` IK 捕捉爪器官已併入此機制並刪除。
 - **受體棘刺陣列（`ReceptorSpikes.tscn`）**：圍繞細胞邊緣排列的環狀旋轉受體，提供化學感應、接觸反傷與旋轉攔截。
 
+### 1.4 胞器腔室裝備（Organelle Chamber 2x2，第三系統）
+
+除視覺外掛件外，每個細胞掛載一個與 `SkillManager` 並列的 `OrganelleChamber` 節點（`BaseCell._Ready` 接線，缺節點時 code fallback 補建，與 `CellStats` 缺失模式一致）：
+- **槽位與能量**：2x2＝最多 4 件，基礎能量 6，`energy_cost ∈ [-1, 4]`（`-1`＝`+1` 發電且必帶重度負面）；已用＝Σ正成本，上限＝6＋Σ發電量，發電件≤2；卸下／替換經 `CellStats.Add/RemoveModifier` 精確回滾，`_ExitTree` 清理。
+- **出戰流程**：選細胞→選配裝（`LoadoutManager` 每細胞多套預設，預設 4 空槽裸裝開局）→選天賦→選地圖；開局 `Main.ApplyChamberLoadout` 讀 active profile，非法／鎖定項略過。
+- **局內獲取**：打怪掉落解鎖（`OrganelleUnlockManager`，基礎機率 2%，`BaseEnemy.Die` 單一入口）→升級三選一 `new_organelle` 卡（僅已解鎖且未擁有，每輪最多 1 張）→滿槽進同一 modal 內換裝（替換／存入背包／丟棄＋回血 15%／取消）。背包 run-scoped，上限 12。
+- 六類 12 件數值表見 `docs/skill.md` §4.1，能量約束見 `docs/stat.md` §3.1。
+
 ---
 
 ## 2. 五大白血球角色矩陣 (The 5 Immune Cell Classes)

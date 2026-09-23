@@ -4,7 +4,7 @@
 > 核心約束：2x2＝最多4件（全1x1無拼接）／基礎能量6／成本域 energy_cost∈[-1,4]（-1＝+1發電）。
 > 能量模型（已用-上限）：已用＝Σ正成本，上限＝6＋Σ發電量，合法⇔已用≤上限 且 件數≤4 且 發電件≤2。
 > 展示：生化展示櫃 Schematic Display（統一圓形數據邊框＋frame_organelle佔位，只生1x1標本頭）。
-> 數值紅線：100%通用Stat（18項），禁私有屬性；+1發電必帶重度負面。
+> 數值紅線：100%通用Stat（19項），禁私有屬性；+1發電必帶重度負面。
 > 出戰流程：選細胞→選配裝（可預配多套）→選天賦→選地圖。背包：6種類籤、上限12（＝首批全圖鑑）、run-scoped。
 > 工程量大，分期交付，每期獨立可測。規約見 AGENTS.md（warnaserror、AssetLoader唯一入口、場景純淨、測試隔離）。
 
@@ -103,20 +103,19 @@
 - [x] `gen/organelle/` 12張（前綴-free，stems＝id；熒光顯微＋純黑底＋1:1）＋`assets/gen/organelle/` 已處理
 - [x] `make check-assets` 綠燈：Organelle 12/12 ready，無 naming／orphan／resolution／unmapped 問題
 
-## Phase 4 — 平衡＋文檔＋新測試
+## Phase 4 — 平衡＋文檔＋新測試 ✅ 完成
 
-- [ ] P4平衡回測：開局配裝對前三分鐘波次影響；發電雙解強度（殘廢流vs血換電）；amount+1鎖4費複查；CDR/閃避/格擋硬上限複查
-- [ ] 文檔：spec.md §5（5+5+腔室4槽位圖）／skill.md §4（六類表）／stat.md（能量註記：約束層非第19屬性）／cell.md（外掛胞器段）
+- [x] P4平衡回測：開局配裝對前三分鐘波次影響；發電雙解強度（殘廢流vs血換電）；amount+1鎖4費複查；CDR/閃避/格擋硬上限複查
+  - 開局影響：庫存預設全鎖＋掉落基礎機率 2%，新號裸裝開局，前三分鐘（03:00 單精英）無配裝紅利；老號滿配上限約 might +12%（acidic_lysosome 單源），`4+1+1` 滿配合法、`4+3` 超載，屬微調非質變
+  - 發電雙解：symbiotic_flora（+1 電／move -30%／might -15%，殘廢流）＋phage_fragment（+1 電／CDR +0.05／max_hp -20%，血換電）；雙發電 6→8 能量，總代價 move -30%／might -15%／hp -20%，8 能量供 `4+3`（已用 7）貪婪連招，坦度／機動墊底
+  - amount+1 鎖 4 費：唯一來源 rough_er（4 費，佔基礎預算 2/3）；`rough(4)+acidic(3)=7>6` 非法、`rough+1+1=6` 合法，機會成本成立
+  - 硬上限：腔室 CDR 合計 +0.26＋被動 Lv5 +0.40＋底盤 0.10 仍被 0.75 鉗制；腔室 evasion +0.02／block +0.04 遠低於 0.60／0.75；數值零調整，約束生效
+  - 新測試 `tests/TestOrganelleBalance.cs`（5 項：預算／雙發電代價／amount 鎖定／硬上限／開局上限＋能量非 stat，headless 綠燈）
+- [x] 文檔：spec.md §5（5+5+腔室4槽位圖）／skill.md §4.1（六類表）／stat.md §3.1（能量註記：約束層非 stat）／cell.md §1.4（外掛胞器段）
+  - 順帶對齊：stat 18→19 項（補 `ailment_damage` 行；spec §4／stat §1／skill §1 計數同步），能量為約束層、不佔 stat 槽位
 - [x] `tests/TestOrganelleChamber.cs`（已建；Phase 0 邏輯項全綠）
   - 已完成：常數／能量超載拒絕／發電擴容6→7／發電負面生效＋卸下回滾／替換語義／去重（max_copies）／能量只算已裝／CanEquip reason token／雙發電上限／UiData／Discard／_ExitTree／5角色卡接線＋code fallback／翻譯鍵解析
   - 待補（依賴後續Phase）：籤過濾（分類籤已存在於配裝頁；draft 不需籤）
   - 已完成（Phase 1）：Loadout preset存取隔離／開局生效／非法profile拒絕／預設空裝／頁面裝卸持久化
   - 已完成（Phase 2）：draft 候選／收取自動上陣／滿槽換裝／超載拒絕／存入／丟棄＋回血／取消／HUD 能量列
   - 註：BackpackCap=12 與 MaxGenerators=2 在現有12件×max_copies=1資料下為結構性守衛（不可達）；已由去重/copy_cap覆蓋等效行為
-
-## Phase 5 — 全量迴歸＋視覺驗收（可選/後續）
-
-- [ ] `dotnet build --warnaserror` 零警告；`GD.Load/ResourceLoader` 零殘留（只允GodotAssetProvider.cs）
-- [ ] 全量42套件（除TestHarness/TestAchievementPreview）綠燈
-- [ ] Headed截圖（禁--headless，PHAGOCYTE_CAPTURE_DIR＋/tmp，before/after肉眼對比）
-- [ ] Phase2+（可選）：暫停覆層自由整理（仿TreeOverlayPanel）／成就解鎖門檻／背包擴容／開局件數放開
