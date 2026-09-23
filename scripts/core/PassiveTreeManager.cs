@@ -60,6 +60,13 @@ public static class PassiveTreeManager
     public const int BaseCellLevel = 1;
 
     /// <summary>
+    /// Meta level cap per cell: 14 level points plus shared achievement bonus
+    /// stays well under the 54-point full-tree cost, so builds must choose.
+    /// Enforced in <see cref="RecordRunLevel"/> and <see cref="GetCellLevel"/>.
+    /// </summary>
+    public const int MaxCellLevel = 15;
+
+    /// <summary>
     /// The deployed cell's start hub is innately lit and never consumes points
     /// (docs/passivetree.md §2 L=0 / §5.1).
     /// </summary>
@@ -407,7 +414,7 @@ public static class PassiveTreeManager
         EnsureLoaded();
         if (!IsKnownCell(cellId))
             return BaseCellLevel;
-        return CellLevels.TryGetValue(cellId, out var level) ? Math.Max(BaseCellLevel, level) : BaseCellLevel;
+        return CellLevels.TryGetValue(cellId, out var level) ? Math.Min(MaxCellLevel, Math.Max(BaseCellLevel, level)) : BaseCellLevel;
     }
 
     public static bool RecordRunLevel(string cellId, int runLevel)
@@ -416,7 +423,7 @@ public static class PassiveTreeManager
         if (!IsKnownCell(cellId))
             return false;
 
-        int normalized = Math.Max(BaseCellLevel, runLevel);
+        int normalized = Math.Min(MaxCellLevel, Math.Max(BaseCellLevel, runLevel));
         int current = GetCellLevel(cellId);
         if (normalized <= current)
             return false;

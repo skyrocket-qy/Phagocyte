@@ -9,7 +9,7 @@ Core: `tests/TestCheats.cs`. Self-check: `tests/TestCheatUnlocks.cs`.
 
 - All 19 achievements → all 5 cells, all 5 organ maps + Hard modes, Endless mode, talent points
 - All 12 organelles (`OrganelleUnlockManager.UnlockAll()`)
-- Tree level 99 for every cell + 50 spendable bonus points
+- Tree level 15 (meta cap) for every cell + 50 spendable bonus points
 
 `TestCheats.MaxOutPlayer(main)` builds the run: level 30, innate kept + 4 actives / 5 passives
 filled and maxed, full vault + best-effort chamber, block/evasion RNG zeroed.

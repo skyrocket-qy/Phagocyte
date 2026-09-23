@@ -711,7 +711,8 @@ public partial class MainMenu : Control
         int spent = PassiveTreeManager.GetSpentPoints(ActiveTreeClassKey);
 
         TreeCanvas?.Render(ActiveTreeClassKey);
-        if (TreeLevelLbl != null) TreeLevelLbl.Text = TextFormatter.Format(Tr("TREE_LEVEL"), level);
+        if (TreeLevelLbl != null) TreeLevelLbl.Text = TextFormatter.Format(Tr("TREE_LEVEL"), level)
+            + (level >= PassiveTreeManager.MaxCellLevel ? " MAX" : "");
         if (TreePointsLbl != null) TreePointsLbl.Text = TextFormatter.Format(Tr("TREE_POINTS"), available, spent);
         RefreshProfileTabs();
     }

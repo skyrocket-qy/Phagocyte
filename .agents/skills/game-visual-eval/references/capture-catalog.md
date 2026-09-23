@@ -1,6 +1,6 @@
-# Phagocyte Visual Surface Capture Catalog
+# Phagocyte Visual Surface & Skill Capture Catalog
 
-This catalog documents all capturable visual surfaces in Project: Phagocyte, detailing the scene path, the **godot-ai MCP recipe** (interactive or runtime capture), the **test harness stage** (for automated headless/headed batch captures), and key evaluation targets.
+This catalog documents all capturable visual surfaces and live skill visual effects in Project: Phagocyte, detailing the scene/skill path, the **automated test harness target**, and the **godot-ai MCP recipe** for interactive inspection.
 
 ---
 
@@ -12,141 +12,52 @@ All captures must be saved under the project-local `tmp/` directory:
 
 ---
 
-## Surface Index & Capture Recipes
+## 1. UI Surfaces Catalog (Automated in `TestFullVisualPreview.cs`)
 
-### 1. Main Menu / Title View
-- **Scene**: `res://scenes/ui/main_menu.tscn` (includes `title_view.tscn`)
-- **Output Filename**: `title_view.png`
-- **MCP Capture Recipe**:
-  ```json
-  // 1. Run the main menu scene
-  project_run(mode="custom", scene="res://scenes/ui/main_menu.tscn")
-  // 2. Capture when live
-  editor_screenshot(source="game", max_resolution=0, user_prompt="Main Menu Title Screen")
-  // 3. Stop
-  project_manage(op="stop")
-  ```
-- **Harness Equivalent**: `TestAchievementPreview.cs` (Stage 1)
-- **Visual Targets**: Bio-hazard title typography (`SmileySans`), glow on start buttons, menu button styling (`assets/theme/menu_buttons.tres`), background microscope ambiance.
-
----
-
-### 2. Endless Affliction Setup Modal
-- **Scene**: `res://scenes/ui/endgame_setup_modal.tscn` (instantiated in `main_menu.tscn`)
-- **Output Filename**: `endgame_setup.png`
-- **MCP Capture Recipe**:
-  ```json
-  project_run(mode="custom", scene="res://scenes/ui/main_menu.tscn")
-  // Open modal via button input or direct script evaluation
-  game_manage(op="input_mouse", params={"event": "button", "position": {"x": 640, "y": 420}})
-  editor_screenshot(source="game", max_resolution=0, user_prompt="Endless Affliction Setup Modal")
-  project_manage(op="stop")
-  ```
-- **Harness Equivalent**: `TestAchievementPreview.cs` (Stage 2)
-- **Visual Targets**: Modal center alignment, darkened backdrop shield, affliction option toggle buttons, confirm/cancel buttons.
+| # | Target Filename | UI Surface | Scene Path | Key Visual Elements |
+|---|---|---|---|---|
+| 1 | `title_view.png` | Main Menu Title | `res://scenes/ui/main_menu.tscn` | SmileySans title typography, bio-fluorescent hover styling (`menu_buttons.tres`), macrophage cell model, dark-field background bokeh |
+| 2 | `class_view.png` | Class Selection | `res://scenes/ui/class_view.tscn` | Immune defense cell dossier, cell selection buttons, baseline vitals, innate skill icon |
+| 3 | `loadout_view.png` | Organelle Chamber | `res://scenes/ui/loadout_view.tscn` | Sockets, ATP energy capacity, organelle inventory backpack, stats delta readout |
+| 4 | `passive_view.png` | Epigenetic Talent Tree | `res://scenes/ui/passive_view.tscn` | Branching tree nodes, fluorophore allocation status, profile tabs |
+| 5 | `map_view.png` | Map Selection & Scanner | `res://scenes/ui/map_view.tscn` | Holographic body scanner, organ sites, difficulty selector, hazard chips |
+| 6 | `gallery_all.png` | Achievement Gallery (All) | `res://scenes/ui/achievement_gallery.tscn` | Unlocked fluorophore badges, locked cards, progress counters, scroll list |
+| 7 | `gallery_locked.png` | Achievement Gallery (Locked) | `res://scenes/ui/achievement_gallery.tscn` | Filtered locked achievements, unachieved grayscale variants |
+| 8 | `endgame_setup.png` | Endgame Affliction Setup | `res://scenes/ui/endgame_setup_modal.tscn` | Overdrive afflictions, modifier cards, confirm/cancel buttons |
+| 9 | `codex_modal.png` | Microscopic Codex | `res://scenes/ui/codex_modal.tscn` | Encyclopaedic dossier tabs (Skills, Cells, Pathogens, Maps) |
+| 10 | `settings_modal.png` | System Settings | `res://scenes/ui/settings_modal.tscn` | Audio volume sliders, display resolution toggles, keybinds |
+| 11 | `run_records.png` | Run History Records | `res://scenes/ui/run_records_modal.tscn` | Medical charts, tactical review of past runs, best survival records |
+| 12 | `toast_banner.png` | Toast Banner | `res://scenes/ui/toast_banner.tscn` | Component banner, icon, localized header and description |
+| 13 | `achievement_toast.png` | Achievement Unlock Toast | `res://scenes/ui/achievement_toast.tscn` | Settled slide-down tween banner, golden trophy reward motif |
+| 14 | `upgrade_modal.png` | Upgrade Mutation Choice | `res://scenes/ui/upgrade_modal.tscn` | 3 upgrade choice cards, rarity tier badges, uniform card bounding dimensions |
+| 15 | `hud_hp.png` | In-Game Combat Arena & HUD | `res://scenes/ui/hud.tscn` & `main.tscn` | HP bar, kill count, active weapon skill slots, cytoplasm Catmull-Rom deformation |
 
 ---
 
-### 3. Achievement Gallery (All & Locked Filters)
-- **Scene**: `res://scenes/ui/achievement_gallery.tscn` (instantiated in `main_menu.tscn`)
-- **Output Filenames**: `gallery_all.png`, `gallery_locked.png`
-- **MCP Capture Recipe**:
-  ```json
-  project_run(mode="custom", scene="res://scenes/ui/main_menu.tscn")
-  // Click Achievements button on menu
-  game_manage(op="input_mouse", params={"event": "button", "position": {"x": 640, "y": 480}})
-  editor_screenshot(source="game", max_resolution=0, user_prompt="Achievement Gallery All")
-  // Toggle filter to Locked
-  game_manage(op="input_mouse", params={"event": "button", "position": {"x": 800, "y": 120}})
-  editor_screenshot(source="game", max_resolution=0, user_prompt="Achievement Gallery Locked")
-  project_manage(op="stop")
-  ```
-- **Harness Equivalent**: `TestAchievementPreview.cs` (Stages 3 & 4)
-- **Visual Targets**: Grid layout of achievement cards (`achievement_card.tscn`), badge icon rendering ($256 \times 256$ scaled), unachieved darkened variants, filter tab highlights, scrollbar appearance.
+## 2. Active Skill Visual Effects (Live in Combat Arena)
+
+| # | Target Filename | Skill Name | Source Script | Visual Effect Captured |
+|---|---|---|---|---|
+| 16 | `skill_mac_mine.png` | Complement Cascade | `ComplementCascadeSkill.cs` | Spawns Membrane Attack Complex (MAC) assembly mine in combat arena |
+| 17 | `skill_mac_blast.png` | Complement Cascade Blast | `ComplementCascadeSkill.cs` | High-energy concentric detonation shockwave destroying pathogen membranes |
+| 18 | `skill_antibody_missile.png` | Antibody Salvo | `AntibodySalvoSkill.cs` | Y-shaped guided immunoglobulin missiles tracking bacterial targets |
+| 19 | `skill_perforin_lance.png` | Perforin Lance | `PerforinLanceSkill.cs` | High-intensity bio-laser lance beam and glowing cylindrical membrane pore decals |
+| 20 | `skill_grasp_chain.png` | Phagocytic Grasp | `PhagocyticGraspSkill.cs` | Extended amoebic pseudopod chain visual tethering and dragging target bacteria |
+| 21 | `skill_ros_torrent.png` | ROS Torrent | `RosTorrentSkill.cs` | Electric cyan reactive oxygen species (ROS) jet stream spraying at pathogens |
 
 ---
 
-### 4. Toast Banner & Achievement Toast
-- **Scene**: `res://scenes/ui/toast_banner.tscn`, `res://scenes/ui/achievement_toast.tscn`
-- **Output Filenames**: `toast_banner.png`, `achievement_toast.png`
-- **MCP Capture Recipe**:
-  Can be inspected by opening the component scenes in editor or triggering an achievement event in a running game session.
-- **Harness Equivalent**: `TestAchievementPreview.cs` (Stages 5 & 6)
-  - Waits 30 frames for the Godot tween slide-down animation to settle.
-- **Visual Targets**: Slide-in banner border glow, reward icon scaling, title/desc typography contrast against dark-field background.
+## 3. Interactive Capture Recipes (godot-ai MCP)
 
----
+For targeted inspection of specific scenes during active development:
 
-### 5. In-Game Combat & Survivor HUD
-- **Scene**: `res://scenes/main.tscn` (game arena + `res://scenes/ui/hud.tscn`)
-- **Output Filename**: `hud_hp.png`
-- **MCP Capture Recipe**:
-  ```json
-  project_run(mode="main")
-  // Wait 1-2 seconds for scene ready
-  editor_screenshot(source="game", max_resolution=0, user_prompt="Combat HUD and Player Cell")
-  project_manage(op="stop")
-  ```
-- **Harness Equivalent**: `TestAchievementPreview.cs` (Stage 7)
-- **Visual Targets**: HP bar gradient & damage flash, active skill cooldown dials, mini-map / radar (if active), cytoplasm gel shader rim on Macrophage, background RBC parallax DoF.
+```json
+// Example: Open and capture Upgrade Modal in 2D viewport
+scene_open(path="res://scenes/ui/upgrade_modal.tscn")
+editor_screenshot(source="viewport_2d", max_resolution=0, user_prompt="Upgrade Modal Card Layout")
 
----
-
-### 6. Upgrade / Level-Up Selection Modal
-- **Scene**: `res://scenes/ui/upgrade_modal.tscn`
-- **Output Filename**: `upgrade_modal.png`
-- **MCP Capture Recipe**:
-  ```json
-  // Open the modal directly in the 2D editor or custom run
-  scene_open(path="res://scenes/ui/upgrade_modal.tscn")
-  editor_screenshot(source="viewport_2d", max_resolution=0, user_prompt="Upgrade Selection Modal Cards")
-  ```
-- **Visual Targets**: 3 upgrade option cards, strict uniform card width and height, organelle/skill icon placement, rarity/tier color badges, button hover states.
-
----
-
-### 7. Class Selection View
-- **Scene**: `res://scenes/ui/class_view.tscn`
-- **Output Filename**: `class_view.png`
-- **MCP Capture Recipe**:
-  ```json
-  project_run(mode="custom", scene="res://scenes/ui/main_menu.tscn")
-  // Navigate to Class Selection
-  game_manage(op="input_mouse", params={"event": "button", "position": {"x": 640, "y": 360}})
-  editor_screenshot(source="game", max_resolution=0, user_prompt="Class Selection View")
-  project_manage(op="stop")
-  ```
-- **Visual Targets**: Macrophage, Neutrophil, NK Cell cards, stat radar/bars, passive ability description box, start run button.
-
----
-
-### 8. Passive Talent Tree View
-- **Scene**: `res://scenes/ui/passive_view.tscn`
-- **Output Filename**: `passive_view.png`
-- **MCP Capture Recipe**:
-  ```json
-  project_run(mode="custom", scene="res://scenes/ui/main_menu.tscn")
-  // Click Epigenetic Talent Tree button
-  editor_screenshot(source="game", max_resolution=0, user_prompt="Passive Talent Tree Graph")
-  project_manage(op="stop")
-  ```
-- **Visual Targets**: Node connection branches/filaments, allocated vs unallocated fluorophore node states, ATP cost display, node tooltip callout.
-
----
-
-### 9. Organelle Chamber / Loadout View
-- **Scene**: `res://scenes/ui/loadout_view.tscn`
-- **Output Filename**: `loadout_view.png`
-- **MCP Capture Recipe**:
-  ```json
-  scene_open(path="res://scenes/ui/loadout_view.tscn")
-  editor_screenshot(source="viewport_2d", max_resolution=0, user_prompt="Organelle Loadout Slots")
-  ```
-- **Visual Targets**: Organelle socket slots, equipped passive organelle badges, inventory grid, stats delta panel.
-
----
-
-### 10. Map Selection & Codex Modals
-- **Scene**: `res://scenes/ui/map_view.tscn`, `res://scenes/ui/codex_modal.tscn`, `res://scenes/ui/settings_modal.tscn`
-- **Output Filenames**: `map_view.png`, `codex_modal.png`, `settings_modal.png`
-- **Visual Targets**: Map thumbnail art (Acute Wound, Sepsis Stream, Bone Marrow), environmental hazard chips, volume/resolution slider controls in settings.
+// Example: Run game and capture running combat arena
+project_run(mode="main")
+editor_screenshot(source="game", max_resolution=0, user_prompt="Live Combat Arena Framebuffer")
+project_manage(op="stop")
+```

@@ -301,6 +301,14 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(0);
         AssertThat(PassiveTreeManager.Purchase("macrophage", "autophagy")).IsFalse();
         GD.Print("[PASS] Tree levels and presets persist across reloads.");
+
+        PassiveTreeManager.ResetAll();
+        AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 99)).IsTrue();
+        AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(PassiveTreeManager.MaxCellLevel);
+        AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 99)).IsFalse();
+        AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 14)).IsFalse();
+        AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(PassiveTreeManager.MaxCellLevel - PassiveTreeManager.BaseCellLevel);
+        GD.Print("[PASS] Cell levels cap at MaxCellLevel so builds stay selective.");
     }
 
     private static void TestGridLayoutAndPurchases()

@@ -28,7 +28,7 @@ public static class TestCheats
     /// <summary>Headed user arg (after `--`): invulnerable on top of <see cref="CheatArgAll"/>.</summary>
     public const string CheatArgGodmode = "--godmode";
 
-    public const int DefaultMetaTreeLevel = 99;
+    public const int DefaultMetaTreeLevel = 15;
     public const int DefaultBonusPoints = 50;
     public const int DefaultRunLevel = 30;
     public const int DefaultSkillLevel = 5;

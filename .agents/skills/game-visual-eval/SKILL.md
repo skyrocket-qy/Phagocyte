@@ -95,21 +95,22 @@ project_manage(op="stop")
 ```
 Save the returned image to `tmp/visual_before/<surface_name>.png`. Refer to [Capture Catalog](./references/capture-catalog.md) for pre-mapped recipes.
 
-#### Method B: Automated Batch Harness Capture
-For full sweeps of the 7 primary UI surfaces with deterministic frame settling:
+#### Method B: Automated Batch Harness Capture (Recommended for Sweeps)
+For full automated sweeps of **ALL 21 visual surfaces and live skill VFX** with frame settling:
 ```bash
 PHAGOCYTE_CAPTURE_DIR=tmp/visual_before \
   /Applications/Godot_mono.app/Contents/MacOS/Godot \
-  --path . -s res://tests/TestAchievementPreview.cs
+  --path . -s res://tests/TestFullVisualPreview.cs
 ```
-This automatically produces:
-- `title_view.png`
-- `endgame_setup.png`
-- `gallery_all.png`
-- `gallery_locked.png`
-- `toast_banner.png`
-- `achievement_toast.png`
-- `hud_hp.png`
+This automatically produces 21 screenshots:
+- **UI Surfaces**: `title_view.png`, `class_view.png`, `loadout_view.png`, `passive_view.png`, `map_view.png`, `gallery_all.png`, `gallery_locked.png`, `endgame_setup.png`, `codex_modal.png`, `settings_modal.png`, `run_records.png`, `toast_banner.png`, `achievement_toast.png`, `upgrade_modal.png`, `hud_hp.png`.
+- **Active Skills in Combat**: `skill_mac_mine.png`, `skill_mac_blast.png`, `skill_antibody_missile.png`, `skill_perforin_lance.png`, `skill_grasp_chain.png`, `skill_ros_torrent.png`.
+
+#### Method C: Auto-Discovery & Coverage Linter
+To audit visual coverage and detect any newly added UI scenes or weapon skills:
+```bash
+python3 .agents/skills/game-visual-eval/scripts/discover_visual_targets.py
+```
 
 ---
 
@@ -126,7 +127,7 @@ Repeat the capture procedure from Step 1 using the same surfaces, directing outp
 ```bash
 PHAGOCYTE_CAPTURE_DIR=tmp/visual_after \
   /Applications/Godot_mono.app/Contents/MacOS/Godot \
-  --path . -s res://tests/TestAchievementPreview.cs
+  --path . -s res://tests/TestFullVisualPreview.cs
 ```
 
 ---
