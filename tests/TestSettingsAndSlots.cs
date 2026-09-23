@@ -192,13 +192,12 @@ public partial class TestSettingsAndSlots : TestHarness
         menuSettingsBtn!.EmitSignal(Button.SignalName.Pressed);
         AssertThat(menuSettingsModal!.Visible).IsTrue();
 
-        var tabControls = menuSettingsModal.GetNodeOrNull<Button>("VBox/TabBar/ControlsTab");
         var tabAudio = menuSettingsModal.GetNodeOrNull<Button>("VBox/TabBar/AudioTab");
         var tabGraphics = menuSettingsModal.GetNodeOrNull<Button>("VBox/TabBar/GraphicsTab");
 
-        AssertThat(tabControls).IsNotNull();
         AssertThat(tabAudio).IsNotNull();
         AssertThat(tabGraphics).IsNotNull();
+        AssertThat(menuSettingsModal.TabKeysBtn).IsNotNull();
 
         tabAudio!.EmitSignal(Button.SignalName.Pressed);
         var audioContent = menuSettingsModal.GetNodeOrNull<Control>("VBox/Content/AudioPanel");
@@ -208,15 +207,16 @@ public partial class TestSettingsAndSlots : TestHarness
         var graphicsContent = menuSettingsModal.GetNodeOrNull<Control>("VBox/Content/GraphicsPanel");
         AssertThat(graphicsContent != null && graphicsContent.Visible).IsTrue();
 
-        tabControls!.EmitSignal(Button.SignalName.Pressed);
-        var controlsContent = menuSettingsModal.GetNodeOrNull<Control>("VBox/Content/ControlsPanel");
-        AssertThat(controlsContent != null && controlsContent.Visible).IsTrue();
+        menuSettingsModal.TabKeysBtn!.EmitSignal(Button.SignalName.Pressed);
+        AssertThat(menuSettingsModal.KeysPanel != null && menuSettingsModal.KeysPanel.Visible).IsTrue();
+        AssertThat(menuSettingsModal.GetNodeOrNull<Button>("VBox/TabBar/ControlsTab")).IsNull();
+        AssertThat(menuSettingsModal.GetNodeOrNull<Control>("VBox/Content/ControlsPanel")).IsNull();
 
         var menuCloseBtn = menuSettingsModal.GetNodeOrNull<Button>("VBox/Header/CloseButton");
         AssertThat(menuCloseBtn).IsNotNull();
         menuCloseBtn!.EmitSignal(Button.SignalName.Pressed);
         AssertThat(menuSettingsModal.Visible).IsFalse();
-        GD.Print("[PASS] 8. Main Menu Settings button, tabs (Controls/Audio/Graphics), and top-left back button verified.");
+        GD.Print("[PASS] 8. Main Menu Settings button, tabs (Audio/Graphics/Keys), and top-left back button verified.");
 
         menuNode.QueueFree();
         main.QueueFree();

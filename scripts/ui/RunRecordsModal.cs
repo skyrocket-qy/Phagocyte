@@ -148,6 +148,8 @@ public partial class RunRecordsModal : ModalBase
         }
 
         if (CloseBtn != null) CloseBtn.Visible = !SettlementMode;
+        var titleSpacer = GetNodeOrNull<Control>("VBox/Header/TitleSpacer");
+        if (titleSpacer != null) titleSpacer.Visible = !SettlementMode;
         if (RetryBtn != null) RetryBtn.Visible = SettlementMode;
         if (MenuBtn != null) MenuBtn.Visible = SettlementMode;
 

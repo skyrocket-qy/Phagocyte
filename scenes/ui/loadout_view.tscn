@@ -92,11 +92,6 @@ layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 0
 
-[node name="BackSpacer" type="Control" parent="Margin/VBox/TopBar"]
-custom_minimum_size = Vector2(150, 0)
-layout_mode = 2
-mouse_filter = 2
-
 [node name="TitleVBox" type="VBoxContainer" parent="Margin/VBox/TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -107,6 +102,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.95, 1, 1)
 theme_override_font_sizes/font_size = 28
 text = "ORGANELLE ASSEMBLY // 活性胞器装配"
+horizontal_alignment = 1
 
 [node name="TopSeparator" type="HSeparator" parent="Margin/VBox"]
 layout_mode = 2
@@ -172,16 +168,18 @@ layout_mode = 2
 mouse_filter = 2
 script = ExtResource("4_links")
 
+[node name="EnergyBar" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("2_pips")
+AlignLeft = false
+MaxDiameter = 26.0
+
 [node name="BottomSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
-
-[node name="EnergyBar" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
-custom_minimum_size = Vector2(0, 24)
-layout_mode = 2
-mouse_filter = 2
-script = ExtResource("2_pips")
 MaxDiameter = 20.0
 Gap = 7.0
 AlignLeft = true

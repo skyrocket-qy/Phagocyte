@@ -22,4 +22,6 @@ public static class DataPaths
     public const string StatLabels = $"{Root}/stat_labels.json";
 
     public const string TranslationsCsv = "res://assets/translations/translations.csv";
+
+    public const string AudioManifest = "res://assets/audio/manifest.json";
 }

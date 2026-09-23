@@ -6,25 +6,17 @@ namespace Phagocyte.UI;
 
 public partial class SettingsModal : ModalBase
 {
-    public Button? TabControlsBtn { get; set; }
     public Button? TabAudioBtn { get; set; }
     public Button? TabGraphicsBtn { get; set; }
     public Button? TabKeysBtn { get; set; }
 
-    public VBoxContainer? ControlsPanel { get; set; }
     public VBoxContainer? AudioPanel { get; set; }
     public VBoxContainer? GraphicsPanel { get; set; }
     public VBoxContainer? KeysPanel { get; set; }
+    public VBoxContainer? KeysRows { get; set; }
 
     public Label? KeysHintLbl { get; set; }
     public Button? KeysResetBtn { get; set; }
-
-    public Label? ControlsHeaderLbl { get; set; }
-    public Label? CtrlMoveLbl { get; set; }
-    public Label? CtrlPauseLbl { get; set; }
-    public Label? CtrlPhagoLbl { get; set; }
-    public Label? CtrlTreeLbl { get; set; }
-
 
     public HSlider? MasterSlider { get; set; }
     public Label? MasterValLbl { get; set; }
@@ -51,10 +43,9 @@ public partial class SettingsModal : ModalBase
 
     public int CurrentTab { get; set; } = 0;
 
-    public const int TabControls = 0;
-    public const int TabAudio = 1;
-    public const int TabGraphics = 2;
-    public const int TabKeys = 3;
+    public const int TabAudio = 0;
+    public const int TabGraphics = 1;
+    public const int TabKeys = 2;
 
     /// <summary>Action currently awaiting a replacement key; "" when idle.</summary>
     public string ListeningAction { get; private set; } = "";
@@ -62,19 +53,11 @@ public partial class SettingsModal : ModalBase
 
     public override void _Ready()
     {
-        TabControlsBtn = GetNodeOrNull<Button>("VBox/TabBar/ControlsTab");
         TabAudioBtn = GetNodeOrNull<Button>("VBox/TabBar/AudioTab");
         TabGraphicsBtn = GetNodeOrNull<Button>("VBox/TabBar/GraphicsTab");
 
-        ControlsPanel = GetNodeOrNull<VBoxContainer>("VBox/Content/ControlsPanel");
         AudioPanel = GetNodeOrNull<VBoxContainer>("VBox/Content/AudioPanel");
         GraphicsPanel = GetNodeOrNull<VBoxContainer>("VBox/Content/GraphicsPanel");
-
-        ControlsHeaderLbl = GetNodeOrNull<Label>("VBox/Content/ControlsPanel/HeaderLabel");
-        CtrlMoveLbl = GetNodeOrNull<Label>("VBox/Content/ControlsPanel/MoveRow/DescLabel");
-        CtrlPauseLbl = GetNodeOrNull<Label>("VBox/Content/ControlsPanel/PauseRow/DescLabel");
-        CtrlPhagoLbl = GetNodeOrNull<Label>("VBox/Content/ControlsPanel/PhagoRow/DescLabel");
-        CtrlTreeLbl = GetNodeOrNull<Label>("VBox/Content/ControlsPanel/TreeRow/DescLabel");
 
         MasterSlider = GetNodeOrNull<HSlider>("VBox/Content/AudioPanel/MasterRow/Slider");
         MasterValLbl = GetNodeOrNull<Label>("VBox/Content/AudioPanel/MasterRow/ValLabel");
@@ -95,12 +78,10 @@ public partial class SettingsModal : ModalBase
         LangTitleLbl = GetNodeOrNull<Label>("VBox/LanguageRow/LangLabel");
         LangOption = GetNodeOrNull<OptionButton>("VBox/LanguageRow/LangOption");
 
-        if (TabControlsBtn != null)
-            TabControlsBtn.Pressed += () => SwitchTab(0);
         if (TabAudioBtn != null)
-            TabAudioBtn.Pressed += () => SwitchTab(1);
+            TabAudioBtn.Pressed += () => SwitchTab(TabAudio);
         if (TabGraphicsBtn != null)
-            TabGraphicsBtn.Pressed += () => SwitchTab(2);
+            TabGraphicsBtn.Pressed += () => SwitchTab(TabGraphics);
 
         BuildKeysTab();
 
@@ -157,23 +138,20 @@ public partial class SettingsModal : ModalBase
     {
         CurrentTab = tabIdx;
 
-        UiBuilders.SetTabActive(TabControlsBtn, tabIdx == 0);
-        UiBuilders.SetTabActive(TabAudioBtn, tabIdx == 1);
-        UiBuilders.SetTabActive(TabGraphicsBtn, tabIdx == 2);
-        UiBuilders.SetTabActive(TabKeysBtn, tabIdx == 3);
+        UiBuilders.SetTabActive(TabAudioBtn, tabIdx == TabAudio);
+        UiBuilders.SetTabActive(TabGraphicsBtn, tabIdx == TabGraphics);
+        UiBuilders.SetTabActive(TabKeysBtn, tabIdx == TabKeys);
 
-        if (ControlsPanel != null)
-            ControlsPanel.Visible = tabIdx == 0;
         if (AudioPanel != null)
-            AudioPanel.Visible = tabIdx == 1;
+            AudioPanel.Visible = tabIdx == TabAudio;
         if (GraphicsPanel != null)
-            GraphicsPanel.Visible = tabIdx == 2;
+            GraphicsPanel.Visible = tabIdx == TabGraphics;
         if (KeysPanel != null)
-            KeysPanel.Visible = tabIdx == 3;
+            KeysPanel.Visible = tabIdx == TabKeys;
     }
 
     /// <summary>
-    /// Code-built 4th tab: the scene keeps its 3 static tabs/panels, key rows
+    /// Code-built keys tab: the scene keeps its static tabs/panels, key rows
     /// vary per action so they are built in code like MainMenu profile tabs.
     /// </summary>
     private void BuildKeysTab()
@@ -183,7 +161,7 @@ public partial class SettingsModal : ModalBase
         if (tabBar == null || content == null)
             return;
 
-        var template = TabControlsBtn;
+        var template = TabAudioBtn;
         TabKeysBtn = new Button
         {
             Name = "KeysTab",
@@ -220,6 +198,22 @@ public partial class SettingsModal : ModalBase
         KeysHintLbl.AddThemeColorOverride("font_color", new Color(0.65f, 0.72f, 0.8f));
         KeysPanel.AddChild(KeysHintLbl);
 
+        // Rows scroll inside the fixed-height content area; hint + reset stay pinned.
+        var keysScroll = new ScrollContainer
+        {
+            Name = "KeysScroll",
+            SizeFlagsVertical = Control.SizeFlags.ExpandFill,
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled
+        };
+        KeysPanel.AddChild(keysScroll);
+        KeysRows = new VBoxContainer
+        {
+            Name = "KeysRows",
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill
+        };
+        KeysRows.AddThemeConstantOverride("separation", 10);
+        keysScroll.AddChild(KeysRows);
+
         foreach (string action in KeyBindings.Actions)
         {
             var row = new HBoxContainer
@@ -247,7 +241,7 @@ public partial class SettingsModal : ModalBase
             rebindBtn.Pressed += () => BeginRebind(localAction);
             row.AddChild(rebindBtn);
             row.SetMeta("action", action);
-            KeysPanel.AddChild(row);
+            KeysRows.AddChild(row);
             _keyRowButtons[action] = rebindBtn;
         }
 
@@ -276,7 +270,7 @@ public partial class SettingsModal : ModalBase
         fixedVal.AddThemeColorOverride("font_color", new Color(0.55f, 0.62f, 0.72f));
         fixedRow.AddChild(fixedVal);
         fixedRow.SetMeta("fixed_pause", true);
-        KeysPanel.AddChild(fixedRow);
+        KeysRows.AddChild(fixedRow);
 
         KeysResetBtn = new Button
         {
@@ -332,9 +326,9 @@ public partial class SettingsModal : ModalBase
 
     public void RefreshKeysPanel()
     {
-        if (KeysPanel == null)
+        if (KeysRows == null)
             return;
-        foreach (var row in KeysPanel.GetChildren())
+        foreach (var row in KeysRows.GetChildren())
         {
             if (row is HBoxContainer hbox && hbox.HasMeta("fixed_pause"))
             {
@@ -456,19 +450,12 @@ public partial class SettingsModal : ModalBase
         base.UpdateLocalizedTexts();
         if (TitleLabel != null) TitleLabel.Text = Tr("SETTINGS_TITLE");
 
-        if (TabControlsBtn != null) TabControlsBtn.Text = Tr("SETTINGS_TAB_CONTROLS");
         if (TabAudioBtn != null) TabAudioBtn.Text = Tr("SETTINGS_TAB_AUDIO");
         if (TabGraphicsBtn != null) TabGraphicsBtn.Text = Tr("SETTINGS_TAB_GRAPHICS");
         if (TabKeysBtn != null) TabKeysBtn.Text = Tr("SETTINGS_TAB_KEYS");
 
         if (KeysHintLbl != null) KeysHintLbl.Text = Tr("KEYS_HINT");
         RefreshKeysPanel();
-
-        if (ControlsHeaderLbl != null) ControlsHeaderLbl.Text = Tr("CONTROLS_TITLE");
-        if (CtrlMoveLbl != null) CtrlMoveLbl.Text = Tr("CONTROLS_MOVE_DESC");
-        if (CtrlPauseLbl != null) CtrlPauseLbl.Text = Tr("CONTROLS_PAUSE_DESC");
-        if (CtrlPhagoLbl != null) CtrlPhagoLbl.Text = Tr("CONTROLS_PHAGO_DESC");
-        if (CtrlTreeLbl != null) CtrlTreeLbl.Text = Tr("CONTROLS_TREE_DESC");
 
         if (MasterTitleLbl != null) MasterTitleLbl.Text = Tr("SETTINGS_MASTER_VOL");
         if (SfxTitleLbl != null) SfxTitleLbl.Text = Tr("SETTINGS_SFX_VOL");

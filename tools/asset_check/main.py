@@ -19,6 +19,7 @@ try:
     from tools.asset_check.orphans import check_orphan_assets, check_orphan_imports
     from tools.asset_check.resolution import check_asset_resolutions
     from tools.asset_check.quality import check_image_quality
+    from tools.asset_check.audio import check_audio_assets
 except ImportError:
     from asset_check.missing import check_missing_assets
     from asset_check.naming import check_naming_conventions
@@ -26,6 +27,7 @@ except ImportError:
     from asset_check.orphans import check_orphan_assets, check_orphan_imports
     from asset_check.resolution import check_asset_resolutions
     from asset_check.quality import check_image_quality
+    from asset_check.audio import check_audio_assets
 
 # ANSI Terminal Color Constants
 RESET = "\033[0m"
@@ -57,29 +59,33 @@ def run_all_checks(target_category=None, summary_only=False) -> bool:
     print_banner()
 
     # 1. Missing & Unmapped Assets (Bidirectional Integrity)
-    print_step(1, 6, "Verifying bidirectional asset references and registered IDs...")
+    print_step(1, 7, "Verifying bidirectional asset references and registered IDs...")
     missing_by_cat, unmapped_issues, category_counts = check_missing_assets(root_dir, target_category=target_category)
 
     # 2. Naming Conventions
-    print_step(2, 6, "Checking snake_case, casing, and prefix conventions...")
+    print_step(2, 7, "Checking snake_case, casing, and prefix conventions...")
     naming_issues = check_naming_conventions(root_dir)
 
     # 3. Duplicates & Conflicts
-    print_step(3, 6, "Scanning for duplicate files & near-duplicate collisions...")
+    print_step(3, 7, "Scanning for duplicate files & near-duplicate collisions...")
     dedup_issues = check_duplicates(root_dir)
 
     # 4. Orphans & Dead Imports
-    print_step(4, 6, "Checking for orphan Godot .import files & unreferenced assets...")
+    print_step(4, 7, "Checking for orphan Godot .import files & unreferenced assets...")
     orphan_imports = check_orphan_imports(root_dir)
     orphan_assets = check_orphan_assets(root_dir)
 
     # 5. Resolutions & Aspect Ratios
-    print_step(5, 6, "Validating 1:1 aspect ratios and minimum resolutions in gen/... ")
+    print_step(5, 7, "Validating 1:1 aspect ratios and minimum resolutions in gen/... ")
     resolution_issues, res_stats = check_asset_resolutions(root_dir)
 
     # 6. Deep Image Quality & Artifact Inspection
-    print_step(6, 6, "Inspecting border clipping, corner transparency, and halos...")
+    print_step(6, 7, "Inspecting border clipping, corner transparency, and halos...")
     quality_issues, quality_stats = check_image_quality(root_dir)
+
+    # 7. Audio Manifest Integrity (manifest.json vs files on disk)
+    print_step(7, 7, "Verifying audio manifest entries resolve to files on disk...")
+    audio_missing, audio_total = check_audio_assets(root_dir)
 
     # --- Summary Table ---
     print(f"\n{MAGENTA}{BOLD}╔══════════════════════════════════════════════════════════════════════════╗{RESET}")
@@ -99,7 +105,7 @@ def run_all_checks(target_category=None, summary_only=False) -> bool:
 
     print(f"{MAGENTA}{BOLD}╚══════════════════════════════════════════════════════════════════════════╝{RESET}\n")
 
-    has_errors = total_missing > 0
+    has_errors = total_missing > 0 or len(audio_missing) > 0
 
     # Print Missing Assets by Category (Full list, NO truncation)
     if total_missing > 0:
@@ -161,6 +167,15 @@ def run_all_checks(target_category=None, summary_only=False) -> bool:
             print(f"  {YELLOW}• {issue}{RESET}")
         print()
 
+    # Print Audio Manifest Issues
+    if audio_missing:
+        print(f"{RED}{BOLD}❌ AUDIO MANIFEST GAPS ({len(audio_missing)} of {audio_total}):{RESET}")
+        for issue in audio_missing:
+            print(f"  {RED}• {issue}{RESET}")
+        print()
+    else:
+        print(f"{GREEN}{BOLD}✓ Audio manifest: all {audio_total} entries resolve to files on disk!{RESET}\n")
+
     print(f"{CYAN}{BOLD}══════════════════════════════════════════════════════════════════════════{RESET}")
     if has_errors or naming_issues or orphan_imports or resolution_issues:
         print(f"{YELLOW}{BOLD}Linter completed with pending items to generate or resolve.{RESET}\n")
@@ -177,7 +192,7 @@ def main():
     args = parser.parse_args()
 
     success = run_all_checks(target_category=args.category, summary_only=args.summary)
-    sys.exit(0 if success else 0)
+    sys.exit(0 if success else 1)
 
 
 if __name__ == "__main__":

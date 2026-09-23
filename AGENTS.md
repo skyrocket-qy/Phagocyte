@@ -68,6 +68,11 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
 - `gen/<achievement|skill|passive_tree|ui>/` is source of truth (prefix-free
   names); `assets/gen/` is pipeline artifact. Check with
   `python3 tools/asset_check/main.py --summary` (`make check-assets`).
+- Audio has its own manifest SSOT: `assets/audio/manifest.json` lists every
+  BGM/SFX the game may play. New sounds go there FIRST, then the file, then
+  the `AudioManager` call. Enforced three ways: `check-assets` step 7 (disk),
+  `AudioManager.ValidateAudioManifest` at boot (fail fast), `TestAudioAssets`
+  (red suite). `PlaySfx` warns on miss — silence is always a bug, never a default.
 - Runtime loads ONLY via `AssetLoader` (`scripts/core/assets/`):
   `Load<T>` throws `AssetLoadException` on miss, `TryLoad<T>` returns null.
   Raw `GD.Load` / `ResourceLoader.*` live solely in `GodotAssetProvider.cs`

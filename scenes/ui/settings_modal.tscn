@@ -104,6 +104,12 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 1)
 theme_override_font_sizes/font_size = 20
 text = "⚙️ 系統設定"
+horizontal_alignment = 1
+
+[node name="TitleSpacer" type="Control" parent="VBox/Header"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+mouse_filter = 2
 
 [node name="LanguageRow" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
@@ -126,18 +132,6 @@ theme_override_font_sizes/font_size = 14
 [node name="TabBar" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
 theme_override_constants/separation = 10
-
-[node name="ControlsTab" type="Button" parent="VBox/TabBar"]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
-theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
-theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
-theme_override_fonts/font = ExtResource("2_btn_font")
-theme_override_font_sizes/font_size = 14
-text = "🎮 操作指南"
 
 [node name="AudioTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(0, 38)
@@ -167,68 +161,6 @@ text = "🖥️ 畫面顯示"
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
-
-[node name="ControlsPanel" type="VBoxContainer" parent="VBox/Content"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="HeaderLabel" type="Label" parent="VBox/Content/ControlsPanel"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.85, 0.35, 1)
-theme_override_font_sizes/font_size = 15
-text = "走位操控與吞噬機制"
-
-[node name="MoveRow" type="HBoxContainer" parent="VBox/Content/ControlsPanel"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="DescLabel" type="Label" parent="VBox/Content/ControlsPanel/MoveRow"]
-custom_minimum_size = Vector2(0, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
-theme_override_font_sizes/font_size = 13
-text = "[W][A][S][D] / ↑↓←→：流體偽足游動走位。"
-autowrap_mode = 3
-
-[node name="PauseRow" type="HBoxContainer" parent="VBox/Content/ControlsPanel"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="DescLabel" type="Label" parent="VBox/Content/ControlsPanel/PauseRow"]
-custom_minimum_size = Vector2(0, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
-theme_override_font_sizes/font_size = 13
-text = "[ESC]：暫停遊戲 / 開啟系統設定與檔案庫。"
-autowrap_mode = 3
-
-[node name="PhagoRow" type="HBoxContainer" parent="VBox/Content/ControlsPanel"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="DescLabel" type="Label" parent="VBox/Content/ControlsPanel/PhagoRow"]
-custom_minimum_size = Vector2(0, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
-theme_override_font_sizes/font_size = 13
-text = "偽足邊界接觸：接觸病原體會被啃咬受傷；擊殺獲取免疫經驗 EXP，吞噬技能仍可吞噬。"
-autowrap_mode = 3
-
-[node name="TreeRow" type="HBoxContainer" parent="VBox/Content/ControlsPanel"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="DescLabel" type="Label" parent="VBox/Content/ControlsPanel/TreeRow"]
-custom_minimum_size = Vector2(0, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 0.95)
-theme_override_font_sizes/font_size = 13
-text = "[C]：切換被動樹屬性面板。"
-autowrap_mode = 3
 
 [node name="AudioPanel" type="VBoxContainer" parent="VBox/Content"]
 visible = false

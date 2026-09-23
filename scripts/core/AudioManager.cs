@@ -53,6 +53,7 @@ public partial class AudioManager : Node
         }
 
         PreloadCommonAudio();
+        ValidateAudioManifest();
     }
 
     public override void _ExitTree()
@@ -87,6 +88,55 @@ public partial class AudioManager : Node
             "res://assets/audio/bgm/boss.mp3",
             "res://assets/audio/bgm/victory.mp3",
             "res://assets/audio/bgm/defeat.mp3");
+    }
+
+    /// <summary>
+    /// Fail-fast manifest check: every BGM track and SFX name listed in
+    /// <c>assets/audio/manifest.json</c> must resolve to a file on disk.
+    /// Missing entries are all reported via <see cref="GD.PushError"/> (loud
+    /// in editor, red in test output) instead of failing silently mid-game.
+    /// </summary>
+    public void ValidateAudioManifest()
+    {
+        Godot.Collections.Dictionary manifest;
+        try
+        {
+            manifest = CatalogLoader.LoadObject(DataPaths.AudioManifest);
+        }
+        catch (DataLoadException ex)
+        {
+            GD.PushError($"[Audio] manifest missing or malformed: {ex.Message}");
+            return;
+        }
+
+        var missing = new System.Collections.Generic.List<string>();
+        foreach (string track in ReadManifestNames(manifest, "bgm"))
+        {
+            if (AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.BgmCandidates(track)) == null)
+                missing.Add($"bgm/{track}");
+        }
+        foreach (string name in ReadManifestNames(manifest, "sfx"))
+        {
+            if (AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.SfxCandidates(name)) == null)
+                missing.Add($"sfx/{name}");
+        }
+        if (missing.Count > 0)
+            GD.PushError($"[Audio] {missing.Count} manifest asset(s) missing on disk: {string.Join(", ", missing)}");
+    }
+
+    private static System.Collections.Generic.List<string> ReadManifestNames(
+        Godot.Collections.Dictionary manifest, string key)
+    {
+        var names = new System.Collections.Generic.List<string>();
+        if (manifest.TryGetValue(key, out var raw) && raw.VariantType == Variant.Type.Array)
+        {
+            foreach (var item in raw.AsGodotArray())
+            {
+                if (item.VariantType == Variant.Type.String)
+                    names.Add(item.AsString());
+            }
+        }
+        return names;
     }
 
     // ==========================================
@@ -167,7 +217,10 @@ public partial class AudioManager : Node
     {
         var stream = AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.SfxCandidates(soundName));
         if (stream == null)
+        {
+            GD.PushWarning($"AudioManager: SFX '{soundName}' not found.");
             return;
+        }
 
         var player = _sfxPlayers[_sfxPoolIndex];
         _sfxPoolIndex = (_sfxPoolIndex + 1) % SfxPoolSize;
@@ -197,17 +250,17 @@ public partial class AudioManager : Node
 
     public void PlayPlayerHit()
     {
-        PlaySfx("player_hit", 0.05f, 2.0f);
+        PlaySfx("hit", 0.05f, 2.0f);
     }
 
     public void PlayPlayerDeath()
     {
-        PlaySfx("player_death", 0.02f, 3.0f);
+        PlaySfx("die_hero", 0.02f, 3.0f);
     }
 
     public void PlayLevelUp()
     {
-        PlaySfx("level_up", 0.0f, 2.0f);
+        PlaySfx("level_upgrade", 0.0f, 2.0f);
     }
 
     public void PlayClick()
@@ -217,7 +270,7 @@ public partial class AudioManager : Node
 
     public void PlayPickup()
     {
-        PlaySfx("pickup", 0.10f, -2.0f);
+        PlaySfx("item_pickup", 0.10f, -2.0f);
     }
 
     public void PlayShoot()
