@@ -52,40 +52,46 @@ public partial class LoadoutView : Control
     private readonly List<string> _backpackIds = new();
     private OrganelleTooltip? _tooltip;
 
-    /// <summary>Bio-socket look for the 2x2 chamber: translucent cytoplasm wells
-    /// ringed with a cyan microtubule glow (workbench refactor).</summary>
+    /// <summary>Bio-socket look for the 2x2 chamber: double-ring bio-energy rail
+    /// with asymmetric chamfer (Scheme B) and glowing cyan rim.</summary>
     private static readonly StyleBoxFlat SocketNormalStyle = MakeSocketStyle(
-        new Color(0.05f, 0.11f, 0.15f, 0.78f), new Color(0.30f, 0.85f, 0.95f, 0.55f));
+        new Color(0.04f, 0.09f, 0.14f, 0.85f), new Color(0.30f, 0.85f, 0.95f, 0.65f), 2.0f, 6.0f);
     private static readonly StyleBoxFlat SocketHoverStyle = MakeSocketStyle(
-        new Color(0.07f, 0.16f, 0.22f, 0.90f), new Color(0.45f, 0.95f, 1.0f, 0.95f));
+        new Color(0.06f, 0.14f, 0.22f, 0.92f), new Color(0.45f, 0.98f, 1.0f, 0.95f), 2.0f, 10.0f);
     private static readonly StyleBoxFlat SocketPressedStyle = MakeSocketStyle(
-        new Color(0.09f, 0.20f, 0.27f, 1.0f), new Color(0.60f, 1.0f, 1.0f, 1.0f));
+        new Color(0.08f, 0.18f, 0.28f, 1.0f), new Color(0.60f, 1.0f, 1.0f, 1.0f), 2.5f, 12.0f);
 
-    private static StyleBoxFlat MakeSocketStyle(Color bg, Color border)
+    private static StyleBoxFlat MakeSocketStyle(Color bg, Color border, float borderWidth = 2.0f, float shadowSize = 8.0f)
     {
         return new StyleBoxFlat
         {
             BgColor = bg,
             BorderColor = border,
-            BorderWidthLeft = 2,
-            BorderWidthTop = 2,
-            BorderWidthRight = 2,
-            BorderWidthBottom = 2,
-            CornerRadiusTopLeft = 26,
-            CornerRadiusTopRight = 26,
-            CornerRadiusBottomRight = 26,
-            CornerRadiusBottomLeft = 26
+            BorderWidthLeft = (int)borderWidth,
+            BorderWidthTop = (int)borderWidth,
+            BorderWidthRight = (int)borderWidth,
+            BorderWidthBottom = (int)borderWidth,
+            CornerRadiusTopLeft = 14,
+            CornerRadiusTopRight = 4,
+            CornerRadiusBottomRight = 14,
+            CornerRadiusBottomLeft = 4,
+            ShadowColor = new Color(0.0f, 0.85f, 1.0f, 0.18f),
+            ShadowSize = (int)shadowSize,
+            ContentMarginLeft = 6.0f,
+            ContentMarginTop = 6.0f,
+            ContentMarginRight = 6.0f,
+            ContentMarginBottom = 6.0f
         };
     }
 
     /// <summary>Capsule profile-tag look: translucent fill with a cyan hairline
-    /// so the switcher melts into the top bar instead of sitting on a black block.</summary>
+    /// and Scheme B asymmetric chamfer.</summary>
     private static readonly StyleBoxFlat ProfileNormalStyle = MakeCapsuleStyle(
-        new Color(0.03f, 0.07f, 0.11f, 0.45f), new Color(0.35f, 0.90f, 1.0f, 0.50f));
+        new Color(0.03f, 0.07f, 0.11f, 0.50f), new Color(0.25f, 0.70f, 0.90f, 0.50f));
     private static readonly StyleBoxFlat ProfileHoverStyle = MakeCapsuleStyle(
-        new Color(0.06f, 0.13f, 0.18f, 0.70f), new Color(0.35f, 0.90f, 1.0f, 0.80f));
+        new Color(0.06f, 0.14f, 0.20f, 0.75f), new Color(0.35f, 0.90f, 1.0f, 0.85f));
     private static readonly StyleBoxFlat ProfilePressedStyle = MakeCapsuleStyle(
-        new Color(0.08f, 0.18f, 0.24f, 0.90f), new Color(0.50f, 0.95f, 1.0f, 0.95f));
+        new Color(0.08f, 0.18f, 0.26f, 0.90f), new Color(0.50f, 0.95f, 1.0f, 0.95f));
     private static readonly Color ProfileInactiveFont = new(0.75f, 0.85f, 0.90f);
     private static readonly Color ProfileActiveFont = new(0.94f, 0.99f, 0.98f);
 
@@ -99,10 +105,10 @@ public partial class LoadoutView : Control
             BorderWidthTop = 1,
             BorderWidthRight = 1,
             BorderWidthBottom = 1,
-            CornerRadiusTopLeft = 20,
-            CornerRadiusTopRight = 20,
-            CornerRadiusBottomRight = 20,
-            CornerRadiusBottomLeft = 20,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 3,
+            CornerRadiusBottomRight = 10,
+            CornerRadiusBottomLeft = 3,
             ContentMarginLeft = 14.0f,
             ContentMarginRight = 14.0f
         };
@@ -217,6 +223,7 @@ public partial class LoadoutView : Control
                 CustomMinimumSize = new Vector2(0, 40),
                 MouseDefaultCursorShape = CursorShape.PointingHand
             };
+            ApplyCapsuleStyle(tab);
             tab.AddThemeFontSizeOverride("font_size", 14);
             tab.Pressed += () => OnCategoryTabPressed(filter);
             tab.ButtonPressed = filter == _categoryFilter;

@@ -836,15 +836,127 @@ public partial class PassiveTreeView : Control
     {
         foreach (string branch in BranchOrder)
         {
-            if (!PassiveTreeManager.TryGetRegionCenter(branch, out _))
+            if (!PassiveTreeManager.TryGetRegionCenter(branch, out Vector2 center))
                 continue;
 
             Color color = GetBranchColor(branch, 1.0f);
             Rect2 rect = PassiveTreeManager.GetRegionBounds(branch);
             bool core = branch == "core";
-            layer.DrawRect(rect, new Color(color.R, color.G, color.B, core ? 0.055f : 0.040f));
-            layer.DrawRect(rect, new Color(color.R, color.G, color.B, core ? 0.20f : 0.14f), false, core ? 1.8f : 1.5f);
+
+            // 1. Organic territorial background wash with subtle breathing alpha
+            float breath = 0.88f + 0.12f * Mathf.Sin(_time * 1.8f + rect.Position.X * 0.01f);
+            layer.DrawRect(rect, new Color(color.R, color.G, color.B, (core ? 0.06f : 0.038f) * breath));
+
+            // 2. Epigenetic Chromatin Fiber Network (sinusoidal micro-filaments weaving across territory)
+            DrawChromatinFibers(layer, rect, color, branch);
+
+            // 3. DNA Methylation / Histone Octamer Hubs
+            DrawMethylationHubs(layer, rect, center, color);
+
+            // 4. Bio-specimen containment brackets at the 4 corners of each territory
+            DrawRegionSpecimenBrackets(layer, rect, color, core);
         }
+    }
+
+    private void DrawChromatinFibers(Control layer, Rect2 rect, Color color, string branch)
+    {
+        int branchSeed = branch.GetHashCode();
+        float fiberAlpha = 0.07f + 0.03f * Mathf.Sin(_time * 1.2f + branchSeed);
+        Color strandColor = new(color.R, color.G, color.B, fiberAlpha);
+
+        // Sinusoidal chromatin strands weaving horizontally
+        for (int s = 0; s < 2; s++)
+        {
+            float baseY = rect.Position.Y + rect.Size.Y * (0.28f + s * 0.44f);
+            int segments = 16;
+            var points = new Vector2[segments + 1];
+            float stepX = rect.Size.X / segments;
+            float freq = 0.012f + s * 0.006f;
+            float amp = 14.0f + s * 6.0f;
+            float phase = _time * (0.4f + s * 0.2f) + s * 1.8f + branchSeed * 0.01f;
+
+            for (int p = 0; p <= segments; p++)
+            {
+                float x = rect.Position.X + p * stepX;
+                float y = baseY + amp * Mathf.Sin(x * freq + phase);
+                points[p] = new Vector2(x, y);
+            }
+            layer.DrawPolyline(points, strandColor, 1.2f, true);
+        }
+    }
+
+    private void DrawMethylationHubs(Control layer, Rect2 rect, Vector2 center, Color color)
+    {
+        // Hub at center and two secondary hubs offset diagonally
+        Vector2[] hubs =
+        {
+            center,
+            new(rect.Position.X + rect.Size.X * 0.28f, rect.Position.Y + rect.Size.Y * 0.32f),
+            new(rect.Position.X + rect.Size.X * 0.72f, rect.Position.Y + rect.Size.Y * 0.68f)
+        };
+
+        for (int h = 0; h < hubs.Length; h++)
+        {
+            Vector2 pos = hubs[h];
+            float hubPulse = 1.0f + 0.15f * Mathf.Sin(_time * 2.2f + h * 1.5f);
+            float haloRadius = (h == 0 ? 16.0f : 10.0f) * hubPulse;
+
+            // Outer soft bio-respiration halo
+            layer.DrawCircle(pos, haloRadius, new Color(color.R, color.G, color.B, 0.05f));
+
+            // Concentric methylation ring
+            layer.DrawArc(pos, (h == 0 ? 9.0f : 6.0f) * hubPulse, 0.0f, Mathf.Tau, 18,
+                new Color(color.R, color.G, color.B, 0.22f), 1.0f);
+
+            // Core histone pip
+            layer.DrawCircle(pos, h == 0 ? 2.8f : 2.0f, new Color(color.R, color.G, color.B, 0.40f));
+            layer.DrawCircle(pos, 1.0f, Colors.White);
+
+            // 4 tiny methylation markers at cardinal offsets
+            float markDist = (h == 0 ? 12.0f : 8.0f) * hubPulse;
+            Color markColor = new(color.R, color.G, color.B, 0.30f);
+            layer.DrawCircle(pos + new Vector2(markDist, 0), 1.2f, markColor);
+            layer.DrawCircle(pos - new Vector2(markDist, 0), 1.2f, markColor);
+            layer.DrawCircle(pos + new Vector2(0, markDist), 1.2f, markColor);
+            layer.DrawCircle(pos - new Vector2(0, markDist), 1.2f, markColor);
+        }
+    }
+
+    private static void DrawRegionSpecimenBrackets(Control layer, Rect2 rect, Color color, bool core)
+    {
+        float arm = 22.0f;
+        float pad = 4.0f;
+        Color bracketColor = new(color.R, color.G, color.B, core ? 0.38f : 0.24f);
+        Color dotColor = new(color.R, color.G, color.B, core ? 0.65f : 0.45f);
+        float width = core ? 2.0f : 1.5f;
+
+        Vector2 tl = rect.Position + new Vector2(pad, pad);
+        Vector2 tr = new(rect.End.X - pad, rect.Position.Y + pad);
+        Vector2 bl = new(rect.Position.X + pad, rect.End.Y - pad);
+        Vector2 br = rect.End - new Vector2(pad, pad);
+
+        // Top-Left
+        layer.DrawLine(tl, tl + new Vector2(arm, 0), bracketColor, width);
+        layer.DrawLine(tl, tl + new Vector2(0, arm), bracketColor, width);
+        layer.DrawCircle(tl + new Vector2(2, 2), 1.5f, dotColor);
+
+        // Top-Right
+        layer.DrawLine(tr, tr - new Vector2(arm, 0), bracketColor, width);
+        layer.DrawLine(tr, tr + new Vector2(0, arm), bracketColor, width);
+        layer.DrawCircle(tr + new Vector2(-2, 2), 1.5f, dotColor);
+
+        // Bottom-Left
+        layer.DrawLine(bl, bl + new Vector2(arm, 0), bracketColor, width);
+        layer.DrawLine(bl, bl - new Vector2(0, arm), bracketColor, width);
+        layer.DrawCircle(bl + new Vector2(2, -2), 1.5f, dotColor);
+
+        // Bottom-Right
+        layer.DrawLine(br, br - new Vector2(arm, 0), bracketColor, width);
+        layer.DrawLine(br, br - new Vector2(0, arm), bracketColor, width);
+        layer.DrawCircle(br - new Vector2(-2, -2), 1.5f, dotColor);
+
+        // Delicate perimeter border
+        layer.DrawRect(rect, new Color(color.R, color.G, color.B, core ? 0.08f : 0.045f), false, 1.0f);
     }
 
     private void DrawEdges(Control layer, Godot.Collections.Dictionary<string, int> owned, string start)
@@ -868,28 +980,31 @@ public partial class PassiveTreeView : Control
             Color color = GetEdgeColor(edge.From, edge.To, lit, highlighted);
             float width = (lit ? 4.4f : 2.0f) + (highlighted ? 1.4f : 0.0f);
 
-            layer.DrawLine(from, to, new Color(color.R, color.G, color.B, color.A * 0.26f), width * 2.8f, true);
+            layer.DrawLine(from, to, new Color(color.R, color.G, color.B, color.A * 0.28f), width * 3.0f, true);
             layer.DrawLine(from, to, color, width, true);
 
             if (lit)
             {
                 Vector2[] points = { from, to };
-                float travel = Mathf.PosMod(_time * 0.22f + i * 0.137f, 1.0f);
+                float travel = Mathf.PosMod(_time * 0.24f + i * 0.137f, 1.0f);
 
-                // ATP bioelectric pulse: fading trail + soft glow behind the head.
+                // Multi-stage fluorophore excitation pulse: brilliant plasma head with fading phosphor tail
                 Vector2 head = PointAlong(points, travel);
-                layer.DrawCircle(head, 9.0f, new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.16f));
-                layer.DrawCircle(head, 4.2f, Colors.White);
-                for (int trail = 1; trail <= 4; trail++)
+                layer.DrawCircle(head, 10.0f, new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.20f));
+                layer.DrawCircle(head, 4.5f, Colors.White);
+
+                for (int trail = 1; trail <= 5; trail++)
                 {
-                    float t = Mathf.PosMod(travel - trail * 0.035f, 1.0f);
-                    float fade = 1.0f - trail / 5.0f;
-                    layer.DrawCircle(PointAlong(points, t), 3.6f * fade,
-                        new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.45f * fade));
+                    float t = Mathf.PosMod(travel - trail * 0.032f, 1.0f);
+                    float fade = 1.0f - trail / 6.0f;
+                    layer.DrawCircle(PointAlong(points, t), 3.8f * fade,
+                        new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.50f * fade));
                 }
 
-                float echo = Mathf.PosMod(travel + 0.22f, 1.0f);
-                layer.DrawCircle(PointAlong(points, echo), 2.6f, new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.55f));
+                // Secondary harmonic pulse in alternating rhythm
+                float echo = Mathf.PosMod(travel + 0.35f, 1.0f);
+                layer.DrawCircle(PointAlong(points, echo), 2.8f, new Color(PlasmaCyan.R, PlasmaCyan.G, PlasmaCyan.B, 0.60f));
+                layer.DrawCircle(PointAlong(points, echo), 1.2f, Colors.White);
             }
         }
     }

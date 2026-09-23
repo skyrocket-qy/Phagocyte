@@ -63,8 +63,11 @@ public partial class ChamberLinks : Control
 
         // Synapse node where the four channels meet.
         var center = (rects[0].GetCenter() + rects[3].GetCenter()) * 0.5f;
-        DrawCircle(center, 9.0f, glow);
+        float synPulse = 1.0f + 0.20f * Mathf.Sin(_phase * 2.0f);
+        DrawCircle(center, 12.0f * synPulse, glow);
+        DrawArc(center, 8.0f * synPulse, 0.0f, Mathf.Tau, 16, line, 1.2f);
         DrawCircle(center, 4.0f, line);
+        DrawCircle(center, 1.8f, Colors.White);
     }
 
     private void DrawChannel(Vector2 from, Vector2 to, Color line, Color glow)
@@ -73,5 +76,11 @@ public partial class ChamberLinks : Control
             return;
         DrawLine(from, to, glow, 7.0f);
         DrawLine(from, to, line, 2.0f);
+
+        // Traveling ATP photon pulse along channel
+        float t = Mathf.PosMod(_phase * 0.15f, 1.0f);
+        Vector2 pulsePos = from.Lerp(to, t);
+        DrawCircle(pulsePos, 3.5f, new Color(LineColor.R, LineColor.G, LineColor.B, 0.45f));
+        DrawCircle(pulsePos, 1.5f, Colors.White);
     }
 }

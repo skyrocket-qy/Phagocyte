@@ -51,6 +51,7 @@ public partial class MainMenu : Control
     public Label? ClassSkillLbl { get; set; }
     public Label? ClassStatusLbl { get; set; }
     public Button? ClassConfirmBtn { get; set; }
+    public BioRadarChart? ClassRadarChart { get; set; }
 
     // Passive Tree View Controls
     public Label? PassiveHeaderLbl { get; set; }
@@ -155,11 +156,14 @@ public partial class MainMenu : Control
         ClassBioLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassBioLabel");
         ClassRoleLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassRoleLabel");
         ClassStatsHeaderLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatsHeader");
-        ClassStatsLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatsLabel");
+        ClassStatsLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/StatsRow/ClassStatsLabel")
+            ?? GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatsLabel");
         ClassSkillHeaderLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassSkillHeader");
         ClassSkillLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassSkillLabel");
         ClassStatusLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatusLabel");
         ClassConfirmBtn = GetNodeOrNull<Button>("ClassView/Buttons/ConfirmButton");
+        ClassRadarChart = GetNodeOrNull<BioRadarChart>("ClassView/HBox/DetailPanel/VBox/StatsRow/BioRadarChart")
+            ?? GetNodeOrNull<BioRadarChart>("ClassView/HBox/DetailPanel/VBox/BioRadarChart");
 
         PassiveHeaderLbl = GetNodeOrNull<Label>("PassiveView/HeaderLabel");
         TreeLevelLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreeLevelLabel");
@@ -494,11 +498,33 @@ public partial class MainMenu : Control
         }
     }
 
+    private readonly System.Collections.Generic.Dictionary<string, Button> _classButtons = new();
+
+    private static StyleBoxFlat MakeClassBtnStyle(Color bg, Color border, float borderWidth = 1.5f)
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = bg,
+            BorderColor = border,
+            BorderWidthLeft = (int)borderWidth,
+            BorderWidthTop = (int)borderWidth,
+            BorderWidthRight = (int)borderWidth,
+            BorderWidthBottom = (int)borderWidth,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 3,
+            CornerRadiusBottomRight = 10,
+            CornerRadiusBottomLeft = 3,
+            ContentMarginLeft = 14.0f,
+            ContentMarginRight = 14.0f
+        };
+    }
+
     public void SetupClassButtons()
     {
         if (ClassListContainer == null)
             return;
 
+        _classButtons.Clear();
         foreach (var child in ClassListContainer.GetChildren())
         {
             ClassListContainer.RemoveChild(child);
@@ -509,15 +535,24 @@ public partial class MainMenu : Control
         {
             string key = keyVar.AsString();
             var data = GameManager.GetClassInfo(key);
+            bool unlocked = data.TryGetValue("unlocked", out Variant uVal) && uVal.AsBool();
             var btn = new Button
             {
                 CustomMinimumSize = new Vector2(280, 48),
                 Alignment = HorizontalAlignment.Left,
-                Text = (data["unlocked"].AsBool() ? " ✅ " : " 🔒 ") + data["name"].AsString()
+                Text = (unlocked ? " ✅ " : " 🔒 ") + data["name"].AsString(),
+                MouseDefaultCursorShape = CursorShape.PointingHand
             };
+            btn.AddThemeStyleboxOverride("normal", MakeClassBtnStyle(new Color(0.04f, 0.08f, 0.12f, 0.75f), new Color(0.18f, 0.40f, 0.60f, 0.5f)));
+            btn.AddThemeStyleboxOverride("hover", MakeClassBtnStyle(new Color(0.06f, 0.13f, 0.19f, 0.85f), new Color(0.35f, 0.85f, 1.0f, 0.85f)));
+            btn.AddThemeStyleboxOverride("pressed", MakeClassBtnStyle(new Color(0.08f, 0.18f, 0.26f, 0.95f), new Color(0.50f, 0.95f, 1.0f, 1.0f)));
+            btn.AddThemeStyleboxOverride("focus", new StyleBoxEmpty());
+            btn.AddThemeFontSizeOverride("font_size", 15);
+
             string localKey = key;
             btn.Pressed += () => SelectClass(localKey);
             ClassListContainer.AddChild(btn);
+            _classButtons[key] = btn;
         }
     }
 
@@ -526,6 +561,16 @@ public partial class MainMenu : Control
         ActiveClassKey = key;
         var data = GameManager.GetClassInfo(key);
         bool unlocked = data.TryGetValue("unlocked", out Variant unlockedVal) && unlockedVal.AsBool();
+
+        // Highlight selected button
+        foreach (var (k, b) in _classButtons)
+        {
+            bool sel = k == key;
+            b.AddThemeStyleboxOverride("normal", sel
+                ? MakeClassBtnStyle(new Color(0.08f, 0.18f, 0.26f, 0.90f), new Color(0.35f, 0.95f, 1.0f, 0.95f), 2.0f)
+                : MakeClassBtnStyle(new Color(0.04f, 0.08f, 0.12f, 0.75f), new Color(0.18f, 0.40f, 0.60f, 0.5f)));
+            b.AddThemeColorOverride("font_color", sel ? Colors.White : new Color(0.75f, 0.85f, 0.90f));
+        }
 
         if (ClassBadgeLbl != null)
         {
@@ -545,6 +590,43 @@ public partial class MainMenu : Control
             ClassStatsHeaderLbl.Text = Tr("CLASS_STATS_HEADER");
         if (ClassStatsLbl != null)
             ClassStatsLbl.Text = BuildClassVitalsText(data);
+
+        // Update Bio-Radar Chart
+        if (ClassRadarChart != null)
+        {
+            float hp = data.TryGetValue("base_hp", out Variant hpVal) ? hpVal.AsSingle() : 100.0f;
+            float speed = data.TryGetValue("base_speed", out Variant spVal) ? spVal.AsSingle() : 230.0f;
+            float armor = data.TryGetValue("base_armor", out Variant arVal) ? arVal.AsSingle() : 0.0f;
+            string sigStat = data.TryGetValue("trait_stat", out Variant sigVal) ? sigVal.AsString() : "";
+            float sigNum = data.TryGetValue("trait_stat_value", out Variant signVal) ? signVal.AsSingle() : 0.0f;
+
+            float normHp = Mathf.Clamp((hp - 60.0f) / 100.0f, 0.15f, 1.0f);
+            float normArmor = Mathf.Clamp(armor / 15.0f, 0.12f, 1.0f);
+            float normSpeed = Mathf.Clamp((speed - 180.0f) / 90.0f, 0.15f, 1.0f);
+            float normTrait = sigStat switch
+            {
+                "block" => Mathf.Clamp(sigNum / 0.10f, 0.25f, 1.0f),
+                "crit_chance" => Mathf.Clamp(sigNum / 0.15f, 0.25f, 1.0f),
+                "might" => Mathf.Clamp((sigNum - 1.0f) / 0.5f, 0.25f, 1.0f),
+                "projectile_speed" => Mathf.Clamp((sigNum - 1.0f) / 0.5f, 0.25f, 1.0f),
+                "magnet" => Mathf.Clamp((sigNum - 1.0f) / 0.5f, 0.25f, 1.0f),
+                _ => 0.45f
+            };
+
+            string vitalsVal = $"{hp:F0}";
+            string armorVal = $"{armor:F0}";
+            string speedVal = $"{speed:F0}";
+            string traitVal = FormatSignatureStat(sigStat, sigNum);
+
+            ClassRadarChart.SetStats(
+                normHp, normArmor, normSpeed, normTrait,
+                vitalsVal, armorVal, speedVal, traitVal,
+                PassiveTreeManager.GetStatLabel("max_health"),
+                PassiveTreeManager.GetStatLabel("armor"),
+                PassiveTreeManager.GetStatLabel("move_speed"),
+                SignatureStatLabel(sigStat));
+        }
+
         if (ClassSkillHeaderLbl != null)
             ClassSkillHeaderLbl.Text = Tr("CLASS_SKILL_HEADER");
         if (ClassSkillLbl != null)

@@ -37,6 +37,17 @@ public partial class EnergyPips : Control
     /// <summary>Stack the discs top-to-bottom (slot bottom-row badge) instead of left-to-right.</summary>
     [Export] public bool Vertical { get; set; } = false;
 
+    private float _time;
+
+    public override void _Process(double delta)
+    {
+        if (FilledCount > 0 || GeneratorCount > 0)
+        {
+            _time += (float)delta;
+            QueueRedraw();
+        }
+    }
+
     public void Configure(int pipCount, int filledCount, int generatorCount)
     {
         PipCount = Mathf.Max(0, pipCount);
@@ -77,16 +88,7 @@ public partial class EnergyPips : Control
             bool isGenerator = i >= PipCount - GeneratorCount;
             bool isFilled = i < FilledCount;
 
-            DrawCircle(center, radius, RingColor);
-
-            Color body = isGenerator ? GeneratorColor : isFilled ? FillColor : EmptyColor;
-            DrawCircle(center, Mathf.Max(1.0f, radius - 1.6f), body);
-
-            if (isGenerator || isFilled)
-            {
-                DrawCircle(center - new Vector2(radius * 0.26f, radius * 0.26f),
-                    Mathf.Max(0.6f, radius * 0.3f), new Color(1.0f, 1.0f, 1.0f, 0.35f));
-            }
+            DrawPipDisc(center, radius, isGenerator, isFilled, i);
         }
     }
 
@@ -115,16 +117,39 @@ public partial class EnergyPips : Control
             bool isGenerator = i >= PipCount - GeneratorCount;
             bool isFilled = i < FilledCount;
 
+            DrawPipDisc(center, radius, isGenerator, isFilled, i);
+        }
+    }
+
+    private void DrawPipDisc(Vector2 center, float radius, bool isGenerator, bool isFilled, int index)
+    {
+        if (isGenerator || isFilled)
+        {
+            Color body = isGenerator ? GeneratorColor : FillColor;
+            float pulse = 0.88f + 0.12f * Mathf.Sin(_time * 4.0f + index * 0.7f);
+
+            // Glowing ATP halo
+            DrawCircle(center, (radius + 2.4f) * pulse, new Color(body.R, body.G, body.B, 0.22f));
+
+            // Structural ring
             DrawCircle(center, radius, RingColor);
 
-            Color body = isGenerator ? GeneratorColor : isFilled ? FillColor : EmptyColor;
-            DrawCircle(center, Mathf.Max(1.0f, radius - 1.6f), body);
+            // Luminous core
+            DrawCircle(center, Mathf.Max(1.0f, radius - 1.3f), body);
 
-            if (isGenerator || isFilled)
-            {
-                DrawCircle(center - new Vector2(radius * 0.26f, radius * 0.26f),
-                    Mathf.Max(0.6f, radius * 0.3f), new Color(1.0f, 1.0f, 1.0f, 0.35f));
-            }
+            // Specular inner rim
+            DrawArc(center, Mathf.Max(1.0f, radius - 2.5f), 0.0f, Mathf.Tau, 14, new Color(1.0f, 1.0f, 1.0f, 0.40f), 0.9f);
+
+            // Photon excitation spark
+            DrawCircle(center - new Vector2(radius * 0.24f, radius * 0.24f),
+                Mathf.Max(0.7f, radius * 0.28f), Colors.White);
+        }
+        else
+        {
+            // Empty cytoplasm well
+            DrawCircle(center, radius, RingColor);
+            DrawCircle(center, Mathf.Max(1.0f, radius - 1.3f), new Color(0.06f, 0.10f, 0.14f, 0.92f));
+            DrawArc(center, Mathf.Max(1.0f, radius - 1.8f), 0.0f, Mathf.Tau, 12, new Color(0.22f, 0.50f, 0.65f, 0.35f), 1.0f);
         }
     }
 }

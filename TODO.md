@@ -36,18 +36,22 @@ Eliminating all programmer-art placeholders and restoring confocal microscopy sp
 
 ---
 
-## [TODO] Phase 3: High-Fidelity UI Reskin & Cyber-Microscopy Styling
+## [DONE] Phase 3: High-Fidelity UI Reskin & Cyber-Microscopy Styling
 
 Elevating screens from flat wireframes to high-tech immunobiology interfaces:
 
-- [ ] **Class Selection (`ClassView`) Overhaul**:
-  - Replace raw text stat lists (`最大生命 140`, `护甲 10`) with animated polygonal bio-radar charts (Vitals, Motility, Armor, Phagocytic Reach).
-  - Add illuminated specimen containment brackets and cellular classification holograms.
-- [ ] **Passive Talent Tree (`PassiveView`) Organic Rework**:
-  - Replace the 6 rigid rectangular coordinate boxes with organic epigenetic chromatin fiber networks, DNA methylation hubs, and pulsing fluorophore node connectors.
-- [ ] **Organelle Chamber (`LoadoutView`) Polish**:
-  - Upgrade the 4 static socket frames with glowing bio-energy rings and animated ATP power pips.
-  - Redesign bottom action buttons with `menu_buttons.tres` cyber-fluorescence styling.
+- [x] **Class Selection (`ClassView`) Overhaul**:
+  - Replaced raw text stat lists with animated polygonal `BioRadarChart` (Vitals, Motility, Armor, Special Trait), featuring concentric cyber-fluorescent grid webs, glowing polygons, and vertex pips.
+  - Added illuminated microscopy specimen containment brackets, 方案 B asymmetric chamfer (`12, 3, 12, 3`), and glowing active button highlights in `ClassList`.
+- [x] **Passive Talent Tree (`PassiveView`) Organic Rework**:
+  - Replaced 6 rigid rectangular coordinate boxes with organic Epigenetic Chromatin Networks (breathing territorial wash + sinusoidal chromatin micro-filaments).
+  - Added DNA Methylation / Histone Octamer Hubs with multi-ring bio-respiration pulsing halos.
+  - Enhanced active edge lines (`DrawEdges`) with multi-stage fluorophore excitation trails and harmonic electron pulses.
+- [x] **Organelle Chamber (`LoadoutView`) Polish**:
+  - Upgraded the 4 static socket frames into double-ring bio-energy rails with 方案 B asymmetric chamfers (`14, 4, 14, 4`) and cyan outer glow.
+  - Upgraded `EnergyPips` with dynamic ATP glowing halos, concentric rims, and specular photon excitation cores.
+  - Added flowing ATP energy pulses along microtubule channels in `ChamberLinks`.
+  - Unified category tabs and profile buttons with 方案 B cyber-fluorescence styling.
 
 ---
 
