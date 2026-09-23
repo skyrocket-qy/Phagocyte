@@ -37,7 +37,6 @@ public partial class LoadoutView : Control
     public Label? GeneratorLabel { get; set; }
     public EnergyPips? EnergyBar { get; set; }
     public GridContainer? ChamberGrid { get; set; }
-    public Label? DetailLabel { get; set; }
     public Button? ResetButton { get; set; }
     public Button? ConfirmButton { get; set; }
 
@@ -51,25 +50,96 @@ public partial class LoadoutView : Control
     private readonly List<OrganelleSlot> _chamberCards = new();
     private readonly List<OrganelleSlot> _backpackCards = new();
     private readonly List<string> _backpackIds = new();
+    private OrganelleTooltip? _tooltip;
+
+    /// <summary>Workbench card footprints (the shared slot scene stays 104x118 for the swap modal).</summary>
+    private static readonly Vector2 ChamberCardSize = new(180, 180);
+    private static readonly Vector2 BackpackCardSize = new(150, 174);
+
+    /// <summary>Bio-socket look for the 2x2 chamber: translucent cytoplasm wells
+    /// ringed with a cyan microtubule glow (workbench refactor).</summary>
+    private static readonly StyleBoxFlat SocketNormalStyle = MakeSocketStyle(
+        new Color(0.05f, 0.11f, 0.15f, 0.78f), new Color(0.30f, 0.85f, 0.95f, 0.55f));
+    private static readonly StyleBoxFlat SocketHoverStyle = MakeSocketStyle(
+        new Color(0.07f, 0.16f, 0.22f, 0.90f), new Color(0.45f, 0.95f, 1.0f, 0.95f));
+    private static readonly StyleBoxFlat SocketPressedStyle = MakeSocketStyle(
+        new Color(0.09f, 0.20f, 0.27f, 1.0f), new Color(0.60f, 1.0f, 1.0f, 1.0f));
+
+    private static StyleBoxFlat MakeSocketStyle(Color bg, Color border)
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = bg,
+            BorderColor = border,
+            BorderWidthLeft = 2,
+            BorderWidthTop = 2,
+            BorderWidthRight = 2,
+            BorderWidthBottom = 2,
+            CornerRadiusTopLeft = 26,
+            CornerRadiusTopRight = 26,
+            CornerRadiusBottomRight = 26,
+            CornerRadiusBottomLeft = 26
+        };
+    }
+
+    /// <summary>Capsule profile-tag look: translucent fill with a cyan hairline
+    /// so the switcher melts into the top bar instead of sitting on a black block.</summary>
+    private static readonly StyleBoxFlat ProfileNormalStyle = MakeCapsuleStyle(
+        new Color(0.03f, 0.07f, 0.11f, 0.45f), new Color(0.35f, 0.90f, 1.0f, 0.50f));
+    private static readonly StyleBoxFlat ProfileHoverStyle = MakeCapsuleStyle(
+        new Color(0.06f, 0.13f, 0.18f, 0.70f), new Color(0.35f, 0.90f, 1.0f, 0.80f));
+    private static readonly StyleBoxFlat ProfilePressedStyle = MakeCapsuleStyle(
+        new Color(0.08f, 0.18f, 0.24f, 0.90f), new Color(0.50f, 0.95f, 1.0f, 0.95f));
+    private static readonly Color ProfileInactiveFont = new(0.75f, 0.85f, 0.90f);
+    private static readonly Color ProfileActiveFont = new(0.94f, 0.99f, 0.98f);
+
+    private static StyleBoxFlat MakeCapsuleStyle(Color bg, Color border)
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = bg,
+            BorderColor = border,
+            BorderWidthLeft = 1,
+            BorderWidthTop = 1,
+            BorderWidthRight = 1,
+            BorderWidthBottom = 1,
+            CornerRadiusTopLeft = 20,
+            CornerRadiusTopRight = 20,
+            CornerRadiusBottomRight = 20,
+            CornerRadiusBottomLeft = 20,
+            ContentMarginLeft = 14.0f,
+            ContentMarginRight = 14.0f
+        };
+    }
+
+    private static void ApplyCapsuleStyle(Button btn)
+    {
+        btn.AddThemeStyleboxOverride("normal", ProfileNormalStyle);
+        btn.AddThemeStyleboxOverride("hover", ProfileHoverStyle);
+        btn.AddThemeStyleboxOverride("pressed", ProfilePressedStyle);
+        btn.AddThemeStyleboxOverride("focus", new StyleBoxEmpty());
+        btn.AddThemeColorOverride("font_color", ProfileInactiveFont);
+        btn.AddThemeColorOverride("font_hover_color", ProfileActiveFont);
+        btn.AddThemeColorOverride("font_pressed_color", ProfileActiveFont);
+    }
 
     public override void _Ready()
     {
-        HeaderLabel = GetNodeOrNull<Label>("HeaderLabel");
-        ProfileHBox = GetNodeOrNull<HBoxContainer>("ProfileHBox");
-        ProfileAddButton = GetNodeOrNull<Button>("ProfileHBox/ProfileAddButton");
-        ProfileDeleteButton = GetNodeOrNull<Button>("ProfileHBox/ProfileDeleteButton");
-        BackpackHeaderLabel = GetNodeOrNull<Label>("MainHBox/BackpackPanel/VBox/BackpackHeader");
-        CategoryTabBar = GetNodeOrNull<HBoxContainer>("MainHBox/BackpackPanel/VBox/CategoryTabBar");
-        BackpackGrid = GetNodeOrNull<GridContainer>("MainHBox/BackpackPanel/VBox/BackpackGrid");
-        HintLabel = GetNodeOrNull<Label>("MainHBox/BackpackPanel/VBox/HintLabel");
-        ChamberHeaderLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/ChamberHeader");
-        EnergyLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/EnergyHBox/EnergyLabel");
-        GeneratorLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/EnergyHBox/GeneratorLabel");
-        EnergyBar = GetNodeOrNull<EnergyPips>("MainHBox/ChamberPanel/VBox/EnergyBar");
-        ChamberGrid = GetNodeOrNull<GridContainer>("MainHBox/ChamberPanel/VBox/ChamberGrid");
-        DetailLabel = GetNodeOrNull<Label>("MainHBox/ChamberPanel/VBox/DetailLabel");
-        ResetButton = GetNodeOrNull<Button>("Buttons/ResetButton");
-        ConfirmButton = GetNodeOrNull<Button>("Buttons/ConfirmButton");
+        HeaderLabel = GetNodeOrNull<Label>("Margin/VBox/TopBar/TitleVBox/HeaderLabel");
+        ProfileHBox = GetNodeOrNull<HBoxContainer>("Margin/VBox/TopBar/ProfileHBox");
+        ProfileAddButton = GetNodeOrNull<Button>("Margin/VBox/TopBar/ProfileHBox/ProfileAddButton");
+        ProfileDeleteButton = GetNodeOrNull<Button>("Margin/VBox/TopBar/ProfileHBox/ProfileDeleteButton");
+        BackpackHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/VaultSide/BackpackHeader");
+        CategoryTabBar = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/VaultSide/CategoryTabBar");
+        BackpackGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/VaultSide/VaultScroll/BackpackGrid");
+        HintLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/VaultSide/HintLabel");
+        ChamberHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/ChamberSide/ChamberHeader");
+        EnergyLabel = GetNodeOrNull<Label>("Margin/VBox/TopBar/EnergyVBox/EnergyLabel");
+        GeneratorLabel = GetNodeOrNull<Label>("Margin/VBox/TopBar/EnergyVBox/GeneratorLabel");
+        EnergyBar = GetNodeOrNull<EnergyPips>("Margin/VBox/ContentHBox/ChamberSide/EnergyBar");
+        ChamberGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin/ChamberGrid");
+        ResetButton = GetNodeOrNull<Button>("Margin/VBox/Buttons/ResetButton");
+        ConfirmButton = GetNodeOrNull<Button>("Margin/VBox/Buttons/ConfirmButton");
 
         BuildCategoryTabs();
         BuildChamberCards();
@@ -83,6 +153,19 @@ public partial class LoadoutView : Control
             ProfileAddButton.Pressed += OnProfileAddPressed;
         if (ProfileDeleteButton != null)
             ProfileDeleteButton.Pressed += OnProfileDeletePressed;
+        if (ProfileAddButton != null)
+            ApplyCapsuleStyle(ProfileAddButton);
+        if (ProfileDeleteButton != null)
+        {
+            ApplyCapsuleStyle(ProfileDeleteButton);
+            ProfileDeleteButton.AddThemeColorOverride("font_color", new Color(1.0f, 0.62f, 0.58f));
+        }
+
+        // PoE-style cursor tooltip (owns hover info; engine tooltips stay
+        // cleared on these cards so the two never double up). Added last so
+        // it draws above every card.
+        _tooltip = new OrganelleTooltip { Name = "OrganelleTooltip" };
+        AddChild(_tooltip);
 
         UpdateLocalizedTexts();
     }
@@ -135,10 +218,10 @@ public partial class LoadoutView : Control
             {
                 Name = filter < 0 ? "CategoryTabAll" : $"CategoryTab_{Categories[filter]}",
                 ToggleMode = true,
-                CustomMinimumSize = new Vector2(0, 34),
+                CustomMinimumSize = new Vector2(0, 40),
                 MouseDefaultCursorShape = CursorShape.PointingHand
             };
-            tab.AddThemeFontSizeOverride("font_size", 12);
+            tab.AddThemeFontSizeOverride("font_size", 14);
             tab.Pressed += () => OnCategoryTabPressed(filter);
             tab.ButtonPressed = filter == _categoryFilter;
             _categoryTabs.Add(tab);
@@ -157,8 +240,14 @@ public partial class LoadoutView : Control
             int slot = i;
             var card = SlotScene.Instantiate<OrganelleSlot>();
             card.Name = $"ChamberSlot{slot}";
+            card.CustomMinimumSize = ChamberCardSize;
+            card.AddThemeStyleboxOverride("normal", SocketNormalStyle);
+            card.AddThemeStyleboxOverride("hover", SocketHoverStyle);
+            card.AddThemeStyleboxOverride("pressed", SocketPressedStyle);
+            card.AddThemeStyleboxOverride("focus", new StyleBoxEmpty());
             card.Pressed += () => OnChamberCardPressed(slot);
-            card.MouseEntered += () => ShowDetail(_chamber?.GetSlot(slot) ?? "");
+            card.MouseEntered += () => _tooltip?.ShowFor(_chamber?.GetSlot(slot) ?? "");
+            card.MouseExited += () => _tooltip?.HideTip();
             ChamberGrid.AddChild(card);
             _chamberCards.Add(card);
         }
@@ -188,8 +277,10 @@ public partial class LoadoutView : Control
             string localId = id;
             var card = SlotScene.Instantiate<OrganelleSlot>();
             card.Name = $"BackpackSlot_{localId}";
+            card.CustomMinimumSize = BackpackCardSize;
             card.Pressed += () => OnBackpackCardPressed(localId);
-            card.MouseEntered += () => ShowDetail(localId);
+            card.MouseEntered += () => _tooltip?.ShowFor(localId);
+            card.MouseExited += () => _tooltip?.HideTip();
             BackpackGrid.AddChild(card);
             _backpackCards.Add(card);
             _backpackIds.Add(localId);
@@ -389,6 +480,7 @@ public partial class LoadoutView : Control
 
     private void RefreshAll()
     {
+        _tooltip?.HideTip();
         RefreshProfileTabs();
         RefreshChamberCards();
         RefreshEnergy();
@@ -432,13 +524,14 @@ public partial class LoadoutView : Control
             var tab = new Button
             {
                 Name = $"ProfileTab{index}",
-                CustomMinimumSize = new Vector2(120, 38),
+                CustomMinimumSize = new Vector2(120, 40),
                 ToggleMode = true,
                 ButtonGroup = _profileGroup,
                 ButtonPressed = index == active,
                 MouseDefaultCursorShape = CursorShape.PointingHand
             };
-            tab.AddThemeFontSizeOverride("font_size", 13);
+            tab.AddThemeFontSizeOverride("font_size", 14);
+            ApplyCapsuleStyle(tab);
             tab.Pressed += () => OnProfileTabPressed(index);
             _profileTabs.Add(tab);
             ProfileHBox.AddChild(tab);
@@ -468,7 +561,8 @@ public partial class LoadoutView : Control
         for (int i = 0; i < _chamberCards.Count; i++)
         {
             string id = _chamber?.GetSlot(i) ?? "";
-            _chamberCards[i].ShowOrganelle(id, !string.IsNullOrEmpty(id));
+            _chamberCards[i].ShowOrganelle(id, !string.IsNullOrEmpty(id), true, true);
+            _chamberCards[i].TooltipText = "";
         }
     }
 
@@ -519,6 +613,7 @@ public partial class LoadoutView : Control
                 }
             }
             _backpackCards[i].ShowOrganelle(id, equipped, OrganelleUnlockManager.IsUnlocked(id));
+            _backpackCards[i].TooltipText = "";
         }
     }
 
@@ -537,29 +632,6 @@ public partial class LoadoutView : Control
                 _categoryTabs[i].AddThemeColorOverride("font_hover_color", Colors.White);
             }
         }
-    }
-
-    private void ShowDetail(string id)
-    {
-        if (DetailLabel == null)
-            return;
-
-        if (string.IsNullOrEmpty(id) || !GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar))
-        {
-            DetailLabel.Text = Tr("LOADOUT_DETAIL_EMPTY");
-            return;
-        }
-
-        var entry = entryVar.AsGodotDictionary();
-        if (!OrganelleUnlockManager.IsUnlocked(id))
-        {
-            DetailLabel.Text = Tr(entry["name_key"].AsString()) + "\n" + Tr("LOADOUT_DETAIL_LOCKED");
-            return;
-        }
-
-        DetailLabel.Text = Tr(entry["name_key"].AsString())
-            + "\n" + Tr(entry["desc_key"].AsString())
-            + "\n" + UiBuilders.StripLeadingLabel(Tr(entry["bio_key"].AsString()));
     }
 
     private void ShowHint(string key)

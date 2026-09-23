@@ -20,8 +20,9 @@ public partial class OrganelleSlot : Button
     public string OrganelleId { get; private set; } = "";
 
     private static readonly Color EmptyIconTint = new(1, 1, 1, 0.28f);
-    private static readonly Color EquippedIconTint = new(1, 1, 1, 0.45f);
-    private static readonly Color LockedIconTint = new(0.42f, 0.46f, 0.52f, 0.5f);
+    private static readonly Color LockedIconTint = new(1, 1, 1, 0.3f);
+    private static readonly Color LockedNameTint = new(0.55f, 0.62f, 0.70f, 0.85f);
+    private static readonly Color EmptyNameTint = new(0.75f, 0.88f, 0.92f, 0.9f);
 
     public override void _Ready()
     {
@@ -30,8 +31,8 @@ public partial class OrganelleSlot : Button
 
     public void Bind()
     {
-        IconTexture ??= GetNodeOrNull<TextureRect>("IconTexture");
-        CostPips ??= GetNodeOrNull<EnergyPips>("CostPips");
+        IconTexture ??= GetNodeOrNull<TextureRect>("TopRow/IconTexture");
+        CostPips ??= GetNodeOrNull<EnergyPips>("TopRow/CostPips");
         NameLabel ??= GetNodeOrNull<Label>("NameLabel");
         StateLabel ??= GetNodeOrNull<Label>("StateLabel");
         CategoryStrip ??= GetNodeOrNull<ColorRect>("CategoryStrip");
@@ -52,8 +53,11 @@ public partial class OrganelleSlot : Button
         };
     }
 
-    /// <summary>Renders an organelle (or an empty chamber slot when id is "").</summary>
-    public void ShowOrganelle(string id, bool equipped, bool unlocked = true)
+    /// <summary>Renders an organelle (or an empty chamber slot when id is "").
+    /// <paramref name="emptyBracket"/> renders the chamber empty state as a
+    /// locale-neutral technical tag ([ EMPTY SLOT ]); the swap modal keeps the
+    /// translated label.</summary>
+    public void ShowOrganelle(string id, bool equipped, bool unlocked = true, bool emptyBracket = false)
     {
         Bind();
         OrganelleId = id ?? "";
@@ -62,19 +66,23 @@ public partial class OrganelleSlot : Button
         {
             if (IconTexture != null)
             {
+                IconTexture.Visible = true;
                 IconTexture.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
                 IconTexture.Modulate = EmptyIconTint;
             }
             if (CostPips != null)
+            {
+                CostPips.Visible = true;
                 CostPips.Configure(0, 0, 0);
+            }
             if (StateLabel != null)
                 StateLabel.Text = "";
             if (CategoryStrip != null)
                 CategoryStrip.Color = new Color(0.35f, 0.45f, 0.55f, 0.35f);
             if (NameLabel != null)
             {
-                NameLabel.Text = Tr("LOADOUT_EMPTY_SLOT");
-                NameLabel.Modulate = new Color(0.6f, 0.68f, 0.78f, 0.75f);
+                NameLabel.Text = emptyBracket ? "[ EMPTY SLOT ]" : Tr("LOADOUT_EMPTY_SLOT");
+                NameLabel.Modulate = EmptyNameTint;
             }
             TooltipText = "";
             return;
@@ -93,45 +101,53 @@ public partial class OrganelleSlot : Button
 
         if (IconTexture != null)
         {
+            IconTexture.Visible = true;
             IconTexture.Texture = AssetLoader.TryLoad<Texture2D>(entry["image_path"].AsString())
                 ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
-            IconTexture.Modulate = !unlocked
-                ? LockedIconTint
-                : equipped ? EquippedIconTint : Colors.White;
+            // Unlocked icons render at full fluorescence; locked ones sink to 0.3 alpha.
+            IconTexture.Modulate = !unlocked ? LockedIconTint : Colors.White;
         }
         if (CostPips != null)
         {
+            CostPips.Visible = true;
             if (!unlocked)
             {
-                CostPips.Configure(0, 0, 0);
+                // Locked cards preview their cost as hollow discs (oooo);
+                // filled cyan is reserved for usable cards.
+                CostPips.Configure(Mathf.Abs(cost), 0, 0);
+                CostPips.Modulate = new Color(1.0f, 1.0f, 1.0f, 0.55f);
             }
             else if (cost < 0)
             {
                 // Generator: the granted energy point renders red.
                 CostPips.Configure(-cost, 0, -cost);
+                CostPips.Modulate = Colors.White;
             }
             else
             {
                 CostPips.Configure(cost, cost, 0);
+                CostPips.Modulate = Colors.White;
             }
         }
         if (CategoryStrip != null)
+        {
+            CategoryStrip.Visible = true;
             CategoryStrip.Color = unlocked
                 ? CategoryColor(entry["category"].AsString())
                 : new Color(0.4f, 0.45f, 0.5f, 0.5f);
+        }
         if (NameLabel != null)
         {
+            // The scene font color carries the #E0F2FE highlight; keep the
+            // modulate neutral so unlocked names are never double-darkened.
+            NameLabel.Visible = true;
             NameLabel.Text = Tr(nameKey);
-            NameLabel.Modulate = !unlocked
-                ? new Color(0.55f, 0.6f, 0.68f, 0.8f)
-                : equipped ? new Color(0.75f, 0.8f, 0.88f, 0.85f) : Colors.White;
+            NameLabel.Modulate = !unlocked ? LockedNameTint : Colors.White;
         }
         if (StateLabel != null)
         {
-            if (!unlocked)
-                StateLabel.Text = Tr("LOADOUT_LOCKED_TAG");
-            else
-                StateLabel.Text = equipped ? Tr("LOADOUT_EQUIPPED_TAG") : "";
+            // Locked cards get an icon-only lock tag (no text).
+            StateLabel.Text = !unlocked ? "🔒" : equipped ? Tr("LOADOUT_EQUIPPED_TAG") : "";
             StateLabel.Visible = !unlocked || equipped;
             StateLabel.Modulate = unlocked
                 ? new Color(0.45f, 1.0f, 0.72f)

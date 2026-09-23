@@ -34,6 +34,9 @@ public partial class EnergyPips : Control
     /// <summary>Draw the row from the left edge instead of centering it.</summary>
     [Export] public bool AlignLeft { get; set; } = true;
 
+    /// <summary>Stack the discs top-to-bottom (slot bottom-row badge) instead of left-to-right.</summary>
+    [Export] public bool Vertical { get; set; } = false;
+
     public void Configure(int pipCount, int filledCount, int generatorCount)
     {
         PipCount = Mathf.Max(0, pipCount);
@@ -46,6 +49,12 @@ public partial class EnergyPips : Control
     {
         if (PipCount <= 0)
             return;
+
+        if (Vertical)
+        {
+            DrawVertical();
+            return;
+        }
 
         float available = Size.X;
         float diameter = Mathf.Min(MaxDiameter, (available - (PipCount - 1) * Gap) / PipCount);
@@ -65,6 +74,44 @@ public partial class EnergyPips : Control
         for (int i = 0; i < PipCount; i++)
         {
             var center = new Vector2(startX + i * (diameter + Gap) + radius, centerY);
+            bool isGenerator = i >= PipCount - GeneratorCount;
+            bool isFilled = i < FilledCount;
+
+            DrawCircle(center, radius, RingColor);
+
+            Color body = isGenerator ? GeneratorColor : isFilled ? FillColor : EmptyColor;
+            DrawCircle(center, Mathf.Max(1.0f, radius - 1.6f), body);
+
+            if (isGenerator || isFilled)
+            {
+                DrawCircle(center - new Vector2(radius * 0.26f, radius * 0.26f),
+                    Mathf.Max(0.6f, radius * 0.3f), new Color(1.0f, 1.0f, 1.0f, 0.35f));
+            }
+        }
+    }
+
+    /// <summary>Top-to-bottom variant for the slot bottom-row badge (name left, cost right).</summary>
+    private void DrawVertical()
+    {
+        float available = Size.Y;
+        float gap = Gap;
+        float diameter = Mathf.Min(MaxDiameter, (available - (PipCount - 1) * gap) / PipCount);
+        if (diameter <= 1.0f)
+        {
+            gap = Mathf.Max(1.0f, gap * 0.5f);
+            diameter = Mathf.Min(MaxDiameter, (available - (PipCount - 1) * gap) / PipCount);
+        }
+        if (diameter <= 1.0f)
+            return;
+
+        float totalHeight = PipCount * diameter + (PipCount - 1) * gap;
+        float startY = Mathf.Max(0.0f, (available - totalHeight) * 0.5f);
+        float centerX = Size.X * 0.5f;
+        float radius = diameter * 0.5f;
+
+        for (int i = 0; i < PipCount; i++)
+        {
+            var center = new Vector2(centerX, startY + i * (diameter + gap) + radius);
             bool isGenerator = i >= PipCount - GeneratorCount;
             bool isFilled = i < FilledCount;
 
