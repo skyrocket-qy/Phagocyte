@@ -52,10 +52,13 @@ public partial class LoadoutView : Control
     private readonly List<string> _backpackIds = new();
     private OrganelleTooltip? _tooltip;
 
-    /// <summary>Bio-socket look for the 2x2 chamber: double-ring bio-energy rail
-    /// with asymmetric chamfer (Scheme B) and glowing cyan rim.</summary>
+    /// <summary>Bio-socket look for the 2x2 chamber: rounded frames with a
+    /// glowing cyan rim (symmetric corners so slots never read as tilted).
+    /// Empty sockets use the dim variant; filled ones the bright variant.</summary>
     private static readonly StyleBoxFlat SocketNormalStyle = MakeSocketStyle(
         new Color(0.04f, 0.09f, 0.14f, 0.85f), new Color(0.30f, 0.85f, 0.95f, 0.65f), 2.0f, 6.0f);
+    private static readonly StyleBoxFlat SocketEmptyNormalStyle = MakeSocketStyle(
+        new Color(0.05f, 0.10f, 0.16f, 0.90f), new Color(0.35f, 0.80f, 0.95f, 0.70f), 2.0f, 0.0f);
     private static readonly StyleBoxFlat SocketHoverStyle = MakeSocketStyle(
         new Color(0.06f, 0.14f, 0.22f, 0.92f), new Color(0.45f, 0.98f, 1.0f, 0.95f), 2.0f, 10.0f);
     private static readonly StyleBoxFlat SocketPressedStyle = MakeSocketStyle(
@@ -63,7 +66,7 @@ public partial class LoadoutView : Control
 
     private static StyleBoxFlat MakeSocketStyle(Color bg, Color border, float borderWidth = 2.0f, float shadowSize = 8.0f)
     {
-        return new StyleBoxFlat
+        var style = new StyleBoxFlat
         {
             BgColor = bg,
             BorderColor = border,
@@ -71,17 +74,16 @@ public partial class LoadoutView : Control
             BorderWidthTop = (int)borderWidth,
             BorderWidthRight = (int)borderWidth,
             BorderWidthBottom = (int)borderWidth,
-            CornerRadiusTopLeft = 14,
-            CornerRadiusTopRight = 4,
-            CornerRadiusBottomRight = 14,
-            CornerRadiusBottomLeft = 4,
             ShadowColor = new Color(0.0f, 0.85f, 1.0f, 0.18f),
-            ShadowSize = (int)shadowSize,
             ContentMarginLeft = 6.0f,
             ContentMarginTop = 6.0f,
             ContentMarginRight = 6.0f,
             ContentMarginBottom = 6.0f
         };
+        style.SetCornerRadiusAll(10);
+        if (shadowSize > 0.0f)
+            style.ShadowSize = (int)shadowSize;
+        return style;
     }
 
     /// <summary>Capsule profile-tag look: translucent fill with a cyan hairline
@@ -590,7 +592,10 @@ public partial class LoadoutView : Control
         for (int i = 0; i < _chamberCards.Count; i++)
         {
             string id = _chamber?.GetSlot(i) ?? "";
-            _chamberCards[i].ShowOrganelle(id, !string.IsNullOrEmpty(id), true, true);
+            bool empty = string.IsNullOrEmpty(id);
+            _chamberCards[i].AddThemeStyleboxOverride("normal",
+                empty ? SocketEmptyNormalStyle : SocketNormalStyle);
+            _chamberCards[i].ShowOrganelle(id, !empty, true);
             _chamberCards[i].TooltipText = "";
         }
     }

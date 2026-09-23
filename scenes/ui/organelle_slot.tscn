@@ -47,7 +47,6 @@ custom_minimum_size = Vector2(128, 140)
 offset_right = 128.0
 offset_bottom = 140.0
 mouse_default_cursor_shape = 2
-flat = true
 theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_slot_pressed")

@@ -49,6 +49,20 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
   the baseline FIRST, then change code. Current captures: title, gallery/all,
   gallery/locked.
 
+### Mandatory UI screenshot verification (agent does it, never the user)
+
+- ANY change affecting pixels — scenes, theme/styleboxes, UI code, icons,
+  translated strings that alter layout — must be verified by the agent with a
+  `godot-ai` game screenshot (`editor_screenshot` with `source="game"`)
+  before declaring done. NEVER ask the user to eyeball it for you.
+- C# does NOT hot-reload: after `dotnet build`, restart the run
+  (`project_manage(op="stop")` → `project_run(mode="main")`), drive to the
+  affected view with `game_eval` (e.g. call the menu flow methods directly),
+  then capture. A stale session will show pre-change pixels and waste a round.
+- Invisible-stylebox checklist (learned the hard way): flat `Button`s skip
+  the normal stylebox (`flat = true`); check `modulate` alpha, shared vs
+  per-instance stylebox overrides, and asymmetric corner radii.
+
 ## Assets
 
 - `gen/<achievement|skill|passive_tree|ui>/` is source of truth (prefix-free

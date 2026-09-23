@@ -18,10 +18,8 @@ public partial class OrganelleSlot : Button
     /// <summary>Catalog id currently shown ("" for an empty chamber slot).</summary>
     public string OrganelleId { get; private set; } = "";
 
-    private static readonly Color EmptyIconTint = new(1, 1, 1, 0.28f);
     private static readonly Color LockedIconTint = new(1, 1, 1, 0.3f);
     private static readonly Color LockedNameTint = new(0.55f, 0.62f, 0.70f, 0.85f);
-    private static readonly Color EmptyNameTint = new(0.75f, 0.88f, 0.92f, 0.9f);
 
     public override void _Ready()
     {
@@ -51,10 +49,9 @@ public partial class OrganelleSlot : Button
         };
     }
 
-    /// <summary>Renders an organelle (or an empty chamber slot when id is "").
-    /// <paramref name="emptyBracket"/> leaves the chamber empty state textless
-    /// (glow socket + faint icon only); the swap modal keeps the translated label.</summary>
-    public void ShowOrganelle(string id, bool equipped, bool unlocked = true, bool emptyBracket = false)
+    /// <summary>Renders an organelle. An empty id shows a pure empty socket:
+    /// frame + background only, no icon and no text.</summary>
+    public void ShowOrganelle(string id, bool equipped, bool unlocked = true)
     {
         Bind();
         OrganelleId = id ?? "";
@@ -62,22 +59,18 @@ public partial class OrganelleSlot : Button
         if (string.IsNullOrEmpty(OrganelleId))
         {
             if (IconTexture != null)
-            {
-                IconTexture.Visible = true;
-                IconTexture.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
-                IconTexture.Modulate = EmptyIconTint;
-            }
+                IconTexture.Visible = false;
             if (CostPips != null)
-            {
-                CostPips.Visible = true;
-                CostPips.Configure(0, 0, 0);
-            }
+                CostPips.Visible = false;
             if (StateLabel != null)
+            {
                 StateLabel.Text = "";
+                StateLabel.Visible = false;
+            }
             if (NameLabel != null)
             {
-                NameLabel.Text = emptyBracket ? "" : Tr("LOADOUT_EMPTY_SLOT");
-                NameLabel.Modulate = EmptyNameTint;
+                NameLabel.Text = "";
+                NameLabel.Visible = false;
             }
             TooltipText = "";
             return;
