@@ -5,6 +5,7 @@
 [ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 [ext_resource type="Shader" path="res://shaders/codex_grid_bg.gdshader" id="3_grid_shader"]
 [ext_resource type="Script" path="res://scripts/ui/ChamberLinks.cs" id="4_links"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/menu/cell.jpeg" id="5_cell"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
 shader = ExtResource("3_grid_shader")
@@ -57,6 +58,19 @@ mouse_filter = 2
 material = SubResource("ShaderMaterial_grid")
 color = Color(0, 0, 0, 0)
 
+[node name="CellBackdrop" type="TextureRect" parent="."]
+modulate = Color(1, 1, 1, 0.18)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 0.55
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("5_cell")
+expand_mode = 1
+stretch_mode = 5
+
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -94,26 +108,6 @@ theme_override_colors/font_color = Color(0.55, 0.95, 1, 1)
 theme_override_font_sizes/font_size = 28
 text = "ORGANELLE ASSEMBLY // 活性胞器装配"
 
-[node name="ProfileHBox" type="HBoxContainer" parent="Margin/VBox/TopBar"]
-layout_mode = 2
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="ProfileAddButton" type="Button" parent="Margin/VBox/TopBar/ProfileHBox"]
-custom_minimum_size = Vector2(56, 40)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-theme_override_font_sizes/font_size = 14
-text = "+"
-
-[node name="ProfileDeleteButton" type="Button" parent="Margin/VBox/TopBar/ProfileHBox"]
-custom_minimum_size = Vector2(96, 40)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(1, 0.45, 0.4, 1)
-theme_override_font_sizes/font_size = 14
-text = "删除"
-
 [node name="EnergyVBox" type="VBoxContainer" parent="Margin/VBox/TopBar"]
 custom_minimum_size = Vector2(170, 0)
 layout_mode = 2
@@ -148,18 +142,34 @@ size_flags_horizontal = 3
 stretch_ratio = 2.0
 theme_override_constants/separation = 8
 
-[node name="EnergyBar" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
-custom_minimum_size = Vector2(0, 24)
+[node name="ProfileHBox" type="HBoxContainer" parent="Margin/VBox/ContentHBox/ChamberSide"]
 layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="ProfileAddButton" type="Button" parent="Margin/VBox/ContentHBox/ChamberSide/ProfileHBox"]
+custom_minimum_size = Vector2(48, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "+"
+
+[node name="ProfileDeleteButton" type="Button" parent="Margin/VBox/ContentHBox/ChamberSide/ProfileHBox"]
+custom_minimum_size = Vector2(84, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 0.45, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "删除"
+
+[node name="TopSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
+layout_mode = 2
+size_flags_vertical = 3
 mouse_filter = 2
-script = ExtResource("2_pips")
-MaxDiameter = 20.0
-Gap = 7.0
-AlignLeft = true
 
 [node name="SocketWell" type="PanelContainer" parent="Margin/VBox/ContentHBox/ChamberSide"]
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_well")
 
 [node name="WellMargin" type="MarginContainer" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell"]
@@ -180,6 +190,20 @@ alignment = 1
 layout_mode = 2
 mouse_filter = 2
 script = ExtResource("4_links")
+
+[node name="BottomSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="EnergyBar" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("2_pips")
+MaxDiameter = 20.0
+Gap = 7.0
+AlignLeft = true
 
 [node name="VaultSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox"]
 layout_mode = 2

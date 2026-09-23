@@ -14,7 +14,6 @@ public partial class OrganelleSlot : Button
     public EnergyPips? CostPips { get; private set; }
     public Label? NameLabel { get; private set; }
     public Label? StateLabel { get; private set; }
-    public ColorRect? CategoryStrip { get; private set; }
 
     /// <summary>Catalog id currently shown ("" for an empty chamber slot).</summary>
     public string OrganelleId { get; private set; } = "";
@@ -35,7 +34,6 @@ public partial class OrganelleSlot : Button
         CostPips ??= GetNodeOrNull<EnergyPips>("TopRow/CostPips");
         NameLabel ??= GetNodeOrNull<Label>("NameLabel");
         StateLabel ??= GetNodeOrNull<Label>("StateLabel");
-        CategoryStrip ??= GetNodeOrNull<ColorRect>("CategoryStrip");
     }
 
     /// <summary>Per-category accent color shared by slot strips and tab buttons.</summary>
@@ -54,9 +52,8 @@ public partial class OrganelleSlot : Button
     }
 
     /// <summary>Renders an organelle (or an empty chamber slot when id is "").
-    /// <paramref name="emptyBracket"/> renders the chamber empty state as a
-    /// locale-neutral technical tag ([ EMPTY SLOT ]); the swap modal keeps the
-    /// translated label.</summary>
+    /// <paramref name="emptyBracket"/> leaves the chamber empty state textless
+    /// (glow socket + faint icon only); the swap modal keeps the translated label.</summary>
     public void ShowOrganelle(string id, bool equipped, bool unlocked = true, bool emptyBracket = false)
     {
         Bind();
@@ -77,11 +74,9 @@ public partial class OrganelleSlot : Button
             }
             if (StateLabel != null)
                 StateLabel.Text = "";
-            if (CategoryStrip != null)
-                CategoryStrip.Color = new Color(0.35f, 0.45f, 0.55f, 0.35f);
             if (NameLabel != null)
             {
-                NameLabel.Text = emptyBracket ? "[ EMPTY SLOT ]" : Tr("LOADOUT_EMPTY_SLOT");
+                NameLabel.Text = emptyBracket ? "" : Tr("LOADOUT_EMPTY_SLOT");
                 NameLabel.Modulate = EmptyNameTint;
             }
             TooltipText = "";
@@ -110,31 +105,16 @@ public partial class OrganelleSlot : Button
         if (CostPips != null)
         {
             CostPips.Visible = true;
-            if (!unlocked)
-            {
-                // Locked cards preview their cost as hollow discs (oooo);
-                // filled cyan is reserved for usable cards.
-                CostPips.Configure(Mathf.Abs(cost), 0, 0);
-                CostPips.Modulate = new Color(1.0f, 1.0f, 1.0f, 0.55f);
-            }
-            else if (cost < 0)
-            {
-                // Generator: the granted energy point renders red.
+            // Cost colors are global: positive costs filled cyan, generators
+            // red. Locked cards reuse the same colors at reduced alpha so the
+            // cost stays readable while still reading as locked.
+            if (cost < 0)
                 CostPips.Configure(-cost, 0, -cost);
-                CostPips.Modulate = Colors.White;
-            }
             else
-            {
                 CostPips.Configure(cost, cost, 0);
-                CostPips.Modulate = Colors.White;
-            }
-        }
-        if (CategoryStrip != null)
-        {
-            CategoryStrip.Visible = true;
-            CategoryStrip.Color = unlocked
-                ? CategoryColor(entry["category"].AsString())
-                : new Color(0.4f, 0.45f, 0.5f, 0.5f);
+            CostPips.Modulate = !unlocked
+                ? new Color(1.0f, 1.0f, 1.0f, 0.55f)
+                : Colors.White;
         }
         if (NameLabel != null)
         {

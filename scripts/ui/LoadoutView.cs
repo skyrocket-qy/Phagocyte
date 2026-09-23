@@ -52,10 +52,6 @@ public partial class LoadoutView : Control
     private readonly List<string> _backpackIds = new();
     private OrganelleTooltip? _tooltip;
 
-    /// <summary>Workbench card footprints (the shared slot scene stays 104x118 for the swap modal).</summary>
-    private static readonly Vector2 ChamberCardSize = new(180, 180);
-    private static readonly Vector2 BackpackCardSize = new(150, 174);
-
     /// <summary>Bio-socket look for the 2x2 chamber: translucent cytoplasm wells
     /// ringed with a cyan microtubule glow (workbench refactor).</summary>
     private static readonly StyleBoxFlat SocketNormalStyle = MakeSocketStyle(
@@ -126,9 +122,9 @@ public partial class LoadoutView : Control
     public override void _Ready()
     {
         HeaderLabel = GetNodeOrNull<Label>("Margin/VBox/TopBar/TitleVBox/HeaderLabel");
-        ProfileHBox = GetNodeOrNull<HBoxContainer>("Margin/VBox/TopBar/ProfileHBox");
-        ProfileAddButton = GetNodeOrNull<Button>("Margin/VBox/TopBar/ProfileHBox/ProfileAddButton");
-        ProfileDeleteButton = GetNodeOrNull<Button>("Margin/VBox/TopBar/ProfileHBox/ProfileDeleteButton");
+        ProfileHBox = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox");
+        ProfileAddButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox/ProfileAddButton");
+        ProfileDeleteButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox/ProfileDeleteButton");
         BackpackHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/VaultSide/BackpackHeader");
         CategoryTabBar = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/VaultSide/CategoryTabBar");
         BackpackGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/VaultSide/VaultScroll/BackpackGrid");
@@ -240,7 +236,6 @@ public partial class LoadoutView : Control
             int slot = i;
             var card = SlotScene.Instantiate<OrganelleSlot>();
             card.Name = $"ChamberSlot{slot}";
-            card.CustomMinimumSize = ChamberCardSize;
             card.AddThemeStyleboxOverride("normal", SocketNormalStyle);
             card.AddThemeStyleboxOverride("hover", SocketHoverStyle);
             card.AddThemeStyleboxOverride("pressed", SocketPressedStyle);
@@ -277,7 +272,6 @@ public partial class LoadoutView : Control
             string localId = id;
             var card = SlotScene.Instantiate<OrganelleSlot>();
             card.Name = $"BackpackSlot_{localId}";
-            card.CustomMinimumSize = BackpackCardSize;
             card.Pressed += () => OnBackpackCardPressed(localId);
             card.MouseEntered += () => _tooltip?.ShowFor(localId);
             card.MouseExited += () => _tooltip?.HideTip();
@@ -524,7 +518,7 @@ public partial class LoadoutView : Control
             var tab = new Button
             {
                 Name = $"ProfileTab{index}",
-                CustomMinimumSize = new Vector2(120, 40),
+                CustomMinimumSize = new Vector2(104, 40),
                 ToggleMode = true,
                 ButtonGroup = _profileGroup,
                 ButtonPressed = index == active,
