@@ -349,6 +349,7 @@ public partial class GameManager : Node
         AfflictionManager.Clear();
         Engine.TimeScale = 1.0;
         tree.Paused = false;
+        AudioManager.Instance?.PlayGameStart();
         tree.ChangeSceneToFile("res://scenes/main.tscn");
     }
 
@@ -373,6 +374,7 @@ public partial class GameManager : Node
         EndlessMode = true;
         Engine.TimeScale = 1.0;
         tree.Paused = false;
+        AudioManager.Instance?.PlayGameStart();
         tree.ChangeSceneToFile("res://scenes/main.tscn");
         return true;
     }

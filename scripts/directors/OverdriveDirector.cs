@@ -324,7 +324,7 @@ public partial class OverdriveDirector : Node
         }
 
         ctx.HudNode?.ShowOverdriveAlert(title, desc);
-        AudioManager.Instance?.PlaySfx("wave_complete", -3.0f);
+        AudioManager.Instance?.PlayWaveStart();
         GD.Print($"[Overdrive] Cycle {cycle} engaged: HP ×{OverdriveHealthMultiplier:F2}, Speed ×{OverdriveSpeedMultiplier:F2}.");
     }
 }

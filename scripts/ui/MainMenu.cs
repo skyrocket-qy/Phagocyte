@@ -1149,6 +1149,7 @@ public partial class MainMenu : Control
         {
             // Locked organ: refresh the requirement readout instead of deploying
             SelectMap(ActiveMapKey);
+            AudioManager.Instance?.PlayError();
             return;
         }
 

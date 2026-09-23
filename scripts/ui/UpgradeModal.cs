@@ -494,9 +494,11 @@ public partial class UpgradeModal : ModalBase
             chamber.CanEquip(_pendingOrganelle, slot, out string reason);
             ShowSwapHint(SwapReasonKey(reason));
             RefreshSwapPanel();
+            AudioManager.Instance?.PlayError();
             return false;
         }
 
+        AudioManager.Instance?.PlaySocket();
         ResolveChoice(PendingChoice());
         return true;
     }
@@ -515,6 +517,8 @@ public partial class UpgradeModal : ModalBase
         var chamber = ResolveChamber();
         if (chamber != null && !string.IsNullOrEmpty(_pendingOrganelle))
             chamber.Discard(_pendingOrganelle);
+
+        AudioManager.Instance?.PlayUnequip();
 
         if (_playerRef != null && _playerRef.HasMethod("Heal"))
         {

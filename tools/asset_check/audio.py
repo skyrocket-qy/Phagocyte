@@ -25,7 +25,7 @@ def _bgm_candidates(audio_dir: Path, track: str) -> List[Path]:
 
 def _sfx_candidates(audio_dir: Path, name: str) -> List[Path]:
     candidates = []
-    for sub in ("", "combat", "ui", "gem"):
+    for sub in ("", "combat", "ui", "event", "gem"):
         for ext in ("mp3", "wav"):
             candidates.append(audio_dir / "sfx" / sub / f"{name}.{ext}" if sub else audio_dir / "sfx" / f"{name}.{ext}")
     return candidates

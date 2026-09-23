@@ -152,7 +152,7 @@ public partial class WaveDirectorComponent : Node
 
         // Single mechanic elite: pure positioning check.
         PathogenSpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 1);
-        AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
+        AudioManager.Instance?.PlayWaveStart();
         GD.Print("[WaveDirector] 03:00 Elite raid incoming.");
     }
 
@@ -168,7 +168,7 @@ public partial class WaveDirectorComponent : Node
         PathogenSpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 1, 0.0f);
         PathogenSpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 1, Mathf.Pi);
         SwarmWindowTimer = PathogenSpawner.SwarmWindowSeconds;
-        AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
+        AudioManager.Instance?.PlayWaveStart();
         GD.Print("[WaveDirector] 06:00 First swarm tide + double elite pincer.");
     }
 
@@ -183,7 +183,7 @@ public partial class WaveDirectorComponent : Node
         // Backfill floods the arena to the 450 swarm cap over the next frames.
         SwarmWindowTimer = PathogenSpawner.SwarmWindowSeconds;
         PathogenSpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 2);
-        AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);
+        AudioManager.Instance?.PlayWaveStart();
         GD.Print("[WaveDirector] 12:00 Extreme swarm + mixed forces.");
     }
 }

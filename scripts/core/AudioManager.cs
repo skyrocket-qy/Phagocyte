@@ -277,4 +277,39 @@ public partial class AudioManager : Node
     {
         PlaySfx("shoot", 0.08f, -1.0f);
     }
+
+    public void PlayDodge()
+    {
+        PlaySfx("flame_dash", 0.10f, -2.0f);
+    }
+
+    public void PlayAchievement()
+    {
+        PlaySfx("extra_coin", 0.05f, 0.0f);
+    }
+
+    public void PlaySocket()
+    {
+        PlaySfx("gem_socket", 0.05f, 0.0f);
+    }
+
+    public void PlayUnequip()
+    {
+        PlaySfx("item_drop", 0.05f, -1.0f);
+    }
+
+    public void PlayError()
+    {
+        PlaySfx("ui_error_02", 0.0f, 0.0f);
+    }
+
+    public void PlayGameStart()
+    {
+        PlaySfx("game_start", 0.0f, 1.0f);
+    }
+
+    public void PlayWaveStart()
+    {
+        PlaySfx("wave_start", 0.05f, -1.0f);
+    }
 }

@@ -357,7 +357,7 @@ public partial class LoadoutView : Control
     /// <summary>
     /// Equips an organelle into the first free slot, or unequips it when already
     /// equipped. Returns true when the chamber changed; refusals surface through
-    /// the hint label (locked / overload / generator cap / full slots).
+    /// the hint label (locked / overload / full slots) plus an error sting.
     /// </summary>
     public bool ToggleOrganelle(string id)
     {
@@ -368,6 +368,7 @@ public partial class LoadoutView : Control
         {
             ShowHint("LOADOUT_HINT_LOCKED");
             FlashEnergy(new Color(1.0f, 0.72f, 0.35f));
+            AudioManager.Instance?.PlayError();
             return false;
         }
 
@@ -382,8 +383,10 @@ public partial class LoadoutView : Control
                 _chamber.CanUnequip(i, out string unequipReason);
                 ShowHint(ReasonKey(unequipReason));
                 FlashEnergy(new Color(1.0f, 0.35f, 0.35f));
+                AudioManager.Instance?.PlayError();
                 return false;
             }
+            AudioManager.Instance?.PlayUnequip();
             Persist();
             RefreshAll();
             return true;
@@ -402,6 +405,7 @@ public partial class LoadoutView : Control
         {
             ShowHint("LOADOUT_HINT_SLOTS_FULL");
             FlashEnergy(new Color(1.0f, 0.55f, 0.45f));
+            AudioManager.Instance?.PlayError();
             return false;
         }
 
@@ -410,9 +414,11 @@ public partial class LoadoutView : Control
             _chamber.CanEquip(id, free, out string reason);
             ShowHint(ReasonKey(reason));
             FlashEnergy(new Color(1.0f, 0.35f, 0.35f));
+            AudioManager.Instance?.PlayError();
             return false;
         }
 
+        AudioManager.Instance?.PlaySocket();
         ShowHint("LOADOUT_HINT_DEFAULT");
         Persist();
         RefreshAll();
@@ -455,8 +461,10 @@ public partial class LoadoutView : Control
             _chamber.CanUnequip(slot, out string reason);
             ShowHint(ReasonKey(reason));
             FlashEnergy(new Color(1.0f, 0.35f, 0.35f));
+            AudioManager.Instance?.PlayError();
             return;
         }
+        AudioManager.Instance?.PlayUnequip();
         Persist();
         RefreshAll();
     }

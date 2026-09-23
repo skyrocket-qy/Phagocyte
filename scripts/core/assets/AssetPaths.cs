@@ -49,6 +49,8 @@ public static class AssetPaths
         yield return $"res://assets/audio/sfx/combat/{soundName}.wav";
         yield return $"res://assets/audio/sfx/ui/{soundName}.mp3";
         yield return $"res://assets/audio/sfx/ui/{soundName}.wav";
+        yield return $"res://assets/audio/sfx/event/{soundName}.mp3";
+        yield return $"res://assets/audio/sfx/event/{soundName}.wav";
         yield return $"res://assets/audio/sfx/gem/{soundName}.mp3";
         yield return $"res://assets/audio/sfx/gem/{soundName}.wav";
     }

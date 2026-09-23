@@ -60,7 +60,7 @@ public partial class AchievementToast : PanelContainer
             .SetTrans(Tween.TransitionType.Back)
             .SetEase(Tween.EaseType.Out);
 
-        AudioManager.Instance?.PlayLevelUp();
+        AudioManager.Instance?.PlayAchievement();
     }
 
     public override void _Process(double delta)

@@ -535,6 +535,7 @@ public partial class BaseCell : CharacterBody2D
             DodgeDashSpeed = baseSpeed * DodgeSpeedMultiplier;
             DodgeTimer = DodgeDuration;
             InvulnTimer = DodgeInvulnSeconds;
+            AudioManager.Instance?.PlayDodge();
         }
     }
 
