@@ -3,3 +3,4 @@
 /android/
 .user_data/
 __pycache__/
+tmp/
