@@ -79,6 +79,7 @@ layout_mode = 2
 theme_override_constants/separation = 4
 
 [node name="ClassBadgeLabel" type="Label" parent="HBox/DetailPanel/VBox"]
+visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 1, 0.4, 1)
 theme_override_font_sizes/font_size = 13
@@ -144,9 +145,10 @@ text = "固有技能"
 autowrap_mode = 3
 
 [node name="ClassStatusLabel" type="Label" parent="HBox/DetailPanel/VBox"]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "状态：已解锁 (READY)"
+text = ""
 autowrap_mode = 3
 
 [node name="Buttons" type="HBoxContainer" parent="."]

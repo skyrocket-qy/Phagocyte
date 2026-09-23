@@ -576,6 +576,7 @@ public partial class MainMenu : Control
         {
             ClassBadgeLbl.Text = "[ " + Tr(unlocked ? "CLASS_BADGE_READY" : "CLASS_BADGE_LOCKED") + " ]";
             ClassBadgeLbl.Modulate = unlocked ? new Color(0.3f, 1.0f, 0.4f) : new Color(1.0f, 0.68f, 0.25f);
+            ClassBadgeLbl.Visible = false;
         }
         if (ClassNameLbl != null && data.TryGetValue("name", out Variant nameVal))
             ClassNameLbl.Text = nameVal.AsString();
@@ -658,13 +659,14 @@ public partial class MainMenu : Control
         {
             if (unlocked)
             {
-                ClassStatusLbl.Text = Tr("STATUS_UNLOCKED");
-                ClassStatusLbl.Modulate = new Color(0.3f, 1.0f, 0.4f);
+                ClassStatusLbl.Text = "";
+                ClassStatusLbl.Visible = false;
             }
             else
             {
                 ClassStatusLbl.Text = AchievementManager.GetCellUnlockRequirementText(key);
                 ClassStatusLbl.Modulate = new Color(1.0f, 0.68f, 0.25f);
+                ClassStatusLbl.Visible = true;
             }
         }
 
