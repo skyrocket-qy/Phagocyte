@@ -124,7 +124,7 @@ public partial class SenescentRBC : Node2D
         {
             // Harvest resolution pays out: neutral matter has no Die().
             if (predator is BaseCell cell && GodotObject.IsInstanceValid(cell))
-                cell.AddExp(GetAtpValue());
+                cell.AddExp(GetAtpValue() * PathogenSpawner.ExpGainMultiplier);
             QueueFree();
         }));
     }

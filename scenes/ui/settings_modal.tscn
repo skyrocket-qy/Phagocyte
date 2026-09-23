@@ -311,3 +311,9 @@ mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
 button_pressed = true
 text = "垂直同步 (VSync)"
+
+[node name="ShakeCheck" type="CheckBox" parent="VBox/Content/GraphicsPanel"]
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "螢幕震動 (Screen Shake)"

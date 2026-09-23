@@ -26,6 +26,7 @@ public partial class SettingsManager : Node
     public static float BgmVolume = 0.8f;
     public static bool Fullscreen = false;
     public static bool Vsync = true;
+    public static bool ScreenShake = false;
 
     public SettingsManager()
     {
@@ -110,6 +111,13 @@ public partial class SettingsManager : Node
         SaveToDisk();
     }
 
+    public static void SetScreenShake(bool enabled)
+    {
+        ScreenShake = enabled;
+        ApplySettings();
+        SaveToDisk();
+    }
+
     public static void SaveToDisk()
     {
         var payload = new Godot.Collections.Dictionary<string, Variant>
@@ -118,7 +126,8 @@ public partial class SettingsManager : Node
             { "sfx_volume", SfxVolume },
             { "bgm_volume", BgmVolume },
             { "fullscreen", Fullscreen },
-            { "vsync", Vsync }
+            { "vsync", Vsync },
+            { "screen_shake", ScreenShake }
         };
         JsonStore.Write(SavePath, payload);
     }
@@ -134,5 +143,6 @@ public partial class SettingsManager : Node
         BgmVolume = d.ContainsKey("bgm_volume") ? (float)d["bgm_volume"] : 0.8f;
         Fullscreen = d.ContainsKey("fullscreen") ? (bool)d["fullscreen"] : false;
         Vsync = d.ContainsKey("vsync") ? (bool)d["vsync"] : true;
+        ScreenShake = d.ContainsKey("screen_shake") ? (bool)d["screen_shake"] : false;
     }
 }

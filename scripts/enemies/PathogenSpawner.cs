@@ -41,6 +41,12 @@ public static class PathogenSpawner
     /// <summary>Endless mode on-screen active pathogen cap.</summary>
     public const int MaxActiveEndless = 500;
 
+    /// <summary>
+    /// Global EXP gain multiplier (balance tuning: 0.3 = -70% progression pace).
+    /// Applied at every monster EXP grant site (BaseEnemy kills, RBC harvests).
+    /// </summary>
+    public const float ExpGainMultiplier = 0.3f;
+
     /// <summary>Number of discrete ladder cycles (15:00-27:00) before the terminal exponential tier.</summary>
     public const int OverdriveCycleCount = 4;
 
@@ -164,8 +170,8 @@ public static class PathogenSpawner
     /// <summary>Duration of the 06:00 / 12:00 swarm window using the raised cap.</summary>
     public const float SwarmWindowSeconds = 30.0f;
 
-    /// <summary>Maximum backfill spawns per poll to avoid frame spikes.</summary>
-    public const int MaxBackfillPerTick = 24;
+    /// <summary>Maximum backfill spawns per poll to avoid frame spikes. Balance tuning: throttled to ~30% pacing (was 24).</summary>
+    public const int MaxBackfillPerTick = 7;
 
     /// <summary>Minimum distance outside the camera view for backfill spawns.</summary>
     public const float BackfillMarginMin = 150.0f;

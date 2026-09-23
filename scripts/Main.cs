@@ -215,9 +215,9 @@ public partial class Main : Node2D, IRunContext
         // Organ-specific fluid mechanics & physiology acting on the player (docs/map.md §3)
         OrganSystem?.Initialize(IsHardRun);
 
-        // Initial pathogen wave
+        // Initial pathogen wave (balance tuning: throttled to ~30% pacing, was 35).
         if (Player != null && EnemyContainer != null)
-            PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, 35);
+            PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, 10);
 
         // GPU swarm batch renderer for the microscopic species (docs/spec.md §9).
         // Parented to Main (not EnemyContainer) so the map fluid mechanics never

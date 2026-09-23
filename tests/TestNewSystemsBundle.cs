@@ -156,6 +156,14 @@ public partial class TestNewSystemsBundle : SceneTree
         AssertThat(CameraFollow.Instance).IsEqual(cam);
         AssertThat(cam.Offset).IsEqual(Vector2.Zero);
 
+        // Screen shake defaults OFF: trauma must be ignored.
+        SettingsManager.ScreenShake = false;
+        cam.AddTrauma(0.8f);
+        cam._PhysicsProcess(0.016);
+        AssertThat(cam.Offset).IsEqual(Vector2.Zero);
+
+        // Opt-in: shake produces displacement, then decays.
+        SettingsManager.ScreenShake = true;
         cam.AddTrauma(0.8f);
         // Process a physics frame
         cam._PhysicsProcess(0.016);
@@ -169,6 +177,7 @@ public partial class TestNewSystemsBundle : SceneTree
 
         AssertThat(cam.Offset).IsEqual(Vector2.Zero);
         GD.Print("[PASS] Step 4: CameraFollow Trauma shake explosion, noise displacement, and decay verified.");
+        SettingsManager.ScreenShake = false;
         cam.QueueFree();
     }
 }

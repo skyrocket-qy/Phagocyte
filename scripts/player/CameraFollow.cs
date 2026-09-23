@@ -1,6 +1,7 @@
 namespace Phagocyte.Player;
 
 using Godot;
+using Phagocyte.Core;
 using System;
 
 /// <summary>
@@ -76,6 +77,8 @@ public partial class CameraFollow : Camera2D
 
     public void AddTrauma(float amount)
     {
+        if (!SettingsManager.ScreenShake)
+            return;
         _trauma = Mathf.Clamp(_trauma + amount, 0.0f, 1.0f);
     }
 
@@ -118,8 +121,14 @@ public partial class CameraFollow : Camera2D
 
         GlobalPosition = Target.GlobalPosition;
 
-        // Trauma Shake calculation
-        if (_trauma > 0.0f)
+        // Trauma Shake calculation (gated by user setting, default OFF)
+        if (!SettingsManager.ScreenShake)
+        {
+            _trauma = 0.0f;
+            if (Offset != Vector2.Zero)
+                Offset = Vector2.Zero;
+        }
+        else if (_trauma > 0.0f)
         {
             float shake = _trauma * _trauma;
             float offsetX = (float)GD.RandRange(-1.0, 1.0) * MaxShakeOffset * shake;

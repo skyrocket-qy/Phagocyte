@@ -87,15 +87,17 @@ public partial class TestDynamicBackfill : TestHarness
         FreeChildren(enemies);
 
         main._PhysicsProcess(0.02f);
+        main._PhysicsProcess(0.02f);
         AssertThat(main.ActiveScreenCap).IsEqual(10);
         AssertThat(main.ActivePathogenCount).IsEqual(10);
-        GD.Print("[PASS] Normal cap backfilled instantly from an empty arena (300 base cap constant verified).");
+        GD.Print("[PASS] Normal cap backfilled from an empty arena (300 base cap constant verified).");
 
-        // Kills release slots and are refilled on the next poll (<0.15s)
+        // Kills release slots and are refilled on the next polls (<0.15s)
         FreeChildren(enemies);
         main._PhysicsProcess(0.02f);
+        main._PhysicsProcess(0.02f);
         AssertThat(main.ActivePathogenCount).IsEqual(10);
-        GD.Print("[PASS] Mass kill deficit refilled within a single poll.");
+        GD.Print("[PASS] Mass kill deficit refilled within two polls.");
 
         // 06:00 swarm event raises the cap and refills to it
         main.EnvironmentTime = PathogenSpawner.EscalationInterval * 2.0f - 0.01f;
@@ -103,6 +105,7 @@ public partial class TestDynamicBackfill : TestHarness
         AssertThat(main.FirstSwarmTriggered).IsTrue();
         AssertThat(main.ActiveScreenCap).IsEqual(14);
         FreeChildren(enemies);
+        main._PhysicsProcess(0.02f);
         main._PhysicsProcess(0.02f);
         AssertThat(main.ActivePathogenCount).IsEqual(14);
 

@@ -35,6 +35,7 @@ public partial class SettingsModal : ModalBase
 
     public CheckBox? FullscreenCheck { get; set; }
     public CheckBox? VsyncCheck { get; set; }
+    public CheckBox? ShakeCheck { get; set; }
 
     public Label? LangTitleLbl { get; set; }
     public OptionButton? LangOption { get; set; }
@@ -75,6 +76,7 @@ public partial class SettingsModal : ModalBase
 
         FullscreenCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/FullscreenCheck");
         VsyncCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/VSyncCheck");
+        ShakeCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/ShakeCheck");
 
         LangTitleLbl = GetNodeOrNull<Label>("VBox/LanguageRow/LangLabel");
         LangOption = GetNodeOrNull<OptionButton>("VBox/LanguageRow/LangOption");
@@ -99,6 +101,8 @@ public partial class SettingsModal : ModalBase
             FullscreenCheck.Toggled += OnFullscreenToggled;
         if (VsyncCheck != null)
             VsyncCheck.Toggled += OnVsyncToggled;
+        if (ShakeCheck != null)
+            ShakeCheck.Toggled += OnShakeToggled;
 
         // Language dropdown (native names, never translated)
         if (LangOption != null)
@@ -168,6 +172,8 @@ public partial class SettingsModal : ModalBase
             FullscreenCheck.ButtonPressed = SettingsManager.Fullscreen;
         if (VsyncCheck != null)
             VsyncCheck.ButtonPressed = SettingsManager.Vsync;
+        if (ShakeCheck != null)
+            ShakeCheck.ButtonPressed = SettingsManager.ScreenShake;
 
         RefreshLanguageOption();
     }
@@ -221,6 +227,11 @@ public partial class SettingsModal : ModalBase
         SettingsManager.SetVsync(toggledOn);
     }
 
+    private void OnShakeToggled(bool toggledOn)
+    {
+        SettingsManager.SetScreenShake(toggledOn);
+    }
+
     public override void UpdateLocalizedTexts()
     {
         base.UpdateLocalizedTexts();
@@ -242,6 +253,7 @@ public partial class SettingsModal : ModalBase
 
         if (FullscreenCheck != null) FullscreenCheck.Text = Tr("SETTINGS_FULLSCREEN");
         if (VsyncCheck != null) VsyncCheck.Text = Tr("SETTINGS_VSYNC");
+        if (ShakeCheck != null) ShakeCheck.Text = Tr("SETTINGS_SCREEN_SHAKE");
 
         if (LangTitleLbl != null) LangTitleLbl.Text = Tr("SETTINGS_LANGUAGE");
         RefreshLanguageOption();

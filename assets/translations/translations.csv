@@ -374,6 +374,7 @@ SETTINGS_SFX_VOL,SFX Volume: ,音效音量：,音效音量：,効果音：,SFX-L
 SETTINGS_BGM_VOL,Music Volume: ,音樂音量：,音樂音量：,音楽：,Musiklautstärke: ,Volume de la musique : ,Громкость музыки: ,Volumen de música: 
 SETTINGS_FULLSCREEN,Fullscreen Mode,全螢幕模式,全螢幕模式,フルスクリーン,Vollbildmodus,Mode plein écran,Полноэкранный режим,Pantalla completa
 SETTINGS_VSYNC,Vertical Sync (VSync),垂直同步,垂直同步,垂直同期（VSync）,Vertikale Sync (VSync),Synchro verticale (VSync),Вертикальная синхронизация (VSync),Sincronización vertical (VSync)
+SETTINGS_SCREEN_SHAKE,Screen Shake,屏幕震动,螢幕震動,画面振動,Bildschirmwackeln,Secousse d'écran,Тряска экрана,Sacudida de pantalla
 CONTROLS_TITLE,Movement & Phagocytosis Operations,走位操控與吞噬機制,走位操控與吞噬機制,移動＆貪食操作,Bewegung & Phagozytose,Mouvement et phagocytose,Движение и фагоцитоз,Movimiento y fagocitosis
 CONTROLS_MOVE_DESC,[W][A][S][D] / Arrow Keys: Fluid pseudopod swimming locomotion.,[W][A][S][D] / 方向鍵：流體偽足游動走位。,[W][A][S][D] / 方向鍵：流體偽足游動走位。,[W][A][S][D]／方向キー：流体偽足で滑らかに移動。,[W][A][S][D]/Pfeiltasten: Fluide Pseudopodien-Bewegung.,[W][A][S][D]/Flèches : locomotion fluide par pseudopodes.,[W][A][S][D]/стрелки: плавное движение на псевдоподиях.,[W][A][S][D]/flechas: locomoción fluida con seudópodos.
 CONTROLS_PAUSE_DESC,[ESC]: Pause game / open System Settings & Manual.,[ESC]：暫停遊戲 / 開啟系統設定與檔案庫。,[ESC]：暫停遊戲 / 開啟系統設定與檔案庫。,[ESC]：一時停止／設定と档案館を開く。,[ESC]: Pause / Einstellungen & Kodex öffnen.,[ESC] : pause / ouvrir paramètres et codex.,[ESC]: пауза / открыть настройки и кодекс.,[ESC]: pausa / abrir ajustes y códice.
