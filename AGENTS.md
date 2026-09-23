@@ -22,7 +22,7 @@ Godot --headless --path . -s res://tests/<Suite>.cs
 - `TestHarness` is abstract scaffolding — never run it directly.
 - `TestAchievementPreview` is the visual preview harness: under `--headless`
   it only verifies logic (capture is skipped); real pixels need a headed run
-  (below). Exclude both from full-sweep loops (42 runnable suites).
+  (below). Exclude both from full-sweep loops (43 runnable suites).
 - Frame-gate async work with `Gate(ref _frame, n)`; saves are auto-isolated
   (`IsolateSaves`, `user://test_*`) so suites never touch real profiles.
 
@@ -95,4 +95,4 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
   intended files; never commit secrets. Suites green before pushing.
 - Hot files (`Hud.cs`, `MainMenu.cs`, shared scenes): coordinate parallel edits
   — concurrent changes here have broken builds before. When in doubt, run the
-  full sweep (all 42 suites, ~7 min) before declaring victory.
+  full sweep (all 43 suites, ~7 min) before declaring victory.

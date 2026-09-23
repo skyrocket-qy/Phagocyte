@@ -2,6 +2,7 @@ using Godot;
 using Godot.Collections;
 using System;
 using Phagocyte.Core;
+using Phagocyte.Tests;
 
 namespace Phagocyte.UI;
 
@@ -357,7 +358,44 @@ public partial class MainMenu : Control
         if (DeployBtn != null)
             DeployBtn.Pressed += OnDeployPressed;
 
+        // Test-demand full-unlock cheat (debug builds only, --cheats=all / --cheats-reset).
+        TestCheats.ApplyHeadedMenuCheats();
+
         UpdateAllTexts();
+    }
+
+    /// <summary>
+    /// Debug-only test hotkeys (no CLI args needed, so plain editor F5 runs
+    /// work): F9 unlocks all meta progression, F10 resets to a fresh
+    /// profile. No-op in release builds.
+    /// </summary>
+    public override void _UnhandledKeyInput(InputEvent @event)
+    {
+        if (!OS.IsDebugBuild() || @event is not InputEventKey key || !key.Pressed || key.Echo)
+            return;
+        if (key.Keycode == Key.F9)
+        {
+            TestCheats.UnlockAllMeta();
+            GD.Print("[Cheats] All meta progression unlocked (F9).");
+            RefreshCheatViews();
+            GetViewport().SetInputAsHandled();
+        }
+        else if (key.Keycode == Key.F10)
+        {
+            TestCheats.LockToBaseline();
+            GD.Print("[Cheats] Meta progression reset to a fresh profile (F10).");
+            RefreshCheatViews();
+            GetViewport().SetInputAsHandled();
+        }
+    }
+
+    private void RefreshCheatViews()
+    {
+        UpdateAllTexts();
+        if (ClassView != null && ClassView.Visible)
+            SetupClassButtons();
+        if (MapView != null && MapView.Visible)
+            SelectMap(ActiveMapKey);
     }
 
     public override void _ExitTree()

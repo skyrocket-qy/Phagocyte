@@ -23,6 +23,7 @@ docs/
 ├── record.md         # 臨床病歷單結算、歷史記錄與衝榜系統（SIRS 陣亡 vs 中和通關、評級 S/A/B/C/D）
 ├── tutorial.md       # 新手引導與直覺 UI/UX（見形知意、非侵入微引導、漸進式揭露）
 ├── endgame.md        # 終局無盡細胞因子風暴模式（突破15分鐘、病理過載詞綴、雙生Boss、全球天梯榜）
+├── cheats.md         # 測試作弊全解鎖指南（F9/F10、--cheats=all、TestCheats API）
 └── feedback.md       # 臨床異常反饋、Bug 診斷快照與數值平衡遙測（F8一鍵回報、確定性種子、平衡KPI、GM工具）
 ```
 
@@ -99,4 +100,5 @@ graph TD
 
 ### 🛠️ 診斷、反饋與平衡 (Diagnostics & Balance)
 - **[feedback.md](file:///Users/zelin/project/Phagocyte/docs/feedback.md)**：設計「顯微鏡臨床異常報告系統」，支援戰鬥中 F8 一鍵捕獲確定性 RNG 種子與現場快照、單局匿名數據遙測（技能選取率、猝死熱點、致命傷害排行）以及研發專用 GM 控制台。
+- **[cheats.md](file:///Users/zelin/project/Phagocyte/docs/cheats.md)**：測試專用全解鎖作弊指南（F9/F10 快捷鍵、`--cheats=all`、環境變量、`TestCheats` API 與 headless 套件寫法）。
 

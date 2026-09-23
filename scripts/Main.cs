@@ -7,6 +7,7 @@ using Phagocyte.Directors;
 using Phagocyte.Enemies;
 using Phagocyte.Environment;
 using Phagocyte.Player;
+using Phagocyte.Tests;
 using Phagocyte.UI;
 
 namespace Phagocyte;
@@ -237,6 +238,25 @@ public partial class Main : Node2D, IRunContext
         NeutralMatter?.SeedInitialPopulation();
 
         AudioManager.Instance?.PlayBgm("battle_bgm", 0.6f);
+
+        // Test-demand full-build cheat (debug builds only, --cheats=all [--godmode]).
+        TestCheats.ApplyHeadedRunCheats(this);
+    }
+
+    /// <summary>
+    /// Debug-only test hotkey (plain editor F5 runs): F9 maxes the deployed
+    /// player, Shift+F9 adds invulnerability. No-op in release builds.
+    /// </summary>
+    public override void _UnhandledKeyInput(InputEvent @event)
+    {
+        if (!OS.IsDebugBuild() || @event is not InputEventKey key || !key.Pressed || key.Echo)
+            return;
+        if (key.Keycode == Key.F9)
+        {
+            if (TestCheats.MaxOutPlayer(this, godmode: key.ShiftPressed))
+                GD.Print("[Cheats] Run player maxed out (F9).");
+            GetViewport().SetInputAsHandled();
+        }
     }
 
     /// <summary>
