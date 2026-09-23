@@ -107,7 +107,7 @@ public partial class CodexModal : ModalBase
     {
         var btn = new Button
         {
-            CustomMinimumSize = new Vector2(0, 40),
+            CustomMinimumSize = new Vector2(0, 36),
             Alignment = HorizontalAlignment.Left,
             Text = line1
         };

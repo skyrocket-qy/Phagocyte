@@ -4,7 +4,7 @@
 [ext_resource type="Font" path="res://assets/fonts/BodyMediumFont.tres" id="2_btn_font"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
-bg_color = Color(0.05, 0.08, 0.14, 0.96)
+bg_color = Color(0.04, 0.07, 0.12, 0.98)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -50,6 +50,17 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
 script = ExtResource("1_settings")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+top_level = true
+z_index = 39
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.01, 0.02, 0.03, 0.98)
 
 [node name="VBox" type="VBoxContainer" parent="."]
 layout_mode = 2
