@@ -27,6 +27,8 @@ public partial class TestMapEnvironments : TestHarness
         GD.Print(">>> STARTING ORGAN FLUID MECHANICS & ENVIRONMENT VERIFICATION <<<");
         GD.Print("==================================================================");
         Paused = false;
+        // Mechanics suites opt in: the global flag defaults to off.
+        SettingsManager.MapEffectsEnabled = true;
     }
 
     public override bool _Process(double delta)
@@ -68,6 +70,10 @@ public partial class TestMapEnvironments : TestHarness
                 return false;
             case 8:
                 RunPlayerDriftIntegrationTests();
+                _phase++;
+                return false;
+            case 9:
+                RunDisabledFlagTests();
                 _phase++;
                 return false;
             default:
@@ -340,6 +346,16 @@ public partial class TestMapEnvironments : TestHarness
         AssertThat(player.Velocity.Normalized().Dot(new Vector2(16.0f, 10.0f).Normalized())).IsGreater(0.5f);
 
         GD.Print("[PASS] Organ drift is stacked onto the player's swim velocity.");
+    }
+
+    private void RunDisabledFlagTests()
+    {
+        SettingsManager.MapEffectsEnabled = false;
+        var main = SpawnMain("acute_wound");
+        AssertThat(main.OrganEnvironment).IsNull();
+        AssertThat(main.CurrentFluidVector).IsEqual(Vector2.Zero);
+        AssertThat(((BaseCell)main.Player!).EnvironmentDrift).IsEqual(Vector2.Zero);
+        GD.Print("[PASS] With the flag off, no environment builds and drift/arrows stay zero.");
     }
 
     private void Cleanup()

@@ -235,6 +235,8 @@ public partial class TestTutorialCues : TestHarness
     {
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = "acute_wound";
+        // Cue 5 needs the fluid field: opt into map mechanics (default off).
+        SettingsManager.MapEffectsEnabled = true;
 
         var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
         _main = main;

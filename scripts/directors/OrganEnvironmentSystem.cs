@@ -26,12 +26,25 @@ public partial class OrganEnvironmentSystem : Node
     /// <summary>GDScript/HUD-friendly view of the organ drift currently applied to the player.</summary>
     public Vector2 EnvironmentPlayerDrift => Current?.PlayerDrift ?? Vector2.Zero;
 
-    /// <summary>Builds the organ environment for this run. Call once from _Ready.</summary>
+    /// <summary>
+    /// Builds the organ environment for this run. Call once from _Ready.
+    /// Gated by <see cref="SettingsManager.MapEffectsEnabled"/>: while off,
+    /// no environment is built (drift, hazards and fluid-arrow cues stay
+    /// zero) and only the arena tints apply. Read at deploy; toggling the
+    /// flag mid-run stops drift immediately but building one requires a
+    /// re-deploy.
+    /// </summary>
     public void Initialize(bool hardRun)
     {
         var ctx = Context;
         if (ctx == null)
             return;
+
+        if (!SettingsManager.MapEffectsEnabled)
+        {
+            Current = null;
+            return;
+        }
 
         Current = MapEnvironment.ForMap(ctx.MapId);
         Current.HardMode = hardRun;
@@ -68,6 +81,8 @@ public partial class OrganEnvironmentSystem : Node
     {
         var ctx = Context;
         if (Current == null || ctx == null)
+            return;
+        if (!SettingsManager.MapEffectsEnabled)
             return;
 
         Current.Tick(ctx, dt);

@@ -28,6 +28,13 @@ public partial class SettingsManager : Node
     public static bool Vsync = true;
     public static bool ScreenShake = false;
 
+    /// <summary>
+    /// Organ map mechanics master switch (docs/map.md §3): fluid drift,
+    /// hazards and the fluid-arrow cues. Visual tints stay always-on.
+    /// Default off so runs are mechanically neutral unless opted in.
+    /// </summary>
+    public static bool MapEffectsEnabled = false;
+
     public SettingsManager()
     {
         Instance = this;
@@ -127,7 +134,8 @@ public partial class SettingsManager : Node
             { "bgm_volume", BgmVolume },
             { "fullscreen", Fullscreen },
             { "vsync", Vsync },
-            { "screen_shake", ScreenShake }
+            { "screen_shake", ScreenShake },
+            { "map_effects_enabled", MapEffectsEnabled }
         };
         JsonStore.Write(SavePath, payload);
     }
@@ -144,5 +152,6 @@ public partial class SettingsManager : Node
         Fullscreen = d.ContainsKey("fullscreen") ? (bool)d["fullscreen"] : false;
         Vsync = d.ContainsKey("vsync") ? (bool)d["vsync"] : true;
         ScreenShake = d.ContainsKey("screen_shake") ? (bool)d["screen_shake"] : false;
+        MapEffectsEnabled = d.ContainsKey("map_effects_enabled") ? (bool)d["map_effects_enabled"] : false;
     }
 }

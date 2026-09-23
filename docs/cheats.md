@@ -67,3 +67,10 @@ Godot --headless --path . -s res://tests/TestCheatUnlocks.cs   # self-check (bas
 ```
 
 Green = no `[FAIL]` / `TestFailedException` + `PASSED SUCCESSFULLY` footer.
+
+## Map effects flag
+
+`SettingsManager.MapEffectsEnabled` (persisted in `settings.json`, **default false**):
+gates organ fluid drift, hazards and the fluid-arrow cues. Arena tints stay always-on.
+Headless suites run with effects off unless they opt in (`TestMapEnvironments`,
+`TestTutorialCues` set it true); visuals-only checks need nothing.
