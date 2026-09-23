@@ -61,3 +61,6 @@ Transforming the in-game action into a visceral microscopic bio-horror battlefie
   - Boost emission intensity on weapon skills (Perforin Lance, ROS Torrent, Grasp chains, MAC Detonations) with piercing laser fluorophore halos.
 - [ ] **Organic HUD Health & Vitals Overhaul**:
   - Replace flat green health bar with a pulsating cellular membrane vital sign gauge that reacts to damage and adrenaline surges.
+
+
+- 如果我先裝-能量再裝能量到超多6，這時我拿掉-能量的裝備會有問題

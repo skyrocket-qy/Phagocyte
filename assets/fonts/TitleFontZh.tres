@@ -7,4 +7,6 @@
 base_font = ExtResource("1_orbitron")
 fallbacks = Array[Font]([ExtResource("2_smiley")])
 spacing_glyph = 9
-variation_opentype = {"wght": 800}
+variation_opentype = {
+2003265652: 800
+}

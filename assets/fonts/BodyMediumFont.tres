@@ -4,4 +4,6 @@
 
 [resource]
 base_font = ExtResource("1_noto")
-variation_embolden = 0.4
+variation_opentype = {
+2003265652: 650
+}

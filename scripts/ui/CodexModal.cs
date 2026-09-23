@@ -85,6 +85,13 @@ public partial class CodexModal : ModalBase
         }
     }
 
+    private static readonly StyleBoxFlat ItemPlateNormal =
+        MakeItemPlate(new Color(0.04f, 0.08f, 0.13f, 0.88f), new Color(0.2f, 0.38f, 0.52f, 0.65f), false);
+    private static readonly StyleBoxFlat ItemPlateActive =
+        MakeItemPlate(new Color(0.06f, 0.18f, 0.24f, 0.96f), new Color(0.35f, 0.95f, 0.85f, 1.0f), true);
+    private static readonly StyleBoxFlat ItemPlateHover =
+        MakeItemPlate(new Color(0.07f, 0.16f, 0.22f, 0.94f), new Color(0.35f, 0.85f, 0.75f, 0.9f), false);
+
     /// <summary>
     /// Paints the active entry GFP so selection never reads as "select A, view B".
     /// Called at the end of every Select* method.
@@ -92,15 +99,37 @@ public partial class CodexModal : ModalBase
     private void RefreshItemSelection()
     {
         foreach (var kv in _itemButtons)
-            kv.Value.AddThemeColorOverride("font_color",
-                kv.Key == ActiveItemKey ? ItemHoverColor : ItemFontColor);
+        {
+            bool isSelected = kv.Key == ActiveItemKey;
+            kv.Value.AddThemeColorOverride("font_color", isSelected ? ItemHoverColor : ItemFontColor);
+            kv.Value.AddThemeStyleboxOverride("normal", isSelected ? ItemPlateActive : ItemPlateNormal);
+        }
     }
 
-    private static StyleBoxFlat MakePlate(Color bg, Color border)
+    private static StyleBoxFlat MakeItemPlate(Color bg, Color border, bool active)
     {
-        var sb = new StyleBoxFlat { BgColor = bg, BorderColor = border };
-        sb.SetBorderWidthAll(1);
-        sb.SetCornerRadiusAll(6);
+        var sb = new StyleBoxFlat
+        {
+            BgColor = bg,
+            BorderColor = border,
+            ContentMarginLeft = 14.0f,
+            ContentMarginTop = 6.0f,
+            ContentMarginRight = 10.0f,
+            ContentMarginBottom = 6.0f,
+            BorderWidthLeft = active ? 3 : 1,
+            BorderWidthTop = 1,
+            BorderWidthRight = 1,
+            BorderWidthBottom = active ? 2 : 1,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 2,
+            CornerRadiusBottomRight = 10,
+            CornerRadiusBottomLeft = 2,
+        };
+        if (active)
+        {
+            sb.ShadowColor = new Color(0.15f, 0.92f, 0.82f, 0.35f);
+            sb.ShadowSize = 6;
+        }
         return sb;
     }
 
@@ -120,11 +149,12 @@ public partial class CodexModal : ModalBase
         btn.AddThemeFontSizeOverride("font_size", 14);
         btn.AddThemeColorOverride("font_color", ItemFontColor);
         btn.AddThemeColorOverride("font_hover_color", ItemHoverColor);
-        btn.AddThemeColorOverride("font_pressed_color", new Color(0f, 0.79f, 0.33f));
-        btn.AddThemeStyleboxOverride("normal",
-            MakePlate(new Color(0.07f, 0.12f, 0.18f, 0.9f), new Color(0.25f, 0.45f, 0.6f, 0.7f)));
-        btn.AddThemeStyleboxOverride("hover",
-            MakePlate(new Color(0.07f, 0.2f, 0.16f, 0.95f), new Color(0.39f, 1.0f, 0.85f, 1.0f)));
+        btn.AddThemeColorOverride("font_pressed_color", new Color(0.3f, 0.95f, 0.8f));
+        btn.AddThemeColorOverride("font_outline_color", new Color(0.01f, 0.03f, 0.06f, 0.95f));
+        btn.AddThemeConstantOverride("outline_size", 2);
+        btn.AddThemeStyleboxOverride("normal", ItemPlateNormal);
+        btn.AddThemeStyleboxOverride("hover", ItemPlateHover);
+        btn.AddThemeStyleboxOverride("pressed", ItemPlateActive);
         return btn;
     }
 

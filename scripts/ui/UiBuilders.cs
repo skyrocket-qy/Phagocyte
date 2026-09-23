@@ -10,18 +10,40 @@ namespace Phagocyte.UI;
 /// </summary>
 public static class UiBuilders
 {
-    public static readonly Color TabActiveColor = new Color(1.0f, 1.0f, 1.0f);
-    public static readonly Color TabInactiveColor = new Color(0.7f, 0.7f, 0.7f);
+    public static readonly Color TabActiveColor = new Color(0.35f, 1.0f, 0.88f);
+    public static readonly Color TabInactiveColor = new Color(0.88f, 0.94f, 0.98f);
+
+    public static readonly StyleBox TabActiveStyle =
+        AssetLoader.Load<StyleBox>("res://assets/theme/tab_button_active.tres");
+    public static readonly StyleBox TabNormalStyle =
+        AssetLoader.Load<StyleBox>("res://assets/theme/tab_button_normal.tres");
+    public static readonly StyleBox TabHoverStyle =
+        AssetLoader.Load<StyleBox>("res://assets/theme/tab_button_hover.tres");
 
     public static readonly Color BadgeInnateColor = new Color(0.4f, 0.95f, 0.8f);
     public static readonly Color BadgeActiveColor = new Color(1.0f, 0.85f, 0.3f);
     public static readonly Color BadgePassiveColor = new Color(0.6f, 0.8f, 1.0f);
 
-    /// <summary>Highlights a tab button (or any Control) as active/inactive.</summary>
+    /// <summary>Highlights a tab button (or any Control) as active/inactive with cyber-fluorescence styling.</summary>
     public static void SetTabActive(Control? tab, bool active)
     {
-        if (tab != null)
+        if (tab == null)
+            return;
+
+        tab.Modulate = Colors.White;
+        if (tab is Button btn)
+        {
+            btn.AddThemeStyleboxOverride("normal", active ? TabActiveStyle : TabNormalStyle);
+            btn.AddThemeStyleboxOverride("hover", TabHoverStyle);
+            btn.AddThemeStyleboxOverride("pressed", TabActiveStyle);
+            btn.AddThemeColorOverride("font_color", active ? TabActiveColor : TabInactiveColor);
+            btn.AddThemeColorOverride("font_hover_color", new Color(0.5f, 1.0f, 0.9f));
+            btn.AddThemeColorOverride("font_pressed_color", TabActiveColor);
+        }
+        else
+        {
             tab.Modulate = active ? TabActiveColor : TabInactiveColor;
+        }
     }
 
     /// <summary>
