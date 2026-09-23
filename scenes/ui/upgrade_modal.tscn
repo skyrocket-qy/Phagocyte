@@ -89,6 +89,7 @@ theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 0.8)
 theme_override_font_sizes/font_size = 14
 text = "细胞摄入充足 ATP，激活沉睡基因转录 (Select an Epigenetic Upgrade)"
 horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="CardsContainer" type="HBoxContainer" parent="CenterContainer/VBox"]
 layout_mode = 2
@@ -142,12 +143,13 @@ columns = 4
 alignment = 1
 
 [node name="SwapHint" type="Label" parent="CenterContainer/VBox/SwapPanel"]
-custom_minimum_size = Vector2(560, 22)
+custom_minimum_size = Vector2(560, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.72, 0.82, 0.9, 0.9)
 theme_override_font_sizes/font_size = 12
 text = "点击槽位替换；或存入背包、丢弃回血。"
 horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="SwapRow" type="HBoxContainer" parent="CenterContainer/VBox/SwapPanel"]
 layout_mode = 2
@@ -155,14 +157,14 @@ theme_override_constants/separation = 24
 alignment = 1
 
 [node name="StoreButton" type="Button" parent="CenterContainer/VBox/SwapPanel/SwapRow"]
-custom_minimum_size = Vector2(170, 42)
+custom_minimum_size = Vector2(190, 42)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
 text = "存入背包"
 
 [node name="DiscardButton" type="Button" parent="CenterContainer/VBox/SwapPanel/SwapRow"]
-custom_minimum_size = Vector2(170, 42)
+custom_minimum_size = Vector2(190, 42)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 0.62, 0.55, 1)
@@ -170,14 +172,14 @@ theme_override_font_sizes/font_size = 14
 text = "丢弃＋回血"
 
 [node name="CancelButton" type="Button" parent="CenterContainer/VBox/SwapPanel/SwapRow"]
-custom_minimum_size = Vector2(170, 42)
+custom_minimum_size = Vector2(190, 42)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
 text = "返回三选一"
 
 [node name="Card0" type="PanelContainer" parent="CenterContainer/VBox/CardsContainer"]
-custom_minimum_size = Vector2(260, 340)
+custom_minimum_size = Vector2(260, 360)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
@@ -230,7 +232,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="DescLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card0/VBox"]
-custom_minimum_size = Vector2(216, 96)
+custom_minimum_size = Vector2(216, 110)
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
@@ -243,7 +245,7 @@ autowrap_mode = 3
 clip_text = true
 
 [node name="Card1" type="PanelContainer" parent="CenterContainer/VBox/CardsContainer"]
-custom_minimum_size = Vector2(260, 340)
+custom_minimum_size = Vector2(260, 360)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
@@ -296,7 +298,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="DescLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card1/VBox"]
-custom_minimum_size = Vector2(216, 96)
+custom_minimum_size = Vector2(216, 110)
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
@@ -309,7 +311,7 @@ autowrap_mode = 3
 clip_text = true
 
 [node name="Card2" type="PanelContainer" parent="CenterContainer/VBox/CardsContainer"]
-custom_minimum_size = Vector2(260, 340)
+custom_minimum_size = Vector2(260, 360)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_card")
 
@@ -362,7 +364,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="DescLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card2/VBox"]
-custom_minimum_size = Vector2(216, 96)
+custom_minimum_size = Vector2(216, 110)
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2

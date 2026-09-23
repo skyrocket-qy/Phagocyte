@@ -55,12 +55,12 @@ public abstract partial class TestHarness : SceneTree
         // Drop any previously tracked isolated files, then register the new ones.
         DeleteIsolatedFiles();
 
-        PassiveTreeManager.SavePath = $"user://test_{tag}_tree.json";
-        AchievementManager.SavePath = $"user://test_{tag}_achievements.json";
-        RunRecordManager.SavePath = $"user://test_{tag}_records.json";
-        SettingsManager.SavePath = $"user://test_{tag}_settings.json";
-        LoadoutManager.SavePath = $"user://test_{tag}_loadouts.json";
-        OrganelleUnlockManager.SavePath = $"user://test_{tag}_organelle_unlocks.json";
+        PassiveTreeManager.SavePath = JsonStore.ResolvePath($"test_{tag}_tree.json");
+        AchievementManager.SavePath = JsonStore.ResolvePath($"test_{tag}_achievements.json");
+        RunRecordManager.SavePath = JsonStore.ResolvePath($"test_{tag}_records.json");
+        SettingsManager.SavePath = JsonStore.ResolvePath($"test_{tag}_settings.json");
+        LoadoutManager.SavePath = JsonStore.ResolvePath($"test_{tag}_loadouts.json");
+        OrganelleUnlockManager.SavePath = JsonStore.ResolvePath($"test_{tag}_organelle_unlocks.json");
 
         // Clear leftovers from crashed earlier runs with the same tag.
         DeleteIfExists(PassiveTreeManager.SavePath);

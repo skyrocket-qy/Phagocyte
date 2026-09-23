@@ -101,7 +101,20 @@ public static class JsonStore
     public static Dictionary? Read(string path)
     {
         if (!FileAccess.FileExists(path))
-            return null;
+        {
+            if (path.StartsWith("user://"))
+            {
+                string fallback = $"res://.user_data/{path.Substring("user://".Length)}";
+                if (FileAccess.FileExists(fallback))
+                    path = fallback;
+                else
+                    return null;
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         using var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
         if (file == null)
