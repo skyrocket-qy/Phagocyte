@@ -2,6 +2,9 @@
 
 [ext_resource type="Script" path="res://scripts/ui/UpgradeModal.cs" id="1_modal"]
 [ext_resource type="Script" path="res://scripts/ui/EnergyPips.cs" id="2_pips"]
+[ext_resource type="Texture2D" uid="uid://cfaeqlbonvlti" path="res://assets/gen/skill/ros_torrent.png" id="3_ros"]
+[ext_resource type="Texture2D" uid="uid://biefccq1honm4" path="res://assets/gen/skill/actin.png" id="4_actin"]
+[ext_resource type="Texture2D" uid="uid://hx13qr0rhyyv" path="res://assets/gen/skill/lysosome.png" id="5_lyso"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg_dim"]
 bg_color = Color(0.02, 0.04, 0.07, 0.78)
@@ -196,26 +199,25 @@ custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="IconLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card0/VBox"]
-custom_minimum_size = Vector2(0, 56)
+[node name="IconTexture" type="TextureRect" parent="CenterContainer/VBox/CardsContainer/Card0/VBox"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
 mouse_filter = 2
-theme_override_font_sizes/font_size = 46
-text = "💨"
-horizontal_alignment = 1
-vertical_alignment = 1
+texture = ExtResource("3_ros")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card0/VBox"]
-custom_minimum_size = Vector2(216, 44)
+custom_minimum_size = Vector2(216, 46)
 layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 14
 text = "活性氧射流"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text_overrun_behavior = 3
 
 [node name="BadgeLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card0/VBox"]
 custom_minimum_size = Vector2(216, 22)
@@ -263,26 +265,25 @@ custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="IconLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card1/VBox"]
-custom_minimum_size = Vector2(0, 56)
+[node name="IconTexture" type="TextureRect" parent="CenterContainer/VBox/CardsContainer/Card1/VBox"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
 mouse_filter = 2
-theme_override_font_sizes/font_size = 46
-text = "🧬"
-horizontal_alignment = 1
-vertical_alignment = 1
+texture = ExtResource("4_actin")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card1/VBox"]
-custom_minimum_size = Vector2(216, 44)
+custom_minimum_size = Vector2(216, 46)
 layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 14
 text = "肌动蛋白微丝"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text_overrun_behavior = 3
 
 [node name="BadgeLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card1/VBox"]
 custom_minimum_size = Vector2(216, 22)
@@ -330,26 +331,25 @@ custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="IconLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card2/VBox"]
-custom_minimum_size = Vector2(0, 56)
+[node name="IconTexture" type="TextureRect" parent="CenterContainer/VBox/CardsContainer/Card2/VBox"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_horizontal = 4
 mouse_filter = 2
-theme_override_font_sizes/font_size = 46
-text = "🧪"
-horizontal_alignment = 1
-vertical_alignment = 1
+texture = ExtResource("5_lyso")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card2/VBox"]
-custom_minimum_size = Vector2(216, 44)
+custom_minimum_size = Vector2(216, 46)
 layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 14
 text = "溶酶体酵素"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-text_overrun_behavior = 3
 
 [node name="BadgeLabel" type="Label" parent="CenterContainer/VBox/CardsContainer/Card2/VBox"]
 custom_minimum_size = Vector2(216, 22)

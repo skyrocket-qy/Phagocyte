@@ -38,6 +38,22 @@ content_margin_top = 16.0
 content_margin_right = 18.0
 content_margin_bottom = 16.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_frame"]
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.04, 0.08, 0.14, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.65, 0.8, 0.5)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="CodexModal" type="PanelContainer"]
 z_index = 30
 layout_mode = 3
@@ -155,24 +171,41 @@ theme_override_constants/separation = 10
 
 [node name="TopRow" type="HBoxContainer" parent="VBox/HBox/DetailPanel/VBox"]
 layout_mode = 2
+theme_override_constants/separation = 16
 
-[node name="DetailTitle" type="Label" parent="VBox/HBox/DetailPanel/VBox"]
+[node name="DetailImageWrap" type="PanelContainer" parent="VBox/HBox/DetailPanel/VBox/TopRow"]
+custom_minimum_size = Vector2(88, 88)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_icon_frame")
+
+[node name="DetailIcon" type="TextureRect" parent="VBox/HBox/DetailPanel/VBox/TopRow/DetailImageWrap"]
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleVBox" type="VBoxContainer" parent="VBox/HBox/DetailPanel/VBox/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="DetailTitle" type="Label" parent="VBox/HBox/DetailPanel/VBox/TopRow/TitleVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
 theme_override_font_sizes/font_size = 24
 text = "技能名称"
 
-[node name="DetailBadge" type="Label" parent="VBox/HBox/DetailPanel/VBox"]
+[node name="DetailBadge" type="Label" parent="VBox/HBox/DetailPanel/VBox/TopRow/TitleVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
 text = "[ 固有专属 ]"
 
-[node name="DetailStats" type="Label" parent="VBox/HBox/DetailPanel/VBox"]
+[node name="DetailStats" type="Label" parent="VBox/HBox/DetailPanel/VBox/TopRow/TitleVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.85, 0.95, 1)
-theme_override_constants/line_spacing = 6
-theme_override_font_sizes/font_size = 14
+theme_override_constants/line_spacing = 4
+theme_override_font_sizes/font_size = 13
 text = "冷却时间: 3.2s • 等级: 1 / 5"
 
 [node name="HSeparator" type="HSeparator" parent="VBox/HBox/DetailPanel/VBox"]

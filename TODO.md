@@ -21,16 +21,18 @@ Emergency fixes for visual bugs, text collisions, and broken layout containers a
 
 ---
 
-## [TODO] Phase 2: Emoji Purge & Contextual Sprite Wiring
+## [COMPLETED] Phase 2: Emoji Purge & Contextual Sprite Wiring
 
 Eliminating all programmer-art placeholders and restoring confocal microscopy sprite fidelity:
 
-- [ ] **Purge OS Emojis from `UpgradeModal`**:
-  - Replace unicode emoji icons (`💨`, `🧬`, `🧪`) in Level-Up Mutation choice cards with actual confocal bio-fluorescent sprites from `assets/gen/skill/` and `assets/gen/organelle/`.
-- [ ] **Fix Card Title Truncation in `UpgradeModal`**:
-  - Eliminate ugly `...` ellipsis truncation on mutation card headers (`Actin Pseudopod...`, `Mitochondrial...`) by refining font size scaling or two-line subtitle wrapping.
-- [ ] **Add Specimen Artwork to `CodexModal`**:
-  - Add illustrated fluorophore specimen portraits in the right-hand dossier panel (skill icon, pathogen microscopy render, cell ultrastructure) instead of dry walls of plain text.
+- [x] **Purge OS Emojis from `UpgradeModal`**:
+  - Replaced unicode emoji icons (`💨`, `🧬`, `🧪`) in Level-Up Mutation choice cards with actual confocal bio-fluorescent sprites from `assets/gen/skill/` and `assets/gen/organelle/`.
+- [x] **Fix Card Title Truncation in `UpgradeModal`**:
+  - Eliminated ugly `...` ellipsis truncation on mutation card headers (`Actin Pseudopod...`, `Mitochondrial...`) with two-line word-smart wrapping (`autowrap_mode = 3`, `text_overrun_behavior = 0`, font size 14px).
+- [x] **Add Specimen Artwork to `CodexModal`**:
+  - Added illustrated fluorophore specimen portraits in the right-hand dossier panel (skill icons, cell evolution portraits, pathogen threat icons, and tissue clear badges) with dedicated microscope specimen frame styling.
+- [x] **Visual Verification**:
+  - Re-ran `TestFullVisualPreview.cs` and generated before/after diffs (`diff_upgrade_modal.png`, `diff_codex_modal.png`). All 3 cards retain 100% identical dimensions in `TestCardUniformSize`.
 
 ---
 

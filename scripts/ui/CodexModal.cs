@@ -13,6 +13,7 @@ public partial class CodexModal : ModalBase
     public Button? TabMapsBtn { get; set; }
 
     public VBoxContainer? ItemList { get; set; }
+    public TextureRect? DetailIcon { get; set; }
     public Label? DetailTitle { get; set; }
     public Label? DetailBadge { get; set; }
     public Label? DetailStats { get; set; }
@@ -38,9 +39,13 @@ public partial class CodexModal : ModalBase
         TabMapsBtn = GetNodeOrNull<Button>("VBox/TabBar/MapsTab");
 
         ItemList = GetNodeOrNull<VBoxContainer>("VBox/HBox/Scroll/ItemList");
-        DetailTitle = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailTitle");
-        DetailBadge = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailBadge");
-        DetailStats = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailStats");
+        DetailIcon = GetNodeOrNull<TextureRect>("VBox/HBox/DetailPanel/VBox/TopRow/DetailImageWrap/DetailIcon");
+        DetailTitle = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/TopRow/TitleVBox/DetailTitle")
+            ?? GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailTitle");
+        DetailBadge = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/TopRow/TitleVBox/DetailBadge")
+            ?? GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailBadge");
+        DetailStats = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/TopRow/TitleVBox/DetailStats")
+            ?? GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailStats");
         DetailDesc = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailDesc");
         DetailBio = GetNodeOrNull<Label>("VBox/HBox/DetailPanel/VBox/DetailBio");
 
@@ -209,6 +214,13 @@ public partial class CodexModal : ModalBase
         var d = GameManager.GetSkillInfo(key);
         if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
 
+        if (DetailIcon != null)
+        {
+            string iconPath = AssetPaths.SkillIcon(key);
+            DetailIcon.Texture = AssetLoader.TryLoad<Texture2D>(iconPath)
+                ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+        }
+
         string type = d["type"].AsString();
         UiBuilders.BuildSkillBadge(type, d["cooldown"].AsSingle(), 1, d["max_level"].AsInt32(),
             out string badgeText, out Color badgeColor, out string statsText);
@@ -258,6 +270,17 @@ public partial class CodexModal : ModalBase
         bool unlocked = d["unlocked"].AsBool();
 
         if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
+
+        if (DetailIcon != null)
+        {
+            string unlockAch = d.TryGetValue("unlock_achievement", out var achVal) ? achVal.AsString() : "";
+            string iconPath = !string.IsNullOrEmpty(unlockAch)
+                ? AssetPaths.AchievementSprite(unlockAch)
+                : AssetPaths.AchievementSprite("first_evolution");
+            DetailIcon.Texture = AssetLoader.TryLoad<Texture2D>(iconPath)
+                ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+        }
+
         if (DetailBadge != null)
         {
             DetailBadge.Text = "[ " + (unlocked ? Tr("STATUS_UNLOCKED") : Tr("STATUS_LOCKED")) + " ]";
@@ -316,6 +339,21 @@ public partial class CodexModal : ModalBase
         var d = GameManager.GetPathogenInfo(key);
         if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
 
+        if (DetailIcon != null)
+        {
+            string iconPath = key switch
+            {
+                "malignant_cell" => AssetPaths.AchievementSprite("prion_cleared"),
+                "e_coli" or "pseudomonas" => AssetPaths.SkillIcon("endotoxin"),
+                "tb" => AssetPaths.SkillIcon("lysosome"),
+                "flu_drift" or "s_virus" => AssetPaths.SkillIcon("autophagy"),
+                _ => AssetPaths.UiIcon("badge_antigen")
+            };
+            DetailIcon.Texture = AssetLoader.TryLoad<Texture2D>(iconPath)
+                ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.UiIcon("reticle_danger"))
+                ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+        }
+
         string dangerLv = d.TryGetValue("danger_level", out var dlVal) ? dlVal.AsString() : (d.TryGetValue("threat_level", out var tlVal) ? tlVal.AsString() : "I");
         if (DetailBadge != null)
         {
@@ -359,6 +397,22 @@ public partial class CodexModal : ModalBase
         ActiveItemKey = key;
         var d = GameManager.GetMapInfo(key);
         if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
+
+        if (DetailIcon != null)
+        {
+            string iconPath = key switch
+            {
+                "acute_wound" => AssetPaths.AchievementSprite("wound_clear"),
+                "alveolar_space" => AssetPaths.AchievementSprite("alveolar_clear"),
+                "hepatic_sinusoid" => AssetPaths.AchievementSprite("hepatic_clear"),
+                "gastric_cavity" => AssetPaths.AchievementSprite("gastric_clear"),
+                "blood_brain_barrier" => AssetPaths.AchievementSprite("bbb_clear"),
+                _ => AssetPaths.PlaceholderIcon
+            };
+            DetailIcon.Texture = AssetLoader.TryLoad<Texture2D>(iconPath)
+                ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+        }
+
         if (DetailBadge != null)
         {
             DetailBadge.Text = "[ " + Tr("CODEX_STAGE_STATUS_OPEN") + " ]";

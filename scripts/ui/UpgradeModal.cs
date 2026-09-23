@@ -171,8 +171,18 @@ public partial class UpgradeModal : ModalBase
                 if (iconTex != null)
                 {
                     string imagePath = choice.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "";
-                    iconTex.Texture = AssetLoader.TryLoad<Texture2D>(imagePath)
-                        ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+                    if (string.IsNullOrEmpty(imagePath) && choice.TryGetValue("id", out var idVal))
+                    {
+                        string id = idVal.AsString();
+                        iconTex.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.SkillIcon(id))
+                            ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.OrganelleIcon(id))
+                            ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+                    }
+                    else
+                    {
+                        iconTex.Texture = AssetLoader.TryLoad<Texture2D>(imagePath)
+                            ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+                    }
                 }
                 if (titleLbl != null)
                 {

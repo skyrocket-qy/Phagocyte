@@ -409,17 +409,23 @@ public partial class TestFullVisualPreview : TestHarness
             var cards = cardsContainer.GetChildren();
             if (cards.Count >= 3)
             {
-                SetupCard(cards[0], "吞噬延伸 (Actin Pseudopod Lunge)", "[ 新主动武器 ]", "向前方伸出伪足抓取远距离病原体，将其拖拽至胞口消化。");
-                SetupCard(cards[1], "线粒体超频 (Mitochondrial Overclock)", "[ 细胞器升级 LEVEL 2 ]", "技能冷却缩减 +12%，氧化磷酸化电子传递链加速，提升ATP产能效率。");
-                SetupCard(cards[2], "活性氧射流 (ROS Torrent)", "[ 新主动武器 ]", "高压喷射超氧阴离子与过氧化氢射流，持续融毁大面积外源病菌囊膜。");
+                SetupCard(cards[0], "吞噬延伸 (Actin Pseudopod Lunge)", "[ 新主动武器 ]", "向前方伸出伪足抓取远距离病原体，将其拖拽至胞口消化。", AssetPaths.SkillIcon("pseudopod_lunge"));
+                SetupCard(cards[1], "线粒体超频 (Mitochondrial Overclock)", "[ 细胞器升级 LEVEL 2 ]", "技能冷却缩减 +12%，氧化磷酸化电子传递链加速，提升ATP产能效率。", AssetPaths.OrganelleIcon("mitochondria_mkii"));
+                SetupCard(cards[2], "活性氧射流 (ROS Torrent)", "[ 新主动武器 ]", "高压喷射超氧阴离子与过氧化氢射流，持续融毁大面积外源病菌囊膜。", AssetPaths.SkillIcon("ros_torrent"));
             }
         }
         _upgradeModal.GetNode<CenterContainer>("CenterContainer").QueueSort();
         _upgradeModal.Visible = true;
     }
 
-    private static void SetupCard(Node cardNode, string title, string badge, string desc)
+    private static void SetupCard(Node cardNode, string title, string badge, string desc, string? iconPath = null)
     {
+        if (!string.IsNullOrEmpty(iconPath))
+        {
+            var iconTex = cardNode.GetNodeOrNull<TextureRect>("VBox/IconTexture");
+            if (iconTex != null)
+                iconTex.Texture = AssetLoader.TryLoad<Texture2D>(iconPath);
+        }
         var titleLbl = cardNode.GetNodeOrNull<Label>("VBox/TitleLabel");
         if (titleLbl != null) titleLbl.Text = title;
         var badgeLbl = cardNode.GetNodeOrNull<Label>("VBox/BadgeLabel");
