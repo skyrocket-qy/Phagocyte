@@ -68,3 +68,13 @@ Transforming the in-game action into a visceral microscopic bio-horror battlefie
 
 
 - 每個skill視覺設計要跟他的asset圖一樣
+
+---
+
+## [TODO] Phase 5: Audio Coverage & Per-Map BGM
+
+Finish the audio pass (P0 wired: boss BGM switch, wave/game-start stingers, dodge/equip/error/achievement sounds; manifest + boot check + `TestAudioAssets` + check-assets step 7 all live):
+
+- [ ] **Dedicated player_hit SFX**: currently temped with `hit` in `PlayPlayerHit`; add a real hurt sound file, point the helper at it (manifest enforces existence).
+- [ ] **Wire button click sounds**: `PlayClick` (`ui_click`) has zero call sites; hook it to main menu / modal buttons.
+- [ ] **Per-map battle BGM**: map the 5 organs to existing tracks (e.g. wound→battle_bgm, alveolar→void/echoes, hepatic→swamp, gastric→crypt/abyss, bbb→dimension/temple); add the map→track table plus endless-overdrive track (`battle_bgm_2` / `boss_final`).
