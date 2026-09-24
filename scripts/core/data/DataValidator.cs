@@ -125,6 +125,7 @@ public static class DataValidator
         CheckKeys(GameManager.SkillCatalog, missing, known, "skill");
         CheckKeys(GameManager.OrganelleCatalog, missing, known, "organelle");
         CheckKeys(GameManager.PathogenCatalog, missing, known, "pathogen");
+        CheckKeys(GameManager.BossCatalog, missing, known, "boss");
         CheckKeys(GameManager.MapData, missing, known, "map");
         CheckKeys(GameManager.ClassData, missing, known, "class");
         CheckKeys(AchievementManager.Achievements, missing, known, "achievement");
@@ -132,6 +133,7 @@ public static class DataValidator
         {
             CheckKey(trait.NameKey, missing, known);
             CheckKey(trait.DescKey, missing, known);
+            CheckKey(trait.BioKey, missing, known);
         }
         foreach (var kv in PassiveTreeManager.StatLabelValues)
             CheckKey(kv.Value, missing, known);

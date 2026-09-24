@@ -1,0 +1,13 @@
+[
+	{"danger_level": "★★★★☆", "desc_key": "PATHOGEN_CHAINLORD_DESC", "icon": "⛓️", "id": "chainlord", "name_key": "PATHOGEN_CHAINLORD_NAME", "trait_key": "PATHOGEN_CHAINLORD_TRAIT"},
+	{"danger_level": "★★★★☆", "desc_key": "PATHOGEN_FLUDUST_CYCLONE_DESC", "icon": "🌀", "id": "fludust_cyclone", "name_key": "PATHOGEN_FLUDUST_CYCLONE_NAME", "trait_key": "PATHOGEN_FLUDUST_CYCLONE_TRAIT"},
+	{"danger_level": "★★★★☆", "desc_key": "PATHOGEN_TB_BEHEMOTH_DESC", "icon": "🫁", "id": "tb_behemoth", "name_key": "PATHOGEN_TB_BEHEMOTH_NAME", "trait_key": "PATHOGEN_TB_BEHEMOTH_TRAIT"},
+	{"danger_level": "★★★★☆", "desc_key": "PATHOGEN_VACA_DESC", "icon": "🧪", "id": "vaca", "name_key": "PATHOGEN_VACA_NAME", "trait_key": "PATHOGEN_VACA_TRAIT"},
+	{"danger_level": "★★★★☆", "desc_key": "PATHOGEN_MEGACYST_DESC", "icon": "🥚", "id": "megacyst", "name_key": "PATHOGEN_MEGACYST_NAME", "trait_key": "PATHOGEN_MEGACYST_TRAIT"},
+	{"danger_level": "★★★★★", "desc_key": "PATHOGEN_MRSA_DESC", "icon": "🧫", "id": "mrsa", "name_key": "PATHOGEN_MRSA_NAME", "trait_key": "PATHOGEN_MRSA_TRAIT"},
+	{"danger_level": "★★★★★", "desc_key": "PATHOGEN_MRSA_ELITE_DESC", "icon": "🦠", "id": "mrsa_elite", "name_key": "PATHOGEN_MRSA_ELITE_NAME", "trait_key": "PATHOGEN_MRSA_ELITE_TRAIT"},
+	{"danger_level": "★★★★★", "desc_key": "PATHOGEN_SYNCYTIAL_DESC", "icon": "🫀", "id": "syncytial", "name_key": "PATHOGEN_SYNCYTIAL_NAME", "trait_key": "PATHOGEN_SYNCYTIAL_TRAIT"},
+	{"danger_level": "★★★★★", "desc_key": "PATHOGEN_MACROSCHIZONT_DESC", "icon": "🦟", "id": "macroschizont", "name_key": "PATHOGEN_MACROSCHIZONT_NAME", "trait_key": "PATHOGEN_MACROSCHIZONT_TRAIT"},
+	{"danger_level": "★★★★★", "desc_key": "PATHOGEN_BIOFILM_CORE_DESC", "icon": "🧬", "id": "biofilm_core", "name_key": "PATHOGEN_BIOFILM_CORE_NAME", "trait_key": "PATHOGEN_BIOFILM_CORE_TRAIT"},
+	{"danger_level": "★★★★★", "desc_key": "PATHOGEN_AMYLOID_DESC", "icon": "🧠", "id": "amyloid", "name_key": "PATHOGEN_AMYLOID_NAME", "trait_key": "PATHOGEN_AMYLOID_TRAIT"}
+]

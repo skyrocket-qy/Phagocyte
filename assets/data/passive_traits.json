@@ -1,6 +1,7 @@
 {
   "traits": [
     {
+      "bio_key": "SKILL_ACTIN_BIO",
       "desc_key": "",
       "icon": "🧬",
       "id": "actin",
@@ -9,6 +10,7 @@
       "rarity": "start"
     },
     {
+      "bio_key": "SKILL_AUTOPHAGY_BIO",
       "desc_key": "SKILL_AUTOPHAGY_DESC",
       "icon": "🔄",
       "id": "autophagy",
@@ -23,6 +25,7 @@
       "rarity": "magic"
     },
     {
+      "bio_key": "SKILL_BILAYER_BIO",
       "desc_key": "SKILL_BILAYER_DESC",
       "icon": "🛡️",
       "id": "bilayer",
@@ -42,6 +45,7 @@
       "rarity": "unique"
     },
     {
+      "bio_key": "SKILL_CHEMOKINE_BIO",
       "desc_key": "",
       "icon": "🧲",
       "id": "chemokine",
@@ -50,6 +54,7 @@
       "rarity": "start"
     },
     {
+      "bio_key": "SKILL_ENDOTOXIN_BIO",
       "desc_key": "SKILL_ENDOTOXIN_DESC",
       "icon": "🧱",
       "id": "endotoxin",
@@ -69,6 +74,7 @@
       "rarity": "rare"
     },
     {
+      "bio_key": "SKILL_GLYCOLYSIS_BIO",
       "desc_key": "SKILL_GLYCOLYSIS_DESC",
       "icon": "🍬",
       "id": "glycolysis",
@@ -88,6 +94,7 @@
       "rarity": "magic"
     },
     {
+      "bio_key": "SKILL_HEMATOPOIETIC_BIO",
       "desc_key": "SKILL_HEMATOPOIETIC_DESC",
       "icon": "🩸",
       "id": "hematopoietic",
@@ -107,6 +114,7 @@
       "rarity": "rare"
     },
     {
+      "bio_key": "SKILL_KINESIN_BIO",
       "desc_key": "",
       "icon": "🛤️",
       "id": "kinesin",
@@ -115,6 +123,7 @@
       "rarity": "start"
     },
     {
+      "bio_key": "SKILL_LONGEVITY_BIO",
       "desc_key": "SKILL_LONGEVITY_DESC",
       "icon": "⏳",
       "id": "longevity",
@@ -134,6 +143,7 @@
       "rarity": "magic"
     },
     {
+      "bio_key": "TREE_NODE_LYSOSOME_BIO",
       "desc_key": "",
       "icon": "🧪",
       "id": "lysosome",
@@ -142,6 +152,7 @@
       "rarity": "start"
     },
     {
+      "bio_key": "SKILL_MITOCHONDRIA_BIO",
       "desc_key": "SKILL_MITOCHONDRIA_DESC",
       "icon": "⚡",
       "id": "mitochondria",
@@ -161,6 +172,7 @@
       "rarity": "magic"
     },
     {
+      "bio_key": "SKILL_OPSONIN_BIO",
       "desc_key": "",
       "icon": "🎯",
       "id": "opsonin",
@@ -169,6 +181,7 @@
       "rarity": "start"
     },
     {
+      "bio_key": "SKILL_VDJ_BIO",
       "desc_key": "SKILL_VDJ_DESC",
       "icon": "🎲",
       "id": "vdj",

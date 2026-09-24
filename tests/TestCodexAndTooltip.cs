@@ -137,22 +137,34 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(itemList.GetChildCount() >= 5).IsTrue();
         GD.Print($"[PASS] Codex Immune Cells tab displays {itemList.GetChildCount()} cells.");
 
-        // Switch to Tab 3 (Pathogens)
+        // Switch to Tab 3 (Pathogens + boss archive)
         codexModal.SwitchTab(3);
         AssertThat(itemList.GetChildCount() >= 4).IsTrue();
         GD.Print($"[PASS] Codex Pathogen Catalog tab displays {itemList.GetChildCount()} pathogens.");
+
+        // Boss archive: 11 notorious historical pathogens appended after the 20 regulars
+        AssertThat(GameManager.BossCatalog.Count).IsEqual(11);
+        AssertThat(itemList.GetChildCount()).IsEqual(GameManager.PathogenCatalog.Count + 11);
+        codexModal.SelectPathogen("fludust_cyclone");
+        GD.Print("[PASS] Codex boss archive lists 11 bosses with historical lore.");
 
         // Switch to Tab 4 (Maps)
         codexModal.SwitchTab(4);
         AssertThat(itemList.GetChildCount() >= 2).IsTrue();
         GD.Print($"[PASS] Codex Pathological Stages tab displays {itemList.GetChildCount()} maps.");
 
+        // Switch to Tab 5 (Organelles)
+        codexModal.SwitchTab(5);
+        AssertThat(codexModal.CurrentTab).IsEqual(5);
+        AssertThat(itemList.GetChildCount()).IsEqual(GameManager.OrganelleCatalog.Count);
+        GD.Print($"[PASS] Codex Organelle tab displays {itemList.GetChildCount()} chamber equipment entries.");
+
         // Achievements moved out of the Codex: MainMenu AchievementView owns them.
-        // Maps (Tab 4) is the last Codex tab; out-of-range indices must be ignored.
-        codexModal.SwitchTab(4);
-        AssertThat(codexModal.CurrentTab).IsEqual(4);
+        // Organelles (Tab 5) is the last Codex tab; out-of-range indices must be ignored.
+        codexModal.SwitchTab(5);
+        AssertThat(codexModal.CurrentTab).IsEqual(5);
         AssertThat(itemList.GetChildCount() >= 2).IsTrue();
-        GD.Print("[PASS] Codex exposes 5 tabs; achievements live in the MainMenu gallery.");
+        GD.Print("[PASS] Codex exposes 6 tabs; achievements live in the MainMenu gallery.");
 
         // Close Codex
         codexModal.CloseCodex();

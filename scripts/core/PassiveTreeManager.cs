@@ -58,6 +58,7 @@ public static class PassiveTreeManager
         string Icon,
         string NameKey,
         string DescKey,
+        string BioKey,
         TreeStatModifier[] Modifiers);
 
     public readonly record struct TreeNode(
@@ -293,6 +294,17 @@ public static class PassiveTreeManager
         if (IsInnateStartNode(cellId, nodeId))
             text.AppendLine(TranslationServer.Translate("TREE_START_INNATE"));
         text.AppendLine(GetNodeDescription(nodeId));
+
+        // Deep lore layer (Dim 4): real-world mechanism below the tactical text.
+        if (TryGetTrait(node.TraitId, out var trait) && !string.IsNullOrEmpty(trait.BioKey))
+        {
+            string bio = TranslationServer.Translate(trait.BioKey);
+            if (bio != "" && bio != trait.BioKey)
+            {
+                text.AppendLine();
+                text.AppendLine(bio);
+            }
+        }
 
         string status = "";
         if (IsInnateStartNode(cellId, nodeId))

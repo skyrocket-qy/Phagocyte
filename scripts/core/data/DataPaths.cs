@@ -13,6 +13,7 @@ public static class DataPaths
     public const string Skills = $"{Root}/skills.json";
     public const string Organelles = $"{Root}/organelles.json";
     public const string Pathogens = $"{Root}/pathogens.json";
+    public const string Bosses = $"{Root}/bosses.json";
     public const string Maps = $"{Root}/maps.json";
     public const string Classes = $"{Root}/classes.json";
     public const string Achievements = $"{Root}/achievements.json";

@@ -12,6 +12,7 @@ public partial class CodexModal : ModalBase
     public Button? TabCellsBtn { get; set; }
     public Button? TabPathogensBtn { get; set; }
     public Button? TabMapsBtn { get; set; }
+    public Button? TabOrganellesBtn { get; set; }
 
     public VBoxContainer? ItemList { get; set; }
     public TextureRect? DetailIcon { get; set; }
@@ -37,6 +38,7 @@ public partial class CodexModal : ModalBase
     public const int TabCells = 2;
     public const int TabPathogens = 3;
     public const int TabMaps = 4;
+    public const int TabOrganelles = 5;
 
     public override void _Ready()
     {
@@ -45,6 +47,7 @@ public partial class CodexModal : ModalBase
         TabCellsBtn = GetNodeOrNull<Button>("VBox/TabBar/CellsTab");
         TabPathogensBtn = GetNodeOrNull<Button>("VBox/TabBar/PathogensTab");
         TabMapsBtn = GetNodeOrNull<Button>("VBox/TabBar/MapsTab");
+        TabOrganellesBtn = GetNodeOrNull<Button>("VBox/TabBar/OrganellesTab");
 
         ItemList = GetNodeOrNull<VBoxContainer>("VBox/HBox/Scroll/ItemList");
         DetailIcon = GetNodeOrNull<TextureRect>("VBox/HBox/DetailPanel/VBox/TopRow/DetailImageWrap/DetailIcon");
@@ -67,6 +70,8 @@ public partial class CodexModal : ModalBase
             TabPathogensBtn.Pressed += () => SwitchTab(TabPathogens);
         if (TabMapsBtn != null)
             TabMapsBtn.Pressed += () => SwitchTab(TabMaps);
+        if (TabOrganellesBtn != null)
+            TabOrganellesBtn.Pressed += () => SwitchTab(TabOrganelles);
 
         InitModal();
     }
@@ -177,13 +182,14 @@ public partial class CodexModal : ModalBase
         if (TabCellsBtn != null) TabCellsBtn.Text = Tr("CODEX_TAB_CELLS");
         if (TabPathogensBtn != null) TabPathogensBtn.Text = Tr("CODEX_TAB_PATHOGENS");
         if (TabMapsBtn != null) TabMapsBtn.Text = Tr("CODEX_TAB_MAPS");
+        if (TabOrganellesBtn != null) TabOrganellesBtn.Text = Tr("CODEX_TAB_ORGANELLES");
 
         RenderCurrentTab();
     }
 
     public void SwitchTab(int tabIdx)
     {
-        if (tabIdx < TabActives || tabIdx > TabMaps)
+        if (tabIdx < TabActives || tabIdx > TabOrganelles)
             return;
         CurrentTab = tabIdx;
 
@@ -192,6 +198,7 @@ public partial class CodexModal : ModalBase
         UiBuilders.SetTabActive(TabCellsBtn, tabIdx == TabCells);
         UiBuilders.SetTabActive(TabPathogensBtn, tabIdx == TabPathogens);
         UiBuilders.SetTabActive(TabMapsBtn, tabIdx == TabMaps);
+        UiBuilders.SetTabActive(TabOrganellesBtn, tabIdx == TabOrganelles);
 
         ActiveItemKey = "";
         RenderCurrentTab();
@@ -225,6 +232,9 @@ public partial class CodexModal : ModalBase
                 break;
             case TabMaps:
                 RenderMapsTab();
+                break;
+            case TabOrganelles:
+                RenderOrganellesTab();
                 break;
         }
     }
@@ -380,7 +390,22 @@ public partial class CodexModal : ModalBase
             _itemButtons[localKey] = btn;
         }
 
-        string target = ActiveItemKey != "" && GameManager.PathogenCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
+        // Boss archive: notorious historical pathogens, kept in a separate
+        // catalog so the 20-entry ecosystem balance stays exact.
+        foreach (var keyVar in GameManager.BossCatalog.Keys)
+        {
+            string key = keyVar.AsString();
+            if (firstKey == "")
+                firstKey = key;
+            var bd = GameManager.GetBossInfo(key);
+            var bbtn = MakeItemButton("👑 " + bd["name"].AsString());
+            string localBossKey = key;
+            bbtn.Pressed += () => SelectPathogen(localBossKey);
+            ItemList.AddChild(bbtn);
+            _itemButtons[localBossKey] = bbtn;
+        }
+
+        string target = ActiveItemKey != "" && (GameManager.PathogenCatalog.ContainsKey(ActiveItemKey) || GameManager.BossCatalog.ContainsKey(ActiveItemKey)) ? ActiveItemKey : firstKey;
         if (target != "")
         {
             SelectPathogen(target);
@@ -391,6 +416,8 @@ public partial class CodexModal : ModalBase
     {
         ActiveItemKey = key;
         var d = GameManager.GetPathogenInfo(key);
+        if (!d.ContainsKey("name"))
+            d = GameManager.GetBossInfo(key);
         if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
 
         if (DetailIcon != null)
@@ -399,8 +426,8 @@ public partial class CodexModal : ModalBase
             {
                 "malignant_cell" => AssetPaths.AchievementSprite("prion_cleared"),
                 "e_coli" or "pseudomonas" => AssetPaths.SkillIcon("endotoxin"),
-                "tb" => AssetPaths.SkillIcon("lysosome"),
-                "flu_drift" or "s_virus" => AssetPaths.SkillIcon("autophagy"),
+                "tb" or "tb_behemoth" => AssetPaths.SkillIcon("lysosome"),
+                "flu_drift" or "s_virus" or "fludust_cyclone" => AssetPaths.SkillIcon("autophagy"),
                 _ => AssetPaths.UiIcon("badge_antigen")
             };
             DetailIcon.Texture = AssetLoader.TryLoad<Texture2D>(iconPath)
@@ -474,7 +501,64 @@ public partial class CodexModal : ModalBase
         }
         if (DetailStats != null) DetailStats.Text = Tr("LABEL_ENV") + d["environment"].AsString();
         if (DetailDesc != null) DetailDesc.Text = Tr("CODEX_HEADER_MECH") + "\n" + d["mechanic"].AsString();
-        if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_THREAT") + "\n" + d["threat"].AsString();
+        if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_THREAT") + "\n" + d["threat"].AsString()
+            + (d.TryGetValue("biochemistry", out var mapBio) && mapBio.AsString() != ""
+                ? "\n\n" + Tr("CODEX_HEADER_BIO") + "\n" + UiBuilders.StripLeadingLabel(mapBio.AsString()) : "");
+        RefreshItemSelection();
+    }
+
+    private void RenderOrganellesTab()
+    {
+        if (ItemList == null)
+            return;
+
+        string firstKey = "";
+        foreach (var keyVar in GameManager.OrganelleCatalog.Keys)
+        {
+            string key = keyVar.AsString();
+            if (firstKey == "")
+                firstKey = key;
+            var entry = (Dictionary)GameManager.OrganelleCatalog[key];
+            var btn = MakeItemButton(" " + Tr(entry["name_key"].AsString()));
+            string localKey = key;
+            btn.Pressed += () => SelectOrganelle(localKey);
+            ItemList.AddChild(btn);
+            _itemButtons[localKey] = btn;
+        }
+
+        string target = ActiveItemKey != "" && GameManager.OrganelleCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
+        if (target != "")
+        {
+            SelectOrganelle(target);
+        }
+    }
+
+    private void SelectOrganelle(string key)
+    {
+        ActiveItemKey = key;
+        if (!GameManager.OrganelleCatalog.ContainsKey(key))
+            return;
+        var entry = (Dictionary)GameManager.OrganelleCatalog[key];
+
+        if (DetailTitle != null) DetailTitle.Text = Tr(entry["name_key"].AsString());
+
+        if (DetailIcon != null)
+        {
+            DetailIcon.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.OrganelleIcon(key))
+                ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
+        }
+
+        string category = entry["category"].AsString();
+        if (DetailBadge != null)
+        {
+            DetailBadge.Text = "[ " + Tr("ORGANELLE_CAT_" + category.ToUpperInvariant()) + " ]";
+            DetailBadge.Modulate = OrganelleSlot.CategoryColor(category);
+        }
+        int cost = entry["energy_cost"].AsInt32();
+        string costText = cost < 0 ? $"+{-cost}" : cost.ToString();
+        if (DetailStats != null) DetailStats.Text = Tr("LOADOUT_COST_LABEL") + ": " + costText;
+        if (DetailDesc != null) DetailDesc.Text = Tr("CODEX_HEADER_TACTICAL") + "\n" + Tr(entry["desc_key"].AsString());
+        if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_BIO") + "\n" + UiBuilders.StripLeadingLabel(Tr(entry["bio_key"].AsString()));
         RefreshItemSelection();
     }
 

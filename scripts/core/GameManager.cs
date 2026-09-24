@@ -118,6 +118,18 @@ public partial class GameManager : Node
         }
     }
 
+    // Boss Catalog for Codex (data-owned: assets/data/bosses.json).
+    private static Dictionary? _bossCatalog;
+    public static Dictionary BossCatalog
+    {
+        get
+        {
+            _bossCatalog ??= CatalogBuilders.BuildBosses();
+            DataValidator.EnsureValidated();
+            return _bossCatalog;
+        }
+    }
+
     public override void _Ready()
     {
         // Initialize locale
@@ -243,7 +255,8 @@ public partial class GameManager : Node
             { "bg_color_accent", d.ContainsKey("bg_color_accent") ? d["bg_color_accent"] : d["bg_color"] },
             { "fiber_color", d.ContainsKey("fiber_color") ? d["fiber_color"] : new Color(0.2f, 0.3f, 0.4f, 0.35f) },
             { "unlocked", d["unlocked"] },
-            { "hard_unlocked", d.ContainsKey("hard_unlocked") && d["hard_unlocked"].AsBool() }
+            { "hard_unlocked", d.ContainsKey("hard_unlocked") && d["hard_unlocked"].AsBool() },
+            { "biochemistry", d.ContainsKey("bio_key") ? TranslationServer.Translate(d["bio_key"].AsString()) : "" }
         };
     }
 
@@ -321,6 +334,23 @@ public partial class GameManager : Node
             return new Dictionary();
         }
         var d = (Dictionary)PathogenCatalog[key];
+        return new Dictionary {
+            { "id", d["id"] },
+            { "name", TranslationServer.Translate(d["name_key"].AsString()) },
+            { "description", TranslationServer.Translate(d["desc_key"].AsString()) },
+            { "trait", TranslationServer.Translate(d["trait_key"].AsString()) },
+            { "icon", d["icon"] },
+            { "danger_level", d["danger_level"] }
+        };
+    }
+
+    public static Dictionary GetBossInfo(string key)
+    {
+        if (!BossCatalog.ContainsKey(key))
+        {
+            return new Dictionary();
+        }
+        var d = (Dictionary)BossCatalog[key];
         return new Dictionary {
             { "id", d["id"] },
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },

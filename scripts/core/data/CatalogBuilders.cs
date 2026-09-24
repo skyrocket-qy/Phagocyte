@@ -143,6 +143,32 @@ public static class CatalogBuilders
         return table;
     }
 
+    /// <summary>Boss catalog for the Codex archive (data-owned: assets/data/bosses.json).
+    /// Kept separate from the 20-entry ecosystem catalog so balance suites keep
+    /// their exact-count invariant.</summary>
+    public static Dictionary BuildBosses()
+    {
+        var table = new Dictionary();
+        var seen = new HashSet<string>();
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.Bosses))
+        {
+            string id = CatalogLoader.GetString(row, "id");
+            if (string.IsNullOrEmpty(id) || !seen.Add(id))
+                throw new DataLoadException(DataPaths.Bosses, $"Duplicate or missing boss id '{id}'.");
+            table[id] = new Dictionary
+            {
+                { "id", id },
+                { "name_key", CatalogLoader.GetString(row, "name_key") },
+                { "desc_key", CatalogLoader.GetString(row, "desc_key") },
+                { "trait_key", CatalogLoader.GetString(row, "trait_key") },
+                { "icon", CatalogLoader.GetString(row, "icon") },
+                { "danger_level", CatalogLoader.GetString(row, "danger_level") }
+            };
+        }
+        GD.Print($"[Catalog] Loaded {table.Count} bosses.");
+        return table;
+    }
+
     public static Dictionary BuildMaps()
     {
         var table = new Dictionary();
@@ -391,6 +417,7 @@ public static class CatalogBuilders
                 CatalogLoader.GetString(row, "icon", "🧬"),
                 CatalogLoader.GetString(row, "name_key"),
                 CatalogLoader.GetString(row, "desc_key"),
+                CatalogLoader.GetString(row, "bio_key"),
                 mods.ToArray());
         }
         return table;
