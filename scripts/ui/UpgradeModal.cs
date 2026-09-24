@@ -432,18 +432,13 @@ public partial class UpgradeModal : ModalBase
             return;
 
         _swapCards.Clear();
-        foreach (var child in SwapSlotsContainer.GetChildren())
-        {
-            SwapSlotsContainer.RemoveChild(child);
-            child.QueueFree();
-        }
         for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
         {
             int slot = i;
-            var card = SlotScene.Instantiate<OrganelleSlot>();
-            card.Name = $"SwapSlot{slot}";
+            var card = SwapSlotsContainer.GetNodeOrNull<OrganelleSlot>($"SwapSlot{slot}");
+            if (card == null)
+                continue;
             card.Pressed += () => OnSwapSlotPressed(slot);
-            SwapSlotsContainer.AddChild(card);
             _swapCards.Add(card);
         }
         AudioManager.Instance?.WireClicks(SwapSlotsContainer);

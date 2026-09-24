@@ -44,8 +44,8 @@ corner_radius_bottom_left = 8
 
 [node name="OrganelleSlot" type="Button"]
 custom_minimum_size = Vector2(104, 114)
-offset_right = 128.0
-offset_bottom = 140.0
+offset_right = 104.0
+offset_bottom = 114.0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_slot_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_slot_hover")

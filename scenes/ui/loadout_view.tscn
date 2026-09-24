@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://dme50k8dk7dpd" path="res://scripts/ui/ChamberLinks.cs" id="4_links"]
 [ext_resource type="Texture2D" uid="uid://tgcu6j4thisj" path="res://assets/sprites/ui/menu/cell.jpeg" id="5_cell"]
 [ext_resource type="PackedScene" path="res://scenes/ui/stat_preview.tscn" id="6_stats"]
+[ext_resource type="PackedScene" path="res://scenes/ui/organelle_slot.tscn" id="7_slots"]
 [ext_resource type="Theme" uid="uid://ppcyc41cyeh7" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
@@ -162,6 +163,18 @@ theme_override_constants/h_separation = 18
 theme_override_constants/v_separation = 18
 columns = 2
 
+[node name="ChamberSlot0" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin/ChamberGrid" instance=ExtResource("7_slots")]
+layout_mode = 2
+
+[node name="ChamberSlot1" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin/ChamberGrid" instance=ExtResource("7_slots")]
+layout_mode = 2
+
+[node name="ChamberSlot2" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin/ChamberGrid" instance=ExtResource("7_slots")]
+layout_mode = 2
+
+[node name="ChamberSlot3" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin/ChamberGrid" instance=ExtResource("7_slots")]
+layout_mode = 2
+
 [node name="ChamberLinks" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell" unique_id=582305744]
 layout_mode = 2
 mouse_filter = 2
@@ -190,6 +203,55 @@ layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 5
+
+[node name="CategoryTabAll" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+toggle_mode = true
+text = "全部"
+
+[node name="CategoryTab_metabolism" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+toggle_mode = true
+text = "能量代谢"
+
+[node name="CategoryTab_digestion" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+toggle_mode = true
+text = "分解消化"
+
+[node name="CategoryTab_cytoskeleton" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+toggle_mode = true
+text = "运动骨架"
+
+[node name="CategoryTab_synthesis" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+toggle_mode = true
+text = "合成加工"
+
+[node name="CategoryTab_sensing" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+toggle_mode = true
+text = "感应光环"
+
+[node name="CategoryTab_symbiosis" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+toggle_mode = true
+text = "外源共生"
 
 [node name="VaultScroll" type="ScrollContainer" parent="Margin/VBox/ContentHBox/VaultSide" unique_id=2066889475]
 layout_mode = 2

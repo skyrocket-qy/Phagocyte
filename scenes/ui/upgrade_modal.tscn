@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://epluj3fksdbj"]
 
 [ext_resource type="Script" path="res://scripts/ui/UpgradeModal.cs" id="1_modal"]
+[ext_resource type="PackedScene" path="res://scenes/ui/organelle_slot.tscn" id="8_slots"]
 [ext_resource type="Script" path="res://scripts/ui/EnergyPips.cs" id="2_pips"]
 [ext_resource type="Texture2D" uid="uid://cfaeqlbonvlti" path="res://assets/gen/skill/ros_torrent.png" id="3_ros"]
 [ext_resource type="Texture2D" uid="uid://biefccq1honm4" path="res://assets/gen/skill/actin.png" id="4_actin"]
@@ -140,6 +141,18 @@ layout_mode = 2
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
 columns = 4
+
+[node name="SwapSlot0" parent="CenterContainer/VBox/SwapPanel/SwapSlots" instance=ExtResource("8_slots")]
+layout_mode = 2
+
+[node name="SwapSlot1" parent="CenterContainer/VBox/SwapPanel/SwapSlots" instance=ExtResource("8_slots")]
+layout_mode = 2
+
+[node name="SwapSlot2" parent="CenterContainer/VBox/SwapPanel/SwapSlots" instance=ExtResource("8_slots")]
+layout_mode = 2
+
+[node name="SwapSlot3" parent="CenterContainer/VBox/SwapPanel/SwapSlots" instance=ExtResource("8_slots")]
+layout_mode = 2
 alignment = 1
 
 [node name="SwapHint" type="Label" parent="CenterContainer/VBox/SwapPanel"]

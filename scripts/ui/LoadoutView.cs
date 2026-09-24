@@ -217,19 +217,15 @@ public partial class LoadoutView : Control
         for (int i = -1; i < Categories.Length; i++)
         {
             int filter = i;
-            var tab = new Button
-            {
-                Name = filter < 0 ? "CategoryTabAll" : $"CategoryTab_{Categories[filter]}",
-                ToggleMode = true,
-                CustomMinimumSize = new Vector2(0, 40),
-                MouseDefaultCursorShape = CursorShape.PointingHand
-            };
+            string tabName = filter < 0 ? "CategoryTabAll" : $"CategoryTab_{Categories[filter]}";
+            var tab = CategoryTabBar.GetNodeOrNull<Button>(tabName);
+            if (tab == null)
+                continue;
             ApplyCapsuleStyle(tab);
             tab.AddThemeFontSizeOverride("font_size", 14);
             tab.Pressed += () => OnCategoryTabPressed(filter);
             tab.ButtonPressed = filter == _categoryFilter;
             _categoryTabs.Add(tab);
-            CategoryTabBar.AddChild(tab);
         }
     }
 
@@ -242,8 +238,9 @@ public partial class LoadoutView : Control
         for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
         {
             int slot = i;
-            var card = SlotScene.Instantiate<OrganelleSlot>();
-            card.Name = $"ChamberSlot{slot}";
+            var card = ChamberGrid.GetNodeOrNull<OrganelleSlot>($"ChamberSlot{slot}");
+            if (card == null)
+                continue;
             card.AddThemeStyleboxOverride("normal", SocketNormalStyle);
             card.AddThemeStyleboxOverride("hover", SocketHoverStyle);
             card.AddThemeStyleboxOverride("pressed", SocketPressedStyle);
@@ -251,7 +248,6 @@ public partial class LoadoutView : Control
             card.Pressed += () => OnChamberCardPressed(slot);
             card.MouseEntered += () => _tooltip?.ShowFor(_chamber?.GetSlot(slot) ?? "");
             card.MouseExited += () => _tooltip?.HideTip();
-            ChamberGrid.AddChild(card);
             _chamberCards.Add(card);
         }
     }
