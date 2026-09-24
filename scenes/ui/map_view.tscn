@@ -63,6 +63,41 @@ custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_constants/separation = 10
 
+[node name="MapBtn_acute_wound" type="Button" parent="HBox/MapList"]
+custom_minimum_size = Vector2(250, 52)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "acute_wound"
+alignment = 0
+
+[node name="MapBtn_alveolar_space" type="Button" parent="HBox/MapList"]
+custom_minimum_size = Vector2(250, 52)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "alveolar_space"
+alignment = 0
+
+[node name="MapBtn_hepatic_sinusoid" type="Button" parent="HBox/MapList"]
+custom_minimum_size = Vector2(250, 52)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "hepatic_sinusoid"
+alignment = 0
+
+[node name="MapBtn_gastric_lumen" type="Button" parent="HBox/MapList"]
+custom_minimum_size = Vector2(250, 52)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "gastric_lumen"
+alignment = 0
+
+[node name="MapBtn_blood_brain_barrier" type="Button" parent="HBox/MapList"]
+custom_minimum_size = Vector2(250, 52)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "blood_brain_barrier"
+alignment = 0
+
 [node name="DetailPanel" type="PanelContainer" parent="HBox" unique_id=2082791970]
 custom_minimum_size = Vector2(460, 0)
 layout_mode = 2

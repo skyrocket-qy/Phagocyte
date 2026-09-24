@@ -66,6 +66,46 @@ custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 theme_override_constants/separation = 12
 
+[node name="ClassBtn_macrophage" type="Button" parent="HBox/ClassList"]
+custom_minimum_size = Vector2(280, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 15
+text = "macrophage"
+alignment = 0
+
+[node name="ClassBtn_ctl" type="Button" parent="HBox/ClassList"]
+custom_minimum_size = Vector2(280, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 15
+text = "ctl"
+alignment = 0
+
+[node name="ClassBtn_neutrophil" type="Button" parent="HBox/ClassList"]
+custom_minimum_size = Vector2(280, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 15
+text = "neutrophil"
+alignment = 0
+
+[node name="ClassBtn_b_cell" type="Button" parent="HBox/ClassList"]
+custom_minimum_size = Vector2(280, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 15
+text = "b_cell"
+alignment = 0
+
+[node name="ClassBtn_dendritic" type="Button" parent="HBox/ClassList"]
+custom_minimum_size = Vector2(280, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 15
+text = "dendritic"
+alignment = 0
+
 [node name="DetailPanel" type="PanelContainer" parent="HBox" unique_id=367121045]
 layout_mode = 2
 size_flags_horizontal = 3

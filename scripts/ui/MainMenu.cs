@@ -579,35 +579,28 @@ public partial class MainMenu : Control
         if (ClassListContainer == null)
             return;
 
-        _classButtons.Clear();
-        foreach (var child in ClassListContainer.GetChildren())
-        {
-            ClassListContainer.RemoveChild(child);
-            child.QueueFree();
-        }
-
         foreach (var keyVar in GameManager.ClassData.Keys)
         {
             string key = keyVar.AsString();
             var data = GameManager.GetClassInfo(key);
             bool unlocked = data.TryGetValue("unlocked", out Variant uVal) && uVal.AsBool();
-            var btn = new Button
+
+            // Wire once; texts/styles refresh on every call (language/cheat changes).
+            if (!_classButtons.TryGetValue(key, out var btn) || !IsInstanceValid(btn))
             {
-                CustomMinimumSize = new Vector2(280, 48),
-                Alignment = HorizontalAlignment.Left,
-                Text = (unlocked ? " ✅ " : " 🔒 ") + data["name"].AsString(),
-                MouseDefaultCursorShape = CursorShape.PointingHand
-            };
+                btn = ClassListContainer.GetNodeOrNull<Button>($"ClassBtn_{key}");
+                if (btn == null)
+                    continue;
+                btn.AddThemeFontSizeOverride("font_size", 15);
+                string localKey = key;
+                btn.Pressed += () => SelectClass(localKey);
+                _classButtons[key] = btn;
+            }
+            btn.Text = (unlocked ? " ✅ " : " 🔒 ") + data["name"].AsString();
             btn.AddThemeStyleboxOverride("normal", MakeClassBtnStyle(new Color(0.04f, 0.08f, 0.12f, 0.75f), new Color(0.18f, 0.40f, 0.60f, 0.5f)));
             btn.AddThemeStyleboxOverride("hover", MakeClassBtnStyle(new Color(0.06f, 0.13f, 0.19f, 0.85f), new Color(0.35f, 0.85f, 1.0f, 0.85f)));
             btn.AddThemeStyleboxOverride("pressed", MakeClassBtnStyle(new Color(0.08f, 0.18f, 0.26f, 0.95f), new Color(0.50f, 0.95f, 1.0f, 1.0f)));
             btn.AddThemeStyleboxOverride("focus", new StyleBoxEmpty());
-            btn.AddThemeFontSizeOverride("font_size", 15);
-
-            string localKey = key;
-            btn.Pressed += () => SelectClass(localKey);
-            ClassListContainer.AddChild(btn);
-            _classButtons[key] = btn;
         }
         AudioManager.Instance?.WireClicks(ClassListContainer);
     }
@@ -1015,12 +1008,6 @@ public partial class MainMenu : Control
         if (MapListContainer == null)
             return;
 
-        foreach (var child in MapListContainer.GetChildren())
-        {
-            MapListContainer.RemoveChild(child);
-            child.QueueFree();
-        }
-
         foreach (var keyVar in GameManager.MapData.Keys)
         {
             string key = keyVar.AsString();
@@ -1031,20 +1018,20 @@ public partial class MainMenu : Control
             string stars = new string('★', diff) + new string('☆', 5 - diff);
             bool unlocked = GameManager.IsMapUnlocked(key);
 
-            var btn = new Button
-            {
-                CustomMinimumSize = new Vector2(250, 52),
-                Alignment = HorizontalAlignment.Left,
-                Text = unlocked
-                    ? $" {icon} {name}\n   {stars}"
-                    : $" 🔒 {icon} {name}\n   {stars}"
-            };
-            btn.Name = $"MapBtn_{key}";
+            var btn = MapListContainer.GetNodeOrNull<Button>($"MapBtn_{key}");
+            if (btn == null)
+                continue;
+            btn.Text = unlocked
+                ? $" {icon} {name}\n   {stars}"
+                : $" 🔒 {icon} {name}\n   {stars}";
             btn.SetMeta("map_locked", !unlocked);
             btn.Modulate = unlocked ? Colors.White : new Color(0.65f, 0.66f, 0.72f, 0.85f);
-            string localKey = key;
-            btn.Pressed += () => SelectMap(localKey);
-            MapListContainer.AddChild(btn);
+            if (!btn.HasMeta("_select_wired"))
+            {
+                btn.SetMeta("_select_wired", true);
+                string localKey = key;
+                btn.Pressed += () => SelectMap(localKey);
+            }
         }
         AudioManager.Instance?.WireClicks(MapListContainer);
     }
