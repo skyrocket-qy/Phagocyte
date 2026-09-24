@@ -29,7 +29,7 @@ public partial class LoadoutView : Control
     public Button? ProfileAddButton { get; set; }
     public Button? ProfileDeleteButton { get; set; }
     public Label? BackpackHeaderLabel { get; set; }
-    public HBoxContainer? CategoryTabBar { get; set; }
+    public GridContainer? CategoryTabBar { get; set; }
     public GridContainer? BackpackGrid { get; set; }
     public Label? HintLabel { get; set; }
     public Label? ChamberHeaderLabel { get; set; }
@@ -129,16 +129,16 @@ public partial class LoadoutView : Control
     public override void _Ready()
     {
         HeaderLabel = GetNodeOrNull<Label>("Margin/VBox/TopBar/TitleVBox/HeaderLabel");
-        ProfileHBox = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/RightBox/ChamberSide/ProfileHBox");
-        ProfileAddButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/RightBox/ChamberSide/ProfileHBox/ProfileAddButton");
-        ProfileDeleteButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/RightBox/ChamberSide/ProfileHBox/ProfileDeleteButton");
-        BackpackHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/RightBox/VaultSide/BackpackHeader");
-        CategoryTabBar = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/RightBox/VaultSide/CategoryTabBar");
-        BackpackGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/RightBox/VaultSide/VaultScroll/BackpackGrid");
-        HintLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/RightBox/VaultSide/HintLabel");
-        ChamberHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/RightBox/ChamberSide/ChamberHeader");
-        EnergyBar = GetNodeOrNull<EnergyPips>("Margin/VBox/ContentHBox/RightBox/ChamberSide/EnergyBar");
-        ChamberGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/RightBox/ChamberSide/SocketWell/WellMargin/ChamberGrid");
+        ProfileHBox = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox");
+        ProfileAddButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox/ProfileAddButton");
+        ProfileDeleteButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox/ProfileDeleteButton");
+        BackpackHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/VaultSide/BackpackHeader");
+        CategoryTabBar = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/VaultSide/CategoryTabBar");
+        BackpackGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/VaultSide/VaultScroll/BackpackGrid");
+        HintLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/VaultSide/HintLabel");
+        ChamberHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/ChamberSide/ChamberHeader");
+        EnergyBar = GetNodeOrNull<EnergyPips>("Margin/VBox/ContentHBox/ChamberSide/EnergyBar");
+        ChamberGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin/ChamberGrid");
         ResetButton = GetNodeOrNull<Button>("Margin/VBox/Buttons/ResetButton");
         ConfirmButton = GetNodeOrNull<Button>("Margin/VBox/Buttons/ConfirmButton");
         StatPanel = GetNodeOrNull<StatPreviewPanel>("Margin/VBox/ContentHBox/StatPreview");
