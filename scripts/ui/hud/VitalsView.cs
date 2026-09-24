@@ -39,6 +39,10 @@ public partial class VitalsView : Node
 
     public Node2D? PlayerRef { get; set; }
 
+    private float _lastVignetteIntensity = -1.0f;
+    private int _lastBuffKind = int.MinValue;
+    private int _lastBuffTenths = int.MinValue;
+
     /// <summary>Raised after any vitals update so the coordinator can refresh dependent overlays.</summary>
     public event System.Action? VitalsChanged;
 
@@ -127,17 +131,21 @@ public partial class VitalsView : Node
         if (VignetteRect != null && VignetteRect.Material is ShaderMaterial vignetteMat)
         {
             float hpRatio = LastMaxHealth > 0 ? LastHealth / LastMaxHealth : 1.0f;
+            float intensity;
             if (hpRatio < 0.30f && LastHealth > 0.0f)
             {
                 float dangerFactor = 1.0f - (hpRatio / 0.30f);
                 float pulse = 0.45f + 0.35f * Mathf.Sin(time * 7.5f);
-                float intensity = Mathf.Clamp(dangerFactor * pulse, 0.0f, 1.0f);
-                vignetteMat.SetShaderParameter("pulse_intensity", intensity);
+                intensity = Mathf.Clamp(dangerFactor * pulse, 0.0f, 1.0f);
             }
             else
             {
-                vignetteMat.SetShaderParameter("pulse_intensity", 0.0f);
+                intensity = 0.0f;
             }
+            if (Mathf.Abs(intensity - _lastVignetteIntensity) < 0.01f)
+                return;
+            _lastVignetteIntensity = intensity;
+            vignetteMat.SetShaderParameter("pulse_intensity", intensity);
         }
     }
 
@@ -192,22 +200,46 @@ public partial class VitalsView : Node
     {
         if (BuffTag == null) return;
 
+        int kind = 0;
+        float timer = 0.0f;
         if (PlayerRef is BaseCell bc && bc.TbBurnTimer > 0.0f)
         {
-            BuffTag.Visible = true;
-            BuffTag.Text = TextFormatter.Format(Tr("HUD_TB_DEBUFF"), bc.TbBurnTimer);
-            BuffTag.Modulate = new Color(1.0f, 0.35f, 0.35f, 0.95f);
+            kind = 1;
+            timer = bc.TbBurnTimer;
         }
         else if (PlayerRef is BaseCell bc2 && bc2.InvertControlsTimer > 0.0f)
         {
-            BuffTag.Visible = true;
-            BuffTag.Text = $"🌀 {Tr("STATUS_CONFUSION")}: {bc2.InvertControlsTimer:F1}s";
-            BuffTag.Modulate = new Color(0.85f, 0.45f, 1.0f, 0.95f);
+            kind = 2;
+            timer = bc2.InvertControlsTimer;
         }
         else if (PlayerRef is BaseCell bc3 && bc3.SlowTimer > 0.0f)
         {
+            kind = 3;
+            timer = bc3.SlowTimer;
+        }
+
+        int tenths = kind == 0 ? 0 : Mathf.RoundToInt(timer * 10.0f);
+        if (kind == _lastBuffKind && tenths == _lastBuffTenths)
+            return;
+        _lastBuffKind = kind;
+        _lastBuffTenths = tenths;
+
+        if (kind == 1 && PlayerRef is BaseCell tb)
+        {
             BuffTag.Visible = true;
-            BuffTag.Text = $"🐌 {Tr("STATUS_SLOW")}: {bc3.SlowTimer:F1}s";
+            BuffTag.Text = TextFormatter.Format(Tr("HUD_TB_DEBUFF"), tb.TbBurnTimer);
+            BuffTag.Modulate = new Color(1.0f, 0.35f, 0.35f, 0.95f);
+        }
+        else if (kind == 2 && PlayerRef is BaseCell bcInv)
+        {
+            BuffTag.Visible = true;
+            BuffTag.Text = $"🌀 {Tr("STATUS_CONFUSION")}: {bcInv.InvertControlsTimer:F1}s";
+            BuffTag.Modulate = new Color(0.85f, 0.45f, 1.0f, 0.95f);
+        }
+        else if (kind == 3 && PlayerRef is BaseCell bcSlow)
+        {
+            BuffTag.Visible = true;
+            BuffTag.Text = $"🐌 {Tr("STATUS_SLOW")}: {bcSlow.SlowTimer:F1}s";
             BuffTag.Modulate = new Color(0.4f, 0.8f, 0.5f, 0.95f);
         }
         else
@@ -255,13 +287,24 @@ public partial class VitalsView : Node
 
     public void OnPathogenDigested(Node2D _enemy, float _atp)
     {
+        if (PlayerRef is BaseCell bc)
+        {
+            if (bc.DigestedCount == LastDigestedCount)
+                return;
+            LastDigestedCount = bc.DigestedCount;
+            RenderCountLines(LastDigestedCount);
+            return;
+        }
         var player = GetTree().GetFirstNodeInGroup("player") as Node2D;
         if (player != null)
         {
             var digProp = player.Get("digested_count");
             if (digProp.VariantType == Variant.Type.Int)
             {
-                LastDigestedCount = digProp.AsInt32();
+                int count = digProp.AsInt32();
+                if (count == LastDigestedCount)
+                    return;
+                LastDigestedCount = count;
                 RenderCountLines(LastDigestedCount);
             }
         }

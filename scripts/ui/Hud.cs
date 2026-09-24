@@ -186,7 +186,7 @@ public partial class Hud : CanvasLayer
         _vitals?.TickVignette(_timer?.SurvivalTime ?? 0.0f);
         _skills?.TickAlpha(dt, GetTree().Paused);
         _vitals?.UpdateBuffStatus();
-        _skills?.UpdateSkillSlots();
+        _skills?.TickSkillSlots();
         Vector2 fluid = FluidVectorProvider?.Invoke() ?? Vector2.Zero;
         _tutorial?.UpdateTutorialCues(dt, fluid);
     }

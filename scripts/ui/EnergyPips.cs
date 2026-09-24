@@ -50,9 +50,14 @@ public partial class EnergyPips : Control
 
     public void Configure(int pipCount, int filledCount, int generatorCount)
     {
-        PipCount = Mathf.Max(0, pipCount);
-        FilledCount = Mathf.Clamp(filledCount, 0, PipCount);
-        GeneratorCount = Mathf.Clamp(generatorCount, 0, PipCount);
+        int pips = Mathf.Max(0, pipCount);
+        int filled = Mathf.Clamp(filledCount, 0, pips);
+        int gens = Mathf.Clamp(generatorCount, 0, pips);
+        if (pips == PipCount && filled == FilledCount && gens == GeneratorCount)
+            return;
+        PipCount = pips;
+        FilledCount = filled;
+        GeneratorCount = gens;
         QueueRedraw();
     }
 

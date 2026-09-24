@@ -36,6 +36,8 @@ public partial class DamageNumberSpawner : CanvasLayer
 
     private readonly DamageNumberEntry[] _pool = new DamageNumberEntry[MaxActiveNumbers];
     private DamageNumberCanvas? _canvas;
+    private int _activeCount;
+    private int _spawnHint;
 
     public override void _Ready()
     {
@@ -135,8 +137,9 @@ public partial class DamageNumberSpawner : CanvasLayer
 
         int targetSlot = -1;
         float maxAge = -1f;
-        for (int i = 0; i < MaxActiveNumbers; i++)
+        for (int pass = 0; pass < MaxActiveNumbers; pass++)
         {
+            int i = (_spawnHint + pass) % MaxActiveNumbers;
             if (!_pool[i].IsActive)
             {
                 targetSlot = i;
@@ -151,6 +154,7 @@ public partial class DamageNumberSpawner : CanvasLayer
 
         if (targetSlot < 0) targetSlot = 0;
 
+        bool wasActive = _pool[targetSlot].IsActive;
         _pool[targetSlot] = new DamageNumberEntry
         {
             IsActive = true,
@@ -163,6 +167,9 @@ public partial class DamageNumberSpawner : CanvasLayer
             Lifetime = 0f,
             MaxLifetime = 0.75f
         };
+        if (!wasActive)
+            _activeCount++;
+        _spawnHint = (targetSlot + 1) % MaxActiveNumbers;
     }
 
     private partial class DamageNumberCanvas : Control
@@ -184,6 +191,8 @@ public partial class DamageNumberSpawner : CanvasLayer
 
         public override void _Process(double delta)
         {
+            if (_spawner._activeCount <= 0)
+                return;
             float dt = (float)delta;
             bool anyActive = false;
 
@@ -196,6 +205,7 @@ public partial class DamageNumberSpawner : CanvasLayer
                 if (_spawner._pool[i].Lifetime >= _spawner._pool[i].MaxLifetime)
                 {
                     _spawner._pool[i].IsActive = false;
+                    _spawner._activeCount--;
                     continue;
                 }
 
