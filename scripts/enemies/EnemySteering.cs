@@ -26,6 +26,12 @@ public static class EnemySteering
 
     private static BaseCell? _cachedPlayer;
 
+    // One senescent-RBC group snapshot per physics tick, shared by every
+    // tissue invader (FPS survey §4): GetNodesInGroup allocates per call.
+    private static readonly List<Node2D> _neutralCache = new();
+    private static ulong _neutralCacheTick = ulong.MaxValue;
+    private static string _neutralCacheGroup = "";
+
     /// <summary>
     /// Registers the current arena dimensions so invaders can pick host-tissue anchors.
     /// </summary>
@@ -166,20 +172,33 @@ public static class EnemySteering
 
     private static Node2D? FindNearestNeutral(Node owner, string group)
     {
+        ulong tick = Engine.GetPhysicsFrames();
+        if (tick != _neutralCacheTick || _neutralCacheGroup != group)
+        {
+            _neutralCacheTick = tick;
+            _neutralCacheGroup = group;
+            _neutralCache.Clear();
+            foreach (var node in owner.GetTree().GetNodesInGroup(group))
+            {
+                if (node is Node2D neutral && GodotObject.IsInstanceValid(neutral))
+                    _neutralCache.Add(neutral);
+            }
+        }
+
         Node2D? best = null;
         float bestDistance = float.MaxValue;
         Vector2 from = owner is Node2D origin ? origin.GlobalPosition : Vector2.Zero;
 
-        foreach (var node in owner.GetTree().GetNodesInGroup(group))
+        foreach (var neutral in _neutralCache)
         {
-            if (node is Node2D neutral && GodotObject.IsInstanceValid(neutral))
+            // Freed mid-tick (eaten after the snapshot): skip, don't touch.
+            if (!GodotObject.IsInstanceValid(neutral))
+                continue;
+            float distance = from.DistanceSquaredTo(neutral.GlobalPosition);
+            if (distance < bestDistance)
             {
-                float distance = from.DistanceSquaredTo(neutral.GlobalPosition);
-                if (distance < bestDistance)
-                {
-                    bestDistance = distance;
-                    best = neutral;
-                }
+                bestDistance = distance;
+                best = neutral;
             }
         }
 

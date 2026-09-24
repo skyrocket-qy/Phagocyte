@@ -65,6 +65,9 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
     public Area2D? HitArea { get; set; }
     public CollisionShape2D? EnemyCollisionShape { get; set; }
 
+    private Tween? _flashTween;
+    private float _lastBreathe = 0.0f;
+
     private static readonly HashSet<BaseEnemy> _activeEnemies = new();
     public static IReadOnlyCollection<BaseEnemy> ActiveEnemies => _activeEnemies;
 
@@ -105,12 +108,16 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
     /// <summary>
     /// Brief modulate flash used by damage and ability feedback: sets the tint
     /// and tweens it back to white over <paramref name="duration"/> seconds.
+    /// Coalesced: focus fire reuses one tween instead of stacking a new one
+    /// per hit (FPS survey §4).
     /// </summary>
     protected void FlashModulate(Color flashColor, float duration)
     {
+        if (_flashTween != null && _flashTween.IsValid())
+            _flashTween.Kill();
         Modulate = flashColor;
-        var tw = CreateTween();
-        tw.TweenProperty(this, "modulate", Colors.White, duration);
+        _flashTween = CreateTween();
+        _flashTween.TweenProperty(this, "modulate", Colors.White, duration);
     }
 
     /// <summary>
@@ -196,10 +203,14 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         HandleBrownianDrift(dt);
         CustomPhysicsProcess(dt);
 
-        // Organic respiration
+        // Organic respiration (transform sync only on visible change).
         BreatheTimer += dt;
         float breathe = 1.0f + Mathf.Sin(BreatheTimer * 2.5f) * 0.04f;
-        Scale = new Vector2(breathe, breathe);
+        if (Mathf.Abs(breathe - _lastBreathe) > 0.001f)
+        {
+            _lastBreathe = breathe;
+            Scale = new Vector2(breathe, breathe);
+        }
     }
 
     protected virtual void HandleBrownianDrift(float dt)
