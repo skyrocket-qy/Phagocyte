@@ -44,6 +44,10 @@ public partial class MicroscopeParallax : Node2D
     private readonly List<BokehData> _bokehList = new();
     private float _age;
 
+    /// <summary>Backdrop drift is slow; 30 Hz redraw halves _Draw primitives with no visible step.</summary>
+    public const float RedrawInterval = 1.0f / 30.0f;
+    private float _redrawAccum;
+
     public List<RbcData> RbcList => _rbcList;
     public List<BokehData> BokehList => _bokehList;
 
@@ -145,18 +149,37 @@ public partial class MicroscopeParallax : Node2D
                 b.Pos.Y = ArenaExtents;
         }
 
-        QueueRedraw();
+        _redrawAccum += dt;
+        if (_redrawAccum >= RedrawInterval)
+        {
+            _redrawAccum = 0.0f;
+            QueueRedraw();
+        }
+    }
+
+    /// <summary>World-space view rect for culling; null when no camera (draw everything).</summary>
+    private Rect2? GetCullRect(Vector2 camPos)
+    {
+        if (CameraRef == null || !GodotObject.IsInstanceValid(CameraRef))
+            return null;
+        float zoom = Mathf.Max(0.01f, CameraRef.Zoom.X);
+        Vector2 viewSize = GetViewportRect().Size / zoom;
+        const float margin = 180.0f;
+        return new Rect2(camPos - viewSize * 0.5f - new Vector2(margin, margin), viewSize + new Vector2(margin * 2.0f, margin * 2.0f));
     }
 
     public override void _Draw()
     {
         Vector2 camPos = CameraRef != null && GodotObject.IsInstanceValid(CameraRef) ? CameraRef.GlobalPosition : Vector2.Zero;
+        Rect2? cull = GetCullRect(camPos);
 
         // 1. Deep Parallax Erythrocytes (moves at 0.25x camera speed)
         Vector2 rbcParallaxOffset = camPos * (1.0f - 0.25f);
         foreach (var rbc in _rbcList)
         {
             Vector2 drawPos = rbc.Pos + rbcParallaxOffset;
+            if (cull.HasValue && !cull.Value.HasPoint(drawPos))
+                continue;
             DrawBlurredErythrocyte(drawPos, rbc.Radius, rbc.Rotation, rbc.Color);
         }
 
@@ -165,6 +188,8 @@ public partial class MicroscopeParallax : Node2D
         foreach (var b in _bokehList)
         {
             Vector2 drawPos = b.Pos + bokehParallaxOffset;
+            if (cull.HasValue && !cull.Value.HasPoint(drawPos))
+                continue;
             DrawBlurredBokeh(drawPos, b.Radius, b.Color);
         }
     }

@@ -191,6 +191,26 @@ public partial class BaseCell : CharacterBody2D
     private DodgeRing? _dodgeRing;
     private Tween? _hitFlashTween;
 
+    /// <summary>
+    /// Membrane geometry refreshes at 30 Hz (FPS survey §3): the noise-driven
+    /// morphology moves slowly, so per-physics-tick Catmull-Rom rebuilds,
+    /// collision rebakes and granule redraws are pure overhead. Phase math
+    /// stays exact by integrating the accumulated step. Direct callers (tests,
+    /// _Ready) still get a synchronous full rebuild.
+    /// </summary>
+    public const float DeformInterval = 1.0f / 30.0f;
+    private float _deformAccum;
+
+    // Reused deformation buffers (steady state: zero allocations per rebuild).
+    // Polygon2D/Line2D/CollisionPolygon2D setters marshal-copy, so reuse is safe.
+    private float[] _rawRadii = Array.Empty<float>();
+    private float[] _relaxedRadii = Array.Empty<float>();
+    private Vector2[] _controlPoints = Array.Empty<Vector2>();
+    private Vector2[] _smoothPoints = Array.Empty<Vector2>();
+    private Vector2[] _uvPoints = Array.Empty<Vector2>();
+    private Vector2[] _linePoints = Array.Empty<Vector2>();
+    private float _lastRadiusParam = float.NaN;
+
     public override void _Ready()
     {
         AddToGroup("player");
@@ -293,7 +313,14 @@ public partial class BaseCell : CharacterBody2D
         UpdateDodgeState(dt);
         HandleMovement(dt);
         ProcessContactDamage();
-        UpdatePseudopodDeformation(dt);
+
+        _deformAccum += dt;
+        if (_deformAccum >= DeformInterval)
+        {
+            float step = _deformAccum;
+            _deformAccum = 0.0f;
+            UpdatePseudopodDeformation(step);
+        }
 
         if (CellSkillManager != null)
         {
@@ -564,12 +591,13 @@ public partial class BaseCell : CharacterBody2D
 
         CurrentRadius = curR;
 
-        var points = new Vector2[VertexCount];
+        EnsureDeformBuffers(VertexCount, VertexCount * SmoothSubdivisions);
+        var points = _controlPoints;
+        var rawRadii = _rawRadii;
         float angleStep = Mathf.Tau / (float)VertexCount;
         Vector2 vel = Velocity;
         Vector2 moveDir = vel.Length() > 20.0f ? vel.Normalized() : Vector2.Zero;
 
-        var rawRadii = new float[VertexCount];
         for (int i = 0; i < VertexCount; i++)
         {
             float angle = i * angleStep;
@@ -605,7 +633,7 @@ public partial class BaseCell : CharacterBody2D
 
         // Biological Surface Tension Filter (Laplacian Relaxation)
         // Lipid bilayer surface tension prevents acute inflections / sharp V-notches
-        var relaxedRadii = new float[VertexCount];
+        var relaxedRadii = _relaxedRadii;
         for (int pass = 0; pass < 2; pass++)
         {
             for (int i = 0; i < VertexCount; i++)
@@ -624,39 +652,81 @@ public partial class BaseCell : CharacterBody2D
             points[i] = dir * rawRadii[i];
         }
 
-        var smoothPoints = SmoothClosedPolygon(points, SmoothSubdivisions);
+        SmoothClosedPolygonInto(points, SmoothSubdivisions, _smoothPoints);
 
+        AssignDeformationMeshes(points, _smoothPoints, curR, updateShaderParam: true);
+
+        UpdateNucleus(delta);
+        UpdateGranules(delta);
+    }
+
+    /// <summary>Sizes the reused deformation buffers; reallocates only when counts change.</summary>
+    protected void EnsureDeformBuffers(int controlCount, int smoothCount)
+    {
+        if (_controlPoints.Length != controlCount)
+        {
+            _controlPoints = new Vector2[controlCount];
+            _rawRadii = new float[controlCount];
+            _relaxedRadii = new float[controlCount];
+        }
+        if (_smoothPoints.Length != smoothCount)
+        {
+            _smoothPoints = new Vector2[smoothCount];
+            _uvPoints = new Vector2[smoothCount];
+            _linePoints = new Vector2[smoothCount + 1];
+        }
+    }
+
+    /// <summary>Reused control-point buffer sized to <see cref="VertexCount"/> (for overrides).</summary>
+    protected Vector2[] GetControlBuffer()
+    {
+        EnsureDeformBuffers(VertexCount, VertexCount * SmoothSubdivisions);
+        return _controlPoints;
+    }
+
+    /// <summary>Reused smooth-point buffer sized to VertexCount * subdiv (for overrides).</summary>
+    protected Vector2[] GetSmoothBuffer(int subdivisions)
+    {
+        EnsureDeformBuffers(VertexCount, VertexCount * subdivisions);
+        return _smoothPoints;
+    }
+
+    /// <summary>
+    /// Assigns rebuilt morphology to the visual mesh, membrane line and engulf
+    /// collider (shared by the base deformation and the dendritic override).
+    /// The cell_radius shader upload is dirty-checked: radius only moves with
+    /// the area stat, not with per-rebuild noise.
+    /// </summary>
+    protected void AssignDeformationMeshes(Vector2[] controlPoints, Vector2[] smoothPoints, float curR, bool updateShaderParam)
+    {
         if (Cytoplasm != null)
         {
             Cytoplasm.Polygon = smoothPoints;
-            var uvs = new Vector2[smoothPoints.Length];
             float uvDenom = Mathf.Max(24.0f, curR * 2.4f);
             for (int i = 0; i < smoothPoints.Length; i++)
             {
-                uvs[i] = (smoothPoints[i] / uvDenom) + new Vector2(0.5f, 0.5f);
+                _uvPoints[i] = (smoothPoints[i] / uvDenom) + new Vector2(0.5f, 0.5f);
             }
-            Cytoplasm.UV = uvs;
-            if (Cytoplasm.Material is ShaderMaterial smat)
+            Cytoplasm.UV = _uvPoints;
+            if (updateShaderParam && Cytoplasm.Material is ShaderMaterial smat
+                && (float.IsNaN(_lastRadiusParam) || Mathf.Abs(_lastRadiusParam - curR) > 0.01f))
             {
                 smat.SetShaderParameter("cell_radius", curR);
+                _lastRadiusParam = curR;
             }
         }
 
         if (Membrane != null)
         {
-            var linePoints = new Vector2[smoothPoints.Length + 1];
-            Array.Copy(smoothPoints, linePoints, smoothPoints.Length);
-            linePoints[^1] = smoothPoints[0];
-            Membrane.Points = linePoints;
+            Array.Copy(smoothPoints, _linePoints, smoothPoints.Length);
+            _linePoints[^1] = smoothPoints[0];
+            Membrane.Points = _linePoints;
         }
 
         if (EngulfCollider != null)
         {
-            EngulfCollider.Polygon = points;
+            EngulfCollider.Polygon = controlPoints;
         }
-
-        UpdateNucleus(delta);
-        UpdateGranules(delta);
     }
 
     private void UpdateGranules(float delta)
@@ -708,6 +778,20 @@ public partial class BaseCell : CharacterBody2D
             return pts;
 
         var smoothed = new Vector2[n * subdivisions];
+        SmoothClosedPolygonInto(pts, subdivisions, smoothed);
+        return smoothed;
+    }
+
+    /// <summary>Allocation-free Catmull-Rom core (writes into a reused buffer).</summary>
+    public static void SmoothClosedPolygonInto(Vector2[] pts, int subdivisions, Vector2[] dest)
+    {
+        int n = pts.Length;
+        if (n < 4 || subdivisions <= 1)
+        {
+            Array.Copy(pts, dest, Math.Min(pts.Length, dest.Length));
+            return;
+        }
+
         float step = 1.0f / (float)subdivisions;
         int idx = 0;
 
@@ -723,17 +807,14 @@ public partial class BaseCell : CharacterBody2D
                 float t = s * step;
                 float t2 = t * t;
                 float t3 = t2 * t;
-                Vector2 pt = 0.5f * (
+                dest[idx++] = 0.5f * (
                     (2.0f * p1) +
                     (-p0 + p2) * t +
                     (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
                     (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3
                 );
-                smoothed[idx++] = pt;
             }
         }
-
-        return smoothed;
     }
 
     public void UpdateNucleus(float delta)

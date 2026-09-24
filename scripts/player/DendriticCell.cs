@@ -84,7 +84,7 @@ public partial class DendriticCell : BaseCell
 
         CurrentRadius = curR;
 
-        var points = new Vector2[VertexCount];
+        var points = GetControlBuffer();
         float angleStep = Mathf.Tau / (float)VertexCount;
         Vector2 vel = Velocity;
         Vector2 moveDir = vel.Length() > 20.0f ? vel.Normalized() : Vector2.Zero;
@@ -112,32 +112,11 @@ public partial class DendriticCell : BaseCell
             points[i] = dir * Mathf.Max(14.0f, r);
         }
 
-        var smoothPoints = SmoothClosedPolygon(points, 2);
+        var smoothPoints = GetSmoothBuffer(2);
+        SmoothClosedPolygonInto(points, 2, smoothPoints);
 
-        if (Cytoplasm != null)
-        {
-            Cytoplasm.Polygon = smoothPoints;
-            var uvs = new Vector2[smoothPoints.Length];
-            float uvDenom = Mathf.Max(24.0f, curR * 2.4f);
-            for (int i = 0; i < smoothPoints.Length; i++)
-            {
-                uvs[i] = (smoothPoints[i] / uvDenom) + new Vector2(0.5f, 0.5f);
-            }
-            Cytoplasm.UV = uvs;
-        }
-
-        if (Membrane != null)
-        {
-            var linePoints = new Vector2[smoothPoints.Length + 1];
-            Array.Copy(smoothPoints, linePoints, smoothPoints.Length);
-            linePoints[^1] = smoothPoints[0];
-            Membrane.Points = linePoints;
-        }
-
-        if (EngulfCollider != null)
-        {
-            EngulfCollider.Polygon = points;
-        }
+        // Dendritic cytoplasm keeps its setup-time shader params (no per-tick upload).
+        AssignDeformationMeshes(points, smoothPoints, curR, updateShaderParam: false);
 
         UpdateNucleus(delta);
     }

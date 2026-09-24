@@ -29,6 +29,13 @@ public partial class SettingsManager : Node
     public static bool ScreenShake = false;
 
     /// <summary>
+    /// Fill-rate saver (FPS survey §1): disables 2D glow/bloom, the
+    /// fullscreen microscope postprocess overlay and the animated tissue
+    /// backdrop shader (flat color instead). Default off — full visuals.
+    /// </summary>
+    public static bool PerformanceMode = false;
+
+    /// <summary>
     /// Organ map mechanics master switch (docs/map.md §3): fluid drift,
     /// hazards and the fluid-arrow cues. Visual tints stay always-on.
     /// Default off so runs are mechanically neutral unless opted in.
@@ -127,6 +134,13 @@ public partial class SettingsManager : Node
         SaveToDisk();
     }
 
+    public static void SetPerformanceMode(bool enabled)
+    {
+        PerformanceMode = enabled;
+        ApplySettings();
+        SaveToDisk();
+    }
+
     public static void SaveToDisk()
     {
         var payload = new Godot.Collections.Dictionary<string, Variant>
@@ -137,6 +151,7 @@ public partial class SettingsManager : Node
             { "fullscreen", Fullscreen },
             { "vsync", Vsync },
             { "screen_shake", ScreenShake },
+            { "performance_mode", PerformanceMode },
             { "map_effects_enabled", MapEffectsEnabled },
             { "keybindings", KeyBindings.ToDict() }
         };
@@ -155,6 +170,7 @@ public partial class SettingsManager : Node
         Fullscreen = d.ContainsKey("fullscreen") ? (bool)d["fullscreen"] : false;
         Vsync = d.ContainsKey("vsync") ? (bool)d["vsync"] : true;
         ScreenShake = d.ContainsKey("screen_shake") ? (bool)d["screen_shake"] : false;
+        PerformanceMode = d.ContainsKey("performance_mode") ? (bool)d["performance_mode"] : false;
         MapEffectsEnabled = d.ContainsKey("map_effects_enabled") ? (bool)d["map_effects_enabled"] : false;
         if (d.TryGetValue("keybindings", out var kbVal) && kbVal.VariantType == Variant.Type.Dictionary)
             KeyBindings.FromDict(kbVal.AsGodotDictionary());

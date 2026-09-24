@@ -36,6 +36,14 @@ public partial class CapillaryTissueLayer : Node2D
     private readonly List<VesselData> _vessels = new();
     private float _age;
 
+    /// <summary>Slow tissue drift; 30 Hz redraw halves polyline cost with no visible step.</summary>
+    public const float RedrawInterval = 1.0f / 30.0f;
+    private float _redrawAccum;
+
+    // Scratch buffers reused every _Draw (avoids 2 allocs per vessel per frame).
+    private Vector2[] _scratchShifted = Array.Empty<Vector2>();
+    private Vector2[] _scratchSheen = Array.Empty<Vector2>();
+
     public IReadOnlyList<VesselData> Vessels => _vessels;
 
     public override void _Ready()
@@ -83,7 +91,12 @@ public partial class CapillaryTissueLayer : Node2D
             if (vp != null)
                 CameraRef = vp.GetCamera2D();
         }
-        QueueRedraw();
+        _redrawAccum += dt;
+        if (_redrawAccum >= RedrawInterval)
+        {
+            _redrawAccum = 0.0f;
+            QueueRedraw();
+        }
     }
 
     public override void _Draw()
@@ -93,45 +106,81 @@ public partial class CapillaryTissueLayer : Node2D
             : Vector2.Zero;
         Vector2 parallaxOffset = camPos * (1.0f - ParallaxFactor);
 
+        Rect2? cull = null;
+        if (CameraRef != null && GodotObject.IsInstanceValid(CameraRef))
+        {
+            float zoom = Mathf.Max(0.01f, CameraRef.Zoom.X);
+            Vector2 viewSize = GetViewportRect().Size / zoom;
+            const float margin = 120.0f;
+            cull = new Rect2(camPos - viewSize * 0.5f - new Vector2(margin, margin), viewSize + new Vector2(margin * 2.0f, margin * 2.0f));
+        }
+
         foreach (var vessel in _vessels)
         {
+            int n = vessel.Points.Length;
+            if (n == 0)
+                continue;
+            if (_scratchShifted.Length < n)
+            {
+                _scratchShifted = new Vector2[n];
+                _scratchSheen = new Vector2[n];
+            }
+
+            for (int i = 0; i < n; i++)
+                _scratchShifted[i] = vessel.Points[i] + parallaxOffset;
+
+            // Whole-vessel reject: skip 3 wide polylines when fully off-screen.
+            if (cull.HasValue)
+            {
+                bool anyVisible = false;
+                float pad = vessel.Width * 0.5f + 6.0f;
+                var bounds = cull.Value.Grow(pad);
+                for (int i = 0; i < n; i++)
+                {
+                    if (bounds.HasPoint(_scratchShifted[i]))
+                    {
+                        anyVisible = true;
+                        break;
+                    }
+                }
+                if (!anyVisible)
+                    continue;
+            }
+
             float depthAlpha = Mathf.Lerp(0.10f, 0.22f, vessel.Depth);
             var wall = new Color(0.45f, 0.16f, 0.20f, depthAlpha);
             var lumen = new Color(0.10f, 0.03f, 0.05f, depthAlpha + 0.08f);
             var sheen = new Color(0.85f, 0.35f, 0.40f, depthAlpha * 0.5f);
 
-            var shifted = new Vector2[vessel.Points.Length];
-            for (int i = 0; i < shifted.Length; i++)
-                shifted[i] = vessel.Points[i] + parallaxOffset;
-
-            DrawPolyline(shifted, wall, vessel.Width + 6.0f, true);
-            DrawPolyline(shifted, lumen, vessel.Width, true);
+            DrawPolyline(_scratchShifted, wall, vessel.Width + 6.0f, true);
+            DrawPolyline(_scratchShifted, lumen, vessel.Width, true);
 
             // Endothelial sheen: thin offset highlight along the vessel.
-            var sheenPts = new Vector2[shifted.Length];
-            for (int i = 0; i < shifted.Length; i++)
-                sheenPts[i] = shifted[i] + new Vector2(0.0f, -vessel.Width * 0.28f);
-            DrawPolyline(sheenPts, sheen, 2.0f, true);
+            for (int i = 0; i < n; i++)
+                _scratchSheen[i] = _scratchShifted[i] + new Vector2(0.0f, -vessel.Width * 0.28f);
+            DrawPolyline(_scratchSheen, sheen, 2.0f, true);
 
             // Fluid-current dashes drifting along the vessel direction.
             float travel = (_age * FlowSpeed + vessel.FlowOffset) % 1000.0f;
             for (int d = 0; d < 4; d++)
             {
                 float s = (travel + d * 250.0f) / 1000.0f;
-                Vector2 p = SamplePolyline(shifted, s);
+                Vector2 p = SamplePolyline(_scratchShifted, n, s);
+                if (cull.HasValue && !cull.Value.HasPoint(p))
+                    continue;
                 DrawCircle(p, 3.0f, new Color(0.9f, 0.55f, 0.55f, depthAlpha * 0.9f));
             }
         }
     }
 
-    private static Vector2 SamplePolyline(Vector2[] pts, float t)
+    private static Vector2 SamplePolyline(Vector2[] pts, int count, float t)
     {
-        if (pts.Length == 0)
+        if (count == 0)
             return Vector2.Zero;
-        if (pts.Length == 1)
+        if (count == 1)
             return pts[0];
-        float f = Mathf.Clamp(t, 0.0f, 1.0f) * (pts.Length - 1);
-        int i = Mathf.Min(Mathf.FloorToInt(f), pts.Length - 2);
+        float f = Mathf.Clamp(t, 0.0f, 1.0f) * (count - 1);
+        int i = Mathf.Min(Mathf.FloorToInt(f), count - 2);
         return pts[i].Lerp(pts[i + 1], f - i);
     }
 }

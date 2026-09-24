@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using Phagocyte.Core;
+using Phagocyte.Environment;
 
 namespace Phagocyte.UI;
 
@@ -33,6 +34,7 @@ public partial class SettingsModal : ModalBase
     public CheckBox? FullscreenCheck { get; set; }
     public CheckBox? VsyncCheck { get; set; }
     public CheckBox? ShakeCheck { get; set; }
+    public CheckBox? PerfCheck { get; set; }
 
     public Label? LangTitleLbl { get; set; }
     public OptionButton? LangOption { get; set; }
@@ -75,6 +77,23 @@ public partial class SettingsModal : ModalBase
         VsyncCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/VSyncCheck");
         ShakeCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/ShakeCheck");
 
+        // Code-built so the shared settings_modal.tscn stays untouched (same
+        // precedent as SkillBarView.ChamberRow): fixed look, trivial layout.
+        if (GraphicsPanel != null && GraphicsPanel.GetNodeOrNull<CheckBox>("PerfCheck") == null)
+        {
+            PerfCheck = new CheckBox
+            {
+                Name = "PerfCheck",
+                MouseDefaultCursorShape = Control.CursorShape.PointingHand
+            };
+            PerfCheck.AddThemeFontSizeOverride("font_size", 14);
+            GraphicsPanel.AddChild(PerfCheck);
+        }
+        else if (GraphicsPanel != null)
+        {
+            PerfCheck = GraphicsPanel.GetNodeOrNull<CheckBox>("PerfCheck");
+        }
+
         LangTitleLbl = GetNodeOrNull<Label>("VBox/LanguageRow/LangLabel");
         LangOption = GetNodeOrNull<OptionButton>("VBox/LanguageRow/LangOption");
 
@@ -100,6 +119,8 @@ public partial class SettingsModal : ModalBase
             VsyncCheck.Toggled += OnVsyncToggled;
         if (ShakeCheck != null)
             ShakeCheck.Toggled += OnShakeToggled;
+        if (PerfCheck != null)
+            PerfCheck.Toggled += OnPerfToggled;
 
         // Language dropdown (native names, never translated)
         if (LangOption != null)
@@ -387,6 +408,8 @@ public partial class SettingsModal : ModalBase
             VsyncCheck.ButtonPressed = SettingsManager.Vsync;
         if (ShakeCheck != null)
             ShakeCheck.ButtonPressed = SettingsManager.ScreenShake;
+        if (PerfCheck != null)
+            PerfCheck.ButtonPressed = SettingsManager.PerformanceMode;
 
         RefreshLanguageOption();
     }
@@ -445,6 +468,12 @@ public partial class SettingsModal : ModalBase
         SettingsManager.SetScreenShake(toggledOn);
     }
 
+    private void OnPerfToggled(bool toggledOn)
+    {
+        SettingsManager.SetPerformanceMode(toggledOn);
+        BackdropQuality.ApplyTo(GetTree()?.CurrentScene, toggledOn);
+    }
+
     public override void UpdateLocalizedTexts()
     {
         base.UpdateLocalizedTexts();
@@ -464,6 +493,7 @@ public partial class SettingsModal : ModalBase
         if (FullscreenCheck != null) FullscreenCheck.Text = Tr("SETTINGS_FULLSCREEN");
         if (VsyncCheck != null) VsyncCheck.Text = Tr("SETTINGS_VSYNC");
         if (ShakeCheck != null) ShakeCheck.Text = Tr("SETTINGS_SCREEN_SHAKE");
+        if (PerfCheck != null) PerfCheck.Text = Tr("SETTINGS_PERF_MODE");
 
         if (LangTitleLbl != null) LangTitleLbl.Text = Tr("SETTINGS_LANGUAGE");
         RefreshLanguageOption();

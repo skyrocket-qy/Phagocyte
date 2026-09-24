@@ -216,6 +216,10 @@ public partial class Main : Node2D, IRunContext
         // Organ-specific fluid mechanics & physiology acting on the player (docs/map.md §3)
         OrganSystem?.Initialize(IsHardRun);
 
+        // Fill-rate switch (FPS survey §1): applied after the map tint so the
+        // stashed "full" material already carries the per-map shader params.
+        BackdropQuality.ApplyTo(this, SettingsManager.PerformanceMode);
+
         // Initial pathogen wave (balance tuning: throttled to ~30% pacing, was 35).
         if (Player != null && EnemyContainer != null)
             PathogenSpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, 10);
