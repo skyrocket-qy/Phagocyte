@@ -171,6 +171,16 @@ theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 15
 text = "活性胞器"
 
+[node name="BossesTab" type="Button" parent="VBox/TabBar"]
+custom_minimum_size = Vector2(154, 38)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_outline_color = Color(0.01, 0.03, 0.06, 0.9)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("3_btn_font")
+theme_override_font_sizes/font_size = 15
+text = "Boss档案"
+
 [node name="HBox" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
 size_flags_vertical = 3
