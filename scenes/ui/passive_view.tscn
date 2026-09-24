@@ -1,10 +1,14 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://c00vnsh841va7"]
 
-[ext_resource type="Script" path="res://scripts/ui/PassiveTreeView.cs" id="5_tree"]
-[ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
+[ext_resource type="Script" uid="uid://12kfq8fu1fas" path="res://scripts/ui/PassiveTreeView.cs" id="5_tree"]
 [ext_resource type="PackedScene" path="res://scenes/ui/stat_preview.tscn" id="6_stats"]
+[ext_resource type="Theme" uid="uid://ppcyc41cyeh7" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tree_tooltip"]
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
 bg_color = Color(0.02, 0.05, 0.09, 0.96)
 border_width_left = 1
 border_width_top = 1
@@ -15,14 +19,9 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 14.0
-content_margin_top = 10.0
-content_margin_right = 14.0
-content_margin_bottom = 10.0
 
-[node name="PassiveView" type="Control"]
-visible = false
-layout_mode = 1
+[node name="PassiveView" type="Control" unique_id=1010535316]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -30,7 +29,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="HeaderLabel" type="Label" parent="."]
+[node name="HeaderLabel" type="Label" parent="." unique_id=448798813]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -45,7 +44,7 @@ theme_override_font_sizes/font_size = 20
 text = "天赋树选择"
 horizontal_alignment = 1
 
-[node name="InfoHBox" type="HBoxContainer" parent="."]
+[node name="InfoHBox" type="HBoxContainer" parent="." unique_id=1263547480]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -57,13 +56,13 @@ offset_bottom = 64.0
 grow_horizontal = 2
 theme_override_constants/separation = 24
 
-[node name="TreeLevelLabel" type="Label" parent="InfoHBox"]
+[node name="TreeLevelLabel" type="Label" parent="InfoHBox" unique_id=2052767037]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 12
 text = "天赋等级：1"
 
-[node name="TreePointsLabel" type="Label" parent="InfoHBox"]
+[node name="TreePointsLabel" type="Label" parent="InfoHBox" unique_id=1446785754]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
@@ -71,7 +70,7 @@ theme_override_font_sizes/font_size = 12
 text = "被动点数：0"
 horizontal_alignment = 2
 
-[node name="ContentHBox" type="HBoxContainer" parent="."]
+[node name="ContentHBox" type="HBoxContainer" parent="." unique_id=1525110732]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -86,37 +85,34 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
 
-[node name="StatPreview" parent="ContentHBox" instance=ExtResource("6_stats")]
-custom_minimum_size = Vector2(230, 0)
-layout_mode = 2
-size_flags_vertical = 3
+[node name="StatPreview" parent="ContentHBox" unique_id=1568452106 instance=ExtResource("6_stats")]
 
-[node name="TreeView" type="Control" parent="ContentHBox"]
+[node name="TreeView" type="Control" parent="ContentHBox" unique_id=1964404588]
+clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-clip_contents = true
 script = ExtResource("5_tree")
 
-[node name="TreeTooltip" type="PanelContainer" parent="ContentHBox/TreeView"]
+[node name="TreeTooltip" type="PanelContainer" parent="ContentHBox/TreeView" unique_id=361866025]
 visible = false
 z_index = 20
 custom_minimum_size = Vector2(330, 0)
+layout_mode = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_tree_tooltip")
 
-[node name="TreeTooltipText" type="RichTextLabel" parent="ContentHBox/TreeView/TreeTooltip"]
-layout_mode = 2
+[node name="TreeTooltipText" type="RichTextLabel" parent="ContentHBox/TreeView/TreeTooltip" unique_id=1686028122]
 custom_minimum_size = Vector2(302, 0)
+layout_mode = 2
 mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 13
+theme_override_font_sizes/bold_font_size = 14
 bbcode_enabled = true
 fit_content = true
 scroll_active = false
-autowrap_mode = 3
-theme_override_font_sizes/normal_font_size = 13
-theme_override_font_sizes/bold_font_size = 14
 
-[node name="Buttons" type="HBoxContainer" parent="."]
+[node name="Buttons" type="HBoxContainer" parent="." unique_id=763118832]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -132,7 +128,7 @@ grow_vertical = 0
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="ResetButton" type="Button" parent="Buttons"]
+[node name="ResetButton" type="Button" parent="Buttons" unique_id=468256860]
 custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
@@ -140,7 +136,7 @@ theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 13
 text = "重置天赋树"
 
-[node name="ConfirmButton" type="Button" parent="Buttons"]
+[node name="ConfirmButton" type="Button" parent="Buttons" unique_id=1488780881]
 custom_minimum_size = Vector2(190, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
@@ -148,7 +144,7 @@ theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 13
 text = "下一步：选择病理战场"
 
-[node name="ZoomOutButton" type="Button" parent="Buttons"]
+[node name="ZoomOutButton" type="Button" parent="Buttons" unique_id=620658355]
 custom_minimum_size = Vector2(80, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
@@ -156,11 +152,10 @@ theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 13
 text = "缩小"
 
-[node name="ZoomInButton" type="Button" parent="Buttons"]
+[node name="ZoomInButton" type="Button" parent="Buttons" unique_id=407904603]
 custom_minimum_size = Vector2(80, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 13
 text = "放大"
-

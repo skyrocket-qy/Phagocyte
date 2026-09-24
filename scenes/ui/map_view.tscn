@@ -1,9 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bdek2slr3afsn"]
 
-[ext_resource type="Script" path="res://scripts/ui/HoloBodyScanner.cs" id="4_scanner"]
-[ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
+[ext_resource type="Script" uid="uid://cj7i0oweubjwl" path="res://scripts/ui/HoloBodyScanner.cs" id="4_scanner"]
+[ext_resource type="Theme" uid="uid://ppcyc41cyeh7" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
 bg_color = Color(0.07, 0.11, 0.16, 0.85)
 border_width_left = 1
 border_width_top = 1
@@ -14,14 +18,9 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 20.0
-content_margin_top = 20.0
-content_margin_right = 20.0
-content_margin_bottom = 20.0
 
-[node name="MapView" type="Control"]
-visible = false
-layout_mode = 1
+[node name="MapView" type="Control" unique_id=414226870]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -29,7 +28,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="HeaderLabel" type="Label" parent="."]
+[node name="HeaderLabel" type="Label" parent="." unique_id=404656032]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -44,7 +43,7 @@ theme_override_font_sizes/font_size = 26
 text = "选择病理战场"
 horizontal_alignment = 1
 
-[node name="HBox" type="HBoxContainer" parent="."]
+[node name="HBox" type="HBoxContainer" parent="." unique_id=1558900727]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -59,32 +58,32 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
 
-[node name="MapList" type="VBoxContainer" parent="HBox"]
+[node name="MapList" type="VBoxContainer" parent="HBox" unique_id=2098473377]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="DetailPanel" type="PanelContainer" parent="HBox"]
+[node name="DetailPanel" type="PanelContainer" parent="HBox" unique_id=2082791970]
 custom_minimum_size = Vector2(460, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="VBox" type="VBoxContainer" parent="HBox/DetailPanel"]
+[node name="VBox" type="VBoxContainer" parent="HBox/DetailPanel" unique_id=432005959]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TopHBox" type="HBoxContainer" parent="HBox/DetailPanel/VBox"]
+[node name="TopHBox" type="HBoxContainer" parent="HBox/DetailPanel/VBox" unique_id=1979139155]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="OrganBadge" type="Label" parent="HBox/DetailPanel/VBox/TopHBox"]
+[node name="OrganBadge" type="Label" parent="HBox/DetailPanel/VBox/TopHBox" unique_id=989559101]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "[ 🫀 宿主区域：肝脏 (Liver) ]"
 
-[node name="DifficultyLabel" type="Label" parent="HBox/DetailPanel/VBox/TopHBox"]
+[node name="DifficultyLabel" type="Label" parent="HBox/DetailPanel/VBox/TopHBox" unique_id=1401676303]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
@@ -92,47 +91,47 @@ theme_override_font_sizes/font_size = 14
 text = "★★★☆☆"
 horizontal_alignment = 2
 
-[node name="TitleVBox" type="VBoxContainer" parent="HBox/DetailPanel/VBox"]
+[node name="TitleVBox" type="VBoxContainer" parent="HBox/DetailPanel/VBox" unique_id=2034594709]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="MapNameLabel" type="Label" parent="HBox/DetailPanel/VBox/TitleVBox"]
+[node name="MapNameLabel" type="Label" parent="HBox/DetailPanel/VBox/TitleVBox" unique_id=1163073894]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.4, 1)
 theme_override_font_sizes/font_size = 22
 text = "肝血窦腔室"
 
-[node name="MapSubtitleLabel" type="Label" parent="HBox/DetailPanel/VBox/TitleVBox"]
+[node name="MapSubtitleLabel" type="Label" parent="HBox/DetailPanel/VBox/TitleVBox" unique_id=391140081]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.75, 0.85, 1)
 theme_override_font_sizes/font_size = 13
 text = "Hepatic Sinusoid Lumen"
 
-[node name="MapEnvLabel" type="Label" parent="HBox/DetailPanel/VBox"]
+[node name="MapEnvLabel" type="Label" parent="HBox/DetailPanel/VBox" unique_id=234958170]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "🔬 生态切片：解毒代谢网络与门静脉微腔"
 autowrap_mode = 3
 
-[node name="MapMechLabel" type="Label" parent="HBox/DetailPanel/VBox"]
+[node name="MapMechLabel" type="Label" parent="HBox/DetailPanel/VBox" unique_id=386614139]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "🌊 战场环境机制：慢速血窦滞流（移速 -15%）；驻扎 3 处固定库佛巨砲主动捕捉敌体；P450 周期排毒脉冲清除有害池。"
 autowrap_mode = 3
 
-[node name="MapThreatLabel" type="Label" parent="HBox/DetailPanel/VBox"]
+[node name="MapThreatLabel" type="Label" parent="HBox/DetailPanel/VBox" unique_id=83382607]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.5, 0.5, 1)
 theme_override_font_sizes/font_size = 13
 text = "☣️ 典型病原威胁：门静脉内毒素波次 (LPS) 与乙型肝炎病毒 (HBV)"
 autowrap_mode = 3
 
-[node name="HoloBodyScanner" type="Control" parent="HBox"]
+[node name="HoloBodyScanner" type="Control" parent="HBox" unique_id=2068757285]
 custom_minimum_size = Vector2(430, 420)
 layout_mode = 2
 script = ExtResource("4_scanner")
 
-[node name="Buttons" type="HBoxContainer" parent="."]
+[node name="Buttons" type="HBoxContainer" parent="." unique_id=1359842901]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -148,11 +147,10 @@ grow_vertical = 0
 theme_override_constants/separation = 40
 alignment = 1
 
-[node name="DeployButton" type="Button" parent="Buttons"]
+[node name="DeployButton" type="Button" parent="Buttons" unique_id=2106242332]
 custom_minimum_size = Vector2(220, 46)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 16
 text = "🚀 开始出击"
-

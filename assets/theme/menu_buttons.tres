@@ -1,8 +1,6 @@
-[gd_resource type="Theme" format=3]
+[gd_resource type="Theme" format=3 uid="uid://ppcyc41cyeh7"]
 
-[ext_resource type="Font" path="res://assets/fonts/BodyMediumFont.tres" id="1_font"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
+[ext_resource type="FontVariation" path="res://assets/fonts/BodyMediumFont.tres" id="1_font"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_disabled"]
 content_margin_left = 16.0
@@ -20,23 +18,7 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 2
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
-content_margin_left = 16.0
-content_margin_top = 8.0
-content_margin_right = 16.0
-content_margin_bottom = 8.0
-bg_color = Color(0.04, 0.09, 0.15, 0.92)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 2
-border_color = Color(0.22, 0.45, 0.62, 0.75)
-corner_radius_top_left = 10
-corner_radius_top_right = 2
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 2
-shadow_color = Color(0, 0.02, 0.05, 0.45)
-shadow_size = 4
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
 content_margin_left = 16.0
@@ -55,6 +37,24 @@ corner_radius_bottom_right = 10
 corner_radius_bottom_left = 2
 shadow_color = Color(0.15, 0.92, 0.82, 0.4)
 shadow_size = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.04, 0.09, 0.15, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 2
+border_color = Color(0.22, 0.45, 0.62, 0.75)
+corner_radius_top_left = 10
+corner_radius_top_right = 2
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 2
+shadow_color = Color(0, 0.02, 0.05, 0.45)
+shadow_size = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
 content_margin_left = 16.0
@@ -76,8 +76,8 @@ corner_radius_bottom_left = 2
 Button/colors/font_color = Color(0.94, 0.99, 0.98, 1)
 Button/colors/font_disabled_color = Color(0.45, 0.5, 0.55, 1)
 Button/colors/font_hover_color = Color(0.4, 1, 0.88, 1)
-Button/colors/font_pressed_color = Color(0.3, 0.95, 0.8, 1)
 Button/colors/font_outline_color = Color(0.01, 0.03, 0.06, 0.95)
+Button/colors/font_pressed_color = Color(0.3, 0.95, 0.8, 1)
 Button/constants/outline_size = 2
 Button/fonts/font = ExtResource("1_font")
 Button/styles/disabled = SubResource("StyleBoxFlat_btn_disabled")

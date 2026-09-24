@@ -1,35 +1,32 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://l1enpmpfxmtj"]
 
-[ext_resource type="Script" path="res://scripts/ui/LoadoutView.cs" id="1_loadout"]
-[ext_resource type="Script" path="res://scripts/ui/EnergyPips.cs" id="2_pips"]
-[ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
-[ext_resource type="Shader" path="res://shaders/codex_grid_bg.gdshader" id="3_grid_shader"]
-[ext_resource type="Script" path="res://scripts/ui/ChamberLinks.cs" id="4_links"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/menu/cell.jpeg" id="5_cell"]
+[ext_resource type="Script" uid="uid://xp0561dcr5n7" path="res://scripts/ui/LoadoutView.cs" id="1_loadout"]
+[ext_resource type="Script" uid="uid://t50lekrjiilm" path="res://scripts/ui/EnergyPips.cs" id="2_pips"]
+[ext_resource type="Shader" uid="uid://bcvuhfjeyxhwt" path="res://shaders/codex_grid_bg.gdshader" id="3_grid_shader"]
+[ext_resource type="Script" uid="uid://dme50k8dk7dpd" path="res://scripts/ui/ChamberLinks.cs" id="4_links"]
+[ext_resource type="Texture2D" uid="uid://tgcu6j4thisj" path="res://assets/sprites/ui/menu/cell.jpeg" id="5_cell"]
 [ext_resource type="PackedScene" path="res://scenes/ui/stat_preview.tscn" id="6_stats"]
+[ext_resource type="Theme" uid="uid://ppcyc41cyeh7" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
 shader = ExtResource("3_grid_shader")
+shader_parameter/line_color = Color(0, 0.9, 1, 1)
+shader_parameter/cell_px = 40.0
+shader_parameter/alpha = 0.05
 
 [sub_resource type="StyleBoxLine" id="StyleBoxLine_sep"]
 color = Color(0, 0.9, 1, 0.25)
-thickness = 1
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_well"]
 bg_color = Color(0, 0, 0, 0)
-border_width_left = 0
-border_width_top = 0
-border_width_right = 0
-border_width_bottom = 0
 border_color = Color(0, 0, 0, 0)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
-[node name="LoadoutView" type="Control"]
-visible = false
-layout_mode = 1
+[node name="LoadoutView" type="Control" unique_id=725438352]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -38,7 +35,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_loadout")
 
-[node name="Bg" type="ColorRect" parent="."]
+[node name="Bg" type="ColorRect" parent="." unique_id=488716801]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -48,7 +45,8 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.02, 0.045, 0.075, 1)
 
-[node name="GridBg" type="ColorRect" parent="."]
+[node name="GridBg" type="ColorRect" parent="." unique_id=2060560056]
+material = SubResource("ShaderMaterial_grid")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -56,13 +54,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-material = SubResource("ShaderMaterial_grid")
 color = Color(0, 0, 0, 0)
 
-[node name="CellBackdrop" type="TextureRect" parent="."]
+[node name="CellBackdrop" type="TextureRect" parent="." unique_id=1046827581]
 modulate = Color(1, 1, 1, 0.18)
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = -1
 anchor_right = 0.75
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -72,7 +69,7 @@ texture = ExtResource("5_cell")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=1242805036]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -84,62 +81,57 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 36
 theme_override_constants/margin_bottom = 20
 
-[node name="VBox" type="VBoxContainer" parent="Margin"]
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1887716445]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TopBar" type="HBoxContainer" parent="Margin/VBox"]
+[node name="TopBar" type="HBoxContainer" parent="Margin/VBox" unique_id=1050944696]
 layout_mode = 2
 theme_override_constants/separation = 16
-alignment = 0
 
-[node name="TitleVBox" type="VBoxContainer" parent="Margin/VBox/TopBar"]
+[node name="TitleVBox" type="VBoxContainer" parent="Margin/VBox/TopBar" unique_id=677547762]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 2
 
-[node name="HeaderLabel" type="Label" parent="Margin/VBox/TopBar/TitleVBox"]
+[node name="HeaderLabel" type="Label" parent="Margin/VBox/TopBar/TitleVBox" unique_id=1209560929]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.95, 1, 1)
 theme_override_font_sizes/font_size = 28
 text = "ORGANELLE ASSEMBLY // 活性胞器装配"
 horizontal_alignment = 1
 
-[node name="TopSeparator" type="HSeparator" parent="Margin/VBox"]
+[node name="TopSeparator" type="HSeparator" parent="Margin/VBox" unique_id=2017758978]
 layout_mode = 2
 theme_override_styles/separator = SubResource("StyleBoxLine_sep")
 
-[node name="ContentHBox" type="HBoxContainer" parent="Margin/VBox"]
+[node name="ContentHBox" type="HBoxContainer" parent="Margin/VBox" unique_id=1556666362]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 28
 
-[node name="StatPreview" parent="Margin/VBox/ContentHBox" instance=ExtResource("6_stats")]
-custom_minimum_size = Vector2(230, 0)
-layout_mode = 2
-size_flags_vertical = 3
+[node name="StatPreview" parent="Margin/VBox/ContentHBox" unique_id=713778740 instance=ExtResource("6_stats")]
 
-[node name="ChamberSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox"]
+[node name="ChamberSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox" unique_id=355113965]
 custom_minimum_size = Vector2(490, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-stretch_ratio = 3.0
 theme_override_constants/separation = 8
 
-[node name="ProfileHBox" type="HBoxContainer" parent="Margin/VBox/ContentHBox/ChamberSide"]
+[node name="ProfileHBox" type="HBoxContainer" parent="Margin/VBox/ContentHBox/ChamberSide" unique_id=1609305078]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="ProfileAddButton" type="Button" parent="Margin/VBox/ContentHBox/ChamberSide/ProfileHBox"]
+[node name="ProfileAddButton" type="Button" parent="Margin/VBox/ContentHBox/ChamberSide/ProfileHBox" unique_id=1130826424]
 custom_minimum_size = Vector2(48, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
 text = "+"
 
-[node name="ProfileDeleteButton" type="Button" parent="Margin/VBox/ContentHBox/ChamberSide/ProfileHBox"]
+[node name="ProfileDeleteButton" type="Button" parent="Margin/VBox/ContentHBox/ChamberSide/ProfileHBox" unique_id=247212843]
 custom_minimum_size = Vector2(84, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
@@ -147,79 +139,76 @@ theme_override_colors/font_color = Color(1, 0.45, 0.4, 1)
 theme_override_font_sizes/font_size = 14
 text = "删除"
 
-[node name="TopSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
+[node name="TopSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide" unique_id=1771514811]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="SocketWell" type="PanelContainer" parent="Margin/VBox/ContentHBox/ChamberSide"]
+[node name="SocketWell" type="PanelContainer" parent="Margin/VBox/ContentHBox/ChamberSide" unique_id=77026710]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_well")
 
-[node name="WellMargin" type="MarginContainer" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell"]
+[node name="WellMargin" type="MarginContainer" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell" unique_id=795600819]
 layout_mode = 2
 theme_override_constants/margin_left = 14
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 14
 
-[node name="ChamberGrid" type="GridContainer" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin"]
+[node name="ChamberGrid" type="GridContainer" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin" unique_id=2003325013]
 layout_mode = 2
 theme_override_constants/h_separation = 18
 theme_override_constants/v_separation = 18
 columns = 2
-alignment = 1
 
-[node name="ChamberLinks" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell"]
+[node name="ChamberLinks" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide/SocketWell" unique_id=582305744]
 layout_mode = 2
 mouse_filter = 2
 script = ExtResource("4_links")
 
-[node name="EnergyBar" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
+[node name="EnergyBar" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide" unique_id=1945584431]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 mouse_filter = 2
 script = ExtResource("2_pips")
 AlignLeft = false
-MaxDiameter = 18.0
 
-[node name="BottomSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
+[node name="BottomSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide" unique_id=470251817]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="VaultSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox"]
+[node name="VaultSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox" unique_id=458451102]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-stretch_ratio = 2.0
 theme_override_constants/separation = 10
 
-[node name="CategoryTabBar" type="GridContainer" parent="Margin/VBox/ContentHBox/VaultSide"]
+[node name="CategoryTabBar" type="GridContainer" parent="Margin/VBox/ContentHBox/VaultSide" unique_id=1520105306]
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 5
 
-[node name="VaultScroll" type="ScrollContainer" parent="Margin/VBox/ContentHBox/VaultSide"]
+[node name="VaultScroll" type="ScrollContainer" parent="Margin/VBox/ContentHBox/VaultSide" unique_id=2066889475]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="BackpackGrid" type="GridContainer" parent="Margin/VBox/ContentHBox/VaultSide/VaultScroll"]
+[node name="BackpackGrid" type="GridContainer" parent="Margin/VBox/ContentHBox/VaultSide/VaultScroll" unique_id=608754368]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
 columns = 4
 
-[node name="Buttons" type="HBoxContainer" parent="Margin/VBox"]
+[node name="Buttons" type="HBoxContainer" parent="Margin/VBox" unique_id=490778244]
 layout_mode = 2
 theme_override_constants/separation = 40
 alignment = 1
 
-[node name="ResetButton" type="Button" parent="Margin/VBox/Buttons"]
+[node name="ResetButton" type="Button" parent="Margin/VBox/Buttons" unique_id=370175601]
 custom_minimum_size = Vector2(200, 46)
 layout_mode = 2
 mouse_default_cursor_shape = 2
@@ -227,7 +216,7 @@ theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 15
 text = "清空腔室"
 
-[node name="ConfirmButton" type="Button" parent="Margin/VBox/Buttons"]
+[node name="ConfirmButton" type="Button" parent="Margin/VBox/Buttons" unique_id=599102615]
 custom_minimum_size = Vector2(240, 46)
 layout_mode = 2
 mouse_default_cursor_shape = 2

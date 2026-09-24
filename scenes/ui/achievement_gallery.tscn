@@ -1,10 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://c5jobgavic24n"]
 
-[ext_resource type="Script" path="res://scripts/ui/AchievementGalleryView.cs" id="1_gallery"]
-
-[ext_resource type="Theme" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
+[ext_resource type="Script" uid="uid://b6oqhtll01hg4" path="res://scripts/ui/AchievementGalleryView.cs" id="1_gallery"]
+[ext_resource type="Theme" uid="uid://ppcyc41cyeh7" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
 bg_color = Color(0.07, 0.11, 0.16, 0.85)
 border_width_left = 1
 border_width_top = 1
@@ -15,14 +18,9 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 20.0
-content_margin_top = 20.0
-content_margin_right = 20.0
-content_margin_bottom = 20.0
 
-[node name="AchievementView" type="Control"]
-visible = false
-layout_mode = 1
+[node name="AchievementView" type="Control" unique_id=670758202]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -31,7 +29,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_gallery")
 
-[node name="HeaderLabel" type="Label" parent="."]
+[node name="HeaderLabel" type="Label" parent="." unique_id=554848356]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -46,7 +44,7 @@ theme_override_font_sizes/font_size = 26
 text = "成就收藏"
 horizontal_alignment = 1
 
-[node name="ProgressHBox" type="HBoxContainer" parent="."]
+[node name="ProgressHBox" type="HBoxContainer" parent="." unique_id=1857940411]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -58,14 +56,13 @@ offset_bottom = 88.0
 grow_horizontal = 2
 theme_override_constants/separation = 12
 
-[node name="ProgressBar" type="ProgressBar" parent="ProgressHBox"]
+[node name="ProgressBar" type="ProgressBar" parent="ProgressHBox" unique_id=342421899]
 custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 size_flags_horizontal = 3
-max_value = 100.0
 show_percentage = false
 
-[node name="ProgressLabel" type="Label" parent="ProgressHBox"]
+[node name="ProgressLabel" type="Label" parent="ProgressHBox" unique_id=1564477461]
 custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
@@ -73,7 +70,7 @@ theme_override_font_sizes/font_size = 13
 text = "0 / 0"
 horizontal_alignment = 2
 
-[node name="FilterHBox" type="HBoxContainer" parent="."]
+[node name="FilterHBox" type="HBoxContainer" parent="." unique_id=332433921]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -86,7 +83,7 @@ grow_horizontal = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="FilterAllButton" type="Button" parent="FilterHBox"]
+[node name="FilterAllButton" type="Button" parent="FilterHBox" unique_id=115786873]
 custom_minimum_size = Vector2(200, 34)
 layout_mode = 2
 mouse_default_cursor_shape = 2
@@ -94,7 +91,7 @@ theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 14
 text = "全部"
 
-[node name="FilterUnlockedButton" type="Button" parent="FilterHBox"]
+[node name="FilterUnlockedButton" type="Button" parent="FilterHBox" unique_id=1098395088]
 custom_minimum_size = Vector2(200, 34)
 layout_mode = 2
 mouse_default_cursor_shape = 2
@@ -102,7 +99,7 @@ theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 14
 text = "已解锁"
 
-[node name="FilterLockedButton" type="Button" parent="FilterHBox"]
+[node name="FilterLockedButton" type="Button" parent="FilterHBox" unique_id=886628934]
 custom_minimum_size = Vector2(200, 34)
 layout_mode = 2
 mouse_default_cursor_shape = 2
@@ -110,11 +107,10 @@ theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 14
 text = "未解锁"
 
-[node name="HBox" type="HBoxContainer" parent="."]
+[node name="HBox" type="HBoxContainer" parent="." unique_id=1625329159]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 13
 anchor_left = 0.5
-anchor_top = 0.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -590.0
@@ -125,35 +121,35 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
 
-[node name="CardScroll" type="ScrollContainer" parent="HBox"]
+[node name="CardScroll" type="ScrollContainer" parent="HBox" unique_id=941210676]
 custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
 horizontal_scroll_mode = 0
 
-[node name="CardList" type="VBoxContainer" parent="HBox/CardScroll"]
+[node name="CardList" type="VBoxContainer" parent="HBox/CardScroll" unique_id=1421754614]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="DetailPanel" type="PanelContainer" parent="HBox"]
+[node name="DetailPanel" type="PanelContainer" parent="HBox" unique_id=1510916493]
 custom_minimum_size = Vector2(460, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="DetailVBox" type="VBoxContainer" parent="HBox/DetailPanel"]
+[node name="DetailVBox" type="VBoxContainer" parent="HBox/DetailPanel" unique_id=1518763884]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="DetailTopHBox" type="HBoxContainer" parent="HBox/DetailPanel/DetailVBox"]
+[node name="DetailTopHBox" type="HBoxContainer" parent="HBox/DetailPanel/DetailVBox" unique_id=1402520944]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="DetailImageWrap" type="Control" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox"]
+[node name="DetailImageWrap" type="Control" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox" unique_id=554445485]
 custom_minimum_size = Vector2(192, 192)
 layout_mode = 2
 
-[node name="DetailImage" type="TextureRect" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailImageWrap"]
+[node name="DetailImage" type="TextureRect" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailImageWrap" unique_id=402421123]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -164,57 +160,55 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="DetailFallbackIcon" type="Label" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailImageWrap"]
+[node name="DetailFallbackIcon" type="Label" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailImageWrap" unique_id=960038279]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_font_sizes/font_size = 96
 text = "🏆"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DetailTitleVBox" type="VBoxContainer" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox"]
+[node name="DetailTitleVBox" type="VBoxContainer" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox" unique_id=1131274747]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="DetailTitle" type="Label" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailTitleVBox"]
+[node name="DetailTitle" type="Label" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailTitleVBox" unique_id=392599998]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
 theme_override_font_sizes/font_size = 24
 text = "成就名称"
 autowrap_mode = 3
 
-[node name="DetailBadge" type="Label" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailTitleVBox"]
+[node name="DetailBadge" type="Label" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailTitleVBox" unique_id=633866320]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
 text = "[ 进行中 ]"
 
-[node name="DetailProgressLabel" type="Label" parent="HBox/DetailPanel/DetailVBox"]
+[node name="DetailProgressLabel" type="Label" parent="HBox/DetailPanel/DetailVBox" unique_id=584943049]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.85, 0.95, 1)
 theme_override_font_sizes/font_size = 14
 text = "0 / 1 (0%)"
 
-[node name="DetailProgress" type="ProgressBar" parent="HBox/DetailPanel/DetailVBox"]
+[node name="DetailProgress" type="ProgressBar" parent="HBox/DetailPanel/DetailVBox" unique_id=882345641]
 custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
-max_value = 100.0
 show_percentage = false
 
-[node name="DetailDesc" type="Label" parent="HBox/DetailPanel/DetailVBox"]
+[node name="DetailDesc" type="Label" parent="HBox/DetailPanel/DetailVBox" unique_id=2118376997]
 layout_mode = 2
 theme_override_constants/line_spacing = 6
 theme_override_font_sizes/font_size = 14
 text = "达成条件"
 autowrap_mode = 3
 
-[node name="DetailReward" type="Label" parent="HBox/DetailPanel/DetailVBox"]
+[node name="DetailReward" type="Label" parent="HBox/DetailPanel/DetailVBox" unique_id=750511040]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
 theme_override_constants/line_spacing = 6
@@ -222,14 +216,14 @@ theme_override_font_sizes/font_size = 14
 text = "奖励"
 autowrap_mode = 3
 
-[node name="DetailSteam" type="Label" parent="HBox/DetailPanel/DetailVBox"]
+[node name="DetailSteam" type="Label" parent="HBox/DetailPanel/DetailVBox" unique_id=2047945186]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.62, 0.72, 1)
 theme_override_font_sizes/font_size = 12
 text = "Steam: -"
 autowrap_mode = 3
 
-[node name="Buttons" type="HBoxContainer" parent="."]
+[node name="Buttons" type="HBoxContainer" parent="." unique_id=60914394]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
