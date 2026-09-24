@@ -202,6 +202,7 @@ public partial class ProjectileManager : Node2D
                 {
                     Position = pos,
                     Direction = dir,
+                    Rotation = dir.Angle(),
                     Speed = speed,
                     Radius = radius,
                     Lifetime = lifetime,
@@ -228,6 +229,7 @@ public partial class ProjectileManager : Node2D
         {
             Position = pos,
             Direction = dir,
+            Rotation = dir.Angle(),
             Speed = speed,
             Radius = radius,
             Lifetime = lifetime,
@@ -259,10 +261,19 @@ public partial class ProjectileManager : Node2D
 
     public override void _PhysicsProcess(double delta)
     {
+        // Idle frames (no bullets in flight) skip the enemy-index rebuild,
+        // the per-bullet queries and the multimesh sync entirely. The
+        // transition frame already zeroed every VisibleInstanceCount.
+        if (_activeCount == 0)
+            return;
+
         float dt = (float)delta;
         Array.Clear(_typeActiveCounts, 0, _typeActiveCounts.Length);
 
-        RebuildEnemyIndex();
+        // Empty arena: bullets fly straight with no targets to index or query.
+        bool hasTargets = BaseEnemy.ActiveEnemies.Count > 0;
+        if (hasTargets)
+            RebuildEnemyIndex();
 
         for (int a = _activeCount - 1; a >= 0; a--)
         {
@@ -283,36 +294,39 @@ public partial class ProjectileManager : Node2D
 
             p.Position += p.Direction * p.Speed * dt;
 
-            // QuadTree neighborhood query: O(log n + k) candidate lookup
-            float queryRadius = p.Radius + 18.0f;
-            float hitDistSq = queryRadius * queryRadius;
-            _enemyQuery.Clear();
-            _enemyTree.QueryCircle(p.Position, queryRadius, _enemyQuery);
-
             bool projectileAlive = true;
-            for (int b = 0; b < _enemyQuery.Count && projectileAlive; b++)
+            if (hasTargets)
             {
-                var enemy = _enemyQuery[b];
-                if (enemy == null || !GodotObject.IsInstanceValid(enemy) || enemy.IsBeingEaten) continue;
+                // QuadTree neighborhood query: O(log n + k) candidate lookup
+                float queryRadius = p.Radius + 18.0f;
+                float hitDistSq = queryRadius * queryRadius;
+                _enemyQuery.Clear();
+                _enemyTree.QueryCircle(p.Position, queryRadius, _enemyQuery);
 
-                ulong enemyId = enemy.GetInstanceId();
-                if (p.HasHitTarget(enemyId)) continue;
-
-                if (p.Position.DistanceSquaredTo(enemy.GlobalPosition) <= hitDistSq)
+                for (int b = 0; b < _enemyQuery.Count && projectileAlive; b++)
                 {
-                    p.AddHitTarget(enemyId);
+                    var enemy = _enemyQuery[b];
+                    if (enemy == null || !GodotObject.IsInstanceValid(enemy) || enemy.IsBeingEaten) continue;
 
-                    // Apply direct combat damage and stats
-                    enemy.TakeDamage(p.Damage, _hostNode, p.IsCrit);
+                    ulong enemyId = enemy.GetInstanceId();
+                    if (p.HasHitTarget(enemyId)) continue;
 
-                    if (p.PierceRemaining > 0)
+                    if (p.Position.DistanceSquaredTo(enemy.GlobalPosition) <= hitDistSq)
                     {
-                        p.PierceRemaining--;
-                    }
-                    else
-                    {
-                        projectileAlive = false;
-                        MarkInactive(slot);
+                        p.AddHitTarget(enemyId);
+
+                        // Apply direct combat damage and stats
+                        enemy.TakeDamage(p.Damage, _hostNode, p.IsCrit);
+
+                        if (p.PierceRemaining > 0)
+                        {
+                            p.PierceRemaining--;
+                        }
+                        else
+                        {
+                            projectileAlive = false;
+                            MarkInactive(slot);
+                        }
                     }
                 }
             }
@@ -326,7 +340,7 @@ public partial class ProjectileManager : Node2D
                 int currentTypeIndex = _typeActiveCounts[type];
                 if (currentTypeIndex < MaxPerTypeCapacity)
                 {
-                    Transform2D xform = new Transform2D(p.Direction.Angle(), p.Position);
+                    Transform2D xform = new Transform2D(p.Rotation, p.Position);
                     _typeMultiMeshes[type].Multimesh.SetInstanceTransform2D(currentTypeIndex, xform);
                     _typeActiveCounts[type]++;
                 }

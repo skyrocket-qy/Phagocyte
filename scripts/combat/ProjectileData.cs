@@ -10,6 +10,8 @@ public struct ProjectileData
 {
     public Vector2 Position;
     public Vector2 Direction;
+    /// <summary>Cached <see cref="Direction"/> angle (direction never changes post-spawn).</summary>
+    public float Rotation;
     public float Speed;
     public float Radius;
     public float Lifetime;
