@@ -244,21 +244,110 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="FullscreenCheck" type="CheckBox" parent="VBox/Content/GraphicsPanel"]
+[node name="FullscreenRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
 layout_mode = 2
-mouse_default_cursor_shape = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="VBox/Content/GraphicsPanel/FullscreenRow"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 text = "全螢幕模式"
 
-[node name="VSyncCheck" type="CheckBox" parent="VBox/Content/GraphicsPanel"]
+[node name="FullscreenCheck" type="Button" parent="VBox/Content/GraphicsPanel/FullscreenRow"]
+custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
-button_pressed = true
+text = "關"
+
+[node name="VSyncRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="VBox/Content/GraphicsPanel/VSyncRow"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
 text = "垂直同步 (VSync)"
 
-[node name="ShakeCheck" type="CheckBox" parent="VBox/Content/GraphicsPanel"]
+[node name="VSyncCheck" type="Button" parent="VBox/Content/GraphicsPanel/VSyncRow"]
+custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
+text = "開"
+
+[node name="ShakeRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="VBox/Content/GraphicsPanel/ShakeRow"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
 text = "螢幕震動 (Screen Shake)"
+
+[node name="ShakeCheck" type="Button" parent="VBox/Content/GraphicsPanel/ShakeRow"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "關"
+
+[node name="PerfRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="VBox/Content/GraphicsPanel/PerfRow"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "效能模式"
+
+[node name="PerfCheck" type="Button" parent="VBox/Content/GraphicsPanel/PerfRow"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "關"
+
+[node name="FpsRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="VBox/Content/GraphicsPanel/FpsRow"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "顯示幀率計數器"
+
+[node name="FpsCheck" type="Button" parent="VBox/Content/GraphicsPanel/FpsRow"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "關"
+
+[node name="MaxFpsRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="VBox/Content/GraphicsPanel/MaxFpsRow"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "最大幀率"
+
+[node name="MaxFpsBtn" type="Button" parent="VBox/Content/GraphicsPanel/MaxFpsRow"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "∞"

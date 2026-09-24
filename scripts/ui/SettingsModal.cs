@@ -31,10 +31,19 @@ public partial class SettingsModal : ModalBase
     public Label? BgmValLbl { get; set; }
     public Label? BgmTitleLbl { get; set; }
 
-    public CheckBox? FullscreenCheck { get; set; }
-    public CheckBox? VsyncCheck { get; set; }
-    public CheckBox? ShakeCheck { get; set; }
-    public CheckBox? PerfCheck { get; set; }
+    public Button? FullscreenCheck { get; set; }
+    public Button? VsyncCheck { get; set; }
+    public Button? ShakeCheck { get; set; }
+    public Button? PerfCheck { get; set; }
+    public Button? FpsCheck { get; set; }
+    public Button? MaxFpsBtn { get; set; }
+
+    public Label? FullscreenTitleLbl { get; set; }
+    public Label? VsyncTitleLbl { get; set; }
+    public Label? ShakeTitleLbl { get; set; }
+    public Label? PerfTitleLbl { get; set; }
+    public Label? FpsTitleLbl { get; set; }
+    public Label? MaxFpsTitleLbl { get; set; }
 
     public Label? LangTitleLbl { get; set; }
     public OptionButton? LangOption { get; set; }
@@ -73,26 +82,19 @@ public partial class SettingsModal : ModalBase
         BgmValLbl = GetNodeOrNull<Label>("VBox/Content/AudioPanel/BGMRow/ValLabel");
         BgmTitleLbl = GetNodeOrNull<Label>("VBox/Content/AudioPanel/BGMRow/TitleLabel");
 
-        FullscreenCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/FullscreenCheck");
-        VsyncCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/VSyncCheck");
-        ShakeCheck = GetNodeOrNull<CheckBox>("VBox/Content/GraphicsPanel/ShakeCheck");
+        FullscreenCheck = GetNodeOrNull<Button>("VBox/Content/GraphicsPanel/FullscreenRow/FullscreenCheck");
+        VsyncCheck = GetNodeOrNull<Button>("VBox/Content/GraphicsPanel/VSyncRow/VSyncCheck");
+        ShakeCheck = GetNodeOrNull<Button>("VBox/Content/GraphicsPanel/ShakeRow/ShakeCheck");
+        PerfCheck = GetNodeOrNull<Button>("VBox/Content/GraphicsPanel/PerfRow/PerfCheck");
+        FpsCheck = GetNodeOrNull<Button>("VBox/Content/GraphicsPanel/FpsRow/FpsCheck");
+        MaxFpsBtn = GetNodeOrNull<Button>("VBox/Content/GraphicsPanel/MaxFpsRow/MaxFpsBtn");
 
-        // Code-built so the shared settings_modal.tscn stays untouched (same
-        // precedent as SkillBarView.ChamberRow): fixed look, trivial layout.
-        if (GraphicsPanel != null && GraphicsPanel.GetNodeOrNull<CheckBox>("PerfCheck") == null)
-        {
-            PerfCheck = new CheckBox
-            {
-                Name = "PerfCheck",
-                MouseDefaultCursorShape = Control.CursorShape.PointingHand
-            };
-            PerfCheck.AddThemeFontSizeOverride("font_size", 14);
-            GraphicsPanel.AddChild(PerfCheck);
-        }
-        else if (GraphicsPanel != null)
-        {
-            PerfCheck = GraphicsPanel.GetNodeOrNull<CheckBox>("PerfCheck");
-        }
+        FullscreenTitleLbl = GetNodeOrNull<Label>("VBox/Content/GraphicsPanel/FullscreenRow/TitleLabel");
+        VsyncTitleLbl = GetNodeOrNull<Label>("VBox/Content/GraphicsPanel/VSyncRow/TitleLabel");
+        ShakeTitleLbl = GetNodeOrNull<Label>("VBox/Content/GraphicsPanel/ShakeRow/TitleLabel");
+        PerfTitleLbl = GetNodeOrNull<Label>("VBox/Content/GraphicsPanel/PerfRow/TitleLabel");
+        FpsTitleLbl = GetNodeOrNull<Label>("VBox/Content/GraphicsPanel/FpsRow/TitleLabel");
+        MaxFpsTitleLbl = GetNodeOrNull<Label>("VBox/Content/GraphicsPanel/MaxFpsRow/TitleLabel");
 
         LangTitleLbl = GetNodeOrNull<Label>("VBox/LanguageRow/LangLabel");
         LangOption = GetNodeOrNull<OptionButton>("VBox/LanguageRow/LangOption");
@@ -112,15 +114,19 @@ public partial class SettingsModal : ModalBase
         if (BgmSlider != null)
             BgmSlider.ValueChanged += OnBgmSliderChanged;
 
-        // Graphics signals
+        // Graphics state buttons (right side shows ON/OFF like the keys tab)
         if (FullscreenCheck != null)
-            FullscreenCheck.Toggled += OnFullscreenToggled;
+            FullscreenCheck.Pressed += OnFullscreenPressed;
         if (VsyncCheck != null)
-            VsyncCheck.Toggled += OnVsyncToggled;
+            VsyncCheck.Pressed += OnVsyncPressed;
         if (ShakeCheck != null)
-            ShakeCheck.Toggled += OnShakeToggled;
+            ShakeCheck.Pressed += OnShakePressed;
         if (PerfCheck != null)
-            PerfCheck.Toggled += OnPerfToggled;
+            PerfCheck.Pressed += OnPerfPressed;
+        if (FpsCheck != null)
+            FpsCheck.Pressed += OnFpsPressed;
+        if (MaxFpsBtn != null)
+            MaxFpsBtn.Pressed += OnMaxFpsPressed;
 
         // Language dropdown (native names, never translated)
         if (LangOption != null)
@@ -402,16 +408,26 @@ public partial class SettingsModal : ModalBase
                 BgmValLbl.Text = $"{(int)BgmSlider.Value}%";
         }
 
-        if (FullscreenCheck != null)
-            FullscreenCheck.ButtonPressed = SettingsManager.Fullscreen;
-        if (VsyncCheck != null)
-            VsyncCheck.ButtonPressed = SettingsManager.Vsync;
-        if (ShakeCheck != null)
-            ShakeCheck.ButtonPressed = SettingsManager.ScreenShake;
-        if (PerfCheck != null)
-            PerfCheck.ButtonPressed = SettingsManager.PerformanceMode;
+        RefreshGraphicsStates();
 
         RefreshLanguageOption();
+    }
+
+    /// <summary>Right-side state buttons always show the current ON/OFF value.</summary>
+    public void RefreshGraphicsStates()
+    {
+        if (FullscreenCheck != null)
+            FullscreenCheck.Text = Tr(SettingsManager.Fullscreen ? "SETTINGS_STATE_ON" : "SETTINGS_STATE_OFF");
+        if (VsyncCheck != null)
+            VsyncCheck.Text = Tr(SettingsManager.Vsync ? "SETTINGS_STATE_ON" : "SETTINGS_STATE_OFF");
+        if (ShakeCheck != null)
+            ShakeCheck.Text = Tr(SettingsManager.ScreenShake ? "SETTINGS_STATE_ON" : "SETTINGS_STATE_OFF");
+        if (PerfCheck != null)
+            PerfCheck.Text = Tr(SettingsManager.PerformanceMode ? "SETTINGS_STATE_ON" : "SETTINGS_STATE_OFF");
+        if (FpsCheck != null)
+            FpsCheck.Text = Tr(SettingsManager.ShowFps ? "SETTINGS_STATE_ON" : "SETTINGS_STATE_OFF");
+        if (MaxFpsBtn != null)
+            MaxFpsBtn.Text = SettingsManager.MaxFps <= 0 ? "∞" : SettingsManager.MaxFps.ToString();
     }
 
     /// <summary>Selects the dropdown entry matching the current locale.</summary>
@@ -453,25 +469,49 @@ public partial class SettingsModal : ModalBase
         SettingsManager.SetBgmVolume((float)(val / 100.0));
     }
 
-    private void OnFullscreenToggled(bool toggledOn)
+    private void OnFullscreenPressed()
     {
-        SettingsManager.SetFullscreen(toggledOn);
+        SettingsManager.SetFullscreen(!SettingsManager.Fullscreen);
+        RefreshGraphicsStates();
     }
 
-    private void OnVsyncToggled(bool toggledOn)
+    private void OnVsyncPressed()
     {
-        SettingsManager.SetVsync(toggledOn);
+        SettingsManager.SetVsync(!SettingsManager.Vsync);
+        RefreshGraphicsStates();
     }
 
-    private void OnShakeToggled(bool toggledOn)
+    private void OnShakePressed()
     {
-        SettingsManager.SetScreenShake(toggledOn);
+        SettingsManager.SetScreenShake(!SettingsManager.ScreenShake);
+        RefreshGraphicsStates();
     }
 
-    private void OnPerfToggled(bool toggledOn)
+    private void OnPerfPressed()
     {
-        SettingsManager.SetPerformanceMode(toggledOn);
-        BackdropQuality.ApplyTo(GetTree()?.CurrentScene, toggledOn);
+        bool next = !SettingsManager.PerformanceMode;
+        SettingsManager.SetPerformanceMode(next);
+        BackdropQuality.ApplyTo(GetTree()?.CurrentScene, next);
+        RefreshGraphicsStates();
+    }
+
+    private void OnFpsPressed()
+    {
+        bool next = !SettingsManager.ShowFps;
+        SettingsManager.SetShowFps(next);
+        GetTree()?.CurrentScene?.GetNodeOrNull<Hud>("HUD")?.SetFpsVisible(next);
+        RefreshGraphicsStates();
+    }
+
+    /// <summary>Cycle order for the Max FPS value button.</summary>
+    private static readonly int[] FpsSteps = { 0, 30, 60, 120 };
+
+    private void OnMaxFpsPressed()
+    {
+        int idx = Array.IndexOf(FpsSteps, SettingsManager.MaxFps);
+        int next = idx < 0 ? 0 : FpsSteps[(idx + 1) % FpsSteps.Length];
+        SettingsManager.SetMaxFps(next);
+        RefreshGraphicsStates();
     }
 
     public override void UpdateLocalizedTexts()
@@ -490,10 +530,13 @@ public partial class SettingsModal : ModalBase
         if (SfxTitleLbl != null) SfxTitleLbl.Text = Tr("SETTINGS_SFX_VOL");
         if (BgmTitleLbl != null) BgmTitleLbl.Text = Tr("SETTINGS_BGM_VOL");
 
-        if (FullscreenCheck != null) FullscreenCheck.Text = Tr("SETTINGS_FULLSCREEN");
-        if (VsyncCheck != null) VsyncCheck.Text = Tr("SETTINGS_VSYNC");
-        if (ShakeCheck != null) ShakeCheck.Text = Tr("SETTINGS_SCREEN_SHAKE");
-        if (PerfCheck != null) PerfCheck.Text = Tr("SETTINGS_PERF_MODE");
+        if (FullscreenTitleLbl != null) FullscreenTitleLbl.Text = Tr("SETTINGS_FULLSCREEN");
+        if (VsyncTitleLbl != null) VsyncTitleLbl.Text = Tr("SETTINGS_VSYNC");
+        if (ShakeTitleLbl != null) ShakeTitleLbl.Text = Tr("SETTINGS_SCREEN_SHAKE");
+        if (PerfTitleLbl != null) PerfTitleLbl.Text = Tr("SETTINGS_PERF_MODE");
+        if (FpsTitleLbl != null) FpsTitleLbl.Text = Tr("SETTINGS_SHOW_FPS");
+        if (MaxFpsTitleLbl != null) MaxFpsTitleLbl.Text = Tr("SETTINGS_MAX_FPS");
+        RefreshGraphicsStates();
 
         if (LangTitleLbl != null) LangTitleLbl.Text = Tr("SETTINGS_LANGUAGE");
         RefreshLanguageOption();

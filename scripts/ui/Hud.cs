@@ -31,6 +31,9 @@ public partial class Hud : CanvasLayer
     private TutorialCueView? _tutorial;
     private ToastView? _toast;
 
+    private Label? _fpsLabel;
+    private float _fpsAccum;
+
     /// <summary>
     /// Fluid-field provider (set by Main). Replaces the old
     /// <c>GetParent() is Main</c> coupling for the tutorial fluid cues.
@@ -170,6 +173,24 @@ public partial class Hud : CanvasLayer
         _langCallback = Callable.From((string _) => UpdateLocalizedTexts());
         GameManager.AddLanguageListener(_langCallback);
 
+        // Code-built FPS counter (top-right, hidden unless opted in).
+        _fpsLabel = new Label
+        {
+            Name = "FpsLabel",
+            HorizontalAlignment = HorizontalAlignment.Right,
+            MouseFilter = Control.MouseFilterEnum.Ignore,
+            Visible = SettingsManager.ShowFps
+        };
+        _fpsLabel.AnchorLeft = 1.0f;
+        _fpsLabel.AnchorRight = 1.0f;
+        _fpsLabel.OffsetLeft = -140.0f;
+        _fpsLabel.OffsetRight = -10.0f;
+        _fpsLabel.OffsetTop = 8.0f;
+        _fpsLabel.OffsetBottom = 28.0f;
+        _fpsLabel.AddThemeFontSizeOverride("font_size", 13);
+        _fpsLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.9f, 0.6f, 0.9f));
+        AddChild(_fpsLabel);
+
         UpdateLocalizedTexts();
     }
 
@@ -187,6 +208,7 @@ public partial class Hud : CanvasLayer
         _skills?.TickAlpha(dt, GetTree().Paused);
         _vitals?.UpdateBuffStatus();
         _skills?.TickSkillSlots();
+        TickFps(dt);
         Vector2 fluid = FluidVectorProvider?.Invoke() ?? Vector2.Zero;
         _tutorial?.UpdateTutorialCues(dt, fluid);
     }
@@ -244,6 +266,29 @@ public partial class Hud : CanvasLayer
     public void UpdateSkillSlots()
     {
         _skills?.UpdateSkillSlots();
+    }
+
+    /// <summary>Shows or hides the FPS counter overlay (settings toggle).</summary>
+    public void SetFpsVisible(bool visible)
+    {
+        if (_fpsLabel != null)
+        {
+            _fpsLabel.Visible = visible;
+            _fpsAccum = 1.0f;
+        }
+    }
+
+    /// <summary>4 Hz text refresh so the counter itself allocates nothing per frame.</summary>
+    private void TickFps(float dt)
+    {
+        if (_fpsLabel == null || !_fpsLabel.Visible)
+            return;
+        _fpsAccum += dt;
+        if (_fpsAccum >= 0.25f)
+        {
+            _fpsAccum = 0.0f;
+            _fpsLabel.Text = Engine.GetFramesPerSecond() + " FPS";
+        }
     }
 
     public void OnSlotMouseEntered(int slotIdx, Control card)

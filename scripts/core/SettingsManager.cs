@@ -35,6 +35,12 @@ public partial class SettingsManager : Node
     /// </summary>
     public static bool PerformanceMode = false;
 
+    /// <summary>FPS counter overlay in the HUD (top-right). Default off.</summary>
+    public static bool ShowFps = false;
+
+    /// <summary>Frame-rate cap (0 = unlimited, the current behavior).</summary>
+    public static int MaxFps = 0;
+
     /// <summary>
     /// Organ map mechanics master switch (docs/map.md §3): fluid drift,
     /// hazards and the fluid-arrow cues. Visual tints stay always-on.
@@ -83,6 +89,9 @@ public partial class SettingsManager : Node
         // VSync mode
         var vsyncMode = Vsync ? DisplayServer.VSyncMode.Enabled : DisplayServer.VSyncMode.Disabled;
         DisplayServer.WindowSetVsyncMode(vsyncMode);
+
+        // Frame-rate cap (0 = unlimited)
+        Engine.MaxFps = MaxFps;
 
         KeyBindings.ApplyAll();
 
@@ -141,6 +150,20 @@ public partial class SettingsManager : Node
         SaveToDisk();
     }
 
+    public static void SetShowFps(bool enabled)
+    {
+        ShowFps = enabled;
+        ApplySettings();
+        SaveToDisk();
+    }
+
+    public static void SetMaxFps(int fps)
+    {
+        MaxFps = fps < 0 ? 0 : fps;
+        ApplySettings();
+        SaveToDisk();
+    }
+
     public static void SaveToDisk()
     {
         var payload = new Godot.Collections.Dictionary<string, Variant>
@@ -152,6 +175,8 @@ public partial class SettingsManager : Node
             { "vsync", Vsync },
             { "screen_shake", ScreenShake },
             { "performance_mode", PerformanceMode },
+            { "show_fps", ShowFps },
+            { "max_fps", MaxFps },
             { "map_effects_enabled", MapEffectsEnabled },
             { "keybindings", KeyBindings.ToDict() }
         };
@@ -171,6 +196,8 @@ public partial class SettingsManager : Node
         Vsync = d.ContainsKey("vsync") ? (bool)d["vsync"] : true;
         ScreenShake = d.ContainsKey("screen_shake") ? (bool)d["screen_shake"] : false;
         PerformanceMode = d.ContainsKey("performance_mode") ? (bool)d["performance_mode"] : false;
+        ShowFps = d.ContainsKey("show_fps") ? (bool)d["show_fps"] : false;
+        MaxFps = d.ContainsKey("max_fps") ? (int)d["max_fps"] : 0;
         MapEffectsEnabled = d.ContainsKey("map_effects_enabled") ? (bool)d["map_effects_enabled"] : false;
         if (d.TryGetValue("keybindings", out var kbVal) && kbVal.VariantType == Variant.Type.Dictionary)
             KeyBindings.FromDict(kbVal.AsGodotDictionary());

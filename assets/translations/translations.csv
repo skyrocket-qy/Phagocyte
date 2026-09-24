@@ -392,6 +392,10 @@ SETTINGS_FULLSCREEN,Fullscreen Mode,全螢幕模式,全螢幕模式,フルスク
 SETTINGS_VSYNC,Vertical Sync (VSync),垂直同步,垂直同步,垂直同期（VSync）,Vertikale Sync (VSync),Synchro verticale (VSync),Вертикальная синхронизация (VSync),Sincronización vertical (VSync)
 SETTINGS_SCREEN_SHAKE,Screen Shake,屏幕震动,螢幕震動,画面振動,Bildschirmwackeln,Secousse d'écran,Тряска экрана,Sacudida de pantalla
 SETTINGS_PERF_MODE,Performance Mode (no glow / backdrop shaders),性能模式（关闭辉光与背景着色器）,效能模式（關閉輝光與背景著色器）,パフォーマンスモード（グロー・背景シェーダー無効）,Leistungsmodus (kein Glow / Hintergrund-Shader),Mode performance (sans halo / shaders de fond),Режим производительности (без свечения и шейдеров фона),Modo de rendimiento (sin brillo ni sombreadores de fondo)
+SETTINGS_SHOW_FPS,Show FPS Counter,显示帧率计数器,顯示幀率計數器,FPSカウンターを表示,FPS-Zähler anzeigen,Afficher le compteur FPS,Показывать счётчик FPS,Mostrar contador de FPS
+SETTINGS_STATE_ON,ON,开,開,オン,An,ON,Вкл,ON
+SETTINGS_STATE_OFF,OFF,关,關,オフ,Aus,OFF,Выкл,OFF
+SETTINGS_MAX_FPS,Max FPS,最大帧率,最大幀率,最大FPS,Max. FPS,FPS max,Макс. FPS,FPS máx
 CONTROLS_TITLE,Movement & Phagocytosis Operations,走位操控與吞噬機制,走位操控與吞噬機制,移動＆貪食操作,Bewegung & Phagozytose,Mouvement et phagocytose,Движение и фагоцитоз,Movimiento y fagocitosis
 CONTROLS_MOVE_DESC,[W][A][S][D] / Arrow Keys: Fluid pseudopod swimming locomotion.,[W][A][S][D] / 方向鍵：流體偽足游動走位。,[W][A][S][D] / 方向鍵：流體偽足游動走位。,[W][A][S][D]／方向キー：流体偽足で滑らかに移動。,[W][A][S][D]/Pfeiltasten: Fluide Pseudopodien-Bewegung.,[W][A][S][D]/Flèches : locomotion fluide par pseudopodes.,[W][A][S][D]/стрелки: плавное движение на псевдоподиях.,[W][A][S][D]/flechas: locomoción fluida con seudópodos.
 CONTROLS_PAUSE_DESC,[ESC]: Pause game / open System Settings & Manual.,[ESC]：暫停遊戲 / 開啟系統設定與檔案庫。,[ESC]：暫停遊戲 / 開啟系統設定與檔案庫。,[ESC]：一時停止／設定と档案館を開く。,[ESC]: Pause / Einstellungen & Kodex öffnen.,[ESC] : pause / ouvrir paramètres et codex.,[ESC]: пауза / открыть настройки и кодекс.,[ESC]: pausa / abrir ajustes y códice.
