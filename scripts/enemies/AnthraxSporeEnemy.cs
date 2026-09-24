@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 
 namespace Phagocyte.Enemies;
@@ -27,7 +28,7 @@ public partial class AnthraxSporeEnemy : BaseEnemy
         BaseScore = 100;
     }
 
-    protected override float GetCollisionRadius() => 16.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(1.0f);
 
     protected override void OnPostDamage(float damage, Node2D? source, bool isCrit)
     {

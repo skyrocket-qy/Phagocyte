@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Core;
 using Phagocyte.Skills;
 
 namespace Phagocyte.Player;
@@ -18,8 +19,8 @@ public partial class DendriticCell : BaseCell
     {
         MaxHealth = 110.0f;
         BaseSpeed = 225.0f;
-        BaseRadius = 45.0f;
-        BaseDeformationMag = 28.0f;
+        BaseRadius = Morphology.RealSizeToRadius(17.0f);
+        BaseDeformationMag = 23.6f;
         DeformationSpeed = 2.8f;
 
         Noise = new FastNoiseLite
@@ -36,7 +37,7 @@ public partial class DendriticCell : BaseCell
         // Central irregular oval nucleus
         var nPts = new Vector2[20];
         int nCount = 20;
-        float baseR = 16.0f;
+        float baseR = 13.5f;
         for (int i = 0; i < nCount; i++)
         {
             float a = i * (Mathf.Tau / (float)nCount);

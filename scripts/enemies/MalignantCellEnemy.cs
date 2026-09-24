@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Combat;
 
@@ -24,6 +25,7 @@ public partial class MalignantCellEnemy : BaseEnemy
     private float _membranePhase = 0.0f;
     private float _mitosisTimer = 0.0f;
     private float _splitPulse = 0.0f;
+    private const float DrawScale = 37.0f / 34.0f; // A-formula visual match: 34px -> 37px
 
     public MalignantCellEnemy()
     {
@@ -38,7 +40,7 @@ public partial class MalignantCellEnemy : BaseEnemy
         IsElite = true;
     }
 
-    protected override float GetCollisionRadius() => 34.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(15.0f);
 
     protected override void CustomPhysicsProcess(float dt)
     {
@@ -93,6 +95,7 @@ public partial class MalignantCellEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Irregular deformed cytoplasm with cancerous blebbing
         Color cytoplasmColor = new Color(0.32f, 0.12f, 0.18f, 0.85f);
         Color membraneColor = new Color(0.75f, 0.22f, 0.32f, 0.95f);
@@ -138,5 +141,6 @@ public partial class MalignantCellEnemy : BaseEnemy
             DrawArc(Vector2.Zero, 32.0f + t * 26.0f, 0.0f, Mathf.Tau, 32,
                 new Color(0.9f, 0.3f, 0.5f, 1.0f - t), 3.5f);
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -10,6 +11,8 @@ namespace Phagocyte.Enemies;
 /// </summary>
 public partial class TbEnemy : BaseEnemy
 {
+    private const float DrawScale = 23.0f / 14.0f; // A-formula visual match: 14px -> 23px
+
     public TbEnemy()
     {
         EnemyId = "tb";
@@ -22,7 +25,7 @@ public partial class TbEnemy : BaseEnemy
         Armor = 2.0f; // Mycolic wax absorbs damage
     }
 
-    protected override float GetCollisionRadius() => 14.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(3.0f);
 
     // Acid-resistant mycolic wall: digestion is slow and burns the predator.
     protected override float EngulfDigestDuration => 0.75f;
@@ -43,6 +46,7 @@ public partial class TbEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Thick waxy mycolic acid outer boundary (glossy yellow-magenta)
         Color waxBorder = new Color(0.9f, 0.3f, 0.5f, 0.85f);
         Color acidCore = new Color(0.6f, 0.1f, 0.25f, 0.95f);
@@ -67,5 +71,6 @@ public partial class TbEnemy : BaseEnemy
         DrawCircle(new Vector2(-8, 0), 2.0f, Colors.White);
         DrawCircle(new Vector2(0, 2), 2.0f, Colors.White);
         DrawCircle(new Vector2(8, 0), 2.0f, Colors.White);
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

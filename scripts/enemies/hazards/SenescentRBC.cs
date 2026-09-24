@@ -15,7 +15,7 @@ public partial class SenescentRBC : Node2D
     [Export] public float AtpValue { get; set; } = 25.0f;
     [Export] public float Lifetime { get; set; } = 30.0f;
     [Export] public float DriftSpeed { get; set; } = 12.0f;
-    [Export] public float CollisionRadius { get; set; } = 18.0f;
+    [Export] public float CollisionRadius { get; set; } = 29.0f;
 
     public bool IsConsumed { get; private set; }
 

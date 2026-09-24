@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 
 namespace Phagocyte.Enemies;
@@ -9,6 +10,8 @@ namespace Phagocyte.Enemies;
 /// </summary>
 public partial class AspergillusEnemy : BaseEnemy
 {
+    private const float DrawScale = 21.0f / 17.0f; // A-formula visual match: 17px -> 21px
+
     public AspergillusEnemy()
     {
         EnemyId = "aspergillus";
@@ -20,7 +23,7 @@ public partial class AspergillusEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
-    protected override float GetCollisionRadius() => 17.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(2.5f);
 
     public override void Die(Node2D? killer)
     {
@@ -49,6 +52,7 @@ public partial class AspergillusEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Conidiophore stalk
         Color stalkCol = new Color(0.28f, 0.42f, 0.22f, 0.95f);
         DrawLine(new Vector2(0, 8), new Vector2(0, 22), stalkCol, 5.0f);
@@ -74,5 +78,6 @@ public partial class AspergillusEnemy : BaseEnemy
                 DrawCircle(pos, 2.8f, s == 3 ? tipCol : sporeCol);
             }
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

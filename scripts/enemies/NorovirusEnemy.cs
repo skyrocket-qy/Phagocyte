@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 
 namespace Phagocyte.Enemies;
@@ -9,6 +10,8 @@ namespace Phagocyte.Enemies;
 /// </summary>
 public partial class NorovirusEnemy : BaseEnemy
 {
+    private const float DrawScale = 6.0f / 7.0f; // A-formula visual match: 7px -> 6px
+
     public NorovirusEnemy()
     {
         EnemyId = "norovirus";
@@ -20,13 +23,14 @@ public partial class NorovirusEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
-    protected override float GetCollisionRadius() => 7.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(0.03f);
 
     /// <summary>Cyan capsid tint for the GPU swarm batch renderer (docs/spec.md §9).</summary>
     public override Color SwarmBatchColor => new(0.3f, 1.0f, 1.05f, 1.0f);
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // Minuscule icosahedral capsid (hexagon/diamond)
         Color capsidColor = new Color(0.2f, 0.85f, 0.95f, 0.95f);
         Color coreColor = new Color(0.85f, 1.0f, 1.0f, 0.95f);
@@ -39,5 +43,6 @@ public partial class NorovirusEnemy : BaseEnemy
 
         DrawColoredPolygon(points, capsidColor);
         DrawCircle(Vector2.Zero, 3.0f, coreColor);
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

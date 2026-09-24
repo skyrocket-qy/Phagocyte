@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -12,6 +13,7 @@ public partial class TetanusEnemy : BaseEnemy
 {
     private float _attackTimer = 0.0f;
     private const float AttackCooldown = 4.0f;
+    private const float DrawScale = 21.0f / 15.0f; // A-formula visual match: 15px -> 21px
 
     public TetanusEnemy()
     {
@@ -24,7 +26,7 @@ public partial class TetanusEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.Standoff;
     }
 
-    protected override float GetCollisionRadius() => 15.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(2.5f);
 
     // Tetanus keeps its bespoke 350-500px firing band instead of the generic orbit.
     protected override bool UseGenericSteering => false;
@@ -78,6 +80,7 @@ public partial class TetanusEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // Drumstick / tennis racket morphology
         Color rodColor = new Color(0.35f, 0.28f, 0.45f, 0.95f);
         Color sporeColor = new Color(0.65f, 0.55f, 0.78f, 0.95f);
@@ -94,5 +97,6 @@ public partial class TetanusEnemy : BaseEnemy
             float sparkPulse = Mathf.Sin(_attackTimer * 30.0f) * 4.0f;
             DrawCircle(new Vector2(10, 0), 10.0f + sparkPulse, new Color(0.4f, 0.8f, 1.0f, 0.4f));
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

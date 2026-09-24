@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -15,6 +16,7 @@ public partial class SVirusEnemy : BaseEnemy
     private const float ReplicationThreshold = 18.0f;
     private const float SpikeInterval = 2.5f;
     private const float SpikeRange = 640.0f;
+    private const float DrawScale = 8.0f / 15.0f; // A-formula visual match: 15px -> 8px
 
     public SVirusEnemy()
     {
@@ -27,7 +29,7 @@ public partial class SVirusEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.Standoff;
     }
 
-    protected override float GetCollisionRadius() => 15.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(0.1f);
 
     public override float SteeringPreferredRange => 280.0f;
 
@@ -104,6 +106,7 @@ public partial class SVirusEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Core viral lipid envelope
         Color envelopeColor = new Color(0.68f, 0.18f, 0.28f, 0.95f);
         Color coreRnaColor = new Color(0.88f, 0.35f, 0.45f, 0.95f);
@@ -127,5 +130,6 @@ public partial class SVirusEnemy : BaseEnemy
             // Clover/club spike head
             DrawCircle(headPos, 2.8f, spikeCrown);
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

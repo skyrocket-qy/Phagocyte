@@ -129,7 +129,8 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
 
     protected virtual float GetCollisionRadius()
     {
-        return 16.0f;
+        // BaseEnemy default ≈ 1um coccus (staph-like) via the A formula.
+        return Morphology.RealSizeToRadius(1.0f);
     }
 
     /// <summary>Public body radius for hit-presentation (envelope sizing).</summary>

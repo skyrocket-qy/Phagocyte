@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -21,12 +22,13 @@ public partial class AnthraxBacillus : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
-    protected override float GetCollisionRadius() => 14.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(4.0f);
 
     /// <summary>Damage multiplier applied to the toxin telegraph (berserk awakening = 1.5x).</summary>
     [Export] public float DamageMultiplier { get; set; } = 1.0f;
 
     private float _toxinTimer = 2.0f;
+    private const float DrawScale = 25.0f / 14.0f; // A-formula visual match: 14px -> 25px
 
     protected override void CustomPhysicsProcess(float dt)
     {
@@ -65,6 +67,7 @@ public partial class AnthraxBacillus : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // Bamboo/boxcar rod body
         Color capsuleColor = new Color(0.42f, 0.28f, 0.48f, 0.95f);
         Color coreColor = new Color(0.68f, 0.45f, 0.75f, 1.0f);
@@ -73,5 +76,6 @@ public partial class AnthraxBacillus : BaseEnemy
         DrawRect(new Rect2(-11, -4, 22, 8), coreColor);
         // Translucent poly-D-glutamic acid capsule boundary
         DrawRect(new Rect2(-16, -9, 32, 18), new Color(0.85f, 0.7f, 0.95f, 0.45f), false, 1.5f);
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

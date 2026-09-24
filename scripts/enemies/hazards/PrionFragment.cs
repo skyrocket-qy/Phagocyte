@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -10,6 +11,7 @@ namespace Phagocyte.Enemies;
 /// </summary>
 public partial class PrionFragment : BaseEnemy
 {
+    private const float DrawScale = 6.0f / 12.0f; // A-formula visual match: 12px -> 6px
     public override bool CanBeEngulfed => false;
 
     public PrionFragment()
@@ -23,12 +25,13 @@ public partial class PrionFragment : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
-    protected override float GetCollisionRadius() => 12.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(0.005f);
 
     protected override float EngulfContactDamage => 10.0f;
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // Jagged refracting crystalline beta-sheet fragment
         Color crystalCol = new Color(0.35f, 0.12f, 0.55f, 0.95f);
         Color edgeCol = new Color(0.85f, 0.35f, 1.0f, 0.85f);
@@ -48,5 +51,6 @@ public partial class PrionFragment : BaseEnemy
             Vector2 p2 = points[(i + 1) % points.Length];
             DrawLine(p1, p2, edgeCol, 1.8f);
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

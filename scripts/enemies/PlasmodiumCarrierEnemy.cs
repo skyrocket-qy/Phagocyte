@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 
 namespace Phagocyte.Enemies;
@@ -10,6 +11,7 @@ namespace Phagocyte.Enemies;
 public partial class PlasmodiumCarrierEnemy : BaseEnemy
 {
     private bool _hasRuptured = false;
+    private const float DrawScale = 29.0f / 18.0f; // A-formula visual match: 18px -> 29px
 
     public PlasmodiumCarrierEnemy()
     {
@@ -22,7 +24,7 @@ public partial class PlasmodiumCarrierEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
-    protected override float GetCollisionRadius() => 18.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(7.0f);
 
     protected override void OnPreDamage(float damage, Node2D? source, bool isCrit)
     {
@@ -62,6 +64,7 @@ public partial class PlasmodiumCarrierEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Erythrocyte biconcave outer ring
         Color rbcRim = new Color(0.78f, 0.18f, 0.18f, 0.95f);
         Color rbcCenter = new Color(0.55f, 0.12f, 0.12f, 0.95f);
@@ -79,5 +82,6 @@ public partial class PlasmodiumCarrierEnemy : BaseEnemy
 
         DrawCircle(new Vector2(4, 3), 3.5f, parasiteCol);
         DrawCircle(new Vector2(5, 2), 1.5f, chromatinDot);
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

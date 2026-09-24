@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 
 namespace Phagocyte.Enemies;
@@ -10,6 +11,7 @@ namespace Phagocyte.Enemies;
 public partial class PseudomonasEnemy : BaseEnemy
 {
     private float _flagellumTime = 0.0f;
+    private const float DrawScale = 20.0f / 15.0f; // A-formula visual match: 15px -> 20px
 
     public PseudomonasEnemy()
     {
@@ -22,7 +24,7 @@ public partial class PseudomonasEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
-    protected override float GetCollisionRadius() => 15.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(2.0f);
 
     protected override void CustomPhysicsProcess(float dt)
     {
@@ -61,6 +63,7 @@ public partial class PseudomonasEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Pyocyanin blue-green rod capsule
         Color capsuleColor = new Color(0.15f, 0.65f, 0.45f, 0.95f);
         Color coreColor = new Color(0.25f, 0.85f, 0.60f, 0.90f);
@@ -83,5 +86,6 @@ public partial class PseudomonasEnemy : BaseEnemy
             DrawLine(prevPoint, nextPoint, new Color(0.3f, 0.8f, 0.5f, 0.65f), 1.6f);
             prevPoint = nextPoint;
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

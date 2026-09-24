@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -10,6 +11,7 @@ namespace Phagocyte.Enemies;
 /// </summary>
 public partial class PlasmodiumMerozoite : BaseEnemy
 {
+    private const float DrawScale = 18.0f / 7.0f; // A-formula visual match: 7px -> 18px
     public PlasmodiumMerozoite()
     {
         EnemyId = "plasmodium_merozoite";
@@ -21,15 +23,17 @@ public partial class PlasmodiumMerozoite : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
-    protected override float GetCollisionRadius() => 7.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(1.5f);
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // Teardrop pear shape
         Color bodyColor = new Color(0.75f, 0.22f, 0.35f, 0.95f);
         Color apicalColor = new Color(1.0f, 0.4f, 0.5f, 1.0f);
 
         DrawCircle(Vector2.Zero, 6.0f, bodyColor);
         DrawCircle(new Vector2(0, -3), 2.5f, apicalColor);
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

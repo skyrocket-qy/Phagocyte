@@ -41,8 +41,8 @@ public partial class PathogenSwarmRenderer : Node2D
         _batchRoot = new MultiMeshInstance2D { Name = "SwarmBatchRoot" };
         AddChild(_batchRoot);
 
-        RegisterSpecies("norovirus", 768, new Vector2(15.0f, 15.0f), BuildNorovirusTexture());
-        RegisterSpecies("flu_drift", 192, new Vector2(48.0f, 48.0f), BuildFluDriftTexture());
+        RegisterSpecies("norovirus", 768, new Vector2(13.0f, 13.0f), BuildNorovirusTexture());
+        RegisterSpecies("flu_drift", 192, new Vector2(24.0f, 24.0f), BuildFluDriftTexture());
     }
 
     public void RegisterSpecies(string speciesId, int capacity, Vector2 quadSize, Texture2D texture)

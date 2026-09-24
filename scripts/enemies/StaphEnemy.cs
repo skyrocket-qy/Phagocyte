@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using System.Collections.Generic;
 
@@ -24,6 +25,8 @@ public partial class StaphEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
         FibrinShield = 0; // Default 0 for basic coccus; cluster spawns set FibrinShield = 1
     }
+
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(1.0f);
 
     protected override void SetupEnemy()
     {

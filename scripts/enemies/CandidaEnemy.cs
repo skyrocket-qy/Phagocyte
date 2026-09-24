@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -18,6 +19,7 @@ public partial class CandidaEnemy : BaseEnemy
     public const float AmbushRange = 200.0f;
     public const float HyphaeReach = 150.0f;
     private const float HyphaeChannelTime = 1.6f;
+    private const float DrawScale = 26.0f / 16.0f; // A-formula visual match: 16px -> 26px
 
     public bool IsHyphaeExtended => _hyphaeExtended;
 
@@ -32,7 +34,7 @@ public partial class CandidaEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
-    protected override float GetCollisionRadius() => 16.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(5.0f);
 
     /// <summary>
     /// The yeast body freezes in place while it channels its piercing pseudohyphae.
@@ -129,6 +131,7 @@ public partial class CandidaEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Oval yeast body
         Color yeastWall = new Color(0.88f, 0.85f, 0.72f, 0.95f);
         Color yeastCore = new Color(0.98f, 0.95f, 0.85f, 0.95f);
@@ -154,5 +157,6 @@ public partial class CandidaEnemy : BaseEnemy
                 DrawCircle(tipPos, 2.5f, Colors.Crimson);
             }
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Combat;
 
@@ -17,6 +18,7 @@ public partial class HpyloriEnemy : BaseEnemy
 
     private float _spinAngle = 0.0f;
     private float _ulcerTimer = 1.0f;
+    private const float DrawScale = 23.0f / 14.0f; // A-formula visual match: 14px -> 23px
 
     public HpyloriEnemy()
     {
@@ -30,7 +32,7 @@ public partial class HpyloriEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.Invader;
     }
 
-    protected override float GetCollisionRadius() => 14.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(3.0f);
 
     protected override void CustomPhysicsProcess(float dt)
     {
@@ -90,6 +92,7 @@ public partial class HpyloriEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Alkaline urease cloud / halo
         Color alkalineAura = new Color(0.35f, 0.75f, 0.95f, 0.25f);
         DrawCircle(Vector2.Zero, 18.0f, alkalineAura);
@@ -116,5 +119,6 @@ public partial class HpyloriEnemy : BaseEnemy
             Vector2 fTip = new Vector2(24, f * 3.5f + Mathf.Sin(_spinAngle * 1.5f + f) * 4.0f);
             DrawLine(new Vector2(16, 0), fTip, new Color(0.9f, 0.6f, 0.3f, 0.7f), 1.4f);
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

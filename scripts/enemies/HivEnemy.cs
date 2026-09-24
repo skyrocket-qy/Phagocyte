@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -11,6 +12,7 @@ namespace Phagocyte.Enemies;
 public partial class HivEnemy : BaseEnemy
 {
     private float _siphonCooldown = 0.0f;
+    private const float DrawScale = 9.0f / 14.0f; // A-formula visual match: 14px -> 9px
 
     public HivEnemy()
     {
@@ -23,7 +25,7 @@ public partial class HivEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.Interceptor;
     }
 
-    protected override float GetCollisionRadius() => 14.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(0.12f);
 
     protected override void CustomPhysicsProcess(float dt)
     {
@@ -33,7 +35,7 @@ public partial class HivEnemy : BaseEnemy
         if (player != null && GodotObject.IsInstanceValid(player))
         {
             // Interception steering is handled by EnemySteering; here only the ATP siphon.
-            if (_siphonCooldown <= 0.0f && GlobalPosition.DistanceTo(player.GlobalPosition) < (player.CurrentRadius + 8.0f))
+            if (_siphonCooldown <= 0.0f && GlobalPosition.DistanceTo(player.GlobalPosition) < (player.CurrentRadius + GetCollisionRadius()))
             {
                 _siphonCooldown = 1.5f;
                 // Siphon ATP and energy
@@ -47,6 +49,7 @@ public partial class HivEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Envelope lipid membrane
         Color envelopeColor = new Color(0.25f, 0.15f, 0.35f, 0.95f);
         DrawCircle(Vector2.Zero, 12.0f, envelopeColor);
@@ -73,5 +76,6 @@ public partial class HivEnemy : BaseEnemy
             DrawLine(basePos, headPos, gp120Color, 1.8f);
             DrawCircle(headPos, 2.0f, gp120Color);
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

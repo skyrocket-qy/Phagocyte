@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Core;
 using Phagocyte.Skills;
 
 namespace Phagocyte.Player;
@@ -18,8 +19,8 @@ public partial class BCell : BaseCell
     {
         MaxHealth = 95.0f;
         BaseSpeed = 220.0f;
-        BaseRadius = 44.0f;
-        BaseDeformationMag = 7.0f;
+        BaseRadius = Morphology.RealSizeToRadius(9.0f);
+        BaseDeformationMag = 5.1f;
         DeformationSpeed = 3.2f;
 
         Noise = new FastNoiseLite
@@ -36,7 +37,7 @@ public partial class BCell : BaseCell
         // Clock-face / Cartwheel spoke nucleus shape
         var nPts = new Vector2[24];
         int nCount = 24;
-        float baseR = 20.0f;
+        float baseR = 14.5f;
         for (int i = 0; i < nCount; i++)
         {
             float a = i * (Mathf.Tau / (float)nCount);

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Core;
 using Phagocyte.Skills;
 
 namespace Phagocyte.Player;
@@ -19,8 +20,8 @@ public partial class Macrophage : BaseCell
     {
         MaxHealth = 140.0f;
         BaseSpeed = 210.0f;
-        BaseRadius = 48.0f;
-        BaseDeformationMag = 28.0f;
+        BaseRadius = Morphology.RealSizeToRadius(20.0f);
+        BaseDeformationMag = 23.3f;
         DeformationSpeed = 3.6f;
 
         Noise = new FastNoiseLite
@@ -37,7 +38,7 @@ public partial class Macrophage : BaseCell
         // Indented kidney / horseshoe shaped nucleus
         var nPts = new Vector2[18];
         int nCount = 18;
-        float nRadius = 16.0f;
+        float nRadius = 13.3f;
         for (int i = 0; i < nCount; i++)
         {
             float a = i * (Mathf.Tau / (float)nCount);

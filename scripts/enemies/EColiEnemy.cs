@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -16,6 +17,7 @@ public partial class EColiEnemy : BaseEnemy
     private float _stateTimer = 0.0f;
     private Vector2 _chargeTargetDir = Vector2.Zero;
     private float _flagellaPhase = 0.0f;
+    private const float DrawScale = 20.0f / 15.0f; // A-formula visual match: 15px -> 20px
 
     public EColiEnemy()
     {
@@ -28,7 +30,7 @@ public partial class EColiEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
-    protected override float GetCollisionRadius() => 15.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(2.0f);
 
     protected override void CustomPhysicsProcess(float dt)
     {
@@ -69,7 +71,7 @@ public partial class EColiEnemy : BaseEnemy
                 // Check collision with player
                 if (player != null && GodotObject.IsInstanceValid(player))
                 {
-                    if (GlobalPosition.DistanceTo(player.GlobalPosition) < (player.CurrentRadius + 15.0f))
+                    if (GlobalPosition.DistanceTo(player.GlobalPosition) < (player.CurrentRadius + GetCollisionRadius()))
                     {
                         // Ram impact: knockback player and distort membrane
                         player.Velocity += _chargeTargetDir * 350.0f;
@@ -102,6 +104,7 @@ public partial class EColiEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Telegraph line during windup
         if (_currentState == State.Windup)
         {
@@ -129,5 +132,6 @@ public partial class EColiEnemy : BaseEnemy
             Vector2 tip = root + Vector2.FromAngle(ang) * 12.0f + new Vector2(-wave * 0.5f, wave);
             DrawLine(root, tip, hairCol, 1.2f);
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

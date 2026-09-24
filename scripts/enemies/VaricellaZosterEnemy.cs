@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -11,6 +12,7 @@ namespace Phagocyte.Enemies;
 public partial class VaricellaZosterEnemy : BaseEnemy
 {
     private bool _isAwakened = false;
+    private const float DrawScale = 10.0f / 14.0f; // A-formula visual match: 14px -> 10px
 
     public VaricellaZosterEnemy()
     {
@@ -22,7 +24,7 @@ public partial class VaricellaZosterEnemy : BaseEnemy
         FloatSpeed = 35.0f;
     }
 
-    protected override float GetCollisionRadius() => 14.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(0.2f);
 
     protected override void CustomPhysicsProcess(float dt)
     {
@@ -63,6 +65,7 @@ public partial class VaricellaZosterEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         float alpha = _isAwakened ? 0.95f : 0.20f;
         Color envelopeCol = _isAwakened ? new Color(0.85f, 0.15f, 0.15f, alpha) : new Color(0.4f, 0.4f, 0.5f, alpha);
         Color coreCol = _isAwakened ? new Color(1.0f, 0.4f, 0.2f, alpha) : new Color(0.6f, 0.6f, 0.7f, alpha);
@@ -80,5 +83,6 @@ public partial class VaricellaZosterEnemy : BaseEnemy
             Vector2 p2 = Vector2.FromAngle(ang) * 17.0f;
             DrawLine(p1, p2, envelopeCol, 1.8f);
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

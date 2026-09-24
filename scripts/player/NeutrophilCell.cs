@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Core;
 using Phagocyte.Skills;
 
 namespace Phagocyte.Player;
@@ -18,8 +19,8 @@ public partial class NeutrophilCell : BaseCell
     {
         MaxHealth = 100.0f;
         BaseSpeed = 230.0f;
-        BaseRadius = 46.0f;
-        BaseDeformationMag = 14.0f;
+        BaseRadius = Morphology.RealSizeToRadius(13.0f);
+        BaseDeformationMag = 10.7f;
         DeformationSpeed = 5.0f;
 
         Noise = new FastNoiseLite
@@ -36,7 +37,7 @@ public partial class NeutrophilCell : BaseCell
         // Segmented 3-4 lobed nucleus (characteristic polymorphonuclear shape)
         var nPts = new Vector2[32];
         int nCount = 32;
-        float baseR = 18.0f;
+        float baseR = 13.7f;
         for (int i = 0; i < nCount; i++)
         {
             float a = i * (Mathf.Tau / (float)nCount);

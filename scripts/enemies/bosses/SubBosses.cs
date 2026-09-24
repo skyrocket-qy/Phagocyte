@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using System.Collections.Generic;
 using Phagocyte.Combat;
@@ -612,6 +613,7 @@ public partial class Tachyzoite : BaseEnemy
 {
     private const float DashDuration = 2.6f;
     private const float DashHitDamage = 9.0f;
+    private const float DrawScale = 25.0f / 6.0f; // A-formula visual match: 6px -> 25px
 
     private Vector2 _dashDirection = Vector2.Right;
     private float _dashTimer;
@@ -627,7 +629,7 @@ public partial class Tachyzoite : BaseEnemy
         FloatSpeed = 320.0f;
     }
 
-    protected override float GetCollisionRadius() => 6.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(4.0f);
 
     public void Launch(Vector2 direction)
     {
@@ -660,11 +662,13 @@ public partial class Tachyzoite : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         Vector2 dir = Velocity.LengthSquared() > 0.001f ? Velocity.Normalized() : _dashDirection;
         Vector2 perp = dir.Orthogonal();
 
         DrawLine(-dir * 9.0f, dir * 9.0f, new Color(0.9f, 0.6f, 1.0f, 0.95f), 3.5f);
         DrawCircle(Vector2.Zero, 5.0f, new Color(0.65f, 0.35f, 0.85f, 0.95f));
         DrawCircle(-dir * 3.0f + perp * 2.0f, 1.6f, new Color(1.0f, 0.75f, 0.35f, 1.0f));
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

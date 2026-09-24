@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -14,6 +15,7 @@ public partial class EbolaEnemy : BaseEnemy
     private const int SegmentCount = 10;
     private readonly Vector2[] _bodySegments = new Vector2[SegmentCount];
     private float _tailSweepCooldown = 0.0f;
+    private const float DrawScale = 15.0f / 16.0f; // A-formula visual match: 16px -> 15px
 
     public EbolaEnemy()
     {
@@ -26,7 +28,7 @@ public partial class EbolaEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.ChemoChaser;
     }
 
-    protected override float GetCollisionRadius() => 16.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(0.8f);
 
     protected override void SetupEnemy()
     {
@@ -61,7 +63,7 @@ public partial class EbolaEnemy : BaseEnemy
         {
             // Check tail tip position in global space
             Vector2 tailGlobal = ToGlobal(_bodySegments[SegmentCount - 1]);
-            if (tailGlobal.DistanceTo(player.GlobalPosition) < (player.CurrentRadius + 14.0f))
+            if (tailGlobal.DistanceTo(player.GlobalPosition) < (player.CurrentRadius + GetCollisionRadius()))
             {
                 _tailSweepCooldown = 2.0f;
                 // Direct core true damage bypass
@@ -74,6 +76,7 @@ public partial class EbolaEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         Color filamentColor = new Color(0.72f, 0.12f, 0.22f, 0.95f);
         Color coreRnaColor = new Color(0.95f, 0.35f, 0.45f, 0.95f);
 
@@ -87,5 +90,6 @@ public partial class EbolaEnemy : BaseEnemy
         // Shepherd's crook terminal hook at head
         DrawArc(new Vector2(6, -4), 6.0f, 0, Mathf.Pi * 1.5f, 12, filamentColor, 6.0f);
         DrawCircle(new Vector2(6, -4), 3.0f, coreRnaColor);
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

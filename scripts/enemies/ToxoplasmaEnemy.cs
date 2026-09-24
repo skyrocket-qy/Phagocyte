@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -13,6 +14,7 @@ public partial class ToxoplasmaEnemy : BaseEnemy
     private float _pulseTimer = 0.0f;
     private const float PulseInterval = 5.5f;
     private float _pullDuration = 0.0f;
+    private const float DrawScale = 25.0f / 16.0f; // A-formula visual match: 16px -> 25px
 
     public ToxoplasmaEnemy()
     {
@@ -24,7 +26,7 @@ public partial class ToxoplasmaEnemy : BaseEnemy
         FloatSpeed = 32.0f;
     }
 
-    protected override float GetCollisionRadius() => 16.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(4.0f);
 
     protected override void CustomPhysicsProcess(float dt)
     {
@@ -51,6 +53,7 @@ public partial class ToxoplasmaEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Psychic gravitational wave ripple when pulling
         if (_pullDuration > 0.0f)
         {
@@ -79,5 +82,6 @@ public partial class ToxoplasmaEnemy : BaseEnemy
         DrawCircle(new Vector2(2, -2), 4.5f, coreColor);
         // Conoid apical complex at anterior tip
         DrawCircle(new Vector2(-12, -8), 3.0f, conoidColor);
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -11,6 +12,7 @@ namespace Phagocyte.Enemies;
 public partial class PrionEnemy : BaseEnemy
 {
     public override bool CanBeEngulfed => false; // Lysosomes cannot digest misfolded amyloid prions!
+    private const float DrawScale = 6.0f / 28.0f; // A-formula visual match: 28px -> 6px
 
     public PrionEnemy()
     {
@@ -25,7 +27,7 @@ public partial class PrionEnemy : BaseEnemy
         IsBoss = true;
     }
 
-    protected override float GetCollisionRadius() => 28.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(0.005f);
 
     protected override void OnPostDamage(float damage, Node2D? source, bool isCrit)
     {
@@ -56,6 +58,7 @@ public partial class PrionEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Unearthly violet amyloid aura
         DrawCircle(Vector2.Zero, 34.0f, new Color(0.5f, 0.1f, 0.8f, 0.22f));
 
@@ -89,5 +92,6 @@ public partial class PrionEnemy : BaseEnemy
         {
             DrawLine(facet2[i], facet2[(i + 1) % facet2.Length], new Color(1.0f, 0.6f, 1.0f, 0.8f), 1.5f);
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

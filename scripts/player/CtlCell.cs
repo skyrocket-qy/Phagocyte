@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Core;
 using Phagocyte.Skills;
 
 namespace Phagocyte.Player;
@@ -19,8 +20,8 @@ public partial class CtlCell : BaseCell
     {
         MaxHealth = 90.0f;
         BaseSpeed = 260.0f;
-        BaseRadius = 42.0f;
-        BaseDeformationMag = 6.0f;
+        BaseRadius = Morphology.RealSizeToRadius(9.0f);
+        BaseDeformationMag = 4.6f;
         DeformationSpeed = 7.2f;
 
         Noise = new FastNoiseLite
@@ -37,7 +38,7 @@ public partial class CtlCell : BaseCell
         // Massive circular nucleus occupying ~80% of interior
         var nPts = new Vector2[24];
         int nCount = 24;
-        float nRadius = 32.0f;
+        float nRadius = 24.4f;
         for (int i = 0; i < nCount; i++)
         {
             float a = i * (Mathf.Tau / (float)nCount);

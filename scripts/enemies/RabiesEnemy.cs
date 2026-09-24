@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -13,6 +14,7 @@ public partial class RabiesEnemy : BaseEnemy
     private float _zigZagTimer = 0.0f;
     private Vector2 _currentTrajectory = Vector2.Right;
     private float _attackCooldown = 0.0f;
+    private const float DrawScale = 10.0f / 13.0f; // A-formula visual match: 13px -> 10px
 
     public RabiesEnemy()
     {
@@ -25,7 +27,7 @@ public partial class RabiesEnemy : BaseEnemy
         ThreatMode = EnemyThreatMode.Interceptor;
     }
 
-    protected override float GetCollisionRadius() => 13.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(0.18f);
 
     protected override void SetupEnemy()
     {
@@ -72,6 +74,7 @@ public partial class RabiesEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // Bullet-shaped virion (flat base at left, hemispherical dome at right)
         Color envelopeCol = new Color(0.95f, 0.55f, 0.12f, 0.95f);
         Color rnpCoreCol = new Color(1.0f, 0.85f, 0.25f, 0.95f);
@@ -94,5 +97,6 @@ public partial class RabiesEnemy : BaseEnemy
         {
             DrawLine(new Vector2(-10, y), new Vector2(-13, y), envelopeCol, 1.2f);
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }

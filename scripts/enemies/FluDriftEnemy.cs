@@ -1,4 +1,5 @@
 using Godot;
+using Phagocyte.Core;
 using System;
 using Phagocyte.Player;
 
@@ -13,6 +14,7 @@ public partial class FluDriftEnemy : BaseEnemy
     private float _driftMutationTimer = 0.0f;
     private const float DriftCooldown = 25.0f;
     private Color _currentHue = new Color(0.25f, 0.65f, 0.85f, 0.95f);
+    private const float DrawScale = 9.0f / 18.0f; // A-formula visual match: 18px -> 9px
 
     public FluDriftEnemy()
     {
@@ -26,7 +28,7 @@ public partial class FluDriftEnemy : BaseEnemy
         IsElite = true;
     }
 
-    protected override float GetCollisionRadius() => 18.0f;
+    protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(0.12f);
 
     /// <summary>Shifting antigen hue for the GPU swarm batch renderer (docs/spec.md Â§9).</summary>
     public override Color SwarmBatchColor => _currentHue;
@@ -65,6 +67,7 @@ public partial class FluDriftEnemy : BaseEnemy
 
     public override void _Draw()
     {
+        DrawSetTransform(Vector2.Zero, 0.0f, new Vector2(DrawScale, DrawScale));
         // 1. Shifting antigenic aura
         DrawCircle(Vector2.Zero, 22.0f, new Color(_currentHue.R, _currentHue.G, _currentHue.B, 0.25f));
 
@@ -92,5 +95,6 @@ public partial class FluDriftEnemy : BaseEnemy
                 DrawCircle(tipPos, 2.2f, Colors.Coral);
             }
         }
+        DrawSetTransform(Vector2.Zero, 0.0f, Vector2.One);
     }
 }
