@@ -192,6 +192,9 @@ public partial class UpgradeModal : ModalBase
                 }
                 if (badgeLbl != null)
                 {
+                    // Slot templates carry hardcoded badge colors: neutralize so
+                    // the type modulate below is the single source of truth.
+                    badgeLbl.AddThemeColorOverride("font_color", Colors.White);
                     string bType = choice.TryGetValue("type", out var btVal) ? btVal.AsString() : "";
                     if (bType == "new_active")
                     {
@@ -300,19 +303,6 @@ public partial class UpgradeModal : ModalBase
         }
 
         aura.Visible = isCatalyst;
-        if (isCatalyst)
-        {
-            card.Modulate = new Color(1.0f, 0.95f, 0.72f);
-            if (badgeLbl != null)
-            {
-                badgeLbl.Text = "[ ⚡ " + Tr("BADGE_CATALYST") + " ]";
-                badgeLbl.Modulate = new Color(1.0f, 0.86f, 0.38f);
-            }
-        }
-        else
-        {
-            card.Modulate = Colors.White;
-        }
     }
 
     public void OnCardClicked(int idx)

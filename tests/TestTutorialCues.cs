@@ -214,7 +214,7 @@ public partial class TestTutorialCues : TestHarness
         var card0 = modal.CardsContainer!.GetChild<Control>(0);
         var badge = card0.GetNodeOrNull<Label>("VBox/BadgeLabel");
         AssertThat(badge).IsNotNull();
-        AssertThat(badge!.Text.Contains(modal.Tr("BADGE_CATALYST"))).IsTrue();
+        AssertThat(badge!.Text.Contains(modal.Tr("BADGE_NEW_PASSIVE"))).IsTrue();
 
         var aura = card0.GetNodeOrNull<Panel>("CatalystAura");
         AssertThat(aura).IsNotNull();

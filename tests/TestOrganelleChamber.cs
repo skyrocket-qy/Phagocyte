@@ -434,10 +434,10 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(OrganelleUnlockManager.DropChance).IsEqual(OrganelleUnlockManager.DefaultDropChance);
     }
 
-    /// <summary>Phase 2: the run draft offers, acquires, equips, swaps and heals.</summary>
+    /// <summary>Phase 2: the run draft offers weapons/passives and heals.</summary>
     private void RunDraftFlowTests()
     {
-        // Draft offers at most one organelle card, only unlocked + unowned ids.
+        // Draft offers weapons and passives only, never organelle cards.
         OrganelleUnlockManager.ResetCache();
         OrganelleUnlockManager.ResetAll();
         OrganelleUnlockManager.Unlock("mitochondria_mkii");
@@ -454,22 +454,16 @@ public partial class TestOrganelleChamber : TestHarness
 
         var choices = UpgradeManager.GenerateChoices(mock, 3);
         AssertThat(choices.Count).IsEqual(3);
-        int organelleCards = 0;
         foreach (var c in choices)
         {
             AssertThat(c.ContainsKey("type") && c.ContainsKey("id") && c.ContainsKey("name")).IsTrue();
-            if (c["type"].AsString() != "new_organelle")
-                continue;
-            organelleCards++;
-            string organelleId = c["id"].AsString();
-            AssertThat(organelleId == "mitochondria_mkii" || organelleId == "acidic_lysosome").IsTrue();
-            AssertThat(c["badge"].AsString()).IsEqual("BADGE_NEW_ORGANELLE");
-            AssertThat(c.ContainsKey("energy_cost")).IsTrue();
+            AssertThat(c["type"].AsString()).IsNotEqual("new_organelle");
         }
-        AssertThat(organelleCards).IsLessEqual(1);
-        GD.Print("[PASS] Draft offers at most one organelle card, only from unlocked ids.");
+        GD.Print("[PASS] Draft offers weapons and passives only, never organelle cards.");
 
-        // ApplyChoice acquires into the backpack and auto-equips the first legal slot.
+        // ApplyChoice still acquires into the backpack and auto-equips the
+        // first legal slot (engine beneath the swap step); drafts just never
+        // offer organelle cards anymore.
         var draftChoice = new Godot.Collections.Dictionary
         {
             { "type", "new_organelle" },
@@ -481,7 +475,7 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("cooldown_reduction"), 0.16f)).IsTrue();
         // Re-applying the same id is refused (already owned).
         AssertThat(UpgradeManager.ApplyChoice(mock, draftChoice)).IsFalse();
-        GD.Print("[PASS] Draft choice acquires, auto-equips and refuses duplicates.");
+        GD.Print("[PASS] Applier acquires, auto-equips and refuses duplicates.");
 
         // A locked organelle is never applied.
         var lockedChoice = new Godot.Collections.Dictionary
@@ -490,7 +484,7 @@ public partial class TestOrganelleChamber : TestHarness
             { "id", "rough_er" }
         };
         AssertThat(UpgradeManager.ApplyChoice(mock, lockedChoice)).IsFalse();
-        GD.Print("[PASS] Locked organelles are refused by the draft applier.");
+        GD.Print("[PASS] Locked organelles are refused by the applier.");
 
         // Fill the chamber (4-cost + 3-cost on a 6 budget stays legal) and check
         // the modal refuses an unaffordable replacement with a stable reason.
@@ -500,7 +494,7 @@ public partial class TestOrganelleChamber : TestHarness
             { "id", "acidic_lysosome" }
         };
         AssertThat(chamber.EquippedCount).IsEqual(1);
-        GD.Print("[PASS] Draft flow ends with a legal single-equip state.");
+        GD.Print("[PASS] Applier flow ends with a legal single-equip state.");
 
         mock.Free();
     }
