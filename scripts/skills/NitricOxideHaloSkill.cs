@@ -29,19 +29,33 @@ public partial class NitricOxideHaloSkill : BaseSkill
             if (Skill == null || Skill.Host == null)
                 return;
 
-            float pulse = 1.0f + 0.06f * Mathf.Sin(Phase);
+            Color accent = SkillAssetPalette.Accent(SkillIds.NitricOxideHalo, new Color(0.3f, 0.79f, 0.89f));
+            Color core = SkillAssetPalette.Core(SkillIds.NitricOxideHalo, Colors.White);
+
+            float pulse = 1.0f + 0.05f * Mathf.Sin(Phase);
             float r = Radius * pulse;
 
-            // Outer soft toxic gas aura
-            Color outerColor = new Color(0.15f, 0.95f, 0.65f, 0.15f);
-            DrawCircle(Vector2.Zero, r, outerColor);
+            // Diffuse inner toxic gas body
+            DrawCircle(Vector2.Zero, r * 0.85f, new Color(accent.R, accent.G, accent.B, 0.12f));
 
-            // Shimmering boundary rings
-            Color ringColor = new Color(0.25f, 1.0f, 0.75f, 0.45f);
-            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 48, ringColor, 2.5f);
+            // Soft core excitation halo
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, r * 0.45f, accent, core, 0.22f, 1.6f);
 
-            Color innerRing = new Color(0.1f, 0.8f, 0.5f, 0.25f);
-            DrawArc(Vector2.Zero, r * 0.82f, 0.0f, Mathf.Tau, 36, innerRing, 1.5f);
+            // Multi-harmonic fluctuating diffusion rings
+            DrawArc(Vector2.Zero, r * 0.55f, 0.0f, Mathf.Tau, 32, new Color(core.R, core.G, core.B, 0.18f), 1.5f);
+            DrawArc(Vector2.Zero, r * 0.82f, 0.0f, Mathf.Tau, 40, new Color(accent.R, accent.G, accent.B, 0.28f), 2.0f);
+            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 48, new Color(accent.R, accent.G, accent.B, 0.45f), 2.8f);
+
+            // Brownian undulating gas puffs along perimeter
+            const int Puffs = 10;
+            for (int i = 0; i < Puffs; i++)
+            {
+                float angle = (i / (float)Puffs) * Mathf.Tau + Phase * 0.6f;
+                float puffOffset = 6.0f * Mathf.Sin(Phase * 2.0f + i * 1.7f);
+                float puffR = r + puffOffset;
+                Vector2 pos = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * puffR;
+                DrawCircle(pos, 5.0f + 2.0f * Mathf.Cos(Phase + i), new Color(accent.R, accent.G, accent.B, 0.20f));
+            }
         }
     }
 

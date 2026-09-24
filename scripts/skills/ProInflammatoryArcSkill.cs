@@ -106,16 +106,30 @@ public partial class ProInflammatoryArcSkill : BaseSkill
             if (Points.Count == 0)
                 return;
 
-            Vector2 prev = StartPos;
-            Color arcColor = new Color(0.4f, 0.8f, 1.0f, 1.0f - (_age / 0.22f));
+            float alpha = Mathf.Clamp(1.0f - (_age / 0.22f), 0.0f, 1.0f);
+            Color accent = SkillAssetPalette.Accent(SkillIds.ProInflammatoryArc, new Color(0.89f, 0.65f, 0.22f));
+            Color core = SkillAssetPalette.Core(SkillIds.ProInflammatoryArc, new Color(1.0f, 0.95f, 0.85f));
 
+            Vector2 prev = StartPos;
             foreach (var pt in Points)
             {
-                // Jittered lightning line
-                Vector2 mid = (prev + pt) * 0.5f + Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 12.0f;
-                DrawLine(ToLocal(prev), ToLocal(mid), arcColor, 2.5f);
-                DrawLine(ToLocal(mid), ToLocal(pt), arcColor, 2.5f);
-                DrawCircle(ToLocal(pt), 6.0f, new Color(0.8f, 0.95f, 1.0f, arcColor.A));
+                Vector2 localPrev = ToLocal(prev);
+                Vector2 localPt = ToLocal(pt);
+
+                // Multi-segment jagged lightning step
+                Vector2 mid1 = localPrev.Lerp(localPt, 0.33f) + Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 14.0f;
+                Vector2 mid2 = localPrev.Lerp(localPt, 0.66f) + Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 14.0f;
+
+                LaserGlow.DrawBeam(this, localPrev, mid1, accent, core, 6.0f, alpha);
+                LaserGlow.DrawBeam(this, mid1, mid2, accent, core, 5.5f, alpha);
+                LaserGlow.DrawBeam(this, mid2, localPt, accent, core, 6.0f, alpha);
+
+                // Side electric discharge fork
+                Vector2 forkTip = mid1 + Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 18.0f;
+                DrawLine(mid1, forkTip, new Color(accent.R, accent.G, accent.B, alpha * 0.5f), 1.5f);
+
+                // Inflammatory cytokine excitation node on target
+                LaserGlow.DrawImpactHalo(this, localPt, 12.0f, accent, core, alpha, 2.0f);
                 prev = pt;
             }
         }

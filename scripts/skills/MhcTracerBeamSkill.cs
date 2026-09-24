@@ -124,16 +124,32 @@ public partial class MhcTracerBeamSkill : BaseSkill
                 return;
 
             Vector2 localTarget = ToLocal(TargetGlobalPos);
-            Color beamGlow = new Color(1.0f, 0.25f, 0.35f, 0.45f);
-            Color beamCore = new Color(1.0f, 0.85f, 0.85f, 0.95f);
+            Color accent = SkillAssetPalette.Accent(SkillIds.MhcTracerBeam, new Color(0.11f, 0.77f, 0.34f));
+            Color core = SkillAssetPalette.Core(SkillIds.MhcTracerBeam, new Color(0.85f, 1.0f, 0.90f));
 
-            DrawLine(Vector2.Zero, localTarget, beamGlow, 5.0f);
-            DrawLine(Vector2.Zero, localTarget, beamCore, 2.0f);
+            // Central confocal laser tracer beam
+            LaserGlow.DrawBeam(this, Vector2.Zero, localTarget, accent, core, 6.0f, 0.9f);
 
-            // Reticle at target
-            DrawArc(localTarget, 16.0f, 0.0f, Mathf.Tau, 24, new Color(1.0f, 0.2f, 0.3f, 0.8f), 2.0f);
-            DrawLine(localTarget + new Vector2(-20, 0), localTarget + new Vector2(20, 0), beamCore, 1.5f);
-            DrawLine(localTarget + new Vector2(0, -20), localTarget + new Vector2(0, 20), beamCore, 1.5f);
+            // Twin parallel pilot laser lines
+            Vector2 perp = (localTarget).Normalized().Orthogonal() * 4.5f;
+            DrawLine(perp, localTarget + perp, new Color(accent.R, accent.G, accent.B, 0.45f), 1.5f);
+            DrawLine(-perp, localTarget - perp, new Color(accent.R, accent.G, accent.B, 0.45f), 1.5f);
+
+            // Emitter lens flare at host
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, 8.0f, accent, core, 0.85f, 1.5f);
+
+            // Animated molecular targeting reticle at pathogen
+            float reticleRadius = 18.0f;
+            DrawArc(localTarget, reticleRadius, 0.0f, Mathf.Tau, 32, accent, 2.0f);
+            DrawArc(localTarget, reticleRadius * 0.55f, 0.0f, Mathf.Tau, 16, core, 1.5f);
+
+            // Precision crosshairs
+            DrawLine(localTarget + new Vector2(-24, 0), localTarget + new Vector2(-6, 0), core, 1.5f);
+            DrawLine(localTarget + new Vector2(6, 0), localTarget + new Vector2(24, 0), core, 1.5f);
+            DrawLine(localTarget + new Vector2(0, -24), localTarget + new Vector2(0, -6), core, 1.5f);
+            DrawLine(localTarget + new Vector2(0, 6), localTarget + new Vector2(0, 24), core, 1.5f);
+
+            LaserGlow.DrawImpactHalo(this, localTarget, 10.0f, accent, core, 0.95f, 2.0f);
         }
     }
 }

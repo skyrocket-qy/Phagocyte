@@ -98,15 +98,44 @@ public partial class InterferonWaveSkill : BaseSkill
             float r = MaxRadius * prog;
             float alpha = 1.0f - prog;
 
-            // Outer shockwave arc
-            Color outerColor = new Color(0.2f, 0.75f, 1.0f, alpha * 0.85f);
-            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 48, outerColor, 4.0f * (1.0f - prog * 0.5f));
+            Color accent = SkillAssetPalette.Accent(SkillIds.InterferonWave, new Color(0.1f, 0.67f, 0.78f));
+            Color core = SkillAssetPalette.Core(SkillIds.InterferonWave, Colors.White);
 
-            // Secondary trailing echo
+            // Origin dissipation pulse
+            if (prog < 0.5f)
+            {
+                LaserGlow.DrawImpactHalo(this, Vector2.Zero, 28.0f * (1.0f - prog * 2.0f), accent, core, (0.5f - prog) * 1.2f, 1.5f);
+            }
+
+            // Leading high-pressure compression shockwave
+            Color leadCoreColor = new Color(core.R, core.G, core.B, alpha * 0.95f);
+            Color leadAccentColor = new Color(accent.R, accent.G, accent.B, alpha * 0.85f);
+            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 64, leadCoreColor, 2.5f * (1.0f - prog * 0.4f));
+            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 64, leadAccentColor, 5.0f * (1.0f - prog * 0.5f));
+
+            // Outer refraction fringe
+            Color outerFringe = new Color(accent.R, accent.G, accent.B, alpha * 0.35f);
+            DrawArc(Vector2.Zero, r * 1.03f, 0.0f, Mathf.Tau, 48, outerFringe, 1.5f);
+
+            // Resonant harmonic trailing ripples
             if (r > 30.0f)
             {
-                Color innerColor = new Color(0.4f, 0.9f, 1.0f, alpha * 0.4f);
-                DrawArc(Vector2.Zero, r * 0.85f, 0.0f, Mathf.Tau, 36, innerColor, 2.0f);
+                Color midEcho = new Color(accent.R, accent.G, accent.B, alpha * 0.45f);
+                DrawArc(Vector2.Zero, r * 0.86f, 0.0f, Mathf.Tau, 48, midEcho, 2.2f);
+
+                Color innerEcho = new Color(core.R, core.G, core.B, alpha * 0.25f);
+                DrawArc(Vector2.Zero, r * 0.72f, 0.0f, Mathf.Tau, 36, innerEcho, 1.5f);
+
+                // Acoustic nodal radial spikes across the compression wavefront
+                const int Spikes = 16;
+                for (int i = 0; i < Spikes; i++)
+                {
+                    float angle = (i / (float)Spikes) * Mathf.Tau;
+                    Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+                    Vector2 p0 = dir * (r * 0.88f);
+                    Vector2 p1 = dir * (r * 1.02f);
+                    DrawLine(p0, p1, new Color(core.R, core.G, core.B, alpha * 0.4f), 1.5f);
+                }
             }
         }
     }

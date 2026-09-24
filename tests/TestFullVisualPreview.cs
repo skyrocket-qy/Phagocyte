@@ -316,7 +316,181 @@ public partial class TestFullVisualPreview : TestHarness
                         return false;
                     CaptureScreenshot("skill_ros_torrent.png");
 
-                    Finish(true, "FULL GAME VISUAL PREVIEW & ACTIVE SKILLS");
+                    // Trigger Granzyme Detonation
+                    var gran = new GranzymeDetonationSkill();
+                    ForceEquip(gran, 1);
+                    var granFoe = SpawnEnemy<TbEnemy>(new Vector2(160, -30));
+                    gran.Trigger();
+                    gran.DetonateCaspase(granFoe.GlobalPosition);
+                    _frame = 0;
+                    _stage = 23;
+                    return false;
+
+                case 23:
+                    // 23. Granzyme Detonation Apoptosis Shockwave
+                    if (!Gate(ref _frame, 5))
+                        return false;
+                    CaptureScreenshot("skill_granzyme_detonation.png");
+
+                    // Trigger Nuclease Blades
+                    var nuc = new NucleaseBladesSkill();
+                    ForceEquip(nuc, 2);
+                    _frame = 0;
+                    _stage = 24;
+                    return false;
+
+                case 24:
+                    // 24. Nuclease Blades Orbiting Crescent Scythes
+                    if (!Gate(ref _frame, 5))
+                        return false;
+                    CaptureScreenshot("skill_nuclease_blades.png");
+
+                    // Trigger Defensin Barbs
+                    var def = new DefensinBarbsSkill();
+                    ForceEquip(def, 3);
+                    def.Trigger();
+                    _frame = 0;
+                    _stage = 25;
+                    return false;
+
+                case 25:
+                    // 25. Defensin Barbs Crystalline Needles
+                    if (!Gate(ref _frame, 6))
+                        return false;
+                    CaptureScreenshot("skill_defensin_barbs.png");
+
+                    // Trigger Pro-Inflammatory Arc
+                    var arc = new ProInflammatoryArcSkill();
+                    ForceEquip(arc, 4);
+                    SpawnEnemy<TbEnemy>(new Vector2(180, 20));
+                    arc.Trigger();
+                    _frame = 0;
+                    _stage = 26;
+                    return false;
+
+                case 26:
+                    // 26. Pro-Inflammatory Arc Cytokine Electric Discharge
+                    if (!Gate(ref _frame, 4))
+                        return false;
+                    CaptureScreenshot("skill_pro_inflammatory_arc.png");
+
+                    // Trigger Exosome Singularity
+                    var exo = new ExosomeSingularitySkill();
+                    ForceEquip(exo, 1);
+                    SpawnEnemy<TbEnemy>(new Vector2(150, 0));
+                    exo.Trigger();
+                    _frame = 0;
+                    _stage = 27;
+                    return false;
+
+                case 27:
+                    // 27. Exosome Singularity Vesicular Vortex
+                    if (!Gate(ref _frame, 8))
+                        return false;
+                    CaptureScreenshot("skill_exosome_singularity.png");
+
+                    // Trigger Phagolysosome Vent
+                    var vent = new PhagolysosomeVentSkill();
+                    ForceEquip(vent, 2);
+                    vent.Trigger();
+                    _frame = 0;
+                    _stage = 28;
+                    return false;
+
+                case 28:
+                    // 28. Phagolysosome Vent Corrosive Enzymatic Puddle
+                    if (!Gate(ref _frame, 8))
+                        return false;
+                    CaptureScreenshot("skill_phagolysosome_vent.png");
+
+                    // Trigger MHC Tracer Beam
+                    var mhc = new MhcTracerBeamSkill();
+                    ForceEquip(mhc, 3);
+                    SpawnEnemy<TbEnemy>(new Vector2(160, -40));
+                    mhc.Trigger();
+                    _frame = 0;
+                    _stage = 29;
+                    return false;
+
+                case 29:
+                    // 29. MHC Tracer Beam Confocal Scanner Reticle
+                    if (!Gate(ref _frame, 6))
+                        return false;
+                    CaptureScreenshot("skill_mhc_tracer_beam.png");
+
+                    // Trigger Histamine Surge
+                    var hist = new HistamineSurgeSkill();
+                    ForceEquip(hist, 4);
+                    SpawnEnemy<TbEnemy>(new Vector2(140, 0));
+                    hist.Trigger();
+                    _frame = 0;
+                    _stage = 30;
+                    return false;
+
+                case 30:
+                    // 30. Histamine Surge Degranulation Wave
+                    if (!Gate(ref _frame, 5))
+                        return false;
+                    CaptureScreenshot("skill_histamine_surge.png");
+
+                    // Trigger Nitric Oxide Halo
+                    var no = new NitricOxideHaloSkill();
+                    ForceEquip(no, 1);
+                    _frame = 0;
+                    _stage = 31;
+                    return false;
+
+                case 31:
+                    // 31. Nitric Oxide Halo Cyan Gas Cloud
+                    if (!Gate(ref _frame, 6))
+                        return false;
+                    CaptureScreenshot("skill_nitric_oxide_halo.png");
+
+                    // Trigger Interferon Wave
+                    var ifn = new InterferonWaveSkill();
+                    ForceEquip(ifn, 2);
+                    ifn.Trigger();
+                    _frame = 0;
+                    _stage = 32;
+                    return false;
+
+                case 32:
+                    // 32. Interferon Wave Acoustic Pressure Ripple
+                    if (!Gate(ref _frame, 6))
+                        return false;
+                    CaptureScreenshot("skill_interferon_wave.png");
+
+                    // Trigger Lysozyme Ricochet
+                    var lyso = new LysozymeRicochetSkill();
+                    ForceEquip(lyso, 3);
+                    SpawnEnemy<TbEnemy>(new Vector2(150, 20));
+                    lyso.Trigger();
+                    _frame = 0;
+                    _stage = 33;
+                    return false;
+
+                case 33:
+                    // 33. Lysozyme Ricochet Globular Protein Capsule
+                    if (!Gate(ref _frame, 6))
+                        return false;
+                    CaptureScreenshot("skill_lysozyme_ricochet.png");
+
+                    // Trigger Pseudopod Lunge
+                    var lunge = new PseudopodLungeSkill();
+                    ForceEquip(lunge, 4);
+                    SpawnEnemy<TbEnemy>(new Vector2(160, -20));
+                    lunge.Trigger();
+                    _frame = 0;
+                    _stage = 34;
+                    return false;
+
+                case 34:
+                    // 34. Pseudopod Lunge Blunt Fist Strike
+                    if (!Gate(ref _frame, 4))
+                        return false;
+                    CaptureScreenshot("skill_pseudopod_lunge.png");
+
+                    Finish(true, "FULL GAME VISUAL PREVIEW & ALL 17 ACTIVE SKILLS");
                     return true;
 
                 default:
@@ -470,6 +644,17 @@ public partial class TestFullVisualPreview : TestHarness
         else
             Root.AddChild(enemy);
         return enemy;
+    }
+
+    private void ForceEquip(BaseSkill skill, int slot)
+    {
+        skill.IsInnate = false;
+        var existing = _player!.CellSkillManager!.ActiveSlots[slot];
+        if (existing != null && GodotObject.IsInstanceValid(existing))
+        {
+            existing.IsInnate = false;
+        }
+        _player.CellSkillManager.EquipActive(skill, slot);
     }
 
     private static void ClearArenaEntities(Node root)

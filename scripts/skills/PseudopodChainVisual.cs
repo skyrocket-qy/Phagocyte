@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Phagocyte.Combat;
 using Phagocyte.Enemies;
 
 namespace Phagocyte.Skills;
@@ -23,6 +24,7 @@ public partial class PseudopodChainVisual : Node2D
     public float RetractSpeed { get; set; } = 900.0f;
     public float HoldDuration { get; set; } = 0.30f;
     public float GrabRadius { get; set; } = 28.0f;
+    public bool IsBluntFist { get; set; } = false;
 
     public Color? ChainFillColor { get; set; }
     public Color? ChainEdgeColor { get; set; }
@@ -200,19 +202,69 @@ public partial class PseudopodChainVisual : Node2D
         DrawColoredPolygon(BuildRibbon(_tipDist, wRoot, wTip, 0.5f), new Color(_core.R, _core.G, _core.B, _core.A * 0.8f * fadeIn));
         DrawOutline(ribbon, new Color(_edge.R, _edge.G, _edge.B, _edge.A * fadeIn), 2.0f);
 
-        // Cup-ring tip: open while travelling, snapped shut on arrival.
         bool closed = _phase != Phase.Extend;
-        float cupR = closed ? 4.5f : 8.0f;
         Vector2 tip = new Vector2(_tipDist, 0.0f);
         Color edgeFade = new Color(_edge.R, _edge.G, _edge.B, _edge.A * fadeIn);
-        DrawArc(tip, cupR, 0.0f, Mathf.Tau, 20, edgeFade, 2.5f);
-        DrawCircle(tip, 2.8f, new Color(_core.R, _core.G, _core.B, _core.A * fadeIn));
+        Color coreFade = new Color(_core.R, _core.G, _core.B, _core.A * fadeIn);
+
+        if (IsBluntFist)
+        {
+            // Amoebic blunt fist tip (Pseudopod Lunge): dense muscular pseudopod club
+            float fistR = closed ? 13.0f : 10.0f;
+            DrawCircle(tip, fistR, new Color(_fill.R, _fill.G, _fill.B, _fill.A * fadeIn));
+            DrawArc(tip, fistR, 0.0f, Mathf.Tau, 24, edgeFade, 2.5f);
+
+            // Three forward knuckle lobes
+            Vector2 knuckleTop = tip + new Vector2(fistR * 0.7f, -fistR * 0.55f);
+            Vector2 knuckleMid = tip + new Vector2(fistR * 0.95f, 0.0f);
+            Vector2 knuckleBot = tip + new Vector2(fistR * 0.7f, fistR * 0.55f);
+            DrawCircle(knuckleTop, fistR * 0.42f, edgeFade);
+            DrawCircle(knuckleMid, fistR * 0.46f, coreFade);
+            DrawCircle(knuckleBot, fistR * 0.42f, edgeFade);
+
+            LaserGlow.DrawImpactHalo(this, tip, fistR * 1.4f, _edge, _core, fadeIn * 0.85f, 2.0f);
+        }
+        else
+        {
+            // Cup-ring tip (Phagocytic Grasp): open while travelling (pincer jaws), snapped shut on arrival.
+            float cupSpread = closed ? 5.0f : 11.0f;
+            float cupLength = closed ? 8.0f : 14.0f;
+
+            // Terminal phagosomal cup clamp jaws (curved amoeboid pincers)
+            Vector2 upperMid = tip + new Vector2(cupLength * 0.4f, -cupSpread * 1.1f);
+            Vector2 upperTip = tip + new Vector2(cupLength, closed ? -1.0f : -cupSpread * 0.7f);
+            Vector2 lowerMid = tip + new Vector2(cupLength * 0.4f, cupSpread * 1.1f);
+            Vector2 lowerTip = tip + new Vector2(cupLength, closed ? 1.0f : cupSpread * 0.7f);
+
+            // Clamp jaw arms
+            DrawLine(tip, upperMid, edgeFade, 3.0f);
+            DrawLine(upperMid, upperTip, edgeFade, 2.5f);
+            DrawLine(tip, lowerMid, edgeFade, 3.0f);
+            DrawLine(lowerMid, lowerTip, edgeFade, 2.5f);
+
+            // Clamping tips glow
+            DrawCircle(upperTip, 2.2f, coreFade);
+            DrawCircle(lowerTip, 2.2f, coreFade);
+
+            // Central phagocytic base vesicle
+            LaserGlow.DrawImpactHalo(this, tip, 8.0f, _edge, _core, fadeIn * 0.75f, 1.5f);
+            DrawCircle(tip, 3.5f, coreFade);
+        }
 
         if (_flashAge < FlashDuration)
         {
             float ft = _flashAge / FlashDuration;
-            DrawArc(_flashLocal.Rotated(-ang), Mathf.Lerp(8.0f, 46.0f, ft), 0.0f, Mathf.Tau, 32,
-                new Color(1.0f, 1.0f, 1.0f, (1.0f - ft) * 0.8f), 4.0f * (1.0f - ft) + 1.5f);
+            if (IsBluntFist)
+            {
+                // Punch kinetic forward shockwave arc
+                DrawArc(_flashLocal.Rotated(-ang), Mathf.Lerp(10.0f, 48.0f, ft), -Mathf.Pi * 0.55f, Mathf.Pi * 1.1f, 24,
+                    new Color(_core.R, _core.G, _core.B, (1.0f - ft) * 0.9f), 4.0f * (1.0f - ft) + 1.8f);
+            }
+            else
+            {
+                DrawArc(_flashLocal.Rotated(-ang), Mathf.Lerp(8.0f, 46.0f, ft), 0.0f, Mathf.Tau, 32,
+                    new Color(1.0f, 1.0f, 1.0f, (1.0f - ft) * 0.8f), 4.0f * (1.0f - ft) + 1.5f);
+            }
         }
         if (_flashAge < FlashCoreDuration)
         {

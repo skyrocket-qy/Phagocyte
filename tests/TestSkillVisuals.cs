@@ -105,11 +105,129 @@ public partial class TestSkillVisuals : TestHarness
                 AssertThat(Collect<PseudopodChainVisual>(_arena!).Count).IsGreater(0);
                 GD.Print("[PASS] Test 5: pseudopod grasp chain visual spawned on grab.");
 
-                Finish(true, "ALL SKILL VISUAL EFFECT TESTS");
+                _phase = 3;
+                return false;
+
+            case 3:
+                // Test 6: ROS Jet
+                var ros = new RosTorrentSkill();
+                ForceEquip(ros, 1);
+                Spawn<TbEnemy>(new Vector2(120, 0));
+                ros.Trigger();
+                AssertThat(Collect<RosJet>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 6: ROS torrent jet visual spawned.");
+
+                // Test 7: Granzyme Detonation
+                var gran = new GranzymeDetonationSkill();
+                ForceEquip(gran, 2);
+                var granTarget = Spawn<TbEnemy>(new Vector2(100, 0));
+                gran.Trigger();
+                AssertThat(Collect<GranzymeDetonationSkill.ApoptosisMarker>(_arena!).Count).IsGreater(0);
+                gran.DetonateCaspase(granTarget.GlobalPosition);
+                AssertThat(Collect<GranzymeDetonationSkill.ApoptosisBurstVisual>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 7: Granzyme detonation apoptosis marker + burst visuals spawned.");
+
+                // Test 8: Nuclease Blades
+                var nuc = new NucleaseBladesSkill();
+                ForceEquip(nuc, 3);
+                AssertThat(Collect<NucleaseBladesSkill.BladesCanvas>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 8: Nuclease blades orbiting canvas visual active.");
+
+                // Test 9: Defensin Barbs
+                var def = new DefensinBarbsSkill();
+                ForceEquip(def, 4);
+                def.Trigger();
+                AssertThat(Collect<DefensinBarbsSkill.BarbProjectile>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 9: Defensin barbs projectile visual spawned.");
+
+                _phase = 4;
+                return false;
+
+            case 4:
+                // Test 10: Pro-Inflammatory Arc
+                var arc = new ProInflammatoryArcSkill();
+                ForceEquip(arc, 1);
+                Spawn<TbEnemy>(new Vector2(100, 0));
+                arc.Trigger();
+                AssertThat(Collect<ProInflammatoryArcSkill.ArcLightningVisual>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 10: Pro-inflammatory arc lightning visual spawned.");
+
+                // Test 11: Exosome Singularity
+                var exo = new ExosomeSingularitySkill();
+                ForceEquip(exo, 2);
+                exo.Trigger();
+                AssertThat(Collect<ExosomeSingularitySkill.SingularityVortex>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 11: Exosome singularity vortex visual spawned.");
+
+                // Test 12: Phagolysosome Vent
+                var vent = new PhagolysosomeVentSkill();
+                ForceEquip(vent, 3);
+                vent.Trigger();
+                AssertThat(Collect<PhagolysosomeVentSkill.AcidPuddle>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 12: Phagolysosome vent acid puddle visual spawned.");
+
+                // Test 13: MHC Tracer Beam
+                var mhc = new MhcTracerBeamSkill();
+                ForceEquip(mhc, 4);
+                AssertThat(Collect<MhcTracerBeamSkill.TracerVisual>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 13: MHC tracer beam visual active.");
+
+                _phase = 5;
+                return false;
+
+            case 5:
+                // Test 14: Histamine Surge
+                var hist = new HistamineSurgeSkill();
+                ForceEquip(hist, 1);
+                hist.Trigger();
+                AssertThat(Collect<HistamineSurgeSkill.SurgeVisual>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 14: Histamine surge degranulation wave visual spawned.");
+
+                // Test 15: Nitric Oxide Halo
+                var no = new NitricOxideHaloSkill();
+                ForceEquip(no, 2);
+                AssertThat(Collect<NitricOxideHaloSkill.HaloVisual>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 15: Nitric oxide halo toxic gas cloud visual active.");
+
+                // Test 16: Interferon Wave
+                var ifn = new InterferonWaveSkill();
+                ForceEquip(ifn, 3);
+                ifn.Trigger();
+                AssertThat(Collect<InterferonWaveSkill.WaveVisual>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 16: Interferon wave acoustic shockwave visual spawned.");
+
+                // Test 17: Lysozyme Ricochet & Pseudopod Lunge
+                var lyso = new LysozymeRicochetSkill();
+                ForceEquip(lyso, 4);
+                Spawn<TbEnemy>(new Vector2(100, 0));
+                lyso.Trigger();
+                AssertThat(Collect<LysozymeRicochetSkill.RicochetVesicle>(_arena!).Count).IsGreater(0);
+                GD.Print("[PASS] Test 17a: Lysozyme ricochet enzyme capsule visual spawned.");
+
+                var lunge = new PseudopodLungeSkill();
+                ForceEquip(lunge, 4);
+                Spawn<TbEnemy>(new Vector2(120, 0));
+                lunge.Trigger();
+                var lunges = Collect<PseudopodChainVisual>(_arena!);
+                AssertThat(lunges.Exists(c => c.IsBluntFist)).IsTrue();
+                GD.Print("[PASS] Test 17b: Pseudopod lunge blunt fist visual spawned.");
+
+                Finish(true, "ALL 17 SKILL VISUAL EFFECT TESTS");
                 return true;
         }
 
         return false;
+    }
+
+    private void ForceEquip(BaseSkill skill, int slot)
+    {
+        skill.IsInnate = false;
+        var existing = _player!.CellSkillManager!.ActiveSlots[slot];
+        if (existing != null && GodotObject.IsInstanceValid(existing))
+        {
+            existing.IsInnate = false;
+        }
+        AssertThat(_player.CellSkillManager.EquipActive(skill, slot)).IsTrue();
     }
 
     private bool SetupArena()

@@ -95,15 +95,39 @@ public partial class PhagolysosomeVentSkill : BaseSkill
         public override void _Draw()
         {
             float alpha = Mathf.Clamp(1.0f - (_age / Duration), 0.0f, 1.0f);
-            Color acidCore = new Color(0.7f, 0.95f, 0.1f, alpha * 0.5f);
-            Color acidEdge = new Color(0.9f, 0.9f, 0.2f, alpha * 0.75f);
+            Color accent = SkillAssetPalette.Accent(SkillIds.PhagolysosomeVent, new Color(0.93f, 0.27f, 0.26f));
+            Color core = SkillAssetPalette.Core(SkillIds.PhagolysosomeVent, new Color(1.0f, 0.70f, 0.55f));
 
-            DrawCircle(Vector2.Zero, Radius, acidCore);
-            DrawArc(Vector2.Zero, Radius, 0.0f, Mathf.Tau, 24, acidEdge, 2.0f);
+            Color puddleBase = new Color(accent.R * 0.4f, accent.G * 0.1f, accent.B * 0.1f, alpha * 0.55f);
+            Color puddleGlow = new Color(accent.R, accent.G, accent.B, alpha * 0.75f);
 
-            // Small bubbling dots
-            DrawCircle(new Vector2(Radius * 0.3f, -Radius * 0.2f), 4.0f, acidEdge);
-            DrawCircle(new Vector2(-Radius * 0.4f, Radius * 0.3f), 3.0f, acidEdge);
+            // Organic amoeboid acidic puddle boundary (12 harmonic lobes)
+            Vector2[] lobes = new Vector2[16];
+            for (int i = 0; i < 16; i++)
+            {
+                float a = i * (Mathf.Tau / 16.0f);
+                float rOffset = Mathf.Sin(a * 3.0f + _age * 4.0f) * 4.0f;
+                lobes[i] = Vector2.FromAngle(a) * (Radius + rOffset);
+            }
+            DrawColoredPolygon(lobes, puddleBase);
+            for (int i = 0; i < 16; i++)
+            {
+                DrawLine(lobes[i], lobes[(i + 1) % 16], puddleGlow, 2.0f);
+            }
+
+            // Boiling effervescent enzymatic bubbles
+            float bPhase = _age * 6.0f;
+            for (int b = 0; b < 4; b++)
+            {
+                float ba = b * (Mathf.Tau / 4.0f) + bPhase * 0.3f;
+                float br = Radius * (0.3f + 0.35f * Mathf.Sin(bPhase + b * 1.5f));
+                Vector2 bPos = Vector2.FromAngle(ba) * br;
+                float bSize = 2.5f + 1.5f * Mathf.Sin(bPhase * 2.0f + b);
+                DrawCircle(bPos, bSize, new Color(core.R, core.G, core.B, alpha * 0.9f));
+                DrawArc(bPos, bSize + 1.0f, 0.0f, Mathf.Tau, 12, puddleGlow, 1.0f);
+            }
+
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, Radius * 0.45f, accent, core, alpha * 0.5f, 1.5f);
         }
     }
 }

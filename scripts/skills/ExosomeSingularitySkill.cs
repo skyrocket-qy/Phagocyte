@@ -143,24 +143,31 @@ public partial class ExosomeSingularitySkill : BaseSkill
         public override void _Draw()
         {
             float alpha = Mathf.Clamp(1.0f - (_age / Duration), 0.0f, 1.0f);
-            Color vortexColor = new Color(0.6f, 0.2f, 0.9f, alpha * 0.65f);
-            Color coreColor = new Color(0.2f, 0.05f, 0.4f, alpha * 0.9f);
+            Color accent = SkillAssetPalette.Accent(SkillIds.ExosomeSingularity, new Color(0.13f, 0.68f, 0.83f));
+            Color core = SkillAssetPalette.Core(SkillIds.ExosomeSingularity, new Color(0.75f, 0.96f, 1.0f));
 
-            // Dark event horizon core
-            DrawCircle(Vector2.Zero, 20.0f, coreColor);
-            DrawArc(Vector2.Zero, Radius, 0.0f, Mathf.Tau, 36, new Color(vortexColor.R, vortexColor.G, vortexColor.B, alpha * 0.3f), 1.5f);
+            // Deep central vesicular void
+            DrawCircle(Vector2.Zero, 22.0f, new Color(0.02f, 0.08f, 0.12f, alpha * 0.95f));
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, 22.0f, accent, core, alpha * 0.9f, 2.5f);
 
-            // 3 spiral vortex arms
-            for (int i = 0; i < 3; i++)
+            // Outer gravitational suction limit
+            DrawArc(Vector2.Zero, Radius, 0.0f, Mathf.Tau, 48, new Color(accent.R, accent.G, accent.B, alpha * 0.35f), 1.5f);
+
+            // 4 swirling lipid vesicular arms matching icon art
+            for (int i = 0; i < 4; i++)
             {
-                float baseA = _spinAngle + i * (Mathf.Tau / 3.0f);
-                for (int s = 0; s < 12; s++)
+                float baseA = _spinAngle + i * (Mathf.Tau / 4.0f);
+                for (int s = 1; s <= 10; s++)
                 {
-                    float t = (float)s / 12.0f;
-                    float armR = Radius * t;
-                    float armA = baseA + t * 2.5f;
+                    float t = (float)s / 10.0f;
+                    float armR = 24.0f + (Radius - 24.0f) * t;
+                    float armA = baseA + t * 2.8f;
                     Vector2 p = Vector2.FromAngle(armA) * armR;
-                    DrawCircle(p, 3.0f * (1.0f - t * 0.5f), vortexColor);
+
+                    // Swirling exosome vesicle sphere
+                    float vesicleSize = 3.5f * (1.0f - t * 0.4f);
+                    DrawCircle(p, vesicleSize, new Color(core.R, core.G, core.B, alpha * 0.85f));
+                    DrawArc(p, vesicleSize + 1.2f, 0.0f, Mathf.Tau, 12, new Color(accent.R, accent.G, accent.B, alpha * 0.6f), 1.0f);
                 }
             }
         }

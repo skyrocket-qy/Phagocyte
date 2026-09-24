@@ -134,8 +134,30 @@ public partial class LysozymeRicochetSkill : BaseSkill
 
         public override void _Draw()
         {
-            DrawCircle(Vector2.Zero, 9.0f, new Color(0.2f, 1.0f, 0.4f, 0.35f));
-            DrawCircle(Vector2.Zero, 5.5f, new Color(0.6f, 1.0f, 0.8f, 0.95f));
+            Color accent = SkillAssetPalette.Accent(SkillIds.LysozymeRicochet, new Color(0.11f, 0.44f, 0.86f));
+            Color core = SkillAssetPalette.Core(SkillIds.LysozymeRicochet, Colors.White);
+
+            Vector2 fwd = Direction.LengthSquared() > 0.001f ? Direction.Normalized() : Vector2.Right;
+            Vector2 side = new Vector2(-fwd.Y, fwd.X);
+
+            // Trailing enzymatic velocity wake
+            Color trailAccent = new Color(accent.R, accent.G, accent.B, 0.45f);
+            Color trailFade = new Color(accent.R, accent.G, accent.B, 0.0f);
+            DrawLine(Vector2.Zero, -fwd * 22.0f, trailAccent, 3.0f);
+            DrawLine(-fwd * 8.0f, -fwd * 34.0f, trailFade, 1.5f);
+
+            // Globular enzymatic core and halo
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, 14.0f, accent, core, 0.85f, 1.8f);
+            DrawCircle(Vector2.Zero, 6.0f, core);
+
+            // Catalytic cleft / lobes (bi-lobed globular structure)
+            Vector2 lobeA = fwd * 3.0f + side * 4.5f;
+            Vector2 lobeB = fwd * 3.0f - side * 4.5f;
+            DrawCircle(lobeA, 3.5f, accent);
+            DrawCircle(lobeB, 3.5f, accent);
+
+            // Forward catalytic cleft focal pin
+            DrawLine(Vector2.Zero, fwd * 8.0f, new Color(core.R, core.G, core.B, 0.95f), 2.0f);
         }
     }
 }

@@ -58,7 +58,10 @@ public partial class PseudopodLungeSkill : BaseSkill
                 Target = n,
                 BaseHalfWidth = 16.0f * GetCalculatedArea(1.0f),
                 ExtendSpeed = 1800.0f,
-                HoldDuration = 0.15f
+                HoldDuration = 0.15f,
+                IsBluntFist = true,
+                ChainFillColor = SkillAssetPalette.Accent(SkillIds.PseudopodLunge, new Color(0.25f, 0.80f, 0.46f)),
+                ChainEdgeColor = SkillAssetPalette.Core(SkillIds.PseudopodLunge, Colors.White)
             };
             Host.GetParent().AddChild(chain);
 

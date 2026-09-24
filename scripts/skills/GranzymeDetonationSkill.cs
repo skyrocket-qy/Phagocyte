@@ -75,7 +75,7 @@ public partial class GranzymeDetonationSkill : BaseSkill
         };
     }
 
-    private void DetonateCaspase(Vector2 center)
+    public void DetonateCaspase(Vector2 center)
     {
         if (!HasValidHost())
             return;

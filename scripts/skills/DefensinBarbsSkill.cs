@@ -136,9 +136,29 @@ public partial class DefensinBarbsSkill : BaseSkill
 
         public override void _Draw()
         {
-            Color barbColor = new Color(1.0f, 0.85f, 0.2f, 0.95f);
-            DrawLine(new Vector2(-8, 0), new Vector2(10, 0), barbColor, 2.5f);
-            DrawCircle(new Vector2(10, 0), 2.5f, new Color(1.0f, 1.0f, 0.6f));
+            Color accent = SkillAssetPalette.Accent(SkillIds.DefensinBarbs, new Color(0.30f, 0.91f, 0.57f));
+            Color core = SkillAssetPalette.Core(SkillIds.DefensinBarbs, new Color(0.85f, 1.0f, 0.92f));
+
+            // Crystalline peptide needle shaft
+            DrawLine(new Vector2(-12, 0), new Vector2(10, 0), accent, 3.5f);
+            DrawLine(new Vector2(-10, 0), new Vector2(12, 0), core, 1.8f);
+
+            // Diamond piercing needle tip
+            Vector2[] tipPolygon = new Vector2[]
+            {
+                new Vector2(16, 0),
+                new Vector2(8, -3.5f),
+                new Vector2(6, 0),
+                new Vector2(8, 3.5f)
+            };
+            DrawColoredPolygon(tipPolygon, core);
+
+            // Backward-angled cationic barb thorns
+            DrawLine(new Vector2(0, 0), new Vector2(-4, -4.5f), accent, 2.0f);
+            DrawLine(new Vector2(0, 0), new Vector2(-4, 4.5f), accent, 2.0f);
+
+            // Glowing needle tip
+            LaserGlow.DrawImpactHalo(this, new Vector2(14, 0), 6.0f, accent, core, 0.85f, 1.5f);
         }
     }
 }

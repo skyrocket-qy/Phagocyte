@@ -107,16 +107,35 @@ public partial class HistamineSurgeSkill : BaseSkill
         {
             float prog = _age / SurgeDuration;
             float curR = Reach * Mathf.Sin(prog * Mathf.Pi * 0.5f);
-            float alpha = 1.0f - prog;
+            float alpha = Mathf.Clamp(1.0f - prog, 0.0f, 1.0f);
 
             float centerAngle = Direction.Angle();
             float startAngle = centerAngle - HalfAngleRad;
             float endAngle = centerAngle + HalfAngleRad;
 
-            Color coneColor = new Color(0.95f, 0.25f, 0.45f, alpha * 0.45f);
-            DrawArc(Vector2.Zero, curR, startAngle, endAngle, 24, coneColor, 4.0f);
-            DrawLine(Vector2.Zero, Vector2.FromAngle(startAngle) * curR, coneColor, 2.0f);
-            DrawLine(Vector2.Zero, Vector2.FromAngle(endAngle) * curR, coneColor, 2.0f);
+            Color accent = SkillAssetPalette.Accent(SkillIds.HistamineSurge, new Color(0.89f, 0.65f, 0.22f));
+            Color core = SkillAssetPalette.Core(SkillIds.HistamineSurge, new Color(1.0f, 0.95f, 0.85f));
+
+            Color arcLead = new Color(accent.R, accent.G, accent.B, alpha * 0.85f);
+            Color arcMid = new Color(core.R, core.G, core.B, alpha * 0.55f);
+
+            // Leading vasodilatory pressure shockwave
+            DrawArc(Vector2.Zero, curR, startAngle, endAngle, 32, arcLead, 4.5f);
+            DrawArc(Vector2.Zero, curR * 0.80f, startAngle, endAngle, 24, arcMid, 2.0f);
+
+            // Boundary confinement edges
+            DrawLine(Vector2.Zero, Vector2.FromAngle(startAngle) * curR, new Color(accent.R, accent.G, accent.B, alpha * 0.4f), 2.0f);
+            DrawLine(Vector2.Zero, Vector2.FromAngle(endAngle) * curR, new Color(accent.R, accent.G, accent.B, alpha * 0.4f), 2.0f);
+
+            // Spray of expelled mast-cell granules
+            for (int g = 0; g < 8; g++)
+            {
+                float ga = Mathf.Lerp(startAngle, endAngle, (g + 0.5f) / 8.0f) + Mathf.Sin(prog * 8.0f + g) * 0.08f;
+                float gr = curR * (0.45f + 0.45f * ((g * 3 % 7) / 7.0f));
+                Vector2 gPos = Vector2.FromAngle(ga) * gr;
+                DrawCircle(gPos, 2.5f, new Color(core.R, core.G, core.B, alpha * 0.9f));
+                DrawCircle(gPos, 4.0f, new Color(accent.R, accent.G, accent.B, alpha * 0.35f));
+            }
         }
     }
 }

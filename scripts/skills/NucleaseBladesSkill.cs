@@ -31,26 +31,36 @@ public partial class NucleaseBladesSkill : BaseSkill
             if (Skill == null || BladeCount <= 0)
                 return;
 
-            Color bladeCore = new Color(0.3f, 0.85f, 1.0f, 0.95f);
-            Color bladeGlow = new Color(0.1f, 0.5f, 0.95f, 0.4f);
+            Color accent = SkillAssetPalette.Accent(SkillIds.NucleaseBlades, new Color(0.25f, 0.77f, 0.44f));
+            Color core = SkillAssetPalette.Core(SkillIds.NucleaseBlades, new Color(0.75f, 1.0f, 0.85f));
+            Color trailColor = new Color(accent.R, accent.G, accent.B, 0.45f);
 
             for (int i = 0; i < BladeCount; i++)
             {
                 float angle = OrbitAngle + i * (Mathf.Tau / BladeCount);
                 Vector2 bladePos = Vector2.FromAngle(angle) * OrbitRadius;
+                Vector2 tangent = Vector2.FromAngle(angle + Mathf.Pi * 0.5f);
 
-                // Glowing outer disc
-                DrawCircle(bladePos, 14.0f, bladeGlow);
-                // Dense cutting enzyme core
-                DrawCircle(bladePos, 8.0f, bladeCore);
+                // Crescent scythe enzyme cutter blade
+                Vector2 bladeTip = bladePos + tangent * 18.0f;
+                Vector2 bladeBack = bladePos - tangent * 12.0f;
+                Vector2 bladeSpine = bladePos + Vector2.FromAngle(angle) * 7.0f;
 
-                // Spiral slicing teeth
-                float spinAngle = angle * 3.0f;
-                for (int t = 0; t < 3; t++)
+                // Glowing outer arc and enzyme edge
+                DrawLine(bladeBack, bladeTip, accent, 3.5f);
+                DrawLine(bladeBack, bladeSpine, trailColor, 2.0f);
+                DrawLine(bladeSpine, bladeTip, core, 2.5f);
+
+                // Laser glow on cutting tip & center
+                LaserGlow.DrawImpactHalo(this, bladeTip, 8.0f, accent, core, 0.85f, 2.0f);
+                LaserGlow.DrawImpactHalo(this, bladePos, 5.0f, accent, core, 0.7f, 1.5f);
+
+                // Orbiting nucleotide cleave sparks
+                for (int s = 1; s <= 3; s++)
                 {
-                    float toothAngle = spinAngle + t * (Mathf.Tau / 3.0f);
-                    Vector2 tip = bladePos + Vector2.FromAngle(toothAngle) * 16.0f;
-                    DrawLine(bladePos, tip, bladeCore, 2.0f);
+                    float shardAngle = angle - s * 0.18f;
+                    Vector2 shardPos = Vector2.FromAngle(shardAngle) * (OrbitRadius + (s % 2 == 0 ? 5.0f : -5.0f));
+                    DrawCircle(shardPos, 2.0f / s, new Color(core.R, core.G, core.B, 0.6f / s));
                 }
             }
         }

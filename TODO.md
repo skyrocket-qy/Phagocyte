@@ -80,10 +80,27 @@ Combat visuals verified live (godot-ai headed screenshots) plus headless suites
     per-instance fill stylebox; `VitalsView` untouched.
 
 
-- 每個skill視覺設計要跟他的asset圖一樣
-  - New `SkillAssetPalette` (`scripts/skills/SkillAssetPalette.cs`): accents
-    sampled (most-saturated hue) from `gen/skill/<id>.png`; lance/ROS/MAC/
-    granzyme/antibody/pore visuals now tint core+halo from their icons.
+- [x] **每個skill視覺設計要跟他的asset圖一樣 (All 17 Active & Innate Skills Visual Alignment)**:
+  - Extended `SkillAssetPalette` (`scripts/skills/SkillAssetPalette.cs`) with saturated accent & white-excitation core colors for all 17 skills.
+  - Aligned shape languages, kinetic behaviors, and shader/glow rendering to canonical 256x256 icon artwork:
+    - `perforin_lance`: Confocal laser lance (`#39c06a`) with pore puncture decals.
+    - `ros_torrent`: Hydrodynamic jet spray (`#2bd2b9`) with bubbling oxidative stress particles.
+    - `complement_cascade`: Electric sky-blue (`#25a4e2`) MAC pore assembly and 6-petal lysis blast.
+    - `granzyme_detonation`: Bioluminescent orange (`#e78c41`) caspase shockwave detonation.
+    - `antibody_salvo`: Dual-pronged bio-cyan (`#26afc0`) Y-shaped immunoglobulin missiles.
+    - `nuclease_blades`: Triple rotating emerald (`#41c471`) crescent scythe blades with nucleotide shards.
+    - `defensin_barbs`: Sharp crystalline peptide needles (`#4de892`) with cationic barb thorns.
+    - `pro_inflammatory_arc`: Amber-gold (`#e3a638`) branching cytokine electric discharge arcs.
+    - `exosome_singularity`: Bio-cyan (`#22add4`) vesicular vortex with central void and lipid arms.
+    - `phagolysosome_vent`: Corrosive crimson (`#ed4543`) 16-lobed organic puddle with enzymatic fizzing.
+    - `mhc_tracer_beam`: Emerald (`#1dc457`) dual laser scanner with molecular targeting reticle.
+    - `histamine_surge`: Golden-amber (`#e3a638`) degranulation wave with expelled mast granules.
+    - `nitric_oxide_halo`: Cyan (`#4ccae3`) fluctuating multi-ring gas aura with Brownian fringe.
+    - `interferon_wave`: Deep cyan (`#1aabc6`) multi-harmonic acoustic pressure ripple.
+    - `lysozyme_ricochet`: Cobalt-blue (`#1c6fdc`) globular catalytic protein capsule with velocity streaks.
+    - `phagocytic_grasp`: Amoeboid pseudopod with terminal phagosomal cup clamp jaws.
+    - `pseudopod_lunge`: Dense amoebic punch fist with triple knuckle lobes and kinetic impact wave.
+  - Test suites updated: `TestSkillVisuals.cs` verifies all 17 skills headless, and `TestFullVisualPreview.cs` captures headed pixel-perfect viewports into `tmp/visual_after/`.
 
 ---
 
