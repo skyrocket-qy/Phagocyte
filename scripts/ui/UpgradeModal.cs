@@ -91,6 +91,7 @@ public partial class UpgradeModal : ModalBase
                 btn.Pressed += () => OnCardClicked(idx);
             }
         }
+        AudioManager.Instance?.WireClicks(this);
     }
 
     public void OpenUpgradeModal(Node2D player)
@@ -445,6 +446,7 @@ public partial class UpgradeModal : ModalBase
             SwapSlotsContainer.AddChild(card);
             _swapCards.Add(card);
         }
+        AudioManager.Instance?.WireClicks(SwapSlotsContainer);
     }
 
     private void RefreshSwapPanel()

@@ -241,7 +241,7 @@ public partial class Main : Node2D, IRunContext
         // Neutral environment matter (senescent RBCs + dormant toxin vesicles)
         NeutralMatter?.SeedInitialPopulation();
 
-        AudioManager.Instance?.PlayBgm("battle_bgm", 0.6f);
+        AudioManager.Instance?.PlayMapBgm(GameManager.SelectedMap, 0.6f);
 
         // Test-demand full-build cheat (debug builds only, --cheats=all [--godmode]).
         TestCheats.ApplyHeadedRunCheats(this);

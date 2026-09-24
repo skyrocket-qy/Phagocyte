@@ -1,4 +1,5 @@
 using Godot;
+using System.Collections.Generic;
 
 namespace Phagocyte.Core;
 
@@ -82,10 +83,17 @@ public partial class AudioManager : Node
             "res://assets/audio/sfx/wave_complete.mp3",
             "res://assets/audio/sfx/game_over.mp3",
             "res://assets/audio/sfx/combat/shoot.mp3",
+            "res://assets/audio/sfx/player_hit.wav",
             // Common BGMs
             "res://assets/audio/bgm/menu.mp3",
             "res://assets/audio/bgm/battle_bgm.mp3",
             "res://assets/audio/bgm/boss.mp3",
+            "res://assets/audio/bgm/boss_final.mp3",
+            "res://assets/audio/bgm/battle_bgm_2.mp3",
+            "res://assets/audio/bgm/echoes_of_the_aether.mp3",
+            "res://assets/audio/bgm/swamp.mp3",
+            "res://assets/audio/bgm/crypt.mp3",
+            "res://assets/audio/bgm/dimension.mp3",
             "res://assets/audio/bgm/victory.mp3",
             "res://assets/audio/bgm/defeat.mp3");
     }
@@ -225,7 +233,7 @@ public partial class AudioManager : Node
 
     public void PlayPlayerHit()
     {
-        PlaySfx("hit", 0.05f, 2.0f);
+        PlaySfx("player_hit", 0.05f, 2.0f);
     }
 
     public void PlayPlayerDeath()
@@ -281,5 +289,48 @@ public partial class AudioManager : Node
     public void PlayWaveStart()
     {
         PlaySfx("wave_start", 0.05f, -1.0f);
+    }
+
+    public void PlayClick()
+    {
+        PlaySfx("ui_click", 0.03f, 0.0f);
+    }
+
+    /// <summary>
+    /// Hooks the click SFX to every <see cref="Button"/> under <paramref name="root"/>.
+    /// Idempotent (guarded by per-button metadata) so menu lists, modal card
+    /// rebuilds and view refreshes can all call it safely.
+    /// </summary>
+    public void WireClicks(Node root)
+    {
+        if (root == null)
+            return;
+        foreach (Node node in root.FindChildren("*", "Button", true, false))
+        {
+            if (node is not Button btn || btn.HasMeta("_click_wired"))
+                continue;
+            btn.SetMeta("_click_wired", true);
+            btn.Pressed += () => Instance?.PlayClick();
+        }
+    }
+
+    /// <summary>
+    /// Per-organ battle BGM (TODO Phase 5): each map id resolves to its own
+    /// track; unknown ids fall back to the default battle theme.
+    /// </summary>
+    private static readonly Dictionary<string, string> MapBgmTracks = new()
+    {
+        ["acute_wound"] = "battle_bgm",
+        ["alveolar_space"] = "echoes_of_the_aether",
+        ["hepatic_sinusoid"] = "swamp",
+        ["gastric_lumen"] = "crypt",
+        ["blood_brain_barrier"] = "dimension",
+    };
+
+    public void PlayMapBgm(string mapKey, float fadeTime = 0.6f)
+    {
+        if (!MapBgmTracks.TryGetValue(mapKey ?? "", out string? track))
+            track = "battle_bgm";
+        PlayBgm(track, fadeTime);
     }
 }

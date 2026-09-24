@@ -91,9 +91,9 @@ Combat visuals verified live (godot-ai headed screenshots) plus headless suites
 
 Finish the audio pass (P0 wired: boss BGM switch, wave/game-start stingers, dodge/equip/error/achievement sounds; manifest + boot check + `TestAudioAssets` + check-assets step 7 all live):
 
-- [ ] **Dedicated player_hit SFX**: currently temped with `hit` in `PlayPlayerHit`; add a real hurt sound file, point the helper at it (manifest enforces existence).
-- [ ] **Wire button click sounds**: `PlayClick` (`ui_click`) has zero call sites; hook it to main menu / modal buttons.
-- [ ] **Per-map battle BGM**: map the 5 organs to existing tracks (e.g. wound→battle_bgm, alveolar→void/echoes, hepatic→swamp, gastric→crypt/abyss, bbb→dimension/temple); add the map→track table plus endless-overdrive track (`battle_bgm_2` / `boss_final`).
+- [x] **Dedicated player_hit SFX**: `PlayPlayerHit` now plays `player_hit.wav` (synthesized hurt thump, `assets/audio/sfx/`), manifest enforces existence.
+- [x] **Wire button click sounds**: restored `PlayClick` (`ui_click`) + idempotent `AudioManager.WireClicks(root)` hooked to MainMenu (incl. class/map lists, settings, loadout), Hud (pause/upgrade), and UpgradeModal draft/swap cards.
+- [x] **Per-map battle BGM**: `AudioManager.PlayMapBgm` table (wound→battle_bgm, alveolar→echoes_of_the_aether, hepatic→swamp, gastric→crypt, bbb→dimension); run start + post-sub-boss use it, endless terminal lockdown plays `boss_final`, endless overdrive plays `battle_bgm_2`. All six tracks added to the manifest.
 
 ---
 

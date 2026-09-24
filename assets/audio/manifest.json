@@ -1,4 +1,4 @@
 {
-	"bgm": ["menu", "battle_bgm", "boss", "victory", "defeat"],
-	"sfx": ["hit", "hit_crit", "death", "die_hero", "level_upgrade", "item_pickup", "shoot", "ui_click", "ui_confirm", "wave_complete", "wave_start", "game_start", "game_over", "explosion", "hit_sword_small", "flame_dash", "extra_coin", "gem_socket", "item_drop", "ui_error_02"]
+	"bgm": ["menu", "battle_bgm", "battle_bgm_2", "boss", "boss_final", "victory", "defeat", "echoes_of_the_aether", "swamp", "crypt", "dimension"],
+	"sfx": ["hit", "hit_crit", "player_hit", "death", "die_hero", "level_upgrade", "item_pickup", "shoot", "ui_click", "ui_confirm", "wave_complete", "wave_start", "game_start", "game_over", "explosion", "hit_sword_small", "flame_dash", "extra_coin", "gem_socket", "item_drop", "ui_error_02"]
 }

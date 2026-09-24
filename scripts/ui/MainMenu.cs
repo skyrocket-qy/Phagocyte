@@ -364,6 +364,9 @@ public partial class MainMenu : Control
         TestCheats.ApplyHeadedMenuCheats();
 
         UpdateAllTexts();
+
+        // TODO Phase 5: click SFX on every menu/modal button (idempotent).
+        AudioManager.Instance?.WireClicks(this);
     }
 
     /// <summary>
@@ -606,6 +609,7 @@ public partial class MainMenu : Control
             ClassListContainer.AddChild(btn);
             _classButtons[key] = btn;
         }
+        AudioManager.Instance?.WireClicks(ClassListContainer);
     }
 
     public void SelectClass(string key)
@@ -1042,6 +1046,7 @@ public partial class MainMenu : Control
             btn.Pressed += () => SelectMap(localKey);
             MapListContainer.AddChild(btn);
         }
+        AudioManager.Instance?.WireClicks(MapListContainer);
     }
 
     public void SelectMap(string key)

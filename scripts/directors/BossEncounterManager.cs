@@ -97,7 +97,7 @@ public partial class BossEncounterManager : Node
         TerminalBoss.EnemyDied += OnTerminalBossDefeated;
         TerminalBoss.Digested += OnTerminalBossDefeated;
         AudioManager.Instance?.PlaySfx("wave_start", -2.0f);
-        AudioManager.Instance?.PlayBgm("boss");
+        AudioManager.Instance?.PlayBgm(ctx.IsEndlessRun ? "boss_final" : "boss");
         GD.Print("[WaveDirector] 15:00 Terminal boss lockdown! Specific neutralization required.");
     }
 
@@ -108,7 +108,7 @@ public partial class BossEncounterManager : Node
         SubBossRewardGranted = true;
 
         AudioManager.Instance?.PlaySfx("wave_complete");
-        AudioManager.Instance?.PlayBgm("battle_bgm");
+        AudioManager.Instance?.PlayMapBgm(Context?.MapId ?? "");
 
         // Guaranteed superweapon chest: the epigenetic evolution system is not
         // online yet, so the reward is currently a guaranteed level-up draft.
@@ -137,7 +137,7 @@ public partial class BossEncounterManager : Node
             TerminalBoss = null;
             BossLockdownActive = false;
             AudioManager.Instance?.PlaySfx("wave_complete");
-            AudioManager.Instance?.PlayBgm("battle_bgm");
+            AudioManager.Instance?.PlayBgm("battle_bgm_2");
             GD.Print("[WaveDirector] Terminal boss neutralized. Endless overdrive continues past 15:00.");
             return;
         }

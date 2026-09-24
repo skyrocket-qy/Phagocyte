@@ -184,6 +184,9 @@ public partial class Hud : CanvasLayer
         AddChild(_fpsLabel);
 
         UpdateLocalizedTexts();
+
+        // TODO Phase 5: click SFX on pause/upgrade buttons (idempotent).
+        AudioManager.Instance?.WireClicks(this);
     }
 
     public override void _ExitTree()
