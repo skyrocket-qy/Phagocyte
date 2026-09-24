@@ -364,19 +364,27 @@ public partial class CodexModal : ModalBase
 
         if (DetailDesc != null)
         {
+            string traitBlock = Tr("CODEX_HEADER_TRAIT") + "\n" + d["trait"].AsString();
+            string vitalsBlock = UiBuilders.BuildClassVitalsText(d);
+            var (skillText, _) = UiBuilders.BuildClassSkillText(key);
+            string skillBlock = Tr("CLASS_SKILL_HEADER") + "\n" + skillText;
+            string body = traitBlock + "\n\n" + vitalsBlock + "\n\n" + skillBlock;
             if (unlocked)
             {
-                DetailDesc.Text = Tr("CODEX_HEADER_TRAIT") + "\n" + d["trait"].AsString();
+                DetailDesc.Text = body;
             }
             else
             {
-                DetailDesc.Text = AchievementManager.GetCellUnlockRequirementText(key) + "\n\n" + Tr("CODEX_HEADER_TRAIT") + "\n" + d["trait"].AsString();
+                DetailDesc.Text = AchievementManager.GetCellUnlockRequirementText(key) + "\n\n" + body;
             }
         }
 
         if (DetailBio != null)
         {
-            DetailBio.Text = "";
+            string bioKey = d.TryGetValue("bio_key", out var bioVal) ? bioVal.AsString() : "";
+            DetailBio.Text = string.IsNullOrEmpty(bioKey)
+                ? ""
+                : Tr("CODEX_HEADER_BIO") + "\n" + UiBuilders.StripLeadingLabel(Tr(bioKey));
         }
         RefreshItemSelection();
     }
@@ -438,7 +446,13 @@ public partial class CodexModal : ModalBase
         }
         if (DetailStats != null) DetailStats.Text = d["trait"].AsString();
         if (DetailDesc != null) DetailDesc.Text = Tr("CODEX_HEADER_PATHOGEN_TRAIT") + "\n" + d["description"].AsString();
-        if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_TACTIC_ADVICE") + "\n" + Tr("CODEX_PATHOGEN_ADVICE_DEFAULT");
+        if (DetailBio != null)
+        {
+            string bio = d.TryGetValue("biochemistry", out var bioVal) ? bioVal.AsString() : "";
+            DetailBio.Text = string.IsNullOrEmpty(bio)
+                ? Tr("CODEX_HEADER_TACTIC_ADVICE") + "\n" + Tr("CODEX_PATHOGEN_ADVICE_DEFAULT")
+                : Tr("CODEX_HEADER_BIO") + "\n" + UiBuilders.StripLeadingLabel(bio);
+        }
         RefreshItemSelection();
     }
 

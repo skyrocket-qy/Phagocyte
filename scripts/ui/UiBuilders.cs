@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using Phagocyte.Core;
 
 namespace Phagocyte.UI;
@@ -135,6 +136,75 @@ public static class UiBuilders
         }
 
         return style;
+    }
+
+    /// <summary>
+    /// Baseline vitals block: raw HP / speed / armor numbers plus the class
+    /// signature stat with a plain-language label (no academic stat names).
+    /// Shared by the class-select dossiers and the codex archive.
+    /// </summary>
+    public static string BuildClassVitalsText(Dictionary data)
+    {
+        float hp = data.TryGetValue("base_hp", out Variant hpVal) ? hpVal.AsSingle() : 100.0f;
+        float speed = data.TryGetValue("base_speed", out Variant spVal) ? spVal.AsSingle() : 230.0f;
+        float armor = data.TryGetValue("base_armor", out Variant arVal) ? arVal.AsSingle() : 0.0f;
+
+        var lines = new System.Collections.Generic.List<string>
+        {
+            $"{PassiveTreeManager.GetStatLabel("max_health")} {hp:F0}",
+            $"{PassiveTreeManager.GetStatLabel("move_speed")} {speed:F0}",
+            $"{PassiveTreeManager.GetStatLabel("armor")} {armor:F0}"
+        };
+
+        string sigStat = data.TryGetValue("trait_stat", out Variant sigVal) ? sigVal.AsString() : "";
+        if (!string.IsNullOrEmpty(sigStat))
+        {
+            float sigNum = data.TryGetValue("trait_stat_value", out Variant signVal) ? signVal.AsSingle() : 0.0f;
+            lines.Add($"{SignatureStatLabel(sigStat)} {FormatSignatureStat(sigStat, sigNum)}");
+        }
+        return string.Join("\n", lines);
+    }
+
+    public static string SignatureStatLabel(string stat)
+    {
+        string key = stat switch
+        {
+            "block" => "CLASS_SIG_BLOCK",
+            "crit_chance" => "CLASS_SIG_CRIT",
+            "might" => "CLASS_SIG_MIGHT",
+            "projectile_speed" => "CLASS_SIG_PROJSPEED",
+            "magnet" => "CLASS_SIG_MAGNET",
+            _ => ""
+        };
+        return string.IsNullOrEmpty(key) ? PassiveTreeManager.GetStatLabel(stat) : TranslationServer.Translate(key);
+    }
+
+    public static string FormatSignatureStat(string stat, float value) => stat switch
+    {
+        "crit_chance" or "evasion" or "block" or "life_steal" or "cooldown_reduction" => $"{value * 100.0f:F0}%",
+        "might" or "area" or "projectile_speed" or "duration" or "amount" or "knockback" or "crit_damage" => $"×{value:F1}".TrimEnd('0').TrimEnd('.'),
+        _ => value % 1.0f == 0.0f ? $"{value:F0}" : $"{value:F1}"
+    };
+
+    /// <summary>
+    /// Innate skill line: name + full description from the skill catalog.
+    /// Shared by the class-select dossiers and the codex archive.
+    /// </summary>
+    public static (string Text, string ImagePath) BuildClassSkillText(string classKey)
+    {
+        foreach (string id in GameManager.SkillCatalog.Keys)
+        {
+            var s = (Dictionary)GameManager.SkillCatalog[id];
+            if (s.TryGetValue("type", out Variant typeVal) && typeVal.AsString() == "innate"
+                && s.TryGetValue("class_id", out Variant cidVal) && cidVal.AsString() == classKey)
+            {
+                string nameKey = s.TryGetValue("name_key", out Variant nVal) ? nVal.AsString() : "";
+                string descKey = s.TryGetValue("desc_key", out Variant dVal) ? dVal.AsString() : "";
+                string imagePath = s.TryGetValue("image_path", out Variant ipVal) ? ipVal.AsString() : AssetPaths.SkillIcon(id);
+                return ($"{TranslationServer.Translate(nameKey)}\n{TranslationServer.Translate(descKey)}", imagePath);
+            }
+        }
+        return ("-", "");
     }
 
     private static readonly System.Text.RegularExpressions.Regex BioPrefixRegex =

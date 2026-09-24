@@ -339,6 +339,7 @@ public partial class GameManager : Node
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },
             { "description", TranslationServer.Translate(d["desc_key"].AsString()) },
             { "trait", TranslationServer.Translate(d["trait_key"].AsString()) },
+            { "biochemistry", d.ContainsKey("bio_key") ? TranslationServer.Translate(d["bio_key"].AsString()) : "" },
             { "icon", d["icon"] },
             { "danger_level", d["danger_level"] }
         };
@@ -356,6 +357,7 @@ public partial class GameManager : Node
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },
             { "description", TranslationServer.Translate(d["desc_key"].AsString()) },
             { "trait", TranslationServer.Translate(d["trait_key"].AsString()) },
+            { "biochemistry", d.ContainsKey("bio_key") ? TranslationServer.Translate(d["bio_key"].AsString()) : "" },
             { "icon", d["icon"] },
             { "danger_level", d["danger_level"] }
         };

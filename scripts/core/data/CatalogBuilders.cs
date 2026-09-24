@@ -135,6 +135,7 @@ public static class CatalogBuilders
                 { "name_key", CatalogLoader.GetString(row, "name_key") },
                 { "desc_key", CatalogLoader.GetString(row, "desc_key") },
                 { "trait_key", CatalogLoader.GetString(row, "trait_key") },
+                { "bio_key", CatalogLoader.GetString(row, "bio_key") },
                 { "icon", CatalogLoader.GetString(row, "icon") },
                 { "danger_level", CatalogLoader.GetString(row, "danger_level") }
             };
@@ -161,6 +162,7 @@ public static class CatalogBuilders
                 { "name_key", CatalogLoader.GetString(row, "name_key") },
                 { "desc_key", CatalogLoader.GetString(row, "desc_key") },
                 { "trait_key", CatalogLoader.GetString(row, "trait_key") },
+                { "bio_key", CatalogLoader.GetString(row, "bio_key") },
                 { "icon", CatalogLoader.GetString(row, "icon") },
                 { "danger_level", CatalogLoader.GetString(row, "danger_level") }
             };
