@@ -41,10 +41,8 @@ public partial class MainMenu : Control
     // Class View Controls
     public Label? ClassHeaderLbl { get; set; }
     public VBoxContainer? ClassListContainer { get; set; }
-    public Label? ClassBadgeLbl { get; set; }
     public Label? ClassNameLbl { get; set; }
     public Label? ClassBioLbl { get; set; }
-    public Label? ClassRoleLbl { get; set; }
     public Label? ClassStatsHeaderLbl { get; set; }
     public Label? ClassStatsLbl { get; set; }
     public Label? ClassSkillHeaderLbl { get; set; }
@@ -152,10 +150,8 @@ public partial class MainMenu : Control
 
         ClassHeaderLbl = GetNodeOrNull<Label>("ClassView/HeaderLabel");
         ClassListContainer = GetNodeOrNull<VBoxContainer>("ClassView/HBox/ClassList");
-        ClassBadgeLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassBadgeLabel");
         ClassNameLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassNameLabel");
         ClassBioLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassBioLabel");
-        ClassRoleLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassRoleLabel");
         ClassStatsHeaderLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatsHeader");
         ClassStatsLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/StatsRow/ClassStatsLabel")
             ?? GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatsLabel");
@@ -628,12 +624,6 @@ public partial class MainMenu : Control
             b.AddThemeColorOverride("font_color", sel ? Colors.White : new Color(0.75f, 0.85f, 0.90f));
         }
 
-        if (ClassBadgeLbl != null)
-        {
-            ClassBadgeLbl.Text = "[ " + Tr(unlocked ? "CLASS_BADGE_READY" : "CLASS_BADGE_LOCKED") + " ]";
-            ClassBadgeLbl.Modulate = unlocked ? new Color(0.3f, 1.0f, 0.4f) : new Color(1.0f, 0.68f, 0.25f);
-            ClassBadgeLbl.Visible = false;
-        }
         if (ClassNameLbl != null && data.TryGetValue("name", out Variant nameVal))
             ClassNameLbl.Text = nameVal.AsString();
         if (ClassBioLbl != null)
@@ -641,10 +631,7 @@ public partial class MainMenu : Control
             string bioKey = data.TryGetValue("bio_key", out Variant bioKeyVal) ? bioKeyVal.AsString() : "";
             ClassBioLbl.Text = Tr("CODEX_HEADER_BIO") + "\n" + (string.IsNullOrEmpty(bioKey) ? "" : Tr(bioKey));
         }
-        // No explicit cell roles: builds are player-defined, so the role
-        // line stays hidden instead of pinning a fixed positioning.
-        if (ClassRoleLbl != null)
-            ClassRoleLbl.Visible = false;
+        // No fixed cell roles: builds are player-defined.
         if (ClassStatsHeaderLbl != null)
             ClassStatsHeaderLbl.Text = Tr("CLASS_STATS_HEADER");
         if (ClassStatsLbl != null)

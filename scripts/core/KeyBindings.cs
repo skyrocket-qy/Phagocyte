@@ -46,11 +46,6 @@ public static class KeyBindings
         return Current.TryGetValue(action, out var key) ? key : Key.None;
     }
 
-    public static Key GetDefault(string action)
-    {
-        return Defaults.TryGetValue(action, out var key) ? key : Key.None;
-    }
-
     public static string KeyText(Key key)
     {
         if (key == Key.None)

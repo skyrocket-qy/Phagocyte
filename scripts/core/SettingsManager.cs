@@ -9,9 +9,6 @@ namespace Phagocyte.Core;
 /// </summary>
 public partial class SettingsManager : Node
 {
-    [Signal]
-    public delegate void SettingsChangedEventHandler();
-
     private static readonly JsonStore.SavePathSlot _savePath = new("settings.json");
     public static string SavePath
     {
@@ -94,11 +91,6 @@ public partial class SettingsManager : Node
         Engine.MaxFps = MaxFps;
 
         KeyBindings.ApplyAll();
-
-        if (Instance != null && IsInstanceValid(Instance))
-        {
-            Instance.EmitSignal(SignalName.SettingsChanged);
-        }
     }
 
     public static void SetMasterVolume(float val)

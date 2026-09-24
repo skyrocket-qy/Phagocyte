@@ -12,15 +12,6 @@ namespace Phagocyte.Skills;
 /// </summary>
 public partial class BaseSkill : Node2D
 {
-    [Signal]
-    public delegate void CooldownUpdatedEventHandler(float timeLeft, float maxTime);
-
-    [Signal]
-    public delegate void SkillActivatedEventHandler();
-
-    [Signal]
-    public delegate void SkillUpgradedEventHandler(int newLevel);
-
     [Export] public string SkillId { get; set; } = "";
     [Export] public string NameKey { get; set; } = "";
     [Export] public string DescKey { get; set; } = "";
@@ -74,7 +65,6 @@ public partial class BaseSkill : Node2D
         if (CooldownTimer > 0.0f)
         {
             CooldownTimer -= (float)delta;
-            EmitSignal(SignalName.CooldownUpdated, Mathf.Max(0.0f, CooldownTimer), currentCd);
             if (CooldownTimer <= 0.0f)
             {
                 Trigger();
@@ -84,7 +74,6 @@ public partial class BaseSkill : Node2D
 
     public virtual void Trigger()
     {
-        EmitSignal(SignalName.SkillActivated);
         CooldownTimer = GetCalculatedCooldown();
     }
 
@@ -101,7 +90,6 @@ public partial class BaseSkill : Node2D
             {
                 ApplyPassiveModifiers();
             }
-            EmitSignal(SignalName.SkillUpgraded, Level);
         }
     }
 

@@ -61,10 +61,6 @@ public partial class TutorialCueView : Node
         {
             player.Connect("LevelUp", Callable.From((int lvl) => OnPlayerLevelUp(lvl)));
         }
-        else if (player.HasSignal("level_up"))
-        {
-            player.Connect("level_up", Callable.From((int lvl) => OnPlayerLevelUp(lvl)));
-        }
     }
 
     /// <summary>

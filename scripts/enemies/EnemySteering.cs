@@ -232,13 +232,6 @@ public static class EnemySteering
         return best;
     }
 
-    public static IReadOnlyList<Vector2> GetTissueAnchors()
-    {
-        if (TissueAnchors.Count == 0)
-            BuildTissueAnchors();
-        return TissueAnchors;
-    }
-
     private static void BuildTissueAnchors()
     {
         TissueAnchors.Clear();

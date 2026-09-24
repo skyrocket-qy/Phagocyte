@@ -129,18 +129,6 @@ public static class SteamBridge
 #if USE_STEAMWORKS
         if (!IsAvailable)
             return;
-
-        try
-        {
-            // TODO(Steamworks): SteamUserStats.FindOrCreateLeaderboard(EndlessSurvivalLeaderboardId, ...);
-            // TODO(Steamworks): SteamUserStats.UploadLeaderboardScore(survivalBoard, ELeaderboardUploadScoreMethod.KeepBest, survivalSeconds, null, 0);
-            // TODO(Steamworks): SteamUserStats.FindOrCreateLeaderboard(EndlessScoreLeaderboardId, ...);
-            // TODO(Steamworks): SteamUserStats.UploadLeaderboardScore(scoreBoard, ELeaderboardUploadScoreMethod.KeepBest, score, null, 0);
-        }
-        catch (Exception ex)
-        {
-            GD.PushWarning($"SteamBridge: leaderboard upload failed ({ex.Message}).");
-        }
 #endif
     }
 

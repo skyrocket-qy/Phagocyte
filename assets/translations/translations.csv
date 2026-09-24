@@ -130,8 +130,6 @@ CLASS_CTL_BIO,High-velocity perforation assassin. The perforin lance deletes pri
 CLASS_NEUTROPHIL_BIO,Kamikaze demolition unit. Detonates its own granules to sterilize the field; survival rate is not assessed.,敢死爆破单位。以自身颗粒为引信，颗粒酶殉爆净化战场；存活率不计入考核。,敢死爆破單位。以自身顆粒為引信，顆粒酶殉爆淨化戰場；存活率不計入考核。,特攻爆破ユニット。自らの顆粒を信管に殉爆で戦場を浄化。生存率は評価対象外。,Kamikaze-Sprengeinheit. Detoniert eigene Granula zur Feldsterilisation; die Überlebensrate wird nicht bewertet.,Unité de démolition kamikaze. Fait détoner ses propres granules pour stériliser le terrain ; le taux de survie n'est pas évalué.,"Смертельный подрывной юнит. Подрывает собственные гранулы, стерилизуя поле; выживаемость не оценивается.",Unidad de demolición kamikaze. Detona sus propios gránulos para esterilizar el campo; la supervivencia no se evalúa.
 CLASS_B_CELL_BIO,Ranged plasma battery. Receptor-guided antibody salvos blanket the field; fatally fragile at contact range.,远程浆细胞炮台。受体导引的抗体齐射覆盖战场；近身接触即致命脆弱。,遠程漿細胞炮台。受體導引的抗體齊射覆蓋戰場；近身接觸即致命脆弱。,遠隔形質細胞砲台。受容体誘導の抗体斉射で戦場を覆う。近接では致命的に脆い。,Plasmazell-Fernbatterie. Rezeptorgelenkte Antikörpersalven decken das Feld ab; im Kontakt fatal fragil.,Batterie plasmatique à distance. Salves d'anticorps guidées couvrant le terrain ; mortellement fragile au contact.,Дальнобойная плазменная батарея. Наводимые залпы антител накрывают поле; в контакте смертельно хрупка.,Batería plasmática a distancia. Salvas de anticuerpos guiadas cubren el campo; mortalmente frágil al contacto.
 CLASS_DENDRITIC_BIO,Tactical command node. Chemotaxis gathers battlefield resources while tracer fire designates targets; never melees.,战术指挥节点。以趋化引力聚拢战场资源，示踪火力标定目标；本体不参与近战。,戰術指揮節點。以趨化引力聚攏戰場資源，示蹤火力標定目標；本體不參與近戰。,戦術指揮ノード。走化性で戦場資源を集め、追跡火力で目標を標定。本体は近接戦闘を行わない。,"Taktischer Kommandoknoten. Chemotaxis sammelt Feldressourcen, Markierungsfeuer designiert Ziele; kein Nahkampf.","Nœud de commandement tactique. La chimiotaxie rassemble les ressources, le tir traceur désigne les cibles ; jamais de mêlée.","Тактический командный узел. Хемотаксис собирает ресурсы поля, трассирующий огонь помечает цели; в ближний бой не вступает.",Nodo de mando táctico. La quimiotaxis reúne recursos mientras el fuego trazador designa blancos; nunca cuerpo a cuerpo.
-CLASS_BADGE_READY,READY,就绪,就緒,出撃可能,BEREIT,PRÊT,ГОТОВ,LISTA
-CLASS_BADGE_LOCKED,LOCKED,未解锁,未解鎖,未解放,GESPERRT,VERROUILLÉ,ЗАКРЫТО,BLOQUEADA
 CLASS_STATS_HEADER,【 Baseline Vitals 】,【 初始生化指标 】,【 初始生化指標 】,【 初期バイタル 】,【 Basis-Vitalwerte 】,【 Constantes initiales 】,【 Исходные витальные показатели 】,【 Constantes basales 】
 CLASS_SKILL_HEADER,【 Active Skill 】,【 主动技能 】,【 主動技能 】,【 アクティブスキル 】,【 Aktive Fähigkeit 】,【 Compétence active 】,【 Активный навык 】,【 Habilidad activa 】
 CLASS_SIG_BLOCK,Block,格挡,格擋,ブロック,Block,Blocage,Блок,Bloqueo
@@ -189,16 +187,10 @@ CODEX_TAB_PASSIVES,🧬 Passive Traits,🧬 被动特质,🧬 被動特質,🧬 
 CODEX_TAB_CELLS,Immune Cells,免疫防御细胞,免疫防御细胞,免疫細胞,Immunzellen,Cellules immunitaires,Иммунные клетки,Células inmunes
 CODEX_TAB_PATHOGENS,Pathogen Catalog,病原体图鉴,病原体图鉴,病原体図鑑,Pathogenkatalog,Catalogue pathogène,Каталог патогенов,Catálogo de patógenos
 CODEX_TAB_MAPS,Pathological Stages,病理战场,病理战场,病理ステージ,Pathologische Bühnen,Stades pathologiques,Патологические арены,Escenarios patológicos
-HUD_TITLE,Macrophage - Status,巨噬细胞 - 状态,巨噬细胞 - 状态,マクロファージ - 状態,Makrophage - Status,Macrophage - statut,Макрофаг - статус,Macrófago - estado
-HUD_BATTLEFIELD,Battlefield: ,战场：,战场：,戦場：,Schlachtfeld: ,Champ de bataille : ,Поле боя: ,Campo de batalla: 
-HUD_LEVEL,Lv. %d,Lv. %d,Lv. %d,Lv.%d,St.%d,Nv.%d,Ур.%d,Nv.%d
 HUD_HP_TITLE,❤️ Health (HP),❤️ 生命值 (HP),❤️ 生命值 (HP),❤️ 体力（HP）,❤️ Gesundheit (LP),❤️ Santé (PV),❤️ Здоровье (HP),❤️ Salud (PV)
 HUD_HP_VAL,%d / %d,%d / %d,%d / %d,%d / %d,%d / %d,%d / %d,%d / %d,%d / %d
 HUD_EXP_TITLE,🧬 Immune EXP,🧬 免疫经验 (EXP),🧬 免疫经验 (EXP),🧬 免疫EXP,🧬 Immun-EXP,🧬 EXP immunitaire,🧬 Иммунный опыт,🧬 EXP inmune
 HUD_EXP_VAL,%d / %d (%d%%),%d / %d (%d%%),%d / %d (%d%%),%d / %d (%d%%),%d / %d (%d%%),%d / %d (%d%%),%d / %d (%d%%),%d / %d (%d%%)
-HUD_ELIMINATED,🦠 Eliminated: %d,🦠 已消灭: %d,🦠 已消灭: %d,🦠 撃破：%d,🦠 Eliminiert: %d,🦠 Éliminés : %d,🦠 Уничтожено: %d,🦠 Eliminados: %d
-HUD_AREA,🔬 View: %.1fx,🔬 视野: %.1fx,🔬 视野: %.1fx,🔬 視野：%.1fx,🔬 Sicht: %.1fx,🔬 Vue : %.1fx,🔬 Обзор: %.1fx,🔬 Vista: %.1fx
-HUD_SPEED,💨 Speed: %d,💨 移速: %d,💨 移速: %d,💨 速度：%d,💨 Tempo: %d,💨 Vitesse : %d,💨 Скорость: %d,💨 Velocidad: %d
 HUD_KILL_COUNT,💀 %d,💀 %d,💀 %d,💀 %d,💀 %d,💀 %d,💀 %d,💀 %d
 HUD_HOMEOSTASIS,🛡️ Homeostasis Normal,🛡️ 生物稳态正常,🛡️ 生物稳态正常,🛡️ 恒常性正常,🛡️ Homöostase normal,🛡️ Homéostasie normale,🛡️ Гомеостаз в норме,🛡️ Homeostasis normal
 HUD_TB_DEBUFF,☣️ Acid Burn: %.1fs,☣️ 酸性腐蚀: %.1fs,☣️ 酸性腐蚀: %.1fs,☣️ 酸腐食：%.1f秒,☣️ Säurebrand: %.1fs,☣️ Brûlure acide : %.1fs,☣️ Кислотный ожог: %.1f с,☣️ Quemadura ácida: %.1fs
@@ -366,7 +358,6 @@ ACH_GIANT_VOLUME_TITLE,Giant Phagocyte,多核巨细胞,多核巨细胞,巨細胞
 ACH_GIANT_VOLUME_DESC,Expand cell volume to 2.0x or greater through Area mutations.,透过范围强化突变使细胞体积膨胀达到原始大小的 2.0 倍以上。,透过范围强化突变使细胞体积膨胀达到原始大小的 2.0 倍以上。,範囲変異で細胞体積2.0倍以上に膨張。,"Erweitere Zellvolumen auf 2,0x+ via Bereichs-Mutationen.","Portez le volume cellulaire à 2,0x+ via mutations de zone.","Увеличьте объём клетки до 2,0x+ мутациями области.","Expande el volumen celular a 2,0x+ con mutaciones de área."
 ACH_FULL_ARSENAL_TITLE,Metabolic Arsenal,基因武装,基因武装,代謝武庫,Stoffwechsel-Arsenal,Arsenal métabolique,Метаболический арсенал,Arsenal metabólico
 ACH_FULL_ARSENAL_DESC,Equip 5 active skills simultaneously in a run.,在单次战局中同时激活装配 5 种主动生化武器。,在单次战局中同时激活装配 5 种主动生化武器。,単一出撃で能動技能5種を同時装備。,Rüste 5 aktive Skills gleichzeitig in einem Run aus.,Équipez 5 compétences actives à la fois en une sortie.,Экипируйте 5 активных навыков сразу за одну вылазку.,Equipa 5 habilidades activas a la vez en una salida.
-SKILL_BAR_DUAL_TITLE,⚔️ Actives (5)  |  🧬 Passives (5),⚔️ 主动武器 (5)  |  🧬 被动特质 (5),⚔️ 主动武器 (5)  |  🧬 被动特质 (5),⚔️ 主動武器 (5)  |  🧬 被動特質 (5),⚔️ Aktive (5)  |  🧬 Passive (5),⚔️ Actives (5)  |  🧬 Passives (5),⚔️ Активные (5)  |  🧬 Пассивные (5),⚔️ Activas (5)  |  🧬 Pasivas (5)
 BTN_SETTINGS,Settings,系统设置,系統設定,設定,Einstellungen,Paramètres,Настройки,Ajustes
 SETTINGS_TITLE,⚙️ System Settings,⚙️ 系統設定,⚙️ 系統設定,⚙️ システム設定,⚙️ Systemeinstellungen,⚙️ Paramètres système,⚙️ Системные настройки,⚙️ Ajustes del sistema
 SETTINGS_LANGUAGE,Language,语言,語言,言語,Sprache,Langue,Язык,Idioma

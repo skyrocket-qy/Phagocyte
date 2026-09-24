@@ -109,13 +109,13 @@ public partial class TestI18n : TestHarness
         // Test in English
         GameManager.SetLanguage("en");
         hud.UpdateLocalizedTexts();
-        AssertThat(hud.TitleLabel?.Text.Contains("Status") ?? false).IsTrue();
+        AssertThat(hud.HpTitleLabel?.Text.Contains("Health") ?? false).IsTrue();
         AssertThat(hud.ResumeBtn?.Text.Contains("Resume") ?? false).IsTrue();
 
         // Test in Chinese
         GameManager.SetLanguage("zh_CN");
         hud.UpdateLocalizedTexts();
-        AssertThat(hud.TitleLabel?.Text.Contains("状态") ?? false).IsTrue();
+        AssertThat(hud.HpTitleLabel?.Text.Contains("生命值") ?? false).IsTrue();
         AssertThat(hud.ResumeBtn?.Text.Contains("继续战斗") ?? false).IsTrue();
         GD.Print("[PASS] In-game HUD & Pause Menu dynamic localization verified.");
 

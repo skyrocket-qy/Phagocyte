@@ -78,13 +78,6 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ClassBadgeLabel" type="Label" parent="HBox/DetailPanel/VBox"]
-visible = false
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 1, 0.4, 1)
-theme_override_font_sizes/font_size = 13
-text = "[ 就绪 ]"
-
 [node name="ClassNameLabel" type="Label" parent="HBox/DetailPanel/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
@@ -103,11 +96,6 @@ theme_override_font_sizes/font_size = 14
 text = "【 生物机制 】"
 autowrap_mode = 3
 clip_text = true
-
-[node name="ClassRoleLabel" type="Label" parent="HBox/DetailPanel/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "定位：近战重装 / 吞噬"
 
 [node name="ClassStatsHeader" type="Label" parent="HBox/DetailPanel/VBox"]
 layout_mode = 2

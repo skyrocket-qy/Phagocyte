@@ -13,9 +13,6 @@ public partial class SkillManager : Node2D
     [Signal]
     public delegate void SkillsChangedEventHandler();
 
-    [Signal]
-    public delegate void SkillEquippedEventHandler(bool isPassive, int slotIndex, BaseSkill skill);
-
     public const int MaxActiveSlots = 5;
     public const int MaxPassiveSlots = 5;
 
@@ -119,7 +116,6 @@ public partial class SkillManager : Node2D
         AddChild(skill);
         if (Host != null)
             skill.Setup(Host, slotIdx);
-        EmitSignal(SignalName.SkillEquipped, false, slotIdx, skill);
         EmitSignal(SignalName.SkillsChanged);
     }
 
@@ -134,7 +130,6 @@ public partial class SkillManager : Node2D
         AddChild(skill);
         if (Host != null)
             skill.Setup(Host, slotIdx);
-        EmitSignal(SignalName.SkillEquipped, true, slotIdx, skill);
         EmitSignal(SignalName.SkillsChanged);
     }
 
@@ -212,7 +207,6 @@ public partial class SkillManager : Node2D
         return res;
     }
 
-    public Dictionary get_ui_data() => GetUiData();
     public Array<Dictionary> get_all_ui_data() => GetAllUiData();
 
     private Dictionary GetEmptySlotData(bool isPass)

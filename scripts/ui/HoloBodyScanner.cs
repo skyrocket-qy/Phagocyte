@@ -17,9 +17,6 @@ public partial class HoloBodyScanner : Control
     [Signal]
     public delegate void OrganSelectedEventHandler(string mapKey);
 
-    [Signal]
-    public delegate void OrganHoveredEventHandler(string mapKey);
-
     public string ActiveMapKey { get; set; } = "acute_wound";
     public string? HoveredMapKey { get; set; } = null;
 
@@ -240,10 +237,6 @@ public partial class HoloBodyScanner : Control
             {
                 HoveredMapKey = foundKey;
                 MouseDefaultCursorShape = foundKey != null ? CursorShape.PointingHand : CursorShape.Arrow;
-                if (foundKey != null)
-                {
-                    EmitSignal(SignalName.OrganHovered, foundKey);
-                }
                 QueueRedraw();
                 _hudOverlay?.QueueRedraw();
             }

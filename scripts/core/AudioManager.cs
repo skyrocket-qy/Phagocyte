@@ -184,31 +184,6 @@ public partial class AudioManager : Node
         }
     }
 
-    public void StopBgm(float fadeTime = 0.5f)
-    {
-        if (_bgmPlayer == null || !_bgmPlayer.Playing)
-            return;
-
-        if (_bgmTween != null && _bgmTween.IsValid())
-            _bgmTween.Kill();
-
-        if (fadeTime > 0.05f)
-        {
-            _bgmTween = CreateTween();
-            _bgmTween.TweenProperty(_bgmPlayer, "volume_db", -80.0f, fadeTime);
-            _bgmTween.TweenCallback(Callable.From(() =>
-            {
-                _bgmPlayer.Stop();
-                _currentBgmTrack = "";
-            }));
-        }
-        else
-        {
-            _bgmPlayer.Stop();
-            _currentBgmTrack = "";
-        }
-    }
-
     // ==========================================
     // SFX Methods
     // ==========================================
@@ -261,11 +236,6 @@ public partial class AudioManager : Node
     public void PlayLevelUp()
     {
         PlaySfx("level_upgrade", 0.0f, 2.0f);
-    }
-
-    public void PlayClick()
-    {
-        PlaySfx("ui_click", 0.03f, 0.0f);
     }
 
     public void PlayPickup()

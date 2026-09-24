@@ -141,8 +141,8 @@ public partial class RunSettlementService : Node
     }
 
     /// <summary>
-    /// Dual-track achievement wiring (typed C# signals with GDScript fallback)
-    /// plus membrane-rupture settlement. Former <c>Main.ConnectAchievementEvents</c>.
+    /// Achievement wiring on typed C# signals plus membrane-rupture
+    /// settlement. Former <c>Main.ConnectAchievementEvents</c>.
     /// </summary>
     public void ConnectRunEvents(CharacterBody2D player)
     {
@@ -169,36 +169,6 @@ public partial class RunSettlementService : Node
             };
 
             bc.Died += () => ctx.EndRun(false, RunRecordManager.CauseMembraneRupture);
-        }
-        else
-        {
-            if (player.HasSignal("pathogen_digested"))
-            {
-                player.Connect("pathogen_digested", Callable.From((Node2D _p, float _atp) =>
-                {
-                    var digVal = player.Get("digested_count");
-                    AchievementManager.RecordEvent("pathogen_digested", digVal.VariantType == Variant.Type.Int ? digVal.AsInt32() : 0);
-                }));
-            }
-            if (player.HasSignal("level_up"))
-            {
-                player.Connect("level_up", Callable.From((int lvl) =>
-                {
-                    AchievementManager.RecordEvent("level_up", lvl);
-                    RecordTreeLevel(lvl);
-                }));
-            }
-            if (player.HasSignal("stats_changed"))
-            {
-                player.Connect("stats_changed", Callable.From((float _h, float _mh, float rr) =>
-                {
-                    AchievementManager.RecordEvent("radius_ratio", rr);
-                }));
-            }
-            if (player.HasSignal("died"))
-            {
-                player.Connect("died", Callable.From(() => ctx.EndRun(false, RunRecordManager.CauseMembraneRupture)));
-            }
         }
 
         var sm = player.GetNodeOrNull<SkillManager>("SkillManager");

@@ -22,8 +22,6 @@ public static class PauseManager
 
     public static int HoldCount => _holds.Count;
 
-    public static bool IsHeld(string token) => _holds.Contains(token);
-
     public static void PushHold(SceneTree tree, string token)
     {
         _holds.Add(token);

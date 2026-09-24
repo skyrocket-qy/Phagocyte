@@ -12,8 +12,6 @@ public partial class WaveTimerView : Node
 {
     public PanelContainer? TopCenterCapsule { get; set; }
     public Label? TimerLabel { get; set; }
-    public Label? TitleLabel { get; set; }
-    public Label? MapLabel { get; set; }
 
     public float SurvivalTime { get; set; } = 0.0f;
 
@@ -30,11 +28,7 @@ public partial class WaveTimerView : Node
     public void Bind(Node root)
     {
         TopCenterCapsule = root.GetNodeOrNull<PanelContainer>("TopCenterCapsule");
-        TimerLabel = root.GetNodeOrNull<Label>("TopCenterCapsule/HBox/TimerLabel")
-            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/TimerLabel");
-        TitleLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/TitleLabel")
-            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/TitleLabel");
-        MapLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/MapLabel");
+        TimerLabel = root.GetNodeOrNull<Label>("TopCenterCapsule/HBox/TimerLabel");
     }
 
     /// <summary>Burning dark-gold fluorescence used by the endless overdrive timer.</summary>
@@ -75,17 +69,6 @@ public partial class WaveTimerView : Node
             TimerLabel.Modulate = overdrive
                 ? BurningGoldFluorescence(SurvivalTime)
                 : Colors.White;
-        }
-    }
-
-    public void UpdateLocalizedTexts()
-    {
-        if (TitleLabel != null) TitleLabel.Text = Tr("HUD_TITLE");
-
-        var mapInfo = GameManager.GetMapInfo(GameManager.SelectedMap);
-        if (mapInfo.TryGetValue("name", out var mapName) && MapLabel != null)
-        {
-            MapLabel.Text = "📍 " + Tr("HUD_BATTLEFIELD") + mapName.AsString();
         }
     }
 }

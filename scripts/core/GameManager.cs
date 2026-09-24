@@ -19,9 +19,6 @@ public partial class GameManager : Node
     /// </summary>
     public static bool EndlessMode = false;
 
-    [Signal]
-    public delegate void LanguageChangedEventHandler(string locale);
-
     // Static callback list for decoupled notification
     private static Array<Callable> _languageListeners = new Array<Callable>();
 

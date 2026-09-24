@@ -224,8 +224,8 @@ public partial class TestSurvivorHudUx : TestHarness
         }
         float hoverAlpha = hud.SkillContainer.Modulate.A;
         AssertThat(hoverAlpha >= 0.90f).IsTrue();
-        AssertThat(hud.SkillTitleLbl?.Visible ?? false).IsFalse();
-        GD.Print($"[PASS] 5. Pure skill bar (TitleLabel hidden, 40x36 micro-slots & dynamic transparency: Combat alpha={combatAlpha:F2} -> Hover alpha={hoverAlpha:F2}) verified.");
+        AssertThat(hud.GetNodeOrNull<Label>("SkillContainer/VBox/TitleLabel")).IsNull();
+        GD.Print($"[PASS] 5. Pure skill bar (TitleLabel removed, 40x36 micro-slots & dynamic transparency: Combat alpha={combatAlpha:F2} -> Hover alpha={hoverAlpha:F2}) verified.");
 
         // =====================================================================
         // TEST 6: Tactical Telemetry & Buff/Debuff Monitor (Top-Left Buff Only)
@@ -233,8 +233,12 @@ public partial class TestSurvivorHudUx : TestHarness
         AssertThat(hud.BuffTag).IsNotNull();
         var headerHBox = hud.GetNodeOrNull<Control>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox");
         var footerHBox = hud.GetNodeOrNull<Control>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox");
-        AssertThat(headerHBox?.Visible ?? true).IsFalse();
-        AssertThat(footerHBox?.Visible ?? true).IsFalse();
+        var legacyBars = hud.GetNodeOrNull<Control>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars");
+        var mapLabel = hud.GetNodeOrNull<Control>("MarginContainer/PanelContainer/VBoxContainer/MapLabel");
+        AssertThat(headerHBox).IsNull();
+        AssertThat(footerHBox).IsNull();
+        AssertThat(legacyBars).IsNull();
+        AssertThat(mapLabel).IsNull();
 
         hud.UpdateLocalizedTexts();
         AssertThat(hud.BuffTag!.Visible).IsFalse();

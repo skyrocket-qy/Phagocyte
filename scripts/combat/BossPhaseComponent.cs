@@ -22,15 +22,6 @@ public class BossPhaseDef
 /// </summary>
 public partial class BossPhaseComponent : Node
 {
-    [Signal]
-    public delegate void BossHealthChangedEventHandler(float currentHp, float maxHp);
-
-    [Signal]
-    public delegate void BossPhaseChangedEventHandler(int newPhaseIndex);
-
-    [Signal]
-    public delegate void BossHardEnragedEventHandler();
-
     public string BossId { get; set; } = "pathogen_boss";
     public int CurrentPhaseIndex { get; private set; } = 1;
     public bool IsEnraged { get; private set; } = false;
@@ -125,7 +116,6 @@ public partial class BossPhaseComponent : Node
         if (!IsHardEnraged && _fightTimer >= HardEnrageSeconds)
         {
             IsHardEnraged = true;
-            EmitSignal(SignalName.BossHardEnraged);
         }
 
         if (_telegraphTimer <= 0.0f)
@@ -144,7 +134,6 @@ public partial class BossPhaseComponent : Node
 
     public void NotifyHealthChanged(float currentHp, float maxHp)
     {
-        EmitSignal(SignalName.BossHealthChanged, currentHp, maxHp);
         if (maxHp <= 0.0f) return;
 
         float hpPct = currentHp / maxHp;
@@ -162,7 +151,6 @@ public partial class BossPhaseComponent : Node
             {
                 CurrentPhaseIndex = phaseNumber;
                 IsEnraged = CurrentPhaseIndex > 1;
-                EmitSignal(SignalName.BossPhaseChanged, CurrentPhaseIndex);
                 break;
             }
         }

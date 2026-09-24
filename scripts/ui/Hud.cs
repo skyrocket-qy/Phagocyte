@@ -46,16 +46,12 @@ public partial class Hud : CanvasLayer
     private Callable _langCallback;
 
     // ---- Vitals facades ----
-    public Label? LevelLabel { get => _vitals?.LevelLabel; set { if (_vitals != null) _vitals.LevelLabel = value; } }
     public Label? HpTitleLabel { get => _vitals?.HpTitleLabel; set { if (_vitals != null) _vitals.HpTitleLabel = value; } }
     public ProgressBar? HpBar { get => _vitals?.HpBar; set { if (_vitals != null) _vitals.HpBar = value; } }
     public Label? HpLabel { get => _vitals?.HpLabel; set { if (_vitals != null) _vitals.HpLabel = value; } }
     public Label? ExpTitleLabel { get => _vitals?.ExpTitleLabel; set { if (_vitals != null) _vitals.ExpTitleLabel = value; } }
     public ProgressBar? ExpBar { get => _vitals?.ExpBar; set { if (_vitals != null) _vitals.ExpBar = value; } }
     public Label? ExpLabel { get => _vitals?.ExpLabel; set { if (_vitals != null) _vitals.ExpLabel = value; } }
-    public Label? SizeLabel { get => _vitals?.SizeLabel; set { if (_vitals != null) _vitals.SizeLabel = value; } }
-    public Label? CountLabel { get => _vitals?.CountLabel; set { if (_vitals != null) _vitals.CountLabel = value; } }
-    public Label? SpeedLabel { get => _vitals?.SpeedLabel; set { if (_vitals != null) _vitals.SpeedLabel = value; } }
     public Label? KillLabel { get => _vitals?.KillLabel; set { if (_vitals != null) _vitals.KillLabel = value; } }
     public ProgressBar? BottomExpBar { get => _vitals?.BottomExpBar; set { if (_vitals != null) _vitals.BottomExpBar = value; } }
     public ColorRect? VignetteRect { get => _vitals?.VignetteRect; set { if (_vitals != null) _vitals.VignetteRect = value; } }
@@ -72,7 +68,6 @@ public partial class Hud : CanvasLayer
 
     // ---- Skill bar facades ----
     public PanelContainer? SkillContainer { get => _skills?.SkillContainer; set { if (_skills != null) _skills.SkillContainer = value; } }
-    public Label? SkillTitleLbl { get => _skills?.SkillTitleLbl; set { if (_skills != null) _skills.SkillTitleLbl = value; } }
     public GridContainer? SlotsContainer { get => _skills?.SlotsContainer; set { if (_skills != null) _skills.SlotsContainer = value; } }
     public PanelContainer? SkillTooltip { get => _skills?.SkillTooltip; set { if (_skills != null) _skills.SkillTooltip = value; } }
     public Label? TooltipIcon { get => _skills?.TooltipIcon; set { if (_skills != null) _skills.TooltipIcon = value; } }
@@ -86,8 +81,6 @@ public partial class Hud : CanvasLayer
     // ---- Timer facades ----
     public PanelContainer? TopCenterCapsule { get => _timer?.TopCenterCapsule; set { if (_timer != null) _timer.TopCenterCapsule = value; } }
     public Label? TimerLabel { get => _timer?.TimerLabel; set { if (_timer != null) _timer.TimerLabel = value; } }
-    public Label? TitleLabel { get => _timer?.TitleLabel; set { if (_timer != null) _timer.TitleLabel = value; } }
-    public Label? MapLabel { get => _timer?.MapLabel; set { if (_timer != null) _timer.MapLabel = value; } }
     public float SurvivalTime { get => _timer?.SurvivalTime ?? 0.0f; set { if (_timer != null) _timer.SurvivalTime = value; } }
     public float GoalSeconds { get => _timer?.GoalSeconds ?? 0.0f; set { if (_timer != null) _timer.GoalSeconds = value; } }
     public bool EndlessMode { get => _timer?.EndlessMode ?? false; set { if (_timer != null) _timer.EndlessMode = value; } }
@@ -164,7 +157,6 @@ public partial class Hud : CanvasLayer
             _vitals?.OnPlayerLeveledUp(lvl);
             if (_pause != null) _pause.LastLevel = lvl;
         };
-        _skills.LevelUpForwarded += (lvl) => _tutorial?.OnPlayerLevelUp(lvl);
         _skills.SetupSlotHoverSignals();
 
         if (CellUpgradeModal != null)
@@ -252,7 +244,6 @@ public partial class Hud : CanvasLayer
 
     public void UpdateLocalizedTexts()
     {
-        _timer?.UpdateLocalizedTexts();
         _vitals?.UpdateLocalizedTexts();
         _skills?.UpdateLocalizedTexts();
         _pause?.UpdateLocalizedTexts();

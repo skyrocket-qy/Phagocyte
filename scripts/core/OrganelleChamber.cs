@@ -16,9 +16,6 @@ namespace Phagocyte.Core;
 /// </summary>
 public partial class OrganelleChamber : Node2D
 {
-    [Signal]
-    public delegate void ChamberChangedEventHandler();
-
     public const int MaxSlots = 4;
     public const int BaseEnergy = 6;
     public const int BackpackCap = 24;
@@ -273,7 +270,6 @@ public partial class OrganelleChamber : Node2D
 
         _slots[slot] = id;
         ApplyStats(id);
-        EmitSignal(SignalName.ChamberChanged);
         return true;
     }
 
@@ -322,7 +318,6 @@ public partial class OrganelleChamber : Node2D
         RemoveStats(id);
         _slots[slot] = "";
         _backpack.Add(id);
-        EmitSignal(SignalName.ChamberChanged);
         return true;
     }
 
@@ -333,7 +328,6 @@ public partial class OrganelleChamber : Node2D
             return false;
 
         (_slots[slotA], _slots[slotB]) = (_slots[slotB], _slots[slotA]);
-        EmitSignal(SignalName.ChamberChanged);
         return true;
     }
 
@@ -348,7 +342,6 @@ public partial class OrganelleChamber : Node2D
             return false;
 
         _backpack.Add(id);
-        EmitSignal(SignalName.ChamberChanged);
         return true;
     }
 
@@ -357,7 +350,6 @@ public partial class OrganelleChamber : Node2D
     {
         if (!_backpack.Remove(id))
             return false;
-        EmitSignal(SignalName.ChamberChanged);
         return true;
     }
 
@@ -397,8 +389,6 @@ public partial class OrganelleChamber : Node2D
             ["overloaded"] = IsOverloaded
         };
     }
-
-    public Dictionary get_ui_data() => GetUiData();
 
     private static Dictionary SlotData(string id, int slot)
     {

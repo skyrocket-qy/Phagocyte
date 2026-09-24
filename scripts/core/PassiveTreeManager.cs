@@ -267,11 +267,6 @@ public static class PassiveTreeManager
         return text.ToString().TrimEnd();
     }
 
-    public static string GetNodeIcon(string nodeId)
-    {
-        return TryGetNode(nodeId, out var node) ? node.Icon : "🧬";
-    }
-
     public static string GetNodeName(string nodeId)
     {
         return TryGetNode(nodeId, out var node) ? TranslationServer.Translate(node.NameKey) : nodeId;
@@ -412,11 +407,6 @@ public static class PassiveTreeManager
         if (!TryGetNode(nodeId, out var node))
             return int.MaxValue;
         return Math.Max(1, node.PointCost);
-    }
-
-    public static TreeRarity GetRarity(string nodeId)
-    {
-        return TryGetNode(nodeId, out var node) ? node.Rarity : TreeRarity.Normal;
     }
 
     public static string GetStartNode(string cellId)

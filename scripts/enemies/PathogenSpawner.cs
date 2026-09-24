@@ -284,18 +284,6 @@ public static class PathogenSpawner
         };
     }
 
-    public static string GetPhaseNameKey(int phaseIndex)
-    {
-        return Mathf.Clamp(phaseIndex, 0, PhaseCount - 1) switch
-        {
-            0 => "WAVE_PHASE_COLONIZATION",
-            1 => "WAVE_PHASE_INFLAMMATION",
-            2 => "WAVE_PHASE_INFILTRATION",
-            3 => "WAVE_PHASE_DISSEMINATION",
-            _ => "WAVE_PHASE_TERMINAL"
-        };
-    }
-
     /// <summary>
     /// Standard phase pool wave used by the periodic population maintenance.
     /// </summary>

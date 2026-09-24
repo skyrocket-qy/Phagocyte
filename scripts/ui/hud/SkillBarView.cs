@@ -13,7 +13,6 @@ namespace Phagocyte.UI;
 public partial class SkillBarView : Node
 {
     public PanelContainer? SkillContainer { get; set; }
-    public Label? SkillTitleLbl { get; set; }
     public GridContainer? SlotsContainer { get; set; }
 
     public PanelContainer? SkillTooltip { get; set; }
@@ -32,8 +31,6 @@ public partial class SkillBarView : Node
     public int HoveredSlotIdx { get; set; } = -1;
 
     public Node2D? PlayerRef { get; set; }
-
-    private Callable? _levelUpCallback;
 
     /// <summary>Per-slot cached node refs + last rendered state (dirty-only refresh).</summary>
     private sealed class SlotCache
@@ -69,7 +66,6 @@ public partial class SkillBarView : Node
     public void Bind(Node root)
     {
         SkillContainer = root.GetNodeOrNull<PanelContainer>("SkillContainer");
-        SkillTitleLbl = root.GetNodeOrNull<Label>("SkillContainer/VBox/TitleLabel");
         SlotsContainer = root.GetNodeOrNull<GridContainer>("SkillContainer/VBox/SlotsContainer");
 
         SkillTooltip = root.GetNodeOrNull<PanelContainer>("SkillTooltip");
@@ -137,7 +133,6 @@ public partial class SkillBarView : Node
         _skillLvTemplate = Tr("SKILL_LV");
         _chamberEnergyTemplate = Tr("LOADOUT_ENERGY_FMT");
         InvalidateSlotCache();
-        if (SkillTitleLbl != null) SkillTitleLbl.Text = Tr("SKILL_BAR_DUAL_TITLE");
 
         if (HoveredSlotIdx >= 0 && SkillTooltip != null && GodotObject.IsInstanceValid(SkillTooltip) && SkillTooltip.Visible)
         {
@@ -193,16 +188,6 @@ public partial class SkillBarView : Node
         PlayerRef = GetTree().GetFirstNodeInGroup("player") as Node2D;
         if (PlayerRef == null)
             return false;
-        if (PlayerRef.HasSignal("level_up"))
-        {
-            // Reuse one callable so the IsConnected guard actually matches;
-            // a fresh lambda per call would stack duplicate handlers.
-            _levelUpCallback ??= Callable.From((int lvl) => LevelUpForwarded?.Invoke(lvl));
-            if (!PlayerRef.IsConnected("level_up", _levelUpCallback.Value))
-            {
-                PlayerRef.Connect("level_up", _levelUpCallback.Value);
-            }
-        }
         return true;
     }
 
@@ -618,9 +603,6 @@ public partial class SkillBarView : Node
         if (ChamberPips != null)
             ChamberPips.Configure(max, used, gens);
     }
-
-    /// <summary>Forwarded GDScript <c>level_up</c> signal (coordinator routes it to the tutorial view).</summary>
-    public event System.Action<int>? LevelUpForwarded;
 
     public void SetupSlotHoverSignals()
     {

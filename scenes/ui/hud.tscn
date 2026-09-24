@@ -86,22 +86,6 @@ content_margin_top = 12.0
 content_margin_right = 16.0
 content_margin_bottom = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_level_badge"]
-bg_color = Color(0.1, 0.25, 0.42, 0.9)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.35, 0.82, 1, 0.8)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 8.0
-content_margin_top = 2.0
-content_margin_right = 8.0
-content_margin_bottom = 2.0
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
 bg_color = Color(0.2, 0.85, 0.45, 0.95)
 corner_radius_top_left = 4
@@ -292,35 +276,6 @@ max_value = 140.0
 value = 140.0
 show_percentage = false
 
-[node name="HeaderHBox" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="LevelBadge" type="PanelContainer" parent="MarginContainer/PanelContainer/VBoxContainer/HeaderHBox"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_level_badge")
-
-[node name="LevelLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/LevelBadge"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.95, 1, 1)
-theme_override_font_sizes/font_size = 11
-text = "Lv. 1"
-
-[node name="TitleLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/HeaderHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.85, 0.94, 1, 1)
-theme_override_font_sizes/font_size = 13
-text = "巨噬细胞 - 状态"
-
-[node name="MapLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
-visible = false
-layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.78, 0.35, 0.95)
-theme_override_font_sizes/font_size = 11
-text = "📍 战场：表皮裂口 (Acute Wound)"
-
 [node name="BuffContainer" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 6
@@ -333,52 +288,6 @@ theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 13
-
-[node name="FooterHBox" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="SpeedLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/FooterHBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.9, 0.75, 1)
-theme_override_font_sizes/font_size = 11
-text = "💨 移速: 230"
-
-[node name="Sep1" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/FooterHBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.55, 0.65, 0.6)
-theme_override_font_sizes/font_size = 11
-text = "•"
-
-[node name="SizeLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/FooterHBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.85, 0.95, 1)
-theme_override_font_sizes/font_size = 11
-text = "🔬 视野: 1.0x"
-
-[node name="LegacyBars" type="VBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
-visible = false
-layout_mode = 2
-
-[node name="HPLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/LegacyBars"]
-layout_mode = 2
-text = "100 / 100"
-
-[node name="HPBar" type="ProgressBar" parent="MarginContainer/PanelContainer/VBoxContainer/LegacyBars"]
-layout_mode = 2
-script = ExtResource("5_membrane")
-
-[node name="EXPLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/LegacyBars"]
-layout_mode = 2
-text = "0 / 30 (0%)"
-
-[node name="EXPBar" type="ProgressBar" parent="MarginContainer/PanelContainer/VBoxContainer/LegacyBars"]
-layout_mode = 2
-
-[node name="CountLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/LegacyBars"]
-layout_mode = 2
-text = "0"
 
 [node name="SkillContainer" type="PanelContainer" parent="."]
 anchors_preset = 7
@@ -397,14 +306,6 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_skill_panel")
 [node name="VBox" type="VBoxContainer" parent="SkillContainer"]
 layout_mode = 2
 theme_override_constants/separation = 0
-
-[node name="TitleLabel" type="Label" parent="SkillContainer/VBox"]
-visible = false
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 0.85)
-theme_override_font_sizes/font_size = 11
-text = "⚔️ 主动武器 (5)  |  🧬 被动特质 (5)"
-horizontal_alignment = 1
 
 [node name="SlotsContainer" type="GridContainer" parent="SkillContainer/VBox"]
 layout_mode = 2

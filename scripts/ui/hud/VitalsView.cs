@@ -12,16 +12,12 @@ namespace Phagocyte.UI;
 /// </summary>
 public partial class VitalsView : Node
 {
-    public Label? LevelLabel { get; set; }
     public Label? HpTitleLabel { get; set; }
     public ProgressBar? HpBar { get; set; }
     public Label? HpLabel { get; set; }
     public Label? ExpTitleLabel { get; set; }
     public ProgressBar? ExpBar { get; set; }
     public Label? ExpLabel { get; set; }
-    public Label? SizeLabel { get; set; }
-    public Label? CountLabel { get; set; }
-    public Label? SpeedLabel { get; set; }
     public Label? KillLabel { get; set; }
     public ProgressBar? BottomExpBar { get; set; }
     public ColorRect? VignetteRect { get; set; }
@@ -49,28 +45,14 @@ public partial class VitalsView : Node
     /// <summary>Wires vitals nodes (with legacy-path fallbacks). Call once from Hud._Ready.</summary>
     public void Bind(Node root)
     {
-        LevelLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HeaderHBox/LevelBadge/LevelLabel");
-        HpTitleLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPTopHBox/HPTitleLabel")
-            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/HPTitleLabel");
-        HpBar = root.GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPBar")
-            ?? root.GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/HPBar");
+        HpTitleLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPTopHBox/HPTitleLabel");
+        HpBar = root.GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPBar");
         HpLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPTopHBox/HPLabel")
-            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPLabel")
-            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/HPLabel");
+            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/HPContainer/HPLabel");
 
-        ExpTitleLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPTitleLabel")
-            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/EXPTitleLabel");
-        ExpBar = root.GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPBar")
-            ?? root.GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/EXPBar");
-        ExpLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPLabel")
-            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/EXPLabel");
-
-        SizeLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/SizeLabel")
-            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/SizeLabel");
-        CountLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/CountLabel")
-            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/CountLabel")
-            ?? root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/LegacyBars/CountLabel");
-        SpeedLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/FooterHBox/SpeedLabel");
+        ExpTitleLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPTitleLabel");
+        ExpBar = root.GetNodeOrNull<ProgressBar>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPBar");
+        ExpLabel = root.GetNodeOrNull<Label>("MarginContainer/PanelContainer/VBoxContainer/EXPContainer/EXPTopHBox/EXPLabel");
 
         KillLabel = root.GetNodeOrNull<Label>("TopCenterCapsule/HBox/KillLabel");
         BottomExpBar = root.GetNodeOrNull<ProgressBar>("BottomExpBar");
@@ -101,7 +83,7 @@ public partial class VitalsView : Node
             HpBar.Value = LastHealth;
         }
         UpdateExpDisplay();
-        RenderVitalLines(LastHealth, LastMaxHealth, LastRadiusRatio, LastSpeed);
+        RenderVitalLines(LastHealth, LastMaxHealth);
         RenderCountLines(LastDigestedCount);
     }
 
@@ -111,18 +93,12 @@ public partial class VitalsView : Node
         PlayerRef = player;
         if (player.HasSignal("StatsChanged"))
             player.Connect("StatsChanged", Callable.From((float h, float mh, float r) => OnPlayerStatsChanged(h, mh, r)));
-        else if (player.HasSignal("stats_changed"))
-            player.Connect("stats_changed", Callable.From((float h, float mh, float r) => OnPlayerStatsChanged(h, mh, r)));
 
         if (player.HasSignal("PathogenDigested"))
             player.Connect("PathogenDigested", Callable.From((Node2D p, float atp) => OnPathogenDigested(p, atp)));
-        else if (player.HasSignal("pathogen_digested"))
-            player.Connect("pathogen_digested", Callable.From((Node2D p, float atp) => OnPathogenDigested(p, atp)));
 
         if (player.HasSignal("ExpChanged"))
             player.Connect("ExpChanged", Callable.From((float c, float m, int l) => OnPlayerExpChanged(c, m, l)));
-        else if (player.HasSignal("exp_changed"))
-            player.Connect("exp_changed", Callable.From((float c, float m, int l) => OnPlayerExpChanged(c, m, l)));
     }
 
     /// <summary>Low-HP vignette pulse (&lt;30% HP). Driven by Hud._Process with the run clock.</summary>
@@ -151,9 +127,8 @@ public partial class VitalsView : Node
 
     public void UpdateLocalizedTexts()
     {
-        if (LevelLabel != null) LevelLabel.Text = TextFormatter.Format(Tr("HUD_LEVEL"), LastLevel);
         if (HpTitleLabel != null) HpTitleLabel.Text = Tr("HUD_HP_TITLE");
-        RenderVitalLines(LastHealth, LastMaxHealth, LastRadiusRatio, LastSpeed);
+        RenderVitalLines(LastHealth, LastMaxHealth);
         if (ExpTitleLabel != null) ExpTitleLabel.Text = Tr("HUD_EXP_TITLE");
         UpdateExpDisplay();
         RenderCountLines(LastDigestedCount);
@@ -177,22 +152,15 @@ public partial class VitalsView : Node
         {
             ExpLabel.Text = TextFormatter.Format(Tr("HUD_EXP_VAL"), (int)LastCurrentExp, (int)LastExpToNext, percent);
         }
-        if (LevelLabel != null)
-        {
-            LevelLabel.Text = TextFormatter.Format(Tr("HUD_LEVEL"), LastLevel);
-        }
     }
 
-    public void RenderVitalLines(float health, float maxHealth, float radiusRatio, float speed)
+    public void RenderVitalLines(float health, float maxHealth)
     {
         if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)health, (int)maxHealth);
-        if (SizeLabel != null) SizeLabel.Text = TextFormatter.Format(Tr("HUD_AREA"), radiusRatio);
-        if (SpeedLabel != null) SpeedLabel.Text = TextFormatter.Format(Tr("HUD_SPEED"), (int)speed);
     }
 
     public void RenderCountLines(int digested)
     {
-        if (CountLabel != null) CountLabel.Text = TextFormatter.Format(Tr("HUD_ELIMINATED"), digested);
         if (KillLabel != null) KillLabel.Text = TextFormatter.Format(Tr("HUD_KILL_COUNT"), digested);
     }
 
@@ -281,7 +249,7 @@ public partial class VitalsView : Node
             HpBar.Value = health;
         }
 
-        RenderVitalLines(health, maxHealth, radiusRatio, LastSpeed);
+        RenderVitalLines(health, maxHealth);
         VitalsChanged?.Invoke();
     }
 
