@@ -77,6 +77,8 @@ public partial class ExosomeSingularitySkill : BaseSkill
         private float _age = 0.0f;
         private float _spinAngle = 0.0f;
         private float _tickTimer = 0.0f;
+        private float _pullAccum = 0.0f;
+        private bool _pendingTick;
 
         public override void _Process(double delta)
         {
@@ -90,14 +92,23 @@ public partial class ExosomeSingularitySkill : BaseSkill
 
             _spinAngle += dt * 6.0f;
             _tickTimer += dt;
-            bool doTick = false;
             if (_tickTimer >= 0.4f)
             {
                 _tickTimer = 0.0f;
-                doTick = true;
+                _pendingTick = true;
             }
 
-            PullEnemies(dt, doTick);
+            // Full-arena enemy scan at half rate (damage ticks ride along,
+            // delayed by at most one 30 Hz step); pull displacement integrates
+            // the scaled step so total suction is unchanged.
+            _pullAccum += dt;
+            if (_pullAccum >= 1.0f / 30.0f)
+            {
+                float step = _pullAccum;
+                _pullAccum = 0.0f;
+                PullEnemies(step, _pendingTick);
+                _pendingTick = false;
+            }
             QueueRedraw();
         }
 

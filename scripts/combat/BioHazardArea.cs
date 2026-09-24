@@ -25,6 +25,7 @@ public partial class BioHazardArea : Node2D
     private float _lifeTimer = 0.0f;
     private float _tickTimer = 0.0f;
     private float _bubblePhase = 0.0f;
+    private float _redrawAccum = 0.0f;
 
     public override void _Ready()
     {
@@ -52,7 +53,12 @@ public partial class BioHazardArea : Node2D
             CheckHazardCollision();
         }
 
-        QueueRedraw();
+        _redrawAccum += dt;
+        if (_redrawAccum >= 1.0f / 30.0f)
+        {
+            _redrawAccum = 0.0f;
+            QueueRedraw();
+        }
     }
 
     private void CheckHazardCollision()

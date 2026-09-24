@@ -62,8 +62,10 @@ public partial class HyperoxicPocket : Node2D
     private float _age;
     private float _buffTimer = -1.0f;
     private BaseCell? _buffTarget;
+    private BaseCell? _player;
     private Vector2 _velocity;
     private float _phase;
+    private float _redrawAccum;
 
     public override void _Ready()
     {
@@ -93,17 +95,24 @@ public partial class HyperoxicPocket : Node2D
 
         Position += _velocity * dt;
 
-        var player = GetTree().GetFirstNodeInGroup("player") as BaseCell;
-        if (player != null && GodotObject.IsInstanceValid(player)
-            && GlobalPosition.DistanceTo(player.GlobalPosition) <= Radius)
+        if (_player == null || !GodotObject.IsInstanceValid(_player))
+            _player = GetTree().GetFirstNodeInGroup("player") as BaseCell;
+        if (_player != null
+            && GlobalPosition.DistanceTo(_player.GlobalPosition) <= Radius)
         {
-            Consume(player);
+            Consume(_player);
         }
 
         if (_age >= Lifetime)
             QueueFree();
 
-        QueueRedraw();
+        // Breathe animation needs no physics-rate redraw.
+        _redrawAccum += dt;
+        if (_redrawAccum >= 1.0f / 30.0f)
+        {
+            _redrawAccum = 0.0f;
+            QueueRedraw();
+        }
     }
 
     private void Consume(BaseCell player)
@@ -161,6 +170,8 @@ public partial class FenestraWall : StaticBody2D
     public float FitRadius { get; set; } = 34.0f;
 
     private readonly Godot.Collections.Array<CollisionShape2D> _shapes = new();
+    private BaseCell? _player;
+    private bool? _lastPassable;
 
     public override void _Ready()
     {
@@ -184,17 +195,22 @@ public partial class FenestraWall : StaticBody2D
 
     public override void _PhysicsProcess(double delta)
     {
-        var player = GetTree().GetFirstNodeInGroup("player") as BaseCell;
-        bool passable = player != null && GodotObject.IsInstanceValid(player)
-            && player.CurrentRadius <= FitRadius;
+        if (_player == null || !GodotObject.IsInstanceValid(_player))
+            _player = GetTree().GetFirstNodeInGroup("player") as BaseCell;
+        bool passable = _player != null && _player.CurrentRadius <= FitRadius;
 
-        foreach (var shape in _shapes)
+        // Static geometry: touch the physics server only on state flips,
+        // never every tick; the pore visual only needs a redraw then too.
+        if (_lastPassable != passable)
         {
-            if (GodotObject.IsInstanceValid(shape))
-                shape.SetDeferred(CollisionShape2D.PropertyName.Disabled, passable);
+            _lastPassable = passable;
+            foreach (var shape in _shapes)
+            {
+                if (GodotObject.IsInstanceValid(shape))
+                    shape.SetDeferred(CollisionShape2D.PropertyName.Disabled, passable);
+            }
+            QueueRedraw();
         }
-
-        QueueRedraw();
     }
 
     public override void _Draw()
@@ -232,6 +248,7 @@ public partial class NeutralizationZone : Node2D
 
     private float _age;
     private float _phase;
+    private float _redrawAccum;
 
     public override void _Ready()
     {
@@ -254,7 +271,14 @@ public partial class NeutralizationZone : Node2D
         if (_age >= Lifetime)
             QueueFree();
         else
-            QueueRedraw();
+        {
+            _redrawAccum += dt;
+            if (_redrawAccum >= 1.0f / 30.0f)
+            {
+                _redrawAccum = 0.0f;
+                QueueRedraw();
+            }
+        }
     }
 
     public bool Contains(Vector2 worldPosition)
@@ -301,6 +325,7 @@ public partial class AcidSurge : Node2D
 
     private float _age;
     private float _phase;
+    private float _redrawAccum;
 
     public override void _Ready()
     {
@@ -317,7 +342,14 @@ public partial class AcidSurge : Node2D
         if (_age >= Lifetime)
             QueueFree();
         else
-            QueueRedraw();
+        {
+            _redrawAccum += dt;
+            if (_redrawAccum >= 1.0f / 30.0f)
+            {
+                _redrawAccum = 0.0f;
+                QueueRedraw();
+            }
+        }
     }
 
     /// <summary>Current wavefront radius (grows over the surge lifetime).</summary>
@@ -348,6 +380,7 @@ public partial class AstrocytePillar : StaticBody2D
     public float Radius { get; set; } = 72.0f;
 
     private float _phase;
+    private float _redrawAccum;
 
     public override void _Ready()
     {
@@ -363,7 +396,14 @@ public partial class AstrocytePillar : StaticBody2D
     public override void _PhysicsProcess(double delta)
     {
         _phase += (float)delta * 0.8f;
-        QueueRedraw();
+
+        // Slow sine pulse on static geometry: 30 Hz redraw is plenty.
+        _redrawAccum += (float)delta;
+        if (_redrawAccum >= 1.0f / 30.0f)
+        {
+            _redrawAccum = 0.0f;
+            QueueRedraw();
+        }
     }
 
     public override void _Draw()

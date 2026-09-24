@@ -16,6 +16,7 @@ public partial class NitricOxideHaloSkill : BaseSkill
 
     private HaloVisual? _visual;
     private float _pulsePhase = 0.0f;
+    private float _redrawAccum = 0.0f;
 
     public partial class HaloVisual : Node2D
     {
@@ -78,14 +79,20 @@ public partial class NitricOxideHaloSkill : BaseSkill
         GlobalPosition = Host.GlobalPosition;
         _pulsePhase += (float)delta * 4.0f;
 
-        if (_visual != null)
+        // Position follows every frame; the slow pulse redraws at 30 Hz.
+        _redrawAccum += (float)delta;
+        if (_redrawAccum >= 1.0f / 30.0f)
         {
-            float hostR = Host.Get("CurrentRadius").VariantType == Variant.Type.Float
-                ? (float)Host.Get("CurrentRadius")
-                : 48.0f;
-            _visual.Radius = hostR + GetCalculatedArea(BaseRadius - 48.0f);
-            _visual.Phase = _pulsePhase;
-            _visual.QueueRedraw();
+            _redrawAccum = 0.0f;
+            if (_visual != null)
+            {
+                float hostR = Host.Get("CurrentRadius").VariantType == Variant.Type.Float
+                    ? (float)Host.Get("CurrentRadius")
+                    : 48.0f;
+                _visual.Radius = hostR + GetCalculatedArea(BaseRadius - 48.0f);
+                _visual.Phase = _pulsePhase;
+                _visual.QueueRedraw();
+            }
         }
     }
 
