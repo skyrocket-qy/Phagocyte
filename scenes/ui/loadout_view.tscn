@@ -182,15 +182,12 @@ layout_mode = 2
 mouse_filter = 2
 script = ExtResource("2_pips")
 AlignLeft = false
-MaxDiameter = 26.0
+MaxDiameter = 18.0
 
 [node name="BottomSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
-MaxDiameter = 20.0
-Gap = 7.0
-AlignLeft = true
 
 [node name="VaultSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox"]
 layout_mode = 2
@@ -203,7 +200,7 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
-columns = 4
+columns = 5
 
 [node name="VaultScroll" type="ScrollContainer" parent="Margin/VBox/ContentHBox/VaultSide"]
 layout_mode = 2

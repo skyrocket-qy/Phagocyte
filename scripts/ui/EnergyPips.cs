@@ -25,7 +25,8 @@ public partial class EnergyPips : Control
     /// <summary>Trailing discs granted by generators (drawn red).</summary>
     public int GeneratorCount { get; private set; }
 
-    /// <summary>Disc diameter cap; discs shrink to fit narrow slots.</summary>
+    /// <summary>Fixed disc diameter — no auto-scaling. Callers size their
+    /// containers for the worst case (max cost / max energy).</summary>
     [Export] public float MaxDiameter { get; set; } = 18.0f;
 
     /// <summary>Gap between discs.</summary>
@@ -73,14 +74,7 @@ public partial class EnergyPips : Control
         }
 
         float available = Size.X;
-        float diameter = Mathf.Min(MaxDiameter, (available - (PipCount - 1) * Gap) / PipCount);
-        if (diameter <= 1.0f)
-        {
-            Gap = Mathf.Max(1.0f, Gap * 0.5f);
-            diameter = Mathf.Min(MaxDiameter, (available - (PipCount - 1) * Gap) / PipCount);
-        }
-        if (diameter <= 1.0f)
-            return;
+        float diameter = MaxDiameter;
 
         float totalWidth = PipCount * diameter + (PipCount - 1) * Gap;
         float startX = AlignLeft ? 0.0f : Mathf.Max(0.0f, (available - totalWidth) * 0.5f);
@@ -102,14 +96,7 @@ public partial class EnergyPips : Control
     {
         float available = Size.Y;
         float gap = Gap;
-        float diameter = Mathf.Min(MaxDiameter, (available - (PipCount - 1) * gap) / PipCount);
-        if (diameter <= 1.0f)
-        {
-            gap = Mathf.Max(1.0f, gap * 0.5f);
-            diameter = Mathf.Min(MaxDiameter, (available - (PipCount - 1) * gap) / PipCount);
-        }
-        if (diameter <= 1.0f)
-            return;
+        float diameter = MaxDiameter;
 
         float totalHeight = PipCount * diameter + (PipCount - 1) * gap;
         float startY = Mathf.Max(0.0f, (available - totalHeight) * 0.5f);

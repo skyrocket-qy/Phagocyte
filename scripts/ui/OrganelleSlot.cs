@@ -18,8 +18,8 @@ public partial class OrganelleSlot : Button
     /// <summary>Catalog id currently shown ("" for an empty chamber slot).</summary>
     public string OrganelleId { get; private set; } = "";
 
-    private static readonly Color LockedIconTint = new(1, 1, 1, 0.3f);
-    private static readonly Color LockedNameTint = new(0.55f, 0.62f, 0.70f, 0.85f);
+    private static readonly Color LockedIconTint = new(1, 1, 1, 0.18f);
+    private static readonly Color LockedNameTint = new(0.38f, 0.43f, 0.50f, 0.85f);
 
     public override void _Ready()
     {
@@ -106,7 +106,7 @@ public partial class OrganelleSlot : Button
             else
                 CostPips.Configure(cost, cost, 0);
             CostPips.Modulate = !unlocked
-                ? new Color(1.0f, 1.0f, 1.0f, 0.55f)
+                ? new Color(1.0f, 1.0f, 1.0f, 0.35f)
                 : Colors.White;
         }
         if (NameLabel != null)
@@ -119,12 +119,11 @@ public partial class OrganelleSlot : Button
         }
         if (StateLabel != null)
         {
-            // Locked cards get an icon-only lock tag (no text).
-            StateLabel.Text = !unlocked ? "🔒" : equipped ? Tr("LOADOUT_EQUIPPED_TAG") : "";
-            StateLabel.Visible = !unlocked || equipped;
-            StateLabel.Modulate = unlocked
-                ? new Color(0.45f, 1.0f, 0.72f)
-                : new Color(1.0f, 0.72f, 0.35f);
+            // No lock icon: locked state reads purely from dimming.
+            // Only the equipped tag uses this label.
+            StateLabel.Text = equipped ? Tr("LOADOUT_EQUIPPED_TAG") : "";
+            StateLabel.Visible = equipped;
+            StateLabel.Modulate = new Color(0.45f, 1.0f, 0.72f);
         }
 
         string costText = cost < 0 ? $"+{-cost}" : cost.ToString();
