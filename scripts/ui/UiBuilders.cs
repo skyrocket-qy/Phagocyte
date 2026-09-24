@@ -24,6 +24,29 @@ public static class UiBuilders
     public static readonly Color BadgeActiveColor = new Color(1.0f, 0.85f, 0.3f);
     public static readonly Color BadgePassiveColor = new Color(0.6f, 0.8f, 1.0f);
 
+    /// <summary>YFP-gold fill for collection-level progress (gallery header/detail).</summary>
+    public static readonly Color AchievementGoldFill = new Color(1.0f, 0.84f, 0.35f);
+    private static readonly Color AchievementTrackColor = new Color(0.05f, 0.08f, 0.12f, 0.9f);
+    private static readonly Color AchievementTrackBorder = new Color(0.2f, 0.35f, 0.5f, 0.6f);
+
+    /// <summary>
+    /// Styles a gallery progress bar with the bio-fluorescence track + fill.
+    /// One source of truth for the header, detail and per-card mini bars
+    /// (which otherwise fall back to the gray default theme).
+    /// </summary>
+    public static void StyleAchievementProgress(ProgressBar? bar, Color fill)
+    {
+        if (bar == null)
+            return;
+        var bg = new StyleBoxFlat { BgColor = AchievementTrackColor, BorderColor = AchievementTrackBorder };
+        bg.SetBorderWidthAll(1);
+        bg.SetCornerRadiusAll(4);
+        var fg = new StyleBoxFlat { BgColor = fill };
+        fg.SetCornerRadiusAll(4);
+        bar.AddThemeStyleboxOverride("background", bg);
+        bar.AddThemeStyleboxOverride("fill", fg);
+    }
+
     /// <summary>Highlights a tab button (or any Control) as active/inactive with cyber-fluorescence styling.</summary>
     public static void SetTabActive(Control? tab, bool active)
     {

@@ -80,6 +80,9 @@ public partial class AchievementGalleryView : Control
         DetailReward = GetNodeOrNull<Label>("HBox/DetailPanel/DetailVBox/DetailReward");
         DetailSteam = GetNodeOrNull<Label>("HBox/DetailPanel/DetailVBox/DetailSteam");
 
+        UiBuilders.StyleAchievementProgress(HeaderProgress, UiBuilders.AchievementGoldFill);
+        UiBuilders.StyleAchievementProgress(DetailProgress, UiBuilders.AchievementGoldFill);
+
         if (FilterAllBtn != null)
             FilterAllBtn.Pressed += () => SetFilter(FilterAll);
         if (FilterUnlockedBtn != null)

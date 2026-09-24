@@ -73,6 +73,7 @@ public partial class AchievementCard : PanelContainer
             mini.MaxValue = 100;
             mini.Value = pct;
             mini.ShowPercentage = false;
+            UiBuilders.StyleAchievementProgress(mini, accent);
         }
 
         GuiInput += (InputEvent @event) =>
