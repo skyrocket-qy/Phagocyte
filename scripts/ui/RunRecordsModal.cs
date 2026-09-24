@@ -64,6 +64,7 @@ public partial class RunRecordsModal : ModalBase
             return;
 
         HistoryTabs = new TabBar { Name = "HistoryTabs" };
+        HistoryTabs.AddTab(Tr("RECORDS_TAB_ALL"));
         HistoryTabs.AddTab(Tr("RECORDS_TAB_VICTORIES"));
         HistoryTabs.AddTab(Tr("RECORDS_TAB_DEFEATS"));
         HistoryTabs.TabChanged += OnHistoryTabChanged;
@@ -109,7 +110,7 @@ public partial class RunRecordsModal : ModalBase
             HistoryScroll.ScrollVertical = 0;
     }
 
-    /// <summary>Switch classification tab (0 = victories, 1 = defeats) and re-render.</summary>
+    /// <summary>Switch classification tab (0 = all, 1 = victories, 2 = defeats) and re-render.</summary>
     public void SetHistoryTab(int index)
     {
         if (HistoryTabs != null && index >= 0 && index < HistoryTabs.TabCount)
@@ -134,8 +135,9 @@ public partial class RunRecordsModal : ModalBase
 
         if (HistoryTabs != null)
         {
-            HistoryTabs.SetTabTitle(0, Tr("RECORDS_TAB_VICTORIES"));
-            HistoryTabs.SetTabTitle(1, Tr("RECORDS_TAB_DEFEATS"));
+            HistoryTabs.SetTabTitle(0, Tr("RECORDS_TAB_ALL"));
+            HistoryTabs.SetTabTitle(1, Tr("RECORDS_TAB_VICTORIES"));
+            HistoryTabs.SetTabTitle(2, Tr("RECORDS_TAB_DEFEATS"));
         }
 
         if (HistoryHeader != null)
@@ -310,18 +312,18 @@ public partial class RunRecordsModal : ModalBase
             return;
         }
 
-        bool wantVictory = HistoryTabs == null || HistoryTabs.CurrentTab == 0;
+        int tab = HistoryTabs == null ? 0 : HistoryTabs.CurrentTab;
         var filtered = new List<Dictionary>();
         foreach (var rec in records)
         {
             bool victory = rec.GetValueOrDefault("result", "").AsString() == RunRecordManager.ResultVictory;
-            if (victory == wantVictory)
+            if (tab == 0 || victory == (tab == 1))
                 filtered.Add(rec);
         }
 
         if (filtered.Count == 0)
         {
-            HistoryList.AddChild(CreateEmptyLabel(wantVictory ? "RECORDS_EMPTY_VICTORIES" : "RECORDS_EMPTY_DEFEATS"));
+            HistoryList.AddChild(CreateEmptyLabel(tab == 1 ? "RECORDS_EMPTY_VICTORIES" : "RECORDS_EMPTY_DEFEATS"));
             return;
         }
 

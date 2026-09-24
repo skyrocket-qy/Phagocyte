@@ -274,20 +274,25 @@ public partial class TestRunRecords : TestHarness
         AssertThat(modal.Visible).IsTrue();
         AssertThat(modal.SettlementMode).IsFalse();
 
-        // Dual-tab classification: Victories / Defeats (docs/record.md §5)
+        // Triple-tab classification: All / Victories / Defeats (docs/record.md §5)
         AssertThat(modal.HistoryTabs).IsNotNull();
-        AssertThat(modal.HistoryTabs!.TabCount).IsEqual(2);
+        AssertThat(modal.HistoryTabs!.TabCount).IsEqual(3);
         AssertThat(modal.HistoryTabs.CurrentTab).IsEqual(0);
 
-        // Victories tab: highest-score chart pinned first (19,900 > 19,400)
+        // All tab: every chart listed, highest-score chart pinned first (19,900 > 19,400)
         AssertThat(modal.HistoryList).IsNotNull();
-        AssertThat(modal.HistoryList!.GetChildCount()).IsEqual(2);
+        AssertThat(modal.HistoryList!.GetChildCount()).IsEqual(3);
         AssertThat(modal.PinnedBest).IsNotNull();
         AssertThat(modal.PinnedBest!["class_id"].AsString()).IsEqual("macrophage");
         AssertThat(modal.PinnedBest!["score"].AsInt32()).IsEqual(19900);
 
-        // One-click switch to the defeats tab re-filters the archive
+        // Victories tab filters to the two wins, same pin on top
         modal.SetHistoryTab(1);
+        AssertThat(modal.HistoryList!.GetChildCount()).IsEqual(2);
+        AssertThat(modal.PinnedBest!["result"].AsString()).IsEqual(RunRecordManager.ResultVictory);
+
+        // One-click switch to the defeats tab re-filters the archive
+        modal.SetHistoryTab(2);
         AssertThat(modal.HistoryList!.GetChildCount()).IsEqual(1);
         AssertThat(modal.PinnedBest!["result"].AsString()).IsEqual(RunRecordManager.ResultDefeat);
 
