@@ -108,6 +108,17 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
   separate change. Verify with the dangling-reference check
   (every used `ExtResource("id")` has a matching `id="..."` decl).
 
+## Code size (net-negative by default)
+
+- Prefer deleting to adding: remove dead branches, unused overloads/params,
+  and one-use abstractions instead of switching them off (`if (false)`,
+  unused `skipX` params, unreachable `else` arms, placeholder overrides).
+- No compatibility shims for removed mechanics: update the call sites,
+  don't keep adapters (`DamageOrEngulf`-style fallbacks).
+- No speculative hooks: if nothing calls it, it doesn't ship.
+- Verify with a zero-residual grep: removed symbol names must return zero
+  hits outside history/flavor text before declaring done.
+
 ## Commits
 
 - Inspect `git status`, `git diff`, `git log --oneline -5` first; stage only
