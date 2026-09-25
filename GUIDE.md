@@ -501,4 +501,49 @@ Run: `TestAssetLoader`, `TestAudioAssets`, `TestStatAndSkills`, `TestMenuFlow`, 
 
 ---
 
+## Appendix D — C# patterns in this repo (review-minimum)
+
+Stack: `Phagocyte.csproj:1-6` — `Godot.NET.Sdk/4.7.1`, `net8.0`, C# 12, `Nullable enable`, `TreatWarningsAsErrors true`. Zero warnings tolerated.
+
+1. `partial class` everywhere: `scripts/Main.cs:25`, `scripts/player/BaseCell.cs:18`, `scripts/player/Macrophage.cs:13`, `scripts/ui/MainMenu.cs:9`. Reason: Godot generator adds hidden glue. Review rule: never remove `partial`; missing `partial` = broken scene binding.
+2. `[Export]` = editor-wired dependency: `scripts/Main.cs:29-41` (`StaphScene`, `ArenaSize`, `WaveDirector`, `BossManager`, ...). Review rule: if you rename an `[Export]` prop, check `scenes/main.tscn:60-68` `WaveDirector = NodePath(...)` wiring still resolves; `ResolveDirectors()` (`Main.cs:269-323`) creates code fallback via `GetNodeOrNull` + `new`, so missing scene wiring silently changes behavior.
+3. Nullable + `GetNodeOrNull<T>`: `Main.cs:142-148` (`Player`, `HudNode`, `EnemyContainer`, `ArenaBg`). Review rule: `GetNode` throws on miss, `GetNodeOrNull` returns null — this repo prefers null + fallback. Any new `GetNode` is a smell; any unchecked deref of `GetNodeOrNull` result is a defect under `Nullable enable`.
+4. C# events for in-run signals: `CellStats.StatChanged` (`CellStats.cs:13`), `BaseCell.ExpChanged/LevelUp` (`BaseCell.cs:27`), `WaveDirector.TerminalPhaseReached` (`WaveDirectorComponent.cs:18`). Subscribed in `VitalsView.ConnectPlayer (:79-80)`, `Main.ResolveDirectors (:322)`. GDScript fallback only in `VitalsView.ConnectFallback (:102-110)` via `Callable`. Review rule: setting `CurrentExp` directly does NOT fire `ExpChanged` — must reset HUD snapshots (`LastCurrentExp`) in tests.
+5. `Callable.From + TweenMethod` for time effects: `TutorialCueView.cs:181,200` (`Engine.TimeScale 1.0 -> 0.05 -> 1.0`). Paired with `GameManager.StartGame (:379,404)` resetting `Engine.TimeScale=1.0` before `ChangeSceneToFile`. Review rule: any early-return that skips timescale restore = permanent slow-mo.
+6. `QueueFree` discipline: `Main.cs:160` (old cell on class swap), `SkillManager.AssignActiveSlot` (old skill). Skills/passives clean up in `_ExitTree` (`BaseSkill.cs:96-102` removes modifiers). Review rule: leaked passive = permanent stat buff.
+7. `static` vs autoload `Instance`: autoloads expose `Instance` (`AudioManager.cs:12`, `AchievementManager.cs:22`); `PassiveTreeManager/LoadoutManager/UpgradeManager/PathogenSpawner` are `static` + `JsonStore`. Review rule: static state leaks across runs unless `Reset`/`ReloadFromDisk` is called (`Main._Ready` calls `HostUlceration.Reset`, `PathogenSpawner.ConfigureRun`).
+8. `ChangeSceneToFile`: `GameManager.cs:382,407,415,420` (`main.tscn` vs `main_menu.tscn`). Review rule: must reset `Engine.TimeScale` + validate unlocks before switch.
+
+Hands-on: open `BaseSkill.cs:30-102` and classify each member as lifecycle (`Setup/Update/Trigger/Upgrade/_ExitTree`) vs stat helper (`GetCalculated*`).
+
+## Appendix E — Godot concepts used here (review-minimum)
+
+1. Scenes are composition: `scenes/main.tscn:1-18` `ExtResource` decls + `60-183` nodes; `main_menu.tscn:133-143` composes 6 views via `instance=ExtResource`. Each `.tscn` must be self-contained (all `ExtResource/SubResource` declared in-file). Review rule: scene diff must show matching `id="..."` decl for every `ExtResource("...")` use.
+2. Autoloads = always-alive singletons: `project.godot:18-26`. Review rule: new global state belongs in an existing autoload/static, not a new autoload.
+3. Groups = runtime registry: `player` (`BaseCell.cs:207`, `Main.cs:172`), `pathogens` (`BaseEnemy.cs:79`), `hazards` (`BioHazardArea.cs:32`), `neutral_matter` (`EnvironmentProps.cs:36`), `telegraphed_attacks` (`TelegraphedAttack.cs:51`), `enemy_shots` (`EnemyPellet.cs:47`). `TargetingService` iterates `BaseEnemy.ActiveEnemies`, not groups. Review rule: missing `AddToGroup` = invisible to scans/HUD.
+4. Physics layers (`project.godot:96-98`): 1=Player, 2=Pathogens, 4=Environment. Enemies are passive `Area2D Layer2/Mask0/Monitoring=false` (`BaseEnemy.cs:185-214`) — detected BY player sensors/skills, cutting broadphase at 300-500 bodies. Skills `Layer0/Mask2`, enemy shots `Layer0/Mask1`, player body `1|4` sensor `1|2`. Review rule: any new `CollisionShape` must state layer/mask or it defaults wrong.
+5. Node lifecycle: `_Ready` (wire once) vs `_PhysicsProcess` (deterministic tick) vs `_Process` (render/sync). `Main._PhysicsProcess` order is contract (wave→boss→organ→overdrive→neutral→backfill). `Main._Process` only syncs `SwarmRenderer`. Review rule: gameplay logic in `_Process` = frame-rate dependent bug.
+6. No C# hot-reload: after `dotnet build`, restart run (`stop` → `project_run(main)`), drive with `game_eval`, then `editor_screenshot source="game"`. Review rule: screenshot from stale session = false evidence.
+7. Persistence: `JsonStore` + `user://*.json`; tests isolate to `user://test_*` with `DropsEnabled=false`. Headed cheats touch real profiles. Review rule: test that writes non-`test_*` path is a defect.
+
+Hands-on: open `scenes/main.tscn:104-148` and map each node to its `GetNodeOrNull` in `Main.cs:142-148,271-311`.
+
+## Appendix F — Change review checklist (use on every PR)
+
+Copy-paste into PR description and check off:
+
+- [ ] Scope: `git status/diff` shows only intended files; secrets excluded.
+- [ ] Build: `dotnet build Phagocyte.csproj --warnaserror` zero warnings.
+- [ ] Scenes: every `ExtResource("id")` has `id="..."` decl in same file; instance root names + `visible` flags preserved; no renamed `GetNodeOrNull` paths.
+- [ ] Code size: no dead branch, unused overload/param, `if(false)`, `skipX`, shim, or speculative hook; zero-residual grep for removed symbols = 0 hits.
+- [ ] Stats: only 19 universal stats touched; no skill-specific stat added.
+- [ ] Assets: `gen/` source updated if art changed; `AssetPaths` used; `PlaceholderIcon` fallback renders; `make check-assets` green.
+- [ ] Audio: `manifest.json` first, then file, then `AudioManager` call; `TestAudioAssets` green; no silent miss (`PlaySfx` warns).
+- [ ] Saves: no real-profile writes from tests (`user://test_*` only).
+- [ ] Determinism: damage test zeroes block/evasion; HUD test resets `LastCurrentExp`; dash/charge has positive control; `Gate(ref _frame,n)` used.
+- [ ] Tests: relevant suite(s) green + full 43-suite sweep if `Hud.cs`/`MainMenu.cs`/shared scene touched.
+- [ ] Pixels (if any): baseline PNG captured FIRST, after-change PNG captured from fresh restarted run via `game` screenshot, eyeballed before/after.
+
+---
+
 *Generated from live repo survey 2026-09-26. If a line number drifted, grep the symbol name — zero-residual grep is source-of-truth.*
