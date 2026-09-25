@@ -86,6 +86,7 @@ public partial class TestFrameSpikeLog : TestHarness
                 {
                     var parsed = Json.ParseString(file!.GetAsText()).AsGodotDictionary();
                     AssertThat(parsed.ContainsKey("spikes")).IsTrue();
+                    AssertThat(parsed.ContainsKey("performance_mode")).IsTrue();
                     AssertThat(parsed["spike_count"].AsInt32()).IsEqual(_quietCount);
                     AssertThat(parsed["spikes"].AsGodotArray().Count).IsEqual(_quietCount);
                 }

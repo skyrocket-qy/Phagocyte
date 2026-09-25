@@ -100,6 +100,10 @@ locale/translations=PackedStringArray("res://assets/translations/translations.en
 [physics]
 
 3d/physics_engine="Jolt Physics"
+; Catch-up spiral guard (6fps-pin investigation): a slow frame may schedule at
+; most 4 physics ticks instead of 8. Sustained overload degrades to brief
+; slow-motion instead of pinning at 6fps for seconds.
+common/max_physics_steps_per_frame=4
 
 [rendering]
 

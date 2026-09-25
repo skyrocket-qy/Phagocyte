@@ -235,6 +235,7 @@ public partial class RunTelemetryManager : Node
         {
             { "spike_threshold_ms", SpikeThresholdMs },
             { "spike_count", FrameSpikeLog.Count },
+            { "performance_mode", SettingsManager.PerformanceMode },
             { "spikes", spikes },
         };
         using var file = FileAccess.Open(SpikeLogPath, FileAccess.ModeFlags.Write);
