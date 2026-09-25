@@ -101,7 +101,6 @@ public partial class TestSpecialAiRefinements : SceneTree
         AssertThat(candida.IsHyphaeExtended).IsFalse();
         candida._PhysicsProcess(0.016);
         AssertThat(candida.IsHyphaeExtended).IsTrue();
-        AssertThat(candida.CanBeEngulfed).IsFalse();
 
         // The yeast body freezes in place while channeling
         Vector2 frozenPosition = candida.GlobalPosition;

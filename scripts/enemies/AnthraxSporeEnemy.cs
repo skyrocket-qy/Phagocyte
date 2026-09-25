@@ -10,8 +10,6 @@ namespace Phagocyte.Enemies;
 /// </summary>
 public partial class AnthraxSporeEnemy : BaseEnemy
 {
-    public override bool CanBeEngulfed => false; // Dormant hard shell cannot be engulfed
-
     /// <summary>HP ratio that triggers the two-stage shell-break awakening.</summary>
     public const float AwakenHealthRatio = 0.5f;
 
@@ -32,7 +30,7 @@ public partial class AnthraxSporeEnemy : BaseEnemy
 
     protected override void OnPostDamage(float damage, Node2D? source, bool isCrit)
     {
-        if (!HasAwakened && !IsBeingEaten && CurrentHealth > 0.0f && CurrentHealth <= MaxHealth * AwakenHealthRatio)
+        if (!HasAwakened && CurrentHealth > 0.0f && CurrentHealth <= MaxHealth * AwakenHealthRatio)
         {
             Awaken();
         }
@@ -85,12 +83,6 @@ public partial class AnthraxSporeEnemy : BaseEnemy
             }
         }
         base.Die(killer);
-    }
-
-    public override void OnEngulfAttemptFailed(Node2D? predator)
-    {
-        // Spore deflects engulfment and chips for 5 damage to spore shell
-        TakeDamage(5.0f, predator);
     }
 
     public override void _Draw()

@@ -254,7 +254,7 @@ public partial class ProjectileManager : Node2D
 
         foreach (var enemy in BaseEnemy.ActiveEnemies)
         {
-            if (enemy == null || !GodotObject.IsInstanceValid(enemy) || enemy.IsBeingEaten) continue;
+            if (enemy == null || !GodotObject.IsInstanceValid(enemy)) continue;
             _enemyTree.Insert(enemy.GlobalPosition, enemy);
         }
     }
@@ -306,7 +306,7 @@ public partial class ProjectileManager : Node2D
                 for (int b = 0; b < _enemyQuery.Count && projectileAlive; b++)
                 {
                     var enemy = _enemyQuery[b];
-                    if (enemy == null || !GodotObject.IsInstanceValid(enemy) || enemy.IsBeingEaten) continue;
+                    if (enemy == null || !GodotObject.IsInstanceValid(enemy)) continue;
 
                     ulong enemyId = enemy.GetInstanceId();
                     if (p.HasHitTarget(enemyId)) continue;

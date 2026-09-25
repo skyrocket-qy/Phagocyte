@@ -141,7 +141,7 @@ public partial class RunTelemetryManager : Node
     public int BlockedCount { get; private set; } = 0;
     public float LifeStealHealed { get; private set; } = 0.0f;
 
-    /// <summary>Total pathogens killed this run (ranged kills + engulfed kills).</summary>
+    /// <summary>Total pathogens killed this run (all damage sources).</summary>
     public int KillCount { get; private set; } = 0;
 
     /// <summary>Accumulated fixed base score of every killed pathogen (docs/record.md §4.1).</summary>
@@ -283,7 +283,7 @@ public partial class RunTelemetryManager : Node
 
     /// <summary>
     /// Log a pathogen kill. Score is the enemy's fixed base score
-    /// (0 for farming-neutral hazards such as senescent RBCs).
+    /// (0 for farming-neutral hazards).
     /// </summary>
     public void RecordKill(int baseScore)
     {

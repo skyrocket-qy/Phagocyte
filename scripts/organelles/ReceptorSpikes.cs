@@ -93,7 +93,7 @@ public partial class ReceptorSpikes : ModularOrganelle
         if (isCrit)
             damage *= GetStat("crit_damage");
 
-        CombatHelper.DamageOrEngulf(enemy, damage, Host, isCrit);
+        CombatHelper.DealDamage(enemy, damage, Host, isCrit);
 
         float knockback = InterceptKnockback * Mathf.Max(0.2f, GetStat("knockback"));
         float spinSign = Mathf.Sign(RotationSpeed == 0.0f ? 1.0f : RotationSpeed);

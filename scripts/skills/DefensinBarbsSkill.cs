@@ -117,14 +117,14 @@ public partial class DefensinBarbsSkill : BaseSkill
                 return;
 
             _scratchHits.Clear();
-            TargetingService.CollectInRadius(GlobalPosition, 20.0f, _scratchHits, skipEaten: false);
+            TargetingService.CollectInRadius(GlobalPosition, 20.0f, _scratchHits);
             foreach (var n in _scratchHits)
             {
                 if (_hitCount >= PierceLimit)
                     break;
 
                 _hitCount++;
-                CombatHelper.DamageOrEngulf(n, Damage, HostRef);
+                CombatHelper.DealDamage(n, Damage, HostRef, false);
 
                 if (_hitCount >= PierceLimit)
                 {

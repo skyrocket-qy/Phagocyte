@@ -95,7 +95,6 @@ public partial class RunSettlementService : Node
             ctx.MapId,
             ctx.EnvironmentTime,
             cell?.CurrentLevel ?? 1,
-            cell?.DigestedCount ?? 0,
             PassiveTreeManager.GetSpentPoints(classId),
             skillIds.ToArray(),
             ctx.TerminalBossNeutralized,
@@ -152,11 +151,6 @@ public partial class RunSettlementService : Node
 
         if (player is BaseCell bc)
         {
-            bc.PathogenDigested += (pathogen, atp) =>
-            {
-                AchievementManager.RecordEvent("pathogen_digested", bc.DigestedCount);
-            };
-
             bc.LevelUp += (lvl) =>
             {
                 AchievementManager.RecordEvent("level_up", lvl);

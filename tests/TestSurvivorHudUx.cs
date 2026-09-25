@@ -78,7 +78,7 @@ public partial class TestSurvivorHudUx : TestHarness
     {
         foreach (var child in root.GetChildren())
         {
-            if (child is BaseEnemy || child is SenescentRBC || child is DormantToxinVesicle || child is BioHazardArea)
+            if (child is BaseEnemy || child is DormantToxinVesicle || child is BioHazardArea)
                 child.Free();
             else
                 ClearArenaEntities(child);
@@ -139,8 +139,13 @@ public partial class TestSurvivorHudUx : TestHarness
         AssertThat(hud.KillLabel!.Text.Contains("\U0001F480")).IsTrue();
         AssertThat(hud.KillLabel.Text.Contains("0")).IsTrue();
 
-        // Simulate digestion / kill increment
-        player.DigestedCount = 4;
+        // Simulate 4 kills feeding the capsule
+        var tele = RunTelemetryManager.Instance ?? new RunTelemetryManager();
+        if (tele.GetParent() == null)
+            Root.AddChild(tele);
+        tele.StartRun();
+        for (int i = 0; i < 4; i++)
+            tele.RecordKill(0);
         hud.ConnectPlayer(player);
         AssertThat(hud.KillLabel.Text.Contains("4")).IsTrue();
         GD.Print("[PASS] 2. Center-top stopwatch capsule & kill count anchor verified.");

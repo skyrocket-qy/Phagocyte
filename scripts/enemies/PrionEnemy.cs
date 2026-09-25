@@ -7,11 +7,10 @@ namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Prion Aggregate (普利昂蛋白聚集體)
-/// Assimilation Boss. Misfolded beta-sheet amyloid fibrils resistant to proteases. Cannot be digested; fragments upon damage.
+/// Assimilation Boss. Misfolded beta-sheet amyloid fibrils resistant to proteases; fragments upon damage.
 /// </summary>
 public partial class PrionEnemy : BaseEnemy
 {
-    public override bool CanBeEngulfed => false; // Lysosomes cannot digest misfolded amyloid prions!
     private const float DrawScale = 6.0f / 28.0f; // A-formula visual match: 28px -> 6px
 
     public PrionEnemy()
@@ -34,10 +33,6 @@ public partial class PrionEnemy : BaseEnemy
         if (CurrentHealth <= MaxHealth * 0.5f && TryConsumeSplitBurst())
             SpawnFragments();
     }
-
-    // Contact with player pseudopods damages the cell and repels it.
-    protected override float EngulfContactDamage => 18.0f;
-    protected override float EngulfRepelForce => 250.0f;
 
     private void SpawnFragments()
     {

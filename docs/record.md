@@ -11,8 +11,8 @@ flowchart TD
     RunEnd["單局戰鬥結束 (Run Termination)"] --> CheckResult{存活達 15:00 並擊殺 Boss?}
     CheckResult -- 是 --> Vic["【特異性中和成功】(Victory)<br>病原體載量歸零 · 器官機能恢復"]
     CheckResult -- 否 --> Def["【SIRS / 敗血性休克陣亡】(Defeat)<br>胞膜破裂解體 · 宿主急性衰竭"]
-    Vic & Def --> Gen["生成臨床生化檢驗報告 (Medical Record)<br>存活時長 · 吞噬量 · 終末等級 · 技能配裝"]
-    Gen --> Rank["計算臨床評級 (Rank S / A / B / C / D)<br>吞噬效率 · 承傷比 · 衝榜積分"]
+    Vic & Def --> Gen["生成臨床生化檢驗報告 (Medical Record)<br>存活時長 · 擊殺量 · 終末等級 · 技能配裝"]
+    Gen --> Rank["計算臨床評級 (Rank S / A / B / C / D)<br>擊殺效率 · 承傷比 · 衝榜積分"]
     Gen --> Persist["持久化至本地歷史病歷庫<br>(user://run_records.json)"]
 ```
 
@@ -32,7 +32,7 @@ flowchart TD
 - **觸發條件**：玩家細胞生命值歸零（胞膜徹底破裂解體）。
 - **臨床診斷**：`【急性呼吸窘迫 / 敗血性休克 / 多器官功能障礙綜合徵 (MODS)】`。
 - **病歷評價**：白血球胞膜解體，炎症因子風暴失控，宿主局部組織大面積壞死。
-- **挫敗感緩衝**：雖然單局中止，但本次戰鬥吞噬積累的經驗仍會計入成就進度條，轉化為後續局外解鎖的推力。
+- **挫敗感緩衝**：雖然單局中止，但本次戰鬥擊殺積累的經驗仍會計入成就進度條，轉化為後續局外解鎖的推力。
 
 ### 2.3 終局結算：無盡細胞因子風暴過載 (Endless Overdrive Termination)
 - **觸發條件**：在【無盡模式】下存活超過 15:00 直至生命膜破裂。
@@ -55,8 +55,7 @@ var record = new Godot.Collections.Dictionary
     { "map_id", mapId },              // 戰鬥器官 ("acute_wound", 等)
     { "survival_time", survivalTime },// 存活時間 (秒)
     { "level", level },                // 終末細胞等級 (Cell Level)
-    { "kills", kills },                // 總擊殺數 (Total Kills: 包含遠程技能擊殺 + 肉身吞噬)
-    { "engulfed", engulfed },          // 肉身吞噬數 (Direct Engulfed: 僅統計偽足/細胞膜直接生吞)
+    { "kills", kills },                // 總擊殺數 (Total Kills: 所有傷害來源擊殺)
     { "kpm", kpm },                    // 擊殺通量 (Kills Per Minute = kills / (survivalTime / 60))
     { "points_spent", pointsSpent },  // 戰鬥時已投入的天賦點總數
     { "active_skills", skills },      // 終末裝備的主動生化技能清單
@@ -77,8 +76,8 @@ var record = new Godot.Collections.Dictionary
 為了使結算評分直觀、公平且易於理解，遊戲在評分系統上貫徹以下兩項準則：
 
 1. **直接以擊殺（Kills）為評分依據**：
-   - **吞噬在計分上視同擊殺**：無論玩家是使用遠程技能（抗體、穿孔長矛、酸液噴流等）擊殺病原體，還是利用吞噬技能包覆吞噬，**在分數結算上一視同仁，均獲得該病原體對應的固定 Base 分數**！
-   - 避免了複雜的額外加分判定，病歷單上的「肉身吞噬數（`engulfed`）」作為玩家戰術風格與榮譽數據單獨展示，但不產生雙重計分偏頗。
+   - **所有擊殺一視同仁**：無論玩家是使用遠程技能（抗體、穿孔長矛、酸液噴流等）還是偽足近戰擊殺病原體，**在分數結算上一視同仁，均獲得該病原體對應的固定 Base 分數**！
+   - 避免了複雜的額外加分判定，總擊殺數（`kills`）同時作為玩家戰術風格與榮譽數據展示，不產生雙重計分偏頗。
 2. **每種病原體擁有固定的基礎分（Fixed Base Score）**：
    - 病原體依照其威脅度與生理強度設定固定的 Base 分數：
      - **微型蜂擁群（Micro Swarm）**：如諾羅病毒、瘧疾裂殖子，每隻 **5 分**。

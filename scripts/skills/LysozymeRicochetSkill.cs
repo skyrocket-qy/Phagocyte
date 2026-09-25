@@ -95,7 +95,7 @@ public partial class LysozymeRicochetSkill : BaseSkill
                 return;
 
             _scratchHits.Clear();
-            TargetingService.CollectInRadius(GlobalPosition, 22.0f, _scratchHits, skipEaten: false);
+            TargetingService.CollectInRadius(GlobalPosition, 22.0f, _scratchHits);
             foreach (var n in _scratchHits)
             {
                 if (_recentlyHit.Contains(n.GetInstanceId()))
@@ -104,7 +104,7 @@ public partial class LysozymeRicochetSkill : BaseSkill
                 _recentlyHit.Add(n.GetInstanceId());
                 _currentBounces++;
 
-                CombatHelper.DamageOrEngulf(n, Damage, HostRef);
+                CombatHelper.DealDamage(n, Damage, HostRef, false);
 
                 // Find next bounce target
                 Node2D? nextTarget = FindNextTarget(n);
@@ -128,8 +128,7 @@ public partial class LysozymeRicochetSkill : BaseSkill
             return TargetingService.FindNearest(
                 this,
                 350.0f,
-                enemy => enemy != current && !_recentlyHit.Contains(enemy.GetInstanceId()),
-                skipEaten: false);
+                enemy => enemy != current && !_recentlyHit.Contains(enemy.GetInstanceId()));
         }
 
         public override void _Draw()

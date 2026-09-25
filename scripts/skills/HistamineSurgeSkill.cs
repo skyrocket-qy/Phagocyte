@@ -68,8 +68,8 @@ public partial class HistamineSurgeSkill : BaseSkill
             var tween = Host.CreateTween();
             tween.TweenProperty(n, "global_position", n.GlobalPosition + push * 80.0f, 0.2f);
 
-            CombatHelper.DamageOrEngulf(n, dmg, Host);
-        }, skipEaten: false);
+            CombatHelper.DealDamage(n, dmg, Host, false);
+        });
     }
 
     private Vector2 FindAimDirection()

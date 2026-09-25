@@ -44,7 +44,7 @@ public static class PathogenSpawner
 
     /// <summary>
     /// Global EXP gain multiplier (balance tuning: 0.3 = -70% progression pace).
-    /// Applied at every monster EXP grant site (BaseEnemy kills, RBC harvests).
+    /// Applied at every monster EXP grant site (BaseEnemy kills).
     /// </summary>
     public const float ExpGainMultiplier = 0.3f;
 
@@ -442,7 +442,7 @@ public static class PathogenSpawner
     /// <summary>
     /// Kill-driven dynamic backfill: spawns exactly <paramref name="amount"/> single
     /// pathogens just outside the camera view (150-250px past the visible edge) so
-    /// the active population instantly refills after kills or engulfment.
+    /// the active population instantly refills after kills.
     /// </summary>
     public static int Backfill(Node2D enemyContainer, CharacterBody2D player, Vector2 arenaSize, Vector2 viewWorldSize, float gameTime, int amount)
     {

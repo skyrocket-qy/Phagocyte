@@ -74,7 +74,6 @@ public partial class TestSubBosses : SceneTree
         var spawned = PathogenSpawner.SpawnSubBoss(_container!, _player!, new Vector2(4800, 4800), "acute_wound");
         AssertThat(spawned).IsNotNull();
         AssertThat(spawned!.IsBoss).IsTrue();
-        AssertThat(spawned.CanBeEngulfed).IsFalse();
         AssertThat(spawned.GetNodeOrNull("BossPhaseComponent")).IsNotNull();
         spawned.QueueFree();
 
@@ -92,7 +91,6 @@ public partial class TestSubBosses : SceneTree
             lord._PhysicsProcess(1.0 / 60.0);
         }
 
-        AssertThat(lord.CanBeEngulfed).IsFalse();
         AssertThat(_player.Health).IsLess(healthBefore);
         GD.Print("[PASS] Streptococcus Chain-Lord serpentine movement and multi-segment collision verified.");
         lord.QueueFree();

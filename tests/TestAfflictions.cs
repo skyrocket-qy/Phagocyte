@@ -119,7 +119,7 @@ public partial class TestAfflictions : TestHarness
         // RecordRun persists the multiplier and the affliction list
         var record = RunRecordManager.RecordRun(
             RunRecordManager.ResultDefeat, "macrophage", "acute_wound",
-            1800.0f, 30, 10, 0, Array.Empty<string>(),
+            1800.0f, 30, 0, Array.Empty<string>(),
             difficulty: RunRecordManager.DifficultyHard,
             endless: true,
             afflictionMultiplier: 2.75f,

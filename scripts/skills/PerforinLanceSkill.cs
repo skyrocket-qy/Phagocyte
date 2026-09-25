@@ -94,10 +94,7 @@ public partial class PerforinLanceSkill : BaseSkill
             if (p is Node2D n && GodotObject.IsInstanceValid(n))
             {
                 // Beam geometry is a capsule (not a radius), so this scan stays
-                // group-based; only pathogens not mid-engulf are pierced.
-                if (n is BaseEnemy be && be.IsBeingEaten)
-                    continue;
-
+                // group-based.
                 Vector2 pPos = n.GlobalPosition;
                 Vector2 projPoint = Geometry2D.GetClosestPointToSegment(pPos, startPos, endPos);
                 if (projPoint.DistanceTo(pPos) <= beamWidth)

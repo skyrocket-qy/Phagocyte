@@ -1,5 +1,4 @@
 using Godot;
-using Phagocyte.Enemies;
 
 namespace Phagocyte.Combat;
 
@@ -41,58 +40,6 @@ public static class CombatHelper
         else if (target.HasMethod("take_damage"))
         {
             target.Call("take_damage", damage);
-        }
-    }
-
-    /// <summary>
-    /// Applies damage when the target accepts it, otherwise falls back to
-    /// pathogen engulfment. Used by AoE waves and projectiles so the
-    /// take_damage/be_engulfed branch lives in one place.
-    /// </summary>
-    public static void DamageOrEngulf(Node? target, float damage, Node2D? source)
-    {
-        if (target == null || !GodotObject.IsInstanceValid(target))
-            return;
-
-        if (target is IDamageable damageable)
-        {
-            damageable.TakeDamage(damage);
-        }
-        else if (target is IEngulfable engulfable)
-        {
-            engulfable.BeEngulfed(source);
-        }
-        else if (target.HasMethod("take_damage"))
-        {
-            target.Call("take_damage", damage);
-        }
-        else if (target.HasMethod("be_engulfed"))
-        {
-            target.Call("be_engulfed", source!);
-        }
-    }
-
-    /// <summary>Crit-aware variant of <see cref="DamageOrEngulf(Node?, float, Node2D?)"/>.</summary>
-    public static void DamageOrEngulf(Node? target, float damage, Node2D? source, bool isCrit)
-    {
-        if (target == null || !GodotObject.IsInstanceValid(target))
-            return;
-
-        if (target is IDamageable damageable)
-        {
-            damageable.TakeDamage(damage, source, isCrit);
-        }
-        else if (target is IEngulfable engulfable)
-        {
-            engulfable.BeEngulfed(source);
-        }
-        else if (target.HasMethod("take_damage"))
-        {
-            target.Call("take_damage", damage, source!, isCrit);
-        }
-        else if (target.HasMethod("be_engulfed"))
-        {
-            target.Call("be_engulfed", source!);
         }
     }
 }

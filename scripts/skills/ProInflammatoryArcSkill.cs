@@ -48,7 +48,7 @@ public partial class ProInflammatoryArcSkill : BaseSkill
             foreach (var t in targets)
             {
                 arcVisual.Points.Add(t.GlobalPosition);
-                CombatHelper.DamageOrEngulf(t, dmg, Host);
+                CombatHelper.DealDamage(t, dmg, Host, false);
             }
             Host.GetParent().AddChild(arcVisual);
         }
@@ -60,7 +60,7 @@ public partial class ProInflammatoryArcSkill : BaseSkill
         if (Host == null)
             return result;
 
-        var first = TargetingService.FindNearest(Host, SearchRange, skipEaten: false);
+        var first = TargetingService.FindNearest(Host, SearchRange);
         if (first == null)
             return result;
 
@@ -72,8 +72,7 @@ public partial class ProInflammatoryArcSkill : BaseSkill
             var next = TargetingService.FindNearest(
                 current,
                 ChainRange,
-                enemy => !result.Contains(enemy),
-                skipEaten: false);
+                enemy => !result.Contains(enemy));
             if (next == null)
                 break;
 

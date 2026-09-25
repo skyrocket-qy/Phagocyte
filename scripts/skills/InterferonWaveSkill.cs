@@ -64,14 +64,7 @@ public partial class InterferonWaveSkill : BaseSkill
             else if (n.HasMethod("apply_slow"))
                 n.Call("apply_slow", 2.0f, 0.5f);
 
-            if (n is IDamageable)
-                CombatHelper.DealDamage(n, dmg);
-            else if (n is IEngulfable engulfable)
-                engulfable.BeEngulfed(Host);
-            else if (n.HasMethod("take_damage"))
-                CombatHelper.DealDamage(n, dmg);
-            else if (n.HasMethod("be_engulfed"))
-                n.Call("be_engulfed", Host!);
+            CombatHelper.DealDamage(n, dmg, Host, false);
         });
     }
 

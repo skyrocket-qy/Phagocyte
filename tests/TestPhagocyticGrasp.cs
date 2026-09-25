@@ -12,7 +12,7 @@ namespace Phagocyte.Tests;
 /// <summary>
 /// Behavioral tests for the Macrophage innate active (吞噬偽足):
 /// default double-grasp, Amount scaling, nearest-first targeting,
-/// and damage-without-engulf on non-engulfable foes.
+/// and direct damage on all foes.
 /// Setup runs frame-gated inside _Process (house style: never touch
 /// nodes inside _Initialize).
 /// </summary>
@@ -69,43 +69,44 @@ public partial class TestPhagocyticGrasp : TestHarness
                 return false;
 
             case 1:
-                // TEST 1: default double-grasp eats both in-reach foes, spares the far one.
+                // TEST 1: default double-grasp damages both in-reach foes, spares the far one.
                 _frameCount++;
                 if (_frameCount < 35)
                     return false;
                 _frameCount = 0;
 
-                AssertThat(IsResolved(_tb1)).IsTrue();
-                AssertThat(IsResolved(_tb2)).IsTrue();
+                AssertThat(IsDamaged(_tb1)).IsTrue();
+                AssertThat(IsDamaged(_tb2)).IsTrue();
                 AssertThat(GodotObject.IsInstanceValid(_ctrl)).IsTrue();
-                AssertThat(_ctrl!.IsBeingEaten).IsFalse();
-                AssertThat(_ctrl.CurrentHealth).IsEqual(35.0f);
-                GD.Print("[PASS] Test 1: default double-grasp engulfed 2 in-reach foes, spared out-of-reach control.");
+                AssertThat(_ctrl!.CurrentHealth).IsEqual(35.0f);
+                GD.Print("[PASS] Test 1: default double-grasp damaged 2 in-reach foes, spared out-of-reach control.");
 
-                // TEST 2 setup: hyphae-extended candida cannot be engulfed.
+                // TEST 2 setup: hyphae-extended candida takes grasp damage like anyone else.
                 _candida = Spawn<CandidaEnemy>(new Vector2(120, 0));
                 _candida.ExtendHyphae();
-                AssertThat(_candida.CanBeEngulfed).IsFalse();
                 _grasp!.Trigger();
                 _phase = 2;
                 return false;
 
             case 2:
-                // TEST 2: non-engulfable foe takes damage but is never eaten.
+                // TEST 2: hyphae-guarded candida takes grasp damage.
                 _frameCount++;
                 if (_frameCount < 35)
                     return false;
                 _frameCount = 0;
 
                 AssertThat(GodotObject.IsInstanceValid(_candida)).IsTrue();
-                AssertThat(_candida!.IsBeingEaten).IsFalse();
-                AssertThat(_candida.CurrentHealth).IsLess(45.0f);
-                GD.Print("[PASS] Test 2: hyphae-guarded candida took grasp damage without being engulfed.");
+                AssertThat(_candida!.CurrentHealth).IsLess(45.0f);
+                GD.Print("[PASS] Test 2: hyphae-guarded candida took grasp damage.");
 
                 // TEST 3 setup: +1 Amount must raise the grasp to 3 targets.
-                // Teleport (don't free): a QueueFree'd node stays in the
-                // targeting registry until frame end and would steal a slot.
-                _candida.GlobalPosition = new Vector2(5000, 0);
+                // Teleport (don't free): stale in-reach foes from earlier
+                // phases would steal grasp slots, and a QueueFree'd node stays
+                // in the targeting registry until frame end. Dead foes are
+                // already gone from the registry, so only move the living.
+                TeleportAway(_candida);
+                TeleportAway(_tb1);
+                TeleportAway(_tb2);
                 _player!.Stats!.SetBase("amount", 1.0f);
                 AssertThat(_grasp!.GetCalculatedAmount(2)).IsEqual(3);
                 _tb3 = Spawn<TbEnemy>(new Vector2(100, 0));
@@ -116,15 +117,15 @@ public partial class TestPhagocyticGrasp : TestHarness
                 return false;
 
             case 3:
-                // TEST 3: all three in-reach foes are engulfed via Amount scaling.
+                // TEST 3: all three in-reach foes are damaged via Amount scaling.
                 _frameCount++;
                 if (_frameCount < 35)
                     return false;
 
-                AssertThat(IsResolved(_tb3)).IsTrue();
-                AssertThat(IsResolved(_tb4)).IsTrue();
-                AssertThat(IsResolved(_tb5)).IsTrue();
-                GD.Print("[PASS] Test 3: Amount +1 scaled the grasp from 2 to 3 engulfments.");
+                AssertThat(IsDamaged(_tb3)).IsTrue();
+                AssertThat(IsDamaged(_tb4)).IsTrue();
+                AssertThat(IsDamaged(_tb5)).IsTrue();
+                GD.Print("[PASS] Test 3: Amount +1 scaled the grasp from 2 to 3 targets.");
                 Finish(true, "ALL PHAGOCYTIC GRASP BEHAVIORAL TESTS");
                 return true;
         }
@@ -166,7 +167,7 @@ public partial class TestPhagocyticGrasp : TestHarness
         _tb1 = Spawn<TbEnemy>(new Vector2(100, 0));
         _tb2 = Spawn<TbEnemy>(new Vector2(150, 0));
         _ctrl = Spawn<TbEnemy>(new Vector2(800, 0));
-        return _tb1.CanBeEngulfed && _tb2.CanBeEngulfed;
+        return _tb1 != null && _tb2 != null;
     }
 
     private T Spawn<T>(Vector2 pos) where T : BaseEnemy, new()
@@ -176,9 +177,16 @@ public partial class TestPhagocyticGrasp : TestHarness
         return enemy;
     }
 
-    /// <summary>Eaten foes shrink-tween then free themselves; either state proves the grasp resolved them.</summary>
-    private static bool IsResolved(BaseEnemy? enemy)
+    /// <summary>Damaged foes keep fighting at reduced HP; undamaged ones are pristine.</summary>
+    private static bool IsDamaged(BaseEnemy? enemy)
     {
-        return enemy == null || !GodotObject.IsInstanceValid(enemy) || enemy.IsBeingEaten;
+        return enemy != null && GodotObject.IsInstanceValid(enemy) && enemy.CurrentHealth < enemy.MaxHealth;
+    }
+
+    /// <summary>Moves a living foe out of grasp reach; freed foes are already untargetable.</summary>
+    private static void TeleportAway(BaseEnemy? enemy)
+    {
+        if (enemy != null && GodotObject.IsInstanceValid(enemy) && !enemy.IsQueuedForDeletion())
+            enemy.GlobalPosition = new Vector2(5000, 5000);
     }
 }

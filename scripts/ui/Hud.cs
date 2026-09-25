@@ -63,7 +63,7 @@ public partial class Hud : CanvasLayer
     public float LastExpToNext { get => _vitals?.LastExpToNext ?? 30.0f; set { if (_vitals != null) _vitals.LastExpToNext = value; } }
     public int LastLevel { get => _vitals?.LastLevel ?? 1; set { if (_vitals != null) _vitals.LastLevel = value; if (_pause != null) _pause.LastLevel = value; } }
     public float LastRadiusRatio { get => _vitals?.LastRadiusRatio ?? 1.0f; set { if (_vitals != null) _vitals.LastRadiusRatio = value; } }
-    public int LastDigestedCount { get => _vitals?.LastDigestedCount ?? 0; set { if (_vitals != null) _vitals.LastDigestedCount = value; } }
+    public int LastKillCount { get => _vitals?.LastKillCount ?? 0; set { if (_vitals != null) _vitals.LastKillCount = value; } }
     public float LastSpeed { get => _vitals?.LastSpeed ?? 230.0f; set { if (_vitals != null) _vitals.LastSpeed = value; } }
 
     // ---- Skill bar facades ----
@@ -211,6 +211,7 @@ public partial class Hud : CanvasLayer
         _skills?.TickAlpha(dt, GetTree().Paused);
         _vitals?.UpdateBuffStatus();
         _vitals?.SyncPendingTexts();
+        _vitals?.SyncKillCount();
         _skills?.TickSkillSlots();
         TickFps(dt);
         Vector2 fluid = FluidVectorProvider?.Invoke() ?? Vector2.Zero;

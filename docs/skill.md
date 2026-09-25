@@ -35,9 +35,9 @@
 
 | 主動技能名稱 | 醫學原型機制 | 消耗的通用 Stat | 戰鬥表現與機制細節 |
 | :--- | :--- | :--- | :--- |
-| **0. 吞噬偽足<br>(Phagocytic Grasp，巨噬固有)** | 巨噬細胞偽足伸出包裹形成吞噬體 | `might`, `area`, `amount`, `cooldown_reduction` | 由近到遠伸出 2 根偽足抓取，`amount` 增加抓取隻數；鏈射命中造成接觸傷害，原地吞噬。不可吞噬者只吃傷害。阿米巴變形本身為全細胞共用底盤視覺。 |
+| **0. 吞噬偽足<br>(Phagocytic Grasp，巨噬固有)** | 巨噬細胞偽足快速伸出打擊 | `might`, `area`, `amount`, `cooldown_reduction` | 由近到遠伸出 2 根偽足抓取，`amount` 增加抓取隻數；鏈射命中造成接觸傷害。阿米巴變形本身為全細胞共用底盤視覺。 |
 | **1. 穿孔素長矛<br>(Perforin Lance)** | 殺手 T 細胞在靶膜成孔 | `might`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近高危病原體射出高初速螺旋光束。`amount` 增加連發射線束數，`pierce` 增加貫穿人數。 |
-| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解沉積引發爆破 | `might`, `area`, `cooldown_reduction`, `duration`, `knockback` | 在玩家周圍隨機生成生化光環地雷，`area` 擴大地雷半徑，延遲 1.5 秒引發強烈擊退衝擊波。 |
+| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解沉積引發爆破 | `might`, `area`, `cooldown_reduction`, `duration`, `knockback` | 在玩家周圍隨機生成生化光環地雷，`area` 擴大地雷半徑，延遲引發強烈衝擊波造成範圍傷害。 |
 | **3. Y 型抗體齊射<br>(Antibody Salvo)** | B 細胞分泌游離抗體中和病原體 | `might`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發巡航尋的 Y 型抗體飛彈，`amount` 直接增加單輪發射彈道數。 |
 | **4. 活性氧射流<br>(ROS Torrent / Spray)** | 吞噬細胞呼吸爆發釋放 $\text{H}_2\text{O}_2$ | `might`, `area`, `duration`, `cooldown_reduction` | 朝游動前方噴射高壓錐形酸霧，`area` 放大錐形覆蓋角度與射程，造成持續溶解破甲 DoT。 |
 | **5. 偽足猛擊<br>(Pseudopod Lunge)** | 肌動蛋白微絲瞬間定向爆發彈射 | `might`, `area`, `amount`, `knockback`, `cooldown_reduction` | 向外猛烈彈出阿米巴肉質抓手，`area` 延長彈射距離，命中時將敵人擊暈並強制向內拖曳。 |
@@ -100,8 +100,8 @@ graph LR
    - *機制原型*：全細胞膜表面過氧化物超頻富集，化身為強氧化性離子渦輪。
    - *遊戲效果*：取消前方噴射限制。全細胞周邊包裹一層青藍色等離子超氧光膜，將細胞本身轉化為碰觸即融化一切非 Boss 病原體的旋轉粉碎機。
 5. **【阿米巴原生巨口】(Amoebic Maelstrom)**：
-   - *機制原型*：極限胞吞吞噬泡融合，微管牽引全域內噬。
-   - *遊戲效果*：偽足彈射分裂為 4 根全向巨型阿米巴觸角，在場地中心引發巨大引力漩渦，將全屏病原體雜兵與 ATP 經驗光點一口氣強行拖入胞體吞噬！
+   - *機制原型*：極限偽足爆發，微管牽引全域絞殺。
+   - *遊戲效果*：偽足彈射分裂為 4 根全向巨型阿米巴觸角，在場地中心引發巨大引力漩渦，將全屏病原體雜兵與 ATP 經驗光點一口氣強行拖入絞殺力場粉碎！
 
 ---
 

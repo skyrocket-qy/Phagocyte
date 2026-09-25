@@ -7,7 +7,7 @@ namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Mycobacterium tuberculosis (結核分枝桿菌)
-/// Thick waxy mycolic acid cell wall. Acid-resistant: slows digestion by 70% and burns player cytoplasm.
+/// Thick waxy mycolic acid cell wall.
 /// </summary>
 public partial class TbEnemy : BaseEnemy
 {
@@ -26,23 +26,6 @@ public partial class TbEnemy : BaseEnemy
     }
 
     protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(3.0f);
-
-    // Acid-resistant mycolic wall: digestion is slow and burns the predator.
-    protected override float EngulfDigestDuration => 0.75f;
-
-    protected override void OnEngulfedBy(Node2D? predator)
-    {
-        if (predator is BaseCell player)
-        {
-            // Apply digestion burn: deals 4 dps to player cytoplasm
-            player.ApplyTBDigestionBurn(2.5f, 4.0f);
-        }
-    }
-
-    protected override void PlayDigestionVfx(Vector2 pos)
-    {
-        // No lysis burst: the waxy wall smoulders out instead.
-    }
 
     public override void _Draw()
     {

@@ -65,20 +65,9 @@ public partial class PseudopodLungeSkill : BaseSkill
             };
             Host.GetParent().AddChild(chain);
 
-            // Pull pathogen rapidly toward player
+            // Pull pathogen rapidly toward player (displacement only).
             var tween = Host.CreateTween();
             tween.TweenProperty(n, "global_position", Host.GlobalPosition, 0.15f);
-            tween.TweenCallback(Callable.From(() =>
-            {
-                if (n != null && GodotObject.IsInstanceValid(n) && n is IEngulfable engulfable)
-                {
-                    engulfable.BeEngulfed(Host);
-                }
-                else if (n != null && GodotObject.IsInstanceValid(n) && n.HasMethod("be_engulfed"))
-                {
-                    n.Call("be_engulfed", Host!);
-                }
-            }));
         });
     }
 }

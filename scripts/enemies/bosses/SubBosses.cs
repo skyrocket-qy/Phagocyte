@@ -9,7 +9,6 @@ namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Shared base for the five 09:00 map sub-bosses.
-/// Sub-bosses cannot be digested: engulf attempts bounce off and damage the cell.
 /// </summary>
 public abstract partial class SubBossEnemy : BaseEnemy
 {
@@ -18,13 +17,7 @@ public abstract partial class SubBossEnemy : BaseEnemy
         BaseScore = 600;
     }
 
-    public override bool CanBeEngulfed => false;
-
     protected override float ContactDamage => 16.0f;
-
-    // Engulf attempts bounce off and damage the cell (repel handled by BaseEnemy).
-    protected override float EngulfContactDamage => ContactDamage;
-    protected override float EngulfRepelForce => 240.0f;
 }
 
 /// <summary>

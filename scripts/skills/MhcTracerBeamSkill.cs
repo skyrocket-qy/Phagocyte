@@ -109,7 +109,7 @@ public partial class MhcTracerBeamSkill : BaseSkill
         if (Host == null)
             return null;
 
-        return TargetingService.FindNearest(Host, SearchRange, skipEaten: false);
+        return TargetingService.FindNearest(Host, SearchRange);
     }
 
     public partial class TracerVisual : Node2D

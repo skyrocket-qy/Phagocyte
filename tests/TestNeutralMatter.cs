@@ -11,8 +11,8 @@ using Phagocyte.Player;
 namespace Phagocyte.Tests;
 
 /// <summary>
-/// Verifies neutral environment matter (senescent RBC cover, dormant toxin vesicles)
-/// and the host ulceration meter.
+/// Verifies neutral environment matter (dormant toxin vesicles, fibrin-clot
+/// cover) and the host ulceration meter.
 /// </summary>
 [TestSuite]
 public partial class TestNeutralMatter : TestHarness
@@ -22,8 +22,6 @@ public partial class TestNeutralMatter : TestHarness
     private bool _done = false;
     private Node2D? _container;
     private BaseCell? _player;
-    private float _rbcExpBefore;
-    private int _rbcKillsBefore;
 
     public override bool _Process(double delta)
     {
@@ -38,19 +36,12 @@ public partial class TestNeutralMatter : TestHarness
         {
             if (_phase == 0)
             {
-                RunSetupAndRbcConsume();
+                RunSetup();
                 _phase = 1;
                 _frame = 0;
                 return false;
             }
 
-            // RBC harvest tween (0.18s) pays out on completion: wait for the
-            // payout (bounded) instead of a fixed frame count, so the suite is
-            // robust at any frame rate (uncapped headless deltas are tiny).
-            if (_player!.CurrentExp <= _rbcExpBefore && _frame < 600)
-                return false;
-
-            AssertSenescentRbc();
             TestPelletCover();
             TestToxinVesicle();
             TestUlcerationMeter();
@@ -73,7 +64,7 @@ public partial class TestNeutralMatter : TestHarness
         return true;
     }
 
-    private void RunSetupAndRbcConsume()
+    private void RunSetup()
     {
         EnemySteering.ConfigureArena(new Vector2(2000, 2000));
         HostUlceration.Reset();
@@ -82,40 +73,13 @@ public partial class TestNeutralMatter : TestHarness
         Root.AddChild(_container);
         _player = new BaseCell { Name = "NeutralMatterHost", GlobalPosition = new Vector2(500, 500) };
         _container.AddChild(_player);
-
-        ConsumeSenescentRbc();
-    }
-
-    private void ConsumeSenescentRbc()
-    {
-        var rbc = new SenescentRBC { GlobalPosition = new Vector2(700, 700) };
-        _container!.AddChild(rbc);
-
-        AssertThat(rbc.IsInGroup("neutral_matter")).IsTrue();
-        AssertThat(rbc.IsInGroup("senescent_rbc")).IsTrue();
-        AssertThat(rbc.IsInGroup("pathogens")).IsFalse();
-        AssertThat(rbc.GetAtpValue()).IsEqual(25.0f);
-        AssertThat(rbc.GetBaseScore()).IsEqual(0);
-
-        _rbcKillsBefore = _player!.DigestedCount;
-        _rbcExpBefore = _player.CurrentExp;
-        rbc.BeEngulfed(_player);
-
-        AssertThat(rbc.IsConsumed).IsTrue();
-    }
-
-    private void AssertSenescentRbc()
-    {
-        AssertThat(_player!.DigestedCount).IsEqual(_rbcKillsBefore + 1);
-        AssertThat(_player.CurrentExp).IsGreater(_rbcExpBefore);
-        GD.Print("[PASS] Senescent RBC is neutral cover and only yields ATP/kill when engulfed.");
     }
 
     private void TestPelletCover()
     {
         _player!.GlobalPosition = new Vector2(-900, -900);
-        var rbc = new SenescentRBC { GlobalPosition = Vector2.Zero };
-        _container!.AddChild(rbc);
+        var clot = new FibrinClot { GlobalPosition = Vector2.Zero };
+        _container!.AddChild(clot);
 
         var pellet = new EnemyPellet
         {
@@ -132,12 +96,11 @@ public partial class TestNeutralMatter : TestHarness
         }
 
         AssertThat(pellet.IsQueuedForDeletion()).IsTrue();
-        AssertThat(rbc.IsConsumed).IsFalse();
-        GD.Print("[PASS] Enemy pellets are absorbed by neutral RBC cover.");
+        GD.Print("[PASS] Enemy pellets are absorbed by neutral fibrin-clot cover.");
         // Free immediately: this synchronous suite runs every phase in one frame,
-        // so a queued free would leave a stale RBC at the origin for later phases.
-        _container.RemoveChild(rbc);
-        rbc.Free();
+        // so a leftover clot at the origin would pollute later phase counts.
+        _container.RemoveChild(clot);
+        clot.Free();
     }
 
     private void TestToxinVesicle()
@@ -146,7 +109,7 @@ public partial class TestNeutralMatter : TestHarness
         _player.Stats!.SetBase("max_health", 500.0f);
         _player.Health = 500.0f;
 
-        var vesicle = new DormantToxinVesicle { GlobalPosition = Vector2.Zero };
+        var vesicle = new DormantToxinVesicle { GlobalPosition = _player.GlobalPosition };
         _container!.AddChild(vesicle);
 
         int hazardsBefore = CountChildren<BioHazardArea>();
@@ -175,27 +138,25 @@ public partial class TestNeutralMatter : TestHarness
 
         var invader = new HpyloriEnemy { GlobalPosition = Vector2.Zero };
         _container!.AddChild(invader);
-        var rbc = new SenescentRBC { GlobalPosition = new Vector2(220, 0) };
-        _container.AddChild(rbc);
 
         // Below threshold: invaders head for host tissue anchors
         Vector2 tissueDirection = EnemySteering.GetDirection(invader, 0.016f);
         AssertThat(tissueDirection.Dot(Vector2.Right)).IsLess(0.99f);
 
-        // Accumulated ulceration retargets invaders onto red blood cells
+        // Accumulated ulceration keeps invaders on tissue duty
         HostUlceration.RegisterPulse();
         HostUlceration.RegisterPulse();
         HostUlceration.RegisterPulse();
-        Vector2 rbcDirection = EnemySteering.GetDirection(invader, 0.016f);
-        AssertThat(rbcDirection.Dot(Vector2.Right)).IsGreater(0.99f);
+        AssertThat(HostUlceration.Pulses).IsEqual(3);
 
-        // Pulses are registered and dissolve nearby RBCs
+        // Pulses secrete a short-lived acid lesion at the latched site
         HostUlceration.Reset();
         invader.GlobalPosition = new Vector2(220, 0);
+        int lesionsBefore = CountChildren<BioHazardArea>();
         invader.EmitUlcerationPulse();
         AssertThat(HostUlceration.Pulses).IsEqual(1);
-        AssertThat(rbc.IsConsumed).IsTrue();
-        GD.Print("[PASS] Host ulceration registers pulses and retargets invaders onto RBCs.");
+        AssertThat(CountChildren<BioHazardArea>()).IsEqual(lesionsBefore + 1);
+        GD.Print("[PASS] Host ulceration registers pulses and secretes acid lesions.");
         invader.QueueFree();
     }
 
@@ -209,23 +170,19 @@ public partial class TestNeutralMatter : TestHarness
         Root.AddChild(main);
         main.SetPhysicsProcess(false);
 
-        int rbcCount = 0;
         int vesicleCount = 0;
         foreach (var child in main.EnemyContainer!.GetChildren())
         {
-            if (child is SenescentRBC)
-                rbcCount++;
             if (child is DormantToxinVesicle)
                 vesicleCount++;
         }
 
-        AssertThat(rbcCount).IsEqual(4);
         AssertThat(vesicleCount).IsEqual(3);
 
         // Neutrals never consume pathogen screen-cap slots
         int pathogensBefore = main.ActivePathogenCount;
-        var extraRbc = new SenescentRBC { GlobalPosition = new Vector2(100, 100) };
-        main.EnemyContainer.AddChild(extraRbc);
+        var extraVesicle = new DormantToxinVesicle { GlobalPosition = new Vector2(100, 100) };
+        main.EnemyContainer.AddChild(extraVesicle);
         AssertThat(main.ActivePathogenCount).IsEqual(pathogensBefore);
 
         // Ulceration environment degradation spawns ambient acid mist

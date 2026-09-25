@@ -233,7 +233,6 @@ public partial class RunRecordsModal : ModalBase
         AddSummaryRow("RECORDS_LEVEL", detail.GetValueOrDefault("level", 1).AsInt32().ToString());
         AddSummaryRow("RECORDS_KILLS", detail.GetValueOrDefault("kills", 0).AsInt32().ToString());
         AddSummaryRow("RECORDS_KPM", $"{detail.GetValueOrDefault("kpm", 0.0f).AsSingle():F1}");
-        AddSummaryRow("RECORDS_DIGESTED", detail.GetValueOrDefault("digested", 0).AsInt32().ToString());
         AddSummaryRow("RECORDS_KILL_SCORE", detail.GetValueOrDefault("kill_score", 0).AsInt32().ToString());
         AddSummaryRow("RECORDS_SCORE", detail.GetValueOrDefault("score", 0).AsInt32().ToString());
 
@@ -415,7 +414,7 @@ public partial class RunRecordsModal : ModalBase
                 chronic ? Tr("RECORDS_CHRONIC_TAG") : Tr(victory ? "RECORDS_VICTORY_TAG" : "RECORDS_DEFEAT_TAG"),
                 RunRecordManager.FormatTime(rec.GetValueOrDefault("survival_time", 0.0f).AsSingle()),
                 rec.GetValueOrDefault("level", 1).AsInt32(),
-                rec.GetValueOrDefault("digested", 0).AsInt32(),
+                rec.GetValueOrDefault("kills", 0).AsInt32(),
                 RunRecordManager.FormatTimestamp(rec.GetValueOrDefault("timestamp", 0.0).AsDouble())),
             VerticalAlignment = VerticalAlignment.Center
         };

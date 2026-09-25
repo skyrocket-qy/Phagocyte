@@ -13,15 +13,12 @@ namespace Phagocyte.Player;
 /// <summary>
 /// Base class for all Immune Defense Cells in Project: Phagocyte.
 /// Encapsulates universal stats, physics movement, 32-vertex organic deformation,
-/// digestion, and experience progression.
+/// and experience progression.
 /// </summary>
 public partial class BaseCell : CharacterBody2D
 {
     [Signal]
     public delegate void StatsChangedEventHandler(float health, float maxHealth, float radiusRatio);
-
-    [Signal]
-    public delegate void PathogenDigestedEventHandler(Node2D pathogen, float atpGained);
 
     [Signal]
     public delegate void LevelUpEventHandler(int newLevel);
@@ -55,9 +52,6 @@ public partial class BaseCell : CharacterBody2D
     [Export] public int SmoothSubdivisions { get; set; } = 4; // 32 * 4 = 128 high-density smooth points
     public FastNoiseLite? Noise { get; set; }
     public float NoiseTime { get; set; } = 0.0f;
-
-    // Digestion tracking
-    public int DigestedCount { get; set; } = 0;
 
     // --- Dodge roll micro-control (docs/skill.md §6) ---
     /// <summary>Maximum dodge charges (one agile burst each).</summary>
@@ -110,8 +104,6 @@ public partial class BaseCell : CharacterBody2D
     public float SlowFactor { get; set; } = 1.0f;
     public float StunTimer { get; set; } = 0.0f;
     public float InvertControlsTimer { get; set; } = 0.0f;
-    public float TbBurnTimer { get; set; } = 0.0f;
-    public float TbBurnDps { get; set; } = 0.0f;
 
     // Node references
     public Polygon2D? Cytoplasm { get; set; }
@@ -246,7 +238,6 @@ public partial class BaseCell : CharacterBody2D
 
         // EngulfArea doubles as the contact-damage sensor: overlapping
         // monsters are polled every physics tick (see ProcessContactDamage).
-        // Touching no longer engulfs — eating is skills-only now.
 
         SetupGranuleCanvas();
         SetupNucleusShape();
@@ -302,11 +293,6 @@ public partial class BaseCell : CharacterBody2D
         if (InvertControlsTimer > 0.0f)
         {
             InvertControlsTimer -= dt;
-        }
-        if (TbBurnTimer > 0.0f)
-        {
-            TbBurnTimer -= dt;
-            TakeDamage(TbBurnDps * dt);
         }
 
         HandleRegen(dt);
@@ -692,8 +678,8 @@ public partial class BaseCell : CharacterBody2D
     }
 
     /// <summary>
-    /// Assigns rebuilt morphology to the visual mesh, membrane line and engulf
-    /// collider (shared by the base deformation and the dendritic override).
+    /// Assigns rebuilt morphology to the visual mesh, membrane line and contact
+    /// sensor collider (shared by the base deformation and the dendritic override).
     /// The cell_radius shader upload is dirty-checked: radius only moves with
     /// the area stat, not with per-rebuild noise.
     /// </summary>
@@ -842,7 +828,7 @@ public partial class BaseCell : CharacterBody2D
     /// <summary>
     /// Survivor-like contact damage (one-directional): overlapping monsters
     /// hurt the cell on a per-enemy tick. The cell never damages monsters
-    /// by touching — eating is skills-only now.
+    /// by touching.
     /// </summary>
     private void ProcessContactDamage()
     {
@@ -854,10 +840,6 @@ public partial class BaseCell : CharacterBody2D
                 continue;
             enemy.TryContactStrike(this);
         }
-    }
-
-    public virtual void OnPathogenConsumed(Node2D enemy, float atp)
-    {
     }
 
     public void AddExp(float amount)
@@ -1002,12 +984,6 @@ public partial class BaseCell : CharacterBody2D
     public void ApplyInvertControls(float duration)
     {
         InvertControlsTimer = duration;
-    }
-
-    public void ApplyTBDigestionBurn(float duration, float dps)
-    {
-        TbBurnTimer = duration;
-        TbBurnDps = dps;
     }
 
     public void DrainAtp(float amount)

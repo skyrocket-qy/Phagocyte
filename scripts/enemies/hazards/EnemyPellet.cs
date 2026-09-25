@@ -80,7 +80,7 @@ public partial class EnemyPellet : Area2D
     }
 
     /// <summary>
-    /// Senescent RBCs, toxin vesicles and fibrin clots act as drifting cover and
+    /// Toxin vesicles and fibrin clots act as drifting cover and
     /// absorb enemy pellets. Cover nodes may expose a BlockRadius/CollisionRadius.
     /// </summary>
     private bool BlockedByNeutralMatter()

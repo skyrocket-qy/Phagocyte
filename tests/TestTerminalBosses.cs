@@ -75,7 +75,6 @@ public partial class TestTerminalBosses : SceneTree
         var spawned = PathogenSpawner.SpawnTerminalBoss(_container!, _player!, new Vector2(4800, 4800), "acute_wound");
         AssertThat(spawned).IsNotNull();
         AssertThat(spawned!.IsBoss).IsTrue();
-        AssertThat(spawned.CanBeEngulfed).IsFalse();
         AssertThat(spawned.GetNodeOrNull("BossPhaseComponent")).IsNotNull();
         spawned.QueueFree();
 

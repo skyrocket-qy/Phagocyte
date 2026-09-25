@@ -76,7 +76,7 @@ public partial class Macrophage : BaseCell
         {
             // Innate active: Phagocytic Grasp (吞噬偽足).
             // Amoeboid deformation itself is chassis-visual in BaseCell;
-            // the innate is the functional grasp + engulf.
+            // the innate is the functional grasp.
             var grasp = new PhagocyticGraspSkill();
             CellSkillManager.EquipActive(grasp, 0);
         }

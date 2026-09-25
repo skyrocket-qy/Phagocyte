@@ -8,8 +8,8 @@ namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Shared base for the five 15:00 map terminal bosses.
-/// They cannot be digested and all lean on BossPhaseComponent for multi-phase HP
-/// transitions, the hard-enrage countdown and ground danger telegraphs.
+/// All lean on BossPhaseComponent for multi-phase HP transitions, the
+/// hard-enrage countdown and ground danger telegraphs.
 /// </summary>
 public abstract partial class TerminalBossEnemy : BaseEnemy
 {
@@ -18,15 +18,9 @@ public abstract partial class TerminalBossEnemy : BaseEnemy
         BaseScore = 3000;
     }
 
-    public override bool CanBeEngulfed => false;
-
     protected override float ContactDamage => 26.0f;
     protected virtual float TelegraphScale => 1.35f;
     protected virtual float TelegraphDamage => 24.0f;
-
-    // Engulf attempts bounce off and damage the cell (repel handled by BaseEnemy).
-    protected override float EngulfContactDamage => ContactDamage;
-    protected override float EngulfRepelForce => 320.0f;
 
     protected override void SetupEnemy()
     {

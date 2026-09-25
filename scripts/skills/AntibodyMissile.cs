@@ -96,9 +96,6 @@ public partial class AntibodyMissile : Area2D
         if (Target == null || !GodotObject.IsInstanceValid(Target) || node != Target)
             return;
 
-        if (node is Enemies.BaseEnemy be && be.IsBeingEaten)
-            return;
-
         CombatHelper.DealDamage(node, Damage, HostRef, IsCrit);
         VfxManager.Instance?.Play(VfxType.OpsoninBind, GlobalPosition);
 

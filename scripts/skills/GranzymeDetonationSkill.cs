@@ -91,7 +91,7 @@ public partial class GranzymeDetonationSkill : BaseSkill
 
         TargetingService.ForEachInRadius(center, splashRadius, n =>
         {
-            CombatHelper.DamageOrEngulf(n, dmg, Host);
+            CombatHelper.DealDamage(n, dmg, Host, false);
         });
     }
 

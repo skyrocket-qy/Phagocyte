@@ -62,7 +62,7 @@ graph TD
     STAT --> SKILL
     SKILL <-->|戰鬥對抗與擊殺| PATH
     MAP -->|流體力學約束| CELL & PATH
-    PATH -->|吞噬轉化 EXP| CELL
+    PATH -->|擊殺轉化 EXP| CELL
     PATH & MAP -->|通關 / 陣亡結算| REC
     REC -->|解鎖進度回饋| ACH
     ACH -->|發放天賦點| TREE
@@ -90,7 +90,7 @@ graph TD
 
 ### 🏆 局外養成與結算
 - **[achievement.md](file:///Users/zelin/project/Phagocyte/docs/achievement.md)**：規範角色與器官地圖解鎖鏈、固有技能解鎖、廣譜生化武器投放，以及與 Steamworks Achievements API 的無縫對接。
-- **[record.md](file:///Users/zelin/project/Phagocyte/docs/record.md)**：將每局結算包裝為臨床病理報告單，定義「特異性中和成功」與「SIRS 敗血陣亡」判準，以及依據 KPM 吞噬通量劃分的 Rank S～D 評級模型。
+- **[record.md](file:///Users/zelin/project/Phagocyte/docs/record.md)**：將每局結算包裝為臨床病理報告單，定義「特異性中和成功」與「SIRS 敗血陣亡」判準，以及依據 KPM 擊殺通量劃分的 Rank S～D 評級模型。
 
 ### 🧭 引導與介面體驗
 - **[tutorial.md](file:///Users/zelin/project/Phagocyte/docs/tutorial.md)**：堅持「見形知意、非侵入式微引導」的 UX 規範，梳理 5 項核心微觀物理與機制教學，以及病歷單與星盤的自然銜接。

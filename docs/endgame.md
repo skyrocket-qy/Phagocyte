@@ -80,7 +80,7 @@ flowchart TD
 ## 5. 終局追求與榮譽殿堂 (Endless Rewards & Hall of Fame)
 
 1. **終末慢性病歷單 (Chronic Pathology Chart)**：
-   - 專屬的金色全息病歷外觀，詳細記錄本次挑戰所勾選的詞綴、存活時長、超武配裝、總擊殺數（Kills）與肉身吞噬數（Engulfed）。
+   - 專屬的金色全息病歷外觀，詳細記錄本次挑戰所勾選的詞綴、存活時長、超武配裝與總擊殺數（Kills）。
    - 結算評級開放最高 **Rank SSS（超載神話）** 與 **Rank EX（破格存在）**。
 2. **微管天賦重鑄結晶 (Cytoskeleton Catalysts)**：
    - 無盡模式結算依據存活時長，獎勵微管重鑄道具，可用於在天賦星盤中解鎖專屬的傳奇螢光外觀塗裝與粒子拖尾。

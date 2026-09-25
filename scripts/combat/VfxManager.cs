@@ -85,7 +85,6 @@ public partial class VfxManager : Node2D
     {
         return type switch
         {
-            VfxType.LysisBurst => 32,
             VfxType.CytoplasmSplatter => 24,
             VfxType.BiofilmBurst => 20,
             VfxType.MacRingBurst => 28,
@@ -101,7 +100,6 @@ public partial class VfxManager : Node2D
     {
         return type switch
         {
-            VfxType.LysisBurst => 0.45f,
             VfxType.CytoplasmSplatter => 0.35f,
             VfxType.BiofilmBurst => 0.40f,
             VfxType.MacRingBurst => 0.50f,
@@ -140,15 +138,6 @@ public partial class VfxManager : Node2D
                 mat.Color = new Color(0.92f, 1.0f, 0.25f, 0.95f);
                 mat.InitialVelocityMin = 90.0f;
                 mat.InitialVelocityMax = 200.0f;
-                break;
-
-            case VfxType.LysisBurst:
-                // High-energy deep magenta/violet cellular rupture
-                mat.Color = new Color(0.95f, 0.25f, 0.85f, 1.0f);
-                mat.InitialVelocityMin = 120.0f;
-                mat.InitialVelocityMax = 260.0f;
-                mat.ScaleMin = 0.8f;
-                mat.ScaleMax = 1.6f;
                 break;
 
             case VfxType.BarbImpact:

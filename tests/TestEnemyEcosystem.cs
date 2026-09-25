@@ -100,17 +100,16 @@ public partial class TestEnemyEcosystem : SceneTree
         var staph = new StaphEnemy { FibrinShield = 1 };
         testContainer.AddChild(staph);
         AssertThat(staph.FibrinShield).IsEqual(1);
-        AssertThat(staph.CanBeEngulfed).IsFalse();
 
-        // First attempt breaks shield
-        staph.BeEngulfed(player);
+        // First hit breaks the shield, health untouched
+        float staphHp = staph.CurrentHealth;
+        staph.TakeDamage(10.0f);
         AssertThat(staph.FibrinShield).IsEqual(0);
-        AssertThat(staph.IsBeingEaten).IsFalse();
-        AssertThat(staph.CanBeEngulfed).IsTrue();
+        AssertThat(staph.CurrentHealth).IsEqual(staphHp);
 
-        // Second attempt digests successfully
-        staph.BeEngulfed(player);
-        AssertThat(staph.IsBeingEaten).IsTrue();
+        // Second hit lands: unarmored coccus takes full damage
+        staph.TakeDamage(10.0f);
+        AssertThat(staph.CurrentHealth).IsEqual(staphHp - 10.0f);
         GD.Print("[PASS] Test 3: Staph fibrin microthrombi armor & shield breaking verified.");
 
         // -------------------------------------------------------------
@@ -146,15 +145,13 @@ public partial class TestEnemyEcosystem : SceneTree
         GD.Print("[PASS] Test 5: Pseudomonas aeruginosa biofilm puddle & player slow effect verified.");
 
         // -------------------------------------------------------------
-        // TEST 6: TB Mycolic Wax & Cytoplasm Digestion Burn
+        // TEST 6: TB Mycolic Wax Armor
         // -------------------------------------------------------------
         var tb = new TbEnemy();
         testContainer.AddChild(tb);
-        float hpBefore = player.Health;
-        tb.BeEngulfed(player);
-        AssertThat(player.TbBurnTimer > 0.0f).IsTrue();
-        AssertThat(player.TbBurnDps).IsEqual(4.0f);
-        GD.Print("[PASS] Test 6: Mycobacterium tuberculosis acid resistance & cytoplasm digestion burn verified.");
+        tb.TakeDamage(10.0f);
+        AssertThat(tb.CurrentHealth).IsEqual(35.0f - Mathf.Max(1.0f, 10.0f - tb.Armor));
+        GD.Print("[PASS] Test 6: Mycobacterium tuberculosis mycolic wax armor verified.");
 
         // -------------------------------------------------------------
         // TEST 7: Rabies Neuro-Chaos Control Inversion
@@ -168,7 +165,6 @@ public partial class TestEnemyEcosystem : SceneTree
         // -------------------------------------------------------------
         var anthrax = new AnthraxSporeEnemy { GlobalPosition = new Vector2(200, 200) };
         testContainer.AddChild(anthrax);
-        AssertThat(anthrax.CanBeEngulfed).IsFalse();
         anthrax.Die(player);
 
         AnthraxBacillus? bacillus = null;
@@ -181,7 +177,6 @@ public partial class TestEnemyEcosystem : SceneTree
             }
         }
         AssertThat(bacillus).IsNotNull();
-        AssertThat(bacillus!.CanBeEngulfed).IsTrue();
         GD.Print("[PASS] Test 8: Bacillus anthracis two-stage spore shell shattering & vegetative hatching verified.");
 
         // -------------------------------------------------------------
@@ -189,15 +184,11 @@ public partial class TestEnemyEcosystem : SceneTree
         // -------------------------------------------------------------
         var candida = new CandidaEnemy();
         testContainer.AddChild(candida);
-        AssertThat(candida.CanBeEngulfed).IsTrue();
         candida.ExtendHyphae();
-        AssertThat(candida.CanBeEngulfed).IsFalse();
-
-        float pHealth = player.Health;
-        player.Stats!.SetBase("block", 0.0f); // Zero innate Block so the hyphae puncture lands deterministically
-        candida.OnEngulfAttemptFailed(player);
-        AssertThat(player.Health < pHealth).IsTrue();
-        GD.Print("[PASS] Test 9: Candida albicans hyphae sprouting & membrane puncture rejection verified.");
+        AssertThat(candida.IsHyphaeExtended).IsTrue();
+        candida.RetractHyphae();
+        AssertThat(candida.IsHyphaeExtended).IsFalse();
+        GD.Print("[PASS] Test 9: Candida albicans hyphae sprouting & retraction verified.");
 
         // -------------------------------------------------------------
         // TEST 10: Prion Amyloid Aggregation Boss
@@ -205,7 +196,6 @@ public partial class TestEnemyEcosystem : SceneTree
         var prion = new PrionEnemy();
         testContainer.AddChild(prion);
         AssertThat(prion.IsBoss).IsTrue();
-        AssertThat(prion.CanBeEngulfed).IsFalse();
 
         // Damage past 50% to trigger splitting
         prion.TakeDamage(80.0f);

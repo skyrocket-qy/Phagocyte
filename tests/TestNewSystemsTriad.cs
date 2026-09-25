@@ -92,7 +92,6 @@ public partial class TestNewSystemsTriad : SceneTree
         AssertThat(VfxManager.Instance).IsNotNull();
         vfx.Play(VfxType.CytoplasmSplatter, new Vector2(100, 100));
         vfx.Play(VfxType.AcidOxidationSparks, new Vector2(150, 150), Vector2.Right);
-        vfx.Play(VfxType.LysisBurst, new Vector2(200, 200));
         vfx.Play(VfxType.BarbImpact, new Vector2(250, 250));
         vfx.Play(VfxType.BiofilmBurst, new Vector2(300, 300));
 

@@ -38,7 +38,7 @@ public partial class AchievementManager : Node
     public static Godot.Collections.Dictionary UnlockedIds = new Godot.Collections.Dictionary();
     public static Godot.Collections.Dictionary ProgressData = new Godot.Collections.Dictionary
     {
-        { "digested", 0.0f },
+        { "kills", 0.0f },
         { "level", 1.0f },
         { "survival_time", 0.0f },
         { "radius_ratio", 1.0f },
@@ -141,12 +141,22 @@ public partial class AchievementManager : Node
     {
         switch (eventName)
         {
-            case "pathogen_digested":
-                float count = value.Obj != null ? value.AsSingle() : (ProgressData.GetValueOrDefault("digested", 0.0f).AsSingle() + 1.0f);
-                ProgressData["digested"] = Mathf.Max(ProgressData.GetValueOrDefault("digested", 0.0f).AsSingle(), count);
+            case "pathogen_killed":
+                // Kill counter drives the digestion-line achievements (re-keyed
+                // to kills) plus the PrPsc amyloid clear.
+                float kills = ProgressData.GetValueOrDefault("kills", 0.0f).AsSingle() + 1.0f;
+                ProgressData["kills"] = kills;
                 EvaluateThreshold("first_digestion");
                 EvaluateThreshold("engulf_20");
                 EvaluateThreshold("devour_50");
+
+                // PrPsc amyloid crystals (regular prion aggregate or the map-5 terminal boss)
+                string enemyId = value.Obj != null ? value.AsString() : "";
+                if (enemyId == "prion" || enemyId == "prpsc_amyloid_aggregate")
+                {
+                    ProgressData["prion_cleared"] = 1.0f;
+                    Unlock("prion_cleared");
+                }
                 break;
 
             case "level_up":
@@ -176,16 +186,6 @@ public partial class AchievementManager : Node
             case "first_evolution":
                 ProgressData["first_evolution"] = 1.0f;
                 Unlock("first_evolution");
-                break;
-
-            case "pathogen_killed":
-                // PrPsc amyloid crystals (regular prion aggregate or the map-5 terminal boss)
-                string enemyId = value.Obj != null ? value.AsString() : "";
-                if (enemyId == "prion" || enemyId == "prpsc_amyloid_aggregate")
-                {
-                    ProgressData["prion_cleared"] = 1.0f;
-                    Unlock("prion_cleared");
-                }
                 break;
         }
     }
@@ -491,7 +491,7 @@ public partial class AchievementManager : Node
         UnlockedIds.Clear();
         ProgressData = new Godot.Collections.Dictionary
         {
-            { "digested", 0.0f },
+            { "kills", 0.0f },
             { "level", 1.0f },
             { "survival_time", 0.0f },
             { "radius_ratio", 1.0f },

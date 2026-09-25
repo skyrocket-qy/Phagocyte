@@ -15,6 +15,7 @@ namespace Phagocyte.Skills;
 public partial class ComplementCascadeSkill : BaseSkill
 {
     [Export] public float BaseAreaRadius { get; set; } = 80.0f;
+    [Export] public float BaseDamage { get; set; } = 40.0f;
 
     public ComplementCascadeSkill()
     {
@@ -72,18 +73,11 @@ public partial class ComplementCascadeSkill : BaseSkill
         AudioManager.Instance?.PlayEnemyDeath();
         CameraFollow.Instance?.AddTrauma(0.25f);
 
-        // Osmotic swelling first (Cryo-EM lysis sequence), then engulfment.
+        // Osmotic rupture (Cryo-EM lysis sequence): direct damage in the ring.
+        GetDamage(BaseDamage, out float dmg, out bool isCrit);
         TargetingService.ForEachInRadius(center, radius, n =>
         {
-            if (n is not BaseEnemy be || !GodotObject.IsInstanceValid(be))
-                return;
-            var swell = be.CreateTween();
-            swell.TweenProperty(be, "scale", be.Scale * 1.3f, 0.12f);
-            swell.TweenCallback(Callable.From(() =>
-            {
-                if (GodotObject.IsInstanceValid(be) && !be.IsBeingEaten)
-                    be.BeEngulfed(Host);
-            }));
+            CombatHelper.DealDamage(n, dmg, Host, isCrit);
         });
     }
 

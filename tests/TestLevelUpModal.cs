@@ -150,7 +150,7 @@ public partial class TestLevelUpModal : TestHarness
     {
         foreach (var child in root.GetChildren())
         {
-            if (child is BaseEnemy || child is SenescentRBC || child is DormantToxinVesicle || child is BioHazardArea)
+            if (child is BaseEnemy || child is DormantToxinVesicle || child is BioHazardArea)
                 child.Free();
             else
                 ClearArenaEntities(child);

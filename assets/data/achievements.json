@@ -5,7 +5,7 @@
     "id": "first_digestion",
     "reward_cell": "",
     "reward_key": "",
-    "stat_key": "digested",
+    "stat_key": "kills",
     "target_value": 1.0,
     "title_key": "ACH_FIRST_DIGESTION_TITLE"
   },
@@ -15,7 +15,7 @@
     "id": "engulf_20",
     "reward_cell": "ctl",
     "reward_key": "ACH_ENGULF_20_REWARD",
-    "stat_key": "digested",
+    "stat_key": "kills",
     "target_value": 200.0,
     "title_key": "ACH_ENGULF_20_TITLE"
   },
@@ -25,7 +25,7 @@
     "id": "devour_50",
     "reward_cell": "neutrophil",
     "reward_key": "ACH_DEVOUR_50_REWARD",
-    "stat_key": "digested",
+    "stat_key": "kills",
     "target_value": 500.0,
     "title_key": "ACH_DEVOUR_50_TITLE"
   },

@@ -17,18 +17,18 @@ public static class TargetingService
     }
 
     /// <summary>
-    /// True when the node is a valid, living pathogen that accepts damage or
-    /// engulfment. Used by organelles that scan for contact targets.
+    /// True when the node is a valid, living pathogen that accepts damage.
+    /// Used by organelles that scan for contact targets.
     /// </summary>
     public static bool IsAttackable(Node? node)
     {
         if (node is not Node2D n || !GodotObject.IsInstanceValid(n))
             return false;
-        if (n is BaseEnemy enemy && (enemy.IsBeingEaten || enemy.CurrentHealth <= 0.0f))
+        if (n is BaseEnemy enemy && enemy.CurrentHealth <= 0.0f)
             return false;
-        if (n is IDamageable or IEngulfable)
+        if (n is IDamageable)
             return true;
-        return n.HasMethod("take_damage") || n.HasMethod("be_engulfed");
+        return n.HasMethod("take_damage");
     }
 
     /// <summary>
@@ -38,16 +38,13 @@ public static class TargetingService
     public static BaseEnemy? FindNearest(
         Node2D origin,
         float maxRange,
-        System.Func<BaseEnemy, bool>? predicate = null,
-        bool skipEaten = true)
+        System.Func<BaseEnemy, bool>? predicate = null)
     {
         BaseEnemy? best = null;
         float bestSq = maxRange * maxRange;
         foreach (var enemy in BaseEnemy.ActiveEnemies)
         {
             if (!IsValidTarget(enemy))
-                continue;
-            if (skipEaten && enemy.IsBeingEaten)
                 continue;
             if (predicate != null && !predicate(enemy))
                 continue;
@@ -80,16 +77,13 @@ public static class TargetingService
     public static int CollectInRadius(
         Vector2 center,
         float radius,
-        System.Collections.Generic.List<BaseEnemy> results,
-        bool skipEaten = true)
+        System.Collections.Generic.List<BaseEnemy> results)
     {
         int added = 0;
         float radiusSq = radius * radius;
         foreach (var enemy in BaseEnemy.ActiveEnemies)
         {
             if (!IsValidTarget(enemy))
-                continue;
-            if (skipEaten && enemy.IsBeingEaten)
                 continue;
 
             if (center.DistanceSquaredTo(enemy.GlobalPosition) <= radiusSq)
@@ -109,15 +103,12 @@ public static class TargetingService
     public static void ForEachInRadius(
         Vector2 center,
         float radius,
-        System.Action<BaseEnemy> action,
-        bool skipEaten = true)
+        System.Action<BaseEnemy> action)
     {
         float radiusSq = radius * radius;
         foreach (var enemy in BaseEnemy.ActiveEnemies)
         {
             if (!IsValidTarget(enemy))
-                continue;
-            if (skipEaten && enemy.IsBeingEaten)
                 continue;
 
             if (center.DistanceSquaredTo(enemy.GlobalPosition) <= radiusSq)
@@ -129,14 +120,12 @@ public static class TargetingService
     /// True when at least one pathogen lies within <paramref name="radius"/> of
     /// <paramref name="center"/>.
     /// </summary>
-    public static bool AnyInRadius(Vector2 center, float radius, bool skipEaten = true)
+    public static bool AnyInRadius(Vector2 center, float radius)
     {
         float radiusSq = radius * radius;
         foreach (var enemy in BaseEnemy.ActiveEnemies)
         {
             if (!IsValidTarget(enemy))
-                continue;
-            if (skipEaten && enemy.IsBeingEaten)
                 continue;
 
             if (center.DistanceSquaredTo(enemy.GlobalPosition) <= radiusSq)
@@ -153,16 +142,13 @@ public static class TargetingService
     public static int CountInRadius(
         Vector2 center,
         float radius,
-        System.Func<BaseEnemy, bool>? predicate = null,
-        bool skipEaten = true)
+        System.Func<BaseEnemy, bool>? predicate = null)
     {
         int count = 0;
         float radiusSq = radius * radius;
         foreach (var enemy in BaseEnemy.ActiveEnemies)
         {
             if (!IsValidTarget(enemy))
-                continue;
-            if (skipEaten && enemy.IsBeingEaten)
                 continue;
             if (predicate != null && !predicate(enemy))
                 continue;

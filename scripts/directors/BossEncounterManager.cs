@@ -66,7 +66,6 @@ public partial class BossEncounterManager : Node
         if (SubBoss != null)
         {
             SubBoss.EnemyDied += OnSubBossDefeated;
-            SubBoss.Digested += OnSubBossDefeated;
         }
 
         AudioManager.Instance?.PlaySfx("wave_start", -2.0f);
@@ -97,7 +96,6 @@ public partial class BossEncounterManager : Node
         }
 
         TerminalBoss.EnemyDied += OnTerminalBossDefeated;
-        TerminalBoss.Digested += OnTerminalBossDefeated;
         AudioManager.Instance?.PlaySfx("wave_start", -2.0f);
         AudioManager.Instance?.PlayBgm(ctx.IsEndlessRun ? "boss_final" : "boss");
         GD.Print("[WaveDirector] 15:00 Terminal boss lockdown! Specific neutralization required.");

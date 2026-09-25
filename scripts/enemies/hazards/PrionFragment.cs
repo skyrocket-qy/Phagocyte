@@ -7,12 +7,11 @@ namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Fragmented amyloid fibril splinter split from Prion Aggregate.
-/// Cannot be digested; contact punctures player cytoplasm.
+/// Contact punctures player cytoplasm.
 /// </summary>
 public partial class PrionFragment : BaseEnemy
 {
     private const float DrawScale = 6.0f / 12.0f; // A-formula visual match: 12px -> 6px
-    public override bool CanBeEngulfed => false;
 
     public PrionFragment()
     {
@@ -26,8 +25,6 @@ public partial class PrionFragment : BaseEnemy
     }
 
     protected override float GetCollisionRadius() => Morphology.RealSizeToRadius(0.005f);
-
-    protected override float EngulfContactDamage => 10.0f;
 
     public override void _Draw()
     {

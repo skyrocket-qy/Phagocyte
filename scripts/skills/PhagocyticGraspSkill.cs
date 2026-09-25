@@ -10,8 +10,7 @@ namespace Phagocyte.Skills;
 /// <summary>
 /// Innate Active Weapon: Phagocytic Grasp (吞噬偽足)
 /// Macrophage-exclusive innate. Extends amoeboid pseudopods to grab the
-/// nearest pathogens, deal contact damage and drag them back for
-/// phagocytosis (wiki step a: phagosome formation).
+/// nearest pathogens and deal contact damage on arrival.
 /// Chassis deformation itself stays in BaseCell for all cells; this skill
 /// is the functional grasp, not the visual wobble.
 /// </summary>
@@ -85,24 +84,6 @@ public partial class PhagocyticGraspSkill : BaseSkill
                     return;
 
                 CombatHelper.DealDamage(enemy, dmg, Host, isCrit);
-
-                if (!GodotObject.IsInstanceValid(enemy))
-                    return;
-                if (enemy.IsBeingEaten)
-                    return;
-
-                // Engulf in place: the envelope already closed over the prey,
-                // so digestion starts where it stands — no drag-back slide.
-                // Non-engulfable foes (TB wax, anthrax shell, prions, bosses)
-                // keep the damage; BeEngulfed refuses them internally.
-                if (enemy is IEngulfable engulfable)
-                {
-                    engulfable.BeEngulfed(Host);
-                }
-                else if (enemy.HasMethod("be_engulfed"))
-                {
-                    enemy.Call("be_engulfed", Host!);
-                }
             };
             Host.GetParent().AddChild(chain);
         }

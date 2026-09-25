@@ -272,7 +272,7 @@ public partial class TestEndlessMode : TestHarness
         // The stored chronic record carries the SSS grade and the full loadout
         var chronic = RunRecordManager.RecordRun(
             RunRecordManager.ResultDefeat, "ctl", "blood_brain_barrier",
-            1900.0f, 45, 600, 12, new[] { "perforin_lance", "antibody_salvo" },
+            1900.0f, 45, 12, new[] { "perforin_lance", "antibody_salvo" },
             difficulty: RunRecordManager.DifficultyHard,
             endless: true,
             afflictionMultiplier: 1.65f,
@@ -284,7 +284,6 @@ public partial class TestEndlessMode : TestHarness
         AssertThat(chronic["kills"].AsInt32()).IsEqual(5600);
         AssertThat(chronic["kpm"].AsSingle()).IsGreater(170.0f);
         AssertThat(chronic["active_skills"].AsGodotArray().Count).IsEqual(2);
-        AssertThat(chronic["digested"].AsInt32()).IsEqual(600);
 
         // Local leaderboard seeds (reserved Steam boards' offline fallback)
         AssertThat(RunRecordManager.GetBestEndlessSurvivalTime()).IsEqualApprox(1900.0f, 0.01f);

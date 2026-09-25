@@ -6,7 +6,7 @@ namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Norovirus (諾羅病毒)
-/// Non-enveloped tiny icosahedral capsid. Extreme swarm waves testing AoE and multi-engulfment.
+/// Non-enveloped tiny icosahedral capsid. Extreme swarm waves testing AoE and multi-target damage.
 /// </summary>
 public partial class NorovirusEnemy : BaseEnemy
 {

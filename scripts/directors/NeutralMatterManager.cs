@@ -5,14 +5,13 @@ using Phagocyte.Enemies;
 namespace Phagocyte.Directors;
 
 /// <summary>
-/// Drifting neutral matter (senescent RBC cover + dormant toxin mines) plus
-/// host ulceration ambient acid mist (docs/map.md §4.3). Extracted from Main.
+/// Drifting neutral matter (dormant toxin mines) plus host ulceration ambient
+/// acid mist (docs/map.md §4.3). Extracted from Main.
 /// Neutrals are not <see cref="BaseEnemy"/> nodes, so they never consume
 /// screen-cap slots.
 /// </summary>
 public partial class NeutralMatterManager : Node
 {
-    public const int MaxSenescentRbc = 12;
     public const int MaxToxinVesicles = 10;
     public const float NeutralSpawnInterval = 6.0f;
 
@@ -24,17 +23,15 @@ public partial class NeutralMatterManager : Node
     private float _neutralSpawnTimer = NeutralSpawnInterval;
     private float _ulcerHazardTimer = 12.0f;
 
-    /// <summary>Opening population: 4 RBCs + 3 toxin vesicles. Call once from _Ready.</summary>
+    /// <summary>Opening population: 3 toxin vesicles. Call once from _Ready.</summary>
     public void SeedInitialPopulation()
     {
-        for (int i = 0; i < 4; i++)
-            SpawnSenescentRbc();
         for (int i = 0; i < 3; i++)
             SpawnToxinVesicle();
     }
 
     /// <summary>
-    /// Maintains the drifting neutral matter population (cover RBCs + toxin mines).
+    /// Maintains the drifting neutral matter population (toxin mines).
     /// </summary>
     public void PhysicsTick(float dt)
     {
@@ -54,24 +51,8 @@ public partial class NeutralMatterManager : Node
 
         _neutralSpawnTimer = NeutralSpawnInterval;
 
-        if (CountGroup("senescent_rbc") < MaxSenescentRbc)
-            SpawnSenescentRbc();
         if (CountGroup("toxin_vesicle") < MaxToxinVesicles)
             SpawnToxinVesicle();
-    }
-
-    public void SpawnSenescentRbc()
-    {
-        var ctx = Context;
-        var container = ctx?.EnemyContainer;
-        if (container == null || ctx?.Player == null)
-            return;
-
-        var rbc = new SenescentRBC
-        {
-            GlobalPosition = GetNeutralSpawnPoint()
-        };
-        container.AddChild(rbc);
     }
 
     public void SpawnToxinVesicle()

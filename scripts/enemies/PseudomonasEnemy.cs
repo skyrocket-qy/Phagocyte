@@ -41,14 +41,7 @@ public partial class PseudomonasEnemy : BaseEnemy
         base.Die(killer);
     }
 
-    public override void BeEngulfed(Node2D? predator)
-    {
-        // When engulfed and digested, also spawn a biofilm residue
-        SpawnBiofilmResidue();
-        base.BeEngulfed(predator);
-    }
-
-    /// <summary>Drops the sticky biofilm puddle left behind by either death path.</summary>
+    /// <summary>Drops the sticky biofilm puddle left behind on death.</summary>
     private void SpawnBiofilmResidue()
     {
         var parent = GetParent();

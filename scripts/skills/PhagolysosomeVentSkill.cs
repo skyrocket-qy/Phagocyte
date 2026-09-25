@@ -88,8 +88,8 @@ public partial class PhagolysosomeVentSkill : BaseSkill
 
             TargetingService.ForEachInRadius(GlobalPosition, Radius, n =>
             {
-                CombatHelper.DamageOrEngulf(n, DamagePerTick, HostRef);
-            }, skipEaten: false);
+                CombatHelper.DealDamage(n, DamagePerTick, HostRef, false);
+            });
         }
 
         public override void _Draw()

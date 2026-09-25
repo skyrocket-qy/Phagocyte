@@ -7,7 +7,7 @@ namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Malignant Mutated Tumor Cell (異變腫瘤細胞)
-/// Large volume, downregulates surface MHC-I. Immune to ranged auto-targeting; only destructible via melee engulfment or lysis.
+/// Large volume, downregulates surface MHC-I. Best cleared with close-range damage or lysis.
 /// </summary>
 public partial class MalignantCellEnemy : BaseEnemy
 {
@@ -89,8 +89,7 @@ public partial class MalignantCellEnemy : BaseEnemy
         return TargetingService.CountInRadius(
             GlobalPosition,
             SiblingCheckRadius,
-            enemy => enemy is MalignantCellEnemy sibling && sibling != this,
-            skipEaten: false);
+            enemy => enemy is MalignantCellEnemy sibling && sibling != this);
     }
 
     public override void _Draw()

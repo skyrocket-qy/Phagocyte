@@ -80,7 +80,6 @@ public partial class Main : Node2D, IRunContext
     public Vector2 CurrentFluidVector { get; set; } = Vector2.Zero;
 
     // ---- Neutral matter facades ----
-    public const int MaxSenescentRbc = NeutralMatterManager.MaxSenescentRbc;
     public const int MaxToxinVesicles = NeutralMatterManager.MaxToxinVesicles;
     public const float NeutralSpawnInterval = NeutralMatterManager.NeutralSpawnInterval;
     public int UlcerationPulses => HostUlceration.Pulses;
@@ -238,7 +237,7 @@ public partial class Main : Node2D, IRunContext
         // Tutorial cue 1 (docs/tutorial.md §2): dormant micro-staph targets ahead
         SpawnTutorialGuides();
 
-        // Neutral environment matter (senescent RBCs + dormant toxin vesicles)
+        // Neutral environment matter (dormant toxin vesicles)
         NeutralMatter?.SeedInitialPopulation();
 
         AudioManager.Instance?.PlayMapBgm(GameManager.SelectedMap, 0.6f);
@@ -414,7 +413,7 @@ public partial class Main : Node2D, IRunContext
 
     /// <summary>
     /// Tutorial cue 1 (docs/tutorial.md §2): two dormant micro-staphylococci
-    /// spawn 150px directly ahead so the opening seconds teach direct engulfment.
+    /// spawn 150px directly ahead so the opening seconds teach direct damage.
     /// </summary>
     private void SpawnTutorialGuides()
     {
@@ -456,12 +455,10 @@ public partial class Main : Node2D, IRunContext
 
 /// <summary>
 /// Run-scoped host ulceration meter. Tissue invaders (H. pylori) accumulate acid
-/// damage; crossing thresholds degrades the whole arena and retargets invaders
-/// onto red blood cells.
+/// damage; crossing thresholds degrades the whole arena.
 /// </summary>
 public static class HostUlceration
 {
-    public const int RbcPreferenceThreshold = 3;
     public const int EnvironmentThreshold = 4;
     public const int SevereThreshold = 8;
 

@@ -108,7 +108,7 @@ public partial class TestContactDamage : TestHarness
             grasp.CooldownTimer = 9999.0f;
         }
 
-        // Overlapping from frame one: well inside the engulf/contact sensor.
+        // Overlapping from frame one: well inside the contact sensor.
         _staph = new StaphEnemy { GlobalPosition = new Vector2(10, 0) };
         _arena.AddChild(_staph);
         return true;

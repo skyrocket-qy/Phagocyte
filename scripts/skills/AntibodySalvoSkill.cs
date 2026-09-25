@@ -88,9 +88,6 @@ public partial class AntibodySalvoSkill : BaseSkill
                         return;
                     if (target != null && GodotObject.IsInstanceValid(target))
                     {
-                        if (target is BaseEnemy be && be.IsBeingEaten)
-                            return;
-
                         GetDamage(BaseDamage, out float dmg, out bool isCrit);
                         float speed = GetCalculatedSpeed(BaseMissileSpeed);
 

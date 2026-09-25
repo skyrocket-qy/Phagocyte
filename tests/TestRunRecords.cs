@@ -110,11 +110,11 @@ public partial class TestRunRecords : TestHarness
 
         RunRecordManager.RecordRun(
             RunRecordManager.ResultVictory, "macrophage", "acute_wound",
-            920.0f, 7, 42, 3, new[] { "perforin_lance", "ros_torrent" },
+            920.0f, 7, 3, new[] { "perforin_lance", "ros_torrent" },
             bossNeutralized: true, kills: 2200);
         RunRecordManager.RecordRun(
             RunRecordManager.ResultDefeat, "ctl", "alveolar_space",
-            123.5f, 4, 11, 1, Array.Empty<string>(), kills: 80);
+            123.5f, 4, 1, Array.Empty<string>(), kills: 80);
 
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(2);
         // Newest run is stored first
@@ -191,7 +191,7 @@ public partial class TestRunRecords : TestHarness
         {
             RunRecordManager.RecordRun(
                 RunRecordManager.ResultDefeat, "neutrophil", "gastric_lumen",
-                i, 2, i, 0, Array.Empty<string>());
+                i, 2, 0, Array.Empty<string>());
         }
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(RunRecordManager.MaxRecords);
         AssertThat(RunRecordManager.Records[0]["survival_time"].AsSingle()).IsEqualApprox(
@@ -205,13 +205,13 @@ public partial class TestRunRecords : TestHarness
         {
             RunRecordManager.RecordRun(
                 RunRecordManager.ResultDefeat, "neutrophil", "gastric_lumen",
-                i, 2, i, 0, Array.Empty<string>());
+                i, 2, 0, Array.Empty<string>());
         }
         AssertThat(RunRecordManager.IsLocked(RunRecordManager.Records[0])).IsFalse();
         RunRecordManager.SetLocked(RunRecordManager.Records[RunRecordManager.MaxRecords - 1], true);
         RunRecordManager.RecordRun(
             RunRecordManager.ResultDefeat, "macrophage", "acute_wound",
-            999.0f, 2, 0, 0, Array.Empty<string>());
+            999.0f, 2, 0, Array.Empty<string>());
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(RunRecordManager.MaxRecords);
         AssertThat(RunRecordManager.Records[0]["survival_time"].AsSingle()).IsEqualApprox(999.0f, 0.01f);
         bool lockedSurvives = false;
@@ -240,7 +240,7 @@ public partial class TestRunRecords : TestHarness
         // An unearned victory claim is downgraded to defeat by the manager guard
         var rejected = RunRecordManager.RecordRun(
             RunRecordManager.ResultVictory, "macrophage", "acute_wound",
-            300.0f, 7, 42, 3, Array.Empty<string>());
+            300.0f, 7, 3, Array.Empty<string>());
         AssertThat(rejected["result"].AsString()).IsEqual(RunRecordManager.ResultDefeat);
         AssertThat(rejected["victory_criteria"].AsGodotDictionary()["met"].AsBool()).IsFalse();
 
@@ -251,13 +251,13 @@ public partial class TestRunRecords : TestHarness
         RunRecordManager.ClearRecords();
         RunRecordManager.RecordRun(
             RunRecordManager.ResultVictory, "macrophage", "acute_wound",
-            920.0f, 7, 42, 3, new[] { "perforin_lance" }, bossNeutralized: true, kills: 2200);
+            920.0f, 7, 3, new[] { "perforin_lance" }, bossNeutralized: true, kills: 2200);
         RunRecordManager.RecordRun(
             RunRecordManager.ResultDefeat, "b_cell", "hepatic_sinusoid",
-            95.0f, 3, 8, 1, Array.Empty<string>());
+            95.0f, 3, 1, Array.Empty<string>());
         RunRecordManager.RecordRun(
             RunRecordManager.ResultVictory, "ctl", "alveolar_space",
-            910.0f, 3, 15, 1, Array.Empty<string>(), bossNeutralized: true, kills: 300);
+            910.0f, 3, 1, Array.Empty<string>(), bossNeutralized: true, kills: 300);
     }
 
     private void PhaseHistoryModal()

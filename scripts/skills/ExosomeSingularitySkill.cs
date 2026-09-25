@@ -59,7 +59,7 @@ public partial class ExosomeSingularitySkill : BaseSkill
         if (Host == null)
             return Vector2.Zero;
 
-        var closest = TargetingService.FindNearest(Host, 450.0f, skipEaten: false);
+        var closest = TargetingService.FindNearest(Host, 450.0f);
         if (closest != null)
             return closest.GlobalPosition;
 
@@ -128,16 +128,9 @@ public partial class ExosomeSingularitySkill : BaseSkill
 
                 if (doTick)
                 {
-                    if (n is IDamageable)
-                        CombatHelper.DealDamage(n, DamagePerTick);
-                    else if (n is IEngulfable engulfable && dist <= 24.0f)
-                        engulfable.BeEngulfed(HostRef);
-                    else if (n.HasMethod("take_damage"))
-                        CombatHelper.DealDamage(n, DamagePerTick);
-                    else if (n.HasMethod("be_engulfed") && dist <= 24.0f)
-                        n.Call("be_engulfed", HostRef!);
+                    CombatHelper.DealDamage(n, DamagePerTick, HostRef, false);
                 }
-            }, skipEaten: false);
+            });
         }
 
         public override void _Draw()

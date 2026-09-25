@@ -14,8 +14,6 @@ public partial class CandidaEnemy : BaseEnemy
     private bool _hyphaeExtended = false;
     private float _hyphaeTimer = 0.0f;
 
-    public override bool CanBeEngulfed => !_hyphaeExtended;
-
     public const float AmbushRange = 200.0f;
     public const float HyphaeReach = 150.0f;
     private const float HyphaeChannelTime = 1.6f;
@@ -118,16 +116,6 @@ public partial class CandidaEnemy : BaseEnemy
         {
             var p = PlayerRef;
             ExtendHyphae(p != null && GodotObject.IsInstanceValid(p) ? p.GlobalPosition : null);
-        }
-    }
-
-    public override void OnEngulfAttemptFailed(Node2D? predator)
-    {
-        if (_hyphaeExtended && predator is BaseCell cell)
-        {
-            // Puncture player cell membrane
-            cell.TakeDamage(15.0f);
-            cell.Velocity += (cell.GlobalPosition - GlobalPosition).Normalized() * 200.0f;
         }
     }
 

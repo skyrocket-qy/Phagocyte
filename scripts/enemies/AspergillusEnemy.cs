@@ -6,7 +6,7 @@ namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Aspergillus fumigatus (煙麴黴菌)
-/// Conidiophore vesicle structure. Detonates in a toxic spore cloud upon death or digestion.
+/// Conidiophore vesicle structure. Detonates in a toxic spore cloud upon death.
 /// </summary>
 public partial class AspergillusEnemy : BaseEnemy
 {
@@ -29,12 +29,6 @@ public partial class AspergillusEnemy : BaseEnemy
     {
         SpawnToxinCloud();
         base.Die(killer);
-    }
-
-    public override void BeEngulfed(Node2D? predator)
-    {
-        SpawnToxinCloud();
-        base.BeEngulfed(predator);
     }
 
     private void SpawnToxinCloud()

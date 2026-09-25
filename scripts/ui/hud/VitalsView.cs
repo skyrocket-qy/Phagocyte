@@ -30,7 +30,7 @@ public partial class VitalsView : Node
     public float LastExpToNext { get; set; } = 30.0f;
     public int LastLevel { get; set; } = 1;
     public float LastRadiusRatio { get; set; } = 1.0f;
-    public int LastDigestedCount { get; set; } = 0;
+    public int LastKillCount { get; set; } = 0;
     public float LastSpeed { get; set; } = 230.0f;
 
     public Node2D? PlayerRef { get; set; }
@@ -77,7 +77,6 @@ public partial class VitalsView : Node
     {
         PlayerRef = bc;
         bc.StatsChanged += (h, mh, r) => OnPlayerStatsChanged(h, mh, r);
-        bc.PathogenDigested += (p, atp) => OnPathogenDigested(p, atp);
         bc.ExpChanged += (cur, max, lvl) => OnPlayerExpChanged(cur, max, lvl);
 
         LastHealth = bc.Health;
@@ -87,7 +86,7 @@ public partial class VitalsView : Node
         LastLevel = bc.CurrentLevel;
         LastSpeed = bc.CurrentSpeed > 0 ? bc.CurrentSpeed : bc.BaseSpeed;
         LastRadiusRatio = bc.CurrentRadius / Mathf.Max(1.0f, bc.BaseRadius);
-        LastDigestedCount = bc.DigestedCount;
+        LastKillCount = RunTelemetryManager.Instance?.KillCount ?? 0;
 
         if (HpBar != null)
         {
@@ -96,7 +95,7 @@ public partial class VitalsView : Node
         }
         UpdateExpDisplay();
         RenderVitalLines(LastHealth, LastMaxHealth);
-        RenderCountLines(LastDigestedCount);
+        RenderCountLines(LastKillCount);
     }
 
     /// <summary>GDScript-fallback subscription (called from Hud.ConnectPlayer).</summary>
@@ -105,9 +104,6 @@ public partial class VitalsView : Node
         PlayerRef = player;
         if (player.HasSignal("StatsChanged"))
             player.Connect("StatsChanged", Callable.From((float h, float mh, float r) => OnPlayerStatsChanged(h, mh, r)));
-
-        if (player.HasSignal("PathogenDigested"))
-            player.Connect("PathogenDigested", Callable.From((Node2D p, float atp) => OnPathogenDigested(p, atp)));
 
         if (player.HasSignal("ExpChanged"))
             player.Connect("ExpChanged", Callable.From((float c, float m, int l) => OnPlayerExpChanged(c, m, l)));
@@ -145,7 +141,7 @@ public partial class VitalsView : Node
         if (ExpTitleLabel != null) ExpTitleLabel.Text = Tr("HUD_EXP_TITLE");
         _lastTextMsec = 0;
         RefreshExpText(true);
-        RenderCountLines(LastDigestedCount);
+        RenderCountLines(LastKillCount);
         UpdateBuffStatus();
     }
 
@@ -221,9 +217,19 @@ public partial class VitalsView : Node
         HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)health, (int)maxHealth);
     }
 
-    public void RenderCountLines(int digested)
+    public void RenderCountLines(int kills)
     {
-        if (KillLabel != null) KillLabel.Text = TextFormatter.Format(Tr("HUD_KILL_COUNT"), digested);
+        if (KillLabel != null) KillLabel.Text = TextFormatter.Format(Tr("HUD_KILL_COUNT"), kills);
+    }
+
+    /// <summary>Polls run kill telemetry into the capsule (called from Hud._Process).</summary>
+    public void SyncKillCount()
+    {
+        int kills = RunTelemetryManager.Instance?.KillCount ?? 0;
+        if (kills == LastKillCount)
+            return;
+        LastKillCount = kills;
+        RenderCountLines(LastKillCount);
     }
 
     public void UpdateBuffStatus()
@@ -232,12 +238,7 @@ public partial class VitalsView : Node
 
         int kind = 0;
         float timer = 0.0f;
-        if (PlayerRef is BaseCell bc && bc.TbBurnTimer > 0.0f)
-        {
-            kind = 1;
-            timer = bc.TbBurnTimer;
-        }
-        else if (PlayerRef is BaseCell bc2 && bc2.InvertControlsTimer > 0.0f)
+        if (PlayerRef is BaseCell bc2 && bc2.InvertControlsTimer > 0.0f)
         {
             kind = 2;
             timer = bc2.InvertControlsTimer;
@@ -254,13 +255,7 @@ public partial class VitalsView : Node
         _lastBuffKind = kind;
         _lastBuffTenths = tenths;
 
-        if (kind == 1 && PlayerRef is BaseCell tb)
-        {
-            BuffTag.Visible = true;
-            BuffTag.Text = TextFormatter.Format(Tr("HUD_TB_DEBUFF"), tb.TbBurnTimer);
-            BuffTag.Modulate = new Color(1.0f, 0.35f, 0.35f, 0.95f);
-        }
-        else if (kind == 2 && PlayerRef is BaseCell bcInv)
+        if (kind == 2 && PlayerRef is BaseCell bcInv)
         {
             BuffTag.Visible = true;
             BuffTag.Text = $"🌀 {Tr("STATUS_CONFUSION")}: {bcInv.InvertControlsTimer:F1}s";
@@ -313,30 +308,5 @@ public partial class VitalsView : Node
 
         RenderVitalLines(health, maxHealth);
         VitalsChanged?.Invoke();
-    }
-
-    public void OnPathogenDigested(Node2D _enemy, float _atp)
-    {
-        if (PlayerRef is BaseCell bc)
-        {
-            if (bc.DigestedCount == LastDigestedCount)
-                return;
-            LastDigestedCount = bc.DigestedCount;
-            RenderCountLines(LastDigestedCount);
-            return;
-        }
-        var player = GetTree().GetFirstNodeInGroup("player") as Node2D;
-        if (player != null)
-        {
-            var digProp = player.Get("digested_count");
-            if (digProp.VariantType == Variant.Type.Int)
-            {
-                int count = digProp.AsInt32();
-                if (count == LastDigestedCount)
-                    return;
-                LastDigestedCount = count;
-                RenderCountLines(LastDigestedCount);
-            }
-        }
     }
 }

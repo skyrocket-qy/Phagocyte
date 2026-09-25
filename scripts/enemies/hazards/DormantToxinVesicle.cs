@@ -7,8 +7,8 @@ namespace Phagocyte.Enemies;
 
 /// <summary>
 /// Dormant toxin vesicle: a drifting microscopic mine.
-/// Detonates into a toxic acid cloud when any entity (cell, pathogen, projectile
-/// or red blood cell) touches it.
+/// Detonates into a toxic acid cloud when any entity (cell, pathogen or
+/// projectile) touches it.
 /// </summary>
 public partial class DormantToxinVesicle : Node2D
 {
@@ -82,7 +82,7 @@ public partial class DormantToxinVesicle : Node2D
             }
         }
 
-        if (TargetingService.AnyInRadius(GlobalPosition, TriggerRadius + 16.0f, skipEaten: false))
+        if (TargetingService.AnyInRadius(GlobalPosition, TriggerRadius + 16.0f))
         {
             Explode();
             return true;
@@ -92,16 +92,6 @@ public partial class DormantToxinVesicle : Node2D
         {
             if (node is Node2D shot && GodotObject.IsInstanceValid(shot)
                 && GlobalPosition.DistanceTo(shot.GlobalPosition) <= TriggerRadius + 8.0f)
-            {
-                Explode();
-                return true;
-            }
-        }
-
-        foreach (var node in tree.GetNodesInGroup("senescent_rbc"))
-        {
-            if (node is Node2D rbc && GodotObject.IsInstanceValid(rbc)
-                && GlobalPosition.DistanceTo(rbc.GlobalPosition) <= TriggerRadius + 18.0f)
             {
                 Explode();
                 return true;
@@ -157,8 +147,7 @@ public partial class DormantToxinVesicle : Node2D
             TargetingService.ForEachInRadius(
                 GlobalPosition,
                 BlastRadius,
-                enemy => enemy.TakeDamage(EnemyBlastDamage, null),
-                skipEaten: false);
+                enemy => enemy.TakeDamage(EnemyBlastDamage, null));
         }
 
         QueueFree();

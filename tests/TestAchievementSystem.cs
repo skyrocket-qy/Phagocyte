@@ -77,7 +77,8 @@ public partial class TestAchievementSystem : TestHarness
 
                 // --- Step 3: Event-Driven Achievement Unlocks & Cell Rewards ---
                 // Calibrated thresholds: sub-threshold values must stay locked
-                AchievementManager.RecordEvent("pathogen_digested", 199);
+                for (int i = 0; i < 199; i++)
+                    AchievementManager.RecordEvent("pathogen_killed", "staph");
                 AssertThat(AchievementManager.IsUnlocked("engulf_20")).IsFalse();
                 AchievementManager.RecordEvent("level_up", 14);
                 AssertThat(AchievementManager.IsUnlocked("reach_level_5")).IsFalse();
@@ -87,8 +88,8 @@ public partial class TestAchievementSystem : TestHarness
                 AssertThat(AchievementManager.IsUnlocked("full_arsenal")).IsFalse();
                 GD.Print("[PASS] Step 3: Calibrated thresholds reject sub-threshold progress.");
 
-                // Test 3a: Digestion 200 -> Unlocks CTL and Perforin Lance
-                AchievementManager.RecordEvent("pathogen_digested", 200);
+                // Test 3a: 200 kills -> Unlocks CTL and Perforin Lance
+                AchievementManager.RecordEvent("pathogen_killed", "staph");
                 AssertThat(AchievementManager.IsUnlocked("first_digestion")).IsTrue();
                 AssertThat(AchievementManager.IsUnlocked("engulf_20")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("ctl")).IsTrue();
@@ -109,13 +110,14 @@ public partial class TestAchievementSystem : TestHarness
                     if (sawPerforin) break;
                 }
                 AssertThat(sawPerforin).IsTrue();
-                GD.Print("[PASS] Step 3a: Engulf 20 unlocks CTL and adds Perforin Lance to upgrade pool.");
+                GD.Print("[PASS] Step 3a: 200 kills unlock CTL and add Perforin Lance to upgrade pool.");
 
-                // Test 3b: Devour 500 -> Unlocks Neutrophil
-                AchievementManager.RecordEvent("pathogen_digested", 500);
+                // Test 3b: 500 kills -> Unlocks Neutrophil
+                for (int i = 0; i < 300; i++)
+                    AchievementManager.RecordEvent("pathogen_killed", "staph");
                 AssertThat(AchievementManager.IsUnlocked("devour_50")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsTrue();
-                GD.Print("[PASS] Step 3b: Devouring 500 pathogens unlocks Neutrophil.");
+                GD.Print("[PASS] Step 3b: 500 kills unlock Neutrophil.");
 
                 // Test 3c: Level 15 -> Unlocks B-Cell
                 AchievementManager.RecordEvent("level_up", 15);
