@@ -49,9 +49,9 @@ public partial class TestI18n : TestHarness
         GameManager.SetLanguage("zh_CN");
         menu.UpdateAllTexts();
 
-        AssertThat(menu.StartBtn?.Text.Contains("开始免疫行动") ?? false).IsTrue();
-        AssertThat(menu.ClassHeaderLbl?.Text.Contains("选择你的免疫防御细胞") ?? false).IsTrue();
-        AssertThat(menu.AchievementsBtn?.Text.Contains("成就收藏") ?? false).IsTrue();
+        AssertThat(menu.StartBtn?.Text.Contains("开始") ?? false).IsTrue();
+        AssertThat(menu.ClassHeaderLbl?.Text.Contains("选择细胞") ?? false).IsTrue();
+        AssertThat(menu.AchievementsBtn?.Text.Contains("成就") ?? false).IsTrue();
         AssertThat(menu.GlobalBackBtn?.Text.Contains("返回") ?? false).IsTrue();
         GD.Print("[PASS] Simplified Chinese (zh_CN) text rendering verified.");
 
@@ -59,11 +59,11 @@ public partial class TestI18n : TestHarness
         GameManager.SetLanguage("en");
         menu.UpdateAllTexts();
 
-        AssertThat(menu.StartBtn?.Text.Contains("Begin Immune Action") ?? false).IsTrue();
-        AssertThat(menu.ClassHeaderLbl?.Text.Contains("Select Your Immune Defense Cell") ?? false).IsTrue();
-        AssertThat(menu.MapHeaderLbl?.Text.Contains("Select Pathological Stage") ?? false).IsTrue();
-        AssertThat(menu.AchievementsBtn?.Text.Contains("Achievement Gallery") ?? false).IsTrue();
-        AssertThat(menu.AchievementView?.HeaderLabel?.Text.Contains("Achievement Gallery") ?? false).IsTrue();
+        AssertThat(menu.StartBtn?.Text.Contains("Start") ?? false).IsTrue();
+        AssertThat(menu.ClassHeaderLbl?.Text.Contains("Select Cell") ?? false).IsTrue();
+        AssertThat(menu.MapHeaderLbl?.Text.Contains("Stage") ?? false).IsTrue();
+        AssertThat(menu.AchievementsBtn?.Text.Contains("Achievements") ?? false).IsTrue();
+        AssertThat(menu.AchievementView?.HeaderLabel?.Text.Contains("Achievements") ?? false).IsTrue();
         AssertThat(menu.GlobalBackBtn?.Text.Contains("Back") ?? false).IsTrue();
         GD.Print("[PASS] English (en) text rendering verified.");
 
@@ -84,7 +84,7 @@ public partial class TestI18n : TestHarness
         AssertThat(newLang).IsEqual("zh_TW");
         AssertThat(GameManager.CurrentLanguage).IsEqual("zh_TW");
         menu.UpdateAllTexts();
-        AssertThat(menu.StartBtn?.Text.Contains("開始免疫行動") ?? false).IsTrue();
+        AssertThat(menu.StartBtn?.Text.Contains("開始") ?? false).IsTrue();
         GD.Print("[PASS] Traditional Chinese (zh_TW) text rendering verified.");
 
         string[] restCycle = { "ja", "de", "fr", "ru", "es", "en" };
@@ -95,7 +95,7 @@ public partial class TestI18n : TestHarness
             AssertThat(GameManager.CurrentLanguage).IsEqual(expected);
         }
         menu.UpdateAllTexts();
-        AssertThat(menu.StartBtn?.Text.Contains("Begin Immune Action") ?? false).IsTrue();
+        AssertThat(menu.StartBtn?.Text.Contains("Start") ?? false).IsTrue();
         GD.Print("[PASS] GameManager.toggle_language() 8-locale cycle verified.");
 
         // 5. Test In-Game HUD Localization
@@ -109,14 +109,14 @@ public partial class TestI18n : TestHarness
         // Test in English
         GameManager.SetLanguage("en");
         hud.UpdateLocalizedTexts();
-        AssertThat(hud.HpTitleLabel?.Text.Contains("Health") ?? false).IsTrue();
+        AssertThat(hud.HpTitleLabel?.Text.Contains("HP") ?? false).IsTrue();
         AssertThat(hud.ResumeBtn?.Text.Contains("Resume") ?? false).IsTrue();
 
         // Test in Chinese
         GameManager.SetLanguage("zh_CN");
         hud.UpdateLocalizedTexts();
-        AssertThat(hud.HpTitleLabel?.Text.Contains("生命值") ?? false).IsTrue();
-        AssertThat(hud.ResumeBtn?.Text.Contains("继续战斗") ?? false).IsTrue();
+        AssertThat(hud.HpTitleLabel?.Text.Contains("HP") ?? false).IsTrue();
+        AssertThat(hud.ResumeBtn?.Text.Contains("继续") ?? false).IsTrue();
         GD.Print("[PASS] In-game HUD & Pause Menu dynamic localization verified.");
 
         hud.QueueFree();

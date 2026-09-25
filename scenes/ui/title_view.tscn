@@ -47,7 +47,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 18
-text = "开始免疫行动"
+text = "开始"
 
 [node name="CodexButton" type="Button" parent="VBox"]
 custom_minimum_size = Vector2(0, 44)
@@ -55,7 +55,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 16
-text = "微观档案馆 (Codex)"
+text = "档案"
 
 [node name="RecordsButton" type="Button" parent="VBox"]
 custom_minimum_size = Vector2(0, 44)
@@ -63,7 +63,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 16
-text = "病历记录"
+text = "记录"
 
 [node name="AchievementsButton" type="Button" parent="VBox"]
 custom_minimum_size = Vector2(0, 44)
@@ -71,7 +71,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 16
-text = "成就收藏"
+text = "成就"
 
 [node name="SettingsButton" type="Button" parent="VBox"]
 custom_minimum_size = Vector2(0, 44)
@@ -79,7 +79,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 16
-text = "系统设置"
+text = "设置"
 
 [node name="QuitButton" type="Button" parent="VBox"]
 custom_minimum_size = Vector2(0, 40)
@@ -87,5 +87,5 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 15
-text = "退出游戏"
+text = "退出"
 
