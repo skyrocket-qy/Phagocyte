@@ -3,6 +3,14 @@
 Read this before touching code, scenes, or assets. Conventions below were
 earned the hard way (red suites, broken builds, ghost diffs).
 
+## Session start (capability probe — never skip)
+
+Never assert a tool is missing without probing. Before claiming anything
+about available tooling, run `execute` → `search({query: "godot"})` and
+`session_manage(op="list")`. The `godot-ai` MCP bridge (editor state,
+`project_run`, `game_eval`, `editor_screenshot source="game"`) may be live
+even when the session prompt doesn't advertise it.
+
 ## Build
 
 ```sh

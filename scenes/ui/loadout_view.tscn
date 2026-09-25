@@ -114,7 +114,7 @@ theme_override_constants/separation = 28
 [node name="StatPreview" parent="Margin/VBox/ContentHBox" unique_id=713778740 instance=ExtResource("6_stats")]
 
 [node name="ChamberSide" type="VBoxContainer" parent="Margin/VBox/ContentHBox" unique_id=355113965]
-custom_minimum_size = Vector2(490, 0)
+custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -263,7 +263,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 14
-columns = 4
+columns = 3
 
 [node name="Buttons" type="HBoxContainer" parent="Margin/VBox" unique_id=490778244]
 layout_mode = 2
