@@ -43,6 +43,11 @@ public partial class PathogenSwarmRenderer : Node2D
 
         RegisterSpecies("norovirus", 768, new Vector2(13.0f, 13.0f), BuildNorovirusTexture());
         RegisterSpecies("flu_drift", 192, new Vector2(24.0f, 24.0f), BuildFluDriftTexture());
+        RegisterSpecies("tb", 256, new Vector2(64.0f, 64.0f), BuildTbTexture());
+        RegisterSpecies("e_coli", 256, new Vector2(72.0f, 72.0f), BuildEColiTexture());
+        RegisterSpecies("staph", 256, new Vector2(40.0f, 40.0f), BuildStaphTexture());
+        RegisterSpecies("staph_shielded", 64, new Vector2(48.0f, 48.0f), BuildStaphShieldedTexture());
+        RegisterSpecies("pseudomonas", 192, new Vector2(48.0f, 48.0f), BuildPseudomonasTexture());
     }
 
     public void RegisterSpecies(string speciesId, int capacity, Vector2 quadSize, Texture2D texture)
@@ -84,6 +89,14 @@ public partial class PathogenSwarmRenderer : Node2D
         return _indexById.ContainsKey(speciesId);
     }
 
+    /// <summary>Batch species for an enemy (shielded staph gets its armor variant).</summary>
+    private static string ResolveSpeciesId(BaseEnemy enemy)
+    {
+        if (enemy.EnemyId == "staph" && enemy.FibrinShield > 0)
+            return "staph_shielded";
+        return enemy.EnemyId;
+    }
+
     /// <summary>
     /// Rewrites every batch transform/color from the active pathogen list.
     /// Called once per rendered frame by Main.
@@ -99,14 +112,15 @@ public partial class PathogenSwarmRenderer : Node2D
         {
             if (enemy == null || !GodotObject.IsInstanceValid(enemy))
                 continue;
-            if (_indexById.ContainsKey(enemy.EnemyId))
+            string speciesId = ResolveSpeciesId(enemy);
+            if (_indexById.ContainsKey(speciesId))
                 _scratch.Add(enemy);
         }
 
         for (int i = 0; i < _scratch.Count; i++)
         {
             var enemy = _scratch[i];
-            if (!_indexById.TryGetValue(enemy.EnemyId, out int speciesIndex))
+            if (!_indexById.TryGetValue(ResolveSpeciesId(enemy), out int speciesIndex))
                 continue;
 
             var species = _species[speciesIndex];
@@ -204,6 +218,114 @@ public partial class PathogenSwarmRenderer : Node2D
                 FillBakedCircle(image, center + tipPos, 2.2f, spike);
         }
 
+        return ImageTexture.CreateFromImage(image);
+    }
+
+    /// <summary>TB waxy arc rod, baked at A-formula scale (r=23).</summary>
+    private static ImageTexture BuildTbTexture()
+    {
+        const int size = 64;
+        var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
+        Vector2 center = new(size * 0.5f, size * 0.5f);
+        Vector2[] pts = { new(-24.6f, -6.6f), new(-9.9f, 3.3f), new(9.9f, 3.3f), new(24.6f, -6.6f) };
+        var border = new Color(0.9f, 0.3f, 0.5f, 0.85f);
+        var core = new Color(0.6f, 0.1f, 0.25f, 0.95f);
+        for (int i = 0; i < pts.Length - 1; i++)
+        {
+            DrawBakedLine(image, center + pts[i], center + pts[i + 1], border, 13);
+            DrawBakedLine(image, center + pts[i], center + pts[i + 1], core, 7);
+        }
+        FillBakedCircle(image, center + new Vector2(-13.2f, 0), 3.3f, Colors.White);
+        FillBakedCircle(image, center + new Vector2(0, 3.3f), 3.3f, Colors.White);
+        FillBakedCircle(image, center + new Vector2(13.2f, 0), 3.3f, Colors.White);
+        return ImageTexture.CreateFromImage(image);
+    }
+
+    /// <summary>E. coli capsule + flagella, baked at A-formula scale (r=20).</summary>
+    private static ImageTexture BuildEColiTexture()
+    {
+        const int size = 72;
+        var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
+        Vector2 center = new(size * 0.5f, size * 0.5f);
+        var capsule = new Color(0.72f, 0.45f, 0.25f, 0.95f);
+        var inner = new Color(0.90f, 0.62f, 0.38f, 0.90f);
+        DrawBakedLine(image, center + new Vector2(-17.3f, 0), center + new Vector2(17.3f, 0), capsule, 16);
+        FillBakedCircle(image, center + new Vector2(17.3f, 0), 8.0f, capsule);
+        FillBakedCircle(image, center + new Vector2(-17.3f, 0), 8.0f, capsule);
+        DrawBakedLine(image, center + new Vector2(-13.3f, 0), center + new Vector2(13.3f, 0), inner, 10);
+        var hair = new Color(0.85f, 0.65f, 0.45f, 0.6f);
+        for (int i = 0; i < 8; i++)
+        {
+            float ang = i * (Mathf.Tau / 8.0f);
+            Vector2 root = center + new Vector2(Mathf.Cos(ang) * 18.7f, Mathf.Sin(ang) * 9.3f);
+            Vector2 tip = root + Vector2.FromAngle(ang) * 16.0f;
+            DrawBakedLine(image, root, tip, hair, 1);
+        }
+        return ImageTexture.CreateFromImage(image);
+    }
+
+    private static void BakeStaphCluster(Image image, Vector2 center, Color baseGolden)
+    {
+        Vector2[] offs = { new(-7, -6), new(7, -5), new(-2, 6), new(6, 7) };
+        float[] rads = { 8.0f, 7.5f, 8.5f, 7.0f };
+        for (int i = 0; i < offs.Length; i++)
+        {
+            Vector2 pos = center + offs[i];
+            float rad = rads[i];
+            FillBakedCircle(image, pos, rad + 1.6f, new Color(0.65f, 0.42f, 0.05f, 0.85f));
+            FillBakedCircle(image, pos, rad, baseGolden);
+            FillBakedCircle(image, pos + new Vector2(-rad * 0.15f, -rad * 0.15f), rad * 0.72f, baseGolden.Lightened(0.18f));
+            FillBakedCircle(image, pos + new Vector2(-rad * 0.32f, -rad * 0.32f), rad * 0.28f, new Color(1, 1, 1, 0.85f));
+        }
+    }
+
+    /// <summary>Staph golden cocci cluster (r=16).</summary>
+    private static ImageTexture BuildStaphTexture()
+    {
+        const int size = 40;
+        var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
+        BakeStaphCluster(image, new Vector2(size * 0.5f, size * 0.5f), new Color(0.95f, 0.78f, 0.18f, 0.95f));
+        return ImageTexture.CreateFromImage(image);
+    }
+
+    /// <summary>Shielded staph: cluster plus fibrin microthrombi shimmer ring.</summary>
+    private static ImageTexture BuildStaphShieldedTexture()
+    {
+        const int size = 48;
+        var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
+        Vector2 center = new(size * 0.5f, size * 0.5f);
+        BakeStaphCluster(image, center, new Color(0.95f, 0.78f, 0.18f, 0.95f));
+        var ring = new Color(1.0f, 0.95f, 0.7f, 0.7f);
+        for (int i = 0; i < 24; i++)
+        {
+            float ang = i * (Mathf.Tau / 24.0f);
+            FillBakedCircle(image, center + Vector2.FromAngle(ang) * 18.0f, 1.5f, ring);
+        }
+        return ImageTexture.CreateFromImage(image);
+    }
+
+    /// <summary>Pseudomonas pyocyanin rod + polar flagellum stub (r=20).</summary>
+    private static ImageTexture BuildPseudomonasTexture()
+    {
+        const int size = 48;
+        var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
+        Vector2 center = new(size * 0.5f, size * 0.5f);
+        var capsule = new Color(0.15f, 0.65f, 0.45f, 0.95f);
+        var core = new Color(0.25f, 0.85f, 0.60f, 0.90f);
+        DrawBakedLine(image, center + new Vector2(-18.7f, 0), center + new Vector2(18.7f, 0), capsule, 19);
+        FillBakedCircle(image, center + new Vector2(18.7f, 0), 9.3f, capsule);
+        FillBakedCircle(image, center + new Vector2(-18.7f, 0), 9.3f, capsule);
+        DrawBakedLine(image, center + new Vector2(-14.7f, 0), center + new Vector2(14.7f, 0), core, 10);
+        DrawBakedLine(image, center + new Vector2(-10.7f, -4), center + new Vector2(10.7f, -4), new Color(1, 1, 1, 0.7f), 2);
+        Vector2 prev = center + new Vector2(-18.7f, 0);
+        var flag = new Color(0.3f, 0.8f, 0.5f, 0.65f);
+        for (int i = 1; i <= 6; i++)
+        {
+            float wave = Mathf.Sin(i * 0.8f) * 6.0f;
+            Vector2 next = center + new Vector2(-18.7f - i * 6.7f, wave);
+            DrawBakedLine(image, prev, next, flag, 2);
+            prev = next;
+        }
         return ImageTexture.CreateFromImage(image);
     }
 

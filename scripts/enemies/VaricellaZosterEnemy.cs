@@ -54,7 +54,7 @@ public partial class VaricellaZosterEnemy : BaseEnemy
 
         // Flash into visible existence
         FlashModulate(Colors.Red * 2.0f, 0.4f);
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     protected override void OnPreDamage(float damage, Node2D? source, bool isCrit)

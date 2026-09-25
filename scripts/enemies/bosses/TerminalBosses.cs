@@ -69,7 +69,7 @@ public partial class MrsASuperColony : TerminalBossEnemy
     protected override void CustomPhysicsProcess(float dt)
     {
         _capsulePhase += dt * 1.8f;
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     public override void Die(Node2D? killer)
@@ -151,7 +151,7 @@ public partial class MrsaEnragedElite : BaseEnemy
     protected override void CustomPhysicsProcess(float dt)
     {
         _ragePhase += dt * 6.0f;
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     public override void _Draw()
@@ -229,7 +229,7 @@ public partial class SyncytialMegaCapsid : TerminalBossEnemy
             TriggerTractionPulse();
         }
 
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     /// <summary>
@@ -326,7 +326,7 @@ public partial class PlasmodiumMacroSchizont : TerminalBossEnemy
             FeedOnRbc();
         }
 
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     /// <summary>
@@ -354,7 +354,7 @@ public partial class PlasmodiumMacroSchizont : TerminalBossEnemy
             }
         }
 
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     public override void Die(Node2D? killer)
@@ -487,7 +487,7 @@ public partial class HpyloriBiofilmCore : TerminalBossEnemy
             SpawnAcidScar();
         }
 
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     /// <summary>
@@ -646,13 +646,13 @@ public partial class PrpscAmyloidAggregate : TerminalBossEnemy
 
         // Only a small fraction leaks through until the crystalline shell is shattered.
         base.TakeDamage(Mathf.Max(1.0f, damage * (1.0f - ShellDamageAbsorption)), source, isCrit);
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     protected override void CustomPhysicsProcess(float dt)
     {
         _crystalPhase += dt * 1.4f;
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     public override void _Draw()

@@ -35,7 +35,7 @@ public partial class ToxoplasmaEnemy : BaseEnemy
         {
             _pulseTimer = 0.0f;
             _pullDuration = 1.6f;
-            QueueRedraw();
+            RedrawIfVisible();
         }
 
         if (_pullDuration > 0.0f)

@@ -98,7 +98,7 @@ public partial class StreptococcusChainLord : SubBossEnemy
         CheckSegmentCollisions(dt);
 
         BreatheTimer += dt;
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     private void UpdateSegments()
@@ -211,7 +211,7 @@ public partial class FluDriftCyclone : SubBossEnemy
             _driftTimer = 0.0f;
             TriggerAntigenicDrift();
         }
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     /// <summary>
@@ -248,7 +248,7 @@ public partial class FluDriftCyclone : SubBossEnemy
         Modulate = Colors.White * 1.8f;
         var tween = CreateTween();
         tween.TweenProperty(this, "modulate", Colors.White, 0.35);
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     public override void _Draw()
@@ -336,7 +336,7 @@ public partial class TbGranulomaBehemoth : SubBossEnemy
     protected override void CustomPhysicsProcess(float dt)
     {
         _waxPhase += dt * 2.2f;
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     public override void Die(Node2D? killer)
@@ -464,7 +464,7 @@ public partial class VacASecretor : SubBossEnemy
             _spawnTimer = 0.0f;
             SpawnAcidPool();
         }
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     private void SpawnAcidPool()
@@ -554,7 +554,7 @@ public partial class ToxoplasmaMegaCyst : SubBossEnemy
         if (CurrentHealth <= MaxHealth * BurstHealthRatio && TryConsumeSplitBurst())
             BurstTachyzoites();
 
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     /// <summary>

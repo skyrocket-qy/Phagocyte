@@ -76,7 +76,7 @@ public partial class CandidaEnemy : BaseEnemy
     {
         _hyphaeExtended = true;
         _hyphaeTimer = HyphaeChannelTime;
-        QueueRedraw();
+        RedrawIfVisible();
 
         Vector2 aim = targetPos ?? (GlobalPosition + Vector2.Right * HyphaeReach);
         SpawnHyphaeTelegraph(aim);
@@ -107,7 +107,7 @@ public partial class CandidaEnemy : BaseEnemy
     public void RetractHyphae()
     {
         _hyphaeExtended = false;
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     protected override void OnPreDamage(float damage, Node2D? source, bool isCrit)

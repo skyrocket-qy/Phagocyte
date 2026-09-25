@@ -62,7 +62,7 @@ public partial class FluDriftEnemy : BaseEnemy
         // 3. Flash effect
         FlashModulate(Colors.White * 2.0f, 0.3f);
 
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     public override void _Draw()

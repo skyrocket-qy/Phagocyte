@@ -40,7 +40,7 @@ public partial class StaphEnemy : BaseEnemy
             Color color = baseGolden.Lightened((float)GD.RandRange(-0.1, 0.1));
             _clusterSpheres.Add(new SphereData(offset, radius, color));
         }
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     public override void _Draw()

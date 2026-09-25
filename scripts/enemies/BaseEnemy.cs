@@ -68,6 +68,10 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
     private Tween? _flashTween;
     private float _lastBreathe = 0.0f;
 
+    private bool _onScreen = true;
+    private float _breathAccum;
+    private const float BreathInterval = 1.0f / 30.0f;
+
     private static readonly HashSet<BaseEnemy> _activeEnemies = new();
     public static IReadOnlyCollection<BaseEnemy> ActiveEnemies => _activeEnemies;
 
@@ -96,6 +100,8 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         }
 
         BossPhase = GetNodeOrNull<BossPhaseComponent>("BossPhaseComponent");
+
+        SetupScreenCull();
 
         EnsureCollisionNodes();
         SetupEnemy();
@@ -150,6 +156,58 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         return GlobalPosition.DistanceSquaredTo(player.GlobalPosition) < reach * reach;
     }
 
+    /// <summary>
+    /// Off-screen draw cull: a notifier sized to the body envelope flips
+    /// <c>_onScreen</c>; culled enemies skip redraw queues.
+    /// Defaults to visible so headless suites (no viewport
+    /// signals) behave exactly as before.
+    /// </summary>
+    private void SetupScreenCull()
+    {
+        float r = GetCollisionRadius() * 1.5f;
+        var notifier = new VisibleOnScreenNotifier2D
+        {
+            Name = "ScreenCull",
+            Rect = new Rect2(-r, -r, r * 2.0f, r * 2.0f)
+        };
+        AddChild(notifier);
+        notifier.ScreenEntered += OnScreenEntered;
+        notifier.ScreenExited += OnScreenExited;
+    }
+
+    /// <summary>
+    /// Far-enemy sleep: off-screen non-boss enemies skip their physics
+    /// tick entirely (no AI, no transform churn). They stay in the tree and
+    /// all groups, so scans, engulf checks and batching still see them.
+    /// State self-heals every 30 ticks from the notifier, so missed signals
+    /// (e.g. spawned directly off-screen) cannot stick. Engulf range sits
+    /// well inside the screen, so a sleeping enemy can never be relevant.
+    /// </summary>
+    private int _cullTick;
+
+    private void SyncCullState()
+    {
+        var n = GetNodeOrNull<VisibleOnScreenNotifier2D>("ScreenCull");
+        if (n != null)
+            _onScreen = n.IsOnScreen();
+    }
+    private void OnScreenEntered()
+    {
+        _onScreen = true;
+    }
+
+    private void OnScreenExited()
+    {
+        _onScreen = false;
+    }
+
+    /// <summary>Queue a redraw only when the body is on screen.</summary>
+    protected void RedrawIfVisible()
+    {
+        if (_onScreen)
+            QueueRedraw();
+    }
+
     private void EnsureCollisionNodes()
     {
         HitArea = GetNodeOrNull<Area2D>("HitArea");
@@ -183,6 +241,14 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
 
     public override void _PhysicsProcess(double delta)
     {
+        _cullTick++;
+        // Headless suites have no viewport: skip entirely so behavior there
+        // is bit-identical to before (signals never fire headless either).
+        if ((_cullTick % 30) == 1 && DisplayServer.GetName() != "headless")
+            SyncCullState();
+        if (!_onScreen && !IsBoss)
+            return;
+
         float dt = (float)delta;
 
         if (StunTimer > 0.0f)
@@ -204,13 +270,20 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         HandleBrownianDrift(dt);
         CustomPhysicsProcess(dt);
 
-        // Organic respiration (transform sync only on visible change).
-        BreatheTimer += dt;
-        float breathe = 1.0f + Mathf.Sin(BreatheTimer * 2.5f) * 0.04f;
-        if (Mathf.Abs(breathe - _lastBreathe) > 0.001f)
+        // Organic respiration at 30 Hz like the deform rebuild: the slow
+        // sine is invisible per-tick, and gating avoids dirtying the whole
+        // subtree transform (plus physics/render sync) 60 times a second.
+        _breathAccum += dt;
+        if (_breathAccum >= BreathInterval)
         {
-            _lastBreathe = breathe;
-            Scale = new Vector2(breathe, breathe);
+            BreatheTimer += _breathAccum;
+            _breathAccum = 0.0f;
+            float breathe = 1.0f + Mathf.Sin(BreatheTimer * 2.5f) * 0.04f;
+            if (Mathf.Abs(breathe - _lastBreathe) > 0.001f)
+            {
+                _lastBreathe = breathe;
+                Scale = new Vector2(breathe, breathe);
+            }
         }
     }
 
@@ -279,7 +352,7 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         if (FibrinShield > 0)
         {
             FibrinShield--;
-            QueueRedraw();
+            RedrawIfVisible();
             return;
         }
 
@@ -327,7 +400,7 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         }
         else
         {
-            QueueRedraw();
+            RedrawIfVisible();
         }
 
         OnPostDamage(damage, source, isCrit);
@@ -540,7 +613,7 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
         if (FibrinShield > 0)
         {
             FibrinShield--;
-            QueueRedraw();
+            RedrawIfVisible();
         }
     }
 

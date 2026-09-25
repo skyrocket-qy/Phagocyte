@@ -71,7 +71,7 @@ public partial class EbolaEnemy : BaseEnemy
             }
         }
 
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     public override void _Draw()

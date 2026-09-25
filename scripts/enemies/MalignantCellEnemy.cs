@@ -54,7 +54,7 @@ public partial class MalignantCellEnemy : BaseEnemy
             TryMitosis();
         }
 
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public partial class MalignantCellEnemy : BaseEnemy
 
         SplitCount++;
         _splitPulse = 0.45f;
-        QueueRedraw();
+        RedrawIfVisible();
         return true;
     }
 

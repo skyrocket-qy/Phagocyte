@@ -99,7 +99,7 @@ public partial class EColiEnemy : BaseEnemy
                 break;
         }
 
-        QueueRedraw();
+        RedrawIfVisible();
     }
 
     public override void _Draw()
