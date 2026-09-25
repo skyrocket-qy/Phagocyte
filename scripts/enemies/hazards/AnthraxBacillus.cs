@@ -60,7 +60,6 @@ public partial class AnthraxBacillus : BaseEnemy
             Radius = 70.0f,
             TelegraphDuration = 1.1f,
             Damage = 22.0f * DamageMultiplier,
-            SourceEnemy = this
         };
         parent.AddChild(attack);
     }

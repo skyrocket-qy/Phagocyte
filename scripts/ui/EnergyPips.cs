@@ -12,7 +12,6 @@ namespace Phagocyte.UI;
 public partial class EnergyPips : Control
 {
     public static readonly Color FillColor = new(0.20f, 0.78f, 0.95f);
-    public static readonly Color EmptyColor = new(0.16f, 0.21f, 0.28f);
     public static readonly Color GeneratorColor = new(1.0f, 0.38f, 0.38f);
     private static readonly Color RingColor = new(0.05f, 0.08f, 0.12f, 0.95f);
 

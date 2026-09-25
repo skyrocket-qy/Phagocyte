@@ -28,7 +28,6 @@ public partial class StreptococcusChainLord : SubBossEnemy
 {
     public const int SegmentCount = 10;
     public const float SegmentSpacing = 26.0f;
-    private const float SegmentRadius = 18.0f;
     private const float SegmentDamage = 14.0f;
     private const float SegmentHitInterval = 0.45f;
 

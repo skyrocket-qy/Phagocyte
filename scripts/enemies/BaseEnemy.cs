@@ -22,7 +22,6 @@ public abstract partial class BaseEnemy : Node2D, IDamageable
     [Export] public float AtpValue { get; set; } = 12.0f;
     [Export] public int BaseScore { get; set; } = 15;
     [Export] public float FloatSpeed { get; set; } = 35.0f;
-    [Export] public float DriftFrequency { get; set; } = 1.2f;
     [Export] public bool IsElite { get; set; } = false;
     [Export] public bool IsBoss { get; set; } = false;
 
@@ -57,7 +56,6 @@ public abstract partial class BaseEnemy : Node2D, IDamageable
     public BossPhaseComponent? BossPhase { get; private set; }
 
     public Area2D? HitArea { get; set; }
-    public CollisionShape2D? EnemyCollisionShape { get; set; }
 
     private Tween? _flashTween;
     private float _lastBreathe = 0.0f;
@@ -203,15 +201,15 @@ public abstract partial class BaseEnemy : Node2D, IDamageable
             AddChild(HitArea);
         }
 
-        EnemyCollisionShape = HitArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
-        if (EnemyCollisionShape == null)
+        CollisionShape2D? collisionShape = HitArea.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+        if (collisionShape == null)
         {
-            EnemyCollisionShape = new CollisionShape2D
+            collisionShape = new CollisionShape2D
             {
                 Name = "CollisionShape2D",
                 Shape = new CircleShape2D { Radius = GetCollisionRadius() }
             };
-            HitArea.AddChild(EnemyCollisionShape);
+            HitArea.AddChild(collisionShape);
         }
     }
 

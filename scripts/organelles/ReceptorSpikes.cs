@@ -86,7 +86,7 @@ public partial class ReceptorSpikes : ModularOrganelle
         return (Host?.CurrentRadius ?? 24.0f) + HoverOffset * area;
     }
 
-    private void Intercept(Node2D enemy, Vector2 outward)
+    private void Intercept(BaseEnemy enemy, Vector2 outward)
     {
         float damage = ContactDamage * GetStat("might");
         bool isCrit = Host!.Stats?.RollCritical() ?? false;
@@ -100,16 +100,9 @@ public partial class ReceptorSpikes : ModularOrganelle
         Vector2 tangent = new Vector2(-outward.Y, outward.X) * spinSign;
         Vector2 impulse = (outward * 0.7f + tangent * 0.3f).Normalized() * knockback;
 
-        if (enemy is BaseEnemy pushed)
-        {
-            pushed.Velocity += impulse;
-            if (StunOnIntercept > 0.0f)
-                pushed.ApplyStun(StunOnIntercept);
-        }
-        else
-        {
-            enemy.GlobalPosition += outward * 6.0f;
-        }
+        enemy.Velocity += impulse;
+        if (StunOnIntercept > 0.0f)
+            enemy.ApplyStun(StunOnIntercept);
 
         InterceptedCount++;
     }

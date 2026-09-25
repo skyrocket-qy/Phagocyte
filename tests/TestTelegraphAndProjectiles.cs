@@ -183,7 +183,7 @@ public partial class TestTelegraphAndProjectiles : SceneTree
         freshProjMgr.SetHost(barbHost);
 
         var skill = new DefensinBarbsSkill();
-        skill.Setup(barbHost, 0);
+        skill.Setup(barbHost);
 
         int activeBefore = freshProjMgr.ActiveCount;
         skill.Trigger();

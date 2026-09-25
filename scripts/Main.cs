@@ -62,7 +62,6 @@ public partial class Main : Node2D, IRunContext
     public BaseEnemy? TerminalBoss => BossManager?.TerminalBoss;
     public bool TerminalBossNeutralized => BossManager?.TerminalBossNeutralized ?? false;
     public IReadOnlyList<BaseEnemy> RaidBosses => BossManager?.RaidBosses ?? Array.Empty<BaseEnemy>();
-    public int RaidBossCount => BossManager?.RaidBossCount ?? 0;
 
     // ---- Overdrive facades ----
     public int OverdriveCycle => Overdrive?.OverdriveCycle
@@ -341,7 +340,7 @@ public partial class Main : Node2D, IRunContext
 
             skill.Name = "TreeLoadout_" + node.Id;
             bc.AddChild(skill);
-            skill.Setup(bc, -1);
+            skill.Setup(bc);
         }
     }
 

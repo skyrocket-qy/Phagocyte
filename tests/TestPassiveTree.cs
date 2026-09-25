@@ -457,7 +457,7 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(skill).IsNotNull();
         AssertThat(skill!.Level).IsEqual(1);
         host.AddChild(skill);
-        skill.Setup(host, -1);
+        skill.Setup(host);
         // Start hubs carry no stat effects: only the CellStats base remains.
         AssertThat(stats.GetStat("crit_chance")).IsEqualApprox(0.05f, 0.001f);
 
@@ -469,7 +469,7 @@ public partial class TestPassiveTree : TestHarness
         var bundle = PassiveTreeManager.CreateStackedSkill("blood_price", 1);
         AssertThat(bundle is TreeStatBundleSkill).IsTrue();
         bundleHost.AddChild(bundle!);
-        bundle!.Setup(bundleHost, -1);
+        bundle!.Setup(bundleHost);
         AssertThat(bundleStats.GetStat("might")).IsEqualApprox(1.08f, 0.001f);
         AssertThat(bundleStats.GetStat("max_health")).IsEqualApprox(100.0f, 0.01f);
         bundleHost.QueueFree();

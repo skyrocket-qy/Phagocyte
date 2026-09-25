@@ -47,7 +47,6 @@ public partial class AchievementGalleryView : Control
     public Label? DetailReward { get; private set; }
     public Label? DetailSteam { get; private set; }
 
-    private readonly System.Collections.Generic.Dictionary<string, PanelContainer> _cards = new();
     private Callable _langCallback;
     private Callable _achUnlockCallback;
 
@@ -149,7 +148,6 @@ public partial class AchievementGalleryView : Control
         if (CardList == null)
             return;
 
-        _cards.Clear();
         foreach (var child in CardList.GetChildren())
         {
             CardList.RemoveChild(child);
@@ -266,8 +264,6 @@ public partial class AchievementGalleryView : Control
                 : Tr("STATUS_ACH_LOCKED");
             DetailSteam.Text = TextFormatter.Format(Tr("ACH_STEAM_ID_FMT"), apiName) + " · " + syncState;
         }
-
-        RefreshCardSelection();
     }
 
     private void ClearDetail()
@@ -309,17 +305,4 @@ public partial class AchievementGalleryView : Control
         return new Color(1.0f, 0.84f, 0.35f);
     }
 
-    private void RefreshCardSelection()
-    {
-        foreach (var kv in _cards)
-        {
-            if (!GodotObject.IsInstanceValid(kv.Value))
-                continue;
-            kv.Value.AddThemeColorOverride("font_color", Colors.White);
-            // Selected card glows: full modulate; others slightly dimmed.
-            var baseMod = kv.Value.Modulate;
-            baseMod.A = kv.Key == ActiveAchievementId ? 1.0f : 0.92f;
-            kv.Value.Modulate = baseMod;
-        }
-    }
 }

@@ -37,8 +37,6 @@ public sealed class QuadTree<T>
     /// <summary>Inserted item count of the last rebuild.</summary>
     public int Count { get; private set; }
 
-    public Rect2 Bounds => _bounds;
-
     public QuadTree(Rect2 bounds, int capacity = 8, int maxDepth = 6)
     {
         _bounds = bounds;

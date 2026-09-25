@@ -22,13 +22,11 @@ public class BossPhaseDef
 /// </summary>
 public partial class BossPhaseComponent : Node
 {
-    public string BossId { get; set; } = "pathogen_boss";
     public int CurrentPhaseIndex { get; private set; } = 1;
     public bool IsEnraged { get; private set; } = false;
     public bool IsHardEnraged { get; private set; } = false;
 
     public float HardEnrageSeconds { get; set; } = 120.0f;
-    public float HardEnrageDamageMult { get; set; } = 1.6f;
     public float HardEnrageSpeedMult { get; set; } = 1.4f;
 
     // Ground danger telegraph tuning (terminal bosses scale these up)

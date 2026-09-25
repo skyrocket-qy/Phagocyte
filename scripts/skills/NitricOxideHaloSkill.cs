@@ -74,9 +74,9 @@ public partial class NitricOxideHaloSkill : BaseSkill
         MaxLevel = 5;
     }
 
-    public override void Setup(CharacterBody2D pHost, int pSlot)
+    public override void Setup(CharacterBody2D pHost)
     {
-        base.Setup(pHost, pSlot);
+        base.Setup(pHost);
         if (_visual == null)
         {
             _visual = new HaloVisual { Skill = this };

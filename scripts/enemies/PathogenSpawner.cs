@@ -67,9 +67,6 @@ public static class PathogenSpawner
 
     private static RunConfig _active = new();
 
-    /// <summary>The configuration of the currently running scene (never null).</summary>
-    public static RunConfig Active => _active;
-
     /// <summary>Replaces the run configuration. Called by Main per scene.</summary>
     public static void ConfigureRun(RunConfig config)
     {
@@ -81,9 +78,6 @@ public static class PathogenSpawner
     {
         _active = new RunConfig();
     }
-
-    /// <summary>True while the running scene is an endless overdrive run.</summary>
-    public static bool OverdriveEnabled => _active.Overdrive;
 
     /// <summary>Called by Main per scene: endless runs enable ladder scaling on every spawn.</summary>
     public static void ConfigureOverdrive(bool enabled)
@@ -578,7 +572,6 @@ public static class PathogenSpawner
         var phases = new BossPhaseComponent
         {
             Name = "BossPhaseComponent",
-            BossId = enemy.EnemyId,
             HardEnrageSeconds = hardEnrageSeconds
         };
         phases.SetupDefaultPhases();

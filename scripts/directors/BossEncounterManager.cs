@@ -36,9 +36,6 @@ public partial class BossEncounterManager : Node
     /// <summary>Alive multi-boss incursion bosses drawn from other organs.</summary>
     public IReadOnlyList<BaseEnemy> RaidBosses => _raidBosses;
 
-    /// <summary>Alive boss-incursion count (GDScript-friendly scalar view).</summary>
-    public int RaidBossCount => _raidBosses.Count;
-
     /// <summary>Evaluates the 09:00 sub-boss trigger. Call once per physics frame.</summary>
     public void PhysicsTick(float dt)
     {

@@ -44,8 +44,6 @@ public partial class CapillaryTissueLayer : Node2D
     private Vector2[] _scratchShifted = Array.Empty<Vector2>();
     private Vector2[] _scratchSheen = Array.Empty<Vector2>();
 
-    public IReadOnlyList<VesselData> Vessels => _vessels;
-
     public override void _Ready()
     {
         ZIndex = -4;

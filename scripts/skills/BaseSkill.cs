@@ -27,7 +27,7 @@ public partial class BaseSkill : Node2D
     public CharacterBody2D? Host { get; set; } = null;
     public Node? Stats { get; set; } = null;
 
-    public virtual void Setup(CharacterBody2D pHost, int pSlot)
+    public virtual void Setup(CharacterBody2D pHost)
     {
         Host = pHost;
 

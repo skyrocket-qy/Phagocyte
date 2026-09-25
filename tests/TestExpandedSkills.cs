@@ -107,7 +107,7 @@ public partial class TestExpandedSkills : SceneTree
         float baseHp = cellStats.GetStat("max_health");
         float baseArmor = cellStats.GetStat("armor");
         var bilayer = new PassiveBilayerHardening();
-        bilayer.Setup(dummyHost, 0);
+        bilayer.Setup(dummyHost);
         AssertThat(cellStats.GetStat("max_health")).IsEqualApprox(baseHp * 1.15f, 0.01f);
         AssertThat(cellStats.GetStat("armor")).IsEqual(baseArmor + 2.0f);
         bilayer.Upgrade(); // Lv.2
@@ -119,7 +119,7 @@ public partial class TestExpandedSkills : SceneTree
 
         // 4.2 Autophagic Recycle: HealthRegen +0.4 HP/s per level
         var autophagy = new PassiveAutophagicRecycle();
-        autophagy.Setup(dummyHost, 0);
+        autophagy.Setup(dummyHost);
         AssertThat(cellStats.GetStat("health_regen")).IsEqualApprox(0.4f, 0.01f);
         autophagy.Upgrade(); // Lv.2
         AssertThat(cellStats.GetStat("health_regen")).IsEqualApprox(0.8f, 0.01f);
@@ -128,14 +128,14 @@ public partial class TestExpandedSkills : SceneTree
 
         // 4.3 Aerobic Glycolysis: Move Speed +6%, Might +5% per level
         var glycolysis = new PassiveAerobicGlycolysis();
-        glycolysis.Setup(dummyHost, 0);
+        glycolysis.Setup(dummyHost);
         AssertThat(cellStats.GetStat("move_speed")).IsEqualApprox(230.0f * 1.06f, 0.5f);
         AssertThat(cellStats.GetStat("might")).IsEqualApprox(1.05f, 0.01f);
         glycolysis.RemovePassiveModifiers();
 
         // 4.4 Kinesin Transit: Speed +15%, Pierce +1
         var kinesin = new PassiveKinesinTransit();
-        kinesin.Setup(dummyHost, 0);
+        kinesin.Setup(dummyHost);
         AssertThat(cellStats.GetStat("projectile_speed")).IsEqualApprox(1.15f, 0.01f);
         AssertThat(cellStats.GetStat("pierce")).IsEqual(1.0f);
         kinesin.Upgrade();
@@ -145,28 +145,28 @@ public partial class TestExpandedSkills : SceneTree
 
         // 4.5 Cytokine Longevity: Duration +15%, Knockback +10% per level
         var longevity = new PassiveCytokineLongevity();
-        longevity.Setup(dummyHost, 0);
+        longevity.Setup(dummyHost);
         AssertThat(cellStats.GetStat("duration")).IsEqualApprox(1.15f, 0.01f);
         AssertThat(cellStats.GetStat("knockback")).IsEqualApprox(1.10f, 0.01f);
         longevity.RemovePassiveModifiers();
 
         // 4.6 V(D)J Diversity: CritDamage +15%, CritChance +3% per level
         var vdj = new PassiveVdjDiversity();
-        vdj.Setup(dummyHost, 0);
+        vdj.Setup(dummyHost);
         AssertThat(cellStats.GetStat("crit_damage")).IsEqualApprox(2.30f, 0.01f);
         AssertThat(cellStats.GetStat("crit_chance")).IsEqualApprox(0.08f, 0.01f);
         vdj.RemovePassiveModifiers();
 
         // 4.7 Endotoxin Barrier: Armor +3, Block +4% per level
         var endotoxin = new PassiveEndotoxinBarrier();
-        endotoxin.Setup(dummyHost, 0);
+        endotoxin.Setup(dummyHost);
         AssertThat(cellStats.GetStat("armor")).IsEqual(3.0f);
         AssertThat(cellStats.GetStat("block")).IsEqualApprox(0.04f, 0.01f);
         endotoxin.RemovePassiveModifiers();
 
         // 4.8 Hematopoietic Reserve: MaxHP +10%, Block +3%
         var hematopoietic = new PassiveHematopoieticReserve();
-        hematopoietic.Setup(dummyHost, 0);
+        hematopoietic.Setup(dummyHost);
         AssertThat(cellStats.GetStat("max_health")).IsEqualApprox(110.0f, 0.1f);
         AssertThat(cellStats.GetStat("block")).IsEqualApprox(0.03f, 0.01f);
         hematopoietic.RemovePassiveModifiers();

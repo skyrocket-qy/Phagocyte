@@ -34,9 +34,9 @@ public partial class MhcTracerBeamSkill : BaseSkill
         MaxLevel = 5;
     }
 
-    public override void Setup(CharacterBody2D pHost, int pSlot)
+    public override void Setup(CharacterBody2D pHost)
     {
-        base.Setup(pHost, pSlot);
+        base.Setup(pHost);
         if (_tracer == null)
         {
             _tracer = new TracerVisual { Skill = this };

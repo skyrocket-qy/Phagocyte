@@ -156,19 +156,13 @@ public partial class AilmentController : Node
             _leakTimer -= dt;
             float leak = _leakDps * dt;
 
-            // Check if parent entity is moving
+            // Check if parent entity is moving via its Velocity property
             if (GetParent() is Node2D parent2D)
             {
                 bool isMoving = false;
-                if (parent2D is CharacterBody2D cb)
-                    isMoving = cb.Velocity.LengthSquared() > 0.1f;
-                else
-                {
-                    // Check BaseEnemy's Velocity property
-                    var velProp = parent2D.Get("Velocity");
-                    if (velProp.VariantType == Variant.Type.Vector2)
-                        isMoving = velProp.AsVector2().LengthSquared() > 0.1f;
-                }
+                var velProp = parent2D.Get("Velocity");
+                if (velProp.VariantType == Variant.Type.Vector2)
+                    isMoving = velProp.AsVector2().LengthSquared() > 0.1f;
 
                 if (isMoving)
                 {

@@ -5,7 +5,4 @@ namespace Phagocyte.Combat;
 /// Replaces per-hit <c>Godot.Collections.Dictionary</c> allocation in
 /// <c>BaseSkill.GetCalculatedDamage</c> (zero GC on the combat hot path).
 /// </summary>
-public readonly record struct DamageResult(float Damage, bool IsCrit)
-{
-    public static readonly DamageResult Zero = new(0.0f, false);
-}
+public readonly record struct DamageResult(float Damage, bool IsCrit);

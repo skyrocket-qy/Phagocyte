@@ -81,9 +81,9 @@ public partial class NucleaseBladesSkill : BaseSkill
         MaxLevel = 5;
     }
 
-    public override void Setup(CharacterBody2D pHost, int pSlot)
+    public override void Setup(CharacterBody2D pHost)
     {
-        base.Setup(pHost, pSlot);
+        base.Setup(pHost);
         if (_canvas == null)
         {
             _canvas = new BladesCanvas { Skill = this };

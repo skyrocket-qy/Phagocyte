@@ -96,7 +96,6 @@ public partial class BaseCell : CharacterBody2D
 
     // Inertial Nucleus offset
     public Vector2 NucleusOffset { get; set; } = Vector2.Zero;
-    public Vector2 NucleusTargetOffset { get; set; } = Vector2.Zero;
     public Vector2 NucleusVelocity { get; set; } = Vector2.Zero;
 
     // Status debuffs
@@ -467,7 +466,6 @@ public partial class BaseCell : CharacterBody2D
         {
             // Dodge roll: locked-direction burst, no steering mid-dash.
             Velocity = DodgeDirection * DodgeDashSpeed + EnvironmentDrift;
-            NucleusTargetOffset = -DodgeDirection * (CurrentRadius * 0.28f);
             MoveAndSlide();
             return;
         }
@@ -477,18 +475,15 @@ public partial class BaseCell : CharacterBody2D
             inputVec = inputVec.Normalized();
             Vector2 targetVelocity = inputVec * CurrentSpeed + EnvironmentDrift;
             Velocity = Velocity.MoveToward(targetVelocity, CurrentSpeed * 5.0f * delta);
-            NucleusTargetOffset = -inputVec * (CurrentRadius * 0.28f);
         }
         else if (EnvironmentDrift != Vector2.Zero)
         {
             // Fluid current keeps dragging the cell even without input (docs/map.md §3).
             Velocity = Velocity.MoveToward(EnvironmentDrift, CurrentSpeed * 4.0f * delta);
-            NucleusTargetOffset = Vector2.Zero;
         }
         else
         {
             Velocity = Velocity.MoveToward(Vector2.Zero, CurrentSpeed * 4.0f * delta);
-            NucleusTargetOffset = Vector2.Zero;
         }
 
         MoveAndSlide();
@@ -751,21 +746,6 @@ public partial class BaseCell : CharacterBody2D
         }
 
         _granuleCanvas.QueueRedraw();
-    }
-
-    /// <summary>
-    /// Closed Catmull-Rom Spline interpolation.
-    /// Converts N control points into N * subdivisions smoothly curving vertices.
-    /// </summary>
-    public static Vector2[] SmoothClosedPolygon(Vector2[] pts, int subdivisions = 2)
-    {
-        int n = pts.Length;
-        if (n < 4 || subdivisions <= 1)
-            return pts;
-
-        var smoothed = new Vector2[n * subdivisions];
-        SmoothClosedPolygonInto(pts, subdivisions, smoothed);
-        return smoothed;
     }
 
     /// <summary>Allocation-free Catmull-Rom core (writes into a reused buffer).</summary>

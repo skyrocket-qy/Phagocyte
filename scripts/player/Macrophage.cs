@@ -65,11 +65,6 @@ public partial class Macrophage : BaseCell
         Stats.SetBase("block", 0.08f);
     }
 
-    public override void _Ready()
-    {
-        base._Ready();
-    }
-
     public override void SetupInitialSkills()
     {
         if (CellSkillManager != null)

@@ -28,9 +28,6 @@ public partial class TelegraphedAttack : Node2D
     [Export] public Vector2 TargetDirection { get; set; } = Vector2.Right;
     [Export] public float TelegraphDuration { get; set; } = 1.2f;
     [Export] public float Damage { get; set; } = 25.0f;
-    [Export] public Node2D? SourceEnemy { get; set; }
-
-    public event Action? OnImpactExecuted;
 
     private float _timer = 0.0f;
     private static readonly Vector2[] MultiCircleOffsets =
@@ -125,8 +122,6 @@ public partial class TelegraphedAttack : Node2D
 
     public void ExecuteImpact()
     {
-        OnImpactExecuted?.Invoke();
-
         var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
         if (player == null || !GodotObject.IsInstanceValid(player))
             return;

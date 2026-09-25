@@ -17,8 +17,6 @@ public partial class UpgradeModal : ModalBase
     [Signal]
     public delegate void ChoiceAppliedEventHandler(Dictionary choice);
 
-    public static PackedScene SlotScene => AssetLoader.Load<PackedScene>("res://scenes/ui/organelle_slot.tscn");
-
     /// <summary>Discarded organelles heal this fraction of max HP (Phase 2).</summary>
     public const float DiscardHealRatio = 0.15f;
 

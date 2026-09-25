@@ -115,7 +115,7 @@ public partial class SkillManager : Node2D
         ActiveSlots[slotIdx] = skill;
         AddChild(skill);
         if (Host != null)
-            skill.Setup(Host, slotIdx);
+            skill.Setup(Host);
         EmitSignal(SignalName.SkillsChanged);
     }
 
@@ -129,7 +129,7 @@ public partial class SkillManager : Node2D
         PassiveSlots[slotIdx] = skill;
         AddChild(skill);
         if (Host != null)
-            skill.Setup(Host, slotIdx);
+            skill.Setup(Host);
         EmitSignal(SignalName.SkillsChanged);
     }
 

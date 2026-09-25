@@ -21,7 +21,6 @@ public static class UiBuilders
     public static readonly StyleBox TabHoverStyle =
         AssetLoader.Load<StyleBox>("res://assets/theme/tab_button_hover.tres");
 
-    public static readonly Color BadgeInnateColor = new Color(0.4f, 0.95f, 0.8f);
     public static readonly Color BadgeActiveColor = new Color(1.0f, 0.85f, 0.3f);
     public static readonly Color BadgePassiveColor = new Color(0.6f, 0.8f, 1.0f);
 

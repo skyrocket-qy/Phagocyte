@@ -18,8 +18,6 @@ public partial class NeutralMatterManager : Node
     /// <summary>Run context (Main). Must be assigned before use.</summary>
     public IRunContext? Context { get; set; }
 
-    public int UlcerationPulses => HostUlceration.Pulses;
-
     private float _neutralSpawnTimer = NeutralSpawnInterval;
     private float _ulcerHazardTimer = 12.0f;
 

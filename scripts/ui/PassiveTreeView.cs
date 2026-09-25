@@ -977,7 +977,7 @@ public partial class PassiveTreeView : Control
             bool lit = fromActive && toActive;
             bool highlighted = HoveredNodeId == edge.From || HoveredNodeId == edge.To
                 || SelectedNodeId == edge.From || SelectedNodeId == edge.To;
-            Color color = GetEdgeColor(edge.From, edge.To, lit, highlighted);
+            Color color = GetEdgeColor(lit, highlighted);
             float width = (lit ? 4.4f : 2.0f) + (highlighted ? 1.4f : 0.0f);
 
             layer.DrawLine(from, to, new Color(color.R, color.G, color.B, color.A * 0.28f), width * 3.0f, true);
@@ -1051,8 +1051,8 @@ public partial class PassiveTreeView : Control
                 ? rarityColor.Lightened(0.25f)
                 : new Color(dormantEdge.R, dormantEdge.G, dormantEdge.B, hovered ? 0.75f : 0.5f);
 
-            layer.DrawColoredPolygon(NodeShape(node, radius, wobblePhase), fill);
-            layer.DrawPolyline(ClosedShape(node, radius, wobblePhase), edge,
+            layer.DrawColoredPolygon(NodeShape(node, radius), fill);
+            layer.DrawPolyline(ClosedShape(node, radius), edge,
                 node.Rarity == PassiveTreeManager.TreeRarity.Unique ? 7.0f : 5.0f, true);
 
             if (isStart)
@@ -1092,29 +1092,16 @@ public partial class PassiveTreeView : Control
         return (hash % 997) / 997.0f;
     }
 
-    private static Vector2[] NodeShape(PassiveTreeManager.TreeNode node, float radius, float wobblePhase)
+    private static Vector2[] NodeShape(PassiveTreeManager.TreeNode node, float radius)
     {
         // All rarities share one circular frame; rarity reads from size + color.
         // No wobble here: the distortion made circles read as lumpy.
         return PolygonPoints(node.Position, radius, 48, 0.0f);
     }
 
-    private static Vector2[] Wobble(Vector2[] points, Vector2 center, float phase)
+    private static Vector2[] ClosedShape(PassiveTreeManager.TreeNode node, float radius)
     {
-        var result = new Vector2[points.Length];
-        for (int i = 0; i < points.Length; i++)
-        {
-            Vector2 direction = points[i] - center;
-            float angle = direction.Angle();
-            float scale = 1.0f + 0.045f * Mathf.Sin(angle * 4.0f + phase);
-            result[i] = center + direction * scale;
-        }
-        return result;
-    }
-
-    private static Vector2[] ClosedShape(PassiveTreeManager.TreeNode node, float radius, float wobblePhase)
-    {
-        var shape = NodeShape(node, radius, wobblePhase);
+        var shape = NodeShape(node, radius);
         var closed = new Vector2[shape.Length + 1];
         System.Array.Copy(shape, closed, shape.Length);
         if (shape.Length > 0)
@@ -1172,7 +1159,7 @@ public partial class PassiveTreeView : Control
     /// </summary>
     private static readonly Color EdgeBaseColor = new(0.34f, 0.48f, 0.66f, 1.0f);
 
-    private static Color GetEdgeColor(string fromId, string toId, bool lit, bool highlighted)
+    private static Color GetEdgeColor(bool lit, bool highlighted)
     {
         if (!lit)
             return new Color(EdgeBaseColor.R, EdgeBaseColor.G, EdgeBaseColor.B, 0.26f);

@@ -144,7 +144,7 @@ public partial class TestBuildStatsPreview : TestHarness
             if (skill == null)
                 continue;
             player.AddChild(skill);
-            skill.Setup(player, -1);
+            skill.Setup(player);
         }
 
         AssertThat(player.Stats).IsNotNull();

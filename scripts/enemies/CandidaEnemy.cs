@@ -99,7 +99,6 @@ public partial class CandidaEnemy : BaseEnemy
             LineWidth = 30.0f,
             TelegraphDuration = 0.9f,
             Damage = 18.0f,
-            SourceEnemy = this
         };
         parent.AddChild(attack);
     }
