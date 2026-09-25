@@ -101,8 +101,6 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
 
         BossPhase = GetNodeOrNull<BossPhaseComponent>("BossPhaseComponent");
 
-        SetupScreenCull();
-
         EnsureCollisionNodes();
         SetupEnemy();
     }
@@ -163,48 +161,28 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
     }
 
     /// <summary>
-    /// Off-screen draw cull: a notifier sized to the body envelope flips
-    /// <c>_onScreen</c>; culled enemies skip redraw queues.
-    /// Defaults to visible so headless suites (no viewport
-    /// signals) behave exactly as before.
-    /// </summary>
-    private void SetupScreenCull()
-    {
-        float r = GetCollisionRadius() * 1.5f;
-        var notifier = new VisibleOnScreenNotifier2D
-        {
-            Name = "ScreenCull",
-            Rect = new Rect2(-r, -r, r * 2.0f, r * 2.0f)
-        };
-        AddChild(notifier);
-        notifier.ScreenEntered += OnScreenEntered;
-        notifier.ScreenExited += OnScreenExited;
-    }
-
-    /// <summary>
-    /// Far-enemy sleep: off-screen non-boss enemies skip their physics
-    /// tick entirely (no AI, no transform churn). They stay in the tree and
-    /// all groups, so scans, engulf checks and batching still see them.
-    /// State self-heals every 30 ticks from the notifier, so missed signals
-    /// (e.g. spawned directly off-screen) cannot stick. Engulf range sits
-    /// well inside the screen, so a sleeping enemy can never be relevant.
+    /// Far-enemy sleep + draw cull, driven by camera distance
+    /// (see SyncCullState). Non-boss enemies outside the sleep range skip
+    /// their physics tick entirely and queue no redraws. They stay in the
+    /// tree and all groups, so scans, engulf checks and batching still see
+    /// them. Engulf range sits well inside the screen, so a sleeping enemy
+    /// can never be interactively relevant.
     /// </summary>
     private int _cullTick;
 
     private void SyncCullState()
     {
-        var n = GetNodeOrNull<VisibleOnScreenNotifier2D>("ScreenCull");
-        if (n != null)
-            _onScreen = n.IsOnScreen();
-    }
-    private void OnScreenEntered()
-    {
-        _onScreen = true;
-    }
-
-    private void OnScreenExited()
-    {
-        _onScreen = false;
+        var vp = GetViewport();
+        var cam = vp?.GetCamera2D();
+        if (cam == null || vp == null)
+        {
+            _onScreen = true;
+            return;
+        }
+        float zoom = cam.Zoom.X > 0.0f ? cam.Zoom.X : 1.0f;
+        float range = vp.GetVisibleRect().Size.Length() * 0.5f / zoom
+            + GetCollisionRadius() + 200.0f;
+        _onScreen = GlobalPosition.DistanceSquaredTo(cam.GlobalPosition) < range * range;
     }
 
     /// <summary>Queue a redraw only when the body is on screen.</summary>
