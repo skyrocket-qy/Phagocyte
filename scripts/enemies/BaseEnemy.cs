@@ -143,6 +143,12 @@ public abstract partial class BaseEnemy : Node2D, IDamageable, IEngulfable
     public float BodyRadius => GetCollisionRadius();
 
     /// <summary>
+    /// Batch variant override (e.g. dormant/retracted states with distinct art).
+    /// Null selects the base EnemyId species. Visual only; logic untouched.
+    /// </summary>
+    public virtual string? BatchSpeciesOverride => null;
+
+    /// <summary>
     /// True when this enemy overlaps a live player cell, using the player's
     /// current radius plus <paramref name="margin"/>. Shared by contact effects.
     /// </summary>

@@ -23,6 +23,8 @@ public partial class CandidaEnemy : BaseEnemy
 
     public bool IsHyphaeExtended => _hyphaeExtended;
 
+    public override string? BatchSpeciesOverride => IsHyphaeExtended ? null : "candida_retracted";
+
     public CandidaEnemy()
     {
         EnemyId = "candida";

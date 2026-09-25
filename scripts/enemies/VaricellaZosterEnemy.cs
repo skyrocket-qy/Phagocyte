@@ -12,6 +12,10 @@ namespace Phagocyte.Enemies;
 public partial class VaricellaZosterEnemy : BaseEnemy
 {
     private bool _isAwakened = false;
+
+    public bool IsAwakened => _isAwakened;
+
+    public override string? BatchSpeciesOverride => IsAwakened ? null : "varicella_dormant";
     private const float DrawScale = 10.0f / 14.0f; // A-formula visual match: 14px -> 10px
 
     public VaricellaZosterEnemy()
