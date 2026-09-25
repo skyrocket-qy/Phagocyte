@@ -330,11 +330,10 @@ public partial class Main : Node2D, IRunContext
         string classId = GameManager.SelectedClass;
         foreach (var node in PassiveTreeManager.Nodes)
         {
-            int stacks = PassiveTreeManager.GetNodeStacks(classId, node.Id);
-            if (stacks <= 0)
+            if (!PassiveTreeManager.IsPlaced(classId, node.Id))
                 continue;
 
-            var skill = PassiveTreeManager.CreateStackedSkill(node.Id, stacks);
+            var skill = PassiveTreeManager.CreateSkill(node.Id);
             if (skill == null)
                 continue;
 

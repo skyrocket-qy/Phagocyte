@@ -41,7 +41,7 @@ offset_bottom = 38.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
 theme_override_font_sizes/font_size = 20
-text = "天赋树选择"
+text = "Talents"
 horizontal_alignment = 1
 
 [node name="InfoHBox" type="HBoxContainer" parent="." unique_id=1263547480]
@@ -60,14 +60,14 @@ theme_override_constants/separation = 24
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 12
-text = "天赋等级：1"
+text = "Cell Level: 1"
 
 [node name="TreePointsLabel" type="Label" parent="InfoHBox" unique_id=1446785754]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
 theme_override_font_sizes/font_size = 12
-text = "被动点数：0"
+text = "Talent Points: 0 available (0 spent)"
 horizontal_alignment = 2
 
 [node name="ContentHBox" type="HBoxContainer" parent="." unique_id=1525110732]
@@ -134,7 +134,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 13
-text = "重置天赋树"
+text = "Reset"
 
 [node name="ConfirmButton" type="Button" parent="Buttons" unique_id=1488780881]
 custom_minimum_size = Vector2(190, 36)
@@ -142,7 +142,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 13
-text = "下一步：选择病理战场"
+text = "Next"
 
 [node name="ZoomOutButton" type="Button" parent="Buttons" unique_id=620658355]
 custom_minimum_size = Vector2(80, 36)
@@ -150,7 +150,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 13
-text = "缩小"
+text = "Zoom Out"
 
 [node name="ZoomInButton" type="Button" parent="Buttons" unique_id=407904603]
 custom_minimum_size = Vector2(80, 36)
@@ -158,4 +158,4 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 13
-text = "放大"
+text = "Zoom In"

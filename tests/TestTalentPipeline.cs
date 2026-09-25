@@ -153,7 +153,7 @@ public partial class TestTalentPipeline : TestHarness
             AssertThat(PassiveTreeManager.IsInnateStartNode(cellId, start)).IsTrue();
 
             // Innately lit, free, permanent, and never purchasable/refundable.
-            AssertThat(PassiveTreeManager.GetNodeStacks(cellId, start)).IsEqual(PassiveTreeManager.InnateStartStacks);
+            AssertThat(PassiveTreeManager.IsPlaced(cellId, start)).IsTrue();
             AssertThat(PassiveTreeManager.GetSpentPoints(cellId)).IsEqual(0);
             AssertThat(PassiveTreeManager.Purchase(cellId, start)).IsFalse();
             AssertThat(PassiveTreeManager.CanPurchase(cellId, start)).IsFalse();
@@ -175,7 +175,7 @@ public partial class TestTalentPipeline : TestHarness
         // The innate hub survives persistence and is not written into the save payload.
         PassiveTreeManager.SaveToDisk();
         PassiveTreeManager.ReloadFromDisk();
-        AssertThat(PassiveTreeManager.GetNodeStacks("macrophage", macrophageStart)).IsEqual(PassiveTreeManager.InnateStartStacks);
+        AssertThat(PassiveTreeManager.IsPlaced("macrophage", macrophageStart)).IsTrue();
         AssertThat(PassiveTreeManager.GetSpentPoints("macrophage")).IsEqual(1);
         AssertThat(PassiveTreeManager.IsInnateStartNode("macrophage", macrophageStart)).IsTrue();
 

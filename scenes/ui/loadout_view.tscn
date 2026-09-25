@@ -99,7 +99,7 @@ theme_override_constants/separation = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.95, 1, 1)
 theme_override_font_sizes/font_size = 28
-text = "ORGANELLE ASSEMBLY // 活性胞器装配"
+text = "Loadout"
 horizontal_alignment = 1
 
 [node name="TopSeparator" type="HSeparator" parent="Margin/VBox" unique_id=2017758978]
@@ -138,7 +138,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 0.45, 0.4, 1)
 theme_override_font_sizes/font_size = 14
-text = "删除"
+text = "X"
 
 [node name="TopSpacer" type="Control" parent="Margin/VBox/ContentHBox/ChamberSide" unique_id=1771514811]
 layout_mode = 2
@@ -209,49 +209,49 @@ custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 toggle_mode = true
-text = "全部"
+text = "All"
 
 [node name="CategoryTab_metabolism" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 toggle_mode = true
-text = "能量代谢"
+text = "Metabolism"
 
 [node name="CategoryTab_digestion" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 toggle_mode = true
-text = "分解消化"
+text = "Digestion"
 
 [node name="CategoryTab_cytoskeleton" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 toggle_mode = true
-text = "运动骨架"
+text = "Cytoskeleton"
 
 [node name="CategoryTab_synthesis" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 toggle_mode = true
-text = "合成加工"
+text = "Synthesis"
 
 [node name="CategoryTab_sensing" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 toggle_mode = true
-text = "感应光环"
+text = "Sensing"
 
 [node name="CategoryTab_symbiosis" type="Button" parent="Margin/VBox/ContentHBox/VaultSide/CategoryTabBar"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 toggle_mode = true
-text = "外源共生"
+text = "Symbiosis"
 
 [node name="VaultScroll" type="ScrollContainer" parent="Margin/VBox/ContentHBox/VaultSide" unique_id=2066889475]
 layout_mode = 2
@@ -276,7 +276,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 15
-text = "清空腔室"
+text = "Clear"
 
 [node name="ConfirmButton" type="Button" parent="Margin/VBox/Buttons" unique_id=599102615]
 custom_minimum_size = Vector2(240, 46)
@@ -284,4 +284,4 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 16
-text = "下一步：天赋树"
+text = "Next"

@@ -11,7 +11,7 @@ public partial class GameManager : Node
     public static string SelectedClass = "macrophage";
     public static string SelectedMap = "acute_wound";
     public static string SelectedDifficulty = RunRecordManager.DifficultyNormal;
-    public static string CurrentLanguage = "zh_CN";
+    public static string CurrentLanguage = "en";
 
     /// <summary>
     /// True while the current run is the Endless Cytokine Storm mode (docs/endgame.md).

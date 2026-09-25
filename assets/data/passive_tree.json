@@ -378,8 +378,6 @@
       "branch": "vitality",
       "col": -2,
       "id": "lysosome",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 2,
       "trait": "lysosome"
     },
@@ -387,8 +385,6 @@
       "branch": "vitality",
       "col": -1,
       "id": "thick_cytoplasm",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 2,
       "trait": "thick_cytoplasm"
     },
@@ -396,8 +392,6 @@
       "branch": "vitality",
       "col": -1,
       "id": "bilayer",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 3,
       "trait": "bilayer"
     },
@@ -405,8 +399,6 @@
       "branch": "vitality",
       "col": -2,
       "id": "iron_membrane",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 3,
       "trait": "iron_membrane"
     },
@@ -414,8 +406,6 @@
       "branch": "vitality",
       "col": -1,
       "id": "rapid_clotting",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 1,
       "trait": "rapid_clotting"
     },
@@ -423,8 +413,6 @@
       "branch": "vitality",
       "col": -2,
       "id": "second_wind",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 1,
       "trait": "second_wind"
     },
@@ -432,8 +420,6 @@
       "branch": "vitality",
       "col": -3,
       "id": "endotoxin",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 1,
       "trait": "endotoxin"
     },
@@ -441,8 +427,6 @@
       "branch": "vitality",
       "col": -3,
       "id": "contained_fury",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 2,
       "trait": "contained_fury"
     },
@@ -450,8 +434,6 @@
       "branch": "vitality",
       "col": -3,
       "id": "autophagy",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 3,
       "trait": "autophagy"
     },
@@ -459,8 +441,6 @@
       "branch": "precision",
       "col": 1,
       "id": "opsonin",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 2,
       "trait": "opsonin"
     },
@@ -468,8 +448,6 @@
       "branch": "precision",
       "col": 2,
       "id": "vdj",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 2,
       "trait": "vdj"
     },
@@ -477,8 +455,6 @@
       "branch": "precision",
       "col": 2,
       "id": "assassins_mandate",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 3,
       "trait": "assassins_mandate"
     },
@@ -486,8 +462,6 @@
       "branch": "precision",
       "col": 0,
       "id": "precise_edge",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 2,
       "trait": "precise_edge"
     },
@@ -495,8 +469,6 @@
       "branch": "precision",
       "col": 0,
       "id": "marked_core",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 3,
       "trait": "marked_core"
     },
@@ -504,8 +476,6 @@
       "branch": "precision",
       "col": 0,
       "id": "execution_tempo",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 1,
       "trait": "execution_tempo"
     },
@@ -513,8 +483,6 @@
       "branch": "precision",
       "col": 1,
       "id": "blood_price",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 1,
       "trait": "blood_price"
     },
@@ -522,8 +490,6 @@
       "branch": "precision",
       "col": 2,
       "id": "deep_wound",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 1,
       "trait": "deep_wound"
     },
@@ -531,8 +497,6 @@
       "branch": "precision",
       "col": 1,
       "id": "lightfooted_killer",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 3,
       "trait": "lightfooted_killer"
     },
@@ -540,8 +504,6 @@
       "branch": "senses",
       "col": -2,
       "id": "chemokine",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -1,
       "trait": "chemokine"
     },
@@ -549,8 +511,6 @@
       "branch": "senses",
       "col": -2,
       "id": "far_sense",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 0,
       "trait": "far_sense"
     },
@@ -558,8 +518,6 @@
       "branch": "senses",
       "col": -1,
       "id": "antigen_harvest",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 0,
       "trait": "antigen_harvest"
     },
@@ -567,8 +525,6 @@
       "branch": "senses",
       "col": -3,
       "id": "scavenger_field",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 0,
       "trait": "scavenger_field"
     },
@@ -576,8 +532,6 @@
       "branch": "senses",
       "col": -3,
       "id": "lucky_mutation",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -1,
       "trait": "lucky_mutation"
     },
@@ -585,8 +539,6 @@
       "branch": "senses",
       "col": -3,
       "id": "patient_observer",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -2,
       "trait": "patient_observer"
     },
@@ -594,8 +546,6 @@
       "branch": "senses",
       "col": -2,
       "id": "swarm_cartography",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -2,
       "trait": "swarm_cartography"
     },
@@ -603,8 +553,6 @@
       "branch": "senses",
       "col": -1,
       "id": "risk_assessment",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -1,
       "trait": "risk_assessment"
     },
@@ -612,8 +560,6 @@
       "branch": "senses",
       "col": -1,
       "id": "senses_f01",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -2,
       "trait": "small_magnet"
     },
@@ -621,8 +567,6 @@
       "branch": "core",
       "col": 0,
       "id": "longevity",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -1,
       "trait": "longevity"
     },
@@ -630,8 +574,6 @@
       "branch": "core",
       "col": 1,
       "id": "immortal_culture",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -1,
       "trait": "immortal_culture"
     },
@@ -639,8 +581,6 @@
       "branch": "core",
       "col": 1,
       "id": "glycolysis",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -2,
       "trait": "glycolysis"
     },
@@ -648,8 +588,6 @@
       "branch": "core",
       "col": 2,
       "id": "mitochondria",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 0,
       "trait": "mitochondria"
     },
@@ -657,8 +595,6 @@
       "branch": "core",
       "col": 2,
       "id": "adaptive_overdrive",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -1,
       "trait": "adaptive_overdrive"
     },
@@ -666,8 +602,6 @@
       "branch": "core",
       "col": 1,
       "id": "omnipotent_cytoplasm",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 0,
       "trait": "omnipotent_cytoplasm"
     },
@@ -675,8 +609,6 @@
       "branch": "core",
       "col": 0,
       "id": "hematopoietic",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -2,
       "trait": "hematopoietic"
     },
@@ -684,8 +616,6 @@
       "branch": "core",
       "col": 0,
       "id": "core_f01",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": 0,
       "trait": "small_might"
     },
@@ -693,8 +623,6 @@
       "branch": "core",
       "col": 2,
       "id": "core_f02",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -2,
       "trait": "small_area"
     },
@@ -702,8 +630,6 @@
       "branch": "motility",
       "col": -2,
       "id": "actin",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -4,
       "trait": "actin"
     },
@@ -711,8 +637,6 @@
       "branch": "motility",
       "col": -1,
       "id": "cytoskeletal_drift",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -4,
       "trait": "cytoskeletal_drift"
     },
@@ -720,8 +644,6 @@
       "branch": "motility",
       "col": -1,
       "id": "slipstream",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -3,
       "trait": "slipstream"
     },
@@ -729,8 +651,6 @@
       "branch": "motility",
       "col": -3,
       "id": "oxidative_pace",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -4,
       "trait": "oxidative_pace"
     },
@@ -738,8 +658,6 @@
       "branch": "motility",
       "col": -3,
       "id": "rapid_reposition",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -3,
       "trait": "rapid_reposition"
     },
@@ -747,8 +665,6 @@
       "branch": "motility",
       "col": -1,
       "id": "aerobic_sprint",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -5,
       "trait": "aerobic_sprint"
     },
@@ -756,8 +672,6 @@
       "branch": "motility",
       "col": -2,
       "id": "pseudopod_marathon",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -3,
       "trait": "pseudopod_marathon"
     },
@@ -765,8 +679,6 @@
       "branch": "motility",
       "col": -2,
       "id": "enduring_march",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -5,
       "trait": "enduring_march"
     },
@@ -774,8 +686,6 @@
       "branch": "motility",
       "col": -3,
       "id": "motility_f01",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -5,
       "trait": "small_move_speed"
     },
@@ -783,8 +693,6 @@
       "branch": "ballistics",
       "col": 1,
       "id": "kinesin",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -4,
       "trait": "kinesin"
     },
@@ -792,8 +700,6 @@
       "branch": "ballistics",
       "col": 1,
       "id": "rolling_thunder",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -3,
       "trait": "rolling_thunder"
     },
@@ -801,8 +707,6 @@
       "branch": "ballistics",
       "col": 2,
       "id": "ballistic_threads",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -4,
       "trait": "ballistic_threads"
     },
@@ -810,8 +714,6 @@
       "branch": "ballistics",
       "col": 0,
       "id": "splitting_volley",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -4,
       "trait": "splitting_volley"
     },
@@ -819,8 +721,6 @@
       "branch": "ballistics",
       "col": 1,
       "id": "piercing_filaments",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -5,
       "trait": "piercing_filaments"
     },
@@ -828,8 +728,6 @@
       "branch": "ballistics",
       "col": 2,
       "id": "guided_salvo",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -3,
       "trait": "guided_salvo"
     },
@@ -837,8 +735,6 @@
       "branch": "ballistics",
       "col": 0,
       "id": "extended_chambers",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -3,
       "trait": "extended_chambers"
     },
@@ -846,8 +742,6 @@
       "branch": "ballistics",
       "col": 2,
       "id": "overdrawn_strings",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -5,
       "trait": "overdrawn_strings"
     },
@@ -855,8 +749,6 @@
       "branch": "ballistics",
       "col": 0,
       "id": "ballistics_f01",
-      "max_stacks": 1,
-      "point_cost": 1,
       "row": -5,
       "trait": "small_projectile_speed"
     }

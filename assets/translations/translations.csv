@@ -15,7 +15,6 @@ TREE_LEVEL,Cell Level: %d,细胞等级：%d,细胞等级：%d,細胞レベル：
 TREE_POINTS,Talent Points: %d available (%d spent),天赋点数：可用 %d（已用 %d）,天賦點數：可用 %d（已用 %d）,タレントポイント：残り%d（使用%d）,Talentpunkte: %d verfügbar (%d ausgegeben),Points de talent : %d dispo. (%d dépensés),Очки талантов: доступно %d (потрачено %d),Puntos de talento: %d disponibles (%d gastados)
 TREE_PURCHASE_HINT,Left-click a glowing node to purchase. Right-click an owned node to refund.,左键点击发光节点购买，右键点击已拥有节点返还。,左键点击发光节点购买，右键点击已拥有节点返还。,発光ノード左クリックで購入。所有ノード右クリックで返金。,Leuchtenden Knoten linksklicken zum Kaufen. Eigenen Knoten rechtsklicken zum Erstatten.,Clic gauche sur un nœud lumineux pour acheter. Clic droit sur un nœud possédé pour rembourser.,ЛКМ по светящемуся узлу — купить. ПКМ по купленному — вернуть.,Clic izquierdo en nodo brillante para comprar. Clic derecho en nodo propio para reembolsar.
 TREE_LOCKED,Requires a connected purchased node.,需要与已购买节点相连。,需要与已购买节点相连。,購入済みの隣接ノードが必要。,Benötigt einen verbundenen gekauften Knoten.,Nécessite un nœud acheté adjacent.,Требуется соединённый купленный узел.,Requiere un nodo comprado adyacente.
-TREE_MAXED,This node is fully stacked.,该节点已达上限。,该节点已达上限。,このノードは上限に達した。,Dieser Knoten ist voll gestapelt.,Ce nœud est au maximum.,Узел полностью прокачан.,Este nodo está al máximo.
 TREE_RESET,Reset,重置,重置,リセット,Reset,Reset,Сброс,Reset
 TREE_EFFECT_LINE,%s %s,%s%s,%s%s,%s %s,%s %s,%s %s,%s %s,%s %s
 TREE_EFFECTS_PER_STACK,Effects:,效果：,效果：,効果：,Effekte:,Effets :,Эффекты:,Efectos:

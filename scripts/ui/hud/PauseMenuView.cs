@@ -204,7 +204,7 @@ public partial class PauseMenuView : Node
         {
             foreach (var node in PassiveTreeManager.Nodes)
             {
-                if (!allocation.TryGetValue(node.Id, out int stacks))
+                if (!allocation.Contains(node.Id))
                     continue;
 
                 string nodeName = PassiveTreeManager.GetNodeName(node.Id);

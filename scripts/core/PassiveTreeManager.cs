@@ -31,20 +31,20 @@ public static class PassiveTreeManager
     public readonly record struct TreeStatModifier(string Stat, float Value, TreeModifierUnit Unit);
 
     /// <summary>
-    /// Single source of truth for splitting one stack-scaled tree modifier
+    /// Single source of truth for splitting one tree modifier
     /// into flat/percent channels (mirrors the organelle modifier
     /// convention: flat/percentage-points go flat, everything else percent).
     /// Used by both the run-time skill
     /// (<see cref="Phagocyte.Skills.TreeStatBundleSkill"/>) and the menu
     /// build preview so the two can never diverge.
     /// </summary>
-    public static (float Flat, float Pct) SplitModifier(TreeStatModifier modifier, int stacks)
+    public static (float Flat, float Pct) SplitModifier(TreeStatModifier modifier)
     {
         bool isFlatOrPoints = modifier.Unit is TreeModifierUnit.Flat
             or TreeModifierUnit.PercentagePoints;
         return isFlatOrPoints
-            ? (modifier.Value * stacks, 0.0f)
-            : (0.0f, modifier.Value * stacks);
+            ? (modifier.Value, 0.0f)
+            : (0.0f, modifier.Value);
     }
 
     /// <summary>
@@ -69,8 +69,6 @@ public static class PassiveTreeManager
         string Icon,
         string NameKey,
         string DescKey,
-        int MaxStacks,
-        int PointCost,
         string TraitId,
         TreeStatModifier[] Modifiers,
         int Ring);
@@ -88,8 +86,6 @@ public static class PassiveTreeManager
     /// The deployed cell's start hub is innately lit and never consumes points
     /// (docs/passivetree.md §2 L=0 / §5.1).
     /// </summary>
-    public const int InnateStartStacks = 1;
-
     public static readonly Vector2 WorldCenter = new(2400.0f, 2400.0f);
 
     public const float GridStep = 150.0f;
@@ -288,7 +284,7 @@ public static class PassiveTreeManager
         if (!IsKnownCell(cellId) || !TryGetNode(nodeId, out var node))
             return "";
 
-        int stacks = GetNodeStacks(cellId, nodeId);
+        bool placed = IsPlaced(cellId, nodeId);
         var text = new StringBuilder();
         text.AppendLine("[b][img=40x40]" + AssetPaths.TraitIcon(node.TraitId) + "[/img] " + TranslationServer.Translate(node.NameKey) + "[/b]");
         if (IsInnateStartNode(cellId, nodeId))
@@ -306,15 +302,15 @@ public static class PassiveTreeManager
             }
         }
 
+        // Innate and owned nodes state their effects with no further hint.
         string status = "";
-        if (IsInnateStartNode(cellId, nodeId))
-            status = ""; // already stated in the header line above
-        else if (stacks >= node.MaxStacks)
-            status = TranslationServer.Translate("TREE_MAXED");
-        else if (CanPurchase(cellId, nodeId))
-            status = TranslationServer.Translate("TREE_PURCHASE_HINT");
-        else if (GetPointsAvailable(cellId) >= node.PointCost)
-            status = TranslationServer.Translate("TREE_LOCKED");
+        if (!IsInnateStartNode(cellId, nodeId) && !placed)
+        {
+            if (CanPurchase(cellId, nodeId))
+                status = TranslationServer.Translate("TREE_PURCHASE_HINT");
+            else if (GetPointsAvailable(cellId) >= 1)
+                status = TranslationServer.Translate("TREE_LOCKED");
+        }
 
         if (!string.IsNullOrEmpty(status))
         {
@@ -343,10 +339,10 @@ public static class PassiveTreeManager
     public const int MaxProfiles = 3;
 
     /// <summary>
-    /// cellId → ordered build profiles; each profile maps nodeId → stacks.
+    /// cellId → ordered build profiles; each profile holds the placed node ids.
     /// Lists always hold between 1 and <see cref="MaxProfiles"/> slots.
     /// </summary>
-    public static Dictionary<string, Array<Dictionary<string, int>>> Allocations = new();
+    public static Dictionary<string, Array<Array<string>>> Allocations = new();
 
     /// <summary>cellId → index of the profile currently edited and deployed.</summary>
     public static Dictionary<string, int> ActiveProfiles = new();
@@ -409,18 +405,6 @@ public static class PassiveTreeManager
         return false;
     }
 
-    public static int GetMaxStacks(string nodeId)
-    {
-        return TryGetNode(nodeId, out var node) ? Math.Max(1, node.MaxStacks) : 0;
-    }
-
-    public static int GetPointCost(string nodeId)
-    {
-        if (!TryGetNode(nodeId, out var node))
-            return int.MaxValue;
-        return Math.Max(1, node.PointCost);
-    }
-
     public static string GetStartNode(string cellId)
     {
         EnsureLoaded();
@@ -459,25 +443,26 @@ public static class PassiveTreeManager
         return true;
     }
 
-    public static Dictionary<string, int> GetAllocation(string cellId)
+    /// <summary>Placed node ids for the active profile (start hub included).</summary>
+    public static System.Collections.Generic.HashSet<string> GetAllocation(string cellId)
     {
         EnsureLoaded();
         return GetConnectedAllocation(cellId);
     }
 
     /// <summary>All profile slots for a cell, guaranteeing at least one slot.</summary>
-    private static Array<Dictionary<string, int>> GetSlots(string cellId)
+    private static Array<Array<string>> GetSlots(string cellId)
     {
         if (!Allocations.TryGetValue(cellId, out var slots) || slots.Count == 0)
         {
-            slots = new Array<Dictionary<string, int>> { new Dictionary<string, int>() };
+            slots = new Array<Array<string>> { new Array<string>() };
             Allocations[cellId] = slots;
         }
         return slots;
     }
 
     /// <summary>The profile slot currently edited and deployed.</summary>
-    private static Dictionary<string, int> GetActiveOwned(string cellId)
+    private static Array<string> GetActiveOwned(string cellId)
     {
         return GetSlots(cellId)[GetActiveProfile(cellId)];
     }
@@ -532,7 +517,7 @@ public static class PassiveTreeManager
         var slots = GetSlots(cellId);
         if (slots.Count >= MaxProfiles)
             return false;
-        slots.Add(new Dictionary<string, int>());
+        slots.Add(new Array<string>());
         ActiveProfiles[cellId] = slots.Count - 1;
         SaveToDisk();
         return true;
@@ -567,22 +552,22 @@ public static class PassiveTreeManager
         return TranslationServer.Translate("TREE_PROFILE_" + (index + 1));
     }
 
-    private static Dictionary<string, int> FilterValidNodes(string cellId, Dictionary<string, int> owned)
+    private static System.Collections.Generic.HashSet<string> FilterValidNodes(Array<string> owned)
     {
-        var result = new Dictionary<string, int>();
-        foreach (var pair in owned)
+        var result = new System.Collections.Generic.HashSet<string>();
+        foreach (string id in owned)
         {
-            if (IsKnownNode(pair.Key) && pair.Value > 0)
-                result[pair.Key] = Math.Min(GetMaxStacks(pair.Key), pair.Value);
+            if (IsKnownNode(id))
+                result.Add(id);
         }
         return result;
     }
 
-    private static Dictionary<string, int> GetValidOwnedNodes(string cellId)
+    private static System.Collections.Generic.HashSet<string> GetValidOwnedNodes(string cellId)
     {
         if (!IsKnownCell(cellId))
-            return new Dictionary<string, int>();
-        return FilterValidNodes(cellId, GetActiveOwned(cellId));
+            return new System.Collections.Generic.HashSet<string>();
+        return FilterValidNodes(GetActiveOwned(cellId));
     }
 
     private static bool HasVisitedNeighbor(string nodeId, System.Collections.Generic.HashSet<string> visited)
@@ -595,23 +580,20 @@ public static class PassiveTreeManager
         return false;
     }
 
-    public static Dictionary<string, int> GetConnectedAllocation(string cellId)
+    public static System.Collections.Generic.HashSet<string> GetConnectedAllocation(string cellId)
     {
         return GetConnectedFrom(GetValidOwnedNodes(cellId), cellId);
     }
 
-    private static Dictionary<string, int> GetConnectedFrom(Dictionary<string, int> remaining, string cellId)
+    private static System.Collections.Generic.HashSet<string> GetConnectedFrom(System.Collections.Generic.HashSet<string> owned, string cellId)
     {
-        var connected = new Dictionary<string, int>();
+        var connected = new System.Collections.Generic.HashSet<string>();
         string start = GetStartNode(cellId);
         var visited = new System.Collections.Generic.HashSet<string>();
         if (!string.IsNullOrEmpty(start))
         {
             // The start hub is innately lit at 0 cost (docs/passivetree.md §5.1).
-            int startStacks = remaining.TryGetValue(start, out int ownedStacks)
-                ? Math.Max(InnateStartStacks, ownedStacks)
-                : InnateStartStacks;
-            connected[start] = startStacks;
+            connected.Add(start);
             visited.Add(start);
         }
 
@@ -621,13 +603,13 @@ public static class PassiveTreeManager
         while (frontier.Count > 0)
         {
             frontier.Dequeue();
-            foreach (var pair in remaining)
+            foreach (string id in owned)
             {
-                if (!connected.ContainsKey(pair.Key) && HasVisitedNeighbor(pair.Key, visited))
+                if (!connected.Contains(id) && HasVisitedNeighbor(id, visited))
                 {
-                    connected[pair.Key] = pair.Value;
-                    visited.Add(pair.Key);
-                    frontier.Enqueue(pair.Key);
+                    connected.Add(id);
+                    visited.Add(id);
+                    frontier.Enqueue(id);
                 }
             }
         }
@@ -640,18 +622,14 @@ public static class PassiveTreeManager
             return false;
         if (nodeId == GetStartNode(cellId))
             return true;
-        return GetConnectedAllocation(cellId).ContainsKey(nodeId);
+        return GetConnectedAllocation(cellId).Contains(nodeId);
     }
 
     private static bool WouldRemainConnected(string cellId, string removeNodeId)
     {
-        var remaining = GetValidOwnedNodes(cellId);
-        if (!remaining.TryGetValue(removeNodeId, out int stacks))
+        var remaining = new System.Collections.Generic.HashSet<string>(GetValidOwnedNodes(cellId));
+        if (!remaining.Remove(removeNodeId))
             return false;
-        if (stacks > 1)
-            remaining[removeNodeId] = stacks - 1;
-        else
-            remaining.Remove(removeNodeId);
 
         string start = GetStartNode(cellId);
         var visited = new System.Collections.Generic.HashSet<string>();
@@ -663,45 +641,45 @@ public static class PassiveTreeManager
         while (frontier.Count > 0)
         {
             frontier.Dequeue();
-            foreach (var pair in remaining)
+            foreach (string id in remaining)
             {
-                if (!visited.Contains(pair.Key) && HasVisitedNeighbor(pair.Key, visited))
+                if (!visited.Contains(id) && HasVisitedNeighbor(id, visited))
                 {
-                    visited.Add(pair.Key);
-                    frontier.Enqueue(pair.Key);
+                    visited.Add(id);
+                    frontier.Enqueue(id);
                 }
             }
         }
 
-        foreach (var pair in remaining)
+        foreach (string id in remaining)
         {
-            if (!visited.Contains(pair.Key))
+            if (!visited.Contains(id))
                 return false;
         }
         return true;
     }
 
-    public static int GetNodeStacks(string cellId, string nodeId)
+    /// <summary>True when the node is placed (the start hub is always placed).</summary>
+    public static bool IsPlaced(string cellId, string nodeId)
     {
-        var allocation = GetAllocation(cellId);
-        return allocation.TryGetValue(nodeId, out var stacks) ? stacks : 0;
+        return GetAllocation(cellId).Contains(nodeId);
     }
 
     public static int GetSpentPoints(string cellId)
     {
         int total = 0;
-        foreach (var pair in GetAllocation(cellId))
+        foreach (string id in GetAllocation(cellId))
         {
-            if (IsInnateStartNode(cellId, pair.Key))
+            if (IsInnateStartNode(cellId, id))
                 continue;
-            total += pair.Value * GetPointCost(pair.Key);
+            total += 1;
         }
         return total;
     }
 
     public static int GetPointsAvailable(string cellId)
     {
-        return Math.Max(0, GetCellLevel(cellId) - BaseCellLevel - GetSpentPoints(cellId)) + GetEarnedBonusPoints();
+        return Math.Max(0, GetCellLevel(cellId) - BaseCellLevel + GetEarnedBonusPoints() - GetSpentPoints(cellId));
     }
 
     public static System.Collections.Generic.List<string> GetNeighbors(string nodeId)
@@ -729,7 +707,7 @@ public static class PassiveTreeManager
         {
             if (neighbor == GetStartNode(cellId))
                 return true;
-            if (owned.ContainsKey(neighbor))
+            if (owned.Contains(neighbor))
                 return true;
         }
         return false;
@@ -740,12 +718,10 @@ public static class PassiveTreeManager
         EnsureLoaded();
         if (!IsKnownCell(cellId) || !IsKnownNode(nodeId))
             return false;
-        if (GetNodeStacks(cellId, nodeId) >= GetMaxStacks(nodeId))
+        if (IsPlaced(cellId, nodeId))
             return false;
-        if (GetPointsAvailable(cellId) < GetPointCost(nodeId))
+        if (GetPointsAvailable(cellId) < 1)
             return false;
-        if (GetNodeStacks(cellId, nodeId) > 0)
-            return IsFullyConnected(cellId, nodeId);
         return IsNodeConnected(cellId, nodeId);
     }
 
@@ -754,8 +730,7 @@ public static class PassiveTreeManager
         if (!CanPurchase(cellId, nodeId))
             return false;
 
-        var owned = GetActiveOwned(cellId);
-        owned[nodeId] = GetNodeStacks(cellId, nodeId) + 1;
+        GetActiveOwned(cellId).Add(nodeId);
         SaveToDisk();
         return true;
     }
@@ -769,16 +744,12 @@ public static class PassiveTreeManager
         if (IsInnateStartNode(cellId, nodeId))
             return false;
         var owned = GetActiveOwned(cellId);
-        if (!owned.TryGetValue(nodeId, out var stacks) || stacks <= 0)
+        if (!owned.Contains(nodeId))
             return false;
         if (!WouldRemainConnected(cellId, nodeId))
             return false;
 
-        if (stacks == 1)
-            owned.Remove(nodeId);
-        else
-            owned[nodeId] = stacks - 1;
-
+        owned.Remove(nodeId);
         SaveToDisk();
         return true;
     }
@@ -796,13 +767,12 @@ public static class PassiveTreeManager
         }
     }
 
-    public static BaseSkill? CreateStackedSkill(string nodeId, int stacks)
+    public static BaseSkill? CreateSkill(string nodeId)
     {
         if (!TryGetNode(nodeId, out var node))
             return null;
 
-        int level = Mathf.Clamp(stacks, 1, node.MaxStacks);
-        return new TreeStatBundleSkill(node, level);
+        return new TreeStatBundleSkill(node);
     }
 
     public static void SaveToDisk()
@@ -821,13 +791,13 @@ public static class PassiveTreeManager
             bool anyNonEmpty = false;
             foreach (var owned in cellPair.Value)
             {
-                var slotOut = new Dictionary();
-                foreach (var nodePair in GetConnectedFrom(FilterValidNodes(cellPair.Key, owned), cellPair.Key))
+                var slotOut = new Godot.Collections.Array();
+                foreach (string nodeId in GetConnectedFrom(FilterValidNodes(owned), cellPair.Key))
                 {
                     // The innate start hub is derived, never persisted.
-                    if (IsInnateStartNode(cellPair.Key, nodePair.Key))
+                    if (IsInnateStartNode(cellPair.Key, nodeId))
                         continue;
-                    slotOut[nodePair.Key] = nodePair.Value;
+                    slotOut.Add(nodeId);
                 }
                 if (slotOut.Count > 0)
                     anyNonEmpty = true;
@@ -847,19 +817,6 @@ public static class PassiveTreeManager
         };
 
         JsonStore.Write(SavePath, payload);
-    }
-
-    private static Dictionary<string, int> ParseSlotDict(string cellId, Dictionary savedOwned)
-    {
-        var owned = new Dictionary<string, int>();
-        foreach (var nodeKey in savedOwned.Keys)
-        {
-            string nodeId = nodeKey.AsString();
-            int stacks = Mathf.Clamp(savedOwned[nodeKey].AsInt32(), 1, GetMaxStacks(nodeId));
-            if (IsKnownNode(nodeId))
-                owned[nodeId] = stacks;
-        }
-        return owned;
     }
 
     public static void LoadFromDisk()
@@ -894,7 +851,7 @@ public static class PassiveTreeManager
                 if (!IsKnownCell(cellId))
                     continue;
 
-                var slots = new Array<Dictionary<string, int>>();
+                var slots = new Array<Array<string>>();
                 var raw = allocations[key];
                 if (raw.VariantType == Variant.Type.Array)
                 {
@@ -902,18 +859,30 @@ public static class PassiveTreeManager
                     {
                         if (slots.Count >= MaxProfiles)
                             break;
-                        if (slotVar.VariantType != Variant.Type.Dictionary)
-                            continue;
-                        slots.Add(ParseSlotDict(cellId, slotVar.AsGodotDictionary()));
+                        // Anything but a string-id array is a pre-binary save:
+                        // those saves are wiped, never migrated.
+                        if (slotVar.VariantType != Variant.Type.Array)
+                        {
+                            WipeLegacySave();
+                            return;
+                        }
+                        var placed = new Array<string>();
+                        foreach (var idVar in slotVar.AsGodotArray())
+                        {
+                            string nodeId = idVar.AsString();
+                            if (IsKnownNode(nodeId))
+                                placed.Add(nodeId);
+                        }
+                        slots.Add(placed);
                     }
                 }
-                else if (raw.VariantType == Variant.Type.Dictionary)
+                else
                 {
-                    // Legacy single-slot format migrates into profile slot 0.
-                    slots.Add(ParseSlotDict(cellId, raw.AsGodotDictionary()));
+                    WipeLegacySave();
+                    return;
                 }
                 if (slots.Count == 0)
-                    slots.Add(new Dictionary<string, int>());
+                    slots.Add(new Array<string>());
                 Allocations[cellId] = slots;
             }
         }
@@ -936,9 +905,12 @@ public static class PassiveTreeManager
             bool anyKept = false;
             for (int i = 0; i < slots.Count; i++)
             {
-                var connected = GetConnectedFrom(FilterValidNodes(cellId, slots[i]), cellId);
-                slots[i] = connected;
-                if (connected.Count > 0)
+                var connected = GetConnectedFrom(FilterValidNodes(slots[i]), cellId);
+                var pruned = new Array<string>();
+                foreach (string id in connected)
+                    pruned.Add(id);
+                slots[i] = pruned;
+                if (pruned.Count > 0)
                     anyKept = true;
             }
             if (!anyKept)
@@ -947,6 +919,15 @@ public static class PassiveTreeManager
                 ActiveProfiles.Remove(cellId);
             }
         }
+    }
+
+    /// <summary>Deletes a pre-binary tree save and resets to a fresh tree.</summary>
+    private static void WipeLegacySave()
+    {
+        JsonStore.Delete(SavePath);
+        CellLevels.Clear();
+        Allocations.Clear();
+        ActiveProfiles.Clear();
     }
 
     public static void ReloadFromDisk()

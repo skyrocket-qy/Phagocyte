@@ -247,7 +247,7 @@ public partial class UpgradeManager : RefCounted
             foreach (var item in PassiveCatalog)
             {
                 string id = item["id"].AsString();
-                if (!equippedPassiveIds.Contains(id) && !treeOwned.ContainsKey(id))
+                if (!equippedPassiveIds.Contains(id) && !treeOwned.Contains(id))
                 {
                     var newPassiveCandidate = new Dictionary
                     {

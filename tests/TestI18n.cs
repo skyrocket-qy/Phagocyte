@@ -45,6 +45,9 @@ public partial class TestI18n : TestHarness
             return true;
         }
 
+        // 0. Default language is English out of the box.
+        AssertThat(GameManager.CurrentLanguage).IsEqual("en");
+
         // 1. Test Simplified Chinese default
         GameManager.SetLanguage("zh_CN");
         menu.UpdateAllTexts();
@@ -118,6 +121,25 @@ public partial class TestI18n : TestHarness
         AssertThat(hud.HpTitleLabel?.Text.Contains("HP") ?? false).IsTrue();
         AssertThat(hud.ResumeBtn?.Text.Contains("继续") ?? false).IsTrue();
         GD.Print("[PASS] In-game HUD & Pause Menu dynamic localization verified.");
+
+        // 6. Stat preview rows re-translate on language switch (they used to
+        // freeze in the build-time language).
+        var statsScene = AssetLoader.Load<PackedScene>("res://scenes/ui/stat_preview.tscn");
+        AssertThat(statsScene).IsNotNull();
+        var panel = statsScene!.Instantiate<StatPreviewPanel>();
+        Root.AddChild(panel);
+        GameManager.SetLanguage("zh_CN");
+        panel.Refresh("macrophage");
+        var mightNameZh = panel.GetNodeOrNull<Label>("Margin/VBox/StatScroll/GroupsBox/Row_might/Name");
+        AssertThat(mightNameZh).IsNotNull();
+        AssertThat(mightNameZh!.Text.Contains("伤害")).IsTrue();
+        GameManager.SetLanguage("en");
+        panel.UpdateLocalizedTexts();
+        var mightNameEn = panel.GetNodeOrNull<Label>("Margin/VBox/StatScroll/GroupsBox/Row_might/Name");
+        AssertThat(mightNameEn).IsNotNull();
+        AssertThat(mightNameEn!.Text.Contains("Might")).IsTrue();
+        panel.QueueFree();
+        GD.Print("[PASS] Stat preview rows re-translate on language switch.");
 
         hud.QueueFree();
         GD.Print("--- ALL BILINGUAL I18N TESTS PASSED SUCCESSFULLY! ---");

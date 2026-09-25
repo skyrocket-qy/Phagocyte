@@ -335,8 +335,6 @@ public static class CatalogBuilders
                 trait.Icon,
                 trait.NameKey,
                 trait.DescKey,
-                CatalogLoader.GetInt(row, "max_stacks", 1),
-                CatalogLoader.GetInt(row, "point_cost", 1),
                 traitId,
                 trait.Modifiers,
                 LayerOf(col, rowIdx)));

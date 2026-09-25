@@ -16,6 +16,7 @@ public partial class StatPreviewPanel : PanelContainer
     private VBoxContainer? _groupsBox;
     private Label? _headerLabel;
     private readonly Dictionary<string, Label> _valueLabels = new();
+    private readonly Dictionary<string, Label> _nameLabels = new();
     private string _classKey = "";
 
     public override void _Ready()
@@ -32,6 +33,9 @@ public partial class StatPreviewPanel : PanelContainer
         _classKey = string.IsNullOrEmpty(classKey) ? "macrophage" : classKey;
         if (_valueLabels.Count == 0)
             BuildRows();
+        UpdateHeader();
+        RefreshGroupTitles();
+        RefreshRowNames();
         var totals = BuildStatsPreview.PreviewStats(_classKey);
         foreach (var pair in _valueLabels)
         {
@@ -42,7 +46,11 @@ public partial class StatPreviewPanel : PanelContainer
 
     public void UpdateLocalizedTexts()
     {
+        if (_valueLabels.Count == 0)
+            BuildRows();
         UpdateHeader();
+        RefreshGroupTitles();
+        RefreshRowNames();
         // Stat names resolve through the localized label table on next refresh.
         if (!string.IsNullOrEmpty(_classKey))
             Refresh(_classKey);
@@ -102,8 +110,15 @@ public partial class StatPreviewPanel : PanelContainer
             row.AddChild(name);
             row.AddChild(value);
             _groupsBox!.AddChild(row);
+            _nameLabels[key] = name;
             _valueLabels[key] = value;
         }
+    }
+
+    private void RefreshRowNames()
+    {
+        foreach (var pair in _nameLabels)
+            pair.Value.Text = PassiveTreeManager.GetStatLabel(pair.Key);
     }
 
     private void RefreshGroupTitles()

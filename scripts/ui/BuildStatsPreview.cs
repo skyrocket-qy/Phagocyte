@@ -85,11 +85,11 @@ public static class BuildStatsPreview
             var allocation = PassiveTreeManager.GetAllocation(classId);
             foreach (var node in PassiveTreeManager.Nodes)
             {
-                if (!allocation.TryGetValue(node.Id, out int stacks) || stacks <= 0)
+                if (!allocation.Contains(node.Id))
                     continue;
                 foreach (var modifier in node.Modifiers)
                 {
-                    var (flat, pct) = PassiveTreeManager.SplitModifier(modifier, stacks);
+                    var (flat, pct) = PassiveTreeManager.SplitModifier(modifier);
                     stats.AddModifier(modifier.Stat, flat, pct);
                 }
             }

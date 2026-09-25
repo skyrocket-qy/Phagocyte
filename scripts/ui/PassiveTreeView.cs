@@ -547,7 +547,7 @@ public partial class PassiveTreeView : Control
     {
         float radius = GetNodeRadius(node);
         Vector2 size = new Vector2(radius * 2.0f + 34.0f, radius * 2.0f + 34.0f);
-        int stacks = PassiveTreeManager.GetNodeStacks(TreeClassKey, node.Id);
+        bool placed = PassiveTreeManager.IsPlaced(TreeClassKey, node.Id);
         bool available = PassiveTreeManager.CanPurchase(TreeClassKey, node.Id);
         var button = new Button
         {
@@ -557,7 +557,7 @@ public partial class PassiveTreeView : Control
             Position = node.Position - size * 0.5f,
             FocusMode = FocusModeEnum.None,
             MouseFilter = MouseFilterEnum.Stop,
-            MouseDefaultCursorShape = (stacks > 0 || available) ? CursorShape.PointingHand : CursorShape.Arrow,
+            MouseDefaultCursorShape = (placed || available) ? CursorShape.PointingHand : CursorShape.Arrow,
             Text = "",
             ClipText = true,
             Alignment = HorizontalAlignment.Center
@@ -588,7 +588,7 @@ public partial class PassiveTreeView : Control
         button.AddThemeStyleboxOverride("disabled", transparent);
         button.AddThemeStyleboxOverride("focus", transparent);
         // Locked-state readability rides on the art texture via Modulate.
-        button.Modulate = stacks > 0 ? Colors.White
+        button.Modulate = placed ? Colors.White
             : available ? Colors.White
             : new Color(0.45f, 0.50f, 0.58f, 1.0f);
         button.AddThemeColorOverride("font_outline_color", new Color(0, 0, 0, 0.9f));
@@ -959,7 +959,7 @@ public partial class PassiveTreeView : Control
         layer.DrawRect(rect, new Color(color.R, color.G, color.B, core ? 0.08f : 0.045f), false, 1.0f);
     }
 
-    private void DrawEdges(Control layer, Godot.Collections.Dictionary<string, int> owned, string start)
+    private void DrawEdges(Control layer, System.Collections.Generic.HashSet<string> owned, string start)
     {
         for (int i = 0; i < PassiveTreeManager.Edges.Length; i++)
         {
@@ -972,8 +972,8 @@ public partial class PassiveTreeView : Control
             if (from.DistanceSquaredTo(to) < 1.0f)
                 continue;
 
-            bool fromActive = owned.ContainsKey(edge.From) || edge.From == start;
-            bool toActive = owned.ContainsKey(edge.To) || edge.To == start;
+            bool fromActive = owned.Contains(edge.From) || edge.From == start;
+            bool toActive = owned.Contains(edge.To) || edge.To == start;
             bool lit = fromActive && toActive;
             bool highlighted = HoveredNodeId == edge.From || HoveredNodeId == edge.To
                 || SelectedNodeId == edge.From || SelectedNodeId == edge.To;
@@ -1020,12 +1020,12 @@ public partial class PassiveTreeView : Control
         return points[index].Lerp(points[index + 1], local);
     }
 
-    private void DrawNodes(Control layer, Godot.Collections.Dictionary<string, int> owned, string start)
+    private void DrawNodes(Control layer, System.Collections.Generic.HashSet<string> owned, string start)
     {
         foreach (var node in _orderedNodes)
         {
             Vector2 position = node.Position;
-            int stacks = owned.TryGetValue(node.Id, out int ownedStacks) ? ownedStacks : 0;
+            bool placed = owned.Contains(node.Id);
             bool hovered = HoveredNodeId == node.Id;
             bool selected = SelectedNodeId == node.Id;
             bool isStart = node.Id == start;
@@ -1038,16 +1038,16 @@ public partial class PassiveTreeView : Control
 
             // Breathing vesicle glow: same-rarity nodes share one glow color;
             // lit nodes pulse stronger than dormant ones.
-            float breath = 0.75f + 0.25f * Mathf.Sin(_time * (stacks > 0 ? 2.0f : 1.2f) + wobblePhase);
-            float halo = (stacks > 0 ? 0.34f : 0.06f) * breath;
-            layer.DrawCircle(position, radius + 7.0f + (stacks > 0 ? 1.6f * breath : 0.0f),
+            float breath = 0.75f + 0.25f * Mathf.Sin(_time * (placed ? 2.0f : 1.2f) + wobblePhase);
+            float halo = (placed ? 0.34f : 0.06f) * breath;
+            layer.DrawCircle(position, radius + 7.0f + (placed ? 1.6f * breath : 0.0f),
                 new Color(rarityColor.R, rarityColor.G, rarityColor.B, halo));
 
-            Color fill = stacks > 0
+            Color fill = placed
                 ? new Color(rarityColor.R, rarityColor.G, rarityColor.B, 0.34f)
                 : new Color(0.035f, 0.065f, 0.11f, 0.90f);
             Color dormantEdge = rarityColor.Darkened(0.45f);
-            Color edge = stacks > 0
+            Color edge = placed
                 ? rarityColor.Lightened(0.25f)
                 : new Color(dormantEdge.R, dormantEdge.G, dormantEdge.B, hovered ? 0.75f : 0.5f);
 

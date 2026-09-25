@@ -422,7 +422,7 @@ Open `hud.tscn:170-728`. Find `HPContainer`, `EXPContainer`, `BottomExpBar`, `Me
 ### Goal
 Understand out-of-run progression.
 
-- Passive tree (`PassiveTreeManager.cs:15-969`): topology `passive_tree.json`, per-cell levels/3 profiles, connectivity/costs/purchase/refund, `CreateStackedSkill` factory, live bonus from achievements. `Main.ApplyTreeLoadout (Main.cs:325-345)` attaches `TreeStatBundleSkill`s. View: `PassiveTreeView.cs` (shell in `passive_view.tscn:90-113`, graph code-drawn `:704-1066`, nodes `TreeNode_{id}` `:546-601`).
+- Passive tree (`PassiveTreeManager.cs`): topology `passive_tree.json`, per-cell levels/3 profiles, connectivity/purchase/refund, `CreateSkill` factory, live bonus from achievements. `Main.ApplyTreeLoadout` attaches `TreeStatBundleSkill`s. View: `PassiveTreeView.cs` (shell in `passive_view.tscn`, graph code-drawn, nodes `TreeNode_{id}`).
 - Achievements (`AchievementManager.cs:28-507`): `achievements.json` + Steam, `RecordEvent/EvaluateThreshold/RecordMapClear`, `IsEndlessUnlocked` (needs `wound_hard_clear`), `ApplyMapRewards/SyncMapUnlocks`, gallery `AchievementGalleryView/Card/Toast`.
 - Records (`RunRecordManager.cs` + `RunRecordsModal.cs`): `OpenHistory` vs `OpenSettlement`, grades, KPM/score.
 - Loadouts (`LoadoutManager.cs` + `LoadoutView.cs:131-577`): `organelle_loadouts.json`, scratch chamber, `BuildBackpackCards:255-286` instantiates `organelle_slot.tscn`, profile tabs code-built.

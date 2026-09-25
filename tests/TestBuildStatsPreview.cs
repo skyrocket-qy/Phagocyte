@@ -137,10 +137,9 @@ public partial class TestBuildStatsPreview : TestHarness
         }
         foreach (var node in PassiveTreeManager.Nodes)
         {
-            int stacks = PassiveTreeManager.GetNodeStacks("macrophage", node.Id);
-            if (stacks <= 0)
+            if (!PassiveTreeManager.IsPlaced("macrophage", node.Id))
                 continue;
-            var skill = PassiveTreeManager.CreateStackedSkill(node.Id, stacks);
+            var skill = PassiveTreeManager.CreateSkill(node.Id);
             if (skill == null)
                 continue;
             player.AddChild(skill);

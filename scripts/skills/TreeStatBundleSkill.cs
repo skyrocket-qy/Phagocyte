@@ -4,13 +4,13 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Applies one stack-scaled bundle of generic passive-tree stat modifiers.
+/// Applies one bundle of generic passive-tree stat modifiers.
 /// </summary>
 public partial class TreeStatBundleSkill : BaseSkill
 {
     private readonly PassiveTreeManager.TreeStatModifier[] _modifiers;
 
-    public TreeStatBundleSkill(PassiveTreeManager.TreeNode node, int stacks)
+    public TreeStatBundleSkill(PassiveTreeManager.TreeNode node)
     {
         SkillId = node.Id;
         IconSymbol = node.Icon;
@@ -19,8 +19,8 @@ public partial class TreeStatBundleSkill : BaseSkill
         IsPassive = true;
         IsInnate = false;
         Cooldown = 0.0f;
-        Level = Mathf.Clamp(stacks, 1, node.MaxStacks);
-        MaxLevel = node.MaxStacks;
+        Level = 1;
+        MaxLevel = 1;
         _modifiers = node.Modifiers;
     }
 
@@ -28,7 +28,7 @@ public partial class TreeStatBundleSkill : BaseSkill
     {
         foreach (var modifier in _modifiers)
         {
-            var (flat, pct) = PassiveTreeManager.SplitModifier(modifier, Level);
+            var (flat, pct) = PassiveTreeManager.SplitModifier(modifier);
             ApplyStat(modifier.Stat, flat, pct);
         }
     }
@@ -37,7 +37,7 @@ public partial class TreeStatBundleSkill : BaseSkill
     {
         foreach (var modifier in _modifiers)
         {
-            var (flat, pct) = PassiveTreeManager.SplitModifier(modifier, Level);
+            var (flat, pct) = PassiveTreeManager.SplitModifier(modifier);
             RemoveStat(modifier.Stat, flat, pct);
         }
     }
