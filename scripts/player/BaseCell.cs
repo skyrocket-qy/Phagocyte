@@ -869,6 +869,7 @@ public partial class BaseCell : CharacterBody2D
             CurrentLevel += 1;
             ExpToNextLevel = ExpToNextLevel * 1.35f + 15.0f;
             AudioManager.Instance?.PlayLevelUp();
+            FrameSpikeLog.MarkLevelUp();
             EmitSignal(SignalName.LevelUp, CurrentLevel);
         }
         EmitSignal(SignalName.ExpChanged, CurrentExp, ExpToNextLevel, CurrentLevel);
@@ -954,13 +955,18 @@ public partial class BaseCell : CharacterBody2D
         }
 
 
+        // Hit-flash coalescing: in a contact storm only one flash tween may
+        // exist at a time. Re-creating (kill + CreateTween + tree insert) on
+        // every hit dominated TakeDamage at 300 strikes/sec; a running flash
+        // already reads as constant impact glow, so reuse it.
         if (Cytoplasm != null && finalDmg > 0.1f && Health > 0.0f)
         {
-            if (_hitFlashTween != null && _hitFlashTween.IsValid())
-                _hitFlashTween.Kill();
-            _hitFlashTween = CreateTween();
-            Cytoplasm.Modulate = new Color(2.2f, 0.6f, 0.6f, 1.0f);
-            _hitFlashTween.TweenProperty(Cytoplasm, "modulate", new Color(1.0f, 1.0f, 1.0f, 1.0f), 0.1);
+            if (_hitFlashTween == null || !_hitFlashTween.IsValid())
+            {
+                _hitFlashTween = CreateTween();
+                Cytoplasm.Modulate = new Color(2.2f, 0.6f, 0.6f, 1.0f);
+                _hitFlashTween.TweenProperty(Cytoplasm, "modulate", new Color(1.0f, 1.0f, 1.0f, 1.0f), 0.1);
+            }
         }
 
         EmitStatsSignal();

@@ -27,6 +27,9 @@ public partial class ToastView : Node
         AchievementBanner = AssetLoader.Load<PackedScene>("res://scenes/ui/toast_banner.tscn").Instantiate<PanelContainer>();
         AchievementBanner.Name = "AchievementBanner";
         AddChild(AchievementBanner);
+        // The shell defaults to visible: hide until the first unlock, or the
+        // banner sits on screen from run start and looks permanently stuck.
+        AchievementBanner.Visible = false;
 
         AchBannerIcon = AchievementBanner.GetNodeOrNull<TextureRect>("HBox/Icon");
         AchBannerTitle = AchievementBanner.GetNodeOrNull<Label>("HBox/VBox/Title");
@@ -113,6 +116,10 @@ public partial class ToastView : Node
             AchTween.Kill();
         }
         AchTween = CreateTween();
+        // Real-time dismissal: bullet-time (time_scale 0.05) would stretch the
+        // 3.2s hold into a minute and repeated unlocks would refresh it
+        // forever, pinning the banner on screen.
+        AchTween.SetIgnoreTimeScale(true);
         AchTween.SetParallel(true);
         AchTween.TweenProperty(AchievementBanner, "modulate:a", 1.0f, 0.35);
         AchTween.TweenProperty(AchievementBanner, "position:y", 18.0f, 0.35)

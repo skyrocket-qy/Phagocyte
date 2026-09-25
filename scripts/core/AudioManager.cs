@@ -15,6 +15,17 @@ public partial class AudioManager : Node
     private readonly AudioStreamPlayer[] _sfxPlayers = new AudioStreamPlayer[SfxPoolSize];
     private int _sfxPoolIndex = 0;
 
+    /// <summary>
+    /// Resolved SFX streams by sound name (null = missing, warned once).
+    /// PlaySfx used to rebuild candidate paths and probe the loader on every
+    /// hit — at 300 contact strikes a second that dominated TakeDamage.
+    /// </summary>
+    private readonly Dictionary<string, AudioStream?> _sfxCache = new(System.StringComparer.Ordinal);
+    /// <summary>Last play timestamp per sound: same-name retriggers inside the
+    /// floor collapse to one voice (indistinguishable in a horde).</summary>
+    private readonly Dictionary<string, ulong> _sfxLastPlayMsec = new(System.StringComparer.Ordinal);
+    private const ulong SfxRetriggerFloorMsec = 35;
+
     private AudioStreamPlayer? _bgmPlayer;
     private Tween? _bgmTween;
     private string _currentBgmTrack = "";
@@ -198,12 +209,20 @@ public partial class AudioManager : Node
 
     public void PlaySfx(string soundName, float pitchRandomness = 0.08f, float volumeDbOffset = 0.0f)
     {
-        var stream = AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.SfxCandidates(soundName));
-        if (stream == null)
-        {
-            GD.PushWarning($"AudioManager: SFX '{soundName}' not found.");
+        ulong now = Time.GetTicksMsec();
+        if (_sfxLastPlayMsec.TryGetValue(soundName, out ulong last) && now - last < SfxRetriggerFloorMsec)
             return;
+        _sfxLastPlayMsec[soundName] = now;
+
+        if (!_sfxCache.TryGetValue(soundName, out AudioStream? stream))
+        {
+            stream = AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.SfxCandidates(soundName));
+            _sfxCache[soundName] = stream;
+            if (stream == null)
+                GD.PushWarning($"AudioManager: SFX '{soundName}' not found.");
         }
+        if (stream == null)
+            return;
 
         var player = _sfxPlayers[_sfxPoolIndex];
         _sfxPoolIndex = (_sfxPoolIndex + 1) % SfxPoolSize;

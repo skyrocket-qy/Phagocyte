@@ -55,6 +55,7 @@ public partial class BossEncounterManager : Node
 
     public void TriggerSubBossEncounter()
     {
+        FrameSpikeLog.MarkBoss();
         var ctx = Context;
         var container = ctx?.EnemyContainer;
         var player = ctx?.Player;
@@ -75,6 +76,7 @@ public partial class BossEncounterManager : Node
 
     public void EnterBossLockdown()
     {
+        FrameSpikeLog.MarkBoss();
         var ctx = Context;
         BossLockdownActive = true;
 
@@ -188,6 +190,7 @@ public partial class BossEncounterManager : Node
             return;
 
         _nextRaidCycle = cycle + 1;
+        FrameSpikeLog.MarkBoss();
 
         bool tripleSiege = ctx.EnvironmentTime >= 1800.0f; // 30:00+ terminal siege
         int count = tripleSiege ? 3 : 2;

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using Phagocyte.Combat;
+using Phagocyte.Core;
 using Phagocyte.Player;
 
 namespace Phagocyte.Enemies;
@@ -291,6 +292,8 @@ public static class PathogenSpawner
     {
         if (enemyContainer == null || player == null)
             return;
+
+        FrameSpikeLog.MarkWave();
 
         string[] pool = GetPhasePool(GetPhaseIndex(gameTime));
         for (int i = 0; i < count; i++)

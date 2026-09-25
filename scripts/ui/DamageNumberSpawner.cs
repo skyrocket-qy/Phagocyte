@@ -1,6 +1,7 @@
 namespace Phagocyte.UI;
 
 using Godot;
+using Phagocyte.Core;
 using System;
 
 public enum DamageNumberType
@@ -38,6 +39,9 @@ public partial class DamageNumberSpawner : CanvasLayer
     private DamageNumberCanvas? _canvas;
     private int _activeCount;
     private int _spawnHint;
+
+    /// <summary>Live floating-text census for the frame-spike flight recorder.</summary>
+    public int ActiveNumbers => _activeCount;
 
     public override void _Ready()
     {
@@ -135,24 +139,25 @@ public partial class DamageNumberSpawner : CanvasLayer
             (float)(Random.Shared.NextDouble() * 16.0 - 8.0)
         );
 
-        int targetSlot = -1;
-        float maxAge = -1f;
-        for (int pass = 0; pass < MaxActiveNumbers; pass++)
+        // O(1) slot claim: hint slot when free, else next free slot, else
+        // round-robin eviction of the hint slot. Never scans for "oldest" —
+        // under saturation that turned every spawn into a full pool walk.
+        int targetSlot = _spawnHint;
+        if (_pool[targetSlot].IsActive)
         {
-            int i = (_spawnHint + pass) % MaxActiveNumbers;
-            if (!_pool[i].IsActive)
+            targetSlot = -1;
+            for (int pass = 1; pass < MaxActiveNumbers; pass++)
             {
-                targetSlot = i;
-                break;
+                int i = (_spawnHint + pass) % MaxActiveNumbers;
+                if (!_pool[i].IsActive)
+                {
+                    targetSlot = i;
+                    break;
+                }
             }
-            if (_pool[i].Lifetime > maxAge)
-            {
-                maxAge = _pool[i].Lifetime;
-                targetSlot = i;
-            }
+            if (targetSlot < 0)
+                targetSlot = _spawnHint;
         }
-
-        if (targetSlot < 0) targetSlot = 0;
 
         bool wasActive = _pool[targetSlot].IsActive;
         _pool[targetSlot] = new DamageNumberEntry
@@ -230,6 +235,10 @@ public partial class DamageNumberSpawner : CanvasLayer
             Camera2D? camera = GetViewport()?.GetCamera2D();
             Vector2 camPos = camera?.GlobalPosition ?? Vector2.Zero;
             Vector2 halfScreen = GetViewportRect().Size * 0.5f;
+            Vector2 vpSize = GetViewportRect().Size;
+            var bounds = new Rect2(new Vector2(-64.0f, -64.0f), vpSize + new Vector2(128.0f, 128.0f));
+            // Performance mode halves font cost by dropping the outline pass.
+            bool outlines = !SettingsManager.PerformanceMode;
 
             for (int i = 0; i < MaxActiveNumbers; i++)
             {
@@ -240,11 +249,16 @@ public partial class DamageNumberSpawner : CanvasLayer
                 float alpha = progress > 0.55f ? (1.0f - progress) / 0.45f : 1.0f;
 
                 Vector2 screenPos = (camera != null ? (entry.WorldPosition - camPos + halfScreen) : entry.WorldPosition) + entry.ScreenJitter;
+                if (!bounds.HasPoint(screenPos))
+                    continue;
 
-                Color outlineColor = new Color(0, 0, 0, alpha * 0.85f);
                 Color drawColor = new Color(entry.Color.R, entry.Color.G, entry.Color.B, alpha);
 
-                DrawStringOutline(_cachedFont, screenPos, entry.Text, HorizontalAlignment.Center, -1, entry.FontSize, 3, outlineColor);
+                if (outlines)
+                {
+                    Color outlineColor = new Color(0, 0, 0, alpha * 0.85f);
+                    DrawStringOutline(_cachedFont, screenPos, entry.Text, HorizontalAlignment.Center, -1, entry.FontSize, 3, outlineColor);
+                }
                 DrawString(_cachedFont, screenPos, entry.Text, HorizontalAlignment.Center, -1, entry.FontSize, drawColor);
             }
         }

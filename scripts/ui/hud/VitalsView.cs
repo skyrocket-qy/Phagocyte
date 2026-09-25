@@ -39,6 +39,18 @@ public partial class VitalsView : Node
     private int _lastBuffKind = int.MinValue;
     private int _lastBuffTenths = int.MinValue;
 
+    /// <summary>
+    /// Text-shaping throttle: HP/EXP labels reshape + relayout their containers
+    /// on every write, which measured 326us per StatsChanged emit (contact storm
+    /// = hundreds of emits/sec). Bars update immediately (cheap); text lines
+    /// refresh at most every 100ms via <see cref="SyncPendingTexts"/>, driven by
+    /// Hud._Process. Death and language changes force an immediate refresh.
+    /// </summary>
+    private const int TextRefreshIntervalMsec = 100;
+    private ulong _lastTextMsec;
+    private bool _pendingVitalText;
+    private bool _pendingExpText;
+
     /// <summary>Raised after any vitals update so the coordinator can refresh dependent overlays.</summary>
     public event System.Action? VitalsChanged;
 
@@ -128,9 +140,11 @@ public partial class VitalsView : Node
     public void UpdateLocalizedTexts()
     {
         if (HpTitleLabel != null) HpTitleLabel.Text = Tr("HUD_HP_TITLE");
+        _lastTextMsec = 0;
         RenderVitalLines(LastHealth, LastMaxHealth);
         if (ExpTitleLabel != null) ExpTitleLabel.Text = Tr("HUD_EXP_TITLE");
-        UpdateExpDisplay();
+        _lastTextMsec = 0;
+        RefreshExpText(true);
         RenderCountLines(LastDigestedCount);
         UpdateBuffStatus();
     }
@@ -147,16 +161,64 @@ public partial class VitalsView : Node
             BottomExpBar.MaxValue = Mathf.Max(1.0f, LastExpToNext);
             BottomExpBar.Value = LastCurrentExp;
         }
-        int percent = (int)((LastCurrentExp / Mathf.Max(1.0f, LastExpToNext)) * 100.0f);
-        if (ExpLabel != null)
+        RefreshExpText(false);
+    }
+
+    /// <summary>EXP text line, throttled unless forced.</summary>
+    private void RefreshExpText(bool force)
+    {
+        if (ExpLabel == null)
+            return;
+        ulong now = Time.GetTicksMsec();
+        if (!force && now - _lastTextMsec < TextRefreshIntervalMsec)
         {
-            ExpLabel.Text = TextFormatter.Format(Tr("HUD_EXP_VAL"), (int)LastCurrentExp, (int)LastExpToNext, percent);
+            _pendingExpText = true;
+            return;
+        }
+        _lastTextMsec = now;
+        _pendingExpText = false;
+        int percent = (int)((LastCurrentExp / Mathf.Max(1.0f, LastExpToNext)) * 100.0f);
+        ExpLabel.Text = TextFormatter.Format(Tr("HUD_EXP_VAL"), (int)LastCurrentExp, (int)LastExpToNext, percent);
+    }
+
+    /// <summary>Flushes throttled text lines. Called from Hud._Process.</summary>
+    public void SyncPendingTexts()
+    {
+        if (!_pendingVitalText && !_pendingExpText)
+            return;
+        ulong now = Time.GetTicksMsec();
+        if (now - _lastTextMsec < TextRefreshIntervalMsec)
+            return;
+        _lastTextMsec = now;
+        if (_pendingVitalText)
+        {
+            _pendingVitalText = false;
+            RenderVitalLines(LastHealth, LastMaxHealth);
+        }
+        if (_pendingExpText)
+        {
+            _pendingExpText = false;
+            int percent = (int)((LastCurrentExp / Mathf.Max(1.0f, LastExpToNext)) * 100.0f);
+            if (ExpLabel != null)
+                ExpLabel.Text = TextFormatter.Format(Tr("HUD_EXP_VAL"), (int)LastCurrentExp, (int)LastExpToNext, percent);
         }
     }
 
     public void RenderVitalLines(float health, float maxHealth)
     {
-        if (HpLabel != null) HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)health, (int)maxHealth);
+        if (HpLabel == null)
+            return;
+        // Death forces through: end screens read the final line.
+        bool force = health <= 0.0f;
+        ulong now = Time.GetTicksMsec();
+        if (!force && now - _lastTextMsec < TextRefreshIntervalMsec)
+        {
+            _pendingVitalText = true;
+            return;
+        }
+        _lastTextMsec = now;
+        _pendingVitalText = false;
+        HpLabel.Text = TextFormatter.Format(Tr("HUD_HP_VAL"), (int)health, (int)maxHealth);
     }
 
     public void RenderCountLines(int digested)

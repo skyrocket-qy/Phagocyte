@@ -65,5 +65,35 @@ public static class BackdropQuality
                 worldEnv.RemoveMeta("full_glow");
             }
         }
+
+        // Mid-layer procedural backdrops (30 Hz redraws each): freeze their
+        // simulation so they persist as a static backdrop at zero per-frame
+        // cost. Not hidden — the frozen frame keeps the tissue read.
+        var parallax = root.GetNodeOrNull<Node2D>("Background/MicroscopeParallax");
+        if (parallax != null)
+            parallax.SetProcess(!performanceMode);
+        var tissue = root.GetNodeOrNull<Node2D>("Background/CapillaryTissue");
+        if (tissue != null)
+            tissue.SetProcess(!performanceMode);
+
+        // Ambient CPU particles: stop emission in performance mode (in-flight
+        // particles drain, sim idles). Stashed in metadata for reversibility.
+        // Accessed as untyped Node (property "emitting") to avoid a hard
+        // dependency on the particle class binding.
+        var fluid = root.GetNodeOrNull<Node>("Background/FluidParticles");
+        if (fluid != null)
+        {
+            if (performanceMode)
+            {
+                if (!fluid.HasMeta("full_emitting"))
+                    fluid.SetMeta("full_emitting", fluid.Get("emitting").AsBool());
+                fluid.Set("emitting", false);
+            }
+            else if (fluid.HasMeta("full_emitting"))
+            {
+                fluid.Set("emitting", fluid.GetMeta("full_emitting").AsBool());
+                fluid.RemoveMeta("full_emitting");
+            }
+        }
     }
 }

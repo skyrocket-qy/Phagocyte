@@ -151,7 +151,15 @@ public partial class Hud : CanvasLayer
         _tutorial.CellUpgradeModal = CellUpgradeModal;
 
         // Cross-view wiring (replaces the old direct method calls).
-        _vitals.VitalsChanged += () => _pause?.RefreshTreeOverlay();
+        // Tree overlay rebuilds only while visible: StatsChanged fires on every
+        // hit (300+/sec in a contact storm) and the rebuild (catalog lookups +
+        // RichText BBCode relayout) measured 300us a pop. Freshness on open is
+        // owned by ToggleTreeOverlay, so gating here loses nothing.
+        _vitals.VitalsChanged += () =>
+        {
+            if (_pause != null && _pause.IsTreeOverlayVisible)
+                _pause.RefreshTreeOverlay();
+        };
         _tutorial.LeveledUp += (lvl) =>
         {
             _vitals?.OnPlayerLeveledUp(lvl);
@@ -202,6 +210,7 @@ public partial class Hud : CanvasLayer
         _vitals?.TickVignette(_timer?.SurvivalTime ?? 0.0f);
         _skills?.TickAlpha(dt, GetTree().Paused);
         _vitals?.UpdateBuffStatus();
+        _vitals?.SyncPendingTexts();
         _skills?.TickSkillSlots();
         TickFps(dt);
         Vector2 fluid = FluidVectorProvider?.Invoke() ?? Vector2.Zero;

@@ -96,6 +96,7 @@ public partial class AchievementManager : Node
         }
 
         UnlockedIds[achId] = true;
+        FrameSpikeLog.MarkAchievement();
         var data = Achievements[achId].AsGodotDictionary();
 
         // Unlock rewarding immune cell if applicable
