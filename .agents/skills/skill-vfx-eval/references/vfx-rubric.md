@@ -1,0 +1,90 @@
+# Bio-Fluorescence Visual Quality Rubric
+
+This rubric defines the criteria for grading and validating skill visual effects in *Project: Phagocyte*. All active skills must conform to the **Microscopic Bio-Fluorescence & Confocal Laser** visual identity.
+
+---
+
+## 1. Multi-Pass Confocal Bio-Fluorescence
+
+Visual effects must never appear as flat, single-pass vector lines or solid geometric primitives. High-energy bio-chemical reactions require a 3-layer luminance hierarchy:
+
+```
++--------------------------------------------------------+
+| Layer 3: Ambient Diffusion Halo (Alpha 0.15 - 0.25)   |
+|   +--------------------------------------------------+ |
+|   | Layer 2: Fluorescent Emission (Accent Color)     | |
+|   |   +--------------------------------------------+ | |
+|   |   | Layer 1: High-Energy Excitation Core       | | |
+|   |   |          (White / 60% Lerp White)          | | |
+|   |   +--------------------------------------------+ | |
+|   +--------------------------------------------------+ |
++--------------------------------------------------------+
+```
+
+### Luminance Hierarchy Rules:
+- **Core (Layer 1)**: Narrow, intense white or pastel core (`SkillAssetPalette.Core(skillId)`). Represents intense photon emission from active molecular bonds.
+- **Emission Body (Layer 2)**: Fully saturated accent color sampled directly from `SkillAssetPalette.Accent(skillId)`.
+- **Diffusion Halo (Layer 3)**: Soft, semi-transparent outer boundary simulating cellular cytoplasm light scattering.
+
+---
+
+## 2. Organic Cellular Geometry vs Artificial Primitives
+
+| Aspect | ❌ Unacceptable (Artificial) | ✅ Required (Bio-Fluorescent) |
+| :--- | :--- | :--- |
+| **Beams / Lances** | Single 1px solid green line | Multi-pass tapered laser with corkscrewing Ca²⁺ helical particles and membrane entry blooms. |
+| **Tentacles / Grabs**| Rigid straight line segments | Curved Bezier/segmented actin microfilaments with fluctuating membrane thickness. |
+| **Ground Hazards** | Perfect sharp geometric circle | Irregular cellular pseudopod puddle with organic bubbling lipid vesicles and caustic edge distortion. |
+| **Explosions** | Plain cartoon circular flash | Multi-ring shockwave, fragmented apoptotic chromatin shards, and radial enzyme dissipation. |
+| **Projectiles** | Simple colored circle | Biologically recognizable entities (e.g. Y-shaped antibodies, helical defensin peptides, crystalline lysozymes). |
+
+---
+
+## 3. Hit-Reaction & Impact Readability
+
+1. **Target Flash**: When a skill strikes a `TargetDummy`, the dummy must display an immediate micro-flash indicating valid contact.
+2. **Impact Decals**: Piercing or puncturing skills (e.g. `PerforinLance`) must instantiate surface decals (e.g. `PoreDecal`) at impact coordinates.
+3. **Directional Feedback**: Dispersal particles and spray should reflect the trajectory of impact rather than dispersing in a generic circular burst.
+4. **Kinetic Contrast**: Attack duration must match its physical feel: sharp snap on strike (1-3 frames), sustained glow on channel (continuous), and smooth exponential fade on trail.
+
+---
+
+## 4. Visual Palette Compliance (SSOT: `SkillAssetPalette`)
+
+Colors must never be hardcoded arbitrarily in `_Draw()` methods. They must derive strictly from `SkillAssetPalette.cs`:
+
+```csharp
+Color accent = SkillAssetPalette.Accent(SkillId, fallbackAccent);
+Color core   = SkillAssetPalette.Core(SkillId, fallbackCore);
+```
+
+### Canonical Accent Mappings:
+- **Perforin Lance**: `#39c06a` (Cytotoxic Emerald)
+- **Lysosomal Overload**: `#b5e61d` (Caustic Acid Yellow-Green)
+- **ROS Torrent**: `#2bd2b9` (Peroxide Cyan)
+- **Phagocytic Grasp**: `#24d15b` (Actin Bio-Green)
+- **Complement Cascade**: `#25a4e2` (MAC Electric Blue)
+- **Antibody Salvo**: `#26afc0` (Immunoglobulin Teal)
+- **Pseudopod Lunge**: `#40cd76` (Cellular Lime)
+- **Nitric Oxide Halo**: `#4ccae3` (Gaseous Light Cyan)
+- **Nuclease Blades**: `#41c471` (Enzyme Green)
+- **Granzyme Detonation**: `#e78c41` (Caspase Apoptosis Amber)
+- **Interferon Wave**: `#1aabc6` (Cytokine Deep Teal)
+- **Lysozyme Ricochet**: `#1c6fdc` (Hydrolase Deep Blue)
+- **Phagolysosome Vent**: `#ed4543` (Digestive Acid Crimson)
+- **Pro-Inflammatory Arc**: `#e3a638` (Interleukin Golden Lightning)
+- **Exosome Singularity**: `#22add4` (Vesicular Sky Cyan)
+- **Defensin Barbs**: `#4de892` (Antimicrobial Mint)
+- **MHC Tracer Beam**: `#1dc457` (Antigen Presentation Emerald)
+- **Histamine Surge**: `#e3a638` (Mast Cell Amber Wave)
+
+---
+
+## 5. Noise & Artifact Audit Checklist
+
+Before declaring any skill VFX complete:
+- [ ] Tested inside `SkillTestChamber` with **strictly 0.00% background noise**.
+- [ ] No lingering nodes after skill finishes (`QueueFree()` correctly called on all particles/decals).
+- [ ] No performance degradation under multiple simultaneous casts (particle pools / capped lifespans).
+- [ ] Clear distinction between primary projectile and background grid overlay.
+- [ ] Verified via 3-column composite generated by `tools/make_chamber_diffs.py`.
