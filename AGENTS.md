@@ -11,6 +11,22 @@ about available tooling, run `execute` → `search({query: "godot"})` and
 `project_run`, `game_eval`, `editor_screenshot source="game"`) may be live
 even when the session prompt doesn't advertise it.
 
+## AI collaboration (grill protocols)
+
+Vibe-coding unfamiliar code is a comprehension trap: fast output, zero
+retained mental model. Route by domain familiarity:
+
+- Familiar domain (backend/systems) or ambiguous requirements →
+  `grill-me`: AI interrogates the spec **before** building. No code until
+  scope, edge cases, and verification are locked.
+- Unfamiliar domain (Godot 4 / C# game code) → `reverse-grill-me`: AI may
+  generate, but the diff is **uncommittable until you pass an oral defense**
+  (3–5 questions, one at a time, graded against
+  `.agents/skills/reverse-grill-me/references/godot-defense-rubric.md`).
+  Two failed attempts → shrink the diff, rewrite by hand, re-grill.
+- Trigger phrases: "grill me" (pre-build spec), "defend this" / "reverse
+  grill" (post-generation defense).
+
 ## Build
 
 ```sh
