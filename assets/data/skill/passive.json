@@ -1,0 +1,145 @@
+[
+  {
+    "bio_key": "SKILL_ACTIN_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_ACTIN_DESC",
+    "icon": "🧬",
+    "id": "actin",
+    "max_level": 5,
+    "name_key": "SKILL_ACTIN_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_LYSOSOME_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "TREE_NODE_LYSOSOME_DESC",
+    "icon": "🧪",
+    "id": "lysosome",
+    "max_level": 5,
+    "name_key": "TREE_NODE_LYSOSOME_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_MITOCHONDRIA_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_MITOCHONDRIA_DESC",
+    "icon": "⚡",
+    "id": "mitochondria",
+    "max_level": 5,
+    "name_key": "SKILL_MITOCHONDRIA_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_OPSONIN_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_OPSONIN_DESC",
+    "icon": "🎯",
+    "id": "opsonin",
+    "max_level": 5,
+    "name_key": "SKILL_OPSONIN_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_CHEMOKINE_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_CHEMOKINE_DESC",
+    "icon": "🧲",
+    "id": "chemokine",
+    "max_level": 5,
+    "name_key": "SKILL_CHEMOKINE_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_BILAYER_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_BILAYER_DESC",
+    "icon": "🛡️",
+    "id": "bilayer",
+    "max_level": 5,
+    "name_key": "SKILL_BILAYER_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_AUTOPHAGY_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_AUTOPHAGY_DESC",
+    "icon": "🔄",
+    "id": "autophagy",
+    "max_level": 5,
+    "name_key": "SKILL_AUTOPHAGY_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_GLYCOLYSIS_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_GLYCOLYSIS_DESC",
+    "icon": "🍬",
+    "id": "glycolysis",
+    "max_level": 5,
+    "name_key": "SKILL_GLYCOLYSIS_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_KINESIN_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_KINESIN_DESC",
+    "icon": "🛤️",
+    "id": "kinesin",
+    "max_level": 5,
+    "name_key": "SKILL_KINESIN_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_LONGEVITY_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_LONGEVITY_DESC",
+    "icon": "⏳",
+    "id": "longevity",
+    "max_level": 5,
+    "name_key": "SKILL_LONGEVITY_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_VDJ_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_VDJ_DESC",
+    "icon": "🎲",
+    "id": "vdj",
+    "max_level": 5,
+    "name_key": "SKILL_VDJ_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_ENDOTOXIN_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_ENDOTOXIN_DESC",
+    "icon": "🧱",
+    "id": "endotoxin",
+    "max_level": 5,
+    "name_key": "SKILL_ENDOTOXIN_NAME",
+    "type": "passive"
+  },
+  {
+    "bio_key": "SKILL_HEMATOPOIETIC_BIO",
+    "class_id": "",
+    "cooldown": 0.0,
+    "desc_key": "SKILL_HEMATOPOIETIC_DESC",
+    "icon": "🩸",
+    "id": "hematopoietic",
+    "max_level": 5,
+    "name_key": "SKILL_HEMATOPOIETIC_NAME",
+    "type": "passive"
+  }
+]

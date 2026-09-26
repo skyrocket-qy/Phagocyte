@@ -42,7 +42,7 @@ def check_missing_assets(
     Bidirectional Asset Integrity Verification across active categories.
     Ids equal gen/ file stems (no prefixes, Vistrace-style):
     - Achievement (from achievements.json -> gen/achievement/{id}.png)
-    - Skill (from skills.json -> gen/skill/{id}.png)
+    - Skill (from skill/active.json + passive.json -> gen/skill/{id}.png)
     - PassiveTree (from passive_traits.json -> gen/passive_tree/{id}.png)
     - Organelle (from organelles.json -> gen/organelle/{id}.png)
     - UI (from ui.json -> gen/ui/{id}.png)
@@ -82,8 +82,10 @@ def check_missing_assets(
             missing_by_cat["Achievement"].append(f"gen/achievement/{ach_id}.png")
 
     # ── 2. Skills ─────────────────────────────────────────────────────────
-    skills_file = assets_dir / "data" / "skills.json"
-    for skill_id in _extract_ids(_load_json(skills_file) or []):
+    skill_ids: list[str] = []
+    for skill_file in ("active.json", "passive.json"):
+        skill_ids.extend(_extract_ids(_load_json(assets_dir / "data" / "skill" / skill_file) or []))
+    for skill_id in skill_ids:
         expected_stems.setdefault("skill", set()).add(skill_id)
         category_counts["Skill"] = category_counts.get("Skill", 0) + 1
 

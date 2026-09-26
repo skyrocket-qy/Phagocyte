@@ -80,7 +80,7 @@ public partial class GameManager : Node
     }
 
     // Skill Catalog for Manual and Tooltips
-    // Skill Catalog for Manual and Tooltips (data-owned: assets/data/skills.json).
+    // (data-owned: assets/data/skill/active.json + passive.json).
     private static Dictionary? _skillCatalog;
     public static Dictionary SkillCatalog
     {

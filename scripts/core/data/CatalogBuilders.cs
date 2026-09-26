@@ -17,24 +17,27 @@ public static class CatalogBuilders
     {
         var table = new Dictionary();
         var seen = new HashSet<string>();
-        foreach (var row in CatalogLoader.LoadArray(DataPaths.Skills))
+        foreach (string path in new[] { DataPaths.ActiveSkills, DataPaths.PassiveSkills })
         {
-            string id = CatalogLoader.GetString(row, "id");
-            if (string.IsNullOrEmpty(id) || !seen.Add(id))
-                throw new DataLoadException(DataPaths.Skills, $"Duplicate or missing skill id '{id}'.");
-            table[id] = new Dictionary
+            foreach (var row in CatalogLoader.LoadArray(path))
             {
-                { "id", id },
-                { "name_key", CatalogLoader.GetString(row, "name_key") },
-                { "desc_key", CatalogLoader.GetString(row, "desc_key") },
-                { "bio_key", CatalogLoader.GetString(row, "bio_key") },
-                { "icon", CatalogLoader.GetString(row, "icon") },
-                { "type", CatalogLoader.GetString(row, "type") },
-                { "class_id", CatalogLoader.GetString(row, "class_id") },
-                { "cooldown", CatalogLoader.GetFloat(row, "cooldown") },
-                { "max_level", CatalogLoader.GetInt(row, "max_level", 5) },
-                { "image_path", AssetPaths.SkillIcon(id) }
-            };
+                string id = CatalogLoader.GetString(row, "id");
+                if (string.IsNullOrEmpty(id) || !seen.Add(id))
+                    throw new DataLoadException(path, $"Duplicate or missing skill id '{id}'.");
+                table[id] = new Dictionary
+                {
+                    { "id", id },
+                    { "name_key", CatalogLoader.GetString(row, "name_key") },
+                    { "desc_key", CatalogLoader.GetString(row, "desc_key") },
+                    { "bio_key", CatalogLoader.GetString(row, "bio_key") },
+                    { "icon", CatalogLoader.GetString(row, "icon") },
+                    { "type", CatalogLoader.GetString(row, "type") },
+                    { "class_id", CatalogLoader.GetString(row, "class_id") },
+                    { "cooldown", CatalogLoader.GetFloat(row, "cooldown") },
+                    { "max_level", CatalogLoader.GetInt(row, "max_level", 5) },
+                    { "image_path", AssetPaths.SkillIcon(id) }
+                };
+            }
         }
         GD.Print($"[Catalog] Loaded {table.Count} skills.");
         return table;
