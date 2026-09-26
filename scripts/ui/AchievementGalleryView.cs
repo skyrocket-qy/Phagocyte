@@ -54,7 +54,7 @@ public partial class AchievementGalleryView : Control
 
     public override void _Ready()
     {
-        HeaderLabel = GetNodeOrNull<Label>("HeaderLabel");
+        HeaderLabel = GetNodeOrNull<Label>("PageHeader/Title");
         HeaderProgress = GetNodeOrNull<ProgressBar>("ProgressHBox/ProgressBar");
         ProgressLabel = GetNodeOrNull<Label>("ProgressHBox/ProgressLabel");
 

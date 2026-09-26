@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/stat_preview.tscn" id="6_stats"]
 [ext_resource type="PackedScene" path="res://scenes/ui/organelle_slot.tscn" id="7_slots"]
 [ext_resource type="Theme" uid="uid://ppcyc41cyeh7" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/page_header.tscn" id="page_header"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
 shader = ExtResource("3_grid_shader")
@@ -78,7 +79,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 36
-theme_override_constants/margin_top = 20
+theme_override_constants/margin_top = 40
 theme_override_constants/margin_right = 36
 theme_override_constants/margin_bottom = 20
 
@@ -86,21 +87,9 @@ theme_override_constants/margin_bottom = 20
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TopBar" type="HBoxContainer" parent="Margin/VBox" unique_id=1050944696]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="TitleVBox" type="VBoxContainer" parent="Margin/VBox/TopBar" unique_id=677547762]
+[node name="PageHeader" parent="Margin/VBox" instance=ExtResource("page_header")]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 2
-
-[node name="HeaderLabel" type="Label" parent="Margin/VBox/TopBar/TitleVBox" unique_id=1209560929]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.95, 1, 1)
-theme_override_font_sizes/font_size = 28
-text = "Loadout"
-horizontal_alignment = 1
 
 [node name="TopSeparator" type="HSeparator" parent="Margin/VBox" unique_id=2017758978]
 layout_mode = 2

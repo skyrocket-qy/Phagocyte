@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b6oqhtll01hg4" path="res://scripts/ui/AchievementGalleryView.cs" id="1_gallery"]
 [ext_resource type="Theme" uid="uid://ppcyc41cyeh7" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/page_header.tscn" id="page_header"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 content_margin_left = 20.0
@@ -29,20 +30,16 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_gallery")
 
-[node name="HeaderLabel" type="Label" parent="." unique_id=554848356]
+[node name="PageHeader" parent="." instance=ExtResource("page_header")]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -300.0
-offset_top = 24.0
+offset_top = 40.0
 offset_right = 300.0
-offset_bottom = 60.0
+offset_bottom = 85.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
-theme_override_font_sizes/font_size = 26
-text = "成就收藏"
-horizontal_alignment = 1
 
 [node name="ProgressHBox" type="HBoxContainer" parent="." unique_id=1857940411]
 layout_mode = 1
@@ -50,9 +47,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -460.0
-offset_top = 64.0
+offset_top = 92.0
 offset_right = 460.0
-offset_bottom = 88.0
+offset_bottom = 116.0
 grow_horizontal = 2
 theme_override_constants/separation = 12
 
@@ -76,9 +73,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -330.0
-offset_top = 94.0
+offset_top = 122.0
 offset_right = 330.0
-offset_bottom = 130.0
+offset_bottom = 158.0
 grow_horizontal = 2
 theme_override_constants/separation = 12
 alignment = 1
@@ -89,7 +86,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 14
-text = "全部"
+text = "All"
 
 [node name="FilterUnlockedButton" type="Button" parent="FilterHBox" unique_id=1098395088]
 custom_minimum_size = Vector2(200, 34)
@@ -97,7 +94,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 14
-text = "已解锁"
+text = "Done"
 
 [node name="FilterLockedButton" type="Button" parent="FilterHBox" unique_id=886628934]
 custom_minimum_size = Vector2(200, 34)
@@ -105,7 +102,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 14
-text = "未解锁"
+text = "Locked"
 
 [node name="HBox" type="HBoxContainer" parent="." unique_id=1625329159]
 layout_mode = 1
@@ -114,7 +111,7 @@ anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -590.0
-offset_top = 140.0
+offset_top = 164.0
 offset_right = 590.0
 offset_bottom = -16.0
 grow_horizontal = 2
@@ -181,14 +178,14 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
 theme_override_font_sizes/font_size = 24
-text = "成就名称"
+text = "Achievement"
 autowrap_mode = 3
 
 [node name="DetailBadge" type="Label" parent="HBox/DetailPanel/DetailVBox/DetailTopHBox/DetailTitleVBox" unique_id=633866320]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "[ 进行中 ]"
+text = "[ Locked ]"
 
 [node name="DetailProgressLabel" type="Label" parent="HBox/DetailPanel/DetailVBox" unique_id=584943049]
 layout_mode = 2
@@ -205,7 +202,7 @@ show_percentage = false
 layout_mode = 2
 theme_override_constants/line_spacing = 6
 theme_override_font_sizes/font_size = 14
-text = "达成条件"
+text = "Requirement"
 autowrap_mode = 3
 
 [node name="DetailReward" type="Label" parent="HBox/DetailPanel/DetailVBox" unique_id=750511040]
@@ -213,7 +210,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
 theme_override_constants/line_spacing = 6
 theme_override_font_sizes/font_size = 14
-text = "奖励"
+text = "Reward"
 autowrap_mode = 3
 
 [node name="DetailSteam" type="Label" parent="HBox/DetailPanel/DetailVBox" unique_id=2047945186]

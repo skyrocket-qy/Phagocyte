@@ -28,11 +28,8 @@ public partial class LoadoutView : Control
     public HBoxContainer? ProfileHBox { get; set; }
     public Button? ProfileAddButton { get; set; }
     public Button? ProfileDeleteButton { get; set; }
-    public Label? BackpackHeaderLabel { get; set; }
     public GridContainer? CategoryTabBar { get; set; }
     public GridContainer? BackpackGrid { get; set; }
-    public Label? HintLabel { get; set; }
-    public Label? ChamberHeaderLabel { get; set; }
     public EnergyPips? EnergyBar { get; set; }
     public GridContainer? ChamberGrid { get; set; }
     public Button? ResetButton { get; set; }
@@ -128,15 +125,12 @@ public partial class LoadoutView : Control
 
     public override void _Ready()
     {
-        HeaderLabel = GetNodeOrNull<Label>("Margin/VBox/TopBar/TitleVBox/HeaderLabel");
+        HeaderLabel = GetNodeOrNull<Label>("Margin/VBox/PageHeader/Title");
         ProfileHBox = GetNodeOrNull<HBoxContainer>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox");
         ProfileAddButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox/ProfileAddButton");
         ProfileDeleteButton = GetNodeOrNull<Button>("Margin/VBox/ContentHBox/ChamberSide/ProfileHBox/ProfileDeleteButton");
-        BackpackHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/VaultSide/BackpackHeader");
         CategoryTabBar = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/VaultSide/CategoryTabBar");
         BackpackGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/VaultSide/VaultScroll/BackpackGrid");
-        HintLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/VaultSide/HintLabel");
-        ChamberHeaderLabel = GetNodeOrNull<Label>("Margin/VBox/ContentHBox/ChamberSide/ChamberHeader");
         EnergyBar = GetNodeOrNull<EnergyPips>("Margin/VBox/ContentHBox/ChamberSide/EnergyBar");
         ChamberGrid = GetNodeOrNull<GridContainer>("Margin/VBox/ContentHBox/ChamberSide/SocketWell/WellMargin/ChamberGrid");
         ResetButton = GetNodeOrNull<Button>("Margin/VBox/Buttons/ResetButton");
@@ -193,7 +187,6 @@ public partial class LoadoutView : Control
     public void UpdateLocalizedTexts()
     {
         if (HeaderLabel != null) HeaderLabel.Text = Tr("LOADOUT_HEADER");
-        if (ChamberHeaderLabel != null) ChamberHeaderLabel.Text = Tr("LOADOUT_CHAMBER_HEADER");
         if (ResetButton != null) ResetButton.Text = Tr("LOADOUT_RESET");
         if (ConfirmButton != null) ConfirmButton.Text = Tr("LOADOUT_CONFIRM");
         if (ProfileAddButton != null) ProfileAddButton.Text = Tr("TREE_PROFILE_ADD");
@@ -355,8 +348,8 @@ public partial class LoadoutView : Control
 
     /// <summary>
     /// Equips an organelle into the first free slot, or unequips it when already
-    /// equipped. Returns true when the chamber changed; refusals surface through
-    /// the hint label (locked / overload / full slots) plus an error sting.
+    /// equipped. Returns true when the chamber changed; refusals surface
+    /// through an energy flash plus an error sting.
     /// </summary>
     public bool ToggleOrganelle(string id)
     {
@@ -365,7 +358,6 @@ public partial class LoadoutView : Control
 
         if (!OrganelleUnlockManager.IsUnlocked(id))
         {
-            ShowHint("LOADOUT_HINT_LOCKED");
             FlashEnergy(new Color(1.0f, 0.72f, 0.35f));
             AudioManager.Instance?.PlayError();
             return false;
@@ -379,8 +371,7 @@ public partial class LoadoutView : Control
                 continue;
             if (!_chamber.Unequip(i))
             {
-                _chamber.CanUnequip(i, out string unequipReason);
-                ShowHint(ReasonKey(unequipReason));
+                _chamber.CanUnequip(i, out _);
                 FlashEnergy(new Color(1.0f, 0.35f, 0.35f));
                 AudioManager.Instance?.PlayError();
                 return false;
@@ -402,7 +393,6 @@ public partial class LoadoutView : Control
         }
         if (free < 0)
         {
-            ShowHint("LOADOUT_HINT_SLOTS_FULL");
             FlashEnergy(new Color(1.0f, 0.55f, 0.45f));
             AudioManager.Instance?.PlayError();
             return false;
@@ -410,15 +400,13 @@ public partial class LoadoutView : Control
 
         if (!_chamber.Equip(id, free))
         {
-            _chamber.CanEquip(id, free, out string reason);
-            ShowHint(ReasonKey(reason));
+            _chamber.CanEquip(id, free, out _);
             FlashEnergy(new Color(1.0f, 0.35f, 0.35f));
             AudioManager.Instance?.PlayError();
             return false;
         }
 
         AudioManager.Instance?.PlaySocket();
-        ShowHint("LOADOUT_HINT_DEFAULT");
         Persist();
         RefreshAll();
         return true;
@@ -447,7 +435,6 @@ public partial class LoadoutView : Control
                 break;
         }
         Persist();
-        ShowHint("LOADOUT_HINT_DEFAULT");
         RefreshAll();
     }
 
@@ -457,8 +444,7 @@ public partial class LoadoutView : Control
             return;
         if (!_chamber.Unequip(slot))
         {
-            _chamber.CanUnequip(slot, out string reason);
-            ShowHint(ReasonKey(reason));
+            _chamber.CanUnequip(slot, out _);
             FlashEnergy(new Color(1.0f, 0.35f, 0.35f));
             AudioManager.Instance?.PlayError();
             return;
@@ -520,18 +506,7 @@ public partial class LoadoutView : Control
         RefreshEnergy();
         RefreshBackpackCards();
         RefreshCategoryTabs();
-        RefreshVaultHeader();
         StatPanel?.Refresh(_classKey);
-    }
-
-    /// <summary>Vault header carries the collection progress (unlocked / total).</summary>
-    private void RefreshVaultHeader()
-    {
-        if (BackpackHeaderLabel == null)
-            return;
-        BackpackHeaderLabel.Text = Tr("LOADOUT_BACKPACK_HEADER") + "   "
-            + TextFormatter.Format(Tr("LOADOUT_VAULT_PROGRESS"),
-                OrganelleUnlockManager.UnlockedCount, GameManager.OrganelleCatalog.Count);
     }
 
     private void RefreshProfileTabs()
@@ -663,12 +638,6 @@ public partial class LoadoutView : Control
         }
     }
 
-    private void ShowHint(string key)
-    {
-        if (HintLabel != null)
-            HintLabel.Text = Tr(key);
-    }
-
     private void FlashEnergy(Color color)
     {
         if (EnergyBar == null)
@@ -677,15 +646,4 @@ public partial class LoadoutView : Control
         CreateTween().TweenProperty(EnergyBar, "modulate", Colors.White, 0.45f);
     }
 
-    private static string ReasonKey(string reason)
-    {
-        return reason switch
-        {
-            "overload" => "LOADOUT_HINT_OVERLOAD",
-            "copy_cap" or "already_equipped" => "LOADOUT_HINT_COPY_CAP",
-            "unknown" => "LOADOUT_HINT_UNKNOWN",
-            "bad_slot" => "LOADOUT_HINT_BAD_SLOT",
-            _ => "LOADOUT_HINT_DEFAULT"
-        };
-    }
 }

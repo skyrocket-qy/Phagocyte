@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[node name="PageHeader" type="VBoxContainer"]
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 26
+text = "Title"
+horizontal_alignment = 1
+
+[node name="SubRow" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4

@@ -152,7 +152,7 @@ offset_bottom = 64.0
 mouse_default_cursor_shape = 2
 theme = ExtResource("menu_theme")
 theme_override_font_sizes/font_size = 16
-text = "‹ 返回"
+text = "‹ Back"
 
 [node name="CodexModal" parent="." instance=ExtResource("2_codex")]
 visible = false

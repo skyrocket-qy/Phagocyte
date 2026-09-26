@@ -148,7 +148,7 @@ public partial class MainMenu : Control
         SettingsBtn = GetNodeOrNull<Button>("TitleView/VBox/SettingsButton");
         QuitBtn = GetNodeOrNull<Button>("TitleView/VBox/QuitButton");
 
-        ClassHeaderLbl = GetNodeOrNull<Label>("ClassView/HeaderLabel");
+        ClassHeaderLbl = GetNodeOrNull<Label>("ClassView/PageHeader/Title");
         ClassListContainer = GetNodeOrNull<VBoxContainer>("ClassView/HBox/ClassList");
         ClassNameLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassNameLabel");
         ClassBioLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassBioLabel");
@@ -162,7 +162,7 @@ public partial class MainMenu : Control
         ClassRadarChart = GetNodeOrNull<BioRadarChart>("ClassView/HBox/DetailPanel/VBox/StatsRow/BioRadarChart")
             ?? GetNodeOrNull<BioRadarChart>("ClassView/HBox/DetailPanel/VBox/BioRadarChart");
 
-        PassiveHeaderLbl = GetNodeOrNull<Label>("PassiveView/HeaderLabel");
+        PassiveHeaderLbl = GetNodeOrNull<Label>("PassiveView/PageHeader/Title");
         TreeLevelLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreeLevelLabel");
         TreePointsLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreePointsLabel");
         TreeCanvas = GetNodeOrNull<PassiveTreeView>("PassiveView/ContentHBox/TreeView");
@@ -172,7 +172,7 @@ public partial class MainMenu : Control
         TreeZoomOutBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ZoomOutButton");
         TreeZoomInBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ZoomInButton");
 
-        MapHeaderLbl = GetNodeOrNull<Label>("MapView/HeaderLabel");
+        MapHeaderLbl = GetNodeOrNull<Label>("MapView/PageHeader/Title");
         MapListContainer = GetNodeOrNull<VBoxContainer>("MapView/HBox/MapList");
         OrganBadgeLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TopHBox/OrganBadge");
         DifficultyLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TopHBox/DifficultyLabel");
@@ -300,9 +300,8 @@ public partial class MainMenu : Control
         }
         // Build-profile tabs (docs/passivetree.md §5.4): dynamic slots, up to MaxProfiles.
         // Shifted right (+130px) so the tabs clear the shared top-left
-        // GlobalBackButton (24,24)-(164,64), and shifted down (+40px) so the
-        // tabs sit below HeaderLabel (8-38) + InfoHBox (42-64) instead of
-        // overlapping the title row.
+        // GlobalBackButton (24,24)-(164,64). They sit in their own row below
+        // HeaderLabel (40-85) + InfoHBox (90-110), above ContentHBox (160+).
         if (PassiveView != null)
         {
             _profileButtonGroup = new ButtonGroup { AllowUnpress = false };
@@ -315,9 +314,9 @@ public partial class MainMenu : Control
                 AnchorRight = 0.5f,
                 AnchorBottom = 0.5f,
                 OffsetLeft = -460.0f,
-                OffsetTop = -292.0f,
+                OffsetTop = -244.0f,
                 OffsetRight = 100.0f,
-                OffsetBottom = -250.0f
+                OffsetBottom = -204.0f
             };
             ProfileHBox.AddThemeConstantOverride("separation", 8);
             ProfileAddBtn = new Button

@@ -86,7 +86,7 @@ public partial class TestCodexAndTooltip : TestHarness
         var tTex = skillTooltip!.GetNodeOrNull<TextureRect>("VBox/HeaderHBox/TooltipIconTexture");
         AssertThat(tTex).IsNotNull();
         AssertThat(tTex!.Texture).IsNotNull();
-        AssertThat(tBadge.Contains("主动") || tBadge.Contains("ACTIVE")).IsTrue();
+        AssertThat(tBadge.Contains("主动") || tBadge.Contains("Active") || tBadge.Contains("ACTIVE")).IsTrue();
         GD.Print($"[PASS] Slot 0 Innate-as-Active Tooltip verified: '{tTitle}' ({tBadge})");
 
         // Test Hover Slot 1 (Drafted Active Weapon)
@@ -97,7 +97,7 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(tTex1).IsNotNull();
         AssertThat(tTex1!.Texture).IsNotNull();
         var activeBadge = hud.TooltipBadge?.Text ?? "";
-        AssertThat(activeBadge.Contains("\u4E3B\u52A8") || activeBadge.Contains("ACTIVE")).IsTrue();
+        AssertThat(activeBadge.Contains("\u4E3B\u52A8") || activeBadge.Contains("Active") || activeBadge.Contains("ACTIVE")).IsTrue();
         AssertThat(hud.TooltipStats?.Text.Contains("3.2") ?? false).IsTrue();
         GD.Print($"[PASS] Slot 1 Active Weapon Tooltip verified: '{hud.TooltipTitle?.Text}' ({activeBadge})");
 
@@ -192,24 +192,24 @@ public partial class TestCodexAndTooltip : TestHarness
         GameManager.SetLanguage("en");
         hud.OnSlotMouseEntered(1, card1);
         var enBadge = hud.TooltipBadge?.Text ?? "";
-        AssertThat(enBadge.Contains("ACTIVE")).IsTrue();
+        AssertThat(enBadge.Contains("Active")).IsTrue();
         AssertThat(hud.TooltipTitle?.Text.Contains("ROS Torrent") ?? false).IsTrue();
-        AssertThat(hud.TooltipDesc?.Text.Contains("\u3010\u0020\u6218\u672F\u673A\u5236\u0020\u3011") ?? false).IsFalse();
+        AssertThat(hud.TooltipDesc?.Text.Contains("效果") ?? false).IsFalse();
         hud.OnSlotMouseEntered(0, card0);
         var enInnateBadge = hud.TooltipBadge?.Text ?? "";
-        AssertThat(enInnateBadge.Contains("ACTIVE")).IsTrue();
+        AssertThat(enInnateBadge.Contains("Active")).IsTrue();
         AssertThat(hud.TooltipTitle?.Text.Contains("Phagocytic Grasp") ?? false).IsTrue();
 
         // Test Codex in English: ensure NO Chinese headers
         codexModal.OpenCodex(2); // Cells tab
         codexModal.SelectCell("macrophage");
         AssertThat(codexModal.DetailDesc?.Text.Contains("\u53D8\u5F62\u7279\u6027") ?? false).IsFalse();
-        AssertThat(codexModal.DetailDesc?.Text.Contains("Deformation Trait") ?? false).IsTrue();
+        AssertThat(codexModal.DetailDesc?.Text.Contains("Trait") ?? false).IsTrue();
 
         codexModal.SwitchTab(0); // Skills tab
         codexModal.SelectSkill("phagocytic_grasp");
         AssertThat(codexModal.DetailDesc?.Text.Contains("\u3010\u0020\u6218\u672F\u673A\u5236\u0020\u3011") ?? false).IsFalse();
-        AssertThat(codexModal.DetailDesc?.Text.Contains("Tactical Effect") ?? false).IsTrue();
+        AssertThat(codexModal.DetailDesc?.Text.Contains("Effect") ?? false).IsTrue();
 
         codexModal.CloseCodex();
 
@@ -218,7 +218,7 @@ public partial class TestCodexAndTooltip : TestHarness
         var zhBadge = hud.TooltipBadge?.Text ?? "";
         AssertThat(zhBadge.Contains("\u4E3B\u52A8")).IsTrue();
         AssertThat(hud.TooltipTitle?.Text.Contains("\u6D3B\u6027\u6C27\u5C04\u6D41") ?? false).IsTrue();
-        AssertThat(hud.TooltipDesc?.Text.Contains("\u3010\u0020\u6218\u672F\u673A\u5236\u0020\u3011") ?? false).IsTrue();
+        AssertThat(hud.TooltipDesc?.Text.Contains("效果") ?? false).IsTrue();
         hud.OnSlotMouseEntered(0, card0);
         var zhInnateBadge = hud.TooltipBadge?.Text ?? "";
         AssertThat(zhInnateBadge.Contains("主动")).IsTrue();

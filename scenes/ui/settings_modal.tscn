@@ -96,14 +96,14 @@ theme_override_colors/font_color = Color(0.94, 0.99, 0.98, 1)
 theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
 theme_override_fonts/font = ExtResource("2_btn_font")
 theme_override_font_sizes/font_size = 14
-text = "‹ 返回"
+text = "‹ Back"
 
 [node name="Title" type="Label" parent="VBox/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 1)
 theme_override_font_sizes/font_size = 20
-text = "⚙️ 系統設定"
+text = "Settings"
 horizontal_alignment = 1
 
 [node name="TitleSpacer" type="Control" parent="VBox/Header"]
@@ -119,7 +119,7 @@ theme_override_constants/separation = 12
 custom_minimum_size = Vector2(130, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "语言"
+text = "Language"
 
 [node name="LangOption" type="OptionButton" parent="VBox/LanguageRow"]
 custom_minimum_size = Vector2(200, 36)
@@ -143,7 +143,7 @@ theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
 theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
 theme_override_fonts/font = ExtResource("2_btn_font")
 theme_override_font_sizes/font_size = 14
-text = "🔊 聲音音效"
+text = "Audio"
 
 [node name="GraphicsTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(0, 38)
@@ -155,7 +155,7 @@ theme_override_colors/font_hover_color = Color(0.39, 1, 0.85, 1)
 theme_override_colors/font_pressed_color = Color(0, 0.75, 0.85, 1)
 theme_override_fonts/font = ExtResource("2_btn_font")
 theme_override_font_sizes/font_size = 14
-text = "🖥️ 畫面顯示"
+text = "Video"
 
 [node name="Content" type="PanelContainer" parent="VBox"]
 layout_mode = 2
@@ -175,7 +175,7 @@ theme_override_constants/separation = 12
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "主音量："
+text = "Master: "
 
 [node name="Slider" type="HSlider" parent="VBox/Content/AudioPanel/MasterRow"]
 layout_mode = 2
@@ -199,7 +199,7 @@ theme_override_constants/separation = 12
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "音效音量："
+text = "SFX: "
 
 [node name="Slider" type="HSlider" parent="VBox/Content/AudioPanel/SFXRow"]
 layout_mode = 2
@@ -223,7 +223,7 @@ theme_override_constants/separation = 12
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "音樂音量："
+text = "Music: "
 
 [node name="Slider" type="HSlider" parent="VBox/Content/AudioPanel/BGMRow"]
 layout_mode = 2
@@ -253,14 +253,14 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = "全螢幕模式"
+text = "Fullscreen"
 
 [node name="FullscreenCheck" type="Button" parent="VBox/Content/GraphicsPanel/FullscreenRow"]
 custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
-text = "關"
+text = "OFF"
 
 [node name="VSyncRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
 layout_mode = 2
@@ -271,14 +271,14 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = "垂直同步 (VSync)"
+text = "VSync"
 
 [node name="VSyncCheck" type="Button" parent="VBox/Content/GraphicsPanel/VSyncRow"]
 custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
-text = "開"
+text = "ON"
 
 [node name="ShakeRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
 layout_mode = 2
@@ -289,14 +289,14 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = "螢幕震動 (Screen Shake)"
+text = "Shake"
 
 [node name="ShakeCheck" type="Button" parent="VBox/Content/GraphicsPanel/ShakeRow"]
 custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
-text = "關"
+text = "OFF"
 
 [node name="PerfRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
 layout_mode = 2
@@ -307,14 +307,14 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = "效能模式"
+text = "Performance"
 
 [node name="PerfCheck" type="Button" parent="VBox/Content/GraphicsPanel/PerfRow"]
 custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
-text = "關"
+text = "OFF"
 
 [node name="FpsRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
 layout_mode = 2
@@ -325,14 +325,14 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = "顯示幀率計數器"
+text = "FPS"
 
 [node name="FpsCheck" type="Button" parent="VBox/Content/GraphicsPanel/FpsRow"]
 custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
-text = "關"
+text = "OFF"
 
 [node name="MaxFpsRow" type="HBoxContainer" parent="VBox/Content/GraphicsPanel"]
 layout_mode = 2
@@ -343,7 +343,7 @@ custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
-text = "最大幀率"
+text = "Max FPS"
 
 [node name="MaxFpsBtn" type="Button" parent="VBox/Content/GraphicsPanel/MaxFpsRow"]
 custom_minimum_size = Vector2(140, 36)

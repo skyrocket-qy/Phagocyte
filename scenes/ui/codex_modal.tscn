@@ -86,7 +86,7 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme = ExtResource("2_menu_theme")
 theme_override_font_sizes/font_size = 14
-text = "‹ 返回"
+text = "‹ Back"
 
 [node name="Title" type="Label" parent="VBox/Header"]
 layout_mode = 2
@@ -99,7 +99,7 @@ theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 2
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 22
-text = "微观档案馆与免疫手册"
+text = "Codex"
 horizontal_alignment = 1
 
 [node name="TitleSpacer" type="Control" parent="VBox/Header"]
@@ -119,7 +119,7 @@ theme_override_colors/font_outline_color = Color(0.01, 0.03, 0.06, 0.9)
 theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 15
-text = "技能与生化因子"
+text = "Skills"
 
 [node name="PassivesTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(154, 38)
@@ -129,7 +129,7 @@ theme_override_colors/font_outline_color = Color(0.01, 0.03, 0.06, 0.9)
 theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 15
-text = "被动特质"
+text = "Traits"
 
 [node name="CellsTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(154, 38)
@@ -139,7 +139,7 @@ theme_override_colors/font_outline_color = Color(0.01, 0.03, 0.06, 0.9)
 theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 15
-text = "免疫防御细胞"
+text = "Cells"
 
 [node name="PathogensTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(154, 38)
@@ -149,7 +149,7 @@ theme_override_colors/font_outline_color = Color(0.01, 0.03, 0.06, 0.9)
 theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 15
-text = "病原体图鉴"
+text = "Foes"
 
 [node name="MapsTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(154, 38)
@@ -159,7 +159,7 @@ theme_override_colors/font_outline_color = Color(0.01, 0.03, 0.06, 0.9)
 theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 15
-text = "病理战场"
+text = "Stages"
 
 [node name="OrganellesTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(154, 38)
@@ -169,7 +169,7 @@ theme_override_colors/font_outline_color = Color(0.01, 0.03, 0.06, 0.9)
 theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 15
-text = "活性胞器"
+text = "Organelles"
 
 [node name="BossesTab" type="Button" parent="VBox/TabBar"]
 custom_minimum_size = Vector2(154, 38)
@@ -179,7 +179,7 @@ theme_override_colors/font_outline_color = Color(0.01, 0.03, 0.06, 0.9)
 theme_override_constants/outline_size = 2
 theme_override_fonts/font = ExtResource("3_btn_font")
 theme_override_font_sizes/font_size = 15
-text = "Boss档案"
+text = "Bosses"
 
 [node name="HBox" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
@@ -231,20 +231,20 @@ alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.8, 1)
 theme_override_font_sizes/font_size = 24
-text = "技能名称"
+text = "Skill"
 
 [node name="DetailBadge" type="Label" parent="VBox/HBox/DetailPanel/VBox/TopRow/TitleVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.85, 0.3, 1)
 theme_override_font_sizes/font_size = 14
-text = "[ 固有专属 ]"
+text = "[ Innate ]"
 
 [node name="DetailStats" type="Label" parent="VBox/HBox/DetailPanel/VBox/TopRow/TitleVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.85, 0.95, 1)
 theme_override_constants/line_spacing = 4
 theme_override_font_sizes/font_size = 13
-text = "冷却时间: 3.2s • 等级: 1 / 5"
+text = "Cooldown: 3.2s • Level: 1 / 5"
 
 [node name="HSeparator" type="HSeparator" parent="VBox/HBox/DetailPanel/VBox"]
 layout_mode = 2
@@ -254,7 +254,7 @@ theme_override_styles/separator = SubResource("StyleBoxLine_sep")
 layout_mode = 2
 theme_override_constants/line_spacing = 6
 theme_override_font_sizes/font_size = 16
-text = "【 战术机制 】\n机制描述"
+text = "Effect\nDescription"
 autowrap_mode = 3
 
 [node name="DetailBio" type="Label" parent="VBox/HBox/DetailPanel/VBox"]
@@ -263,5 +263,5 @@ size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 0.85)
 theme_override_constants/line_spacing = 6
 theme_override_font_sizes/font_size = 18
-text = "【 生物机制 】\n背景科学机制"
+text = "Bio\nBackground"
 autowrap_mode = 3

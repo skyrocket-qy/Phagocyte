@@ -2,6 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://ppcyc41cyeh7" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 [ext_resource type="Script" uid="uid://bspbhrqqpch6d" path="res://scripts/ui/BioRadarChart.cs" id="radar_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/page_header.tscn" id="page_header"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 content_margin_left = 24.0
@@ -33,7 +34,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="HeaderLabel" type="Label" parent="." unique_id=943744755]
+[node name="PageHeader" parent="." instance=ExtResource("page_header")]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -43,10 +44,6 @@ offset_top = 40.0
 offset_right = 300.0
 offset_bottom = 85.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
-theme_override_font_sizes/font_size = 26
-text = "Select Cell"
-horizontal_alignment = 1
 
 [node name="HBox" type="HBoxContainer" parent="." unique_id=53139238]
 layout_mode = 1
