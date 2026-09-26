@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Endotoxin Barrier (內毒素脫敏耐受)
+/// Passive Gear Trait: Endotoxin Barrier (內毒素脫敏耐受)
 /// Universal Stat Modifiers: Armor +3 flat, Block +4% per level
 /// </summary>
 public partial class PassiveEndotoxinBarrier : BaseSkill

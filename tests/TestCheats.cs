@@ -34,7 +34,7 @@ public static class TestCheats
 
     /// <summary>
     /// Unlocks every achievement (cascades to all classes, maps + Hard modes
-    /// and Endless), every organelle and max tree levels for every cell.
+    /// and Endless), every gear and max tree levels for every cell.
     /// Talent points follow automatically: the earned bonus is derived from
     /// unlocks, so no point grant is needed (or possible) here.
     /// </summary>
@@ -46,13 +46,13 @@ public static class TestCheats
         foreach (string achId in ids)
             AchievementManager.Unlock(achId);
 
-        OrganelleUnlockManager.UnlockAll();
+        GearUnlockManager.UnlockAll();
         MaxTreeLevels(treeLevel);
     }
 
     /// <summary>
     /// Wipes meta progression back to a fresh profile: macrophage-only, wound
-    /// Normal-only, empty organelle vault, level-1 trees, zero bonus points,
+    /// Normal-only, empty gear vault, level-1 trees, zero bonus points,
     /// empty loadouts. Headed runs need this because menu cheats write the
     /// real profile (headless suites stay isolated via
     /// <see cref="TestHarness"/> save paths instead).
@@ -60,7 +60,7 @@ public static class TestCheats
     public static void LockToBaseline()
     {
         AchievementManager.ResetAll();
-        OrganelleUnlockManager.ResetAll();
+        GearUnlockManager.ResetAll();
         PassiveTreeManager.ResetAll();
         LoadoutManager.ResetCache();
         JsonStore.Delete(LoadoutManager.SavePath);
@@ -75,7 +75,7 @@ public static class TestCheats
 
     /// <summary>
     /// Builds a max-level run loadout on <paramref name="main"/>'s player:
-    /// run level, maxed innate + filled active/passive slots, full organelle
+    /// run level, maxed innate + filled active/passive slots, full gear
     /// vault + best-effort chamber, zeroed block/evasion RNG. Godmode stays
     /// opt-in (default false) so damage-sensitive suites keep their signal.
     /// Idempotent — safe to call twice (e.g. once plain, once with godmode).
@@ -106,7 +106,7 @@ public static class TestCheats
 
         MaxOutSkills(player, skillLevel);
 
-        OrganelleUnlockManager.UnlockAll();
+        GearUnlockManager.UnlockAll();
         MaxOutChamber(player);
 
         if (godmode && player.Stats != null)
@@ -131,7 +131,7 @@ public static class TestCheats
         if (HasUserArg(CheatArgAll))
         {
             UnlockAllMeta();
-            GD.Print("[Cheats] All meta progression unlocked (classes, maps+hard, endless, organelles, tree levels).");
+            GD.Print("[Cheats] All meta progression unlocked (classes, maps+hard, endless, gear, tree levels).");
         }
     }
 
@@ -253,12 +253,12 @@ public static class TestCheats
 
     private static void MaxOutChamber(BaseCell player)
     {
-        var chamber = player.CellOrganelleChamber;
+        var chamber = player.CellGearChamber;
         if (chamber == null || !GodotObject.IsInstanceValid(chamber))
             return;
 
         var ids = new List<string>();
-        foreach (var keyVar in GameManager.OrganelleCatalog.Keys)
+        foreach (var keyVar in GameManager.GearCatalog.Keys)
             ids.Add(keyVar.AsString());
         foreach (string id in ids)
         {
@@ -267,7 +267,7 @@ public static class TestCheats
         }
 
         // Best-effort equip: first legal backpack id per free slot.
-        for (int slot = 0; slot < OrganelleChamber.MaxSlots; slot++)
+        for (int slot = 0; slot < GearChamber.MaxSlots; slot++)
         {
             if (!string.IsNullOrEmpty(chamber.GetSlot(slot)))
                 continue;

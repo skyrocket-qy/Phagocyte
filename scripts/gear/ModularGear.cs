@@ -2,22 +2,22 @@ using Godot;
 using System;
 using Phagocyte.Player;
 
-namespace Phagocyte.Organelles;
+namespace Phagocyte.Gear;
 
 /// <summary>
-/// Base class for Modular Organelles (外掛式細胞器).
-/// Organelles are decoupled PackedScene attachments that live as child nodes of a
+/// Base class for Modular Gear (外掛式細胞器).
+/// Gear are decoupled PackedScene attachments that live as child nodes of a
 /// BaseCell and extend beyond its main polygon topology (IK limbs, receptor rings).
-/// Attached organelles read the host's universal CellStats pool at runtime.
+/// Attached gear read the host's universal CellStats pool at runtime.
 /// </summary>
-public abstract partial class ModularOrganelle : Node2D
+public abstract partial class ModularGear : Node2D
 {
     public BaseCell? Host { get; protected set; }
 
     public bool IsAttached => Host != null && GodotObject.IsInstanceValid(Host);
 
     /// <summary>
-    /// Binds this organelle to a host cell, reparenting it under the host center.
+    /// Binds this gear to a host cell, reparenting it under the host center.
     /// </summary>
     public virtual void AttachTo(BaseCell host)
     {
@@ -36,7 +36,7 @@ public abstract partial class ModularOrganelle : Node2D
     }
 
     /// <summary>
-    /// Unbinds the organelle from its host and removes it.
+    /// Unbinds the gear from its host and removes it.
     /// </summary>
     public virtual void Detach()
     {

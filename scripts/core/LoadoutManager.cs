@@ -6,10 +6,10 @@ using System.Collections.Generic;
 namespace Phagocyte.Core;
 
 /// <summary>
-/// Persistent pre-run organelle loadouts (TODO Phase 1). Each cell keeps up to
+/// Persistent pre-run gear loadouts (TODO Phase 1). Each cell keeps up to
 /// <see cref="MaxProfiles"/> named builds of four chamber slots. A fresh cell
 /// deploys with <b>no equipment at all</b>: the default profile is four empty
-/// slots. Legality is delegated to <see cref="OrganelleChamber.ValidateSlots"/>
+/// slots. Legality is delegated to <see cref="GearChamber.ValidateSlots"/>
 /// so the page, the apply step and the runtime chamber share one contract.
 /// </summary>
 public static class LoadoutManager
@@ -18,9 +18,9 @@ public static class LoadoutManager
     public const int MaxProfiles = 3;
 
     /// <summary>Chamber slot count (2x2).</summary>
-    public const int SlotCount = OrganelleChamber.MaxSlots;
+    public const int SlotCount = GearChamber.MaxSlots;
 
-    private static readonly JsonStore.SavePathSlot _savePath = new("organelle_loadouts.json");
+    private static readonly JsonStore.SavePathSlot _savePath = new("gear_loadouts.json");
     public static string SavePath
     {
         get => _savePath.Value;
@@ -171,18 +171,18 @@ public static class LoadoutManager
     /// <summary>
     /// Replaces one profile. Refused when the set breaks the chamber contract
     /// (overload / generator cap / duplicate copies / unknown ids) or references
-    /// an organelle that has not dropped yet.
+    /// a gear item that has not dropped yet.
     /// </summary>
     public static bool SetSlots(string cellId, int profileIndex, IReadOnlyList<string> slots)
     {
         EnsureLoaded();
         if (!IsKnownCell(cellId))
             return false;
-        if (!OrganelleChamber.ValidateSlots(slots, out _))
+        if (!GearChamber.ValidateSlots(slots, out _))
             return false;
         foreach (string id in slots)
         {
-            if (!string.IsNullOrEmpty(id) && !OrganelleUnlockManager.IsUnlocked(id))
+            if (!string.IsNullOrEmpty(id) && !GearUnlockManager.IsUnlocked(id))
                 return false;
         }
         var list = GetProfileList(cellId);
@@ -293,14 +293,14 @@ public static class LoadoutManager
         for (int i = 0; i < SlotCount && i < raw.Count; i++)
         {
             string id = raw[i].AsString();
-            if (!string.IsNullOrEmpty(id) && GameManager.OrganelleCatalog.ContainsKey(id)
-                && OrganelleUnlockManager.IsUnlocked(id))
+            if (!string.IsNullOrEmpty(id) && GameManager.GearCatalog.ContainsKey(id)
+                && GearUnlockManager.IsUnlocked(id))
             {
                 row[i] = id;
             }
         }
 
-        if (!OrganelleChamber.ValidateSlots(row, out string reason))
+        if (!GearChamber.ValidateSlots(row, out string reason))
         {
             GD.PushWarning($"[Loadout] Illegal saved profile sanitized to empty (reason: {reason}).");
             return EmptySlots();

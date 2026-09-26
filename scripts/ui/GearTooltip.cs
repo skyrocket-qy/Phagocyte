@@ -4,13 +4,13 @@ using Phagocyte.Core;
 namespace Phagocyte.UI;
 
 /// <summary>
-/// PoE-style cursor tooltip for organelle cards: a styled floating panel that
+/// PoE-style cursor tooltip for gear cards: a styled floating panel that
 /// follows the mouse while hovering (category-tinted title, energy cost,
 /// effect, bio). Built in code and owned by the hosting view (LoadoutView);
 /// the engine built-in TooltipText stays cleared on those cards so the two
 /// never double up. Pure view: hidden by default, never touches saves.
 /// </summary>
-public partial class OrganelleTooltip : PanelContainer
+public partial class GearTooltip : PanelContainer
 {
     private static readonly Vector2 CursorOffset = new(18, 24);
     private const float CardWidth = 280.0f;
@@ -103,11 +103,11 @@ public partial class OrganelleTooltip : PanelContainer
         GlobalPosition = pos;
     }
 
-    /// <summary>Shows the tooltip for an organelle id (hides when id is empty/unknown).</summary>
+    /// <summary>Shows the tooltip for a gear id (hides when id is empty/unknown).</summary>
     public void ShowFor(string id)
     {
         if (string.IsNullOrEmpty(id)
-            || !GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar)
+            || !GameManager.GearCatalog.TryGetValue(id, out var entryVar)
             || _titleLabel == null || _costLabel == null || _descLabel == null || _bioLabel == null)
         {
             HideTip();
@@ -117,11 +117,11 @@ public partial class OrganelleTooltip : PanelContainer
         var entry = entryVar.AsGodotDictionary();
         string category = entry["category"].AsString();
         int cost = entry["energy_cost"].AsInt32();
-        bool unlocked = OrganelleUnlockManager.IsUnlocked(id);
+        bool unlocked = GearUnlockManager.IsUnlocked(id);
 
         _titleLabel.Text = (unlocked ? "" : "🔒 ") + Tr(entry["name_key"].AsString());
         _titleLabel.AddThemeColorOverride("font_color", unlocked
-            ? OrganelleSlot.CategoryColor(category)
+            ? GearSlot.CategoryColor(category)
             : new Color(1.0f, 0.72f, 0.35f));
 
         if (!unlocked)

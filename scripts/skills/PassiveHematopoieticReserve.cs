@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Hematopoietic Reserve (造血幹細胞儲備)
+/// Passive Gear Trait: Hematopoietic Reserve (造血幹細胞儲備)
 /// Universal Stat Modifiers: Max HP +10% per level, Block +3% per level
 /// </summary>
 public partial class PassiveHematopoieticReserve : BaseSkill

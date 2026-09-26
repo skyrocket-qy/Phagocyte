@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Aerobic Glycolysis (瓦伯格有氧糖酵解)
+/// Passive Gear Trait: Aerobic Glycolysis (瓦伯格有氧糖酵解)
 /// Universal Stat Modifiers: Move Speed +6%, Might +5% per level
 /// </summary>
 public partial class PassiveAerobicGlycolysis : BaseSkill

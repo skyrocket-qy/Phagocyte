@@ -44,38 +44,38 @@ public static class CatalogBuilders
     }
 
     /// <summary>
-    /// Organelle chamber catalog (TODO Phase 0): equipment definitions for the
+    /// Gear chamber catalog (TODO Phase 0): equipment definitions for the
     /// 2x2 chamber. energy_cost in [-1, 4] (-1 = +1 generator, must carry a
     /// drawback); modifiers/drawback share the passive-trait {stat, value, unit}
     /// convention (flat / percent / percentagepoints).
     /// </summary>
-    public static readonly System.Collections.Generic.HashSet<string> OrganelleCategories = new()
+    public static readonly System.Collections.Generic.HashSet<string> GearCategories = new()
     {
         "metabolism", "digestion", "cytoskeleton", "synthesis", "sensing", "symbiosis"
     };
 
-    public const int OrganelleMinEnergyCost = -1;
-    public const int OrganelleMaxEnergyCost = 4;
+    public const int GearMinEnergyCost = -1;
+    public const int GearMaxEnergyCost = 4;
 
-    public static Dictionary BuildOrganelles()
+    public static Dictionary BuildGear()
     {
         var table = new Dictionary();
         var seen = new HashSet<string>();
-        foreach (var row in CatalogLoader.LoadArray(DataPaths.Organelles))
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.Gear))
         {
             string id = CatalogLoader.GetString(row, "id");
             if (string.IsNullOrEmpty(id) || !seen.Add(id))
-                throw new DataLoadException(DataPaths.Organelles, $"Duplicate or missing organelle id '{id}'.");
+                throw new DataLoadException(DataPaths.Gear, $"Duplicate or missing gear id '{id}'.");
             string category = CatalogLoader.GetString(row, "category");
-            if (!OrganelleCategories.Contains(category))
-                throw new DataLoadException(DataPaths.Organelles, $"Organelle '{id}' has unknown category '{category}'.");
+            if (!GearCategories.Contains(category))
+                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' has unknown category '{category}'.");
             int energyCost = CatalogLoader.GetInt(row, "energy_cost");
-            if (energyCost < OrganelleMinEnergyCost || energyCost > OrganelleMaxEnergyCost)
-                throw new DataLoadException(DataPaths.Organelles, $"Organelle '{id}' energy_cost {energyCost} outside [{OrganelleMinEnergyCost}, {OrganelleMaxEnergyCost}].");
-            var modifiers = ParseOrganelleStatList(row, "modifiers", id);
-            var drawback = ParseOrganelleStatList(row, "drawback", id);
+            if (energyCost < GearMinEnergyCost || energyCost > GearMaxEnergyCost)
+                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' energy_cost {energyCost} outside [{GearMinEnergyCost}, {GearMaxEnergyCost}].");
+            var modifiers = ParseGearStatList(row, "modifiers", id);
+            var drawback = ParseGearStatList(row, "drawback", id);
             if (energyCost < 0 && drawback.Count == 0)
-                throw new DataLoadException(DataPaths.Organelles, $"Generator organelle '{id}' must carry a drawback.");
+                throw new DataLoadException(DataPaths.Gear, $"Generator gear '{id}' must carry a drawback.");
             table[id] = new Dictionary
             {
                 { "id", id },
@@ -88,14 +88,14 @@ public static class CatalogBuilders
                 { "desc_key", CatalogLoader.GetString(row, "desc_key") },
                 { "bio_key", CatalogLoader.GetString(row, "bio_key") },
                 { "icon", CatalogLoader.GetString(row, "icon") },
-                { "image_path", AssetPaths.OrganelleIcon(id) }
+                { "image_path", AssetPaths.GearIcon(id) }
             };
         }
-        GD.Print($"[Catalog] Loaded {table.Count} organelles.");
+        GD.Print($"[Catalog] Loaded {table.Count} gear.");
         return table;
     }
 
-    private static Array<Dictionary> ParseOrganelleStatList(Dictionary row, string key, string id)
+    private static Array<Dictionary> ParseGearStatList(Dictionary row, string key, string id)
     {
         var list = new Array<Dictionary>();
         if (!row.TryGetValue(key, out var listVar) || listVar.VariantType != Variant.Type.Array)
@@ -103,16 +103,16 @@ public static class CatalogBuilders
         foreach (var item in listVar.AsGodotArray())
         {
             if (item.VariantType != Variant.Type.Dictionary)
-                throw new DataLoadException(DataPaths.Organelles, $"Organelle '{id}' {key} entries must be JSON objects.");
+                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entries must be JSON objects.");
             var md = item.AsGodotDictionary();
             string stat = CatalogLoader.GetString(md, "stat");
             if (string.IsNullOrEmpty(stat))
-                throw new DataLoadException(DataPaths.Organelles, $"Organelle '{id}' {key} entry has no stat.");
+                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry has no stat.");
             if (!PassiveTreeManager.HasStatLabel(stat))
-                throw new DataLoadException(DataPaths.Organelles, $"Organelle '{id}' {key} entry references unknown stat '{stat}'.");
+                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry references unknown stat '{stat}'.");
             string unit = CatalogLoader.GetString(md, "unit", "flat");
             if (!System.Enum.TryParse<PassiveTreeManager.TreeModifierUnit>(unit, true, out _))
-                throw new DataLoadException(DataPaths.Organelles, $"Organelle '{id}' {key} entry has unknown unit '{unit}'.");
+                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry has unknown unit '{unit}'.");
             list.Add(new Dictionary
             {
                 { "stat", stat },

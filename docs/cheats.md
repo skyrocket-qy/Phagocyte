@@ -8,7 +8,7 @@ Core: `tests/TestCheats.cs`. Self-check: `tests/TestCheatUnlocks.cs`.
 `TestCheats.UnlockAllMeta()` unlocks:
 
 - All 19 achievements → all 5 cells, all 5 organ maps + Hard modes, Endless mode, talent points
-- All 24 organelles (`OrganelleUnlockManager.UnlockAll()`)
+- All 24 organelles (`GearUnlockManager.UnlockAll()`)
 - Tree level 15 (meta cap) for every cell; talent bonus is derived from unlocks
   (catalog total, 11 today) — no granted points, re-running is idempotent
 

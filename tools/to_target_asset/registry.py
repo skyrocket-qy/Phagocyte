@@ -51,7 +51,7 @@ CATEGORY_PIPELINES: Dict[str, Pipeline] = {
         step_quality_check()
     ]),
 
-    # Passive tree traits & organelles: 128x128 with circular mask
+    # Passive tree traits & gear: 128x128 with circular mask
     "passive_tree": Pipeline([
         step_remove_bg(tolerance=28),
         step_apply_mask(margin=0.05),
@@ -60,9 +60,9 @@ CATEGORY_PIPELINES: Dict[str, Pipeline] = {
         step_quality_check()
     ]),
 
-    # Organelle chamber equipment specimens: 128x128 with circular mask
+    # Gear chamber equipment specimens: 128x128 with circular mask
     # (same specimen-box treatment as passive_tree traits)
-    "organelle": Pipeline([
+    "gear": Pipeline([
         step_remove_bg(tolerance=28),
         step_apply_mask(margin=0.05),
         step_guided_filter(radius=2),

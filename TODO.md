@@ -26,7 +26,7 @@ Emergency fixes for visual bugs, text collisions, and broken layout containers a
 Eliminating all programmer-art placeholders and restoring confocal microscopy sprite fidelity:
 
 - [x] **Purge OS Emojis from `UpgradeModal`**:
-  - Replaced unicode emoji icons (`💨`, `🧬`, `🧪`) in Level-Up Mutation choice cards with actual confocal bio-fluorescent sprites from `assets/gen/skill/` and `assets/gen/organelle/`.
+  - Replaced unicode emoji icons (`💨`, `🧬`, `🧪`) in Level-Up Mutation choice cards with actual confocal bio-fluorescent sprites from `assets/gen/skill/` and `assets/gen/gear/`.
 - [x] **Fix Card Title Truncation in `UpgradeModal`**:
   - Eliminated ugly `...` ellipsis truncation on mutation card headers (`Actin Pseudopod...`, `Mitochondrial...`) with two-line word-smart wrapping (`autowrap_mode = 3`, `text_overrun_behavior = 0`, font size 14px).
 - [x] **Add Specimen Artwork to `CodexModal`**:

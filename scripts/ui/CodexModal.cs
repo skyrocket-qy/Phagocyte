@@ -12,7 +12,7 @@ public partial class CodexModal : ModalBase
     public Button? TabCellsBtn { get; set; }
     public Button? TabPathogensBtn { get; set; }
     public Button? TabMapsBtn { get; set; }
-    public Button? TabOrganellesBtn { get; set; }
+    public Button? TabGearBtn { get; set; }
     public Button? TabBossesBtn { get; set; }
 
     public VBoxContainer? ItemList { get; set; }
@@ -39,7 +39,7 @@ public partial class CodexModal : ModalBase
     public const int TabCells = 2;
     public const int TabPathogens = 3;
     public const int TabMaps = 4;
-    public const int TabOrganelles = 5;
+    public const int TabGear = 5;
     public const int TabBosses = 6;
 
     public override void _Ready()
@@ -49,7 +49,7 @@ public partial class CodexModal : ModalBase
         TabCellsBtn = GetNodeOrNull<Button>("VBox/TabBar/CellsTab");
         TabPathogensBtn = GetNodeOrNull<Button>("VBox/TabBar/PathogensTab");
         TabMapsBtn = GetNodeOrNull<Button>("VBox/TabBar/MapsTab");
-        TabOrganellesBtn = GetNodeOrNull<Button>("VBox/TabBar/OrganellesTab");
+        TabGearBtn = GetNodeOrNull<Button>("VBox/TabBar/GearTab");
         TabBossesBtn = GetNodeOrNull<Button>("VBox/TabBar/BossesTab");
 
         ItemList = GetNodeOrNull<VBoxContainer>("VBox/HBox/Scroll/ItemList");
@@ -73,8 +73,8 @@ public partial class CodexModal : ModalBase
             TabPathogensBtn.Pressed += () => SwitchTab(TabPathogens);
         if (TabMapsBtn != null)
             TabMapsBtn.Pressed += () => SwitchTab(TabMaps);
-        if (TabOrganellesBtn != null)
-            TabOrganellesBtn.Pressed += () => SwitchTab(TabOrganelles);
+        if (TabGearBtn != null)
+            TabGearBtn.Pressed += () => SwitchTab(TabGear);
         if (TabBossesBtn != null)
             TabBossesBtn.Pressed += () => SwitchTab(TabBosses);
 
@@ -187,7 +187,7 @@ public partial class CodexModal : ModalBase
         if (TabCellsBtn != null) TabCellsBtn.Text = Tr("CODEX_TAB_CELLS");
         if (TabPathogensBtn != null) TabPathogensBtn.Text = Tr("CODEX_TAB_PATHOGENS");
         if (TabMapsBtn != null) TabMapsBtn.Text = Tr("CODEX_TAB_MAPS");
-        if (TabOrganellesBtn != null) TabOrganellesBtn.Text = Tr("CODEX_TAB_ORGANELLES");
+        if (TabGearBtn != null) TabGearBtn.Text = Tr("CODEX_TAB_ORGANELLES");
         if (TabBossesBtn != null) TabBossesBtn.Text = Tr("CODEX_TAB_BOSSES");
 
         RenderCurrentTab();
@@ -204,7 +204,7 @@ public partial class CodexModal : ModalBase
         UiBuilders.SetTabActive(TabCellsBtn, tabIdx == TabCells);
         UiBuilders.SetTabActive(TabPathogensBtn, tabIdx == TabPathogens);
         UiBuilders.SetTabActive(TabMapsBtn, tabIdx == TabMaps);
-        UiBuilders.SetTabActive(TabOrganellesBtn, tabIdx == TabOrganelles);
+        UiBuilders.SetTabActive(TabGearBtn, tabIdx == TabGear);
         UiBuilders.SetTabActive(TabBossesBtn, tabIdx == TabBosses);
 
         ActiveItemKey = "";
@@ -240,8 +240,8 @@ public partial class CodexModal : ModalBase
             case TabMaps:
                 RenderMapsTab();
                 break;
-            case TabOrganelles:
-                RenderOrganellesTab();
+            case TabGear:
+                RenderGearTab();
                 break;
             case TabBosses:
                 RenderBossesTab();
@@ -542,44 +542,44 @@ public partial class CodexModal : ModalBase
         }
     }
 
-    private void RenderOrganellesTab()
+    private void RenderGearTab()
     {
         if (ItemList == null)
             return;
 
         string firstKey = "";
-        foreach (var keyVar in GameManager.OrganelleCatalog.Keys)
+        foreach (var keyVar in GameManager.GearCatalog.Keys)
         {
             string key = keyVar.AsString();
             if (firstKey == "")
                 firstKey = key;
-            var entry = (Dictionary)GameManager.OrganelleCatalog[key];
+            var entry = (Dictionary)GameManager.GearCatalog[key];
             var btn = MakeItemButton(" " + Tr(entry["name_key"].AsString()));
             string localKey = key;
-            btn.Pressed += () => SelectOrganelle(localKey);
+            btn.Pressed += () => SelectGear(localKey);
             ItemList.AddChild(btn);
             _itemButtons[localKey] = btn;
         }
 
-        string target = ActiveItemKey != "" && GameManager.OrganelleCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
+        string target = ActiveItemKey != "" && GameManager.GearCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
         if (target != "")
         {
-            SelectOrganelle(target);
+            SelectGear(target);
         }
     }
 
-    private void SelectOrganelle(string key)
+    private void SelectGear(string key)
     {
         ActiveItemKey = key;
-        if (!GameManager.OrganelleCatalog.ContainsKey(key))
+        if (!GameManager.GearCatalog.ContainsKey(key))
             return;
-        var entry = (Dictionary)GameManager.OrganelleCatalog[key];
+        var entry = (Dictionary)GameManager.GearCatalog[key];
 
         if (DetailTitle != null) DetailTitle.Text = Tr(entry["name_key"].AsString());
 
         if (DetailIcon != null)
         {
-            DetailIcon.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.OrganelleIcon(key))
+            DetailIcon.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.GearIcon(key))
                 ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
         }
 
@@ -587,7 +587,7 @@ public partial class CodexModal : ModalBase
         if (DetailBadge != null)
         {
             DetailBadge.Text = "[ " + Tr("ORGANELLE_CAT_" + category.ToUpperInvariant()) + " ]";
-            DetailBadge.Modulate = OrganelleSlot.CategoryColor(category);
+            DetailBadge.Modulate = GearSlot.CategoryColor(category);
         }
         int cost = entry["energy_cost"].AsInt32();
         string costText = cost < 0 ? $"+{-cost}" : cost.ToString();

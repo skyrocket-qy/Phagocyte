@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/OrganelleSlot.cs" id="1_slot"]
+[ext_resource type="Script" path="res://scripts/ui/GearSlot.cs" id="1_slot"]
 [ext_resource type="Script" path="res://scripts/ui/EnergyPips.cs" id="2_pips"]
 [ext_resource type="Font" path="res://assets/fonts/BodyMediumFont.tres" id="3_btn_font"]
 
@@ -42,7 +42,7 @@ corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_focus"]
 
-[node name="OrganelleSlot" type="Button"]
+[node name="GearSlot" type="Button"]
 custom_minimum_size = Vector2(104, 114)
 offset_right = 104.0
 offset_bottom = 114.0

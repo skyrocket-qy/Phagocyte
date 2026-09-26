@@ -527,7 +527,7 @@ public partial class MainMenu : Control
     /// <summary>
     /// The single back affordance for all views. Targets mirror the forward
     /// flow: Map re-enters the passive build (refreshing the tree), Passive
-    /// returns to the organelle loadout, Loadout returns to class selection,
+    /// returns to the gear loadout, Loadout returns to class selection,
     /// everything else to title.
     /// </summary>
     public void OnGlobalBackPressed()

@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Autophagic Recycle (自噬體修復再生)
+/// Passive Gear Trait: Autophagic Recycle (自噬體修復再生)
 /// Universal Stat Modifiers: Health Regen +0.4 HP/s per level
 /// </summary>
 public partial class PassiveAutophagicRecycle : BaseSkill

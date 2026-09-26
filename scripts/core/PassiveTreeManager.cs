@@ -32,7 +32,7 @@ public static class PassiveTreeManager
 
     /// <summary>
     /// Single source of truth for splitting one tree modifier
-    /// into flat/percent channels (mirrors the organelle modifier
+    /// into flat/percent channels (mirrors the gear modifier
     /// convention: flat/percentage-points go flat, everything else percent).
     /// Used by both the run-time skill
     /// (<see cref="Phagocyte.Skills.TreeStatBundleSkill"/>) and the menu

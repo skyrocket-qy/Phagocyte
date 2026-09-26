@@ -95,22 +95,22 @@ public static class DataValidator
             throw new DataLoadException("DataValidator", $"{errors.Count} error(s):\n  • {string.Join("\n  • ", errors)}");
 
         WarnMissingTranslationKeys();
-        WarnMissingOrganelleArt();
+        WarnMissingGearArt();
         GD.Print("[Catalog] All cross-references validated OK.");
     }
 
     /// <summary>
-    /// Organelle art lands in Phase 3 — a missing icon is a warning, not an
+    /// Gear art lands in Phase 3 — a missing icon is a warning, not an
     /// error: the runtime legally falls back to <see cref="AssetPaths.PlaceholderIcon"/>.
     /// </summary>
-    private static void WarnMissingOrganelleArt()
+    private static void WarnMissingGearArt()
     {
-        foreach (string id in GameManager.OrganelleCatalog.Keys)
+        foreach (string id in GameManager.GearCatalog.Keys)
         {
-            var entry = GameManager.OrganelleCatalog[id].AsGodotDictionary();
+            var entry = GameManager.GearCatalog[id].AsGodotDictionary();
             string imagePath = CatalogLoader.GetString(entry, "image_path");
             if (!string.IsNullOrEmpty(imagePath) && !AssetLoader.Exists(imagePath))
-                GD.PushWarning($"[Catalog] Organelle '{id}' art '{imagePath}' is missing (PlaceholderIcon fallback; Phase 3).");
+                GD.PushWarning($"[Catalog] Gear '{id}' art '{imagePath}' is missing (PlaceholderIcon fallback; Phase 3).");
         }
     }
 
@@ -123,7 +123,7 @@ public static class DataValidator
 
         var missing = new HashSet<string>();
         CheckKeys(GameManager.SkillCatalog, missing, known, "skill");
-        CheckKeys(GameManager.OrganelleCatalog, missing, known, "organelle");
+        CheckKeys(GameManager.GearCatalog, missing, known, "gear");
         CheckKeys(GameManager.PathogenCatalog, missing, known, "pathogen");
         CheckKeys(GameManager.BossCatalog, missing, known, "boss");
         CheckKeys(GameManager.MapData, missing, known, "map");

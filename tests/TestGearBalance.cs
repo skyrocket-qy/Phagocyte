@@ -14,14 +14,14 @@ namespace Phagocyte.Tests;
 /// and CDR/evasion/block hard caps. Energy stays a constraint layer,
 /// never a 19th stat.
 /// </summary>
-public partial class TestOrganelleBalance : TestHarness
+public partial class TestGearBalance : TestHarness
 {
     private int _frame = 0;
     private bool _done = false;
 
     public override void _Initialize()
     {
-        Banner("STARTING ORGANELLE BALANCE VERIFICATION (PHASE 4)");
+        Banner("STARTING GEAR BALANCE VERIFICATION (PHASE 4)");
     }
 
     public override bool _Process(double delta)
@@ -39,17 +39,17 @@ public partial class TestOrganelleBalance : TestHarness
             RunAmountLockTests();
             RunHardCapTests();
             RunOpenerBoundTests();
-            Finish(true, "ALL ORGANELLE BALANCE TESTS");
+            Finish(true, "ALL GEAR BALANCE TESTS");
         }
         catch (Exception ex)
         {
-            GD.PrintErr("[FAIL] TestOrganelleBalance threw: ", ex);
-            Finish(false, "ORGANELLE BALANCE TESTS");
+            GD.PrintErr("[FAIL] TestGearBalance threw: ", ex);
+            Finish(false, "GEAR BALANCE TESTS");
         }
         return true;
     }
 
-    private static OrganelleChamber NewChamber(out CellStats stats)
+    private static GearChamber NewChamber(out CellStats stats)
     {
         var mock = new CharacterBody2D { Name = "BalanceHost" };
         stats = new CellStats { Name = "CellStats" };
@@ -57,7 +57,7 @@ public partial class TestOrganelleBalance : TestHarness
         stats.SetBase("block", 0.0f);
         stats.SetBase("evasion", 0.0f);
         mock.AddChild(stats);
-        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        var chamber = new GearChamber { Name = "GearChamber" };
         mock.AddChild(chamber);
         // Not added to Root: pure-logic chamber needs no scene tree.
         chamber.Setup(mock);
@@ -67,13 +67,13 @@ public partial class TestOrganelleBalance : TestHarness
     /// <summary>Base 6 budget: 4+3 overloads, 4+1+1 fits (first-wave opener bound).</summary>
     private void RunEnergyBudgetTests()
     {
-        AssertThat(OrganelleChamber.BaseEnergy).IsEqual(6);
-        AssertThat(OrganelleChamber.MaxSlots).IsEqual(4);
+        AssertThat(GearChamber.BaseEnergy).IsEqual(6);
+        AssertThat(GearChamber.MaxSlots).IsEqual(4);
 
-        AssertThat(OrganelleChamber.ValidateSlots(
+        AssertThat(GearChamber.ValidateSlots(
             new[] { "rough_er", "acidic_lysosome", "", "" }, out string overload)).IsFalse();
         AssertThat(overload).IsEqual("overload");
-        AssertThat(OrganelleChamber.ValidateSlots(
+        AssertThat(GearChamber.ValidateSlots(
             new[] { "rough_er", "chemokine_patch", "microtubule_anchor", "" }, out _)).IsTrue();
         GD.Print("[PASS] Base-6 budget: 4+3 overloads, 4+1+1 fits.");
     }
@@ -110,7 +110,7 @@ public partial class TestOrganelleBalance : TestHarness
     /// <summary>amount+1 lives only on the 4-cost rough_er (opportunity-cost lock).</summary>
     private void RunAmountLockTests()
     {
-        var catalog = GameManager.OrganelleCatalog;
+        var catalog = GameManager.GearCatalog;
         string amountSource = "";
         foreach (string id in catalog.Keys)
         {
@@ -166,9 +166,9 @@ public partial class TestOrganelleBalance : TestHarness
     private void RunOpenerBoundTests()
     {
         float maxMight = 0.0f;
-        foreach (string id in GameManager.OrganelleCatalog.Keys)
+        foreach (string id in GameManager.GearCatalog.Keys)
         {
-            var entry = GameManager.OrganelleCatalog[id].AsGodotDictionary();
+            var entry = GameManager.GearCatalog[id].AsGodotDictionary();
             if (entry["energy_cost"].AsInt32() < 0)
                 continue;
             foreach (var mod in entry["modifiers"].AsGodotArray<Dictionary>())
@@ -180,9 +180,9 @@ public partial class TestOrganelleBalance : TestHarness
         AssertThat(maxMight).IsEqualApprox(0.12f, 0.001f);
 
         // Energy is not a stat: no entry references it and the pool has no slot.
-        foreach (string id in GameManager.OrganelleCatalog.Keys)
+        foreach (string id in GameManager.GearCatalog.Keys)
         {
-            var entry = GameManager.OrganelleCatalog[id].AsGodotDictionary();
+            var entry = GameManager.GearCatalog[id].AsGodotDictionary();
             foreach (string listName in new[] { "modifiers", "drawback" })
             {
                 foreach (var mod in entry[listName].AsGodotArray<Dictionary>())

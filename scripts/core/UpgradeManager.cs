@@ -6,7 +6,7 @@ using Phagocyte.Skills;
 namespace Phagocyte.Core;
 
 /// <summary>
-/// Manages Level-Up 3-Choice generation from Active Cytokines and Passive Organelles.
+/// Manages Level-Up 3-Choice generation from Active Cytokines and Passive Gear.
 /// </summary>
 public partial class UpgradeManager : RefCounted
 {
@@ -267,7 +267,7 @@ public partial class UpgradeManager : RefCounted
             }
         }
 
-        // Draft offers weapons and passives only: organelles join the run
+        // Draft offers weapons and passives only: gear join the run
         // through enemy drops and the pre-run loadout, never through cards.
 
         // Shuffle candidates
@@ -349,27 +349,27 @@ public partial class UpgradeManager : RefCounted
                 break;
             }
 
-            case "new_organelle":
+            case "new_gear":
             {
                 // Not offered by drafts anymore (weapons/passives only); kept
                 // as the acquisition engine beneath the in-modal swap step,
                 // which acquires into the backpack then best-effort equips.
                 // Returns whether anything was acquired.
-                string organelleId = choice.TryGetValue("id", out var organelleIdVal) ? organelleIdVal.AsString() : "";
-                if (string.IsNullOrEmpty(organelleId) || !OrganelleUnlockManager.IsUnlocked(organelleId))
+                string gearId = choice.TryGetValue("id", out var gearIdVal) ? gearIdVal.AsString() : "";
+                if (string.IsNullOrEmpty(gearId) || !GearUnlockManager.IsUnlocked(gearId))
                     break;
-                var organelleChamber = player.GetNodeOrNull<OrganelleChamber>("OrganelleChamber");
-                if (organelleChamber == null || organelleChamber.Owns(organelleId))
+                var gearChamber = player.GetNodeOrNull<GearChamber>("GearChamber");
+                if (gearChamber == null || gearChamber.Owns(gearId))
                     break;
-                if (!organelleChamber.AddToBackpack(organelleId))
+                if (!gearChamber.AddToBackpack(gearId))
                     break;
-                for (int slot = 0; slot < OrganelleChamber.MaxSlots; slot++)
+                for (int slot = 0; slot < GearChamber.MaxSlots; slot++)
                 {
-                    if (!string.IsNullOrEmpty(organelleChamber.GetSlot(slot)))
+                    if (!string.IsNullOrEmpty(gearChamber.GetSlot(slot)))
                         continue;
-                    if (organelleChamber.CanEquip(organelleId, slot, out _))
+                    if (gearChamber.CanEquip(gearId, slot, out _))
                     {
-                        organelleChamber.Equip(organelleId, slot);
+                        gearChamber.Equip(gearId, slot);
                         break;
                     }
                 }

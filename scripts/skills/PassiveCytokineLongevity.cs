@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Cytokine Longevity (細胞因子半衰期延展)
+/// Passive Gear Trait: Cytokine Longevity (細胞因子半衰期延展)
 /// Universal Stat Modifiers: Duration +15%, Knockback +10% per level
 /// </summary>
 public partial class PassiveCytokineLongevity : BaseSkill

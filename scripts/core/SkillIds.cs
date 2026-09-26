@@ -25,7 +25,7 @@ public static class SkillIds
     public const string MhcTracerBeam = "mhc_tracer_beam";
     public const string HistamineSurge = "histamine_surge";
 
-    // --- Passive organelle traits ---
+    // --- Passive gear traits ---
     public const string PassiveActin = "actin";
     public const string PassiveLysosome = "lysosome";
     public const string PassiveMitochondria = "mitochondria";

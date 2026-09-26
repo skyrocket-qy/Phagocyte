@@ -18,7 +18,7 @@ public static class TargetingService
 
     /// <summary>
     /// True when the node is a valid, living pathogen that accepts damage.
-    /// Used by organelles that scan for contact targets.
+    /// Used by gear that scan for contact targets.
     /// </summary>
     public static bool IsAttackable(Node? node)
     {

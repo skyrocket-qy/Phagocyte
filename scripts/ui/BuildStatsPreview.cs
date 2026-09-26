@@ -10,7 +10,7 @@ namespace Phagocyte.UI;
 /// stats a deploy would produce, so the loadout and tree pages can show
 /// live totals while crafting. Rules are never duplicated here — class bases
 /// run through the real <c>BaseCell.ApplyClassBaseStats</c>, chamber entries
-/// through a real <see cref="OrganelleChamber"/> (same skip + energy rules
+/// through a real <see cref="GearChamber"/> (same skip + energy rules
 /// as <c>Main.ApplyChamberLoadout</c>), tree entries through
 /// <see cref="PassiveTreeManager.ApplyModifier"/>. Nothing enters the tree;
 /// all scratch nodes are freed before return.
@@ -64,7 +64,7 @@ public static class BuildStatsPreview
 
             host = new CharacterBody2D { Name = "BuildPreviewHost" };
             host.AddChild(stats);
-            var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+            var chamber = new GearChamber { Name = "GearChamber" };
             host.AddChild(chamber);
             chamber.Setup(host);
 
@@ -72,10 +72,10 @@ public static class BuildStatsPreview
             // Main.ApplyChamberLoadout, same energy rules via Equip itself.
             // Slot position is stat-neutral, so profile indices are reused.
             string[] slots = LoadoutManager.GetActiveSlots(classId);
-            for (int i = 0; i < slots.Length && i < OrganelleChamber.MaxSlots; i++)
+            for (int i = 0; i < slots.Length && i < GearChamber.MaxSlots; i++)
             {
                 string id = slots[i];
-                if (string.IsNullOrEmpty(id) || !OrganelleUnlockManager.IsUnlocked(id))
+                if (string.IsNullOrEmpty(id) || !GearUnlockManager.IsUnlocked(id))
                     continue;
                 if (!chamber.AddToBackpack(id))
                     continue;

@@ -6,15 +6,15 @@ using System.Collections.Generic;
 namespace Phagocyte.Core;
 
 /// <summary>
-/// Organelle Chamber — the 2x2 equipment system (TODO Phase 0).
+/// Gear Chamber — the 2x2 equipment system (TODO Phase 0).
 /// Four 1x1 slots under a base 6-point energy budget. Generators
 /// (<c>energy_cost == -1</c>, +1 energy each) raise the cap with no limit
 /// but must carry a drawback. Owned-but-unequipped
-/// organelles live in the run-scoped backpack. Every effect is applied through
+/// gear live in the run-scoped backpack. Every effect is applied through
 /// the universal <see cref="CellStats"/> pool (modifiers + drawback alike).
 /// Energy model (used/max): used = sum of positive costs, max = base + generators.
 /// </summary>
-public partial class OrganelleChamber : Node2D
+public partial class GearChamber : Node2D
 {
     public const int MaxSlots = 4;
     public const int BaseEnergy = 6;
@@ -28,7 +28,7 @@ public partial class OrganelleChamber : Node2D
     public CharacterBody2D? Host { get; private set; }
     public CellStats? Stats { get; private set; }
 
-    public OrganelleChamber()
+    public GearChamber()
     {
         for (int i = 0; i < MaxSlots; i++)
             _slots[i] = "";
@@ -145,7 +145,7 @@ public partial class OrganelleChamber : Node2D
             reason = "empty_id";
             return false;
         }
-        if (!GameManager.OrganelleCatalog.ContainsKey(id))
+        if (!GameManager.GearCatalog.ContainsKey(id))
         {
             reason = "unknown";
             return false;
@@ -217,7 +217,7 @@ public partial class OrganelleChamber : Node2D
         {
             if (string.IsNullOrEmpty(id))
                 continue;
-            if (!GameManager.OrganelleCatalog.ContainsKey(id))
+            if (!GameManager.GearCatalog.ContainsKey(id))
             {
                 reason = "unknown";
                 return false;
@@ -251,7 +251,7 @@ public partial class OrganelleChamber : Node2D
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// Equips an owned (backpack) organelle into a slot. A replaced occupant
+    /// Equips an owned (backpack) gear into a slot. A replaced occupant
     /// returns to the backpack; its stat modifiers are removed exactly.
     /// </summary>
     public bool Equip(string id, int slot)
@@ -331,10 +331,10 @@ public partial class OrganelleChamber : Node2D
         return true;
     }
 
-    /// <summary>Acquires an organelle into the backpack (dedupe + capacity gated).</summary>
+    /// <summary>Acquires a gear item into the backpack (dedupe + capacity gated).</summary>
     public bool AddToBackpack(string id)
     {
-        if (string.IsNullOrEmpty(id) || !GameManager.OrganelleCatalog.ContainsKey(id))
+        if (string.IsNullOrEmpty(id) || !GameManager.GearCatalog.ContainsKey(id))
             return false;
         if (_backpack.Count >= BackpackCap)
             return false;
@@ -345,7 +345,7 @@ public partial class OrganelleChamber : Node2D
         return true;
     }
 
-    /// <summary>Removes one unequipped organelle from the backpack (discard).</summary>
+    /// <summary>Removes one unequipped gear from the backpack (discard).</summary>
     public bool Discard(string id)
     {
         if (!_backpack.Remove(id))
@@ -399,7 +399,7 @@ public partial class OrganelleChamber : Node2D
             ["empty"] = string.IsNullOrEmpty(id),
             ["is_generator"] = false
         };
-        if (string.IsNullOrEmpty(id) || !GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar)
+        if (string.IsNullOrEmpty(id) || !GameManager.GearCatalog.TryGetValue(id, out var entryVar)
             || entryVar.VariantType != Variant.Type.Dictionary)
         {
             return data;
@@ -423,7 +423,7 @@ public partial class OrganelleChamber : Node2D
 
     private static int EnergyCostOf(string id)
     {
-        if (string.IsNullOrEmpty(id) || !GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar)
+        if (string.IsNullOrEmpty(id) || !GameManager.GearCatalog.TryGetValue(id, out var entryVar)
             || entryVar.VariantType != Variant.Type.Dictionary)
         {
             return 0;
@@ -433,7 +433,7 @@ public partial class OrganelleChamber : Node2D
 
     private static int MaxCopiesOf(string id)
     {
-        if (string.IsNullOrEmpty(id) || !GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar)
+        if (string.IsNullOrEmpty(id) || !GameManager.GearCatalog.TryGetValue(id, out var entryVar)
             || entryVar.VariantType != Variant.Type.Dictionary)
         {
             return 1;
@@ -472,13 +472,13 @@ public partial class OrganelleChamber : Node2D
     }
 
     /// <summary>
-    /// Iterates an organelle's stat entries (modifiers + drawback alike) as
+    /// Iterates a gear item's stat entries (modifiers + drawback alike) as
     /// flat/percent pairs. Public so the menu build preview applies exactly
     /// the same entries the run-time chamber equips — one rule, two callers.
     /// </summary>
     public static void ForEachModifier(string id, Action<string, float, float> action)
     {
-        if (string.IsNullOrEmpty(id) || !GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar)
+        if (string.IsNullOrEmpty(id) || !GameManager.GearCatalog.TryGetValue(id, out var entryVar)
             || entryVar.VariantType != Variant.Type.Dictionary)
         {
             return;

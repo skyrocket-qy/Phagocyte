@@ -7,7 +7,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Base class for all Active Cytokine Weapons and Passive Organelle Traits in Phagocyte.
+/// Base class for all Active Cytokine Weapons and Passive Gear Traits in Phagocyte.
 /// Interacts directly with the universal CellStats system.
 /// </summary>
 public partial class BaseSkill : Node2D

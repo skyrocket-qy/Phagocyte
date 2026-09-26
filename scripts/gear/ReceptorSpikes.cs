@@ -5,15 +5,15 @@ using Phagocyte.Combat;
 using Phagocyte.Enemies;
 using Phagocyte.Player;
 
-namespace Phagocyte.Organelles;
+namespace Phagocyte.Gear;
 
 /// <summary>
-/// Modular Organelle: Receptor Spikes (受體棘刺陣列).
+/// Modular Gear: Receptor Spikes (受體棘刺陣列).
 /// A ring of receptor stalks hovering just outside the cell membrane. The array
 /// rotates continuously; pathogens sweeping across a stalk take contact damage
 /// (反傷) and are shoved away by a rotational interception impulse (旋轉攔截).
 /// </summary>
-public partial class ReceptorSpikes : ModularOrganelle
+public partial class ReceptorSpikes : ModularGear
 {
     [Export] public int SpikeCount { get; set; } = 10;
     [Export] public float HoverOffset { get; set; } = 10.0f;

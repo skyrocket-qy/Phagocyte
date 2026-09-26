@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Kinesin Rapid-Transit (微管驅動蛋白軌道)
+/// Passive Gear Trait: Kinesin Rapid-Transit (微管驅動蛋白軌道)
 /// Universal Stat Modifiers: Projectile Speed +15% per level, Pierce +1
 /// </summary>
 public partial class PassiveKinesinTransit : BaseSkill

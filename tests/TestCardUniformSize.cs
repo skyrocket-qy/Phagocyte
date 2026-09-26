@@ -57,7 +57,7 @@ public partial class TestCardUniformSize : SceneTree
 
         // Card 1: Very long English and Chinese text
         cards[1].GetNode<Label>("VBox/TitleLabel").Text = "線粒體超頻呼吸 (Mitochondrial Overclock Cascade Ultra)";
-        cards[1].GetNode<Label>("VBox/BadgeLabel").Text = "[ NEW PASSIVE ORGANELLE LEVEL 5 ]";
+        cards[1].GetNode<Label>("VBox/BadgeLabel").Text = "[ NEW PASSIVE GEAR LEVEL 5 ]";
         cards[1].GetNode<Label>("VBox/DescLabel").Text = "Cooldown Reduction +8% (max 75%), Skill Duration +10% per level. Highly accelerated oxidative phosphorylation turnover rate in mitochondrial matrix.";
 
         // Card 2: Standard medium text

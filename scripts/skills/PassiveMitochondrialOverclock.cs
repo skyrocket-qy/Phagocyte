@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Mitochondrial Overclock (線粒體超頻)
+/// Passive Gear Trait: Mitochondrial Overclock (線粒體超頻)
 /// Universal Stat Modifiers per level: Cooldown Reduction +8% (flat), Duration +10%
 /// </summary>
 public partial class PassiveMitochondrialOverclock : BaseSkill

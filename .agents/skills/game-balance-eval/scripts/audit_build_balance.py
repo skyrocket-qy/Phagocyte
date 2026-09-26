@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Phagocyte Roguelite Build Synergy & Dynamic Balance Audit Linter.
-Quantitatively assesses 5-class viability, organelle energy efficiency,
+Quantitatively assesses 5-class viability, gear energy efficiency,
 anti-monopoly / dead-card elimination, and canonical archetype coverage.
 """
 
@@ -45,7 +45,7 @@ class BalanceAuditor:
         self.data_dir = root / "assets" / "data"
         self.classes_path = self.data_dir / "classes.json"
         self.skills_path = self.data_dir / "skills.json"
-        self.organelles_path = self.data_dir / "organelles.json"
+        self.gear_path = self.data_dir / "gear.json"
         self.passives_path = self.data_dir / "passive_traits.json"
         self.pathogens_path = self.data_dir / "pathogens.json"
 
@@ -53,7 +53,7 @@ class BalanceAuditor:
         self.passes: List[str] = []
         self.scores: Dict[str, float] = {
             "class_diversity": 0.0,
-            "organelle_utility": 0.0,
+            "gear_utility": 0.0,
             "archetype_synergy": 0.0,
             "stat_economy": 0.0,
             "pathogen_escalation": 0.0,
@@ -108,19 +108,19 @@ class BalanceAuditor:
 
         return max(0.0, score)
 
-    def audit_organelle_utility(self) -> float:
-        """Audits organelles for anti-monopoly, dead-card elimination, and category balance."""
+    def audit_gear_utility(self) -> float:
+        """Audits gear for anti-monopoly, dead-card elimination, and category balance."""
         score = 25.0
-        organelles = load_json(self.organelles_path)
-        if not organelles or not isinstance(organelles, list):
-            self.warnings.append("organelles.json not found or malformed.")
+        gear = load_json(self.gear_path)
+        if not gear or not isinstance(gear, list):
+            self.warnings.append("gear.json not found or malformed.")
             return 0.0
 
         categories = set()
-        dead_organelles = []
+        dead_gear = []
         energy_costs = []
 
-        for org in organelles:
+        for org in gear:
             oid = org.get("id", "")
             cat = org.get("category", "")
             cost = org.get("energy_cost", 0)
@@ -130,32 +130,32 @@ class BalanceAuditor:
             categories.add(cat)
             energy_costs.append(cost)
 
-            # A functional organelle has either stat modifiers or acts as an energy generator (cost < 0)
+            # A functional gear has either stat modifiers or acts as an energy generator (cost < 0)
             has_valid_mod = any(m.get("value", 0) != 0 for m in modifiers)
             is_energy_battery = cost < 0
             if not has_valid_mod and not is_energy_battery:
-                dead_organelles.append(oid)
+                dead_gear.append(oid)
 
-        if dead_organelles:
-            self.warnings.append(f"Dead organelles detected (zero functional modifiers): {dead_organelles}")
-            score -= min(10.0, len(dead_organelles) * 3.0)
+        if dead_gear:
+            self.warnings.append(f"Dead gear detected (zero functional modifiers): {dead_gear}")
+            score -= min(10.0, len(dead_gear) * 3.0)
         else:
-            self.passes.append(f"All {len(organelles)} organelles have functional stat modifiers (zero dead cards).")
+            self.passes.append(f"All {len(gear)} gear have functional stat modifiers (zero dead cards).")
 
         expected_cats = {"metabolism", "digestion", "cytoskeleton", "synthesis", "sensing", "symbiosis"}
         covered_cats = categories.intersection(expected_cats)
         if covered_cats == expected_cats:
-            self.passes.append(f"Full 6-category biological organelle taxonomy covered ({', '.join(sorted(covered_cats))}).")
+            self.passes.append(f"Full 6-category biological gear taxonomy covered ({', '.join(sorted(covered_cats))}).")
         else:
             missing_cats = expected_cats - covered_cats
-            self.warnings.append(f"Missing organelle categories: {missing_cats}")
+            self.warnings.append(f"Missing gear categories: {missing_cats}")
             score -= len(missing_cats) * 2.0
 
         avg_cost = sum(energy_costs) / len(energy_costs) if energy_costs else 0
         if 2.0 <= avg_cost <= 3.5:
-            self.passes.append(f"Average organelle energy cost is well-balanced ({avg_cost:.2f} ATP).")
+            self.passes.append(f"Average gear energy cost is well-balanced ({avg_cost:.2f} ATP).")
         else:
-            self.warnings.append(f"Average organelle cost skewed: {avg_cost:.2f}")
+            self.warnings.append(f"Average gear cost skewed: {avg_cost:.2f}")
             score -= 3.0
 
         return max(0.0, score)
@@ -164,13 +164,13 @@ class BalanceAuditor:
         """Audits coverage of the 5 canonical immunological archetypes."""
         score = 25.0
         skills = load_json(self.skills_path) or []
-        organelles = load_json(self.organelles_path) or []
+        gear = load_json(self.gear_path) or []
 
         skill_ids = {s.get("id", "") for s in skills}
-        organelle_stats = set()
-        for org in organelles:
+        gear_stats = set()
+        for org in gear:
             for mod in org.get("modifiers", []):
-                organelle_stats.add(mod.get("stat", ""))
+                gear_stats.add(mod.get("stat", ""))
 
         archetypes = {
             "ROS Melt / Oxidation": {
@@ -198,13 +198,13 @@ class BalanceAuditor:
         covered_archetypes = 0
         for arch_name, req in archetypes.items():
             matching_skills = [sid for sid in req["skills"] if sid in skill_ids]
-            matching_stats = [st for st in req["stats"] if st in organelle_stats]
+            matching_stats = [st for st in req["stats"] if st in gear_stats]
 
             if len(matching_skills) > 0 and len(matching_stats) >= 2:
                 covered_archetypes += 1
-                self.passes.append(f"Archetype '{arch_name}' supported by {len(matching_skills)} skills and {len(matching_stats)} organelle stats.")
+                self.passes.append(f"Archetype '{arch_name}' supported by {len(matching_skills)} skills and {len(matching_stats)} gear stats.")
             else:
-                self.warnings.append(f"Archetype '{arch_name}' lacks adequate skill or organelle support.")
+                self.warnings.append(f"Archetype '{arch_name}' lacks adequate skill or gear support.")
                 score -= 4.0
 
         if covered_archetypes == 5:
@@ -215,11 +215,11 @@ class BalanceAuditor:
     def audit_stat_economy(self) -> float:
         """Audits energy-to-potency ratios and diminishing returns."""
         score = 15.0
-        organelles = load_json(self.organelles_path) or []
+        gear = load_json(self.gear_path) or []
 
-        # Check that positive cost organelles provide proportional power
+        # Check that positive cost gear provide proportional power
         outliers = []
-        for org in organelles:
+        for org in gear:
             cost = org.get("energy_cost", 1)
             if cost <= 0:
                 continue  # Energy generation battery, skip potency/cost check
@@ -230,10 +230,10 @@ class BalanceAuditor:
                 outliers.append(org.get("id", ""))
 
         if outliers:
-            self.warnings.append(f"Organelles with poor energy-to-potency ratio (<0.01): {outliers}")
+            self.warnings.append(f"Gear with poor energy-to-potency ratio (<0.01): {outliers}")
             score -= min(5.0, len(outliers) * 2.0)
         else:
-            self.passes.append("Organelle stat scaling scales proportionally with energy investment.")
+            self.passes.append("Gear stat scaling scales proportionally with energy investment.")
 
         # Check passive tree node count
         tree_path = self.data_dir / "passive_tree.json"
@@ -281,7 +281,7 @@ class BalanceAuditor:
 
     def run(self) -> Dict[str, Any]:
         self.scores["class_diversity"] = self.audit_class_diversity()
-        self.scores["organelle_utility"] = self.audit_organelle_utility()
+        self.scores["gear_utility"] = self.audit_gear_utility()
         self.scores["archetype_synergy"] = self.audit_archetype_synergy()
         self.scores["stat_economy"] = self.audit_stat_economy()
         self.scores["pathogen_escalation"] = self.audit_pathogen_escalation()
@@ -319,7 +319,7 @@ def format_report_markdown(results: Dict[str, Any]) -> str:
         "| Evaluation Pillar | Score | Max | Status |",
         "|:---|:---:|:---:|:---:|",
         f"| 1. Class Diversity & Distinctiveness | {results['scores']['class_diversity']} | 20.0 | {'✅ PASS' if results['scores']['class_diversity'] >= 16 else '⚠️ WARN'} |",
-        f"| 2. Organelle Utility & Anti-Monopoly | {results['scores']['organelle_utility']} | 25.0 | {'✅ PASS' if results['scores']['organelle_utility'] >= 20 else '⚠️ WARN'} |",
+        f"| 2. Gear Utility & Anti-Monopoly | {results['scores']['gear_utility']} | 25.0 | {'✅ PASS' if results['scores']['gear_utility'] >= 20 else '⚠️ WARN'} |",
         f"| 3. Archetype Synergy Depth | {results['scores']['archetype_synergy']} | 25.0 | {'✅ PASS' if results['scores']['archetype_synergy'] >= 20 else '⚠️ WARN'} |",
         f"| 4. Stat Economy & Meta Progression | {results['scores']['stat_economy']} | 15.0 | {'✅ PASS' if results['scores']['stat_economy'] >= 12 else '⚠️ WARN'} |",
         f"| 5. Pathogen Escalation Progression | {results['scores']['pathogen_escalation']} | 15.0 | {'✅ PASS' if results['scores']['pathogen_escalation'] >= 12 else '⚠️ WARN'} |",

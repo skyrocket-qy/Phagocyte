@@ -92,16 +92,16 @@ public partial class GameManager : Node
         }
     }
 
-    // Organelle chamber catalog (TODO Phase 0): 2x2 equipment definitions
-    // (data-owned: assets/data/organelles.json).
-    private static Dictionary? _organelleCatalog;
-    public static Dictionary OrganelleCatalog
+    // Gear chamber catalog (TODO Phase 0): 2x2 equipment definitions
+    // (data-owned: assets/data/gear.json).
+    private static Dictionary? _gearCatalog;
+    public static Dictionary GearCatalog
     {
         get
         {
-            _organelleCatalog ??= CatalogBuilders.BuildOrganelles();
+            _gearCatalog ??= CatalogBuilders.BuildGear();
             DataValidator.EnsureValidated();
-            return _organelleCatalog;
+            return _gearCatalog;
         }
     }
 

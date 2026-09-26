@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Actin Polymerization (肌動蛋白微絲聚合)
+/// Passive Gear Trait: Actin Polymerization (肌動蛋白微絲聚合)
 /// Universal Stat Modifiers per level: Area +12%, Move Speed +6%
 /// </summary>
 public partial class PassiveActinPolymerization : BaseSkill

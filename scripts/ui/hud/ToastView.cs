@@ -18,7 +18,7 @@ public partial class ToastView : Node
     public Tween? AchTween { get; set; }
 
     private Callable _achUnlockCallback;
-    private Callable _organelleUnlockCallback;
+    private Callable _gearUnlockCallback;
 
     /// <summary>Builds the banner and subscribes to achievement unlocks. Call once from Hud._Ready.</summary>
     public void Bind()
@@ -40,19 +40,19 @@ public partial class ToastView : Node
         _achUnlockCallback = Callable.From((string a, Dictionary b) => OnAchievementUnlocked(a, b));
         AchievementManager.AddUnlockListener(_achUnlockCallback);
 
-        _organelleUnlockCallback = Callable.From((string id, Dictionary entry) => OnOrganelleUnlocked(id, entry));
-        OrganelleUnlockManager.AddUnlockListener(_organelleUnlockCallback);
+        _gearUnlockCallback = Callable.From((string id, Dictionary entry) => OnGearUnlocked(id, entry));
+        GearUnlockManager.AddUnlockListener(_gearUnlockCallback);
     }
 
     /// <summary>Removes the achievement listener. Call from Hud._ExitTree.</summary>
     public void Unbind()
     {
         AchievementManager.RemoveUnlockListener(_achUnlockCallback);
-        OrganelleUnlockManager.RemoveUnlockListener(_organelleUnlockCallback);
+        GearUnlockManager.RemoveUnlockListener(_gearUnlockCallback);
     }
 
-    /// <summary>Organelle drop collected: same banner, chamber-green accent.</summary>
-    public void OnOrganelleUnlocked(string _organelleId, Dictionary entry)
+    /// <summary>Gear drop collected: same banner, chamber-green accent.</summary>
+    public void OnGearUnlocked(string _gearId, Dictionary entry)
     {
         string imagePath = entry.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "";
         string nameKey = entry.TryGetValue("name_key", out var nkVal) ? nkVal.AsString() : "";

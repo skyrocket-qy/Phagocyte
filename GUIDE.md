@@ -35,12 +35,12 @@ scripts/combat/            # CombatHelper, IDamageable, ProjectileManager, VfxMa
 scripts/enemies/           # BaseEnemy, PathogenSpawner, steering, bosses/, hazards/
 scripts/directors/         # Wave, Boss, Overdrive, Organ, Settlement, Neutral, IRunContext
 scripts/environment/       # 5 organ environments + parallax/tissue layers
-scripts/organelles/        # ModularOrganelle, ReceptorSpikes
+scripts/gear/        # Gear, ReceptorSpikes
 scripts/ui/ + ui/hud/      # MainMenu, Hud, modals, views
 gen/<cat>/                 # source-of-truth PNGs (prefix-free)
 assets/gen/                # pipeline artifact (do not edit directly)
 assets/audio/manifest.json # BGM/SFX SSOT (11 bgm, 21 sfx)
-assets/data/*.json         # classes/maps/skills/organelles/pathogens/bosses/achievements
+assets/data/*.json         # classes/maps/skills/gear/pathogens/bosses/achievements
 docs/*.md                  # 15 design docs (spec, stat, skill, map, pathogen, etc.)
 tests/Test*.cs             # 56 files incl. TestHarness scaffolding
 tools/asset_check/         # lint: missing/naming/dedup/orphans/resolution/quality/audio
@@ -127,7 +127,7 @@ Non-autoload (common mistake):
 - `CellStats` — `Node,IStatHost` on each cell (`scripts/core/CellStats.cs:11`)
 - `UpgradeManager` — static draft engine (`scripts/core/UpgradeManager.cs`)
 - `PassiveTreeManager` — static + `JsonStore` (`scripts/core/PassiveTreeManager.cs:340-352`)
-- `OrganelleChamber` — `Node2D` child of cell (`scripts/core/OrganelleChamber.cs:19-29`)
+- `GearChamber` — `Node2D` child of cell (`scripts/core/GearChamber.cs:19-29`)
 - `LoadoutManager` — static + `JsonStore` (`scripts/core/LoadoutManager.cs:18-23`)
 
 Key APIs to read:
@@ -172,7 +172,7 @@ Formula: `GetStat` (`:90-113`) with caps: CDR 75%, crit 100%, evasion 60%, block
 Helpers: `GetDamageReductionRatio=armor/(armor+50)` (`:153`), `RollCritical/Evasion/Block/LifeSteal` (`:164-194`), `CalculateAilmentDamage/Duration` (`:199-210`).
 Signal: `StatChanged` (`:13-14`).
 
-`BaseCell._Ready` (`BaseCell.cs:205-269`): `AddToGroup("player")`, cache `Cytoplasm/Membrane/Nucleus/EngulfArea/SkillManager`, create `CellStats`, seed `max_health/move_speed`, call virtual `ApplyClassBaseStats()`, derive `Health/CurrentSpeed/CurrentRadius`, subscribe `StatChanged→OnStatChanged`, `CellSkillManager.Setup`, `SetupInitialSkills`, `OrganelleChamber.Setup`.
+`BaseCell._Ready` (`BaseCell.cs:205-269`): `AddToGroup("player")`, cache `Cytoplasm/Membrane/Nucleus/EngulfArea/SkillManager`, create `CellStats`, seed `max_health/move_speed`, call virtual `ApplyClassBaseStats()`, derive `Health/CurrentSpeed/CurrentRadius`, subscribe `StatChanged→OnStatChanged`, `CellSkillManager.Setup`, `SetupInitialSkills`, `GearChamber.Setup`.
 
 Class deltas (examples):
 - `Macrophage.cs:57-66` — `armor 10, area 1.25, might 1.0, block .08` + innate `PhagocyticGraspSkill` (`:68-78`)
@@ -202,15 +202,15 @@ Know skill lifecycle, slot rules, and how builds are assembled.
 - `scripts/skills/SkillManager.cs:12,16-20,44-134,154-208`
 - `scripts/core/SkillIds.cs:10-42` — 17 active + 13 passive IDs
 - `scripts/core/UpgradeManager.cs:17-39,142-412`
-- `scripts/organelles/ModularOrganelle.cs:13-53`, `ReceptorSpikes.cs:16-108`
-- `scripts/core/OrganelleChamber.cs`, `scripts/core/LoadoutManager.cs`
+- `scripts/gear/Gear.cs:13-53`, `ReceptorSpikes.cs:16-108`
+- `scripts/core/GearChamber.cs`, `scripts/core/LoadoutManager.cs`
 
 ### Hierarchy
 ```
 CharacterBody2D → BaseCell → Macrophage / Neutrophil / B / CTL / Dendritic
 Node2D → BaseSkill → active (Perforin, Antibody, ROS, Defensin, Grasp, ...) / passive (Actin, Bilayer, ...) / TreeStatBundleSkill
 Node2D → SkillManager (container, NOT a skill)
-Node2D → ModularOrganelle → ReceptorSpikes
+Node2D → Gear → ReceptorSpikes
 Area2D → AntibodyMissile (exception, not BaseSkill)
 Node2D visuals (transient): LanceBeamVisual, PoreDecal, BarbProjectile, PseudopodChainVisual, RosJet
 ```
@@ -225,11 +225,11 @@ Node2D visuals (transient): LanceBeamVisual, PoreDecal, BarbProjectile, Pseudopo
 
 ### Draft engine (`UpgradeManager`)
 - `ActiveCatalog` (`:17`), `PassiveCatalog` (`:39`), `CatalystActiveLevel=5` (`:78`), `CatalystPairs` (`:80`), `IsCatalystReady` (`:93`)
-- `GenerateChoices(player,3)` (`:142`), `ApplyChoice` (`:305`): `new_active` (`:322`), `new_passive` (`:337`), `new_organelle` (`:352`), `upgrade_*` (`:379`), `heal_fallback` (`:394`)
+- `GenerateChoices(player,3)` (`:142`), `ApplyChoice` (`:305`): `new_active` (`:322`), `new_passive` (`:337`), `new_gear` (`:352`), `upgrade_*` (`:379`), `heal_fallback` (`:394`)
 
 ### Organelles
-- `ModularOrganelle.AttachTo/GetStat` (`:13-53`) reads `Host.Stats.GetStat`.
-- `OrganelleChamber`: `MaxSlots=4` (`:19`), `BaseEnergy=6` (`:20`), `BackpackCap=24` (`:21`), `CanEquip/ValidateSlots/Equip/Unequip/Swap/AddToBackpack/Discard` (`:140,204,257,282,325,335,349`)
+- `Gear.AttachTo/GetStat` (`:13-53`) reads `Host.Stats.GetStat`.
+- `GearChamber`: `MaxSlots=4` (`:19`), `BaseEnergy=6` (`:20`), `BackpackCap=24` (`:21`), `CanEquip/ValidateSlots/Equip/Unequip/Swap/AddToBackpack/Discard` (`:140,204,257,282,325,335,349`)
 - `LoadoutManager`: `MaxProfiles=3` (`:18`), `GetActiveSlots` (`:166`), `SetSlots` (`:176`) — `Main.ApplyChamberLoadout (Main.cs:352-369)` deploys it; empty = nothing equipped, stale/locked entries skipped.
 
 ### Hands-on
@@ -425,8 +425,8 @@ Understand out-of-run progression.
 - Passive tree (`PassiveTreeManager.cs`): topology `passive_tree.json`, per-cell levels/3 profiles, connectivity/purchase/refund, `CreateSkill` factory, live bonus from achievements. `Main.ApplyTreeLoadout` attaches `TreeStatBundleSkill`s. View: `PassiveTreeView.cs` (shell in `passive_view.tscn`, graph code-drawn, nodes `TreeNode_{id}`).
 - Achievements (`AchievementManager.cs:28-507`): `achievements.json` + Steam, `RecordEvent/EvaluateThreshold/RecordMapClear`, `IsEndlessUnlocked` (needs `wound_hard_clear`), `ApplyMapRewards/SyncMapUnlocks`, gallery `AchievementGalleryView/Card/Toast`.
 - Records (`RunRecordManager.cs` + `RunRecordsModal.cs`): `OpenHistory` vs `OpenSettlement`, grades, KPM/score.
-- Loadouts (`LoadoutManager.cs` + `LoadoutView.cs:131-577`): `organelle_loadouts.json`, scratch chamber, `BuildBackpackCards:255-286` instantiates `organelle_slot.tscn`, profile tabs code-built.
-- Unlocks (`OrganelleUnlockManager.cs`): `IsUnlocked`, `TrySpawnDrop`.
+- Loadouts (`LoadoutManager.cs` + `LoadoutView.cs:131-577`): `gear_loadouts.json`, scratch chamber, `BuildBackpackCards:255-286` instantiates `gear_slot.tscn`, profile tabs code-built.
+- Unlocks (`GearUnlockManager.cs`): `IsUnlocked`, `TrySpawnDrop`.
 - i18n: 8 locales in `project.godot:92`, `GameManager.SetLanguage/ToggleLanguage (:152,167)`, `UpdateAllTexts` in menu/HUD, `TestI18n/TestMultilingualLayout`.
 
 Docs: `docs/passivetree.md`, `achievement.md`, `record.md`, `tutorial.md`, `endgame.md`.

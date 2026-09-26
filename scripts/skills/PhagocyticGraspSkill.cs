@@ -67,7 +67,7 @@ public partial class PhagocyticGraspSkill : BaseSkill
                 continue;
 
             // Chain-strike delivery (merged from the retired PseudopodLimb
-            // organelle): the chain visibly travels out, and damage + drag
+            // gear): the chain visibly travels out, and damage + drag
             // start exactly on contact instead of instantly.
             var chain = new PseudopodChainVisual
             {

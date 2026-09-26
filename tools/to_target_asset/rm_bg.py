@@ -3,7 +3,7 @@
 Background removal utility for Phagocyte sprites and assets.
 Keys out outer dark (black) and light (white) background boxes using BFS floodfill
 from canvas borders, setting connected background pixels to RGBA (0, 0, 0, 0).
-Leaves interior dark/light pixels inside cells, organelles, and icons intact.
+Leaves interior dark/light pixels inside cells, gear, and icons intact.
 """
 
 from collections import deque

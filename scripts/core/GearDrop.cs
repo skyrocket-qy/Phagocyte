@@ -4,11 +4,11 @@ using Phagocyte.Core;
 namespace Phagocyte.Core;
 
 /// <summary>
-/// Transient organelle drop (spawn → drift to the player → collect → free).
+/// Transient gear drop (spawn → drift to the player → collect → free).
 /// Lives in code like the other throwaway effect nodes: nothing here is
 /// editor-tunable beyond the exported pickup constants.
 /// </summary>
-public partial class OrganelleDrop : Node2D
+public partial class GearDrop : Node2D
 {
     /// <summary>Distance at which the drop is collected.</summary>
     public const float PickupRadius = 26.0f;
@@ -19,7 +19,7 @@ public partial class OrganelleDrop : Node2D
     /// <summary>Magnet pull speed once close.</summary>
     public const float PullSpeedMax = 620.0f;
 
-    public string OrganelleId { get; set; } = "";
+    public string GearId { get; set; } = "";
     public Node2D? Target { get; set; }
 
     private Sprite2D? _icon;
@@ -30,7 +30,7 @@ public partial class OrganelleDrop : Node2D
     {
         ZIndex = 4;
 
-        string imagePath = GameManager.OrganelleCatalog.TryGetValue(OrganelleId, out var entryVar)
+        string imagePath = GameManager.GearCatalog.TryGetValue(GearId, out var entryVar)
             ? entryVar.AsGodotDictionary()["image_path"].AsString()
             : "";
         _icon = new Sprite2D
@@ -87,11 +87,11 @@ public partial class OrganelleDrop : Node2D
         DrawCircle(Vector2.Zero, 22.0f, new Color(0.2f, 0.9f, 0.6f, 0.10f + pulse * 0.06f));
     }
 
-    /// <summary>Unlocks the organelle (first time only notifies listeners) and frees the drop.</summary>
+    /// <summary>Unlocks the gear (first time only notifies listeners) and frees the drop.</summary>
     public void Collect()
     {
-        if (!string.IsNullOrEmpty(OrganelleId))
-            OrganelleUnlockManager.Unlock(OrganelleId);
+        if (!string.IsNullOrEmpty(GearId))
+            GearUnlockManager.Unlock(GearId);
         AudioManager.Instance?.PlayPickup();
         QueueFree();
     }

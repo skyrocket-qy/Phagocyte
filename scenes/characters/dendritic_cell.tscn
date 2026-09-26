@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/player/DendriticCell.cs" id="1_dendritic"]
 [ext_resource type="Script" path="res://scripts/skills/SkillManager.cs" id="2_skills"]
-[ext_resource type="Script" path="res://scripts/core/OrganelleChamber.cs" id="3_chamber"]
+[ext_resource type="Script" path="res://scripts/core/GearChamber.cs" id="3_chamber"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_wall"]
 radius = 22.0
@@ -37,5 +37,5 @@ collision_mask = 2
 [node name="SkillManager" type="Node2D" parent="."]
 script = ExtResource("2_skills")
 
-[node name="OrganelleChamber" type="Node2D" parent="."]
+[node name="GearChamber" type="Node2D" parent="."]
 script = ExtResource("3_chamber")

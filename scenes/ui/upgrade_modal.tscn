@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://epluj3fksdbj"]
 
 [ext_resource type="Script" path="res://scripts/ui/UpgradeModal.cs" id="1_modal"]
-[ext_resource type="PackedScene" path="res://scenes/ui/organelle_slot.tscn" id="8_slots"]
+[ext_resource type="PackedScene" path="res://scenes/ui/gear_slot.tscn" id="8_slots"]
 [ext_resource type="Script" path="res://scripts/ui/EnergyPips.cs" id="2_pips"]
 [ext_resource type="Texture2D" uid="uid://cfaeqlbonvlti" path="res://assets/gen/skill/ros_torrent.png" id="3_ros"]
 [ext_resource type="Texture2D" uid="uid://biefccq1honm4" path="res://assets/gen/skill/actin.png" id="4_actin"]

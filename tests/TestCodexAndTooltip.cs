@@ -155,11 +155,11 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(itemList.GetChildCount() >= 2).IsTrue();
         GD.Print($"[PASS] Codex Pathological Stages tab displays {itemList.GetChildCount()} maps.");
 
-        // Switch to Tab 5 (Organelles)
+        // Switch to Tab 5 (Gear)
         codexModal.SwitchTab(5);
         AssertThat(codexModal.CurrentTab).IsEqual(5);
-        AssertThat(itemList.GetChildCount()).IsEqual(GameManager.OrganelleCatalog.Count);
-        GD.Print($"[PASS] Codex Organelle tab displays {itemList.GetChildCount()} chamber equipment entries.");
+        AssertThat(itemList.GetChildCount()).IsEqual(GameManager.GearCatalog.Count);
+        GD.Print($"[PASS] Codex Gear tab displays {itemList.GetChildCount()} chamber equipment entries.");
 
         // Achievements moved out of the Codex: MainMenu AchievementView owns them.
         // Bosses (Tab 6) is the last Codex tab; out-of-range indices must be ignored.

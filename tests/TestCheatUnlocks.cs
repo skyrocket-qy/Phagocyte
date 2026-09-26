@@ -74,11 +74,11 @@ public partial class TestCheatUnlocks : TestHarness
         AssertThat(passives).IsEqual(SkillManager.MaxPassiveSlots);
         GD.Print("[PASS] MaxOutPlayer fills and maxes 5 actives + 5 passives.");
 
-        var chamber = player.CellOrganelleChamber;
+        var chamber = player.CellGearChamber;
         AssertThat(chamber).IsNotNull();
-        foreach (var keyVar in GameManager.OrganelleCatalog.Keys)
+        foreach (var keyVar in GameManager.GearCatalog.Keys)
             AssertThat(chamber!.Owns(keyVar.AsString())).IsTrue();
-        GD.Print("[PASS] MaxOutPlayer unlocks the full organelle vault.");
+        GD.Print("[PASS] MaxOutPlayer unlocks the full gear vault.");
 
         AssertThat(player.Health).IsLess(999999.0f);
         GD.Print("[PASS] Godmode defaults to off.");
@@ -112,7 +112,7 @@ public partial class TestCheatUnlocks : TestHarness
                 AssertThat(GameManager.IsMapUnlocked(map)).IsFalse();
             AssertThat(GameManager.IsMapHardUnlocked(map)).IsFalse();
         }
-        AssertThat(OrganelleUnlockManager.UnlockedCount).IsEqual(0);
+        AssertThat(GearUnlockManager.UnlockedCount).IsEqual(0);
         AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(PassiveTreeManager.BaseCellLevel);
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(0);
         GD.Print($"[PASS] Baseline {stage}: fresh profile (macrophage-only, wound-only, vault locked).");
@@ -128,7 +128,7 @@ public partial class TestCheatUnlocks : TestHarness
             AssertThat(GameManager.IsMapHardUnlocked(map)).IsTrue();
         }
         AssertThat(AchievementManager.IsEndlessUnlocked()).IsTrue();
-        AssertThat(OrganelleUnlockManager.UnlockedCount).IsEqual(GameManager.OrganelleCatalog.Count);
+        AssertThat(GearUnlockManager.UnlockedCount).IsEqual(GameManager.GearCatalog.Count);
         AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(TestCheats.DefaultMetaTreeLevel);
         // No granted points anymore: the earned bonus is derived from unlocks,
         // so full unlock yields exactly the catalog total (11 today).
@@ -144,6 +144,6 @@ public partial class TestCheatUnlocks : TestHarness
         // Re-running the cheat is idempotent: nothing stacks.
         TestCheats.UnlockAllMeta();
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(expectedBonus);
-        GD.Print("[PASS] UnlockAllMeta unlocks all classes, maps+hard, endless, organelles and tree levels.");
+        GD.Print("[PASS] UnlockAllMeta unlocks all classes, maps+hard, endless, gear and tree levels.");
     }
 }

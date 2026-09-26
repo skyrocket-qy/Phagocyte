@@ -60,7 +60,7 @@ public abstract partial class TestHarness : SceneTree
         RunRecordManager.SavePath = JsonStore.ResolvePath($"test_{tag}_records.json");
         SettingsManager.SavePath = JsonStore.ResolvePath($"test_{tag}_settings.json");
         LoadoutManager.SavePath = JsonStore.ResolvePath($"test_{tag}_loadouts.json");
-        OrganelleUnlockManager.SavePath = JsonStore.ResolvePath($"test_{tag}_organelle_unlocks.json");
+        GearUnlockManager.SavePath = JsonStore.ResolvePath($"test_{tag}_gear_unlocks.json");
 
         // Clear leftovers from crashed earlier runs with the same tag.
         DeleteIfExists(PassiveTreeManager.SavePath);
@@ -68,17 +68,17 @@ public abstract partial class TestHarness : SceneTree
         DeleteIfExists(RunRecordManager.SavePath);
         DeleteIfExists(SettingsManager.SavePath);
         DeleteIfExists(LoadoutManager.SavePath);
-        DeleteIfExists(OrganelleUnlockManager.SavePath);
+        DeleteIfExists(GearUnlockManager.SavePath);
 
         _isolatedPaths.Add(PassiveTreeManager.SavePath);
         _isolatedPaths.Add(AchievementManager.SavePath);
         _isolatedPaths.Add(RunRecordManager.SavePath);
         _isolatedPaths.Add(SettingsManager.SavePath);
         _isolatedPaths.Add(LoadoutManager.SavePath);
-        _isolatedPaths.Add(OrganelleUnlockManager.SavePath);
+        _isolatedPaths.Add(GearUnlockManager.SavePath);
 
-        // Determinism: organelle drops must never fire unscripted in a suite.
-        OrganelleUnlockManager.DropsEnabled = false;
+        // Determinism: gear drops must never fire unscripted in a suite.
+        GearUnlockManager.DropsEnabled = false;
     }
 
     /// <summary>Restores the real save paths and removes the isolated files.</summary>
@@ -90,11 +90,11 @@ public abstract partial class TestHarness : SceneTree
         RunRecordManager.SavePath = "";
         SettingsManager.SavePath = "";
         LoadoutManager.SavePath = "";
-        OrganelleUnlockManager.SavePath = "";
+        GearUnlockManager.SavePath = "";
         LoadoutManager.ResetCache();
-        OrganelleUnlockManager.ResetCache();
-        OrganelleUnlockManager.DropsEnabled = true;
-        OrganelleUnlockManager.DropChance = OrganelleUnlockManager.DefaultDropChance;
+        GearUnlockManager.ResetCache();
+        GearUnlockManager.DropsEnabled = true;
+        GearUnlockManager.DropChance = GearUnlockManager.DefaultDropChance;
     }
 
     private static void DeleteIsolatedFiles()

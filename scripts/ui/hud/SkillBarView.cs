@@ -23,7 +23,7 @@ public partial class SkillBarView : Node
     public Label? TooltipDesc { get; set; }
     public Label? TooltipBio { get; set; }
 
-    /// <summary>Chamber energy row (built once, only shown while the player engages organelles).</summary>
+    /// <summary>Chamber energy row (built once, only shown while the player engages gear).</summary>
     public HBoxContainer? ChamberRow { get; set; }
     public Label? ChamberLabel { get; set; }
     public EnergyPips? ChamberPips { get; set; }
@@ -77,7 +77,7 @@ public partial class SkillBarView : Node
         TooltipBio = root.GetNodeOrNull<Label>("SkillTooltip/VBox/TooltipBio");
 
         // Chamber energy row (Phase 2): code-built so the shared hud.tscn
-        // stays untouched; only visible once the player engages organelles.
+        // stays untouched; only visible once the player engages gear.
         ChamberRow = root.GetNodeOrNull<HBoxContainer>("SkillContainer/VBox/ChamberRow");
         if (ChamberRow == null)
         {
@@ -556,17 +556,17 @@ public partial class SkillBarView : Node
 
     /// <summary>
     /// Refreshes the chamber energy row from the player's chamber (Phase 2).
-    /// Shown only once the player engages organelles; overloaded states tint red.
+    /// Shown only once the player engages gear; overloaded states tint red.
     /// Dirty-checked: translations and pip redraws only run on state change.
     /// </summary>
     public void UpdateChamberRow()
     {
-        OrganelleChamber? chamber = null;
+        GearChamber? chamber = null;
         if (PlayerRef != null && GodotObject.IsInstanceValid(PlayerRef))
-            chamber = PlayerRef.GetNodeOrNull<OrganelleChamber>("OrganelleChamber");
+            chamber = PlayerRef.GetNodeOrNull<GearChamber>("GearChamber");
 
         int used = chamber?.UsedEnergy ?? 0;
-        int max = chamber?.MaxEnergy ?? OrganelleChamber.BaseEnergy;
+        int max = chamber?.MaxEnergy ?? GearChamber.BaseEnergy;
         int gens = chamber?.GeneratorCount ?? 0;
         bool engaged = (chamber?.EquippedCount ?? 0) > 0 || (chamber?.Backpack.Count ?? 0) > 0;
         bool overloaded = used > max;

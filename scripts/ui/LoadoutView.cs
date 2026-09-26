@@ -5,10 +5,10 @@ using Phagocyte.Core;
 namespace Phagocyte.UI;
 
 /// <summary>
-/// Pre-run loadout page (TODO Phase 1): the 6-category organelle vault on the
+/// Pre-run loadout page (TODO Phase 1): the 6-category gear vault on the
 /// left and the 2x2 energy chamber on the right. A fresh cell deploys with no
 /// equipment — the default profile is four empty slots. All legality checks run
-/// through a scratch <see cref="OrganelleChamber"/>, so the page enforces
+/// through a scratch <see cref="GearChamber"/>, so the page enforces
 /// exactly the same energy/slot contract as the run itself.
 /// </summary>
 public partial class LoadoutView : Control
@@ -16,9 +16,9 @@ public partial class LoadoutView : Control
     [Signal]
     public delegate void ConfirmedEventHandler();
 
-    public static PackedScene SlotScene => AssetLoader.Load<PackedScene>("res://scenes/ui/organelle_slot.tscn");
+    public static PackedScene SlotScene => AssetLoader.Load<PackedScene>("res://scenes/ui/gear_slot.tscn");
 
-    /// <summary>Category ids in display order (data-owned values from organelles.json).</summary>
+    /// <summary>Category ids in display order (data-owned values from gear.json).</summary>
     public static readonly string[] Categories =
     {
         "metabolism", "digestion", "cytoskeleton", "synthesis", "sensing", "symbiosis"
@@ -36,17 +36,17 @@ public partial class LoadoutView : Control
     public Button? ConfirmButton { get; set; }
     public StatPreviewPanel? StatPanel { get; set; }
 
-    private OrganelleChamber? _chamber;
+    private GearChamber? _chamber;
     private CharacterBody2D? _scratchHost;
     private string _classKey = "macrophage";
     private int _categoryFilter = -1;
     private ButtonGroup? _profileGroup;
     private readonly List<Button> _profileTabs = new();
     private readonly List<Button> _categoryTabs = new();
-    private readonly List<OrganelleSlot> _chamberCards = new();
-    private readonly List<OrganelleSlot> _backpackCards = new();
+    private readonly List<GearSlot> _chamberCards = new();
+    private readonly List<GearSlot> _backpackCards = new();
     private readonly List<string> _backpackIds = new();
-    private OrganelleTooltip? _tooltip;
+    private GearTooltip? _tooltip;
 
     /// <summary>Bio-socket look for the 2x2 chamber: rounded frames with a
     /// glowing cyan rim (symmetric corners so slots never read as tilted).
@@ -160,7 +160,7 @@ public partial class LoadoutView : Control
         // PoE-style cursor tooltip (owns hover info; engine tooltips stay
         // cleared on these cards so the two never double up). Added last so
         // it draws above every card.
-        _tooltip = new OrganelleTooltip { Name = "OrganelleTooltip" };
+        _tooltip = new GearTooltip { Name = "GearTooltip" };
         AddChild(_tooltip);
 
         UpdateLocalizedTexts();
@@ -182,7 +182,7 @@ public partial class LoadoutView : Control
     public string ClassKey => _classKey;
 
     /// <summary>Chamber snapshot for tests/inspection (never null after _Ready).</summary>
-    public OrganelleChamber? Chamber => _chamber;
+    public GearChamber? Chamber => _chamber;
 
     public void UpdateLocalizedTexts()
     {
@@ -228,10 +228,10 @@ public partial class LoadoutView : Control
             return;
 
         _chamberCards.Clear();
-        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+        for (int i = 0; i < GearChamber.MaxSlots; i++)
         {
             int slot = i;
-            var card = ChamberGrid.GetNodeOrNull<OrganelleSlot>($"ChamberSlot{slot}");
+            var card = ChamberGrid.GetNodeOrNull<GearSlot>($"ChamberSlot{slot}");
             if (card == null)
                 continue;
             card.AddThemeStyleboxOverride("normal", SocketNormalStyle);
@@ -255,7 +255,7 @@ public partial class LoadoutView : Control
 
         // Stable display order: category order, then id.
         var ids = new List<string>();
-        foreach (string id in GameManager.OrganelleCatalog.Keys)
+        foreach (string id in GameManager.GearCatalog.Keys)
             ids.Add(id);
         ids.Sort((a, b) =>
         {
@@ -267,7 +267,7 @@ public partial class LoadoutView : Control
         foreach (string id in ids)
         {
             string localId = id;
-            var card = SlotScene.Instantiate<OrganelleSlot>();
+            var card = SlotScene.Instantiate<GearSlot>();
             card.Name = $"BackpackSlot_{localId}";
             card.Pressed += () => OnBackpackCardPressed(localId);
             card.MouseEntered += () => _tooltip?.ShowFor(localId);
@@ -290,7 +290,7 @@ public partial class LoadoutView : Control
 
     private static string CategoryOf(string id)
     {
-        return GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar)
+        return GameManager.GearCatalog.TryGetValue(id, out var entryVar)
             ? entryVar.AsGodotDictionary()["category"].AsString()
             : "";
     }
@@ -309,20 +309,20 @@ public partial class LoadoutView : Control
 
         _scratchHost = new CharacterBody2D { Name = "LoadoutScratchHost" };
         _scratchHost.AddChild(new CellStats { Name = "CellStats" });
-        _chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        _chamber = new GearChamber { Name = "GearChamber" };
         _scratchHost.AddChild(_chamber);
         AddChild(_scratchHost);
         _chamber.Setup(_scratchHost);
 
-        // Only unlocked organelles are owned; the vault shows the rest as locked.
-        foreach (string id in GameManager.OrganelleCatalog.Keys)
+        // Only unlocked gear are owned; the vault shows the rest as locked.
+        foreach (string id in GameManager.GearCatalog.Keys)
         {
-            if (OrganelleUnlockManager.IsUnlocked(id))
+            if (GearUnlockManager.IsUnlocked(id))
                 _chamber.AddToBackpack(id);
         }
 
         string[] slots = LoadoutManager.GetSlots(_classKey, LoadoutManager.GetActiveProfile(_classKey));
-        for (int i = 0; i < slots.Length && i < OrganelleChamber.MaxSlots; i++)
+        for (int i = 0; i < slots.Length && i < GearChamber.MaxSlots; i++)
         {
             if (string.IsNullOrEmpty(slots[i]))
                 continue;
@@ -343,20 +343,20 @@ public partial class LoadoutView : Control
 
     private void OnBackpackCardPressed(string id)
     {
-        ToggleOrganelle(id);
+        ToggleGear(id);
     }
 
     /// <summary>
-    /// Equips an organelle into the first free slot, or unequips it when already
+    /// Equips a gear item into the first free slot, or unequips it when already
     /// equipped. Returns true when the chamber changed; refusals surface
     /// through an energy flash plus an error sting.
     /// </summary>
-    public bool ToggleOrganelle(string id)
+    public bool ToggleGear(string id)
     {
         if (_chamber == null || string.IsNullOrEmpty(id))
             return false;
 
-        if (!OrganelleUnlockManager.IsUnlocked(id))
+        if (!GearUnlockManager.IsUnlocked(id))
         {
             FlashEnergy(new Color(1.0f, 0.72f, 0.35f));
             AudioManager.Instance?.PlayError();
@@ -365,7 +365,7 @@ public partial class LoadoutView : Control
 
         // Already equipped: the click unequips it. A generator whose removal
         // would overload is refused with the overload hint (same as equipping).
-        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+        for (int i = 0; i < GearChamber.MaxSlots; i++)
         {
             if (_chamber.GetSlot(i) != id)
                 continue;
@@ -383,7 +383,7 @@ public partial class LoadoutView : Control
         }
 
         int free = -1;
-        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+        for (int i = 0; i < GearChamber.MaxSlots; i++)
         {
             if (string.IsNullOrEmpty(_chamber.GetSlot(i)))
             {
@@ -421,10 +421,10 @@ public partial class LoadoutView : Control
     {
         if (_chamber == null)
             return;
-        for (int pass = 0; pass <= OrganelleChamber.MaxSlots; pass++)
+        for (int pass = 0; pass <= GearChamber.MaxSlots; pass++)
         {
             bool changed = false;
-            for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+            for (int i = 0; i < GearChamber.MaxSlots; i++)
             {
                 if (string.IsNullOrEmpty(_chamber.GetSlot(i)))
                     continue;
@@ -488,8 +488,8 @@ public partial class LoadoutView : Control
         if (_chamber == null)
             return;
 
-        var slots = new string[OrganelleChamber.MaxSlots];
-        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+        var slots = new string[GearChamber.MaxSlots];
+        for (int i = 0; i < GearChamber.MaxSlots; i++)
             slots[i] = _chamber.GetSlot(i);
         LoadoutManager.SetSlots(_classKey, LoadoutManager.GetActiveProfile(_classKey), slots);
     }
@@ -574,7 +574,7 @@ public partial class LoadoutView : Control
             bool empty = string.IsNullOrEmpty(id);
             _chamberCards[i].AddThemeStyleboxOverride("normal",
                 empty ? SocketEmptyNormalStyle : SocketNormalStyle);
-            _chamberCards[i].ShowOrganelle(id, !empty, true);
+            _chamberCards[i].ShowGear(id, !empty, true);
             _chamberCards[i].TooltipText = "";
         }
     }
@@ -582,7 +582,7 @@ public partial class LoadoutView : Control
     private void RefreshEnergy()
     {
         int used = _chamber?.UsedEnergy ?? 0;
-        int max = _chamber?.MaxEnergy ?? OrganelleChamber.BaseEnergy;
+        int max = _chamber?.MaxEnergy ?? GearChamber.BaseEnergy;
         int generators = _chamber?.GeneratorCount ?? 0;
 
         if (EnergyBar != null)
@@ -607,7 +607,7 @@ public partial class LoadoutView : Control
             bool equipped = false;
             if (_chamber != null)
             {
-                for (int s = 0; s < OrganelleChamber.MaxSlots; s++)
+                for (int s = 0; s < GearChamber.MaxSlots; s++)
                 {
                     if (_chamber.GetSlot(s) == id)
                     {
@@ -616,7 +616,7 @@ public partial class LoadoutView : Control
                     }
                 }
             }
-            _backpackCards[i].ShowOrganelle(id, equipped, OrganelleUnlockManager.IsUnlocked(id));
+            _backpackCards[i].ShowGear(id, equipped, GearUnlockManager.IsUnlocked(id));
             _backpackCards[i].TooltipText = "";
         }
     }
@@ -631,7 +631,7 @@ public partial class LoadoutView : Control
             _categoryTabs[i].ButtonPressed = filter == _categoryFilter;
             if (filter >= 0)
             {
-                _categoryTabs[i].AddThemeColorOverride("font_color", OrganelleSlot.CategoryColor(Categories[filter]));
+                _categoryTabs[i].AddThemeColorOverride("font_color", GearSlot.CategoryColor(Categories[filter]));
                 _categoryTabs[i].AddThemeColorOverride("font_pressed_color", Colors.White);
                 _categoryTabs[i].AddThemeColorOverride("font_hover_color", Colors.White);
             }

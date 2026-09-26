@@ -10,7 +10,7 @@ MINIMUM_DIMENSIONS: Dict[str, Tuple[int, int]] = {
     "achievement": (128, 128),
     "skill": (128, 128),
     "passive_tree": (128, 128),
-    "organelle": (128, 128),
+    "gear": (128, 128),
     "ui": (64, 64),
 }
 
@@ -19,7 +19,7 @@ ASPECT_RATIO_1_1_CATEGORIES = {
     "achievement",
     "skill",
     "passive_tree",
-    "organelle",
+    "gear",
 }
 
 

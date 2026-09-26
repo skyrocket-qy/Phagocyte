@@ -95,7 +95,7 @@ public partial class TestMenuFlow : TestHarness
         }
         GD.Print("[PASS] All 5 immune defense cells selectable and confirmed unlocked via achievements.");
 
-        // Re-select Macrophage and proceed through the organelle loadout
+        // Re-select Macrophage and proceed through the gear loadout
         menu.SelectClass("macrophage");
         menu.OnClassConfirmPressed();
         AssertThat(menu.ClassView.Visible).IsFalse();
@@ -107,38 +107,38 @@ public partial class TestMenuFlow : TestHarness
         GD.Print("[PASS] Transition to LoadoutView with GameManager.selected_class = 'macrophage' verified.");
 
         // Phase 1: the page offers the vault but the cell deploys bare, and the
-        // vault is locked until pathogen drops unlock organelles.
-        OrganelleUnlockManager.ResetAll();
+        // vault is locked until pathogen drops unlock gear.
+        GearUnlockManager.ResetAll();
         menu.RefreshLoadoutView();
         AssertThat(menu.LoadoutView.Chamber).IsNotNull();
         AssertThat(menu.LoadoutView.Chamber!.EquippedCount).IsEqual(0);
         AssertThat(menu.LoadoutView.Chamber.Backpack.Count).IsEqual(0);
-        AssertThat(menu.LoadoutView.ToggleOrganelle("mitochondria_mkii")).IsFalse();
+        AssertThat(menu.LoadoutView.ToggleGear("mitochondria_mkii")).IsFalse();
         AssertThat(menu.LoadoutView.Chamber.EquippedCount).IsEqual(0);
         GD.Print("[PASS] Loadout page starts with an empty, fully locked vault.");
 
-        OrganelleUnlockManager.UnlockAll();
+        GearUnlockManager.UnlockAll();
         menu.RefreshLoadoutView();
         AssertThat(menu.LoadoutView.Chamber!.Backpack.Count).IsEqual(24);
-        GD.Print("[PASS] Unlocking the vault makes every organelle equippable.");
+        GD.Print("[PASS] Unlocking the vault makes every gear equippable.");
 
-        AssertThat(menu.LoadoutView.ToggleOrganelle("mitochondria_mkii")).IsTrue();
+        AssertThat(menu.LoadoutView.ToggleGear("mitochondria_mkii")).IsTrue();
         AssertThat(menu.LoadoutView.Chamber.GetSlot(0)).IsEqual("mitochondria_mkii");
         AssertThat(menu.LoadoutView.Chamber.UsedEnergy).IsEqual(4);
         AssertThat(LoadoutManager.GetSlots("macrophage", 0)[0]).IsEqual("mitochondria_mkii");
 
         // Overload (4+3 > 6) is refused by the page.
-        AssertThat(menu.LoadoutView.ToggleOrganelle("acidic_lysosome")).IsFalse();
+        AssertThat(menu.LoadoutView.ToggleGear("acidic_lysosome")).IsFalse();
         AssertThat(menu.LoadoutView.Chamber.EquippedCount).IsEqual(1);
 
         // A generator raises the cap and the 3-cost then fits.
-        AssertThat(menu.LoadoutView.ToggleOrganelle("symbiotic_flora")).IsTrue();
+        AssertThat(menu.LoadoutView.ToggleGear("symbiotic_flora")).IsTrue();
         AssertThat(menu.LoadoutView.Chamber.MaxEnergy).IsEqual(7);
-        AssertThat(menu.LoadoutView.ToggleOrganelle("acidic_lysosome")).IsTrue();
+        AssertThat(menu.LoadoutView.ToggleGear("acidic_lysosome")).IsTrue();
         AssertThat(menu.LoadoutView.Chamber.UsedEnergy).IsEqual(7);
 
-        // Toggling an equipped organelle removes it and persists.
-        AssertThat(menu.LoadoutView.ToggleOrganelle("acidic_lysosome")).IsTrue();
+        // Toggling an equipped gear removes it and persists.
+        AssertThat(menu.LoadoutView.ToggleGear("acidic_lysosome")).IsTrue();
         AssertThat(menu.LoadoutView.Chamber.EquippedCount).IsEqual(2);
         AssertThat(LoadoutManager.GetSlots("macrophage", 0)[2]).IsEqual("");
 

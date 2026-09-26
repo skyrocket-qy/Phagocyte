@@ -44,7 +44,7 @@ def check_missing_assets(
     - Achievement (from achievements.json -> gen/achievement/{id}.png)
     - Skill (from skill/active.json + passive.json -> gen/skill/{id}.png)
     - PassiveTree (from passive_traits.json -> gen/passive_tree/{id}.png)
-    - Organelle (from organelles.json -> gen/organelle/{id}.png)
+    - Gear (from gear.json -> gen/gear/{id}.png)
     - UI (from ui.json -> gen/ui/{id}.png)
 
     Returns:
@@ -56,7 +56,7 @@ def check_missing_assets(
         "Achievement": [],
         "Skill": [],
         "PassiveTree": [],
-        "Organelle": [],
+        "Gear": [],
         "UI": [],
     }
     unmapped: List[str] = []
@@ -103,15 +103,15 @@ def check_missing_assets(
         if not gen_path.exists():
             missing_by_cat["PassiveTree"].append(f"gen/passive_tree/{trait_id}.png")
 
-    # ── 4. Organelle Chamber Equipment ────────────────────────────────────
-    organelles_file = assets_dir / "data" / "organelles.json"
-    for organelle_id in _extract_ids(_load_json(organelles_file) or []):
-        expected_stems.setdefault("organelle", set()).add(organelle_id)
-        category_counts["Organelle"] = category_counts.get("Organelle", 0) + 1
+    # ── 4. Gear Chamber Equipment ────────────────────────────────────
+    gear_file = assets_dir / "data" / "gear.json"
+    for gear_id in _extract_ids(_load_json(gear_file) or []):
+        expected_stems.setdefault("gear", set()).add(gear_id)
+        category_counts["Gear"] = category_counts.get("Gear", 0) + 1
 
-        gen_path = gen_dir / "organelle" / f"{organelle_id}.png"
+        gen_path = gen_dir / "gear" / f"{gear_id}.png"
         if not gen_path.exists():
-            missing_by_cat["Organelle"].append(f"gen/organelle/{organelle_id}.png")
+            missing_by_cat["Gear"].append(f"gen/gear/{gear_id}.png")
 
     # ── 5. UI (registry: assets/data/ui.json) ────────────────────────────
     ui_file = assets_dir / "data" / "ui.json"
@@ -125,7 +125,7 @@ def check_missing_assets(
 
     # ── 6. Reverse Reference Checks (Disk -> Data, gen/ only) ───────────────
     # Only gen/ is scanned: it is the source of truth for
-    # achievement/skill/passive_tree/organelle/ui. Processed outputs under
+    # achievement/skill/passive_tree/gear/ui. Processed outputs under
     # assets/gen/ are pipeline artifacts, not registered sources.
     if gen_dir.exists():
         for root, _, files in os.walk(gen_dir):
@@ -133,7 +133,7 @@ def check_missing_assets(
             if not rel_root.parts:
                 continue
             cat = rel_root.parts[0]
-            if cat not in ["achievement", "skill", "passive_tree", "organelle", "ui"]:
+            if cat not in ["achievement", "skill", "passive_tree", "gear", "ui"]:
                 continue
 
             for f in files:
@@ -152,7 +152,7 @@ def check_missing_assets(
             "achievement": "Achievement",
             "skill": "Skill",
             "passive_tree": "PassiveTree",
-            "organelle": "Organelle",
+            "gear": "Gear",
             "ui": "UI",
         }.get(target_category.lower(), target_category)
 

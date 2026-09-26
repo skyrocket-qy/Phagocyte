@@ -76,7 +76,7 @@ public partial class TestFullVisualPreview : TestHarness
                     return false;
 
                 case 3:
-                    // 3. Organelle Loadout Chamber
+                    // 3. Gear Loadout Chamber
                     if (!Gate(ref _frame, 6))
                         return false;
                     CaptureScreenshot("loadout_view.png");
@@ -584,7 +584,7 @@ public partial class TestFullVisualPreview : TestHarness
             if (cards.Count >= 3)
             {
                 SetupCard(cards[0], "吞噬延伸 (Actin Pseudopod Lunge)", "[ 新主动武器 ]", "向前方伸出伪足抓取远距离病原体，将其拖拽至胞口消化。", AssetPaths.SkillIcon("pseudopod_lunge"));
-                SetupCard(cards[1], "线粒体超频 (Mitochondrial Overclock)", "[ 细胞器升级 LEVEL 2 ]", "技能冷却缩减 +12%，氧化磷酸化电子传递链加速，提升ATP产能效率。", AssetPaths.OrganelleIcon("mitochondria_mkii"));
+                SetupCard(cards[1], "线粒体超频 (Mitochondrial Overclock)", "[ 细胞器升级 LEVEL 2 ]", "技能冷却缩减 +12%，氧化磷酸化电子传递链加速，提升ATP产能效率。", AssetPaths.GearIcon("mitochondria_mkii"));
                 SetupCard(cards[2], "活性氧射流 (ROS Torrent)", "[ 新主动武器 ]", "高压喷射超氧阴离子与过氧化氢射流，持续融毁大面积外源病菌囊膜。", AssetPaths.SkillIcon("ros_torrent"));
             }
         }

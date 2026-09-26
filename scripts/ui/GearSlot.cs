@@ -4,11 +4,11 @@ using Phagocyte.Core;
 namespace Phagocyte.UI;
 
 /// <summary>
-/// One organelle slot card (2x2 chamber or backpack grid). Dumb view: the
-/// owner pushes state through <see cref="ShowOrganelle"/>; clicks are forwarded
+/// One gear slot card (2x2 chamber or backpack grid). Dumb view: the
+/// owner pushes state through <see cref="ShowGear"/>; clicks are forwarded
 /// via <see cref="Pressed"/> (inherited from Button).
 /// </summary>
-public partial class OrganelleSlot : Button
+public partial class GearSlot : Button
 {
     public TextureRect? IconTexture { get; private set; }
     public EnergyPips? CostPips { get; private set; }
@@ -16,7 +16,7 @@ public partial class OrganelleSlot : Button
     public Label? StateLabel { get; private set; }
 
     /// <summary>Catalog id currently shown ("" for an empty chamber slot).</summary>
-    public string OrganelleId { get; private set; } = "";
+    public string GearId { get; private set; } = "";
 
     private static readonly Color LockedIconTint = new(1, 1, 1, 0.18f);
     private static readonly Color LockedNameTint = new(0.38f, 0.43f, 0.50f, 0.85f);
@@ -49,14 +49,14 @@ public partial class OrganelleSlot : Button
         };
     }
 
-    /// <summary>Renders an organelle. An empty id shows a pure empty socket:
+    /// <summary>Renders a gear item. An empty id shows a pure empty socket:
     /// frame + background only, no icon and no text.</summary>
-    public void ShowOrganelle(string id, bool equipped, bool unlocked = true)
+    public void ShowGear(string id, bool equipped, bool unlocked = true)
     {
         Bind();
-        OrganelleId = id ?? "";
+        GearId = id ?? "";
 
-        if (string.IsNullOrEmpty(OrganelleId))
+        if (string.IsNullOrEmpty(GearId))
         {
             if (IconTexture != null)
                 IconTexture.Visible = false;
@@ -76,7 +76,7 @@ public partial class OrganelleSlot : Button
             return;
         }
 
-        var entry = GameManager.OrganelleCatalog.TryGetValue(OrganelleId, out var entryVar)
+        var entry = GameManager.GearCatalog.TryGetValue(GearId, out var entryVar)
             ? entryVar.AsGodotDictionary()
             : null;
         if (entry == null)

@@ -187,7 +187,7 @@ def run_all_checks(target_category=None, summary_only=False) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(description="Phagocyte Asset Quality & Integrity Linter")
-    parser.add_argument("--category", "-c", type=str, default=None, help="Filter by category (achievement, skill, passive_tree, organelle, ui)")
+    parser.add_argument("--category", "-c", type=str, default=None, help="Filter by category (achievement, skill, passive_tree, gear, ui)")
     parser.add_argument("--summary", "-s", action="store_true", help="Only show category counts without full item lists")
     args = parser.parse_args()
 

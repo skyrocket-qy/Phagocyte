@@ -6,12 +6,12 @@ using System.Collections.Generic;
 namespace Phagocyte.Core;
 
 /// <summary>
-/// Meta-progression unlocks for organelle chamber equipment (TODO Phase 1
-/// revision): the vault starts fully locked and organelles are only obtained
+/// Meta-progression unlocks for gear chamber equipment (TODO Phase 1
+/// revision): the vault starts fully locked and gear are only obtained
 /// from pathogen kills at a deliberately low drop chance. Unlocks are
 /// account-wide and persisted; a collected drop is the only way in.
 /// </summary>
-public static class OrganelleUnlockManager
+public static class GearUnlockManager
 {
     /// <summary>Base chance per pathogen kill. Deliberately low.</summary>
     public const float DefaultDropChance = 0.02f;
@@ -22,7 +22,7 @@ public static class OrganelleUnlockManager
     /// <summary>Master switch so headless suites stay deterministic.</summary>
     public static bool DropsEnabled = true;
 
-    private static readonly JsonStore.SavePathSlot _savePath = new("organelle_unlocks.json");
+    private static readonly JsonStore.SavePathSlot _savePath = new("gear_unlocks.json");
     public static string SavePath
     {
         get => _savePath.Value;
@@ -41,7 +41,7 @@ public static class OrganelleUnlockManager
         LoadFromDisk();
     }
 
-    /// <summary>True when the organelle exists in the catalog and has dropped at least once.</summary>
+    /// <summary>True when the gear exists in the catalog and has dropped at least once.</summary>
     public static bool IsUnlocked(string id)
     {
         if (string.IsNullOrEmpty(id))
@@ -64,15 +64,15 @@ public static class OrganelleUnlockManager
         get
         {
             EnsureLoaded();
-            return Math.Max(0, GameManager.OrganelleCatalog.Count - Unlocked.Count);
+            return Math.Max(0, GameManager.GearCatalog.Count - Unlocked.Count);
         }
     }
 
-    /// <summary>Unlocks an organelle. Returns true only when it was newly unlocked.</summary>
+    /// <summary>Unlocks a gear item. Returns true only when it was newly unlocked.</summary>
     public static bool Unlock(string id)
     {
         EnsureLoaded();
-        if (string.IsNullOrEmpty(id) || !GameManager.OrganelleCatalog.ContainsKey(id))
+        if (string.IsNullOrEmpty(id) || !GameManager.GearCatalog.ContainsKey(id))
             return false;
         if (!Unlocked.Add(id))
             return false;
@@ -86,7 +86,7 @@ public static class OrganelleUnlockManager
     public static void UnlockAll()
     {
         EnsureLoaded();
-        foreach (string id in GameManager.OrganelleCatalog.Keys)
+        foreach (string id in GameManager.GearCatalog.Keys)
             Unlocked.Add(id);
         SaveToDisk();
     }
@@ -99,12 +99,12 @@ public static class OrganelleUnlockManager
         JsonStore.Delete(SavePath);
     }
 
-    /// <summary>A uniformly random locked organelle id, or "" when all are unlocked.</summary>
+    /// <summary>A uniformly random locked gear id, or "" when all are unlocked.</summary>
     public static string RollLockedId()
     {
         EnsureLoaded();
         var locked = new List<string>();
-        foreach (string id in GameManager.OrganelleCatalog.Keys)
+        foreach (string id in GameManager.GearCatalog.Keys)
         {
             if (!Unlocked.Contains(id))
                 locked.Add(id);
@@ -116,9 +116,9 @@ public static class OrganelleUnlockManager
 
     /// <summary>
     /// Rolls <see cref="DropChance"/> once and spawns a pickup at
-    /// <paramref name="position"/> when it hits and a locked organelle remains.
+    /// <paramref name="position"/> when it hits and a locked gear remains.
     /// </summary>
-    public static OrganelleDrop? TrySpawnDrop(Vector2 position, Node? parent, Node2D? target)
+    public static GearDrop? TrySpawnDrop(Vector2 position, Node? parent, Node2D? target)
     {
         if (!DropsEnabled || DropChance <= 0.0f || parent == null || !GodotObject.IsInstanceValid(parent))
             return null;
@@ -131,10 +131,10 @@ public static class OrganelleUnlockManager
         if (string.IsNullOrEmpty(id))
             return null;
 
-        var drop = new OrganelleDrop
+        var drop = new GearDrop
         {
-            Name = "OrganelleDrop_" + id,
-            OrganelleId = id,
+            Name = "GearDrop_" + id,
+            GearId = id,
             Target = target,
             GlobalPosition = position
         };
@@ -159,7 +159,7 @@ public static class OrganelleUnlockManager
 
     private static void NotifyListeners(string id)
     {
-        if (!GameManager.OrganelleCatalog.TryGetValue(id, out var entryVar))
+        if (!GameManager.GearCatalog.TryGetValue(id, out var entryVar))
             return;
         var entry = entryVar.AsGodotDictionary();
         foreach (Callable cb in _listeners)
@@ -195,7 +195,7 @@ public static class OrganelleUnlockManager
             foreach (var idVar in unlockedVal.AsGodotArray())
             {
                 string id = idVar.AsString();
-                if (!string.IsNullOrEmpty(id) && GameManager.OrganelleCatalog.ContainsKey(id))
+                if (!string.IsNullOrEmpty(id) && GameManager.GearCatalog.ContainsKey(id))
                     Unlocked.Add(id);
             }
         }

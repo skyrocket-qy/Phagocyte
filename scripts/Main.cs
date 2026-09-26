@@ -344,22 +344,22 @@ public partial class Main : Node2D, IRunContext
     }
 
     /// <summary>
-    /// Deploys the cell's active organelle loadout (TODO Phase 1). A fresh cell
+    /// Deploys the cell's active gear loadout (TODO Phase 1). A fresh cell
     /// has no equipment: an empty profile simply equips nothing. Entries that
     /// are stale, still locked or energy-illegal are skipped, never fatal.
     /// </summary>
     private void ApplyChamberLoadout()
     {
-        if (Player is not BaseCell bc || bc.CellOrganelleChamber == null)
+        if (Player is not BaseCell bc || bc.CellGearChamber == null)
             return;
 
         string classId = GameManager.SelectedClass;
         string[] slots = LoadoutManager.GetActiveSlots(classId);
-        var chamber = bc.CellOrganelleChamber;
-        for (int i = 0; i < slots.Length && i < OrganelleChamber.MaxSlots; i++)
+        var chamber = bc.CellGearChamber;
+        for (int i = 0; i < slots.Length && i < GearChamber.MaxSlots; i++)
         {
             string id = slots[i];
-            if (string.IsNullOrEmpty(id) || !OrganelleUnlockManager.IsUnlocked(id))
+            if (string.IsNullOrEmpty(id) || !GearUnlockManager.IsUnlocked(id))
                 continue;
             if (!chamber.AddToBackpack(id))
                 continue;

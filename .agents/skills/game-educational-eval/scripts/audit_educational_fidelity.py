@@ -81,7 +81,7 @@ class EducationalAuditor:
         # Loaded data
         self.classes = load_json(self.data_dir / "classes.json") or []
         self.skills = load_json(self.data_dir / "skills.json") or []
-        self.organelles = load_json(self.data_dir / "organelles.json") or []
+        self.gear = load_json(self.data_dir / "gear.json") or []
         self.passives = load_json(self.data_dir / "passive_traits.json") or {}
         if isinstance(self.passives, dict):
             self.passives = self.passives.get("traits", [])
@@ -107,7 +107,7 @@ class EducationalAuditor:
         categories = [
             ("Class", self.classes, ["name_key", "desc_key", "bio_key"]),
             ("Skill", self.skills, ["name_key", "desc_key", "bio_key"]),
-            ("Organelle", self.organelles, ["name_key", "desc_key", "bio_key"]),
+            ("Gear", self.gear, ["name_key", "desc_key", "bio_key"]),
             ("PassiveTrait", self.passives, ["name_key", "desc_key", "bio_key"]),
             ("Pathogen", self.pathogens, ["name_key", "desc_key", "trait_key"]),
             ("Map", self.maps, ["name_key", "desc_key", "bio_key"]),
@@ -163,7 +163,7 @@ class EducationalAuditor:
             else:
                 issues.append(f"Pathogen name '{name_en}' may violate standard Latin binomial or medical taxonomy format.")
 
-        # Check Biochemical Acronyms and Conventions in Organelles & Skills
+        # Check Biochemical Acronyms and Conventions in Gear & Skills
         recognized_acronyms = {"ATP", "ADP", "NADH", "NADPH", "ROS", "TLR", "MHC", "DNA", "RNA", "rDNA", "mRNA", "C5b-9", "MAC", "Arp2/3", "ANT", "V-ATPase"}
         bio_texts = []
         for row in self.translations.values():
@@ -186,7 +186,7 @@ class EducationalAuditor:
 
     def audit_mechanic_biology_consistency(self) -> Dict[str, Any]:
         """Audits whether gameplay stat modifiers map logically to biological functions."""
-        consistent_organelles = 0
+        consistent_gear = 0
         inconsistencies = []
 
         # Expected mappings
@@ -199,7 +199,7 @@ class EducationalAuditor:
             "symbiosis": set() # Symbiosis is defined by energy generation + drawbacks
         }
 
-        for org in self.organelles:
+        for org in self.gear:
             cat = org.get("category", "")
             cost = org.get("energy_cost", 0)
             drawbacks = org.get("drawback", [])
@@ -208,22 +208,22 @@ class EducationalAuditor:
             # Check generators have drawbacks (First Law of Thermodynamics / metabolic cost)
             if cost < 0:
                 if not drawbacks:
-                    inconsistencies.append(f"Generator organelle '{org.get('id')}' generates energy without metabolic drawback (violates energy conservation).")
+                    inconsistencies.append(f"Generator gear '{org.get('id')}' generates energy without metabolic drawback (violates energy conservation).")
                 else:
-                    consistent_organelles += 1
+                    consistent_gear += 1
             else:
                 # Check stats match category
                 expected = category_expected_stats.get(cat, set())
                 stats_used = {m.get("stat") for m in modifiers}
                 if stats_used.issubset(expected) or not stats_used:
-                    consistent_organelles += 1
+                    consistent_gear += 1
                 else:
                     unexpected = stats_used - expected
-                    inconsistencies.append(f"Organelle '{org.get('id')}' in category '{cat}' uses unusual stats: {unexpected}")
+                    inconsistencies.append(f"Gear '{org.get('id')}' in category '{cat}' uses unusual stats: {unexpected}")
 
         return {
-            "total_organelles": len(self.organelles),
-            "consistent_organelles": consistent_organelles,
+            "total_gear": len(self.gear),
+            "consistent_gear": consistent_gear,
             "inconsistencies": inconsistencies
         }
 
@@ -248,9 +248,9 @@ class EducationalAuditor:
                     if "TabPathogensBtn" in content: surfaced_tabs.append("Pathogens")
                     if "TabMapsBtn" in content: surfaced_tabs.append("Organ Environments")
 
-                    # Check if Organelles are in Codex
-                    if "Organelle" not in content and "organelle" not in content.lower():
-                        missing_tabs.append("Organelle Chamber Equipment")
+                    # Check if Gear are in Codex
+                    if "Gear" not in content and "gear" not in content.lower():
+                        missing_tabs.append("Gear Chamber Equipment")
             except Exception:
                 pass
 
@@ -269,8 +269,8 @@ class EducationalAuditor:
     ) -> Dict[str, Any]:
         """Calculates the 5-Dimension Educational Fidelity Index (EFI)."""
         # Dim 1: Mechanistic Scientific Fidelity (0-100)
-        # Based on organelle consistency and biological Casework
-        mech_ratio = mech_stats["consistent_organelles"] / max(1, mech_stats["total_organelles"])
+        # Based on gear consistency and biological Casework
+        mech_ratio = mech_stats["consistent_gear"] / max(1, mech_stats["total_gear"])
         dim1_score = round(min(100.0, mech_ratio * 90.0 + 10.0), 1)
 
         # Dim 2: Pathogen-Host Interaction Accuracy (0-100)
@@ -293,8 +293,8 @@ class EducationalAuditor:
 
         # Dim 5: Scientific Misconception Resistance (0-100)
         # Symbiont modeling (flora, quorum, phage) + energy conservation + waxy pathogen defense
-        has_symbionts = any(o.get("category") == "symbiosis" for o in self.organelles)
-        has_energy_cap = any(o.get("energy_cost", 0) > 0 for o in self.organelles)
+        has_symbionts = any(o.get("category") == "symbiosis" for o in self.gear)
+        has_energy_cap = any(o.get("energy_cost", 0) > 0 for o in self.gear)
         dim5_score = 92.0 if (has_symbionts and has_energy_cap) else 75.0
 
         # Weighted Composite EFI
@@ -355,7 +355,7 @@ class EducationalAuditor:
         report.append(f"- **Total Registered Entities**: `{lore_stats['total_entities']}`")
         report.append(f"  - Immune Cell Classes: `{len(self.classes)}`")
         report.append(f"  - Skills & Epigenetic Weapons: `{len(self.skills)}`")
-        report.append(f"  - Cellular Organelles: `{len(self.organelles)}`")
+        report.append(f"  - Cellular Gear: `{len(self.gear)}`")
         report.append(f"  - Passive Traits & Metabolic Nodes: `{len(self.passives)}`")
         report.append(f"  - Pathogen Strains & Microbes: `{len(self.pathogens)}`")
         report.append(f"  - Anatomical Battlefields: `{len(self.maps)}`")
@@ -375,13 +375,13 @@ class EducationalAuditor:
             if codex_stats["missing_tabs"]:
                 report.append("\n⚠️ **Gaps in Codex Presentation**:")
                 for mt in codex_stats["missing_tabs"]:
-                    report.append(f"- `[!]` **{mt}** is currently missing a dedicated tab in `CodexModal` (players currently only see organelle bio lore in the Loadout vault).")
+                    report.append(f"- `[!]` **{mt}** is currently missing a dedicated tab in `CodexModal` (players currently only see gear bio lore in the Loadout vault).")
         else:
             report.append("❌ No dedicated Codex UI surface found!\n")
 
         report.append("\n---\n")
         report.append("## 🎯 4. Strategic Pedagogical Recommendations\n")
-        report.append("1. **Add Organelle Chamber Tab to CodexModal**:")
+        report.append("1. **Add Organelle Tab to CodexModal**:")
         report.append("   - All 24 cellular organelles have rich `ORGANELLE_*_BIO` texts (ANT translocase, pH 4.5 V-ATPase, Arp2/3 actin mesh). Adding an Organelle tab to `CodexModal` will make this valuable cell biology knowledge freely browsable outside combat loadout.")
         report.append("2. **Post-Run Clinical Pathology Summary (Discharge Record)**:")
         report.append("   - At the run-end screen (Victory or SIRS), present a 'Microscopic Pathology Report' showing pathogens neutralized by taxon (Gram+ vs Gram- vs Viral) and primary biochemical mechanisms used (e.g. '82% of microbes eliminated via Lysosomal Phagocytosis').")

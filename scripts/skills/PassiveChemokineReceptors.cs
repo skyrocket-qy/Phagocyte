@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Chemokine Receptors (趨化因子受體)
+/// Passive Gear Trait: Chemokine Receptors (趨化因子受體)
 /// Universal Stat Modifiers per level: Magnet +25%, Move Speed +6%
 /// </summary>
 public partial class PassiveChemokineReceptors : BaseSkill

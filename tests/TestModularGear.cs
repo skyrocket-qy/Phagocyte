@@ -3,7 +3,7 @@ using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using Phagocyte.Enemies;
-using Phagocyte.Organelles;
+using Phagocyte.Gear;
 using Phagocyte.Player;
 
 using Phagocyte.Core;
@@ -11,12 +11,12 @@ using Phagocyte.Core;
 namespace Phagocyte.Tests;
 
 /// <summary>
-/// Verifies the Modular Organelles (ReceptorSpikes ring).
+/// Verifies the Modular Gear (ReceptorSpikes ring).
 /// The PseudopodLimb IK grabber was merged into Phagocytic Grasp's
 /// chain-strike delivery and deleted.
 /// </summary>
 [TestSuite]
-public partial class TestModularOrganelles : SceneTree
+public partial class TestModularGear : SceneTree
 {
     private int _frame = 0;
     private bool _done = false;
@@ -25,7 +25,7 @@ public partial class TestModularOrganelles : SceneTree
     public override void _Initialize()
     {
         GD.Print("==================================================================");
-        GD.Print(">>> STARTING MODULAR ORGANELLES VERIFICATION <<<");
+        GD.Print(">>> STARTING MODULAR GEAR VERIFICATION <<<");
         GD.Print("==================================================================");
     }
 
@@ -45,13 +45,13 @@ public partial class TestModularOrganelles : SceneTree
         }
         catch (Exception ex)
         {
-            GD.PrintErr("[FAIL] TestModularOrganelles threw: ", ex);
+            GD.PrintErr("[FAIL] TestModularGear threw: ", ex);
             Quit(1);
             return true;
         }
 
         GD.Print("==================================================================");
-        GD.Print(">>> ALL MODULAR ORGANELLE TESTS PASSED SUCCESSFULLY! <<<");
+        GD.Print(">>> ALL MODULAR GEAR TESTS PASSED SUCCESSFULLY! <<<");
         GD.Print("==================================================================");
         Quit(0);
         return true;
@@ -59,13 +59,13 @@ public partial class TestModularOrganelles : SceneTree
 
     private void RunTests()
     {
-        _container = new Node2D { Name = "OrganelleTestContainer" };
+        _container = new Node2D { Name = "GearTestContainer" };
         Root.AddChild(_container);
 
         var spikeScene = AssetLoader.Load<PackedScene>("res://scenes/skills/ReceptorSpikes.tscn");
         AssertThat(spikeScene).IsNotNull();
 
-        var cell = new BaseCell { Name = "OrganelleHost", GlobalPosition = new Vector2(500, 500) };
+        var cell = new BaseCell { Name = "GearHost", GlobalPosition = new Vector2(500, 500) };
         _container!.AddChild(cell);
         AssertThat(cell.Stats).IsNotNull();
 

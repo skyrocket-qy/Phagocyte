@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: V(D)J Diversity (V(D)J 基因重排多樣性)
+/// Passive Gear Trait: V(D)J Diversity (V(D)J 基因重排多樣性)
 /// Universal Stat Modifiers: Crit Damage +15%, Crit Chance +3% per level
 /// </summary>
 public partial class PassiveVdjDiversity : BaseSkill

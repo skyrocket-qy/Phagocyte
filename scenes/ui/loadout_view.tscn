@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://dme50k8dk7dpd" path="res://scripts/ui/ChamberLinks.cs" id="4_links"]
 [ext_resource type="Texture2D" uid="uid://tgcu6j4thisj" path="res://assets/sprites/ui/menu/cell.jpeg" id="5_cell"]
 [ext_resource type="PackedScene" path="res://scenes/ui/stat_preview.tscn" id="6_stats"]
-[ext_resource type="PackedScene" path="res://scenes/ui/organelle_slot.tscn" id="7_slots"]
+[ext_resource type="PackedScene" path="res://scenes/ui/gear_slot.tscn" id="7_slots"]
 [ext_resource type="Theme" uid="uid://ppcyc41cyeh7" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
 [ext_resource type="PackedScene" path="res://scenes/ui/page_header.tscn" id="page_header"]
 

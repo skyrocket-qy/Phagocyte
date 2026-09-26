@@ -12,19 +12,19 @@ using static GdUnit4.Assertions;
 namespace Phagocyte.Tests;
 
 /// <summary>
-/// Phase 0 verification for the organelle chamber (TODO.md §Phase 0):
+/// Phase 0 verification for the gear chamber (TODO.md §Phase 0):
 /// slot/energy/generator accounting, overload rejection, exact stat rollback,
 /// backpack dedupe and the scene/code wiring of every immune cell.
 /// UI flows (loadout page, upgrade draft) land in later phases.
 /// </summary>
-public partial class TestOrganelleChamber : TestHarness
+public partial class TestGearChamber : TestHarness
 {
     private int _frame = 0;
     private bool _done = false;
 
     public override void _Initialize()
     {
-        Banner("STARTING ORGANELLE CHAMBER VERIFICATION (PHASE 0)");
+        Banner("STARTING GEAR CHAMBER VERIFICATION (PHASE 0)");
     }
 
     public override bool _Process(double delta)
@@ -48,17 +48,17 @@ public partial class TestOrganelleChamber : TestHarness
             RunDraftFlowTests();
             RunSwapFlowTests();
             RunDiscardAndHudTests();
-            Finish(true, "ALL ORGANELLE CHAMBER TESTS");
+            Finish(true, "ALL GEAR CHAMBER TESTS");
         }
         catch (Exception ex)
         {
-            GD.PrintErr("[FAIL] TestOrganelleChamber threw: ", ex);
-            Finish(false, "ORGANELLE CHAMBER TESTS");
+            GD.PrintErr("[FAIL] TestGearChamber threw: ", ex);
+            Finish(false, "GEAR CHAMBER TESTS");
         }
         return true;
     }
 
-    private static bool BagHas(OrganelleChamber chamber, string id)
+    private static bool BagHas(GearChamber chamber, string id)
     {
         foreach (string bagged in chamber.Backpack)
         {
@@ -70,9 +70,9 @@ public partial class TestOrganelleChamber : TestHarness
 
     private void RunConstantsTest()
     {
-        AssertThat(OrganelleChamber.MaxSlots).IsEqual(4);
-        AssertThat(OrganelleChamber.BaseEnergy).IsEqual(6);
-        AssertThat(OrganelleChamber.BackpackCap).IsEqual(24);
+        AssertThat(GearChamber.MaxSlots).IsEqual(4);
+        AssertThat(GearChamber.BaseEnergy).IsEqual(6);
+        AssertThat(GearChamber.BackpackCap).IsEqual(24);
         GD.Print("[PASS] Chamber constants: 4 slots / base energy 6 / backpack 24 (generators uncapped).");
     }
 
@@ -81,19 +81,19 @@ public partial class TestOrganelleChamber : TestHarness
         var mock = new CharacterBody2D { Name = "ChamberHost" };
         var stats = new CellStats { Name = "CellStats" };
         mock.AddChild(stats);
-        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        var chamber = new GearChamber { Name = "GearChamber" };
         mock.AddChild(chamber);
         Root.AddChild(mock);
         chamber.Setup(mock);
 
         AssertThat(chamber.Stats).IsEqual(stats);
         AssertThat(chamber.UsedEnergy).IsEqual(0);
-        AssertThat(chamber.MaxEnergy).IsEqual(OrganelleChamber.BaseEnergy);
+        AssertThat(chamber.MaxEnergy).IsEqual(GearChamber.BaseEnergy);
         AssertThat(chamber.EquippedCount).IsEqual(0);
 
         // --- Acquisition + dedupe (max_copies = 1 across equipped + backpack) ---
         var ids = new List<string>();
-        foreach (string id in GameManager.OrganelleCatalog.Keys)
+        foreach (string id in GameManager.GearCatalog.Keys)
             ids.Add(id);
         AssertThat(ids.Count).IsEqual(24);
         foreach (string id in ids)
@@ -134,7 +134,7 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(BagHas(chamber, "mitochondria_mkii")).IsTrue();
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("cooldown_reduction"), 0.05f)).IsTrue();
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("duration"), 1.0f)).IsTrue();
-        GD.Print("[PASS] Slot replace: replaced organelle returns to backpack, its stats removed exactly.");
+        GD.Print("[PASS] Slot replace: replaced gear returns to backpack, its stats removed exactly.");
 
         // --- Unequip rollback + backpack return ---
         AssertThat(chamber.Unequip(1)).IsTrue();
@@ -161,7 +161,7 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(copyReason).IsEqual("copy_cap");
         AssertThat(chamber.CanEquip("glycolytic_bypass", 9, out string slotReason)).IsFalse();
         AssertThat(slotReason).IsEqual("bad_slot");
-        AssertThat(chamber.CanEquip("not_a_real_organelle", 1, out string unknownReason)).IsFalse();
+        AssertThat(chamber.CanEquip("not_a_real_gear", 1, out string unknownReason)).IsFalse();
         AssertThat(unknownReason).IsEqual("unknown");
         AssertThat(chamber.CanEquip("glycolytic_bypass", 2, out string sameReason)).IsFalse();
         AssertThat(sameReason).IsEqual("already_equipped");
@@ -205,7 +205,7 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(chamber.Discard("rough_er")).IsFalse();
         AssertThat(BagHas(chamber, "rough_er")).IsFalse();
         AssertThat(chamber.Discard("acidic_lysosome")).IsFalse();
-        GD.Print("[PASS] Discard removes an unequipped organelle only.");
+        GD.Print("[PASS] Discard removes an unequipped gear only.");
 
         // --- _ExitTree rolls every equipped modifier back ---
         chamber.Free();
@@ -219,14 +219,14 @@ public partial class TestOrganelleChamber : TestHarness
 
     private void RunUnequipOverloadTests()
     {
-        OrganelleUnlockManager.ResetCache();
-        OrganelleUnlockManager.ResetAll();
-        OrganelleUnlockManager.UnlockAll();
+        GearUnlockManager.ResetCache();
+        GearUnlockManager.ResetAll();
+        GearUnlockManager.UnlockAll();
 
         var mock = new CharacterBody2D { Name = "UnequipHost" };
         var stats = new CellStats { Name = "CellStats" };
         mock.AddChild(stats);
-        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        var chamber = new GearChamber { Name = "GearChamber" };
         mock.AddChild(chamber);
         Root.AddChild(mock);
         chamber.Setup(mock);
@@ -262,7 +262,7 @@ public partial class TestOrganelleChamber : TestHarness
         // Recovery: shed load first, then the generator leaves.
         AssertThat(chamber.Unequip(2)).IsTrue();
         AssertThat(chamber.Unequip(1)).IsTrue();
-        AssertThat(chamber.MaxEnergy).IsEqual(OrganelleChamber.BaseEnergy);
+        AssertThat(chamber.MaxEnergy).IsEqual(GearChamber.BaseEnergy);
         AssertThat(BagHas(chamber, "symbiotic_flora")).IsTrue();
         GD.Print("[PASS] Shedding a consumer first unblocks the generator removal.");
 
@@ -277,23 +277,23 @@ public partial class TestOrganelleChamber : TestHarness
         view.Open("macrophage");
         AssertThat(view.Chamber).IsNotNull();
 
-        AssertThat(view.ToggleOrganelle("mitochondria_mkii")).IsTrue();
-        AssertThat(view.ToggleOrganelle("symbiotic_flora")).IsTrue();
-        AssertThat(view.ToggleOrganelle("acidic_lysosome")).IsTrue();
+        AssertThat(view.ToggleGear("mitochondria_mkii")).IsTrue();
+        AssertThat(view.ToggleGear("symbiotic_flora")).IsTrue();
+        AssertThat(view.ToggleGear("acidic_lysosome")).IsTrue();
         AssertThat(view.Chamber!.UsedEnergy).IsEqual(7);
 
-        AssertThat(view.ToggleOrganelle("symbiotic_flora")).IsFalse();
+        AssertThat(view.ToggleGear("symbiotic_flora")).IsFalse();
         AssertThat(view.Chamber.GetSlot(1)).IsEqual("symbiotic_flora");
         AssertThat(view.Chamber.IsOverloaded).IsFalse();
         GD.Print("[PASS] Loadout page refuses the generator removal with the overload hint.");
 
-        AssertThat(view.ToggleOrganelle("acidic_lysosome")).IsTrue();
-        AssertThat(view.ToggleOrganelle("symbiotic_flora")).IsTrue();
+        AssertThat(view.ToggleGear("acidic_lysosome")).IsTrue();
+        AssertThat(view.ToggleGear("symbiotic_flora")).IsTrue();
         AssertThat(view.Chamber.GeneratorCount).IsEqual(0);
 
-        AssertThat(view.ToggleOrganelle("mitochondria_mkii")).IsTrue();
-        AssertThat(view.ToggleOrganelle("symbiotic_flora")).IsTrue();
-        AssertThat(view.ToggleOrganelle("acidic_lysosome")).IsTrue();
+        AssertThat(view.ToggleGear("mitochondria_mkii")).IsTrue();
+        AssertThat(view.ToggleGear("symbiotic_flora")).IsTrue();
+        AssertThat(view.ToggleGear("acidic_lysosome")).IsTrue();
         view.ResetLoadout();
         AssertThat(view.Chamber.EquippedCount).IsEqual(0);
         AssertThat(view.Chamber.IsOverloaded).IsFalse();
@@ -312,36 +312,36 @@ public partial class TestOrganelleChamber : TestHarness
             var cell = (BaseCell)scene.Instantiate();
             Root.AddChild(cell);
 
-            AssertThat(cell.GetNodeOrNull<OrganelleChamber>("OrganelleChamber")).IsNotNull();
-            AssertThat(cell.CellOrganelleChamber).IsNotNull();
-            AssertThat(cell.CellOrganelleChamber!.Stats).IsEqual(cell.Stats);
+            AssertThat(cell.GetNodeOrNull<GearChamber>("GearChamber")).IsNotNull();
+            AssertThat(cell.CellGearChamber).IsNotNull();
+            AssertThat(cell.CellGearChamber!.Stats).IsEqual(cell.Stats);
 
             float cdrBefore = cell.Stats!.GetStat("cooldown_reduction");
-            AssertThat(cell.CellOrganelleChamber.AddToBackpack("mitochondria_mkii")).IsTrue();
-            AssertThat(cell.CellOrganelleChamber.Equip("mitochondria_mkii", 0)).IsTrue();
+            AssertThat(cell.CellGearChamber.AddToBackpack("mitochondria_mkii")).IsTrue();
+            AssertThat(cell.CellGearChamber.Equip("mitochondria_mkii", 0)).IsTrue();
             AssertThat(cell.Stats.GetStat("cooldown_reduction")).IsGreater(cdrBefore);
 
             cell.Free();
         }
-        GD.Print("[PASS] All 5 immune cell scenes resolve their OrganelleChamber and apply stats.");
+        GD.Print("[PASS] All 5 immune cell scenes resolve their GearChamber and apply stats.");
 
         // Code fallback when the scene lacks the node (mirrors the CellStats pattern).
         var fallbackScene = GameManager.GetCellScene("macrophage");
         var bare = (BaseCell)fallbackScene.Instantiate();
-        bare.GetNode("OrganelleChamber").Free();
+        bare.GetNode("GearChamber").Free();
         Root.AddChild(bare);
-        AssertThat(bare.GetNodeOrNull<OrganelleChamber>("OrganelleChamber")).IsNotNull();
-        AssertThat(bare.CellOrganelleChamber).IsNotNull();
-        AssertThat(bare.CellOrganelleChamber!.Stats).IsEqual(bare.Stats);
+        AssertThat(bare.GetNodeOrNull<GearChamber>("GearChamber")).IsNotNull();
+        AssertThat(bare.CellGearChamber).IsNotNull();
+        AssertThat(bare.CellGearChamber!.Stats).IsEqual(bare.Stats);
         bare.Free();
-        GD.Print("[PASS] Missing scene node falls back to a code-created OrganelleChamber.");
+        GD.Print("[PASS] Missing scene node falls back to a code-created GearChamber.");
     }
 
     private void RunTranslationTests()
     {
-        foreach (string id in GameManager.OrganelleCatalog.Keys)
+        foreach (string id in GameManager.GearCatalog.Keys)
         {
-            var entry = GameManager.OrganelleCatalog[id].AsGodotDictionary();
+            var entry = GameManager.GearCatalog[id].AsGodotDictionary();
             foreach (string key in new[] { "name_key", "desc_key", "bio_key" })
             {
                 string trKey = entry[key].AsString();
@@ -349,7 +349,7 @@ public partial class TestOrganelleChamber : TestHarness
                 AssertThat(TranslationServer.Translate(trKey)).IsNotEqual(trKey);
             }
         }
-        GD.Print("[PASS] All organelle name/desc/bio keys resolve through translations.csv.");
+        GD.Print("[PASS] All gear name/desc/bio keys resolve through translations.csv.");
 
         // Phase 1 loadout page keys.
         foreach (string key in new[]
@@ -377,77 +377,77 @@ public partial class TestOrganelleChamber : TestHarness
     /// <summary>Phase 1 revision: the vault starts locked and only drops unlock it.</summary>
     private void RunUnlockManagerTests()
     {
-        OrganelleUnlockManager.ResetCache();
-        OrganelleUnlockManager.ResetAll();
+        GearUnlockManager.ResetCache();
+        GearUnlockManager.ResetAll();
 
         // Fresh profile: nothing is unlocked (the vault is earned, not given).
-        AssertThat(OrganelleUnlockManager.UnlockedCount).IsEqual(0);
-        AssertThat(OrganelleUnlockManager.LockedCount).IsEqual(GameManager.OrganelleCatalog.Count);
-        AssertThat(OrganelleUnlockManager.IsUnlocked("mitochondria_mkii")).IsFalse();
-        GD.Print("[PASS] Organelle vault starts fully locked.");
+        AssertThat(GearUnlockManager.UnlockedCount).IsEqual(0);
+        AssertThat(GearUnlockManager.LockedCount).IsEqual(GameManager.GearCatalog.Count);
+        AssertThat(GearUnlockManager.IsUnlocked("mitochondria_mkii")).IsFalse();
+        GD.Print("[PASS] Gear vault starts fully locked.");
 
         // Unlock is idempotent, validated and persisted.
-        AssertThat(OrganelleUnlockManager.Unlock("mitochondria_mkii")).IsTrue();
-        AssertThat(OrganelleUnlockManager.Unlock("mitochondria_mkii")).IsFalse();
-        AssertThat(OrganelleUnlockManager.Unlock("not_a_real_organelle")).IsFalse();
-        OrganelleUnlockManager.ResetCache();
-        AssertThat(OrganelleUnlockManager.IsUnlocked("mitochondria_mkii")).IsTrue();
-        AssertThat(OrganelleUnlockManager.UnlockedCount).IsEqual(1);
+        AssertThat(GearUnlockManager.Unlock("mitochondria_mkii")).IsTrue();
+        AssertThat(GearUnlockManager.Unlock("mitochondria_mkii")).IsFalse();
+        AssertThat(GearUnlockManager.Unlock("not_a_real_gear")).IsFalse();
+        GearUnlockManager.ResetCache();
+        AssertThat(GearUnlockManager.IsUnlocked("mitochondria_mkii")).IsTrue();
+        AssertThat(GearUnlockManager.UnlockedCount).IsEqual(1);
         GD.Print("[PASS] Unlocks are idempotent, validated and persisted (isolated save).");
 
         // Roll selection only ever returns a locked id.
-        string rolled = OrganelleUnlockManager.RollLockedId();
+        string rolled = GearUnlockManager.RollLockedId();
         AssertThat(rolled).IsNotEmpty();
-        AssertThat(OrganelleUnlockManager.IsUnlocked(rolled)).IsFalse();
-        GD.Print("[PASS] Drop roll only selects still-locked organelles.");
+        AssertThat(GearUnlockManager.IsUnlocked(rolled)).IsFalse();
+        GD.Print("[PASS] Drop roll only selects still-locked gear.");
 
         // Suites run with drops disabled so kills can never unlock unscripted.
-        AssertThat(OrganelleUnlockManager.DropsEnabled).IsFalse();
+        AssertThat(GearUnlockManager.DropsEnabled).IsFalse();
         var host = new Node2D { Name = "DropHost" };
         Root.AddChild(host);
-        AssertThat(OrganelleUnlockManager.TrySpawnDrop(Vector2.Zero, host, null)).IsNull();
-        GD.Print("[PASS] Suite default: organelle drops are disabled for determinism.");
+        AssertThat(GearUnlockManager.TrySpawnDrop(Vector2.Zero, host, null)).IsNull();
+        GD.Print("[PASS] Suite default: gear drops are disabled for determinism.");
 
         // Explicit roll spawns a pickup; collecting it is what unlocks.
-        OrganelleUnlockManager.DropsEnabled = true;
-        OrganelleUnlockManager.DropChance = 1.0f;
-        var drop = OrganelleUnlockManager.TrySpawnDrop(new Vector2(10, 20), host, null);
+        GearUnlockManager.DropsEnabled = true;
+        GearUnlockManager.DropChance = 1.0f;
+        var drop = GearUnlockManager.TrySpawnDrop(new Vector2(10, 20), host, null);
         AssertThat(drop).IsNotNull();
-        string droppedId = drop!.OrganelleId;
+        string droppedId = drop!.GearId;
         AssertThat(droppedId).IsNotEmpty();
-        AssertThat(OrganelleUnlockManager.IsUnlocked(droppedId)).IsFalse();
+        AssertThat(GearUnlockManager.IsUnlocked(droppedId)).IsFalse();
         drop.CollectForTest();
-        AssertThat(OrganelleUnlockManager.IsUnlocked(droppedId)).IsTrue();
+        AssertThat(GearUnlockManager.IsUnlocked(droppedId)).IsTrue();
         AssertThat(drop.IsQueuedForDeletion()).IsTrue();
         GD.Print("[PASS] A rolled drop spawns as a pickup and unlocks on collect.");
 
-        // No locked organelles left -> no drops at all.
-        OrganelleUnlockManager.UnlockAll();
-        AssertThat(OrganelleUnlockManager.LockedCount).IsEqual(0);
-        AssertThat(OrganelleUnlockManager.RollLockedId()).IsEqual("");
-        AssertThat(OrganelleUnlockManager.TrySpawnDrop(Vector2.Zero, host, null)).IsNull();
+        // No locked gear left -> no drops at all.
+        GearUnlockManager.UnlockAll();
+        AssertThat(GearUnlockManager.LockedCount).IsEqual(0);
+        AssertThat(GearUnlockManager.RollLockedId()).IsEqual("");
+        AssertThat(GearUnlockManager.TrySpawnDrop(Vector2.Zero, host, null)).IsNull();
         GD.Print("[PASS] A complete collection stops spawning drops.");
 
         host.Free();
-        OrganelleUnlockManager.DropsEnabled = false;
-        OrganelleUnlockManager.DropChance = OrganelleUnlockManager.DefaultDropChance;
-        AssertThat(OrganelleUnlockManager.DropChance).IsEqual(OrganelleUnlockManager.DefaultDropChance);
+        GearUnlockManager.DropsEnabled = false;
+        GearUnlockManager.DropChance = GearUnlockManager.DefaultDropChance;
+        AssertThat(GearUnlockManager.DropChance).IsEqual(GearUnlockManager.DefaultDropChance);
     }
 
     /// <summary>Phase 2: the run draft offers weapons/passives and heals.</summary>
     private void RunDraftFlowTests()
     {
-        // Draft offers weapons and passives only, never organelle cards.
-        OrganelleUnlockManager.ResetCache();
-        OrganelleUnlockManager.ResetAll();
-        OrganelleUnlockManager.Unlock("mitochondria_mkii");
-        OrganelleUnlockManager.Unlock("acidic_lysosome");
+        // Draft offers weapons and passives only, never gear cards.
+        GearUnlockManager.ResetCache();
+        GearUnlockManager.ResetAll();
+        GearUnlockManager.Unlock("mitochondria_mkii");
+        GearUnlockManager.Unlock("acidic_lysosome");
 
         var mock = new CharacterBody2D { Name = "DraftHost" };
         var stats = new CellStats { Name = "CellStats" };
         mock.AddChild(stats);
         mock.AddChild(new SkillManager { Name = "SkillManager" });
-        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        var chamber = new GearChamber { Name = "GearChamber" };
         mock.AddChild(chamber);
         Root.AddChild(mock);
         chamber.Setup(mock);
@@ -457,16 +457,16 @@ public partial class TestOrganelleChamber : TestHarness
         foreach (var c in choices)
         {
             AssertThat(c.ContainsKey("type") && c.ContainsKey("id") && c.ContainsKey("name")).IsTrue();
-            AssertThat(c["type"].AsString()).IsNotEqual("new_organelle");
+            AssertThat(c["type"].AsString()).IsNotEqual("new_gear");
         }
-        GD.Print("[PASS] Draft offers weapons and passives only, never organelle cards.");
+        GD.Print("[PASS] Draft offers weapons and passives only, never gear cards.");
 
         // ApplyChoice still acquires into the backpack and auto-equips the
         // first legal slot (engine beneath the swap step); drafts just never
-        // offer organelle cards anymore.
+        // offer gear cards anymore.
         var draftChoice = new Godot.Collections.Dictionary
         {
-            { "type", "new_organelle" },
+            { "type", "new_gear" },
             { "id", "mitochondria_mkii" },
             { "skill_class", "" }
         };
@@ -477,20 +477,20 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(UpgradeManager.ApplyChoice(mock, draftChoice)).IsFalse();
         GD.Print("[PASS] Applier acquires, auto-equips and refuses duplicates.");
 
-        // A locked organelle is never applied.
+        // A locked gear is never applied.
         var lockedChoice = new Godot.Collections.Dictionary
         {
-            { "type", "new_organelle" },
+            { "type", "new_gear" },
             { "id", "rough_er" }
         };
         AssertThat(UpgradeManager.ApplyChoice(mock, lockedChoice)).IsFalse();
-        GD.Print("[PASS] Locked organelles are refused by the applier.");
+        GD.Print("[PASS] Locked gear are refused by the applier.");
 
         // Fill the chamber (4-cost + 3-cost on a 6 budget stays legal) and check
         // the modal refuses an unaffordable replacement with a stable reason.
         var acidicChoice = new Godot.Collections.Dictionary
         {
-            { "type", "new_organelle" },
+            { "type", "new_gear" },
             { "id", "acidic_lysosome" }
         };
         AssertThat(chamber.EquippedCount).IsEqual(1);
@@ -503,21 +503,21 @@ public partial class TestOrganelleChamber : TestHarness
     /// <summary>Phase 2: the in-modal swap step (replace / store / discard).</summary>
     private void RunSwapFlowTests()
     {
-        OrganelleUnlockManager.ResetCache();
-        OrganelleUnlockManager.ResetAll();
+        GearUnlockManager.ResetCache();
+        GearUnlockManager.ResetAll();
         foreach (string id in new[]
         {
             "symbiotic_flora", "phage_fragment", "chemokine_patch", "proteasome_sieve",
             "rough_er", "acidic_lysosome", "glycolytic_bypass", "ribosome_cluster"
         })
         {
-            AssertThat(OrganelleUnlockManager.Unlock(id)).IsTrue();
+            AssertThat(GearUnlockManager.Unlock(id)).IsTrue();
         }
 
         var mock = new CharacterBody2D { Name = "SwapHost" };
         mock.AddChild(new CellStats { Name = "CellStats" });
         mock.AddChild(new SkillManager { Name = "SkillManager" });
-        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        var chamber = new GearChamber { Name = "GearChamber" };
         mock.AddChild(chamber);
         Root.AddChild(mock);
         chamber.Setup(mock);
@@ -530,7 +530,7 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(chamber.Equip("phage_fragment", 1)).IsTrue();
         AssertThat(chamber.Equip("chemokine_patch", 2)).IsTrue();
         AssertThat(chamber.Equip("proteasome_sieve", 3)).IsTrue();
-        AssertThat(chamber.EquippedCount).IsEqual(OrganelleChamber.MaxSlots);
+        AssertThat(chamber.EquippedCount).IsEqual(GearChamber.MaxSlots);
         AssertThat(chamber.UsedEnergy).IsEqual(2);
         AssertThat(chamber.MaxEnergy).IsEqual(8);
 
@@ -539,12 +539,12 @@ public partial class TestOrganelleChamber : TestHarness
         Root.AddChild(modal);
 
         // 1) A full chamber opens the swap step instead of auto-equipping.
-        ShowOrganelleCard(modal, mock, "rough_er", 4);
+        ShowGearCard(modal, mock, "rough_er", 4);
         modal.OnCardClicked(0);
         AssertThat(modal.IsSwapMode).IsTrue();
         AssertThat(modal.Visible).IsTrue();
         AssertThat(Paused).IsTrue();
-        AssertThat(modal.PendingOrganelle).IsEqual("rough_er");
+        AssertThat(modal.PendingGear).IsEqual("rough_er");
         GD.Print("[PASS] A full chamber opens the in-modal swap step.");
 
         // 2) Replacing the generator (slot 0) keeps used 6 <= max 7: legal.
@@ -558,7 +558,7 @@ public partial class TestOrganelleChamber : TestHarness
         GD.Print("[PASS] Swap replaces the chosen slot, retires the old item and resumes.");
 
         // 3) An over-budget replacement (6 + 3 = 9 > 7) is refused with a hint.
-        ShowOrganelleCard(modal, mock, "acidic_lysosome", 3);
+        ShowGearCard(modal, mock, "acidic_lysosome", 3);
         modal.OnCardClicked(0);
         AssertThat(modal.IsSwapMode).IsTrue();
         AssertThat(modal.OnSwapSlotPressed(1)).IsFalse();
@@ -574,17 +574,17 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(Paused).IsTrue();
         GD.Print("[PASS] Swap cancel rewinds to the 3-choice cards without resuming.");
 
-        // 5) Re-opening the pending card and storing it keeps the organelle.
+        // 5) Re-opening the pending card and storing it keeps the gear.
         modal.OnCardClicked(0);
         AssertThat(modal.IsSwapMode).IsTrue();
         modal.OnSwapStorePressed();
         AssertThat(modal.Visible).IsFalse();
         AssertThat(Paused).IsFalse();
         AssertThat(BagHas(chamber, "acidic_lysosome")).IsTrue();
-        GD.Print("[PASS] Swap store keeps the organelle in the run backpack.");
+        GD.Print("[PASS] Swap store keeps the gear in the run backpack.");
 
-        // 6) Discard drops the pending organelle from the run.
-        ShowOrganelleCard(modal, mock, "ribosome_cluster", 2);
+        // 6) Discard drops the pending gear from the run.
+        ShowGearCard(modal, mock, "ribosome_cluster", 2);
         modal.OnCardClicked(0);
         AssertThat(modal.IsSwapMode).IsTrue();
         AssertThat(BagHas(chamber, "ribosome_cluster")).IsTrue();
@@ -592,23 +592,23 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(modal.Visible).IsFalse();
         AssertThat(Paused).IsFalse();
         AssertThat(BagHas(chamber, "ribosome_cluster")).IsFalse();
-        GD.Print("[PASS] Swap discard removes the pending organelle from the run.");
+        GD.Print("[PASS] Swap discard removes the pending gear from the run.");
 
         modal.Free();
         mock.Free();
         Root.GetTree().Paused = false;
     }
 
-    /// <summary>Shows a single organelle draft card bound to a host cell.</summary>
-    private static void ShowOrganelleCard(UpgradeModal modal, Node2D player, string id, int cost)
+    /// <summary>Shows a single gear draft card bound to a host cell.</summary>
+    private static void ShowGearCard(UpgradeModal modal, Node2D player, string id, int cost)
     {
         var card = new Godot.Collections.Dictionary
         {
-            { "type", "new_organelle" },
+            { "type", "new_gear" },
             { "id", id },
             { "player", player },
-            { "name", "ORGANELLE_TEST_NAME" },
-            { "desc", "ORGANELLE_TEST_DESC" },
+            { "name", "GEAR_TEST_NAME" },
+            { "desc", "GEAR_TEST_DESC" },
             { "badge", "BADGE_NEW_ORGANELLE" },
             { "level", 1 },
             { "energy_cost", cost },
@@ -620,14 +620,14 @@ public partial class TestOrganelleChamber : TestHarness
     /// <summary>Phase 2: discard heals and the HUD chamber row reflects state.</summary>
     private void RunDiscardAndHudTests()
     {
-        OrganelleUnlockManager.ResetCache();
-        OrganelleUnlockManager.ResetAll();
-        OrganelleUnlockManager.Unlock("chemokine_patch");
+        GearUnlockManager.ResetCache();
+        GearUnlockManager.ResetAll();
+        GearUnlockManager.Unlock("chemokine_patch");
 
         var mock = new CharacterBody2D { Name = "DiscardHost" };
         var stats = new CellStats { Name = "CellStats" };
         mock.AddChild(stats);
-        var chamber = new OrganelleChamber { Name = "OrganelleChamber" };
+        var chamber = new GearChamber { Name = "GearChamber" };
         mock.AddChild(chamber);
         Root.AddChild(mock);
         chamber.Setup(mock);
@@ -638,7 +638,7 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(chamber.Discard("chemokine_patch")).IsFalse();
         AssertThat(chamber.Unequip(0)).IsTrue();
         AssertThat(chamber.Discard("chemokine_patch")).IsTrue();
-        GD.Print("[PASS] Discard only removes unequipped organelles from the run backpack.");
+        GD.Print("[PASS] Discard only removes unequipped gear from the run backpack.");
 
         // HUD chamber row hides when unengaged and shows energy once equipped.
         var hudScene = AssetLoader.Load<PackedScene>("res://scenes/ui/hud.tscn");
@@ -677,13 +677,13 @@ public partial class TestOrganelleChamber : TestHarness
             AssertThat(id).IsEqual("");
         GD.Print("[PASS] Default loadout profile is a single build with 4 empty slots (no equipment).");
 
-        // Locked organelles can never enter a profile.
-        OrganelleUnlockManager.ResetCache();
-        OrganelleUnlockManager.ResetAll();
+        // Locked gear can never enter a profile.
+        GearUnlockManager.ResetCache();
+        GearUnlockManager.ResetAll();
         AssertThat(LoadoutManager.SetSlots(cell, 0, new[] { "mitochondria_mkii", "", "", "" })).IsFalse();
         AssertThat(LoadoutManager.GetSlots(cell, 0)[0]).IsEqual("");
-        OrganelleUnlockManager.UnlockAll();
-        GD.Print("[PASS] Locked organelles are refused by the loadout manager.");
+        GearUnlockManager.UnlockAll();
+        GD.Print("[PASS] Locked gear are refused by the loadout manager.");
 
         // Legal set persists and round-trips through disk.
         string[] legal = { "mitochondria_mkii", "chemokine_patch", "", "" };
@@ -700,7 +700,7 @@ public partial class TestOrganelleChamber : TestHarness
         AssertThat(LoadoutManager.SetSlots(cell, 0, overloaded)).IsFalse();
         string[] duplicated = { "mitochondria_mkii", "mitochondria_mkii", "", "" };
         AssertThat(LoadoutManager.SetSlots(cell, 0, duplicated)).IsFalse();
-        string[] unknown = { "not_a_real_organelle", "", "", "" };
+        string[] unknown = { "not_a_real_gear", "", "", "" };
         AssertThat(LoadoutManager.SetSlots(cell, 0, unknown)).IsFalse();
         AssertThat(LoadoutManager.GetSlots(cell, 0)[0]).IsEqual("mitochondria_mkii");
         GD.Print("[PASS] Overload / duplicate / unknown loadout sets are refused (stored profile untouched).");
@@ -733,7 +733,7 @@ public partial class TestOrganelleChamber : TestHarness
                     { cell, new Godot.Collections.Array
                         {
                             new Godot.Collections.Array<string> { "rough_er", "rough_er", "rough_er", "rough_er" },
-                            new Godot.Collections.Array<string> { "not_a_real_organelle", "", "", "" }
+                            new Godot.Collections.Array<string> { "not_a_real_gear", "", "", "" }
                         }
                     }
                 }
@@ -761,9 +761,9 @@ public partial class TestOrganelleChamber : TestHarness
         var emptyRun = InstantiateMain(cell);
         var emptyPlayer = emptyRun.Player as BaseCell;
         AssertThat(emptyPlayer).IsNotNull();
-        AssertThat(emptyPlayer!.CellOrganelleChamber).IsNotNull();
-        AssertThat(emptyPlayer.CellOrganelleChamber!.EquippedCount).IsEqual(0);
-        AssertThat(emptyPlayer.CellOrganelleChamber.Backpack.Count).IsEqual(0);
+        AssertThat(emptyPlayer!.CellGearChamber).IsNotNull();
+        AssertThat(emptyPlayer.CellGearChamber!.EquippedCount).IsEqual(0);
+        AssertThat(emptyPlayer.CellGearChamber.Backpack.Count).IsEqual(0);
         FreeMain(emptyRun);
         GD.Print("[PASS] A run deploys with an empty chamber by default (no starting equipment).");
 
@@ -772,7 +772,7 @@ public partial class TestOrganelleChamber : TestHarness
         var loadedRun = InstantiateMain(cell);
         var player = loadedRun.Player as BaseCell;
         AssertThat(player).IsNotNull();
-        var chamber = player!.CellOrganelleChamber;
+        var chamber = player!.CellGearChamber;
         AssertThat(chamber).IsNotNull();
         AssertThat(chamber!.GetSlot(0)).IsEqual("mitochondria_mkii");
         AssertThat(chamber.GetSlot(1)).IsEqual("symbiotic_flora");
@@ -801,13 +801,13 @@ public partial class TestOrganelleChamber : TestHarness
         var fallbackRun = InstantiateMain(cell);
         var fallbackPlayer = fallbackRun.Player as BaseCell;
         AssertThat(fallbackPlayer).IsNotNull();
-        AssertThat(fallbackPlayer!.CellOrganelleChamber).IsNotNull();
+        AssertThat(fallbackPlayer!.CellGearChamber).IsNotNull();
         FreeMain(fallbackRun);
         GD.Print("[PASS] An illegal on-disk profile sanitizes and the run still deploys.");
 
-        // Locked organelles are stripped on load: a run never equips what has not dropped.
-        OrganelleUnlockManager.ResetCache();
-        OrganelleUnlockManager.ResetAll();
+        // Locked gear are stripped on load: a run never equips what has not dropped.
+        GearUnlockManager.ResetCache();
+        GearUnlockManager.ResetAll();
         var lockedPayload = new Godot.Collections.Dictionary
         {
             { "profiles", new Godot.Collections.Dictionary
@@ -827,11 +827,11 @@ public partial class TestOrganelleChamber : TestHarness
         var lockedRun = InstantiateMain(cell);
         var lockedPlayer = lockedRun.Player as BaseCell;
         AssertThat(lockedPlayer).IsNotNull();
-        AssertThat(lockedPlayer!.CellOrganelleChamber!.EquippedCount).IsEqual(0);
+        AssertThat(lockedPlayer!.CellGearChamber!.EquippedCount).IsEqual(0);
         FreeMain(lockedRun);
-        GD.Print("[PASS] Locked organelles are stripped from profiles and never deploy.");
+        GD.Print("[PASS] Locked gear are stripped from profiles and never deploy.");
 
-        OrganelleUnlockManager.UnlockAll();
+        GearUnlockManager.UnlockAll();
         LoadoutManager.ResetCache();
         LoadoutManager.SetSlots(cell, 0, LoadoutManager.EmptySlots());
     }

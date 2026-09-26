@@ -7,8 +7,8 @@ namespace Phagocyte.UI;
 
 /// <summary>
 /// Level-Up 3-Choice Epigenetic Mutation Modal.
-/// Pauses the game, displays 3 distinct choices (Active/Passive/Organelle).
-/// An organelle card that cannot auto-equip opens an in-modal swap step:
+/// Pauses the game, displays 3 distinct choices (Active/Passive/Gear).
+/// A gear card that cannot auto-equip opens an in-modal swap step:
 /// replace one chamber slot, store the item to the run backpack, or discard
 /// it for a small heal.
 /// </summary>
@@ -17,7 +17,7 @@ public partial class UpgradeModal : ModalBase
     [Signal]
     public delegate void ChoiceAppliedEventHandler(Dictionary choice);
 
-    /// <summary>Discarded organelles heal this fraction of max HP (Phase 2).</summary>
+    /// <summary>Discarded gear heals this fraction of max HP (Phase 2).</summary>
     public const float DiscardHealRatio = 0.15f;
 
     public Label? SubtitleLabel { get; set; }
@@ -33,8 +33,8 @@ public partial class UpgradeModal : ModalBase
     public Button? SwapDiscardButton { get; set; }
     public Button? SwapCancelButton { get; set; }
 
-    /// <summary>True while the modal is resolving an organelle placement.</summary>
-    public bool IsSwapMode => _pendingOrganelle != "";
+    /// <summary>True while the modal is resolving a gear placement.</summary>
+    public bool IsSwapMode => _pendingGear != "";
 
     // Scene-built modal without a header: title lives inside the center VBox.
     protected override string? TitleLabelPath => null;
@@ -44,8 +44,8 @@ public partial class UpgradeModal : ModalBase
     public Array<Dictionary> CurrentChoices => _currentChoices;
     private Node2D? _playerRef = null;
     private int _pendingLevels = 0;
-    private string _pendingOrganelle = "";
-    private readonly System.Collections.Generic.List<OrganelleSlot> _swapCards = new();
+    private string _pendingGear = "";
+    private readonly System.Collections.Generic.List<GearSlot> _swapCards = new();
 
     public override void _Ready()
     {
@@ -174,7 +174,7 @@ public partial class UpgradeModal : ModalBase
                     {
                         string id = idVal.AsString();
                         iconTex.Texture = AssetLoader.TryLoad<Texture2D>(AssetPaths.SkillIcon(id))
-                            ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.OrganelleIcon(id))
+                            ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.GearIcon(id))
                             ?? AssetLoader.TryLoad<Texture2D>(AssetPaths.PlaceholderIcon);
                     }
                     else
@@ -224,7 +224,7 @@ public partial class UpgradeModal : ModalBase
                     descLbl.Text = descKey == "UPGRADE_TO_LV"
                         ? TextFormatter.Format(Tr(descKey), descLvl)
                         : Tr(descKey);
-                    // Organelle cards carry their energy cost under the description.
+                    // Gear cards carry their energy cost under the description.
                     if (choice.TryGetValue("energy_cost", out var costVal))
                     {
                         int cost = costVal.AsInt32();
@@ -270,8 +270,8 @@ public partial class UpgradeModal : ModalBase
 
     private string SwapCandidateText()
     {
-        if (string.IsNullOrEmpty(_pendingOrganelle)
-            || !GameManager.OrganelleCatalog.TryGetValue(_pendingOrganelle, out var entryVar))
+        if (string.IsNullOrEmpty(_pendingGear)
+            || !GameManager.GearCatalog.TryGetValue(_pendingGear, out var entryVar))
         {
             return "";
         }
@@ -309,9 +309,9 @@ public partial class UpgradeModal : ModalBase
             return;
 
         var choice = _currentChoices[idx];
-        if (choice.TryGetValue("type", out var typeVal) && typeVal.AsString() == "new_organelle")
+        if (choice.TryGetValue("type", out var typeVal) && typeVal.AsString() == "new_gear")
         {
-            OnOrganelleCardClicked(choice);
+            OnGearCardClicked(choice);
             return;
         }
 
@@ -332,7 +332,7 @@ public partial class UpgradeModal : ModalBase
             SwapPanel.Visible = false;
         if (CardsContainer != null)
             CardsContainer.Visible = true;
-        _pendingOrganelle = "";
+        _pendingGear = "";
         PauseManager.PopHold(GetTree(), PauseManager.UpgradeDraft);
 
         if (_pendingLevels > 0)
@@ -343,24 +343,24 @@ public partial class UpgradeModal : ModalBase
     }
 
     // ------------------------------------------------------------------
-    // Organelle swap flow (Phase 2)
+    // Gear swap flow (Phase 2)
     // ------------------------------------------------------------------
 
     /// <summary>Id pending placement ("" when the modal shows plain cards).</summary>
-    public string PendingOrganelle => _pendingOrganelle;
+    public string PendingGear => _pendingGear;
 
-    private OrganelleChamber? ResolveChamber()
+    private GearChamber? ResolveChamber()
     {
-        return _playerRef?.GetNodeOrNull<OrganelleChamber>("OrganelleChamber");
+        return _playerRef?.GetNodeOrNull<GearChamber>("GearChamber");
     }
 
     /// <summary>
-    /// Organelle cards always acquire into the run backpack first. When the new
+    /// Gear cards always acquire into the run backpack first. When the new
     /// item auto-equips (free slot + legal energy) the draft resolves exactly
     /// like other choices; otherwise the swap step opens for replace / store /
     /// discard / cancel.
     /// </summary>
-    public void OnOrganelleCardClicked(Dictionary choice)
+    public void OnGearCardClicked(Dictionary choice)
     {
         if (choice.TryGetValue("player", out var playerVal) && playerVal.AsGodotObject() is Node2D explicitPlayer)
             _playerRef = explicitPlayer;
@@ -391,9 +391,9 @@ public partial class UpgradeModal : ModalBase
         EnterSwapMode(id);
     }
 
-    private static bool IsEquipped(OrganelleChamber chamber, string id)
+    private static bool IsEquipped(GearChamber chamber, string id)
     {
-        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+        for (int i = 0; i < GearChamber.MaxSlots; i++)
         {
             if (chamber.GetSlot(i) == id)
                 return true;
@@ -401,10 +401,10 @@ public partial class UpgradeModal : ModalBase
         return false;
     }
 
-    /// <summary>Shows the swap step for a freshly acquired organelle.</summary>
-    public void EnterSwapMode(string organelleId)
+    /// <summary>Shows the swap step for a freshly acquired gear.</summary>
+    public void EnterSwapMode(string gearId)
     {
-        _pendingOrganelle = organelleId ?? "";
+        _pendingGear = gearId ?? "";
         if (CardsContainer != null)
             CardsContainer.Visible = false;
         if (SwapPanel != null)
@@ -420,10 +420,10 @@ public partial class UpgradeModal : ModalBase
             return;
 
         _swapCards.Clear();
-        for (int i = 0; i < OrganelleChamber.MaxSlots; i++)
+        for (int i = 0; i < GearChamber.MaxSlots; i++)
         {
             int slot = i;
-            var card = SwapSlotsContainer.GetNodeOrNull<OrganelleSlot>($"SwapSlot{slot}");
+            var card = SwapSlotsContainer.GetNodeOrNull<GearSlot>($"SwapSlot{slot}");
             if (card == null)
                 continue;
             card.Pressed += () => OnSwapSlotPressed(slot);
@@ -441,7 +441,7 @@ public partial class UpgradeModal : ModalBase
         for (int i = 0; i < _swapCards.Count; i++)
         {
             string slotId = chamber.GetSlot(i);
-            _swapCards[i].ShowOrganelle(slotId, !string.IsNullOrEmpty(slotId));
+            _swapCards[i].ShowGear(slotId, !string.IsNullOrEmpty(slotId));
         }
 
         int used = chamber.UsedEnergy;
@@ -467,16 +467,16 @@ public partial class UpgradeModal : ModalBase
     /// <summary>Latest swap-step hint text (tests / scripted flows).</summary>
     public string SwapHintText => SwapHintLabel?.Text ?? "";
 
-    /// <summary>Replaces one chamber slot with the pending organelle.</summary>
+    /// <summary>Replaces one chamber slot with the pending gear.</summary>
     public bool OnSwapSlotPressed(int slot)
     {
         var chamber = ResolveChamber();
-        if (chamber == null || string.IsNullOrEmpty(_pendingOrganelle) || !chamber.Owns(_pendingOrganelle))
+        if (chamber == null || string.IsNullOrEmpty(_pendingGear) || !chamber.Owns(_pendingGear))
             return false;
 
-        if (!chamber.Equip(_pendingOrganelle, slot))
+        if (!chamber.Equip(_pendingGear, slot))
         {
-            chamber.CanEquip(_pendingOrganelle, slot, out string reason);
+            chamber.CanEquip(_pendingGear, slot, out string reason);
             ShowSwapHint(SwapReasonKey(reason));
             RefreshSwapPanel();
             AudioManager.Instance?.PlayError();
@@ -488,20 +488,20 @@ public partial class UpgradeModal : ModalBase
         return true;
     }
 
-    /// <summary>Keeps the pending organelle in the run backpack.</summary>
+    /// <summary>Keeps the pending gear in the run backpack.</summary>
     public void OnSwapStorePressed()
     {
-        if (string.IsNullOrEmpty(_pendingOrganelle))
+        if (string.IsNullOrEmpty(_pendingGear))
             return;
         ResolveChoice(PendingChoice());
     }
 
-    /// <summary>Discards the pending organelle for a small heal.</summary>
+    /// <summary>Discards the pending gear for a small heal.</summary>
     public void OnSwapDiscardPressed()
     {
         var chamber = ResolveChamber();
-        if (chamber != null && !string.IsNullOrEmpty(_pendingOrganelle))
-            chamber.Discard(_pendingOrganelle);
+        if (chamber != null && !string.IsNullOrEmpty(_pendingGear))
+            chamber.Discard(_pendingGear);
 
         AudioManager.Instance?.PlayUnequip();
 
@@ -513,27 +513,27 @@ public partial class UpgradeModal : ModalBase
         ResolveChoice(PendingChoice());
     }
 
-    /// <summary>Returns to the 3-choice cards; the organelle stays acquired.</summary>
+    /// <summary>Returns to the 3-choice cards; the gear stays acquired.</summary>
     public void OnSwapCancelPressed()
     {
         if (CardsContainer != null)
             CardsContainer.Visible = true;
         if (SwapPanel != null)
             SwapPanel.Visible = false;
-        _pendingOrganelle = "";
+        _pendingGear = "";
     }
 
     private Dictionary PendingChoice()
     {
         foreach (var candidate in _currentChoices)
         {
-            if (candidate.TryGetValue("type", out var typeVal) && typeVal.AsString() == "new_organelle"
-                && candidate.TryGetValue("id", out var idVal) && idVal.AsString() == _pendingOrganelle)
+            if (candidate.TryGetValue("type", out var typeVal) && typeVal.AsString() == "new_gear"
+                && candidate.TryGetValue("id", out var idVal) && idVal.AsString() == _pendingGear)
             {
                 return candidate;
             }
         }
-        return new Dictionary { { "type", "new_organelle" }, { "id", _pendingOrganelle } };
+        return new Dictionary { { "type", "new_gear" }, { "id", _pendingGear } };
     }
 
     private static string SwapReasonKey(string reason)

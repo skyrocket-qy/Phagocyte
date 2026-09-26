@@ -5,7 +5,7 @@ using System;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Manages 5 Active Cytokine Weapon slots and 5 Passive Organelle Trait slots.
+/// Manages 5 Active Cytokine Weapon slots and 5 Passive Gear Trait slots.
 /// Separates weapon ticks and stat modifier lifecycles cleanly.
 /// </summary>
 public partial class SkillManager : Node2D
@@ -79,7 +79,7 @@ public partial class SkillManager : Node2D
     }
 
     /// <summary>
-    /// Equips a Passive organelle trait into PassiveSlots (0..4)
+    /// Equips a Passive gear trait into PassiveSlots (0..4)
     /// </summary>
     public bool EquipPassive(BaseSkill? skill, int targetSlot = -1)
     {

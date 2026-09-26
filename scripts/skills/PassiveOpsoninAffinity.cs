@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Opsonin Affinity (調理素親和)
+/// Passive Gear Trait: Opsonin Affinity (調理素親和)
 /// Universal Stat Modifiers per level: Crit Chance +5% (flat), Crit Damage +25%
 /// </summary>
 public partial class PassiveOpsoninAffinity : BaseSkill

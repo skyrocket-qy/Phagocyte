@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Lysosome Priming (溶酶體酵素活化)
+/// Passive Gear Trait: Lysosome Priming (溶酶體酵素活化)
 /// Universal Stat Modifiers per level: Might +10%, Health Regen +0.6 HP/s
 /// </summary>
 public partial class PassiveLysosomePriming : BaseSkill

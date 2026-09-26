@@ -82,7 +82,7 @@ public partial class TestBuildStatsPreview : TestHarness
     private void SetupBuild()
     {
         TestCheats.LockToBaseline();
-        OrganelleUnlockManager.UnlockAll();
+        GearUnlockManager.UnlockAll();
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 6)).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "thick_cytoplasm")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "iron_membrane")).IsTrue();
@@ -124,12 +124,12 @@ public partial class TestBuildStatsPreview : TestHarness
         AssertThat(GodotObject.IsInstanceValid(_player)).IsTrue();
         var player = _player!;
         string[] slots = LoadoutManager.GetActiveSlots("macrophage");
-        var chamber = player.CellOrganelleChamber;
+        var chamber = player.CellGearChamber;
         AssertThat(chamber).IsNotNull();
-        for (int i = 0; i < slots.Length && i < OrganelleChamber.MaxSlots; i++)
+        for (int i = 0; i < slots.Length && i < GearChamber.MaxSlots; i++)
         {
             string id = slots[i];
-            if (string.IsNullOrEmpty(id) || !OrganelleUnlockManager.IsUnlocked(id))
+            if (string.IsNullOrEmpty(id) || !GearUnlockManager.IsUnlocked(id))
                 continue;
             if (!chamber!.AddToBackpack(id))
                 continue;
@@ -165,10 +165,10 @@ public partial class TestBuildStatsPreview : TestHarness
         AssertThat(loadout!.StatPanel).IsNotNull();
 
         string before = StatValue(loadout.StatPanel!, "might");
-        AssertThat(loadout.ToggleOrganelle("redox_symbiont")).IsTrue();
+        AssertThat(loadout.ToggleGear("redox_symbiont")).IsTrue();
         string unequipped = StatValue(loadout.StatPanel!, "might");
         AssertThat(unequipped).IsNotEqual(before);
-        AssertThat(loadout.ToggleOrganelle("redox_symbiont")).IsTrue();
+        AssertThat(loadout.ToggleGear("redox_symbiont")).IsTrue();
         AssertThat(StatValue(loadout.StatPanel!, "might")).IsEqual(before);
         GD.Print($"[PASS] Test 3: loadout panel refreshes on equip/unequip (might {unequipped} <-> {before}).");
 

@@ -7,7 +7,7 @@ namespace Phagocyte.Skills;
 
 /// <summary>
 /// Transient chain-strike visual for the pseudopod attacks (merged from the
-/// retired PseudopodLimb organelle): a tapered flesh chain shoots from the
+/// retired PseudopodLimb gear): a tapered flesh chain shoots from the
 /// host edge in the host cell's own colors, its cup-ring tip snaps shut on
 /// the prey (grab flash + cytoplasm burst), then the chain retracts.
 /// Fires <see cref="Arrived"/> once the tip reaches the target so the owning

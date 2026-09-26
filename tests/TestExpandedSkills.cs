@@ -96,7 +96,7 @@ public partial class TestExpandedSkills : SceneTree
             // Verify entry exists in GameManager.SkillCatalog
             AssertThat(GameManager.SkillCatalog.ContainsKey(skill!.SkillId)).IsTrue();
         }
-        GD.Print($"[PASS] Step 3: All {passiveTypes.Length} Passive Organelle Traits instantiated and verified in GameManager.SkillCatalog.");
+        GD.Print($"[PASS] Step 3: All {passiveTypes.Length} Passive Gear Traits instantiated and verified in GameManager.SkillCatalog.");
 
         // --- 4. Verify 8 New Passives Stat Injections ---
         var dummyHost = new CharacterBody2D();

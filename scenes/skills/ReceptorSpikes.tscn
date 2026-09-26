@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/organelles/ReceptorSpikes.cs" id="1_spikes"]
+[ext_resource type="Script" path="res://scripts/gear/ReceptorSpikes.cs" id="1_spikes"]
 
 [node name="ReceptorSpikes" type="Node2D"]
 z_index = 3

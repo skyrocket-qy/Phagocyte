@@ -4,7 +4,7 @@ using Phagocyte.Core;
 namespace Phagocyte.Skills;
 
 /// <summary>
-/// Passive Organelle Trait: Bilayer Hardening (磷脂雙分子層緻密化)
+/// Passive Gear Trait: Bilayer Hardening (磷脂雙分子層緻密化)
 /// Universal Stat Modifiers: Max Health +15%, Armor +2 per level
 /// </summary>
 public partial class PassiveBilayerHardening : BaseSkill
