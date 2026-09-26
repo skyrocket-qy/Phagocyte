@@ -35,7 +35,10 @@ public static class CatalogBuilders
                     { "class_id", CatalogLoader.GetString(row, "class_id") },
                     { "cooldown", CatalogLoader.GetFloat(row, "cooldown") },
                     { "max_level", CatalogLoader.GetInt(row, "max_level", 5) },
-                    { "image_path", AssetPaths.SkillIcon(id) }
+                    { "image_path", AssetPaths.SkillIcon(id) },
+                    { "tags", CatalogLoader.GetStringArray(row, "tags") },
+                    { "damage_per_level", CatalogLoader.GetFloatArray(row, "damage_per_level") },
+                    { "cooldown_per_level", CatalogLoader.GetFloatArray(row, "cooldown_per_level") }
                 };
             }
         }

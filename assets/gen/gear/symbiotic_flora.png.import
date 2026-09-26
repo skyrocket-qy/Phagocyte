@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c0ym86dx0dl4x"
-path="res://.godot/imported/symbiotic_flora.png-c83c3d9adadf8d17c401b7fd0dc7f5e6.ctex"
+path="res://.godot/imported/symbiotic_flora.png-e47405c1c54b31e9a62543004afdc40a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/symbiotic_flora.png"
-dest_files=["res://.godot/imported/symbiotic_flora.png-c83c3d9adadf8d17c401b7fd0dc7f5e6.ctex"]
+source_file="res://assets/gen/gear/symbiotic_flora.png"
+dest_files=["res://.godot/imported/symbiotic_flora.png-e47405c1c54b31e9a62543004afdc40a.ctex"]
 
 [params]
 

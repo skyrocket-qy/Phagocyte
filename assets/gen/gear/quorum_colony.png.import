@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://btmynqwunsq3c"
-path="res://.godot/imported/quorum_colony.png-0b302c666b2613d623f46231f88aa3d3.ctex"
+path="res://.godot/imported/quorum_colony.png-44c6cbf5da613cbc03f7277ca61c935e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/quorum_colony.png"
-dest_files=["res://.godot/imported/quorum_colony.png-0b302c666b2613d623f46231f88aa3d3.ctex"]
+source_file="res://assets/gen/gear/quorum_colony.png"
+dest_files=["res://.godot/imported/quorum_colony.png-44c6cbf5da613cbc03f7277ca61c935e.ctex"]
 
 [params]
 

@@ -42,6 +42,8 @@ public partial class ComplementCascadeSkill : BaseSkill
         float effRadius = GetCalculatedArea(BaseAreaRadius);
         float effDuration = GetCalculatedDuration(1.2f);
 
+        AudioManager.Instance?.PlaySfx("icicle_mine");
+
         for (int i = 0; i < amount; i++)
         {
             Vector2 offset = Vector2.FromAngle(GD.Randf() * Mathf.Tau) * (float)GD.RandRange(50.0f, 220.0f);
@@ -70,11 +72,12 @@ public partial class ComplementCascadeSkill : BaseSkill
         };
         Host.GetParent().AddChild(blast);
         VfxManager.Instance?.Play(VfxType.MacRingBurst, center);
-        AudioManager.Instance?.PlayEnemyDeath();
+        AudioManager.Instance?.PlaySfx("explosion");
         CameraFollow.Instance?.AddTrauma(0.25f);
 
         // Osmotic rupture (Cryo-EM lysis sequence): direct damage in the ring.
-        GetDamage(BaseDamage, out float dmg, out bool isCrit);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out bool isCrit);
         TargetingService.ForEachInRadius(center, radius, n =>
         {
             CombatHelper.DealDamage(n, dmg, Host, isCrit);

@@ -305,6 +305,39 @@ public partial class CodexModal : ModalBase
         }
         if (DetailStats != null) DetailStats.Text = statsText;
 
+        // Render PoE tags row in Codex
+        Node? titleVbox = DetailBadge?.GetParent();
+        if (titleVbox != null)
+        {
+            var oldTags = titleVbox.GetNodeOrNull<Control>("CodexSkillTags");
+            if (oldTags != null)
+                oldTags.QueueFree();
+
+            string[] skillTags = System.Array.Empty<string>();
+            if (d.TryGetValue("tags", out var tgv))
+            {
+                if (tgv.Obj is string[] strArr)
+                    skillTags = strArr;
+                else if (tgv.VariantType == Variant.Type.PackedStringArray)
+                    skillTags = tgv.AsStringArray();
+                else if (tgv.VariantType == Variant.Type.Array)
+                {
+                    var arr = tgv.AsGodotArray();
+                    skillTags = new string[arr.Count];
+                    for (int t = 0; t < arr.Count; t++) skillTags[t] = arr[t].AsString();
+                }
+            }
+
+            if (skillTags.Length > 0)
+            {
+                var tagsBox = UiBuilders.BuildSkillTagsContainer(skillTags);
+                tagsBox.Name = "CodexSkillTags";
+                titleVbox.AddChild(tagsBox);
+                int bIdx = DetailBadge != null ? DetailBadge.GetIndex() : 1;
+                titleVbox.MoveChild(tagsBox, bIdx + 1);
+            }
+        }
+
         if (DetailDesc != null) DetailDesc.Text = Tr("CODEX_HEADER_TACTICAL") + "\n" + d["description"].AsString();
         if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_BIO") + "\n" + UiBuilders.StripLeadingLabel(d["biochemistry"].AsString());
         RefreshItemSelection();

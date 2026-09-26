@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cencaar1x2sax"
-path="res://.godot/imported/flagellar_base.png-759f88ab76ae27916b8d95662a1ce98d.ctex"
+path="res://.godot/imported/flagellar_base.png-e3c892e792103e687e556764c6adf34a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/flagellar_base.png"
-dest_files=["res://.godot/imported/flagellar_base.png-759f88ab76ae27916b8d95662a1ce98d.ctex"]
+source_file="res://assets/gen/gear/flagellar_base.png"
+dest_files=["res://.godot/imported/flagellar_base.png-e3c892e792103e687e556764c6adf34a.ctex"]
 
 [params]
 

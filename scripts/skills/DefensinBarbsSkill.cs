@@ -42,7 +42,10 @@ public partial class DefensinBarbsSkill : BaseSkill
         int count = GetCalculatedAmount(BaseCount);
         int pierce = GetCalculatedPierce(BasePierce);
         float speed = GetCalculatedSpeed(BaseSpeed);
-        GetDamage(BaseDamage, out float dmg, out bool isCrit);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out bool isCrit);
+
+        AudioManager.Instance?.PlaySfx("ethereal_knives");
 
         if (Phagocyte.Combat.ProjectileManager.Instance != null)
         {

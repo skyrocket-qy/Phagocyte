@@ -40,7 +40,8 @@ public partial class ExosomeSingularitySkill : BaseSkill
         Vector2 targetPos = FindClusteredTargetPosition();
         float dur = GetCalculatedDuration(BaseDuration);
         float rad = GetCalculatedArea(BaseRadius);
-        GetDamage(BaseDamage, out float dmg, out _);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out _);
 
         var singularity = new SingularityVortex
         {
@@ -52,6 +53,7 @@ public partial class ExosomeSingularitySkill : BaseSkill
             HostRef = Host
         };
         Host.GetParent().AddChild(singularity);
+        AudioManager.Instance?.PlaySfx("vortex");
     }
 
     private Vector2 FindClusteredTargetPosition()

@@ -42,7 +42,7 @@ public partial class PerforinLanceSkill : BaseSkill
 
         if (amount > 0)
         {
-            AudioManager.Instance?.PlayShoot();
+            AudioManager.Instance?.PlaySfx("holy_bolt");
         }
 
         for (int i = 0; i < amount; i++)
@@ -86,6 +86,8 @@ public partial class PerforinLanceSkill : BaseSkill
         };
         Host.GetParent().AddChild(beam);
 
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+
         foreach (var p in pathogens)
         {
             if (hitCount >= pierceLimit)
@@ -93,19 +95,21 @@ public partial class PerforinLanceSkill : BaseSkill
 
             if (p is Node2D n && GodotObject.IsInstanceValid(n))
             {
-                // Beam geometry is a capsule (not a radius), so this scan stays
-                // group-based.
                 Vector2 pPos = n.GlobalPosition;
                 Vector2 projPoint = Geometry2D.GetClosestPointToSegment(pPos, startPos, endPos);
                 if (projPoint.DistanceTo(pPos) <= beamWidth)
                 {
                     hitCount++;
-                    GetDamage(BaseDamage, out float dmg, out bool isCrit);
+                    GetDamage(baseDmg, out float dmg, out bool isCrit);
 
                     CombatHelper.DealDamage(n, dmg, Host, isCrit);
 
-                    // Transmembrane pore decal: subunits assemble, then
-                    // granzyme leaks inward through the finished ring.
+                    // Transmembrane pore debuff: polymer pore punctures membrane, amplifying damage
+                    if (n is Node node && node.GetNodeOrNull<AilmentController>("AilmentController") is AilmentController ac)
+                    {
+                        ac.ApplyOpsonization(2.5f, 0.15f);
+                    }
+
                     var pore = new PoreDecal { GlobalPosition = pPos };
                     Host.GetParent().AddChild(pore);
                     VfxManager.Instance?.Play(VfxType.PerforinPore, pPos);

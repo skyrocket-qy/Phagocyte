@@ -18,18 +18,19 @@ public partial class TestExpandedSkills : SceneTree
     public override void _Initialize()
     {
         GD.Print("==================================================================");
-        GD.Print(">>> STARTING EXPANDED 17 ACTIVE + 13 PASSIVE SKILL VERIFICATION <<<");
+        GD.Print(">>> STARTING EXPANDED 18 ACTIVE + 13 PASSIVE SKILL VERIFICATION <<<");
         GD.Print("==================================================================");
 
         // --- 1. Verify Catalog Counts ---
-        AssertThat(UpgradeManager.ActiveCatalog.Count).IsEqual(17);
+        AssertThat(UpgradeManager.ActiveCatalog.Count).IsEqual(18);
         AssertThat(UpgradeManager.PassiveCatalog.Count).IsEqual(13);
-        GD.Print("[PASS] Step 1: UpgradeManager.ActiveCatalog has 17 items and PassiveCatalog has 13 items.");
+        GD.Print("[PASS] Step 1: UpgradeManager.ActiveCatalog has 18 items and PassiveCatalog has 13 items.");
 
         // --- 2. Verify Every Active Skill Instantiation & Metadata ---
         var activeTypes = new Type[]
         {
             typeof(PhagocyticGraspSkill),
+            typeof(LysosomalOverloadSkill),
             typeof(RosTorrentSkill),
             typeof(PerforinLanceSkill),
             typeof(ComplementCascadeSkill),

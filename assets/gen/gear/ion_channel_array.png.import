@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cvjwkf24k1rka"
-path="res://.godot/imported/ion_channel_array.png-28e8c1536f9cab2c7ef04e9362a7a0ba.ctex"
+path="res://.godot/imported/ion_channel_array.png-025a35a2ed5406269bce767d291ce5fa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/ion_channel_array.png"
-dest_files=["res://.godot/imported/ion_channel_array.png-28e8c1536f9cab2c7ef04e9362a7a0ba.ctex"]
+source_file="res://assets/gen/gear/ion_channel_array.png"
+dest_files=["res://.godot/imported/ion_channel_array.png-025a35a2ed5406269bce767d291ce5fa.ctex"]
 
 [params]
 

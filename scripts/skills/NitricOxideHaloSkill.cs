@@ -120,11 +120,24 @@ public partial class NitricOxideHaloSkill : BaseSkill
             ? (float)Host.Get("CurrentRadius")
             : 48.0f;
         float currentRadius = hostR + GetCalculatedArea(BaseRadius - 48.0f);
-        GetDamage(BaseDamage, out float dmg, out _);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out _);
 
+        int hitAny = 0;
         TargetingService.ForEachInRadius(Host.GlobalPosition, currentRadius, n =>
         {
+            hitAny++;
             CombatHelper.DealDamage(n, dmg, Host, false);
+
+            if (n is Node node && node.GetNodeOrNull<AilmentController>("AilmentController") is AilmentController ac)
+            {
+                ac.ApplyMembraneLeak(dmg * 0.25f, 1.5f);
+            }
         });
+
+        if (hitAny > 0)
+        {
+            AudioManager.Instance?.PlaySfx("shock_nova");
+        }
     }
 }

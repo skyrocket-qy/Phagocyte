@@ -35,7 +35,7 @@ public partial class RosTorrentSkill : BaseSkill
         if (!HasValidHost())
             return;
 
-        AudioManager.Instance?.PlayShoot();
+        AudioManager.Instance?.PlaySfx("incinerate");
 
         Vector2 targetDir = FindTargetDirection();
         int amount = GetCalculatedAmount(1);
@@ -78,7 +78,8 @@ public partial class RosTorrentSkill : BaseSkill
         var jet = JetScene.Instantiate<Node2D>();
         Host.GetParent().AddChild(jet);
 
-        GetDamage(BaseDamage, out float dmg, out bool isCrit);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out bool isCrit);
 
         if (jet is RosJet rj)
         {

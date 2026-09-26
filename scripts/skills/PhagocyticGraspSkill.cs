@@ -43,7 +43,8 @@ public partial class PhagocyticGraspSkill : BaseSkill
 
         int graspCount = GetCalculatedAmount(BaseGraspCount);
         float reach = GetCalculatedArea(BaseReach);
-        GetDamage(BaseDamage, out float dmg, out bool isCrit);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out bool isCrit);
 
         var found = new List<BaseEnemy>();
         TargetingService.CollectInRadius(Host.GlobalPosition, reach, found);
@@ -56,7 +57,7 @@ public partial class PhagocyticGraspSkill : BaseSkill
 
         if (targets.Count > 0)
         {
-            AudioManager.Instance?.PlayShoot();
+            AudioManager.Instance?.PlaySfx("heavy_strike");
         }
 
         float areaScale = GetCalculatedArea(1.0f);
@@ -66,9 +67,7 @@ public partial class PhagocyticGraspSkill : BaseSkill
             if (!GodotObject.IsInstanceValid(target))
                 continue;
 
-            // Chain-strike delivery (merged from the retired PseudopodLimb
-            // gear): the chain visibly travels out, and damage + drag
-            // start exactly on contact instead of instantly.
+            // Chain-strike delivery with tip engulfment digestion burst on arrival
             var chain = new PseudopodChainVisual
             {
                 GlobalPosition = Host.GlobalPosition,
@@ -84,6 +83,15 @@ public partial class PhagocyticGraspSkill : BaseSkill
                     return;
 
                 CombatHelper.DealDamage(enemy, dmg, Host, isCrit);
+
+                // Engulfment digestion tip burst
+                float tipSplash = 40.0f * areaScale;
+                TargetingService.ForEachInRadius(enemy.GlobalPosition, tipSplash, n =>
+                {
+                    if (n != enemy)
+                        CombatHelper.DealDamage(n, dmg * 0.4f, Host, false);
+                });
+                VfxManager.Instance?.Play(VfxType.CytoplasmSplatter, enemy.GlobalPosition);
             };
             Host.GetParent().AddChild(chain);
         }

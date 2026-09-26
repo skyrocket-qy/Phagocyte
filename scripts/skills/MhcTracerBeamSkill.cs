@@ -54,6 +54,7 @@ public partial class MhcTracerBeamSkill : BaseSkill
         if (_currentTarget != null)
         {
             _activeChannelTimer = GetCalculatedDuration(BaseDuration);
+            AudioManager.Instance?.PlaySfx("scorching_ray");
         }
     }
 
@@ -75,7 +76,8 @@ public partial class MhcTracerBeamSkill : BaseSkill
 
             if (_currentTarget != null && GodotObject.IsInstanceValid(_currentTarget))
             {
-                GetDamage(BaseDps * (float)delta, out float dmg, out _);
+                float baseDps = GetBaseDamageForLevel(BaseDps);
+                GetDamage(baseDps * (float)delta, out float dmg, out _);
                 CombatHelper.DealDamage(_currentTarget, dmg);
 
                 // Apply vulnerability tag (metadata flag, clearable by antigenic drift)

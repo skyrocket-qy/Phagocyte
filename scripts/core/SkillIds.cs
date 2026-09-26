@@ -8,6 +8,7 @@ public static class SkillIds
 {
     // --- Active cytokine weapons ---
     public const string PhagocyticGrasp = "phagocytic_grasp";
+    public const string LysosomalOverload = "lysosomal_overload";
     public const string RosTorrent = "ros_torrent";
     public const string PerforinLance = "perforin_lance";
     public const string ComplementCascade = "complement_cascade";

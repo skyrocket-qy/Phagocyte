@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ummsgdspi55c"
-path="res://.godot/imported/rough_er.png-95d3c8348e9c7e8c09d691cea0cc9bb7.ctex"
+path="res://.godot/imported/rough_er.png-6e660dd508c0a39d5e85cce0a83275e6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/rough_er.png"
-dest_files=["res://.godot/imported/rough_er.png-95d3c8348e9c7e8c09d691cea0cc9bb7.ctex"]
+source_file="res://assets/gen/gear/rough_er.png"
+dest_files=["res://.godot/imported/rough_er.png-6e660dd508c0a39d5e85cce0a83275e6.ctex"]
 
 [params]
 

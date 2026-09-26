@@ -16,6 +16,7 @@ public partial class UpgradeManager : RefCounted
     public static Array<Dictionary> ActiveCatalog = new Array<Dictionary>()
     {
         MakeEntry(SkillIds.PhagocyticGrasp, typeof(PhagocyticGraspSkill)),
+        MakeEntry(SkillIds.LysosomalOverload, typeof(LysosomalOverloadSkill)),
         MakeEntry(SkillIds.RosTorrent, typeof(RosTorrentSkill)),
         MakeEntry(SkillIds.PerforinLance, typeof(PerforinLanceSkill)),
         MakeEntry(SkillIds.ComplementCascade, typeof(ComplementCascadeSkill)),

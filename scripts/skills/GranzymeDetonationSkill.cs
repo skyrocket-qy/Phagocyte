@@ -83,10 +83,11 @@ public partial class GranzymeDetonationSkill : BaseSkill
         // Spawn visual burst
         var burst = new ApoptosisBurstVisual { GlobalPosition = center };
         Host.GetParent().AddChild(burst);
-        AudioManager.Instance?.PlayEnemyDeath();
+        AudioManager.Instance?.PlaySfx("discharge_blast");
         CameraFollow.Instance?.AddTrauma(0.3f);
 
-        GetDamage(BaseDamage, out float dmg, out _);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out _);
         float splashRadius = GetCalculatedArea(110.0f);
 
         TargetingService.ForEachInRadius(center, splashRadius, n =>

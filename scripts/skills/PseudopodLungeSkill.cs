@@ -37,7 +37,10 @@ public partial class PseudopodLungeSkill : BaseSkill
 
         int amount = GetCalculatedAmount(1);
         float reach = GetCalculatedArea(BaseReach);
-        GetDamage(BaseDamage, out float dmg, out bool isCrit);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out bool isCrit);
+
+        AudioManager.Instance?.PlaySfx("ground_slam");
 
         int pulled = 0;
         TargetingService.ForEachInRadius(Host.GlobalPosition, reach, n =>

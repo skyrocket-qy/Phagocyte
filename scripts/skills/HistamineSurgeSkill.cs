@@ -38,8 +38,11 @@ public partial class HistamineSurgeSkill : BaseSkill
 
         Vector2 aimDir = FindAimDirection();
         float reach = GetCalculatedArea(BaseReach);
-        GetDamage(BaseDamage, out float dmg, out _);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out _);
         float halfConeRad = Mathf.DegToRad(ConeAngleDeg * 0.5f);
+
+        AudioManager.Instance?.PlaySfx("discharge_blast");
 
         // Spawn visual surge cone
         var surgeVisual = new SurgeVisual

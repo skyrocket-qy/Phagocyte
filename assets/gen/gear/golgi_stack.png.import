@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://biud6nbigmm4k"
-path="res://.godot/imported/golgi_stack.png-29a6842eaad8386c9b360015899e496a.ctex"
+path="res://.godot/imported/golgi_stack.png-c0cb3a351f8802aef8a7e4d87d75e8db.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/golgi_stack.png"
-dest_files=["res://.godot/imported/golgi_stack.png-29a6842eaad8386c9b360015899e496a.ctex"]
+source_file="res://assets/gen/gear/golgi_stack.png"
+dest_files=["res://.godot/imported/golgi_stack.png-c0cb3a351f8802aef8a7e4d87d75e8db.ctex"]
 
 [params]
 

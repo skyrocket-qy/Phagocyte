@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://crolb1k5kbi3n"
-path="res://.godot/imported/toll_receptor.png-ea30ec9519c815bd9a0070d65c7ed67f.ctex"
+path="res://.godot/imported/toll_receptor.png-bb9e79bd7747d1f889da6fc692b9cfc2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/toll_receptor.png"
-dest_files=["res://.godot/imported/toll_receptor.png-ea30ec9519c815bd9a0070d65c7ed67f.ctex"]
+source_file="res://assets/gen/gear/toll_receptor.png"
+dest_files=["res://.godot/imported/toll_receptor.png-bb9e79bd7747d1f889da6fc692b9cfc2.ctex"]
 
 [params]
 

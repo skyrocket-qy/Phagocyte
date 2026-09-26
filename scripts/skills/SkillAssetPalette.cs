@@ -16,6 +16,7 @@ public static class SkillAssetPalette
     private static readonly Dictionary<string, Color> Accents = new()
     {
         { SkillIds.PerforinLance, Color.FromHtml("#39c06a") },
+        { SkillIds.LysosomalOverload, Color.FromHtml("#b5e61d") },
         { SkillIds.RosTorrent, Color.FromHtml("#2bd2b9") },
         { SkillIds.PhagocyticGrasp, Color.FromHtml("#24d15b") },
         { SkillIds.ComplementCascade, Color.FromHtml("#25a4e2") },

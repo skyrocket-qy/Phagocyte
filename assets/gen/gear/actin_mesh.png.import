@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b67cd6dwr8viw"
-path="res://.godot/imported/actin_mesh.png-121f623591e5571fc3b770c5d26108fe.ctex"
+path="res://.godot/imported/actin_mesh.png-d9212b1de98a99694a9f8ce5f06b55df.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/actin_mesh.png"
-dest_files=["res://.godot/imported/actin_mesh.png-121f623591e5571fc3b770c5d26108fe.ctex"]
+source_file="res://assets/gen/gear/actin_mesh.png"
+dest_files=["res://.godot/imported/actin_mesh.png-d9212b1de98a99694a9f8ce5f06b55df.ctex"]
 
 [params]
 

@@ -120,4 +120,26 @@ public static class CatalogLoader
             _ => 0.0f
         };
     }
+
+    public static string[] GetStringArray(Dictionary d, string key)
+    {
+        if (!d.TryGetValue(key, out var v) || v.VariantType != Variant.Type.Array)
+            return System.Array.Empty<string>();
+        var arr = v.AsGodotArray();
+        var result = new string[arr.Count];
+        for (int i = 0; i < arr.Count; i++)
+            result[i] = arr[i].AsString();
+        return result;
+    }
+
+    public static float[] GetFloatArray(Dictionary d, string key)
+    {
+        if (!d.TryGetValue(key, out var v) || v.VariantType != Variant.Type.Array)
+            return System.Array.Empty<float>();
+        var arr = v.AsGodotArray();
+        var result = new float[arr.Count];
+        for (int i = 0; i < arr.Count; i++)
+            result[i] = ToFloat(arr[i]);
+        return result;
+    }
 }

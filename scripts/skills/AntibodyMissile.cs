@@ -99,6 +99,11 @@ public partial class AntibodyMissile : Area2D
         CombatHelper.DealDamage(node, Damage, HostRef, IsCrit);
         VfxManager.Instance?.Play(VfxType.OpsoninBind, GlobalPosition);
 
+        if (node is Node n && n.GetNodeOrNull<AilmentController>("AilmentController") is AilmentController ac)
+        {
+            ac.ApplyAgglutination(1.5f, 0.35f);
+        }
+
         // Opsonization stick: Fab tips in, Fc stem outward.
         _stuck = true;
         _stickTimer = StickDuration;

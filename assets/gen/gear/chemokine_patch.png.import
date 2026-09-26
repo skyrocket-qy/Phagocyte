@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cf23nyjswajg5"
-path="res://.godot/imported/chemokine_patch.png-637bee21e3e5fc97033d9d12d84cfe10.ctex"
+path="res://.godot/imported/chemokine_patch.png-28b27a1827472c20dc724de1c8a1aa6a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/chemokine_patch.png"
-dest_files=["res://.godot/imported/chemokine_patch.png-637bee21e3e5fc97033d9d12d84cfe10.ctex"]
+source_file="res://assets/gen/gear/chemokine_patch.png"
+dest_files=["res://.godot/imported/chemokine_patch.png-28b27a1827472c20dc724de1c8a1aa6a.ctex"]
 
 [params]
 

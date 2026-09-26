@@ -104,6 +104,43 @@ public static class UiBuilders
     }
 
     /// <summary>
+    /// Builds a container of styled PoE-style tag badges with fluorescent border coloring.
+    /// </summary>
+    public static HBoxContainer BuildSkillTagsContainer(string[] tags)
+    {
+        var hbox = new HBoxContainer { Name = "TagsContainer" };
+        hbox.AddThemeConstantOverride("separation", 5);
+        if (tags == null || tags.Length == 0)
+            return hbox;
+
+        foreach (var tag in tags)
+        {
+            Color tagColor = SkillTag.GetTagColor(tag);
+            var lbl = new Label
+            {
+                Text = $" {tag} ",
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            lbl.AddThemeColorOverride("font_color", tagColor);
+            lbl.AddThemeFontSizeOverride("font_size", 11);
+            var sb = new StyleBoxFlat
+            {
+                BgColor = new Color(0.06f, 0.10f, 0.14f, 0.85f),
+                BorderColor = new Color(tagColor.R, tagColor.G, tagColor.B, 0.65f)
+            };
+            sb.SetBorderWidthAll(1);
+            sb.SetCornerRadiusAll(3);
+            sb.ContentMarginLeft = 4;
+            sb.ContentMarginRight = 4;
+            sb.ContentMarginTop = 1;
+            sb.ContentMarginBottom = 1;
+            lbl.AddThemeStyleboxOverride("normal", sb);
+            hbox.AddChild(lbl);
+        }
+        return hbox;
+    }
+
+    /// <summary>
     /// Composes a StyleBoxFlat from the common bg/border/corner/margin shape
     /// used by panels across scripts/ui. Margins default to unchanged.
     /// </summary>

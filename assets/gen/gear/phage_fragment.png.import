@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b6dp5ebjjbqgh"
-path="res://.godot/imported/phage_fragment.png-a954e6acdcbcfbdb13f805c3fd8c460e.ctex"
+path="res://.godot/imported/phage_fragment.png-15ef898af1f4aa1f8f61318b67dbce4c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/phage_fragment.png"
-dest_files=["res://.godot/imported/phage_fragment.png-a954e6acdcbcfbdb13f805c3fd8c460e.ctex"]
+source_file="res://assets/gen/gear/phage_fragment.png"
+dest_files=["res://.godot/imported/phage_fragment.png-15ef898af1f4aa1f8f61318b67dbce4c.ctex"]
 
 [params]
 

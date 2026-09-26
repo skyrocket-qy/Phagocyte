@@ -11,6 +11,16 @@ about available tooling, run `execute` → `search({query: "godot"})` and
 `project_run`, `game_eval`, `editor_screenshot source="game"`) may be live
 even when the session prompt doesn't advertise it.
 
+## Focus on current state over history (no git archaeology)
+
+- Always focus on the **current** codebase, active workspace files, and present behavior.
+- **No git archaeology:** Never get bogged down running repetitive `git log`, `git show`,
+  or diffing against past commits to understand problems unless the user explicitly asks.
+- Diagnose and solve problems directly from the current code (`view_file`, ripgrep),
+  live runtime logs, test harness output, and current visual captures.
+- In visual / VFX validation, establish clean, identical current baselines (e.g. pre-cast
+  vs peak-cast in the same scene) rather than digging through broken past revisions.
+
 ## AI collaboration (grill protocols)
 
 Vibe-coding unfamiliar code is a comprehension trap: fast output, zero
@@ -145,8 +155,9 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
 
 ## Commits
 
-- Inspect `git status`, `git diff`, `git log --oneline -5` first; stage only
-  intended files; never commit secrets. Suites green before pushing.
+- Inspect `git status` when preparing commits; stage only intended files;
+  never commit secrets. Do not waste turns on git history loops.
+  Suites must be green before pushing.
 - Hot files (`Hud.cs`, `MainMenu.cs`, shared scenes): coordinate parallel edits
   — concurrent changes here have broken builds before. When in doubt, run the
   full sweep (all 43 suites, ~7 min) before declaring victory.

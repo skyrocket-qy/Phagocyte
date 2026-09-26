@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dllr2qo1844bg"
-path="res://.godot/imported/krebs_cycle.png-ae17bf2761e056ab5f3d2bca7dc39eac.ctex"
+path="res://.godot/imported/krebs_cycle.png-71b6654c372dcce2ed936bee9d6612c8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/krebs_cycle.png"
-dest_files=["res://.godot/imported/krebs_cycle.png-ae17bf2761e056ab5f3d2bca7dc39eac.ctex"]
+source_file="res://assets/gen/gear/krebs_cycle.png"
+dest_files=["res://.godot/imported/krebs_cycle.png-71b6654c372dcce2ed936bee9d6612c8.ctex"]
 
 [params]
 

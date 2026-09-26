@@ -37,7 +37,10 @@ public partial class InterferonWaveSkill : BaseSkill
             return;
 
         float maxRadius = GetCalculatedArea(BaseRadius);
-        GetDamage(BaseDamage, out float dmg, out _);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out _);
+
+        AudioManager.Instance?.PlaySfx("ice_nova");
 
         // Spawn expanding visual wave
         var wave = new WaveVisual

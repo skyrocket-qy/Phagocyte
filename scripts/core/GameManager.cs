@@ -315,7 +315,7 @@ public partial class GameManager : Node
             return new Dictionary();
         }
         var d = (Dictionary)SkillCatalog[key];
-        return new Dictionary {
+        var info = new Dictionary {
             { "id", d["id"] },
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },
             { "description", TranslationServer.Translate(d["desc_key"].AsString()) },
@@ -325,6 +325,9 @@ public partial class GameManager : Node
             { "cooldown", d["cooldown"] },
             { "max_level", d["max_level"] }
         };
+        if (d.TryGetValue("tags", out var tgv))
+            info["tags"] = tgv;
+        return info;
     }
 
     public static Dictionary GetPathogenInfo(string key)

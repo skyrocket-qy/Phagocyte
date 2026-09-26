@@ -39,11 +39,13 @@ public partial class ProInflammatoryArcSkill : BaseSkill
             return;
 
         int chainCount = GetCalculatedAmount(BaseChainCount);
-        GetDamage(BaseDamage, out float dmg, out _);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out _);
 
         var targets = FindChainTargets(chainCount);
         if (targets.Count > 0)
         {
+            AudioManager.Instance?.PlaySfx("spark");
             var arcVisual = new ArcLightningVisual { StartPos = Host.GlobalPosition };
             foreach (var t in targets)
             {

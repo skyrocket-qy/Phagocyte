@@ -45,7 +45,7 @@ public partial class AntibodySalvoSkill : BaseSkill
 
         if (amount > 0)
         {
-            AudioManager.Instance?.PlayShoot();
+            AudioManager.Instance?.PlaySfx("split_arrow_fire");
         }
 
         for (int i = 0; i < amount; i++)
@@ -88,7 +88,8 @@ public partial class AntibodySalvoSkill : BaseSkill
                         return;
                     if (target != null && GodotObject.IsInstanceValid(target))
                     {
-                        GetDamage(BaseDamage, out float dmg, out bool isCrit);
+                        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+                        GetDamage(baseDmg, out float dmg, out bool isCrit);
                         float speed = GetCalculatedSpeed(BaseMissileSpeed);
 
                         var missile = new AntibodyMissile

@@ -38,7 +38,8 @@ public partial class PhagolysosomeVentSkill : BaseSkill
 
         float duration = GetCalculatedDuration(BaseDuration);
         float radius = GetCalculatedArea(BaseRadius);
-        GetDamage(BaseDamage, out float dmg, out _);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out _);
 
         var puddle = new AcidPuddle
         {
@@ -49,6 +50,7 @@ public partial class PhagolysosomeVentSkill : BaseSkill
             HostRef = Host
         };
         Host.GetParent().AddChild(puddle);
+        AudioManager.Instance?.PlaySfx("toxic_rain");
     }
 
     public partial class AcidPuddle : Node2D

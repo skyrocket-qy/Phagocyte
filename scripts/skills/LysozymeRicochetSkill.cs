@@ -41,7 +41,10 @@ public partial class LysozymeRicochetSkill : BaseSkill
         int amount = GetCalculatedAmount(1);
         int bounces = GetCalculatedPierce(BaseBounces);
         float speed = GetCalculatedSpeed(BaseSpeed);
-        GetDamage(BaseDamage, out float dmg, out _);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out _);
+
+        AudioManager.Instance?.PlaySfx("cold_snap");
 
         for (int i = 0; i < amount; i++)
         {

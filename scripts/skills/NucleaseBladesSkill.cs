@@ -128,8 +128,10 @@ public partial class NucleaseBladesSkill : BaseSkill
 
         _damageCooldown = 0.22f; // tick damage every ~0.2s
 
-        GetDamage(BaseDamage, out float dmg, out _);
+        float baseDmg = GetBaseDamageForLevel(BaseDamage);
+        GetDamage(baseDmg, out float dmg, out _);
 
+        int hitCount = 0;
         for (int i = 0; i < bladeCount; i++)
         {
             float angle = _currentOrbitAngle + i * (Mathf.Tau / bladeCount);
@@ -137,8 +139,14 @@ public partial class NucleaseBladesSkill : BaseSkill
 
             TargetingService.ForEachInRadius(bladePos, 28.0f, n =>
             {
+                hitCount++;
                 CombatHelper.DealDamage(n, dmg, Host, false);
             });
+        }
+
+        if (hitCount > 0)
+        {
+            AudioManager.Instance?.PlaySfx("ethereal_knives");
         }
     }
 }

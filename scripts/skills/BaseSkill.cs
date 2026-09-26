@@ -23,13 +23,82 @@ public partial class BaseSkill : Node2D
     [Export] public bool IsPassive { get; set; } = false;
     [Export] public bool IsInnate { get; set; } = false;
 
+    public string[] Tags { get; set; } = System.Array.Empty<string>();
+    public float[] DamagePerLevel { get; set; } = System.Array.Empty<float>();
+    public float[] CooldownPerLevel { get; set; } = System.Array.Empty<float>();
+
     public float CooldownTimer { get; set; } = 0.0f;
     public CharacterBody2D? Host { get; set; } = null;
     public Node? Stats { get; set; } = null;
 
+    public virtual void SetupCatalogData()
+    {
+        if (string.IsNullOrEmpty(SkillId) || GameManager.SkillCatalog == null) return;
+        if (GameManager.SkillCatalog.TryGetValue(SkillId, out var rawInfo) && rawInfo.VariantType == Variant.Type.Dictionary)
+        {
+            var info = rawInfo.AsGodotDictionary();
+            if (info.TryGetValue("tags", out var tVal))
+            {
+                if (tVal.VariantType == Variant.Type.PackedStringArray)
+                    Tags = tVal.AsStringArray();
+                else if (tVal.VariantType == Variant.Type.Array)
+                {
+                    var arr = tVal.AsGodotArray();
+                    Tags = new string[arr.Count];
+                    for (int i = 0; i < arr.Count; i++) Tags[i] = arr[i].AsString();
+                }
+            }
+
+            if (info.TryGetValue("damage_per_level", out var dVal))
+            {
+                if (dVal.VariantType == Variant.Type.PackedFloat32Array)
+                    DamagePerLevel = dVal.AsFloat32Array();
+                else if (dVal.VariantType == Variant.Type.Array)
+                {
+                    var arr = dVal.AsGodotArray();
+                    DamagePerLevel = new float[arr.Count];
+                    for (int i = 0; i < arr.Count; i++) DamagePerLevel[i] = (float)arr[i].AsDouble();
+                }
+            }
+
+            if (info.TryGetValue("cooldown_per_level", out var cdVal))
+            {
+                if (cdVal.VariantType == Variant.Type.PackedFloat32Array)
+                    CooldownPerLevel = cdVal.AsFloat32Array();
+                else if (cdVal.VariantType == Variant.Type.Array)
+                {
+                    var arr = cdVal.AsGodotArray();
+                    CooldownPerLevel = new float[arr.Count];
+                    for (int i = 0; i < arr.Count; i++) CooldownPerLevel[i] = (float)arr[i].AsDouble();
+                }
+            }
+        }
+    }
+
+    public float GetBaseDamageForLevel(float fallback)
+    {
+        if (DamagePerLevel != null && DamagePerLevel.Length > 0)
+        {
+            int idx = Math.Clamp(Level - 1, 0, DamagePerLevel.Length - 1);
+            return DamagePerLevel[idx];
+        }
+        return fallback;
+    }
+
+    public float GetBaseCooldownForLevel(float fallback)
+    {
+        if (CooldownPerLevel != null && CooldownPerLevel.Length > 0)
+        {
+            int idx = Math.Clamp(Level - 1, 0, CooldownPerLevel.Length - 1);
+            return CooldownPerLevel[idx];
+        }
+        return fallback;
+    }
+
     public virtual void Setup(CharacterBody2D pHost)
     {
         Host = pHost;
+        SetupCatalogData();
 
         if (Host != null)
         {
@@ -149,20 +218,21 @@ public partial class BaseSkill : Node2D
 
     public float GetCalculatedCooldown()
     {
-        if (Cooldown <= 0.0f)
+        float baseCd = GetBaseCooldownForLevel(Cooldown);
+        if (baseCd <= 0.0f)
             return 0.0f;
 
         if (Stats is IStatHost host)
         {
             float cdr = host.GetStat("cooldown_reduction");
-            return Cooldown * (1.0f - cdr);
+            return baseCd * (1.0f - cdr);
         }
         else if (Stats != null && Stats.HasMethod("get_stat"))
         {
             float cdr = (float)Stats.Call("get_stat", "cooldown_reduction");
-            return Cooldown * (1.0f - cdr);
+            return baseCd * (1.0f - cdr);
         }
-        return Cooldown;
+        return baseCd;
     }
 
     public DamageResult GetCalculatedDamage(float baseDmg)
@@ -275,6 +345,7 @@ public partial class BaseSkill : Node2D
             ["max_level"] = MaxLevel,
             ["is_passive"] = IsPassive,
             ["is_innate"] = IsInnate,
+            ["tags"] = Tags,
             ["cooldown_max"] = effCd,
             ["cooldown_ratio"] = cdPct,
             ["cooldown_time"] = Mathf.Max(0.0f, CooldownTimer)

@@ -217,6 +217,43 @@ public partial class UpgradeModal : ModalBase
                         badgeLbl.Modulate = new Color(0.5f, 0.8f, 1.0f);
                     }
                 }
+
+                // Render PoE-style skill tags if present on the skill
+                var vboxContainer = card.GetNodeOrNull<VBoxContainer>("VBox");
+                if (vboxContainer != null)
+                {
+                    var oldTags = vboxContainer.GetNodeOrNull<Control>("TagsContainer");
+                    if (oldTags != null)
+                        oldTags.QueueFree();
+
+                    string choiceId = choice.TryGetValue("id", out var idv) ? idv.AsString() : "";
+                    if (!string.IsNullOrEmpty(choiceId) && GameManager.SkillCatalog != null && GameManager.SkillCatalog.TryGetValue(choiceId, out var rawSkill) && rawSkill.VariantType == Variant.Type.Dictionary)
+                    {
+                        var skillDict = rawSkill.AsGodotDictionary();
+                        string[] skillTags = System.Array.Empty<string>();
+                        if (skillDict.TryGetValue("tags", out var tgv))
+                        {
+                            if (tgv.Obj is string[] strArr)
+                                skillTags = strArr;
+                            else if (tgv.VariantType == Variant.Type.PackedStringArray)
+                                skillTags = tgv.AsStringArray();
+                            else if (tgv.VariantType == Variant.Type.Array)
+                            {
+                                var arr = tgv.AsGodotArray();
+                                skillTags = new string[arr.Count];
+                                for (int t = 0; t < arr.Count; t++) skillTags[t] = arr[t].AsString();
+                            }
+                        }
+                        if (skillTags.Length > 0)
+                        {
+                            var tagsBox = UiBuilders.BuildSkillTagsContainer(skillTags);
+                            vboxContainer.AddChild(tagsBox);
+                            int bIdx = badgeLbl != null ? badgeLbl.GetIndex() : 1;
+                            vboxContainer.MoveChild(tagsBox, bIdx + 1);
+                        }
+                    }
+                }
+
                 if (descLbl != null)
                 {
                     string descKey = choice.TryGetValue("desc", out var dVal) ? dVal.AsString() : "";

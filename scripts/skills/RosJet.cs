@@ -54,5 +54,11 @@ public partial class RosJet : Area2D
     {
         var enemy = area.GetParent();
         CombatHelper.DealDamage(enemy, Damage, Predator, IsCrit);
+        VfxManager.Instance?.Play(VfxType.AcidOxidationSparks, GlobalPosition);
+
+        if (enemy is Node node && node.GetNodeOrNull<AilmentController>("AilmentController") is AilmentController ac)
+        {
+            ac.ApplyOxidativeBurn(Damage * 0.35f, 2.0f);
+        }
     }
 }

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://hlkjjm5cqlb1"
-path="res://.godot/imported/glycolytic_bypass.png-a55156e779d4218505c181a63496252b.ctex"
+path="res://.godot/imported/glycolytic_bypass.png-d3a23f5cfd6cba78325e3689b8d547e8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gen/organelle/glycolytic_bypass.png"
-dest_files=["res://.godot/imported/glycolytic_bypass.png-a55156e779d4218505c181a63496252b.ctex"]
+source_file="res://assets/gen/gear/glycolytic_bypass.png"
+dest_files=["res://.godot/imported/glycolytic_bypass.png-d3a23f5cfd6cba78325e3689b8d547e8.ctex"]
 
 [params]
 
