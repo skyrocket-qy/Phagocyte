@@ -103,15 +103,14 @@ public partial class InterferonWaveSkill : BaseSkill
                 LaserGlow.DrawImpactHalo(this, Vector2.Zero, 28.0f * (1.0f - prog * 2.0f), accent, core, (0.5f - prog) * 1.2f, 1.5f);
             }
 
-            // Leading high-pressure compression shockwave
-            Color leadCoreColor = new Color(core.R, core.G, core.B, alpha * 0.95f);
-            Color leadAccentColor = new Color(accent.R, accent.G, accent.B, alpha * 0.85f);
-            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 64, leadCoreColor, 2.5f * (1.0f - prog * 0.4f));
-            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 64, leadAccentColor, 5.0f * (1.0f - prog * 0.5f));
+            // Leading high-pressure compression shockwave (3-pass confocal glow)
+            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 64, accent with { A = alpha * 0.35f }, 12.0f * (1.0f - prog * 0.4f));
+            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 64, accent with { A = alpha * 0.95f }, 5.5f * (1.0f - prog * 0.4f));
+            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 64, core with { A = alpha * 0.98f }, 2.2f * (1.0f - prog * 0.3f));
 
             // Outer refraction fringe
-            Color outerFringe = new Color(accent.R, accent.G, accent.B, alpha * 0.35f);
-            DrawArc(Vector2.Zero, r * 1.03f, 0.0f, Mathf.Tau, 48, outerFringe, 1.5f);
+            Color outerFringe = accent with { A = alpha * 0.45f };
+            DrawArc(Vector2.Zero, r * 1.04f, 0.0f, Mathf.Tau, 48, outerFringe, 2.0f);
 
             // Resonant harmonic trailing ripples
             if (r > 30.0f)

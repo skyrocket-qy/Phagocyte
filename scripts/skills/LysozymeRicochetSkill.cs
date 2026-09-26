@@ -142,24 +142,33 @@ public partial class LysozymeRicochetSkill : BaseSkill
             Vector2 fwd = Direction.LengthSquared() > 0.001f ? Direction.Normalized() : Vector2.Right;
             Vector2 side = new Vector2(-fwd.Y, fwd.X);
 
-            // Trailing enzymatic velocity wake
-            Color trailAccent = new Color(accent.R, accent.G, accent.B, 0.45f);
-            Color trailFade = new Color(accent.R, accent.G, accent.B, 0.0f);
-            DrawLine(Vector2.Zero, -fwd * 22.0f, trailAccent, 3.0f);
-            DrawLine(-fwd * 8.0f, -fwd * 34.0f, trailFade, 1.5f);
+            // 1. Ambient enzymatic velocity wake (3-pass streamlined tail)
+            DrawLine(Vector2.Zero, -fwd * 36.0f, accent with { A = 0.25f }, 12.0f);
+            DrawLine(Vector2.Zero, -fwd * 28.0f, accent with { A = 0.65f }, 4.5f);
+            DrawLine(Vector2.Zero, -fwd * 18.0f, core with { A = 0.9f }, 2.0f);
 
-            // Globular enzymatic core and halo
-            LaserGlow.DrawImpactHalo(this, Vector2.Zero, 14.0f, accent, core, 0.85f, 1.8f);
-            DrawCircle(Vector2.Zero, 6.0f, core);
+            // Twin trailing wake streamlines
+            DrawLine(-fwd * 6.0f + side * 5.0f, -fwd * 24.0f + side * 8.0f, accent with { A = 0.45f }, 1.8f);
+            DrawLine(-fwd * 6.0f - side * 5.0f, -fwd * 24.0f - side * 8.0f, accent with { A = 0.45f }, 1.8f);
 
-            // Catalytic cleft / lobes (bi-lobed globular structure)
-            Vector2 lobeA = fwd * 3.0f + side * 4.5f;
-            Vector2 lobeB = fwd * 3.0f - side * 4.5f;
-            DrawCircle(lobeA, 3.5f, accent);
-            DrawCircle(lobeB, 3.5f, accent);
+            // 2. Globular enzymatic core and halo
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, 18.0f, accent, core, 0.95f, 2.8f);
+            DrawCircle(Vector2.Zero, 7.5f, core);
 
-            // Forward catalytic cleft focal pin
-            DrawLine(Vector2.Zero, fwd * 8.0f, new Color(core.R, core.G, core.B, 0.95f), 2.0f);
+            // 3. Catalytic cleft / lobes (bi-lobed globular hydrolase structure)
+            Vector2 lobeA = fwd * 4.0f + side * 5.5f;
+            Vector2 lobeB = fwd * 4.0f - side * 5.5f;
+            DrawCircle(lobeA, 5.0f, accent with { A = 0.5f });
+            DrawCircle(lobeA, 3.8f, accent);
+            DrawCircle(lobeA, 1.8f, core);
+
+            DrawCircle(lobeB, 5.0f, accent with { A = 0.5f });
+            DrawCircle(lobeB, 3.8f, accent);
+            DrawCircle(lobeB, 1.8f, core);
+
+            // 4. Forward catalytic cleavage pin
+            DrawLine(Vector2.Zero, fwd * 11.0f, core with { A = 0.98f }, 2.5f);
+            LaserGlow.DrawImpactHalo(this, fwd * 11.0f, 6.0f, accent, core, 0.9f, 1.5f);
         }
     }
 }

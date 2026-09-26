@@ -124,7 +124,7 @@ public partial class PerforinLanceSkill : BaseSkill
         public Vector2 BeamEnd { get; set; } = Vector2.Right * 700.0f;
         public float BeamWidth { get; set; } = 24.0f;
 
-        private const float Duration = 0.18f;
+        private const float Duration = 0.28f;
         private float _age = 0.0f;
 
         public override void _Ready()
@@ -146,10 +146,47 @@ public partial class PerforinLanceSkill : BaseSkill
         public override void _Draw()
         {
             float a = 1.0f - _age / Duration;
-            Color halo = SkillAssetPalette.Accent(SkillIds.PerforinLance, new Color(0.6f, 0.3f, 1.0f));
-            Color core = SkillAssetPalette.Core(SkillIds.PerforinLance, new Color(0.85f, 0.95f, 1.0f));
+            Color halo = SkillAssetPalette.Accent(SkillIds.PerforinLance, new Color(0.22f, 0.75f, 0.42f));
+            Color core = SkillAssetPalette.Core(SkillIds.PerforinLance, new Color(0.9f, 1.0f, 0.92f));
+
+            // 1. Ambient fluorophore diffusion corridor
+            DrawLine(Vector2.Zero, BeamEnd, halo with { A = 0.28f * a }, BeamWidth * 2.8f);
+
+            // 2. High-energy cylindrical perforin beam
             LaserGlow.DrawBeam(this, Vector2.Zero, BeamEnd, halo, core, BeamWidth, a);
-            LaserGlow.DrawImpactHalo(this, BeamEnd, BeamWidth * 0.8f * a + 2.0f, halo, core, a * 0.7f);
+
+            // 3. Rotating Ca2+ helical corkscrew wave wrapping the beam
+            Vector2 dir = (BeamEnd - Vector2.Zero).Normalized();
+            Vector2 normal = dir.Orthogonal();
+            float len = BeamEnd.Length();
+            int steps = 28;
+            float stepLen = len / steps;
+            float helixRadius = BeamWidth * 0.75f;
+            float phaseOffset = (_age / Duration) * 16.0f;
+
+            for (int i = 0; i < steps; i++)
+            {
+                float x1 = i * stepLen;
+                float x2 = (i + 1) * stepLen;
+                float y1 = Mathf.Sin((x1 * 0.04f) + phaseOffset) * helixRadius;
+                float y2 = Mathf.Sin((x2 * 0.04f) + phaseOffset) * helixRadius;
+
+                Vector2 p1 = dir * x1 + normal * y1;
+                Vector2 p2 = dir * x2 + normal * y2;
+
+                DrawLine(p1, p2, halo with { A = 0.85f * a }, 2.8f);
+                DrawLine(p1, p2, core with { A = 0.95f * a }, 1.2f);
+                if (i % 4 == 0)
+                {
+                    DrawCircle(p1, 2.5f, core with { A = 0.9f * a });
+                }
+            }
+
+            // 4. Origin cell membrane exit flare
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, BeamWidth * 1.4f * a + 4.0f, halo, core, a * 0.9f, 2.0f);
+
+            // 5. Impact end bloom
+            LaserGlow.DrawImpactHalo(this, BeamEnd, BeamWidth * 1.2f * a + 6.0f, halo, core, a * 0.95f, 2.5f);
         }
     }
 

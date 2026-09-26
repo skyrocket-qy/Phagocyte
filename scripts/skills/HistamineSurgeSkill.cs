@@ -122,22 +122,28 @@ public partial class HistamineSurgeSkill : BaseSkill
             Color arcLead = new Color(accent.R, accent.G, accent.B, alpha * 0.85f);
             Color arcMid = new Color(core.R, core.G, core.B, alpha * 0.55f);
 
-            // Leading vasodilatory pressure shockwave
-            DrawArc(Vector2.Zero, curR, startAngle, endAngle, 32, arcLead, 4.5f);
-            DrawArc(Vector2.Zero, curR * 0.80f, startAngle, endAngle, 24, arcMid, 2.0f);
+            // 1. Ambient vasodilatory diffusion cone
+            DrawArc(Vector2.Zero, curR, startAngle, endAngle, 36, accent with { A = alpha * 0.35f }, 12.0f);
 
-            // Boundary confinement edges
-            DrawLine(Vector2.Zero, Vector2.FromAngle(startAngle) * curR, new Color(accent.R, accent.G, accent.B, alpha * 0.4f), 2.0f);
-            DrawLine(Vector2.Zero, Vector2.FromAngle(endAngle) * curR, new Color(accent.R, accent.G, accent.B, alpha * 0.4f), 2.0f);
+            // 2. Leading vasodilatory pressure shockwave (3-pass confocal glow)
+            DrawArc(Vector2.Zero, curR, startAngle, endAngle, 36, accent with { A = alpha * 0.95f }, 5.5f);
+            DrawArc(Vector2.Zero, curR, startAngle, endAngle, 36, core with { A = alpha * 0.98f }, 2.2f);
+            DrawArc(Vector2.Zero, curR * 0.82f, startAngle, endAngle, 28, core with { A = alpha * 0.55f }, 2.0f);
 
-            // Spray of expelled mast-cell granules
-            for (int g = 0; g < 8; g++)
+            // 3. Boundary confinement edges
+            DrawLine(Vector2.Zero, Vector2.FromAngle(startAngle) * curR, accent with { A = alpha * 0.6f }, 3.0f);
+            DrawLine(Vector2.Zero, Vector2.FromAngle(endAngle) * curR, accent with { A = alpha * 0.6f }, 3.0f);
+            DrawLine(Vector2.Zero, Vector2.FromAngle(startAngle) * curR, core with { A = alpha * 0.7f }, 1.2f);
+            DrawLine(Vector2.Zero, Vector2.FromAngle(endAngle) * curR, core with { A = alpha * 0.7f }, 1.2f);
+
+            // 4. Spray of expelled mast-cell granules with dual-circle excitation
+            for (int g = 0; g < 10; g++)
             {
-                float ga = Mathf.Lerp(startAngle, endAngle, (g + 0.5f) / 8.0f) + Mathf.Sin(prog * 8.0f + g) * 0.08f;
-                float gr = curR * (0.45f + 0.45f * ((g * 3 % 7) / 7.0f));
+                float ga = Mathf.Lerp(startAngle, endAngle, (g + 0.5f) / 10.0f) + Mathf.Sin(prog * 8.0f + g) * 0.08f;
+                float gr = curR * (0.4f + 0.5f * ((g * 3 % 7) / 7.0f));
                 Vector2 gPos = Vector2.FromAngle(ga) * gr;
-                DrawCircle(gPos, 2.5f, new Color(core.R, core.G, core.B, alpha * 0.9f));
-                DrawCircle(gPos, 4.0f, new Color(accent.R, accent.G, accent.B, alpha * 0.35f));
+                DrawCircle(gPos, 5.0f, accent with { A = alpha * 0.45f });
+                DrawCircle(gPos, 3.0f, core with { A = alpha * 0.95f });
             }
         }
     }

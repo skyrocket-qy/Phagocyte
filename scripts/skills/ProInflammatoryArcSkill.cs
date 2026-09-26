@@ -91,10 +91,24 @@ public partial class ProInflammatoryArcSkill : BaseSkill
         public List<Vector2> Points { get; set; } = new();
         private float _age = 0.0f;
 
+        private readonly List<Vector2[]> _segmentOffsets = new();
+
+        public override void _Ready()
+        {
+            // Pre-seed consistent jagged path offsets so the lightning does not jitter
+            for (int i = 0; i < Points.Count; i++)
+            {
+                Vector2 j1 = Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 16.0f;
+                Vector2 j2 = Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 16.0f;
+                Vector2 fork = Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 22.0f;
+                _segmentOffsets.Add(new Vector2[] { j1, j2, fork });
+            }
+        }
+
         public override void _Process(double delta)
         {
             _age += (float)delta;
-            if (_age >= 0.22f)
+            if (_age >= 0.28f)
             {
                 QueueFree();
                 return;
@@ -107,30 +121,41 @@ public partial class ProInflammatoryArcSkill : BaseSkill
             if (Points.Count == 0)
                 return;
 
-            float alpha = Mathf.Clamp(1.0f - (_age / 0.22f), 0.0f, 1.0f);
+            float alpha = Mathf.Clamp(1.0f - (_age / 0.28f), 0.0f, 1.0f);
             Color accent = SkillAssetPalette.Accent(SkillIds.ProInflammatoryArc, new Color(0.89f, 0.65f, 0.22f));
             Color core = SkillAssetPalette.Core(SkillIds.ProInflammatoryArc, new Color(1.0f, 0.95f, 0.85f));
 
             Vector2 prev = StartPos;
-            foreach (var pt in Points)
+            for (int i = 0; i < Points.Count; i++)
             {
+                var pt = Points[i];
                 Vector2 localPrev = ToLocal(prev);
                 Vector2 localPt = ToLocal(pt);
 
-                // Multi-segment jagged lightning step
-                Vector2 mid1 = localPrev.Lerp(localPt, 0.33f) + Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 14.0f;
-                Vector2 mid2 = localPrev.Lerp(localPt, 0.66f) + Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 14.0f;
+                Vector2 j1 = (i < _segmentOffsets.Count) ? _segmentOffsets[i][0] : Vector2.Zero;
+                Vector2 j2 = (i < _segmentOffsets.Count) ? _segmentOffsets[i][1] : Vector2.Zero;
+                Vector2 fork = (i < _segmentOffsets.Count) ? _segmentOffsets[i][2] : Vector2.Zero;
 
-                LaserGlow.DrawBeam(this, localPrev, mid1, accent, core, 6.0f, alpha);
-                LaserGlow.DrawBeam(this, mid1, mid2, accent, core, 5.5f, alpha);
-                LaserGlow.DrawBeam(this, mid2, localPt, accent, core, 6.0f, alpha);
+                Vector2 mid1 = localPrev.Lerp(localPt, 0.33f) + j1;
+                Vector2 mid2 = localPrev.Lerp(localPt, 0.66f) + j2;
 
-                // Side electric discharge fork
-                Vector2 forkTip = mid1 + Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 18.0f;
-                DrawLine(mid1, forkTip, new Color(accent.R, accent.G, accent.B, alpha * 0.5f), 1.5f);
+                // 1. Ambient electrical diffusion halo (wide)
+                DrawLine(localPrev, mid1, accent with { A = alpha * 0.3f }, 16.0f);
+                DrawLine(mid1, mid2, accent with { A = alpha * 0.3f }, 16.0f);
+                DrawLine(mid2, localPt, accent with { A = alpha * 0.3f }, 16.0f);
 
-                // Inflammatory cytokine excitation node on target
-                LaserGlow.DrawImpactHalo(this, localPt, 12.0f, accent, core, alpha, 2.0f);
+                // 2. High-energy cytokine lightning beam
+                LaserGlow.DrawBeam(this, localPrev, mid1, accent, core, 9.0f, alpha);
+                LaserGlow.DrawBeam(this, mid1, mid2, accent, core, 8.5f, alpha);
+                LaserGlow.DrawBeam(this, mid2, localPt, accent, core, 9.0f, alpha);
+
+                // 3. Side electric discharge fork
+                Vector2 forkTip = mid1 + fork;
+                DrawLine(mid1, forkTip, accent with { A = alpha * 0.7f }, 2.5f);
+                DrawLine(mid1, forkTip, core with { A = alpha * 0.9f }, 1.0f);
+
+                // 4. Inflammatory cytokine excitation node on target
+                LaserGlow.DrawImpactHalo(this, localPt, 16.0f, accent, core, alpha * 0.95f, 2.5f);
                 prev = pt;
             }
         }

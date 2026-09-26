@@ -67,15 +67,20 @@ public partial class PhagocyticGraspSkill : BaseSkill
             if (!GodotObject.IsInstanceValid(target))
                 continue;
 
+            Color accent = SkillAssetPalette.Accent(SkillIds.PhagocyticGrasp, new Color(0.14f, 0.82f, 0.36f));
+            Color core = SkillAssetPalette.Core(SkillIds.PhagocyticGrasp, Colors.White);
+
             // Chain-strike delivery with tip engulfment digestion burst on arrival
             var chain = new PseudopodChainVisual
             {
                 GlobalPosition = Host.GlobalPosition,
                 Host = Host,
                 Target = target,
-                BaseHalfWidth = 16.0f * areaScale,
+                BaseHalfWidth = 18.0f * areaScale,
                 ExtendSpeed = 1250.0f,
-                HoldDuration = 0.30f
+                HoldDuration = 0.30f,
+                ChainFillColor = accent with { A = 0.6f },
+                ChainEdgeColor = accent with { A = 0.98f }
             };
             chain.Arrived += (Node2D arrived) =>
             {

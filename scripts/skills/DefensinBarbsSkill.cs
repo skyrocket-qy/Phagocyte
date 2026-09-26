@@ -47,27 +47,6 @@ public partial class DefensinBarbsSkill : BaseSkill
 
         AudioManager.Instance?.PlaySfx("ethereal_knives");
 
-        if (Phagocyte.Combat.ProjectileManager.Instance != null)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                float angle = i * (Mathf.Tau / count);
-                Vector2 dir = Vector2.FromAngle(angle);
-                Phagocyte.Combat.ProjectileManager.Instance.Spawn(
-                    Host.GlobalPosition,
-                    dir,
-                    speed,
-                    dmg,
-                    isCrit,
-                    pierce,
-                    lifetime: 1.6f,
-                    radius: 12.0f,
-                    projType: "defensin_barb"
-                );
-            }
-            return;
-        }
-
         for (int i = 0; i < count; i++)
         {
             float angle = i * (Mathf.Tau / count);
@@ -142,26 +121,40 @@ public partial class DefensinBarbsSkill : BaseSkill
             Color accent = SkillAssetPalette.Accent(SkillIds.DefensinBarbs, new Color(0.30f, 0.91f, 0.57f));
             Color core = SkillAssetPalette.Core(SkillIds.DefensinBarbs, new Color(0.85f, 1.0f, 0.92f));
 
-            // Crystalline peptide needle shaft
-            DrawLine(new Vector2(-12, 0), new Vector2(10, 0), accent, 3.5f);
-            DrawLine(new Vector2(-10, 0), new Vector2(12, 0), core, 1.8f);
+            // 1. Ambient fluorophore diffusion veil
+            DrawLine(new Vector2(-16, 0), new Vector2(16, 0), accent with { A = 0.35f }, 7.5f);
 
-            // Diamond piercing needle tip
+            // 2. Crystalline peptide needle shaft (saturated body + white excitation core)
+            DrawLine(new Vector2(-14, 0), new Vector2(12, 0), accent with { A = 0.9f }, 4.0f);
+            DrawLine(new Vector2(-12, 0), new Vector2(14, 0), core with { A = 0.95f }, 1.8f);
+
+            // 3. Diamond piercing needle tip (bio-fluorescent crystal)
+            Vector2[] tipPolygonHalo = new Vector2[]
+            {
+                new Vector2(22, 0),
+                new Vector2(8, -5.5f),
+                new Vector2(5, 0),
+                new Vector2(8, 5.5f)
+            };
+            DrawColoredPolygon(tipPolygonHalo, accent with { A = 0.45f });
+
             Vector2[] tipPolygon = new Vector2[]
             {
-                new Vector2(16, 0),
+                new Vector2(19, 0),
                 new Vector2(8, -3.5f),
                 new Vector2(6, 0),
                 new Vector2(8, 3.5f)
             };
             DrawColoredPolygon(tipPolygon, core);
 
-            // Backward-angled cationic barb thorns
-            DrawLine(new Vector2(0, 0), new Vector2(-4, -4.5f), accent, 2.0f);
-            DrawLine(new Vector2(0, 0), new Vector2(-4, 4.5f), accent, 2.0f);
+            // 4. Backward-angled cationic barb thorns with micro-halos
+            DrawLine(new Vector2(1, 0), new Vector2(-5, -6.5f), accent, 2.5f);
+            DrawLine(new Vector2(1, 0), new Vector2(-5, 6.5f), accent, 2.5f);
+            DrawLine(new Vector2(0, 0), new Vector2(-4, -5.0f), core, 1.2f);
+            DrawLine(new Vector2(0, 0), new Vector2(-4, 5.0f), core, 1.2f);
 
-            // Glowing needle tip
-            LaserGlow.DrawImpactHalo(this, new Vector2(14, 0), 6.0f, accent, core, 0.85f, 1.5f);
+            // 5. Glowing needle tip excitation bloom
+            LaserGlow.DrawImpactHalo(this, new Vector2(16, 0), 8.5f, accent, core, 0.95f, 2.0f);
         }
     }
 }

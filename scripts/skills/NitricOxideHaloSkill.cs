@@ -29,32 +29,38 @@ public partial class NitricOxideHaloSkill : BaseSkill
             if (Skill == null || Skill.Host == null)
                 return;
 
-            Color accent = SkillAssetPalette.Accent(SkillIds.NitricOxideHalo, new Color(0.3f, 0.79f, 0.89f));
+            Color accent = SkillAssetPalette.Accent(SkillIds.NitricOxideHalo, new Color(0.30f, 0.79f, 0.89f));
             Color core = SkillAssetPalette.Core(SkillIds.NitricOxideHalo, Colors.White);
 
-            float pulse = 1.0f + 0.05f * Mathf.Sin(Phase);
+            float pulse = 1.0f + 0.06f * Mathf.Sin(Phase * 1.5f);
             float r = Radius * pulse;
 
-            // Diffuse inner toxic gas body
-            DrawCircle(Vector2.Zero, r * 0.85f, new Color(accent.R, accent.G, accent.B, 0.12f));
+            // 1. Diffuse inner reactive nitrogen gas cloud
+            DrawCircle(Vector2.Zero, r * 0.9f, accent with { A = 0.16f });
 
-            // Soft core excitation halo
-            LaserGlow.DrawImpactHalo(this, Vector2.Zero, r * 0.45f, accent, core, 0.22f, 1.6f);
+            // 2. Core excitation glow near host membrane
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, r * 0.4f, accent, core, 0.35f, 2.0f);
 
-            // Multi-harmonic fluctuating diffusion rings
-            DrawArc(Vector2.Zero, r * 0.55f, 0.0f, Mathf.Tau, 32, new Color(core.R, core.G, core.B, 0.18f), 1.5f);
-            DrawArc(Vector2.Zero, r * 0.82f, 0.0f, Mathf.Tau, 40, new Color(accent.R, accent.G, accent.B, 0.28f), 2.0f);
-            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 48, new Color(accent.R, accent.G, accent.B, 0.45f), 2.8f);
+            // 3. Fluctuating middle acoustic/diffusion ripples
+            DrawArc(Vector2.Zero, r * 0.65f, 0.0f, Mathf.Tau, 36, accent with { A = 0.35f }, 1.8f);
+            DrawArc(Vector2.Zero, r * 0.65f, 0.0f, Mathf.Tau, 36, core with { A = 0.5f }, 1.0f);
 
-            // Brownian undulating gas puffs along perimeter
-            const int Puffs = 10;
+            // 4. Primary outer toxic gas boundary (high-contrast dual arc)
+            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 48, accent with { A = 0.85f }, 3.5f);
+            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 48, core with { A = 0.95f }, 1.6f);
+
+            // 5. Undulating radical gas puffs with core excitation along perimeter
+            const int Puffs = 12;
             for (int i = 0; i < Puffs; i++)
             {
-                float angle = (i / (float)Puffs) * Mathf.Tau + Phase * 0.6f;
-                float puffOffset = 6.0f * Mathf.Sin(Phase * 2.0f + i * 1.7f);
+                float angle = (i / (float)Puffs) * Mathf.Tau + Phase * 0.5f;
+                float puffOffset = 7.0f * Mathf.Sin(Phase * 2.2f + i * 1.5f);
                 float puffR = r + puffOffset;
                 Vector2 pos = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * puffR;
-                DrawCircle(pos, 5.0f + 2.0f * Mathf.Cos(Phase + i), new Color(accent.R, accent.G, accent.B, 0.20f));
+                float pRadius = 5.5f + 2.0f * Mathf.Cos(Phase + i * 0.8f);
+
+                DrawCircle(pos, pRadius + 2.0f, accent with { A = 0.45f });
+                DrawCircle(pos, pRadius, core with { A = 0.85f });
             }
         }
     }

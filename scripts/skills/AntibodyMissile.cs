@@ -116,22 +116,42 @@ public partial class AntibodyMissile : Area2D
 
     public override void _Draw()
     {
-        // IgG silhouette: two Fab arms + Fc stem, arms tinted from the skill icon.
-        Color accent = SkillAssetPalette.Accent(SkillIds.AntibodySalvo, new Color(1.0f, 0.88f, 0.55f));
-        Color armColor = new Color(accent.R, accent.G, accent.B, _stuck ? 1.0f : 0.9f);
-        Color stemColor = new Color(1.0f, 0.95f, 0.8f, 0.95f);
-        float armLen = 9.0f;
-        float armSpread = 0.6f;
+        Color accent = SkillAssetPalette.Accent(SkillIds.AntibodySalvo, new Color(0.15f, 0.69f, 0.75f));
+        Color core = SkillAssetPalette.Core(SkillIds.AntibodySalvo, Colors.White);
+        float armLen = 11.0f;
+        float armSpread = 0.65f;
 
-        // Arms open toward +X (flight direction / membrane).
-        DrawLine(Vector2.Zero, new Vector2(armLen, -armLen * armSpread), armColor, 2.5f);
-        DrawLine(Vector2.Zero, new Vector2(armLen, armLen * armSpread), armColor, 2.5f);
-        DrawCircle(new Vector2(armLen, -armLen * armSpread), 2.2f, armColor);
-        DrawCircle(new Vector2(armLen, armLen * armSpread), 2.2f, armColor);
-        // Fc stem trails behind.
-        DrawLine(Vector2.Zero, new Vector2(-armLen * 1.1f, 0.0f), stemColor, 3.0f);
+        Vector2 leftFab = new Vector2(armLen, -armLen * armSpread);
+        Vector2 rightFab = new Vector2(armLen, armLen * armSpread);
+        Vector2 stemEnd = new Vector2(-armLen * 1.2f, 0.0f);
 
+        // 1. Layer 1: Ambient Fluorophore Diffusion Halo (wide, soft)
+        Color haloColor = accent with { A = _stuck ? 0.35f : 0.25f };
+        DrawLine(Vector2.Zero, leftFab, haloColor, 6.0f);
+        DrawLine(Vector2.Zero, rightFab, haloColor, 6.0f);
+        DrawLine(Vector2.Zero, stemEnd, haloColor, 6.5f);
+
+        // 2. Layer 2: Fluorescent Emission Body (saturated)
+        Color midColor = accent with { A = _stuck ? 1.0f : 0.85f };
+        DrawLine(Vector2.Zero, leftFab, midColor, 3.0f);
+        DrawLine(Vector2.Zero, rightFab, midColor, 3.0f);
+        DrawLine(Vector2.Zero, stemEnd, midColor, 3.2f);
+
+        // 3. Layer 3: High-Energy Excitation Core (sharp white-hot center)
+        Color coreColor = core with { A = 0.95f };
+        DrawLine(Vector2.Zero, leftFab, coreColor, 1.2f);
+        DrawLine(Vector2.Zero, rightFab, coreColor, 1.2f);
+        DrawLine(Vector2.Zero, stemEnd, coreColor, 1.3f);
+
+        // 4. Fab Antigen-Binding Tips (Confocal 3-pass blooms)
+        LaserGlow.DrawImpactHalo(this, leftFab, 3.8f, accent, core, 0.9f, 1.2f);
+        LaserGlow.DrawImpactHalo(this, rightFab, 3.8f, accent, core, 0.9f, 1.2f);
+
+        // 5. Opsonization anchor ring when bound to target
         if (_stuck)
-            DrawArc(Vector2.Zero, 12.0f, 0.0f, Mathf.Tau, 20, new Color(accent.R, accent.G, accent.B, 0.6f), 1.5f);
+        {
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, 14.0f, accent, core, 0.85f, 2.0f);
+            DrawArc(Vector2.Zero, 16.0f, 0.0f, Mathf.Tau, 24, accent with { A = 0.5f }, 1.5f);
+        }
     }
 }

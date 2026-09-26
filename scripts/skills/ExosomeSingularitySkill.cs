@@ -141,30 +141,43 @@ public partial class ExosomeSingularitySkill : BaseSkill
             Color accent = SkillAssetPalette.Accent(SkillIds.ExosomeSingularity, new Color(0.13f, 0.68f, 0.83f));
             Color core = SkillAssetPalette.Core(SkillIds.ExosomeSingularity, new Color(0.75f, 0.96f, 1.0f));
 
-            // Deep central vesicular void
-            DrawCircle(Vector2.Zero, 22.0f, new Color(0.02f, 0.08f, 0.12f, alpha * 0.95f));
-            LaserGlow.DrawImpactHalo(this, Vector2.Zero, 22.0f, accent, core, alpha * 0.9f, 2.5f);
+            // 1. Outer gravitational distortion veil & perimeter boundary
+            DrawCircle(Vector2.Zero, Radius, accent with { A = alpha * 0.08f });
+            DrawArc(Vector2.Zero, Radius, 0.0f, Mathf.Tau, 48, accent with { A = alpha * 0.45f }, 2.0f);
+            DrawArc(Vector2.Zero, Radius * 0.96f, 0.0f, Mathf.Tau, 40, core with { A = alpha * 0.25f }, 1.2f);
 
-            // Outer gravitational suction limit
-            DrawArc(Vector2.Zero, Radius, 0.0f, Mathf.Tau, 48, new Color(accent.R, accent.G, accent.B, alpha * 0.35f), 1.5f);
-
-            // 4 swirling lipid vesicular arms matching icon art
+            // 2. 4 swirling logarithmic spiral stream lines
             for (int i = 0; i < 4; i++)
             {
                 float baseA = _spinAngle + i * (Mathf.Tau / 4.0f);
-                for (int s = 1; s <= 10; s++)
+                Vector2 prevP = Vector2.Zero;
+
+                for (int s = 1; s <= 12; s++)
                 {
-                    float t = (float)s / 10.0f;
-                    float armR = 24.0f + (Radius - 24.0f) * t;
-                    float armA = baseA + t * 2.8f;
+                    float t = (float)s / 12.0f;
+                    float armR = 26.0f + (Radius - 26.0f) * t;
+                    float armA = baseA + t * 3.2f;
                     Vector2 p = Vector2.FromAngle(armA) * armR;
 
+                    if (s > 1)
+                    {
+                        // Continuous luminous suction filament
+                        DrawLine(prevP, p, accent with { A = alpha * (0.3f + 0.4f * (1.0f - t)) }, 2.5f);
+                        DrawLine(prevP, p, core with { A = alpha * (0.6f * (1.0f - t)) }, 1.2f);
+                    }
+                    prevP = p;
+
                     // Swirling exosome vesicle sphere
-                    float vesicleSize = 3.5f * (1.0f - t * 0.4f);
-                    DrawCircle(p, vesicleSize, new Color(core.R, core.G, core.B, alpha * 0.85f));
-                    DrawArc(p, vesicleSize + 1.2f, 0.0f, Mathf.Tau, 12, new Color(accent.R, accent.G, accent.B, alpha * 0.6f), 1.0f);
+                    float vesicleSize = 4.0f * (1.0f - t * 0.45f);
+                    DrawCircle(p, vesicleSize + 1.5f, accent with { A = alpha * 0.5f });
+                    DrawCircle(p, vesicleSize, core with { A = alpha * 0.9f });
                 }
             }
+
+            // 3. Central black void & high-luminance accretion event horizon
+            DrawCircle(Vector2.Zero, 26.0f, new Color(0.01f, 0.04f, 0.07f, alpha * 0.98f));
+            LaserGlow.DrawImpactHalo(this, Vector2.Zero, 28.0f, accent, core, alpha * 0.95f, 3.5f);
+            DrawArc(Vector2.Zero, 16.0f, 0.0f, Mathf.Tau, 24, core with { A = alpha * 0.9f }, 1.8f);
         }
     }
 }

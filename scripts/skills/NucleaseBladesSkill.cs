@@ -41,26 +41,38 @@ public partial class NucleaseBladesSkill : BaseSkill
                 Vector2 bladePos = Vector2.FromAngle(angle) * OrbitRadius;
                 Vector2 tangent = Vector2.FromAngle(angle + Mathf.Pi * 0.5f);
 
-                // Crescent scythe enzyme cutter blade
-                Vector2 bladeTip = bladePos + tangent * 18.0f;
-                Vector2 bladeBack = bladePos - tangent * 12.0f;
-                Vector2 bladeSpine = bladePos + Vector2.FromAngle(angle) * 7.0f;
+                // Crescent scythe enzyme cutter blade geometry
+                Vector2 bladeTip = bladePos + tangent * 24.0f;
+                Vector2 bladeBack = bladePos - tangent * 16.0f;
+                Vector2 bladeSpine = bladePos + Vector2.FromAngle(angle) * 11.0f;
+                Vector2 bladeInner = bladePos - Vector2.FromAngle(angle) * 3.0f;
 
-                // Glowing outer arc and enzyme edge
-                DrawLine(bladeBack, bladeTip, accent, 3.5f);
-                DrawLine(bladeBack, bladeSpine, trailColor, 2.0f);
-                DrawLine(bladeSpine, bladeTip, core, 2.5f);
+                // 1. Orbital wake arc
+                DrawArc(Vector2.Zero, OrbitRadius, angle - 0.45f, angle, 16, accent with { A = 0.45f }, 3.5f);
+                DrawArc(Vector2.Zero, OrbitRadius, angle - 0.25f, angle, 12, core with { A = 0.8f }, 1.5f);
 
-                // Laser glow on cutting tip & center
-                LaserGlow.DrawImpactHalo(this, bladeTip, 8.0f, accent, core, 0.85f, 2.0f);
-                LaserGlow.DrawImpactHalo(this, bladePos, 5.0f, accent, core, 0.7f, 1.5f);
+                // 2. Crescent cutter polygon (saturated body + white excitation cutting edge)
+                Vector2[] bladePolyHalo = new Vector2[] { bladeTip, bladeSpine + Vector2.FromAngle(angle) * 3.0f, bladeBack, bladeInner };
+                DrawColoredPolygon(bladePolyHalo, accent with { A = 0.4f });
 
-                // Orbiting nucleotide cleave sparks
-                for (int s = 1; s <= 3; s++)
+                Vector2[] bladePoly = new Vector2[] { bladeTip, bladeSpine, bladeBack, bladeInner };
+                DrawColoredPolygon(bladePoly, accent with { A = 0.95f });
+
+                // Razor-sharp excitation cutting edge
+                DrawLine(bladeBack, bladeTip, core with { A = 0.98f }, 2.8f);
+                DrawLine(bladeSpine, bladeTip, core with { A = 0.95f }, 2.0f);
+
+                // 3. Laser glow on cutting tip & enzyme active site hub
+                LaserGlow.DrawImpactHalo(this, bladeTip, 10.0f, accent, core, 0.95f, 2.5f);
+                LaserGlow.DrawImpactHalo(this, bladePos, 7.0f, accent, core, 0.85f, 2.0f);
+
+                // 4. Orbiting nucleotide cleave sparks
+                for (int s = 1; s <= 4; s++)
                 {
-                    float shardAngle = angle - s * 0.18f;
-                    Vector2 shardPos = Vector2.FromAngle(shardAngle) * (OrbitRadius + (s % 2 == 0 ? 5.0f : -5.0f));
-                    DrawCircle(shardPos, 2.0f / s, new Color(core.R, core.G, core.B, 0.6f / s));
+                    float shardAngle = angle - s * 0.16f;
+                    Vector2 shardPos = Vector2.FromAngle(shardAngle) * (OrbitRadius + (s % 2 == 0 ? 6.0f : -6.0f));
+                    DrawCircle(shardPos, 3.0f / s + 0.8f, accent with { A = 0.7f / s });
+                    DrawCircle(shardPos, 2.0f / s + 0.5f, core with { A = 0.95f / s });
                 }
             }
         }
