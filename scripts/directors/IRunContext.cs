@@ -1,7 +1,30 @@
 using Godot;
-using Phagocyte.UI;
+using Godot.Collections;
 
 namespace Phagocyte.Directors;
+
+/// <summary>
+/// Director-facing HUD surface. Implemented by <c>Phagocyte.UI.Hud</c>;
+/// lives here so directors never compile against concrete UI types
+/// (gameplay → UI is forbidden — see docs/architecture/ARCH_RULE.md).
+/// </summary>
+public interface IDirectorHud
+{
+    bool PauseInputSuppressed { get; set; }
+    void ResumeGame();
+    void ShowOverdriveAlert(string title, string desc);
+}
+
+/// <summary>
+/// Director-facing settlement modal surface. Implemented by
+/// <c>Phagocyte.UI.RunRecordsModal</c>; same inversion as
+/// <see cref="IDirectorHud"/> — directors resolve it via
+/// <c>GetNodeOrNull&lt;IRunSettlementModal&gt;</c>, never the concrete type.
+/// </summary>
+public interface IRunSettlementModal
+{
+    void OpenSettlement(Dictionary record);
+}
 
 /// <summary>
 /// Narrow run-scoped view of the orchestrator that director components are
@@ -24,7 +47,7 @@ public interface IRunContext
     CharacterBody2D? Player { get; }
     Node2D? EnemyContainer { get; }
     Camera2D? MainCamera { get; }
-    Hud? HudNode { get; }
+    IDirectorHud? HudNode { get; }
     int ScreenCapNormal { get; }
     int ScreenCapSwarm { get; }
     Vector2 CurrentFluidVector { get; set; }

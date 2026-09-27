@@ -41,6 +41,7 @@ retained mental model. Route by domain familiarity:
 
 ```sh
 dotnet build Phagocyte.csproj --warnaserror   # or: make build
+python3 scripts/check_arch.py                 # or: make check-arch (layer boundaries, docs/architecture/ARCH_RULE.md)
 ```
 
 Zero warnings tolerated. Godot binary:

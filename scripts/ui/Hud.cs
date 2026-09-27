@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using Phagocyte.Core;
+using Phagocyte.Directors;
 using Phagocyte.Player;
 
 namespace Phagocyte.UI;
@@ -14,7 +15,7 @@ namespace Phagocyte.UI;
 /// The pre-split public surface is preserved as thin facades so the
 /// test harness keeps working unchanged.
 /// </summary>
-public partial class Hud : CanvasLayer
+public partial class Hud : CanvasLayer, IDirectorHud
 {
     public static PackedScene UpgradeModalScene => AssetLoader.Load<PackedScene>("res://scenes/ui/upgrade_modal.tscn");
 

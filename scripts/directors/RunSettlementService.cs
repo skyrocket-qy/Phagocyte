@@ -6,7 +6,6 @@ using Phagocyte.Core;
 using Phagocyte.Endgame;
 using Phagocyte.Player;
 using Phagocyte.Skills;
-using Phagocyte.UI;
 
 namespace Phagocyte.Directors;
 
@@ -129,7 +128,7 @@ public partial class RunSettlementService : Node
 
         if (ctx is Node ctxNode)
         {
-            var modal = ctxNode.GetNodeOrNull<RunRecordsModal>("UIOverlay/RunRecordsModal");
+            var modal = ctxNode.GetNodeOrNull<IRunSettlementModal>("UIOverlay/RunRecordsModal");
             if (modal != null)
                 modal.OpenSettlement(record);
 

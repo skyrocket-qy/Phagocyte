@@ -3,6 +3,7 @@ using Godot.Collections;
 using System;
 using System.Collections.Generic;
 using Phagocyte.Core;
+using Phagocyte.Directors;
 using Phagocyte.Endgame;
 
 namespace Phagocyte.UI;
@@ -11,7 +12,7 @@ namespace Phagocyte.UI;
 /// Medical record panel. Shows the settlement of the just-finished run
 /// (victory / defeat) and the persistent history of past runs.
 /// </summary>
-public partial class RunRecordsModal : ModalBase
+public partial class RunRecordsModal : ModalBase, IRunSettlementModal
 {
     public Label? BannerLabel { get; set; }
     public VBoxContainer? SummaryBox { get; set; }

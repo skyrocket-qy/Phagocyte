@@ -90,6 +90,7 @@ public partial class Main : Node2D, IRunContext
 
     public CharacterBody2D? Player { get; set; }
     public Hud? HudNode { get; set; }
+    IDirectorHud? IRunContext.HudNode => HudNode;
     public Node2D? EnemyContainer { get; set; }
     public Camera2D? MainCamera { get; set; }
 
