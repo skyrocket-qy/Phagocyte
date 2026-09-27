@@ -29,7 +29,8 @@ scripts/Main.cs            # run orchestrator
 scripts/core/              # GameManager, Stats, save, audio, achievements, tree, chamber
 scripts/core/assets/       # AssetLoader, AssetPaths, GodotAssetProvider
 scripts/core/data/         # CatalogBuilders/Loader, DataPaths, DataValidator
-scripts/hero/            # BaseCell + 5 cells + CameraFollow
+scripts/hero/            # BaseCell + 5 cells
+scripts/camera/         # CameraFollow (hero-agnostic follow + trauma shake)
 scripts/skills/            # BaseSkill, SkillManager, 17 active + 13 passive + visuals
 scripts/combat/            # CombatHelper, IDamageable, ProjectileManager, VfxManager, Targeting
 scripts/enemies/           # BaseEnemy, PathogenSpawner, steering, bosses/, hazards/

@@ -1,4 +1,4 @@
-namespace Phagocyte.Hero;
+namespace Phagocyte.Camera;
 
 using Godot;
 using Phagocyte.Core;
@@ -52,9 +52,7 @@ public partial class CameraFollow : Camera2D
 
         if (Target == null)
         {
-            Target = GetParent()?.GetNodeOrNull<Node2D>("Player") 
-                ?? GetParent()?.GetNodeOrNull<Node2D>("BaseCell") 
-                ?? GetTree().GetFirstNodeInGroup("player") as Node2D;
+            Target = GetTree().GetFirstNodeInGroup("player") as Node2D;
         }
 
         PositionSmoothingEnabled = true;

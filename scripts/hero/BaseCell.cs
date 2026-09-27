@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Phagocyte.Camera;
 using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Endgame;

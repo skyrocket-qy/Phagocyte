@@ -57,10 +57,10 @@ class CombatAuditor:
         self.scripts_dir = root / "scripts"
         self.assets_dir = root / "assets"
         self.audio_manifest_path = self.assets_dir / "audio" / "manifest.json"
-        self.camera_follow_path = self.scripts_dir / "player" / "CameraFollow.cs"
+        self.camera_follow_path = self.scripts_dir / "camera" / "CameraFollow.cs"
         self.damage_spawner_path = self.scripts_dir / "ui" / "DamageNumberSpawner.cs"
         self.base_enemy_path = self.scripts_dir / "enemies" / "BaseEnemy.cs"
-        self.base_cell_path = self.scripts_dir / "player" / "BaseCell.cs"
+        self.base_cell_path = self.scripts_dir / "hero" / "BaseCell.cs"
         self.vfx_manager_path = self.scripts_dir / "combat" / "VfxManager.cs"
 
         self.warnings: List[str] = []

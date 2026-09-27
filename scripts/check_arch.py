@@ -70,6 +70,7 @@ AUTOLOAD_FILES = {
 
 # L3: everything gameplay (directory prefixes + gameplay-tagged core files).
 GAMEPLAY_PREFIXES = (
+    "scripts/camera/",
     "scripts/combat/",
     "scripts/hero/",
     "scripts/enemies/",
