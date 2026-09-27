@@ -3,7 +3,7 @@ using System;
 using Phagocyte.Core;
 using Phagocyte.Skills;
 
-namespace Phagocyte.Player;
+namespace Phagocyte.Hero;
 
 /// <summary>
 /// Macrophage (巨噬細胞)

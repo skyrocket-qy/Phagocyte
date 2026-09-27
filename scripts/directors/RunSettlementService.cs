@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Phagocyte.Core;
 using Phagocyte.Endgame;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 using Phagocyte.Skills;
 
 namespace Phagocyte.Directors;

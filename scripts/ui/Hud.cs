@@ -2,7 +2,7 @@ using Godot;
 using System;
 using Phagocyte.Core;
 using Phagocyte.Directors;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 
 namespace Phagocyte.UI;
 

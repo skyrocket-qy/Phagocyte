@@ -1,5 +1,6 @@
 using Godot;
 using Phagocyte.Core;
+using Phagocyte.Hero;
 
 namespace Phagocyte.Core;
 
@@ -68,7 +69,7 @@ public partial class GearDrop : Node2D
             return;
         }
 
-        float magnet = Target is Player.BaseCell cell && cell.Stats != null
+        float magnet = Target is BaseCell cell && cell.Stats != null
             ? cell.Stats.GetStat("magnet")
             : 150.0f;
         if (dist <= magnet)

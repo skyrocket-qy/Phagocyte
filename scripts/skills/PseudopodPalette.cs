@@ -1,5 +1,5 @@
 using Godot;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 
 namespace Phagocyte.Skills;
 

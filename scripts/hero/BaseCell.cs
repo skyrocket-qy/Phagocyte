@@ -8,7 +8,7 @@ using Phagocyte.Skills;
 using Phagocyte.Enemies;
 using Phagocyte.UI;
 
-namespace Phagocyte.Player;
+namespace Phagocyte.Hero;
 
 /// <summary>
 /// Base class for all Immune Defense Cells in Project: Phagocyte.

@@ -6,7 +6,7 @@ using static GdUnit4.Assertions;
 using Phagocyte.Core;
 using Phagocyte.Enemies;
 using Phagocyte.Endgame;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 using Phagocyte.Skills;
 using Phagocyte.UI;
 

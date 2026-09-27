@@ -1,6 +1,6 @@
 using Godot;
 using System;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 
 namespace Phagocyte.Enemies;
 

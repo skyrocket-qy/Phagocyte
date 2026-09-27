@@ -1,6 +1,6 @@
 using Godot;
 using Phagocyte.Combat;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 
 namespace Phagocyte.Environment;
 

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Phagocyte;
 using Phagocyte.Core;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 using Phagocyte.Skills;
 using Phagocyte.UI;
 

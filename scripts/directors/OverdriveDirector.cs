@@ -3,7 +3,7 @@ using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Endgame;
 using Phagocyte.Enemies;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 
 namespace Phagocyte.Directors;
 

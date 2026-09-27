@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Phagocyte.Core;
 using Phagocyte.Enemies;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 
 namespace Phagocyte.Tests;
 

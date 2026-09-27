@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/player/CtlCell.cs" id="1_ctl"]
+[ext_resource type="Script" path="res://scripts/hero/CtlCell.cs" id="1_ctl"]
 [ext_resource type="Script" path="res://scripts/skills/SkillManager.cs" id="2_skills"]
 [ext_resource type="Script" path="res://scripts/core/GearChamber.cs" id="3_chamber"]
 

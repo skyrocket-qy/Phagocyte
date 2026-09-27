@@ -5,7 +5,7 @@ using System;
 using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Enemies;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 using Phagocyte.UI;
 
 namespace Phagocyte.Tests;

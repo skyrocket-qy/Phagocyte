@@ -1,4 +1,4 @@
-namespace Phagocyte.Player;
+namespace Phagocyte.Hero;
 
 using Godot;
 using Phagocyte.Core;

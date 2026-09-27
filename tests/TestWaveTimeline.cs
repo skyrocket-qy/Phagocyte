@@ -5,7 +5,7 @@ using static GdUnit4.Assertions;
 using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Enemies;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 
 namespace Phagocyte.Tests;
 

@@ -2,7 +2,7 @@ using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using Phagocyte.Enemies;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 using Phagocyte.Skills;
 
 using Phagocyte.Core;

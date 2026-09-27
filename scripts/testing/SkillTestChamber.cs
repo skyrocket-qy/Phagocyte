@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Phagocyte.Core;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 using Phagocyte.Skills;
 
 namespace Phagocyte.Testing;

@@ -4,7 +4,7 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using Phagocyte.Enemies;
 using Phagocyte.Gear;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 
 using Phagocyte.Core;
 

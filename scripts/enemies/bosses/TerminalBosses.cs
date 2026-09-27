@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Phagocyte.Combat;
-using Phagocyte.Player;
+using Phagocyte.Hero;
 
 namespace Phagocyte.Enemies;
 

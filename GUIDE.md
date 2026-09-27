@@ -29,7 +29,7 @@ scripts/Main.cs            # run orchestrator
 scripts/core/              # GameManager, Stats, save, audio, achievements, tree, chamber
 scripts/core/assets/       # AssetLoader, AssetPaths, GodotAssetProvider
 scripts/core/data/         # CatalogBuilders/Loader, DataPaths, DataValidator
-scripts/player/            # BaseCell + 5 cells + CameraFollow
+scripts/hero/            # BaseCell + 5 cells + CameraFollow
 scripts/skills/            # BaseSkill, SkillManager, 17 active + 13 passive + visuals
 scripts/combat/            # CombatHelper, IDamageable, ProjectileManager, VfxManager, Targeting
 scripts/enemies/           # BaseEnemy, PathogenSpawner, steering, bosses/, hazards/
@@ -157,8 +157,8 @@ Grep `Instance` in `AudioManager`, `AchievementManager`, `RunRecordManager`, `Se
 Understand the only numbers that matter: 19 universal stats, no skill-specific stats.
 
 ### Files
-- `scripts/player/BaseCell.cs:18` — abstract chassis (`CharacterBody2D`)
-- `scripts/player/Macrophage.cs`, `NeutrophilCell.cs`, `BCell.cs`, `CtlCell.cs`, `DendriticCell.cs`
+- `scripts/hero/BaseCell.cs:18` — abstract chassis (`CharacterBody2D`)
+- `scripts/hero/Macrophage.cs`, `NeutrophilCell.cs`, `BCell.cs`, `CtlCell.cs`, `DendriticCell.cs`
 - `scripts/core/CellStats.cs:17-39,90-210`
 - `scripts/core/IStatHost.cs`
 - `scenes/characters/*.tscn` — body `layer1/mask4`, sensor `layer1/mask2`
@@ -505,7 +505,7 @@ Run: `TestAssetLoader`, `TestAudioAssets`, `TestStatAndSkills`, `TestMenuFlow`, 
 
 Stack: `Phagocyte.csproj:1-6` — `Godot.NET.Sdk/4.7.1`, `net8.0`, C# 12, `Nullable enable`, `TreatWarningsAsErrors true`. Zero warnings tolerated.
 
-1. `partial class` everywhere: `scripts/Main.cs:25`, `scripts/player/BaseCell.cs:18`, `scripts/player/Macrophage.cs:13`, `scripts/ui/MainMenu.cs:9`. Reason: Godot generator adds hidden glue. Review rule: never remove `partial`; missing `partial` = broken scene binding.
+1. `partial class` everywhere: `scripts/Main.cs:25`, `scripts/hero/BaseCell.cs:18`, `scripts/hero/Macrophage.cs:13`, `scripts/ui/MainMenu.cs:9`. Reason: Godot generator adds hidden glue. Review rule: never remove `partial`; missing `partial` = broken scene binding.
 2. `[Export]` = editor-wired dependency: `scripts/Main.cs:29-41` (`StaphScene`, `ArenaSize`, `WaveDirector`, `BossManager`, ...). Review rule: if you rename an `[Export]` prop, check `scenes/main.tscn:60-68` `WaveDirector = NodePath(...)` wiring still resolves; `ResolveDirectors()` (`Main.cs:269-323`) creates code fallback via `GetNodeOrNull` + `new`, so missing scene wiring silently changes behavior.
 3. Nullable + `GetNodeOrNull<T>`: `Main.cs:142-148` (`Player`, `HudNode`, `EnemyContainer`, `ArenaBg`). Review rule: `GetNode` throws on miss, `GetNodeOrNull` returns null — this repo prefers null + fallback. Any new `GetNode` is a smell; any unchecked deref of `GetNodeOrNull` result is a defect under `Nullable enable`.
 4. C# events for in-run signals: `CellStats.StatChanged` (`CellStats.cs:13`), `BaseCell.ExpChanged/LevelUp` (`BaseCell.cs:27`), `WaveDirector.TerminalPhaseReached` (`WaveDirectorComponent.cs:18`). Subscribed in `VitalsView.ConnectPlayer (:79-80)`, `Main.ResolveDirectors (:322)`. GDScript fallback only in `VitalsView.ConnectFallback (:102-110)` via `Callable`. Review rule: setting `CurrentExp` directly does NOT fire `ExpChanged` — must reset HUD snapshots (`LastCurrentExp`) in tests.
