@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "slow_aggregation": "strongest",
+  "amp_applies_to_own_dot": true,
+  "ailments": [
+    {
+      "id": "oxidative_burn",
+      "name": "ROS Oxidative Burn",
+      "duration": 3.0,
+      "magnitude": 0.0,
+      "stack": "refresh_max",
+      "channels": ["dot"]
+    },
+    {
+      "id": "agglutination",
+      "name": "Agglutination",
+      "duration": 2.5,
+      "magnitude": 0.40,
+      "stack": "strongest_wins",
+      "channels": ["slow"],
+      "min_magnitude": 0.05,
+      "max_magnitude": 0.75
+    },
+    {
+      "id": "opsonization",
+      "name": "Opsonization",
+      "duration": 4.0,
+      "magnitude": 0.30,
+      "stack": "refresh_max",
+      "channels": ["amp"],
+      "min_magnitude": 0.10,
+      "max_magnitude": 0.60
+    },
+    {
+      "id": "membrane_leak",
+      "name": "Membrane Leakage",
+      "duration": 3.0,
+      "magnitude": 0.0,
+      "stack": "refresh_max",
+      "channels": ["dot"],
+      "move_multiplier": 3.0
+    },
+    {
+      "id": "endotoxin",
+      "name": "Endotoxin",
+      "duration": 4.0,
+      "magnitude": 0.0,
+      "stack": "independent",
+      "channels": ["dot"],
+      "max_stacks": 0
+    }
+  ]
+}

@@ -1,117 +1,106 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Phagocyte.Core;
 using Phagocyte.UI;
+using StatusSystem;
 
 namespace Phagocyte.Combat;
 
 /// <summary>
-/// Autonomous component managing biological status effects (Ailments) on combatants.
-/// Supports ROS Oxidative Burn (DoT), Agglutination (Slow), Opsonization (Damage Amp),
-/// Membrane Leakage (Movement-scaled Bleed), and Endotoxin (Stacking Poison).
+/// Phagocyte adapter over the portable <see cref="StatusController"/> core:
+/// owns the Node lifecycle, loads ailment defs from assets/data/ailments.json,
+/// routes DoT into TakeDoTDamage and batches floating numbers. Game-specific
+/// hooks (antigenic drift clears opsonization) stay here, not in the core.
 /// </summary>
 public partial class AilmentController : Node
 {
-    // 1. ROS Oxidative Burn (Ignite DoT)
-    private float _burnDps = 0.0f;
-    private float _burnTimer = 0.0f;
+    public const string BurnId = "oxidative_burn";
+    public const string AgglutinationId = "agglutination";
+    public const string OpsonizationId = "opsonization";
+    public const string LeakId = "membrane_leak";
+    public const string EndotoxinId = "endotoxin";
 
-    // 2. Agglutination / Cross-linking (Slow)
-    private float _agglutinationTimer = 0.0f;
-    private float _agglutinationSlowPct = 0.40f;
+    private static List<StatusDef>? _sharedDefs;
+    private static StatusOptions? _sharedOptions;
+    private static readonly object _defLock = new();
 
-    // 3. Opsonization / Marked for Lysis (Damage Amplification)
-    private float _opsonizationTimer = 0.0f;
-    private float _opsonizationAmpPct = 0.30f; // +30% damage taken
-
-    // 4. Membrane Leakage (Bleed: 3x DoT while moving)
-    private float _leakDps = 0.0f;
-    private float _leakTimer = 0.0f;
-    private const float LeakMovingMultiplier = 3.0f;
-
-    // 5. Endotoxin / Sepsis (Poison: independent stacking DoT)
-    private readonly List<(float Dps, float Timer)> _endotoxinStacks = new();
+    private readonly StatusController _core = new();
+    private bool _configured;
 
     // Visual tick accumulator (avoids spamming 60 floating numbers per sec)
     private float _visualTickTimer = 0.0f;
     private float _accumulatedVisualDot = 0.0f;
 
-    public bool IsOxidized => _burnTimer > 0.0f;
-    public bool IsAgglutinated => _agglutinationTimer > 0.0f;
-    public bool IsOpsonized => _opsonizationTimer > 0.0f;
-    public bool IsLeaking => _leakTimer > 0.0f;
-    public bool IsToxic => _endotoxinStacks.Count > 0;
+    public bool IsOxidized => _core.IsActive(BurnId);
+    public bool IsAgglutinated => _core.IsActive(AgglutinationId);
+    public bool IsOpsonized => _core.IsActive(OpsonizationId);
+    public bool IsLeaking => _core.IsActive(LeakId);
+    public bool IsToxic => _core.IsActive(EndotoxinId);
 
-    public float OpsonizationMultiplier => IsOpsonized ? (1.0f + _opsonizationAmpPct) : 1.0f;
-    public float SpeedMultiplier => IsAgglutinated ? Mathf.Clamp(1.0f - _agglutinationSlowPct, 0.1f, 1.0f) : 1.0f;
+    public float OpsonizationMultiplier => _core.DamageTakenMultiplier;
+    public float SpeedMultiplier => _core.SpeedMultiplier;
 
-    public float BurnTimer => _burnTimer;
-    public float AgglutinationTimer => _agglutinationTimer;
-    public float OpsonizationTimer => _opsonizationTimer;
-    public float LeakTimer => _leakTimer;
-    public int EndotoxinStackCount => _endotoxinStacks.Count;
+    public float BurnTimer => _core.GetTimer(BurnId);
+    public float AgglutinationTimer => _core.GetTimer(AgglutinationId);
+    public float OpsonizationTimer => _core.GetTimer(OpsonizationId);
+    public float LeakTimer => _core.GetTimer(LeakId);
+    public int EndotoxinStackCount => _core.GetStackCount(EndotoxinId);
 
     /// <summary>
-    /// Applies or refreshes ROS Oxidative Burn DoT.
+    /// Applies or refreshes ROS Oxidative Burn DoT. Negative args fall back to JSON defaults.
     /// </summary>
-    public void ApplyOxidativeBurn(float dps, float duration = 3.0f)
+    public void ApplyOxidativeBurn(float dps, float duration = -1.0f)
     {
-        _burnDps = Math.Max(_burnDps, dps);
-        _burnTimer = Math.Max(_burnTimer, duration);
+        EnsureConfigured();
+        if (!_core.Apply(BurnId, dps, duration))
+            GD.PushWarning($"[AilmentController] Unknown ailment '{BurnId}'.");
     }
 
     /// <summary>
-    /// Applies or refreshes Agglutination slow. Stronger slow overrides weaker.
+    /// Applies or refreshes Agglutination slow. Stronger slow overrides weaker (PoE strongest-wins).
     /// </summary>
-    public void ApplyAgglutination(float duration = 2.5f, float slowPct = 0.40f)
+    public void ApplyAgglutination(float duration = -1.0f, float slowPct = -1.0f)
     {
-        slowPct = Math.Clamp(slowPct, 0.05f, 0.75f);
-        if (slowPct >= _agglutinationSlowPct)
-        {
-            _agglutinationSlowPct = slowPct;
-            _agglutinationTimer = Math.Max(_agglutinationTimer, duration);
-        }
-        else
-        {
-            _agglutinationTimer = Math.Max(_agglutinationTimer, duration);
-        }
+        EnsureConfigured();
+        if (!_core.Apply(AgglutinationId, slowPct, duration))
+            GD.PushWarning($"[AilmentController] Unknown ailment '{AgglutinationId}'.");
     }
 
     /// <summary>
     /// Marks target with Opsonin (C3b / antibody Fc), amplifying all damage taken.
     /// </summary>
-    public void ApplyOpsonization(float duration = 4.0f, float ampPct = 0.30f)
+    public void ApplyOpsonization(float duration = -1.0f, float ampPct = -1.0f)
     {
-        _opsonizationAmpPct = Math.Clamp(ampPct, 0.10f, 0.60f);
-        _opsonizationTimer = Math.Max(_opsonizationTimer, duration);
+        EnsureConfigured();
+        if (!_core.Apply(OpsonizationId, ampPct, duration))
+            GD.PushWarning($"[AilmentController] Unknown ailment '{OpsonizationId}'.");
     }
 
     /// <summary>
     /// Punctures target membrane, causing leakage that intensifies 3x when moving.
     /// </summary>
-    public void ApplyMembraneLeak(float dps, float duration = 3.0f)
+    public void ApplyMembraneLeak(float dps, float duration = -1.0f)
     {
-        _leakDps = Math.Max(_leakDps, dps);
-        _leakTimer = Math.Max(_leakTimer, duration);
+        EnsureConfigured();
+        if (!_core.Apply(LeakId, dps, duration))
+            GD.PushWarning($"[AilmentController] Unknown ailment '{LeakId}'.");
     }
 
     /// <summary>
     /// Adds an independent Endotoxin poison stack.
     /// </summary>
-    public void ApplyEndotoxin(float dps, float duration = 4.0f)
+    public void ApplyEndotoxin(float dps, float duration = -1.0f)
     {
-        _endotoxinStacks.Add((dps, duration));
+        EnsureConfigured();
+        if (!_core.Apply(EndotoxinId, dps, duration))
+            GD.PushWarning($"[AilmentController] Unknown ailment '{EndotoxinId}'.");
     }
 
     public void ClearAll()
     {
-        _burnDps = 0f;
-        _burnTimer = 0f;
-        _agglutinationTimer = 0f;
-        _opsonizationTimer = 0f;
-        _leakDps = 0f;
-        _leakTimer = 0f;
-        _endotoxinStacks.Clear();
+        EnsureConfigured();
+        _core.ClearAll();
         _accumulatedVisualDot = 0f;
     }
 
@@ -121,88 +110,28 @@ public partial class AilmentController : Node
     /// </summary>
     public void ClearOpsonization()
     {
-        _opsonizationTimer = 0.0f;
+        EnsureConfigured();
+        _core.Clear(OpsonizationId);
     }
 
     public override void _PhysicsProcess(double delta)
     {
+        EnsureConfigured();
         float dt = (float)delta;
-        float frameDot = 0.0f;
 
-        // 1. Burn timer
-        if (_burnTimer > 0.0f)
+        Vector2 velocity = Vector2.Zero;
+        if (GetParent() is Node2D parent2D)
         {
-            _burnTimer -= dt;
-            frameDot += _burnDps * dt;
-            if (_burnTimer <= 0.0f) _burnDps = 0.0f;
+            var velProp = parent2D.Get("Velocity");
+            if (velProp.VariantType == Variant.Type.Vector2)
+                velocity = velProp.AsVector2();
         }
 
-        // 2. Agglutination timer
-        if (_agglutinationTimer > 0.0f)
-        {
-            _agglutinationTimer -= dt;
-            if (_agglutinationTimer <= 0.0f) _agglutinationSlowPct = 0.40f;
-        }
+        float frameDot = _core.Tick(dt, velocity);
 
-        // 3. Opsonization timer
-        if (_opsonizationTimer > 0.0f)
-        {
-            _opsonizationTimer -= dt;
-        }
-
-        // 4. Leak timer
-        if (_leakTimer > 0.0f)
-        {
-            _leakTimer -= dt;
-            float leak = _leakDps * dt;
-
-            // Check if parent entity is moving via its Velocity property
-            if (GetParent() is Node2D parent2D)
-            {
-                bool isMoving = false;
-                var velProp = parent2D.Get("Velocity");
-                if (velProp.VariantType == Variant.Type.Vector2)
-                    isMoving = velProp.AsVector2().LengthSquared() > 0.1f;
-
-                if (isMoving)
-                {
-                    leak *= LeakMovingMultiplier;
-                }
-            }
-
-            frameDot += leak;
-            if (_leakTimer <= 0.0f) _leakDps = 0.0f;
-        }
-
-        // 5. Endotoxin stacks
-        if (_endotoxinStacks.Count > 0)
-        {
-            float toxinDps = 0.0f;
-            for (int i = _endotoxinStacks.Count - 1; i >= 0; i--)
-            {
-                var (dps, timer) = _endotoxinStacks[i];
-                timer -= dt;
-                if (timer <= 0.0f)
-                {
-                    _endotoxinStacks.RemoveAt(i);
-                }
-                else
-                {
-                    _endotoxinStacks[i] = (dps, timer);
-                    toxinDps += dps;
-                }
-            }
-            frameDot += toxinDps * dt;
-        }
-
-        // Apply Opsonization amplification to DoT as well
+        // frameDot already carries move-mult and (per JSON flag) opsonization amp.
         if (frameDot > 0.0f)
         {
-            if (IsOpsonized)
-            {
-                frameDot *= OpsonizationMultiplier;
-            }
-
             ApplyDoTToParent(frameDot);
 
             // Accumulate for periodic floating text
@@ -238,5 +167,82 @@ public partial class AilmentController : Node
         {
             parent.Call("take_dot_damage", damage);
         }
+    }
+
+    private void EnsureConfigured()
+    {
+        if (_configured)
+            return;
+        EnsureDefsLoaded();
+        _core.Configure(_sharedDefs!, _sharedOptions!);
+        _configured = true;
+    }
+
+    private static void EnsureDefsLoaded()
+    {
+        if (_sharedDefs != null)
+            return;
+        lock (_defLock)
+        {
+            if (_sharedDefs != null)
+                return;
+            try
+            {
+                var root = CatalogLoader.LoadObject(DataPaths.Ailments);
+                int schema = CatalogLoader.GetInt(root, "schema", 0);
+                if (schema != 1)
+                    throw new DataLoadException(DataPaths.Ailments, $"Unsupported schema {schema} (expected 1).");
+
+                var options = new StatusOptions
+                {
+                    SlowAggregation = CatalogLoader.GetString(root, "slow_aggregation", "strongest"),
+                    AmpAppliesToOwnDot = CatalogLoader.GetBool(root, "amp_applies_to_own_dot", false)
+                };
+
+                var defs = new List<StatusDef>();
+                if (!root.TryGetValue("ailments", out var listVar) || listVar.VariantType != Variant.Type.Array)
+                    throw new DataLoadException(DataPaths.Ailments, "Missing 'ailments' array.");
+                foreach (var item in listVar.AsGodotArray())
+                {
+                    if (item.VariantType != Variant.Type.Dictionary)
+                        throw new DataLoadException(DataPaths.Ailments, "Ailment entries must be JSON objects.");
+                    var d = item.AsGodotDictionary();
+                    defs.Add(new StatusDef
+                    {
+                        Id = CatalogLoader.GetString(d, "id"),
+                        Name = CatalogLoader.GetString(d, "name"),
+                        Duration = CatalogLoader.GetFloat(d, "duration", 3.0f),
+                        Magnitude = CatalogLoader.GetFloat(d, "magnitude", 0.0f),
+                        Stack = CatalogLoader.GetString(d, "stack", "refresh_max"),
+                        Channels = CatalogLoader.GetStringArray(d, "channels"),
+                        MoveMultiplier = CatalogLoader.GetFloat(d, "move_multiplier", 1.0f),
+                        MaxStacks = CatalogLoader.GetInt(d, "max_stacks", 0),
+                        MinMagnitude = GetOptionalFloat(d, "min_magnitude"),
+                        MaxMagnitude = GetOptionalFloat(d, "max_magnitude")
+                    });
+                }
+
+                // Fail fast on invalid defs before any controller consumes them.
+                new StatusController().Configure(defs, options);
+                _sharedDefs = defs;
+                _sharedOptions = options;
+            }
+            catch (StatusDataException ex)
+            {
+                throw new DataLoadException(DataPaths.Ailments, ex.Message, ex);
+            }
+        }
+    }
+
+    private static float GetOptionalFloat(Godot.Collections.Dictionary d, string key)
+    {
+        if (!d.TryGetValue(key, out var v))
+            return float.NaN;
+        return v.VariantType switch
+        {
+            Variant.Type.Int => (float)v.AsInt64(),
+            Variant.Type.Float => v.AsSingle(),
+            _ => float.NaN
+        };
     }
 }

@@ -22,6 +22,7 @@ public static class DataPaths
     public const string PassiveTree = $"{Root}/passive_tree.json";
     public const string PassiveTraits = $"{Root}/passive_traits.json";
     public const string StatLabels = $"{Root}/stat_labels.json";
+    public const string Ailments = $"{Root}/ailments.json";
 
     public const string TranslationsCsv = "res://assets/translations/translations.csv";
 
