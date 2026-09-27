@@ -28,8 +28,11 @@ public partial class TreeStatBundleSkill : BaseSkill
     {
         foreach (var modifier in _modifiers)
         {
-            var (flat, pct) = PassiveTreeManager.SplitModifier(modifier);
-            ApplyStat(modifier.Stat, flat, pct);
+            var (flat, pct, scalingStat, scalePer, hasScaling) = PassiveTreeManager.SplitScaledModifier(modifier);
+            if (hasScaling && Stats is CellStats cs)
+                cs.AddScaledModifier(modifier.Stat, flat, pct, scalingStat, scalePer);
+            else
+                ApplyStat(modifier.Stat, flat, pct);
         }
     }
 
@@ -37,8 +40,11 @@ public partial class TreeStatBundleSkill : BaseSkill
     {
         foreach (var modifier in _modifiers)
         {
-            var (flat, pct) = PassiveTreeManager.SplitModifier(modifier);
-            RemoveStat(modifier.Stat, flat, pct);
+            var (flat, pct, scalingStat, scalePer, hasScaling) = PassiveTreeManager.SplitScaledModifier(modifier);
+            if (hasScaling && Stats is CellStats cs)
+                cs.RemoveScaledModifier(modifier.Stat, flat, pct, scalingStat, scalePer);
+            else
+                RemoveStat(modifier.Stat, flat, pct);
         }
     }
 }

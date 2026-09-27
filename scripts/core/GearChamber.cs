@@ -461,22 +461,44 @@ public partial class GearChamber : Node2D
     // Stat application (mirrors the passive-trait modifier convention)
     // ------------------------------------------------------------------
 
+    /// <summary>One gear stat entry with optional Vistrace-style scaling.</summary>
+    public readonly record struct GearStatEntry(string Stat, float Flat, float Pct, string ScalingStat, float ScalePer)
+    {
+        public bool HasScaling => !string.IsNullOrEmpty(ScalingStat);
+    }
+
     private void ApplyStats(string id)
     {
-        ForEachModifier(id, (stat, flat, pct) => Stats?.AddModifier(stat, flat, pct));
+        ForEachStatEntry(id, entry =>
+        {
+            if (Stats == null)
+                return;
+            if (entry.HasScaling)
+                Stats.AddScaledModifier(entry.Stat, entry.Flat, entry.Pct, entry.ScalingStat, entry.ScalePer);
+            else
+                Stats.AddModifier(entry.Stat, entry.Flat, entry.Pct);
+        });
     }
 
     private void RemoveStats(string id)
     {
-        ForEachModifier(id, (stat, flat, pct) => Stats?.RemoveModifier(stat, flat, pct));
+        ForEachStatEntry(id, entry =>
+        {
+            if (Stats == null)
+                return;
+            if (entry.HasScaling)
+                Stats.RemoveScaledModifier(entry.Stat, entry.Flat, entry.Pct, entry.ScalingStat, entry.ScalePer);
+            else
+                Stats.RemoveModifier(entry.Stat, entry.Flat, entry.Pct);
+        });
     }
 
     /// <summary>
-    /// Iterates a gear item's stat entries (modifiers + drawback alike) as
-    /// flat/percent pairs. Public so the menu build preview applies exactly
-    /// the same entries the run-time chamber equips — one rule, two callers.
+    /// Iterates a gear item's stat entries (modifiers + drawback alike).
+    /// Unscaled entries behave exactly as before; entries carrying
+    /// scaling_stat/scale_per resolve against the source stat at apply time.
     /// </summary>
-    public static void ForEachModifier(string id, Action<string, float, float> action)
+    public static void ForEachStatEntry(string id, Action<GearStatEntry> action)
     {
         if (string.IsNullOrEmpty(id) || !GameManager.GearCatalog.TryGetValue(id, out var entryVar)
             || entryVar.VariantType != Variant.Type.Dictionary)
@@ -499,7 +521,14 @@ public partial class GearChamber : Node2D
                 float value = mod["value"].AsSingle();
                 string unit = mod["unit"].AsString();
                 bool isFlatOrPoints = unit is "flat" or "percentagepoints";
-                action(stat, isFlatOrPoints ? value : 0.0f, isFlatOrPoints ? 0.0f : value);
+                string scalingStat = mod.TryGetValue("scaling_stat", out var ssVar) ? ssVar.AsString() : "";
+                float scalePer = mod.TryGetValue("scale_per", out var spVar) ? spVar.AsSingle() : 1.0f;
+                action(new GearStatEntry(
+                    stat,
+                    isFlatOrPoints ? value : 0.0f,
+                    isFlatOrPoints ? 0.0f : value,
+                    scalingStat,
+                    scalePer));
             }
         }
     }

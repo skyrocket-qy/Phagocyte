@@ -89,8 +89,11 @@ public static class BuildStatsPreview
                     continue;
                 foreach (var modifier in node.Modifiers)
                 {
-                    var (flat, pct) = PassiveTreeManager.SplitModifier(modifier);
-                    stats.AddModifier(modifier.Stat, flat, pct);
+                    var (flat, pct, scalingStat, scalePer, hasScaling) = PassiveTreeManager.SplitScaledModifier(modifier);
+                    if (hasScaling)
+                        stats.AddScaledModifier(modifier.Stat, flat, pct, scalingStat, scalePer);
+                    else
+                        stats.AddModifier(modifier.Stat, flat, pct);
                 }
             }
 

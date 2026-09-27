@@ -116,11 +116,19 @@ public static class CatalogBuilders
             string unit = CatalogLoader.GetString(md, "unit", "flat");
             if (!System.Enum.TryParse<PassiveTreeManager.TreeModifierUnit>(unit, true, out _))
                 throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry has unknown unit '{unit}'.");
+            string scalingStat = CatalogLoader.GetString(md, "scaling_stat");
+            float scalePer = md.ContainsKey("scale_per") ? CatalogLoader.GetFloat(md, "scale_per", 1.0f) : 1.0f;
+            if (!string.IsNullOrEmpty(scalingStat) && !PassiveTreeManager.HasStatLabel(scalingStat))
+                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry references unknown scaling_stat '{scalingStat}'.");
+            if (!string.IsNullOrEmpty(scalingStat) && scalePer <= 0.0f)
+                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry has non-positive scale_per {scalePer}.");
             list.Add(new Dictionary
             {
                 { "stat", stat },
                 { "value", CatalogLoader.GetFloat(md, "value") },
-                { "unit", unit.ToLowerInvariant() }
+                { "unit", unit.ToLowerInvariant() },
+                { "scaling_stat", scalingStat },
+                { "scale_per", scalePer }
             });
         }
         return list;
@@ -408,10 +416,18 @@ public static class CatalogBuilders
                     var md = m.AsGodotDictionary();
                     if (!System.Enum.TryParse<TreeModifierUnit>(CatalogLoader.GetString(md, "unit", "flat"), true, out var unit))
                         throw new DataLoadException(DataPaths.PassiveTraits, $"Trait '{id}' has unknown modifier unit.");
+                    string scalingStat = CatalogLoader.GetString(md, "scaling_stat");
+                    float scalePer = md.ContainsKey("scale_per") ? CatalogLoader.GetFloat(md, "scale_per", 1.0f) : 1.0f;
+                    if (!string.IsNullOrEmpty(scalingStat) && !HasStatLabel(scalingStat))
+                        throw new DataLoadException(DataPaths.PassiveTraits, $"Trait '{id}' references unknown scaling_stat '{scalingStat}'.");
+                    if (!string.IsNullOrEmpty(scalingStat) && scalePer <= 0.0f)
+                        throw new DataLoadException(DataPaths.PassiveTraits, $"Trait '{id}' has non-positive scale_per {scalePer}.");
                     mods.Add(new TreeStatModifier(
                         CatalogLoader.GetString(md, "stat"),
                         CatalogLoader.GetFloat(md, "value"),
-                        unit));
+                        unit,
+                        scalingStat,
+                        scalePer));
                 }
             }
             if (mods.Count == 0 && rarity != TreeRarity.Start)

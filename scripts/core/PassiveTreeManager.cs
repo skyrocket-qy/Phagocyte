@@ -28,7 +28,7 @@ public static class PassiveTreeManager
         PercentagePoints
     }
 
-    public readonly record struct TreeStatModifier(string Stat, float Value, TreeModifierUnit Unit);
+    public readonly record struct TreeStatModifier(string Stat, float Value, TreeModifierUnit Unit, string ScalingStat = "", float ScalePer = 1.0f);
 
     /// <summary>
     /// Single source of truth for splitting one tree modifier
@@ -45,6 +45,17 @@ public static class PassiveTreeManager
         return isFlatOrPoints
             ? (modifier.Value, 0.0f)
             : (0.0f, modifier.Value);
+    }
+
+    /// <summary>
+    /// Scaled split: flat/pct channels plus the optional scaling source.
+    /// Entries without a scaling_stat behave exactly like <see cref="SplitModifier"/>.
+    /// </summary>
+    public static (float Flat, float Pct, string ScalingStat, float ScalePer, bool HasScaling) SplitScaledModifier(TreeStatModifier modifier)
+    {
+        var (flat, pct) = SplitModifier(modifier);
+        bool hasScaling = !string.IsNullOrEmpty(modifier.ScalingStat);
+        return (flat, pct, modifier.ScalingStat, modifier.ScalePer, hasScaling);
     }
 
     /// <summary>

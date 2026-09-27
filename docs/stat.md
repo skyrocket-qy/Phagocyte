@@ -41,9 +41,18 @@ graph TD
 
 ## 2. 屬性底層計算模型 (`Stat.cs` & `CellStats.cs`)
 
-每個屬性封裝為獨立的數值對象，嚴格遵守**「簡約、無複雜 Scaling」**原則，僅採用標準的雙軌基礎疊加計算：
+每個屬性封裝為獨立的數值對象，基礎公式為標準的雙軌疊加計算：
 
 $$\text{FinalValue} = (\text{BaseValue} + \text{FlatBonus}) \times (1.0 + \text{PercentBonus})$$
+
+Flat/Pct 池由三種來源組成（Vistrace 式，見 `CellStats.ScaledRecord` / `StatRule`）：直接加成、縮放加成、內建跨屬性規則。
+
+縮放加成（per-modifier scaling）：`value × (sourceStat / scalePer)`，由 `scaling_stat` / `scale_per`
+在 modifier 條目中顯式聲明（gear / 天賦皆可選配，缺省即為舊行為）；任何屬性變動都會觸發
+`RecomputeScaled` 即時重算（fixed-point 上限 8 輪，循環會警告——約定為無環）。
+
+內建跨屬性規則：`flat += ratio × sourceStat`（flat 通道限定），由 `AddStatRule` 註冊，
+同樣即時重算、可精確移除。
 
 ```csharp
 // scripts/core/Stat.cs
@@ -78,9 +87,10 @@ public class Stat
 ```
 
 > [!IMPORTANT]
-> **拒絕隱性複合 Scaling 原則**：
-> - 🚫 不做屬性間的交叉非線性轉換（如「每 100 點生命增加 5% 傷害」）。
-> - ✅ 保持各屬性完全獨立運算，公式透明，便於後續數值平衡調優與極速 Debug。
+> **顯式 Scaling 原則**（取代舊版「拒絕隱性複合 Scaling」）：
+> - ✅ 允許屬性間交叉轉換（如「每 50 點生命 +1 護甲」），但必須在數據條目中顯式聲明（`scaling_stat` / `scale_per`），禁止隱性硬編碼。
+> - ✅ 縮放加成即時重算、`StatChanged` 發射前保證為最終值；移除時精確回滾。
+> - 🚫 縮放圖約定為無環；循環會被截斷並警告，不得依賴循環行為。
 
 ---
 
