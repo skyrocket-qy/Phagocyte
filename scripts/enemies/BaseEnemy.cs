@@ -8,7 +8,7 @@ using Phagocyte.UI;
 
 namespace Phagocyte.Enemies;
 
-public abstract partial class BaseEnemy : Node2D, IDamageable
+public abstract partial class BaseEnemy : Node2D, IDamageable, ISlowable
 {
     [Signal]
     public delegate void EnemyDiedEventHandler(BaseEnemy enemy);

@@ -16,7 +16,7 @@ namespace Phagocyte.Hero;
 /// Encapsulates universal stats, physics movement, 32-vertex organic deformation,
 /// and experience progression.
 /// </summary>
-public partial class BaseCell : CharacterBody2D
+public partial class BaseCell : CharacterBody2D, ISlowable
 {
     [Signal]
     public delegate void StatsChangedEventHandler(float health, float maxHealth, float radiusRatio);

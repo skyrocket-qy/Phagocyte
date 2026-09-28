@@ -61,9 +61,9 @@ public partial class InterferonWaveSkill : BaseSkill
             var tween = Host.CreateTween();
             tween.TweenProperty(n, "global_position", n.GlobalPosition + pushDir * 65.0f, 0.2f);
 
-            // Replication inhibition: 50% slow for 2s
-            if (n is BaseEnemy be)
-                be.ApplySlow(2.0f, 0.5f);
+            // Replication inhibition: 50% slow for 2s (any ISlowable host, GDScript fallback otherwise)
+            if (n is ISlowable slowable)
+                slowable.ApplySlow(2.0f, 0.5f);
             else if (n.HasMethod("apply_slow"))
                 n.Call("apply_slow", 2.0f, 0.5f);
 
