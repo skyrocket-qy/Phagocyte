@@ -1,9 +1,9 @@
 using Godot;
-using Phagocyte.Core;
+using Game.Core;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Audio manifest integrity: every BGM track and SFX name listed in
@@ -51,7 +51,7 @@ public partial class TestAudioAssets : TestHarness
         GD.Print($"[PASS] All {sfx.Count} manifest SFX names resolve to audio files.");
 
         // Previously silent gaps (wrong names): these helpers must hit real files.
-        AssertThat(AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.SfxCandidates("die_hero"))).IsNotNull();
+        AssertThat(AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.SfxCandidates("die_player"))).IsNotNull();
         AssertThat(AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.SfxCandidates("level_upgrade"))).IsNotNull();
         AssertThat(AssetLoader.TryLoadFirst<AudioStream>(AssetPaths.SfxCandidates("item_pickup"))).IsNotNull();
         GD.Print("[PASS] Remapped helpers (death/level-up/pickup) resolve to real files.");
@@ -64,3 +64,4 @@ public partial class TestAudioAssets : TestHarness
         return true;
     }
 }
+

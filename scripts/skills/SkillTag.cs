@@ -2,10 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
-/// The 7 PoE-style skill tags for Project: Phagocyte.
+/// The 7 PoE-style skill tags for Project: Game.
 /// Defines the archetype classification and indicates which universal stats scale each skill.
 /// </summary>
 public static class SkillTag

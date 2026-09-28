@@ -1,11 +1,11 @@
 using Godot;
 using Godot.Collections;
 using System;
-using Phagocyte.Core;
+using Game.Core;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Phase 4 balance regression guards (TODO.md §Phase 4):
@@ -49,15 +49,15 @@ public partial class TestGearBalance : TestHarness
         return true;
     }
 
-    private static GearChamber NewChamber(out CellStats stats)
+    private static EquipmentChamber NewChamber(out ActorStats stats)
     {
         var mock = new CharacterBody2D { Name = "BalanceHost" };
-        stats = new CellStats { Name = "CellStats" };
+        stats = new ActorStats { Name = "ActorStats" };
         // Determinism: zero the RNG-gated avoidance stats first.
         stats.SetBase("block", 0.0f);
         stats.SetBase("evasion", 0.0f);
         mock.AddChild(stats);
-        var chamber = new GearChamber { Name = "GearChamber" };
+        var chamber = new EquipmentChamber { Name = "EquipmentChamber" };
         mock.AddChild(chamber);
         // Not added to Root: pure-logic chamber needs no scene tree.
         chamber.Setup(mock);
@@ -67,13 +67,13 @@ public partial class TestGearBalance : TestHarness
     /// <summary>Base 6 budget: 4+3 overloads, 4+1+1 fits (first-wave opener bound).</summary>
     private void RunEnergyBudgetTests()
     {
-        AssertThat(GearChamber.BaseEnergy).IsEqual(6);
-        AssertThat(GearChamber.MaxSlots).IsEqual(4);
+        AssertThat(EquipmentChamber.BaseEnergy).IsEqual(6);
+        AssertThat(EquipmentChamber.MaxSlots).IsEqual(4);
 
-        AssertThat(GearChamber.ValidateSlots(
+        AssertThat(EquipmentChamber.ValidateSlots(
             new[] { "rough_er", "acidic_lysosome", "", "" }, out string overload)).IsFalse();
         AssertThat(overload).IsEqual("overload");
-        AssertThat(GearChamber.ValidateSlots(
+        AssertThat(EquipmentChamber.ValidateSlots(
             new[] { "rough_er", "chemokine_patch", "microtubule_anchor", "" }, out _)).IsTrue();
         GD.Print("[PASS] Base-6 budget: 4+3 overloads, 4+1+1 fits.");
     }
@@ -110,7 +110,7 @@ public partial class TestGearBalance : TestHarness
     /// <summary>amount+1 lives only on 4+ cost gear (opportunity-cost gate, any source).</summary>
     private void RunAmountLockTests()
     {
-        var catalog = GameManager.GearCatalog;
+        var catalog = GameManager.EquipmentCatalog;
         var amountSources = new System.Collections.Generic.List<string>();
         foreach (string id in catalog.Keys)
         {
@@ -135,7 +135,7 @@ public partial class TestGearBalance : TestHarness
     /// <summary>CDR/evasion/block hard caps hold under full chamber + passive stacking.</summary>
     private void RunHardCapTests()
     {
-        var stats = new CellStats { Name = "CapStats" };
+        var stats = new ActorStats { Name = "CapStats" };
         stats.SetBase("block", 0.0f);
         stats.SetBase("evasion", 0.0f);
 
@@ -172,9 +172,9 @@ public partial class TestGearBalance : TestHarness
     private void RunOpenerBoundTests()
     {
         float maxMight = 0.0f;
-        foreach (string id in GameManager.GearCatalog.Keys)
+        foreach (string id in GameManager.EquipmentCatalog.Keys)
         {
-            var entry = GameManager.GearCatalog[id].AsGodotDictionary();
+            var entry = GameManager.EquipmentCatalog[id].AsGodotDictionary();
             if (entry["energy_cost"].AsInt32() < 0)
                 continue;
             foreach (var mod in entry["modifiers"].AsGodotArray<Dictionary>())
@@ -186,16 +186,16 @@ public partial class TestGearBalance : TestHarness
         AssertThat(maxMight).IsEqualApprox(0.12f, 0.001f);
 
         // Energy is not a stat: no entry references it and the pool has no slot.
-        foreach (string id in GameManager.GearCatalog.Keys)
+        foreach (string id in GameManager.EquipmentCatalog.Keys)
         {
-            var entry = GameManager.GearCatalog[id].AsGodotDictionary();
+            var entry = GameManager.EquipmentCatalog[id].AsGodotDictionary();
             foreach (string listName in new[] { "modifiers", "drawback" })
             {
                 foreach (var mod in entry[listName].AsGodotArray<Dictionary>())
                     AssertThat(mod["stat"].AsString()).IsNotEqual("energy");
             }
         }
-        var probe = new CellStats { Name = "EnergyProbe" };
+        var probe = new ActorStats { Name = "EnergyProbe" };
         AssertThat(probe.GetStatObj("energy")).IsNull();
         probe.Free();
 

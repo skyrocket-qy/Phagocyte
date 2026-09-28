@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Unified runtime asset pipeline (vistrace DataLoader-style): every Resource

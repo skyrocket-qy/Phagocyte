@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Screen-space overlay for the first-run micro-cues (docs/tutorial.md §2):

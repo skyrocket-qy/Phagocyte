@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace Phagocyte.Combat;
+namespace Game.Combat;
 
 /// <summary>
 /// Pre-allocated GPU particle pool for combat impacts, cytoplasm bursts, and lysis reactions.
@@ -88,7 +88,7 @@ public partial class VfxManager : Node2D
             VfxType.CytoplasmSplatter => 24,
             VfxType.BiofilmBurst => 20,
             VfxType.MacRingBurst => 28,
-            VfxType.OpsoninBind => 10,
+            VfxType.MarkBind => 10,
             VfxType.PerforinPore => 14,
             VfxType.AcidOxidationSparks => 16,
             VfxType.BarbImpact => 12,
@@ -103,7 +103,7 @@ public partial class VfxManager : Node2D
             VfxType.CytoplasmSplatter => 0.35f,
             VfxType.BiofilmBurst => 0.40f,
             VfxType.MacRingBurst => 0.50f,
-            VfxType.OpsoninBind => 0.30f,
+            VfxType.MarkBind => 0.30f,
             VfxType.PerforinPore => 0.35f,
             VfxType.AcidOxidationSparks => 0.25f,
             VfxType.BarbImpact => 0.20f,
@@ -164,8 +164,8 @@ public partial class VfxManager : Node2D
                 mat.ScaleMax = 1.6f;
                 break;
 
-            case VfxType.OpsoninBind:
-                // Antibody Fab binding: soft opsonin gold tag sparks
+            case VfxType.MarkBind:
+                // Mark binding: soft gold tag sparks
                 mat.Color = new Color(1.0f, 0.82f, 0.35f, 0.95f);
                 mat.InitialVelocityMin = 40.0f;
                 mat.InitialVelocityMax = 110.0f;

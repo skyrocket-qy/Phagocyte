@@ -1,10 +1,10 @@
 using Godot;
 using System.Collections.Generic;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
-/// Centralized Audio Manager Autoload for Project: Phagocyte.
+/// Centralized Audio Manager Autoload for Project: Game.
 /// Manages high-performance SFX pooling and smooth BGM transitions.
 /// </summary>
 public partial class AudioManager : Node
@@ -86,7 +86,7 @@ public partial class AudioManager : Node
             "res://assets/audio/sfx/death.wav",
             "res://assets/audio/sfx/explosion.mp3",
             "res://assets/audio/sfx/combat/hit_sword_small.mp3",
-            "res://assets/audio/sfx/combat/die_hero.mp3",
+            "res://assets/audio/sfx/combat/die_player.mp3",
             "res://assets/audio/sfx/level_upgrade.mp3",
             "res://assets/audio/sfx/ui/ui_click.mp3",
             "res://assets/audio/sfx/ui/ui_confirm.mp3",
@@ -257,7 +257,7 @@ public partial class AudioManager : Node
 
     public void PlayPlayerDeath()
     {
-        PlaySfx("die_hero", 0.02f, 3.0f);
+        PlaySfx("die_player", 0.02f, 3.0f);
     }
 
     public void PlayLevelUp()
@@ -353,3 +353,4 @@ public partial class AudioManager : Node
         PlayBgm(track, fadeTime);
     }
 }
+

@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Core;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the map first-clear talent point pipeline and the innately lit start
@@ -29,7 +29,7 @@ public partial class TestTalentPipeline : TestHarness
     };
 
     private int _phase = 0;
-    private Main? _main = null;
+    private GameRoot? _main = null;
 
     public override void _Initialize()
     {
@@ -86,14 +86,14 @@ public partial class TestTalentPipeline : TestHarness
         // each awarding at least one microtube talent point.
         int normalClears = 0;
         int hardClears = 0;
-        foreach (string mapId in MapIds)
+        foreach (string stageId in MapIds)
         {
             bool foundNormal = false;
             bool foundHard = false;
             foreach (string achId in AchievementManager.Achievements.Keys)
             {
                 var ach = AchievementManager.Achievements[achId].AsGodotDictionary();
-                if (ach.GetValueOrDefault("map_id", "").AsString() != mapId)
+                if (ach.GetValueOrDefault("map_id", "").AsString() != stageId)
                     continue;
 
                 bool hard = ach.GetValueOrDefault("difficulty", "normal").AsString() == "hard";
@@ -188,7 +188,7 @@ public partial class TestTalentPipeline : TestHarness
         var main = InstantiateMain();
         _main = main;
 
-        var player = main.GetNodeOrNull<BaseCell>("Macrophage");
+        var player = main.GetNodeOrNull<PlayerActor>("Player");
         AssertThat(player).IsNotNull();
 
         // The innate hub is instantiated for free but carries no stat effects.
@@ -213,3 +213,4 @@ public partial class TestTalentPipeline : TestHarness
         GameManager.SelectedClass = "macrophage";
     }
 }
+

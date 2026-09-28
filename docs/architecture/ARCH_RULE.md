@@ -8,24 +8,30 @@ Ported from Vistrace-godot's 5-layer model, adapted to Phagocyte's
 
 ```text
 scripts/
-├── core/GameEvents.cs, IStatHost.cs, Morphology.cs, QuadTree.cs,   # [L1] DOMAIN
+├── core/GameEvents.cs, IStatHost.cs, BodyDeformation.cs, QuadTree.cs,   # [L1] DOMAIN
 │   SkillIds.cs, Stat.cs, TextFormatter.cs
 ├── core/assets/* (except none), core/data/CatalogLoader.cs,       # [L1] DOMAIN-infra
 │   DataPaths.cs, DataLoadException.cs
 ├── core/AchievementManager.cs, AudioManager.cs, GameManager.cs,    # [L2] AUTOLOAD
-│   RunRecordManager.cs, SettingsManager.cs, GearUnlockManager.cs,
+│   RunRecordManager.cs, SettingsManager.cs, EquipmentUnlockManager.cs,
 │   LoadoutManager.cs, PassiveTreeManager.cs, PauseManager.cs,
 │   JsonStore.cs, KeyBindings.cs, SteamBridge.cs, GameEvents.cs,
 │   data/CatalogBuilders.cs, data/DataValidator.cs
-├── combat/, hero/, camera/, enemies/, skills/, directors/, map/,  # [L3] GAMEPLAY
-│   gear/, endgame/, testing/
-│   + core/CellStats.cs, GearChamber.cs, GearDrop.cs,
+├── combat/, player/, camera/, enemies/, skills/, directors/, stages/,  # [L3] GAMEPLAY
+│   equipment/, testing/
+│   + core/ActorStats.cs, EquipmentChamber.cs, EquipmentDrop.cs,
 │     RunTelemetryManager.cs, UpgradeManager.cs
 ├── ui/ (except DamageNumberSpawner.cs)                             # [L4] UI
-├── Main.cs                                                         # [ROOT] composition root (unchecked)
+├── GameRoot.cs                                                     # [ROOT] composition root (unchecked)
 └── check_arch.py                                                   # enforcement
 tests/                                                              # [T] can import all (never checked)
 ```
+
+Engine rule (Phase 0): `Game.*` namespaces only. Heroes, enemies,
+stages, skills, equipment and mutators are data rows (JSON) driven by
+generic archetype executors (`PlayerActor`, `EnemyActor`, stage effects,
+salvo/beam/nova/zone/strike/aura, `StatPassive`) — never per-domain
+subclasses. A new behavior extends its archetype's schema.
 
 The full file→layer map lives in `scripts/check_arch.py`
 (`DOMAIN_FILES`, `AUTOLOAD_FILES`, `GAMEPLAY_PREFIXES`, `GAMEPLAY_FILES`,
@@ -35,21 +41,21 @@ The full file→layer map lives in `scripts/check_arch.py`
 
 | Layer | May import | Must NOT import |
 |---|---|---|
-| **L1 Domain** | C# stdlib, `System.Text.Json`, Godot math (`Vector2`, `Rect2`, `Color`, `Mathf`), `Resource`/`FileAccess` IO | `Node`/`Control`/`CharacterBody2D`, SceneTree (`GetTree`, `GetNode`, `CurrentScene`), gameplay actors (`BaseCell`, `BaseEnemy`, `SkillManager`, `GearChamber`, `CellStats`), autoloads (`GameManager`, `AudioManager`, `SettingsManager`, `AchievementManager`, `PassiveTreeManager`), any `scripts/ui/` type |
+| **L1 Domain** | C# stdlib, `System.Text.Json`, Godot math (`Vector2`, `Rect2`, `Color`, `Mathf`), `Resource`/`FileAccess` IO | `Node`/`Control`/`CharacterBody2D`, SceneTree (`GetTree`, `GetNode`, `CurrentScene`), gameplay actors (`PlayerActor`, `EnemyActor`, `SkillManager`, `EquipmentChamber`, `ActorStats`), autoloads (`GameManager`, `AudioManager`, `SettingsManager`, `AchievementManager`, `PassiveTreeManager`), any `scripts/ui/` type |
 | **L2 Autoload** | L1, Godot `Node` lifecycle | Concrete gameplay actors, any `scripts/ui/` type |
 | **L3 Gameplay** | L1, L2, Godot 2D physics | Concrete UI types (`Hud`, `*Modal`, `*View`, `UIOverlay/` lookups). SOLE EXCEPTION: the `DamageNumberSpawner` autoload (lives in `scripts/ui/` pending a move; gameplay→autoload is legal) |
 | **L4 UI** | L1, L2, L3 (read/intent only) | Sibling-modal manipulation stays signal-based |
-| **ROOT Main.cs** | All (assembler wiring) | — |
+| **ROOT GameRoot.cs** | All (assembler wiring) | — |
 
 ## 3. Inversion points (how gameplay talks to UI without depending on it)
 
 - `IDirectorHud` (`scripts/directors/IRunContext.cs`): `ShowOverdriveAlert`,
-  `PauseInputSuppressed`, `ResumeGame`. Implemented by `Phagocyte.UI.Hud`.
+  `PauseInputSuppressed`, `ResumeGame`. Implemented by `Game.UI.Hud`.
   Directors touch `IRunContext.HudNode` only.
 - `IRunSettlementModal`: `OpenSettlement(Dictionary)`. Implemented by
-  `Phagocyte.UI.RunRecordsModal`. Resolved via
+  `Game.UI.RunRecordsModal`. Resolved via
   `GetNodeOrNull<IRunSettlementModal>`, never the concrete type.
-- `Main` keeps the concrete `Hud? HudNode` property for wiring/tests and
+- `GameRoot` keeps the concrete `Hud? HudNode` property for wiring/tests and
   satisfies the interface explicitly
   (`IDirectorHud? IRunContext.HudNode => HudNode;`).
 

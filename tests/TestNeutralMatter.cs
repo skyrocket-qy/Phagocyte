@@ -2,12 +2,12 @@ using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Combat;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Combat;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies neutral environment matter (dormant toxin vesicles)
@@ -20,7 +20,7 @@ public partial class TestNeutralMatter : TestHarness
     private int _phase = 0;
     private bool _done = false;
     private Node2D? _container;
-    private BaseCell? _player;
+    private PlayerActor? _player;
 
     public override bool _Process(double delta)
     {
@@ -69,7 +69,7 @@ public partial class TestNeutralMatter : TestHarness
 
         _container = new Node2D { Name = "NeutralMatterContainer" };
         Root.AddChild(_container);
-        _player = new BaseCell { Name = "NeutralMatterHost", GlobalPosition = new Vector2(500, 500) };
+        _player = new PlayerActor { Name = "NeutralMatterHost", GlobalPosition = new Vector2(500, 500) };
         _container.AddChild(_player);
     }
 
@@ -79,19 +79,20 @@ public partial class TestNeutralMatter : TestHarness
         _player.Stats!.SetBase("max_health", 500.0f);
         _player.Health = 500.0f;
 
-        var vesicle = new DormantToxinVesicle { GlobalPosition = _player.GlobalPosition };
+        var vesicle = new ProximityMine { GlobalPosition = _player.GlobalPosition };
         _container!.AddChild(vesicle);
 
-        int hazardsBefore = CountChildren<BioHazardArea>();
+        int hazardsBefore = CountChildren<HazardZone>();
         vesicle._PhysicsProcess(0.016);
 
         AssertThat(vesicle.HasExploded).IsTrue();
-        AssertThat(CountChildren<BioHazardArea>()).IsEqual(hazardsBefore + 1);
+        AssertThat(CountChildren<HazardZone>()).IsEqual(hazardsBefore + 1);
 
         // Enemy contact also triggers the mine (friendly fire)
-        var staph = new StaphEnemy { GlobalPosition = new Vector2(1500, 1500) };
+        var staph = EnemySpawner.CreateEnemy("staph")!;
+        staph.GlobalPosition = new Vector2(1500, 1500);
         _container.AddChild(staph);
-        var vesicle2 = new DormantToxinVesicle { GlobalPosition = new Vector2(1500, 1500) };
+        var vesicle2 = new ProximityMine { GlobalPosition = new Vector2(1500, 1500) };
         _container.AddChild(vesicle2);
         vesicle2._PhysicsProcess(0.016);
 
@@ -106,7 +107,8 @@ public partial class TestNeutralMatter : TestHarness
         HostUlceration.Reset();
         AssertThat(HostUlceration.Pulses).IsEqual(0);
 
-        var invader = new HpyloriEnemy { GlobalPosition = Vector2.Zero };
+        var invader = EnemySpawner.CreateEnemy("h_pylori")!;
+        invader.GlobalPosition = Vector2.Zero;
         _container!.AddChild(invader);
 
         // Below threshold: invaders head for host tissue anchors
@@ -122,10 +124,13 @@ public partial class TestNeutralMatter : TestHarness
         // Pulses secrete a short-lived acid lesion at the latched site
         HostUlceration.Reset();
         invader.GlobalPosition = new Vector2(220, 0);
-        int lesionsBefore = CountChildren<BioHazardArea>();
-        invader.EmitUlcerationPulse();
+        invader.GlobalPosition = EnemySteering.GetNearestTissueAnchor(invader.GlobalPosition);
+        EnemySteering.GetDirection(invader, 0.016f);
+        int lesionsBefore = CountChildren<HazardZone>();
+        invader._PhysicsProcess(1.1);
         AssertThat(HostUlceration.Pulses).IsEqual(1);
-        AssertThat(CountChildren<BioHazardArea>()).IsEqual(lesionsBefore + 1);
+        AssertThat(invader.LatchPulses).IsEqual(1);
+        AssertThat(CountChildren<HazardZone>()).IsEqual(lesionsBefore + 1);
         GD.Print("[PASS] Host ulceration registers pulses and secretes acid lesions.");
         invader.QueueFree();
     }
@@ -136,24 +141,24 @@ public partial class TestNeutralMatter : TestHarness
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = "acute_wound";
 
-        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         Root.AddChild(main);
         main.SetPhysicsProcess(false);
 
         int vesicleCount = 0;
         foreach (var child in main.EnemyContainer!.GetChildren())
         {
-            if (child is DormantToxinVesicle)
+            if (child is ProximityMine)
                 vesicleCount++;
         }
 
         AssertThat(vesicleCount).IsEqual(3);
 
         // Neutrals never consume pathogen screen-cap slots
-        int pathogensBefore = main.ActivePathogenCount;
-        var extraVesicle = new DormantToxinVesicle { GlobalPosition = new Vector2(100, 100) };
+        int pathogensBefore = main.ActiveEnemyCount;
+        var extraVesicle = new ProximityMine { GlobalPosition = new Vector2(100, 100) };
         main.EnemyContainer.AddChild(extraVesicle);
-        AssertThat(main.ActivePathogenCount).IsEqual(pathogensBefore);
+        AssertThat(main.ActiveEnemyCount).IsEqual(pathogensBefore);
 
         // Ulceration environment degradation spawns ambient acid mist
         for (int i = 0; i < HostUlceration.EnvironmentThreshold; i++)
@@ -163,7 +168,7 @@ public partial class TestNeutralMatter : TestHarness
         int hazardsBefore = 0;
         foreach (var child in main.EnemyContainer.GetChildren())
         {
-            if (child is BioHazardArea)
+            if (child is HazardZone)
                 hazardsBefore++;
         }
 
@@ -172,12 +177,12 @@ public partial class TestNeutralMatter : TestHarness
         int hazardsAfter = 0;
         foreach (var child in main.EnemyContainer.GetChildren())
         {
-            if (child is BioHazardArea)
+            if (child is HazardZone)
                 hazardsAfter++;
         }
         AssertThat(hazardsAfter).IsEqual(hazardsBefore + 1);
 
-        GD.Print("[PASS] Main seeds neutrals, keeps them out of the cap, and ulceration degrades the arena.");
+        GD.Print("[PASS] GameRoot seeds neutrals, keeps them out of the cap, and ulceration degrades the arena.");
         main.QueueFree();
     }
 
@@ -192,3 +197,4 @@ public partial class TestNeutralMatter : TestHarness
         return count;
     }
 }
+

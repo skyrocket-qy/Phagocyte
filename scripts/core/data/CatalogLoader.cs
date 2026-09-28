@@ -1,7 +1,7 @@
 using Godot;
 using Godot.Collections;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Unified JSON catalog pipeline (Phase 3, vistrace-style): one tolerant

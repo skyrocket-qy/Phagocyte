@@ -2,11 +2,11 @@ using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Combat;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Combat;
+using Game.Enemies;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the five 15:00 map terminal bosses and their signature mechanics.
@@ -17,7 +17,7 @@ public partial class TestTerminalBosses : SceneTree
     private int _frame = 0;
     private bool _done = false;
     private Node2D? _container;
-    private BaseCell? _player;
+    private PlayerActor? _player;
 
     public override bool _Process(double delta)
     {
@@ -51,7 +51,7 @@ public partial class TestTerminalBosses : SceneTree
     {
         _container = new Node2D { Name = "TerminalBossTestContainer" };
         Root.AddChild(_container);
-        _player = new BaseCell { Name = "TerminalBossHost", GlobalPosition = new Vector2(400, 400) };
+        _player = new PlayerActor { Name = "TerminalBossHost", GlobalPosition = new Vector2(400, 400) };
         _container.AddChild(_player);
 
         TestMapMapping();
@@ -66,13 +66,13 @@ public partial class TestTerminalBosses : SceneTree
 
     private void TestMapMapping()
     {
-        AssertThat(PathogenSpawner.CreateTerminalBoss("acute_wound") is MrsASuperColony).IsTrue();
-        AssertThat(PathogenSpawner.CreateTerminalBoss("alveolar_space") is SyncytialMegaCapsid).IsTrue();
-        AssertThat(PathogenSpawner.CreateTerminalBoss("hepatic_sinusoid") is PlasmodiumMacroSchizont).IsTrue();
-        AssertThat(PathogenSpawner.CreateTerminalBoss("gastric_lumen") is HpyloriBiofilmCore).IsTrue();
-        AssertThat(PathogenSpawner.CreateTerminalBoss("blood_brain_barrier") is PrpscAmyloidAggregate).IsTrue();
+        AssertThat(EnemySpawner.CreateTerminalBoss("acute_wound")!.EnemyId).IsEqual("mrsa_super_colony");
+        AssertThat(EnemySpawner.CreateTerminalBoss("alveolar_space")!.EnemyId).IsEqual("syncytial_mega_capsid");
+        AssertThat(EnemySpawner.CreateTerminalBoss("hepatic_sinusoid")!.EnemyId).IsEqual("plasmodium_macro_schizont");
+        AssertThat(EnemySpawner.CreateTerminalBoss("gastric_lumen")!.EnemyId).IsEqual("hpylori_biofilm_core");
+        AssertThat(EnemySpawner.CreateTerminalBoss("blood_brain_barrier")!.EnemyId).IsEqual("prpsc_amyloid_aggregate");
 
-        var spawned = PathogenSpawner.SpawnTerminalBoss(_container!, _player!, new Vector2(4800, 4800), "acute_wound");
+        var spawned = EnemySpawner.SpawnTerminalBoss(_container!, _player!, new Vector2(4800, 4800), "acute_wound");
         AssertThat(spawned).IsNotNull();
         AssertThat(spawned!.IsBoss).IsTrue();
         AssertThat(spawned.GetNodeOrNull("BossPhaseComponent")).IsNotNull();
@@ -83,26 +83,27 @@ public partial class TestTerminalBosses : SceneTree
 
     private void TestMrsaSuperColony()
     {
-        var mrsa = new MrsASuperColony { GlobalPosition = new Vector2(900, 900) };
+        var mrsa = EnemySpawner.CreateEnemy("mrsa_super_colony")!;
+        mrsa.GlobalPosition = new Vector2(900, 900);
         _container!.AddChild(mrsa);
 
         mrsa.TakeDamage(9999999.0f);
-        AssertThat(mrsa.HasSplit).IsTrue();
 
         int elites = 0;
         foreach (var child in _container.GetChildren())
         {
-            if (child is MrsaEnragedElite)
+            if (child is EnemyActor elite && elite.EnemyId == "mrsa_enraged_elite")
                 elites++;
         }
 
-        AssertThat(elites).IsEqual(MrsASuperColony.SplitCount);
+        AssertThat(elites).IsEqual(4);
         GD.Print("[PASS] MRSA Super-Colony ruptured into four enraged child elites.");
     }
 
     private void TestSyncytialMegaCapsid()
     {
-        var capsid = new SyncytialMegaCapsid { GlobalPosition = _player!.GlobalPosition + new Vector2(120, 0) };
+        var capsid = EnemySpawner.CreateEnemy("syncytial_mega_capsid")!;
+        capsid.GlobalPosition = _player!.GlobalPosition + new Vector2(120, 0);
         _container!.AddChild(capsid);
 
         _player.SlowTimer = 0.0f;
@@ -110,8 +111,8 @@ public partial class TestTerminalBosses : SceneTree
         AssertThat(_player.SlowTimer).IsGreater(0.0f);
 
         Vector2 velocityBefore = _player.Velocity;
-        capsid.TriggerTractionPulse();
-        AssertThat(capsid.TractionPulses).IsEqual(1);
+        for (int i = 0; i < 366; i++)
+            capsid._PhysicsProcess(1.0 / 60.0);
         AssertThat(_player.Velocity.DistanceTo(velocityBefore) > 1.0f).IsTrue();
 
         // Traction field widens as the boss loses HP
@@ -125,39 +126,39 @@ public partial class TestTerminalBosses : SceneTree
 
     private void TestPlasmodiumMacroSchizont()
     {
-        var schizont = new PlasmodiumMacroSchizont { GlobalPosition = new Vector2(1800, 1800) };
+        var schizont = EnemySpawner.CreateEnemy("plasmodium_macro_schizont")!;
+        schizont.GlobalPosition = new Vector2(1800, 1800);
         _container!.AddChild(schizont);
 
         schizont.TakeDamage(300.0f);
         float hpBefore = schizont.CurrentHealth;
-        schizont.FeedOnRbc();
-        AssertThat(schizont.FeedsCount).IsEqual(1);
+        schizont._PhysicsProcess(5.1);
         AssertThat(schizont.CurrentHealth).IsGreater(hpBefore);
 
         schizont.TakeDamage(9999999.0f);
-        AssertThat(schizont.HasRuptured).IsTrue();
 
         int merozoites = 0;
         foreach (var child in _container.GetChildren())
         {
-            if (child is PlasmodiumMerozoite)
+            if (child is EnemyActor mero && mero.EnemyId == "plasmodium_merozoite")
                 merozoites++;
         }
 
-        AssertThat(merozoites).IsGreaterEqual(PlasmodiumMacroSchizont.MerozoiteBurstCount);
+        AssertThat(merozoites).IsGreaterEqual(10);
         GD.Print("[PASS] Plasmodium Macro-Schizont fed on RBCs to heal and burst into merozoites.");
     }
 
     private void TestHpyloriBiofilmCore()
     {
-        var core = new HpyloriBiofilmCore { GlobalPosition = _player!.GlobalPosition + new Vector2(60, 0) };
+        var core = EnemySpawner.CreateEnemy("hpylori_biofilm_core")!;
+        core.GlobalPosition = _player!.GlobalPosition + new Vector2(60, 0);
         _container!.AddChild(core);
 
-        core.SpawnAcidScar();
-        HpyloriAcidScar? scar = null;
+        core._PhysicsProcess(6.1);
+        HazardZone? scar = null;
         foreach (var child in _container.GetChildren())
         {
-            if (child is HpyloriAcidScar found)
+            if (child is HazardZone found)
             {
                 scar = found;
                 break;
@@ -166,9 +167,10 @@ public partial class TestTerminalBosses : SceneTree
         AssertThat(scar).IsNotNull();
         AssertThat(scar!.Duration).IsGreater(1000.0f);
 
+        _player.Stats!.SetBase("block", 0.0f);
+        _player.Stats.SetBase("evasion", 0.0f);
         float hpBefore = _player.Health;
-        core.TriggerToxinTick();
-        AssertThat(core.ToxinTicks).IsEqual(1);
+        core._PhysicsProcess(1.0);
         AssertThat(_player.Health).IsLess(hpBefore);
 
         GD.Print("[PASS] H. pylori Biofilm Core left permanent acid muck and pulsed its spiral toxin storm.");
@@ -177,7 +179,8 @@ public partial class TestTerminalBosses : SceneTree
 
     private void TestPrpscAmyloidAggregate()
     {
-        var amyloid = new PrpscAmyloidAggregate { GlobalPosition = new Vector2(3600, 3600) };
+        var amyloid = EnemySpawner.CreateEnemy("prpsc_amyloid_aggregate")!;
+        amyloid.GlobalPosition = new Vector2(3600, 3600);
         _container!.AddChild(amyloid);
 
         AssertThat(amyloid.ShellIntact).IsTrue();
@@ -192,7 +195,7 @@ public partial class TestTerminalBosses : SceneTree
         amyloid.TakeDamage(2000.0f);
         AssertThat(amyloid.ShellBroken).IsTrue();
         AssertThat(amyloid.ShellIntact).IsFalse();
-        AssertThat(amyloid.Armor).IsEqual(PrpscAmyloidAggregate.BrokenArmor);
+        AssertThat(amyloid.Armor).IsEqual(6.0f);
 
         GD.Print("[PASS] PrPsc Amyloid Aggregate crystalline shell absorbed damage until shattered.");
         amyloid.QueueFree();

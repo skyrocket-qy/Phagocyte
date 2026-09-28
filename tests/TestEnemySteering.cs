@@ -1,12 +1,12 @@
-﻿using Godot;
+using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Combat;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Combat;
+using Game.Enemies;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the four-mode threat-intent steering model (docs/pathogen.md):
@@ -18,7 +18,7 @@ public partial class TestEnemySteering : SceneTree
     private int _frame = 0;
     private bool _done = false;
     private Node2D? _container;
-    private BaseCell? _player;
+    private PlayerActor? _player;
 
     public override bool _Process(double delta)
     {
@@ -54,7 +54,7 @@ public partial class TestEnemySteering : SceneTree
 
         _container = new Node2D { Name = "SteeringTestContainer" };
         Root.AddChild(_container);
-        _player = new BaseCell { Name = "SteeringTestHost", GlobalPosition = new Vector2(600, 0) };
+        _player = new PlayerActor { Name = "SteeringTestHost", GlobalPosition = new Vector2(600, 0) };
         _container.AddChild(_player);
 
         TestModeMapping();
@@ -70,28 +70,28 @@ public partial class TestEnemySteering : SceneTree
 
     private void TestModeMapping()
     {
-        AssertThat(new StaphEnemy().ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
-        AssertThat(new NorovirusEnemy().ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
-        AssertThat(new EColiEnemy().ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
-        AssertThat(new PseudomonasEnemy().ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
-        AssertThat(new TbEnemy().ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
-        AssertThat(new FluDriftEnemy().ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
-        AssertThat(new EbolaEnemy().ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
-        AssertThat(new MalignantCellEnemy().ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
-        AssertThat(new PrionEnemy().ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
-        AssertThat(new HivEnemy().ThreatMode).IsEqual(EnemyThreatMode.Interceptor);
-        AssertThat(new RabiesEnemy().ThreatMode).IsEqual(EnemyThreatMode.Interceptor);
-        AssertThat(new SVirusEnemy().ThreatMode).IsEqual(EnemyThreatMode.Standoff);
-        AssertThat(new TetanusEnemy().ThreatMode).IsEqual(EnemyThreatMode.Standoff);
-        AssertThat(new HpyloriEnemy().ThreatMode).IsEqual(EnemyThreatMode.Invader);
-        AssertThat(new AnthraxSporeEnemy().ThreatMode).IsEqual(EnemyThreatMode.Drifter);
-        AssertThat(new ToxoplasmaEnemy().ThreatMode).IsEqual(EnemyThreatMode.Drifter);
+        AssertThat(EnemySpawner.CreateEnemy("staph")!.ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
+        AssertThat(EnemySpawner.CreateEnemy("norovirus")!.ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
+        AssertThat(EnemySpawner.CreateEnemy("e_coli")!.ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
+        AssertThat(EnemySpawner.CreateEnemy("pseudomonas")!.ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
+        AssertThat(EnemySpawner.CreateEnemy("tb")!.ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
+        AssertThat(EnemySpawner.CreateEnemy("flu_drift")!.ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
+        AssertThat(EnemySpawner.CreateEnemy("ebola")!.ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
+        AssertThat(EnemySpawner.CreateEnemy("malignant_cell")!.ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
+        AssertThat(EnemySpawner.CreateEnemy("prion")!.ThreatMode).IsEqual(EnemyThreatMode.ChemoChaser);
+        AssertThat(EnemySpawner.CreateEnemy("hiv")!.ThreatMode).IsEqual(EnemyThreatMode.Interceptor);
+        AssertThat(EnemySpawner.CreateEnemy("rabies")!.ThreatMode).IsEqual(EnemyThreatMode.Interceptor);
+        AssertThat(EnemySpawner.CreateEnemy("s_virus")!.ThreatMode).IsEqual(EnemyThreatMode.Standoff);
+        AssertThat(EnemySpawner.CreateEnemy("tetanus")!.ThreatMode).IsEqual(EnemyThreatMode.Standoff);
+        AssertThat(EnemySpawner.CreateEnemy("h_pylori")!.ThreatMode).IsEqual(EnemyThreatMode.Invader);
+        AssertThat(EnemySpawner.CreateEnemy("anthrax_spore")!.ThreatMode).IsEqual(EnemyThreatMode.Drifter);
+        AssertThat(EnemySpawner.CreateEnemy("toxoplasma")!.ThreatMode).IsEqual(EnemyThreatMode.Drifter);
 
-        var chainLord = PathogenSpawner.CreateSubBoss("acute_wound");
+        var chainLord = EnemySpawner.CreateSubBoss("acute_wound");
         AssertThat(chainLord).IsNotNull();
         AssertThat(chainLord!.ThreatMode).IsEqual(EnemyThreatMode.Interceptor);
 
-        var terminal = PathogenSpawner.CreateTerminalBoss("acute_wound");
+        var terminal = EnemySpawner.CreateTerminalBoss("acute_wound");
         AssertThat(terminal).IsNotNull();
         AssertThat(terminal!.ThreatMode).IsEqual(EnemyThreatMode.Drifter);
         GD.Print("[PASS] Threat-mode assignment verified across the pathogen roster.");
@@ -99,7 +99,8 @@ public partial class TestEnemySteering : SceneTree
 
     private void TestChemoChaserSeek()
     {
-        var chaser = new StaphEnemy { GlobalPosition = new Vector2(-300, 0) };
+        var chaser = EnemySpawner.CreateEnemy("staph")!;
+        chaser.GlobalPosition = new Vector2(-300, 0);
         _container!.AddChild(chaser);
 
         Vector2 direction = EnemySteering.GetDirection(chaser, 0.016f);
@@ -111,7 +112,8 @@ public partial class TestEnemySteering : SceneTree
 
     private void TestInterceptorLead()
     {
-        var interceptor = new HivEnemy { GlobalPosition = Vector2.Zero };
+        var interceptor = EnemySpawner.CreateEnemy("hiv")!;
+        interceptor.GlobalPosition = Vector2.Zero;
         _container!.AddChild(interceptor);
 
         // Player moving right at 200px/s => aim 120px ahead (clamped lead)
@@ -129,7 +131,9 @@ public partial class TestEnemySteering : SceneTree
     private void TestStandoffOrbit()
     {
         _player!.GlobalPosition = Vector2.Zero;
-        var artillery = new SVirusEnemy { GlobalPosition = new Vector2(300, 0), SteeringOrbitSign = 1.0f };
+        var artillery = EnemySpawner.CreateEnemy("s_virus")!;
+        artillery.GlobalPosition = new Vector2(300, 0);
+        artillery.SteeringOrbitSign = 1.0f;
         _container!.AddChild(artillery);
 
         // In-band: orbit tangentially
@@ -152,14 +156,15 @@ public partial class TestEnemySteering : SceneTree
     private void TestStandoffPellets()
     {
         _player!.GlobalPosition = new Vector2(600, 0);
-        var artillery = new SVirusEnemy { GlobalPosition = new Vector2(250, 0) };
+        var artillery = EnemySpawner.CreateEnemy("s_virus")!;
+        artillery.GlobalPosition = new Vector2(250, 0);
         _container!.AddChild(artillery);
 
-        artillery.FireSpikePellet(_player.GlobalPosition);
-        EnemyPellet? pellet = null;
+        artillery._PhysicsProcess(2.6);
+        EnemyProjectile? pellet = null;
         foreach (var child in _container.GetChildren())
         {
-            if (child is EnemyPellet found)
+            if (child is EnemyProjectile found)
             {
                 pellet = found;
                 break;
@@ -169,18 +174,29 @@ public partial class TestEnemySteering : SceneTree
         AssertThat(pellet!.IsInGroup("enemy_shots")).IsTrue();
 
         // Soft cap holds under pressure
-        for (int i = 0; i < EnemyPellet.MaxActivePellets + 40; i++)
+        for (int i = 0; i < EnemyProjectile.MaxActivePellets + 40; i++)
         {
-            artillery.FireSpikePellet(_player.GlobalPosition);
+            artillery._PhysicsProcess(2.6);
         }
-        AssertThat(EnemyPellet.ActiveCount).IsLessEqual(EnemyPellet.MaxActivePellets);
-        GD.Print($"[PASS] Standoff pellets spawn and the soft cap holds at {EnemyPellet.MaxActivePellets}.");
+        AssertThat(EnemyProjectile.ActiveCount).IsLessEqual(EnemyProjectile.MaxActivePellets);
+        GD.Print($"[PASS] Standoff pellets spawn and the soft cap holds at {EnemyProjectile.MaxActivePellets}.");
         artillery.QueueFree();
+        foreach (var child in _container.GetChildren())
+        {
+            // Immediate removal (not QueueFree): the freed-pending count must
+            // not pollute the tetanus artillery test below.
+            if (child is EnemyProjectile spent)
+            {
+                _container.RemoveChild(spent);
+                spent.Free();
+            }
+        }
     }
 
     private void TestTissueInvader()
     {
-        var invader = new HpyloriEnemy { GlobalPosition = Vector2.Zero };
+        var invader = EnemySpawner.CreateEnemy("h_pylori")!;
+        invader.GlobalPosition = Vector2.Zero;
         _container!.AddChild(invader);
 
         Vector2 anchor = EnemySteering.GetNearestTissueAnchor(invader.GlobalPosition);
@@ -196,12 +212,12 @@ public partial class TestEnemySteering : SceneTree
         AssertThat(EnemySteering.IsInvaderLatched(invader)).IsTrue();
 
         invader._PhysicsProcess(1.2);
-        AssertThat(invader.UlcerationPulses).IsEqual(1);
+        AssertThat(invader.LatchPulses).IsEqual(1);
 
         int lesions = 0;
         foreach (var child in _container.GetChildren())
         {
-            if (child is BioHazardArea)
+            if (child is HazardZone)
                 lesions++;
         }
         AssertThat(lesions).IsEqual(1);
@@ -212,7 +228,8 @@ public partial class TestEnemySteering : SceneTree
     private void TestTetanusArtillery()
     {
         _player!.GlobalPosition = new Vector2(900, 0);
-        var tetanus = new TetanusEnemy { GlobalPosition = new Vector2(480, 0) };
+        var tetanus = EnemySpawner.CreateEnemy("tetanus")!;
+        tetanus.GlobalPosition = new Vector2(480, 0);
         _container!.AddChild(tetanus);
 
         for (int i = 0; i < 320; i++)
@@ -220,10 +237,10 @@ public partial class TestEnemySteering : SceneTree
             tetanus._PhysicsProcess(1.0 / 60.0);
         }
 
-        TetanusPulse? pulse = null;
+        EnemyProjectile? pulse = null;
         foreach (var child in _container.GetChildren())
         {
-            if (child is TetanusPulse found)
+            if (child is EnemyProjectile found && found.StunDuration > 0.0f)
             {
                 pulse = found;
                 break;
@@ -236,3 +253,4 @@ public partial class TestEnemySteering : SceneTree
         tetanus.QueueFree();
     }
 }
+

@@ -1,13 +1,13 @@
 using Godot;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
-using Phagocyte.UI;
+using Game.Core;
+using Game.Player;
+using Game.Skills;
+using Game.UI;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 public partial class TestCodexAndTooltip : TestHarness
 {
@@ -38,10 +38,10 @@ public partial class TestCodexAndTooltip : TestHarness
             return false;
 
         _testDone = true;
-        var main = Root.GetNodeOrNull<Node>("Main");
+        var main = Root.GetNodeOrNull<Node>("GameRoot");
         if (main == null)
         {
-            GD.PrintErr("[FAIL] Main scene not found");
+            GD.PrintErr("[FAIL] GameRoot scene not found");
             Quit(1);
             return true;
         }
@@ -60,17 +60,17 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(GameManager.SkillCatalog.ContainsKey("ros_torrent")).IsTrue();
         GD.Print("[PASS] GameManager.SkillCatalog contains complete skill definitions.");
 
-        AssertThat(GameManager.PathogenCatalog.Count >= 20).IsTrue();
-        GD.Print($"[PASS] GameManager.PathogenCatalog contains {GameManager.PathogenCatalog.Count} complete pathogen definitions.");
+        AssertThat(GameManager.EnemyCatalog.Count >= 20).IsTrue();
+        GD.Print($"[PASS] GameManager.EnemyCatalog contains {GameManager.EnemyCatalog.Count} complete pathogen definitions.");
 
         // 2. Verify In-Game Skill Tooltip
         var skillTooltip = hud.SkillTooltip;
         AssertThat(skillTooltip).IsNotNull();
 
         // Macrophage starts with the innate active (吞噬偽足) in slot 0; draft a ranged weapon to test the active tooltip
-        var player = main.GetNodeOrNull<BaseCell>("Macrophage");
+        var player = main.GetNodeOrNull<PlayerActor>("Player");
         AssertThat(player).IsNotNull();
-        AssertThat(player!.CellSkillManager!.EquipActive(new RosTorrentSkill(), 1)).IsTrue();
+        AssertThat(player!.CellSkillManager!.EquipActive(SkillFactory.CreateActive("ros_torrent")!, 1)).IsTrue();
         hud.UpdateSkillSlots();
 
         var slotsContainer = hud.SlotsContainer;
@@ -137,17 +137,17 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(itemList.GetChildCount() >= 5).IsTrue();
         GD.Print($"[PASS] Codex Immune Cells tab displays {itemList.GetChildCount()} cells.");
 
-        // Switch to Tab 3 (Pathogens, 20 regulars)
+        // Switch to Tab 3 (Enemies, 20 regulars)
         codexModal.SwitchTab(3);
         AssertThat(itemList.GetChildCount() >= 4).IsTrue();
-        GD.Print($"[PASS] Codex Pathogen Catalog tab displays {itemList.GetChildCount()} pathogens.");
+        GD.Print($"[PASS] Codex Enemy Catalog tab displays {itemList.GetChildCount()} pathogens.");
 
         // Boss archive lives on its own tab (Tab 6): 11 notorious historical pathogens
         AssertThat(GameManager.BossCatalog.Count).IsEqual(11);
         codexModal.SwitchTab(6);
         AssertThat(codexModal.CurrentTab).IsEqual(6);
         AssertThat(itemList.GetChildCount()).IsEqual(11);
-        codexModal.SelectPathogen("fludust_cyclone");
+        codexModal.SelectEnemy("fludust_cyclone");
         GD.Print("[PASS] Codex boss archive tab lists 11 bosses with historical lore.");
 
         // Switch to Tab 4 (Maps)
@@ -155,11 +155,11 @@ public partial class TestCodexAndTooltip : TestHarness
         AssertThat(itemList.GetChildCount() >= 2).IsTrue();
         GD.Print($"[PASS] Codex Pathological Stages tab displays {itemList.GetChildCount()} maps.");
 
-        // Switch to Tab 5 (Gear)
+        // Switch to Tab 5 (Equipment)
         codexModal.SwitchTab(5);
         AssertThat(codexModal.CurrentTab).IsEqual(5);
-        AssertThat(itemList.GetChildCount()).IsEqual(GameManager.GearCatalog.Count);
-        GD.Print($"[PASS] Codex Gear tab displays {itemList.GetChildCount()} chamber equipment entries.");
+        AssertThat(itemList.GetChildCount()).IsEqual(GameManager.EquipmentCatalog.Count);
+        GD.Print($"[PASS] Codex Equipment tab displays {itemList.GetChildCount()} chamber equipment entries.");
 
         // Achievements moved out of the Codex: MainMenu AchievementView owns them.
         // Bosses (Tab 6) is the last Codex tab; out-of-range indices must be ignored.
@@ -231,3 +231,4 @@ public partial class TestCodexAndTooltip : TestHarness
         return true;
     }
 }
+

@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://xp0561dcr5n7" path="res://scripts/ui/LoadoutView.cs" id="1_loadout"]
 [ext_resource type="Script" uid="uid://t50lekrjiilm" path="res://scripts/ui/EnergyPips.cs" id="2_pips"]
 [ext_resource type="Shader" uid="uid://bcvuhfjeyxhwt" path="res://shaders/codex_grid_bg.gdshader" id="3_grid_shader"]
-[ext_resource type="Script" uid="uid://dme50k8dk7dpd" path="res://scripts/ui/ChamberLinks.cs" id="4_links"]
+[ext_resource type="Script" uid="uid://dme50k8dk7dpd" path="res://scripts/ui/LoadoutLinks.cs" id="4_links"]
 [ext_resource type="Texture2D" uid="uid://tgcu6j4thisj" path="res://assets/sprites/ui/menu/cell.jpeg" id="5_cell"]
 [ext_resource type="PackedScene" path="res://scenes/ui/stat_preview.tscn" id="6_stats"]
 [ext_resource type="PackedScene" path="res://scenes/ui/gear_slot.tscn" id="7_slots"]

@@ -2,18 +2,18 @@ using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.UI;
+using Game.Core;
+using Game.Player;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 [TestSuite]
 public partial class TestRunRecords : TestHarness
 {
     private int _phase = 0;
     private int _phaseFrames = 0;
-    private Main? _main = null;
+    private GameRoot? _main = null;
 
     public override void _Initialize()
     {
@@ -337,9 +337,9 @@ public partial class TestRunRecords : TestHarness
 
     private void PhaseDeathAndRevival()
     {
-        var cellScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+        var cellScene = AssetLoader.Load<PackedScene>("res://scenes/actors/player_base.tscn");
 
-        var doomed = cellScene.Instantiate<Macrophage>();
+        var doomed = cellScene.Instantiate<PlayerActor>();
         Root.AddChild(doomed);
         // Damage math below must not be nullified by the innate block/evasion roll.
         doomed.Stats!.SetBase("block", 0.0f);
@@ -352,7 +352,7 @@ public partial class TestRunRecords : TestHarness
         AssertThat(doomed.Health).IsEqual(0.0f);
         doomed.QueueFree();
 
-        var survivor = cellScene.Instantiate<Macrophage>();
+        var survivor = cellScene.Instantiate<PlayerActor>();
         Root.AddChild(survivor);
         survivor.Stats!.SetBase("block", 0.0f);
         survivor.Stats.SetBase("evasion", 0.0f);
@@ -368,7 +368,7 @@ public partial class TestRunRecords : TestHarness
 
     private void PhaseStartMainScene()
     {
-        _main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        _main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         Root.AddChild(_main);
         AssertThat(_main.RunGoalSeconds).IsGreater(0.0f);
         AssertThat(_main.RunEnded).IsFalse();
@@ -416,10 +416,10 @@ public partial class TestRunRecords : TestHarness
 
     private void PhaseDefeatSettlement()
     {
-        var main2 = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main2 = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         Root.AddChild(main2);
 
-        var player = main2.GetNodeOrNull<BaseCell>("Macrophage");
+        var player = main2.GetNodeOrNull<PlayerActor>("Player");
         AssertThat(player).IsNotNull();
 
         // Lethal damage must not be nullified by the innate block/evasion roll.
@@ -456,3 +456,5 @@ public partial class TestRunRecords : TestHarness
         RestoreSaves();
     }
 }
+
+

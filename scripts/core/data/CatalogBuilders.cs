@@ -1,9 +1,9 @@
 using Godot;
 using Godot.Collections;
 using System.Collections.Generic;
-using static Phagocyte.Core.PassiveTreeManager;
+using static Game.Core.PassiveTreeManager;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Per-catalog assembly: JSON rows → runtime dictionaries with schema defaults
@@ -38,7 +38,10 @@ public static class CatalogBuilders
                     { "image_path", AssetPaths.SkillIcon(id) },
                     { "tags", CatalogLoader.GetStringArray(row, "tags") },
                     { "damage_per_level", CatalogLoader.GetFloatArray(row, "damage_per_level") },
-                    { "cooldown_per_level", CatalogLoader.GetFloatArray(row, "cooldown_per_level") }
+                    { "cooldown_per_level", CatalogLoader.GetFloatArray(row, "cooldown_per_level") },
+                    { "archetype", CatalogLoader.GetString(row, "archetype") },
+                    { "params", row.TryGetValue("params", out Variant sxVal) ? sxVal : new Dictionary() },
+                    { "mods", row.TryGetValue("mods", out Variant smVal) ? smVal : new Array() }
                 };
             }
         }
@@ -47,7 +50,7 @@ public static class CatalogBuilders
     }
 
     /// <summary>
-    /// Gear chamber catalog (TODO Phase 0): equipment definitions for the
+    /// Equipment chamber catalog (TODO Phase 0): equipment definitions for the
     /// 2x2 chamber. energy_cost in [-1, 4] (-1 = +1 generator, must carry a
     /// drawback); modifiers/drawback share the passive-trait {stat, value, unit}
     /// convention (flat / percent / percentagepoints).
@@ -64,21 +67,21 @@ public static class CatalogBuilders
     {
         var table = new Dictionary();
         var seen = new HashSet<string>();
-        foreach (var row in CatalogLoader.LoadArray(DataPaths.Gear))
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.Equipment))
         {
             string id = CatalogLoader.GetString(row, "id");
             if (string.IsNullOrEmpty(id) || !seen.Add(id))
-                throw new DataLoadException(DataPaths.Gear, $"Duplicate or missing gear id '{id}'.");
+                throw new DataLoadException(DataPaths.Equipment, $"Duplicate or missing gear id '{id}'.");
             string category = CatalogLoader.GetString(row, "category");
             if (!GearCategories.Contains(category))
-                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' has unknown category '{category}'.");
+                throw new DataLoadException(DataPaths.Equipment, $"Equipment '{id}' has unknown category '{category}'.");
             int energyCost = CatalogLoader.GetInt(row, "energy_cost");
             if (energyCost < GearMinEnergyCost || energyCost > GearMaxEnergyCost)
-                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' energy_cost {energyCost} outside [{GearMinEnergyCost}, {GearMaxEnergyCost}].");
+                throw new DataLoadException(DataPaths.Equipment, $"Equipment '{id}' energy_cost {energyCost} outside [{GearMinEnergyCost}, {GearMaxEnergyCost}].");
             var modifiers = ParseGearStatList(row, "modifiers", id);
             var drawback = ParseGearStatList(row, "drawback", id);
             if (energyCost < 0 && drawback.Count == 0)
-                throw new DataLoadException(DataPaths.Gear, $"Generator gear '{id}' must carry a drawback.");
+                throw new DataLoadException(DataPaths.Equipment, $"Generator gear '{id}' must carry a drawback.");
             table[id] = new Dictionary
             {
                 { "id", id },
@@ -106,22 +109,22 @@ public static class CatalogBuilders
         foreach (var item in listVar.AsGodotArray())
         {
             if (item.VariantType != Variant.Type.Dictionary)
-                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entries must be JSON objects.");
+                throw new DataLoadException(DataPaths.Equipment, $"Equipment '{id}' {key} entries must be JSON objects.");
             var md = item.AsGodotDictionary();
             string stat = CatalogLoader.GetString(md, "stat");
             if (string.IsNullOrEmpty(stat))
-                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry has no stat.");
+                throw new DataLoadException(DataPaths.Equipment, $"Equipment '{id}' {key} entry has no stat.");
             if (!PassiveTreeManager.HasStatLabel(stat))
-                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry references unknown stat '{stat}'.");
+                throw new DataLoadException(DataPaths.Equipment, $"Equipment '{id}' {key} entry references unknown stat '{stat}'.");
             string unit = CatalogLoader.GetString(md, "unit", "flat");
             if (!System.Enum.TryParse<PassiveTreeManager.TreeModifierUnit>(unit, true, out _))
-                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry has unknown unit '{unit}'.");
+                throw new DataLoadException(DataPaths.Equipment, $"Equipment '{id}' {key} entry has unknown unit '{unit}'.");
             string scalingStat = CatalogLoader.GetString(md, "scaling_stat");
             float scalePer = md.ContainsKey("scale_per") ? CatalogLoader.GetFloat(md, "scale_per", 1.0f) : 1.0f;
             if (!string.IsNullOrEmpty(scalingStat) && !PassiveTreeManager.HasStatLabel(scalingStat))
-                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry references unknown scaling_stat '{scalingStat}'.");
+                throw new DataLoadException(DataPaths.Equipment, $"Equipment '{id}' {key} entry references unknown scaling_stat '{scalingStat}'.");
             if (!string.IsNullOrEmpty(scalingStat) && scalePer <= 0.0f)
-                throw new DataLoadException(DataPaths.Gear, $"Gear '{id}' {key} entry has non-positive scale_per {scalePer}.");
+                throw new DataLoadException(DataPaths.Equipment, $"Equipment '{id}' {key} entry has non-positive scale_per {scalePer}.");
             list.Add(new Dictionary
             {
                 { "stat", stat },
@@ -134,15 +137,15 @@ public static class CatalogBuilders
         return list;
     }
 
-    public static Dictionary BuildPathogens()
+    public static Dictionary BuildEnemies()
     {
         var table = new Dictionary();
         var seen = new HashSet<string>();
-        foreach (var row in CatalogLoader.LoadArray(DataPaths.Pathogens))
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.Enemies))
         {
             string id = CatalogLoader.GetString(row, "id");
             if (string.IsNullOrEmpty(id) || !seen.Add(id))
-                throw new DataLoadException(DataPaths.Pathogens, $"Duplicate or missing pathogen id '{id}'.");
+                throw new DataLoadException(DataPaths.Enemies, $"Duplicate or missing pathogen id '{id}'.");
             table[id] = new Dictionary
             {
                 { "id", id },
@@ -159,8 +162,41 @@ public static class CatalogBuilders
     }
 
     /// <summary>Boss catalog for the Codex archive (data-owned: assets/data/bosses.json).
-    /// Kept separate from the 20-entry ecosystem catalog so balance suites keep
-    /// their exact-count invariant.</summary>
+    public static Dictionary BuildEnemyDefs()
+    {
+        var table = new Dictionary();
+        var seen = new HashSet<string>();
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.EnemyDefs))
+        {
+            string id = CatalogLoader.GetString(row, "id");
+            if (string.IsNullOrEmpty(id) || !seen.Add(id))
+                throw new DataLoadException(DataPaths.EnemyDefs, $"Duplicate or missing enemy id '{id}'.");
+            table[id] = new Dictionary
+            {
+                { "id", id },
+                { "max_health", CatalogLoader.GetFloat(row, "max_health", 20.0f) },
+                { "armor", CatalogLoader.GetFloat(row, "armor", 0.0f) },
+                { "shield_charges", CatalogLoader.GetInt(row, "shield_charges", 0) },
+                { "xp", CatalogLoader.GetFloat(row, "xp", 12.0f) },
+                { "score", CatalogLoader.GetInt(row, "score", 15) },
+                { "float_speed", CatalogLoader.GetFloat(row, "float_speed", 35.0f) },
+                { "contact_damage", CatalogLoader.GetFloat(row, "contact_damage", 3.0f) },
+                { "threat_mode", CatalogLoader.GetString(row, "threat_mode", "Drifter") },
+                { "elite", CatalogLoader.GetBool(row, "elite", false) },
+                { "boss", CatalogLoader.GetBool(row, "boss", false) },
+                { "body_microns", CatalogLoader.GetFloat(row, "body_microns", 1.0f) },
+                { "tint", CatalogLoader.GetString(row, "tint") },
+                { "display_name_key", CatalogLoader.GetString(row, "display_name_key") },
+                { "batch_variant", CatalogLoader.GetString(row, "batch_variant") },
+                { "steering", row.TryGetValue("steering", out Variant stVal) ? stVal : new Dictionary() },
+                { "spawn_cluster", row.TryGetValue("spawn_cluster", out Variant scVal) ? scVal : new Dictionary() },
+                { "traits", row.TryGetValue("traits", out Variant trVal) ? trVal : new Dictionary() }
+            };
+        }
+        GD.Print($"[Catalog] Loaded {table.Count} enemy defs.");
+        return table;
+    }
+
     public static Dictionary BuildBosses()
     {
         var table = new Dictionary();
@@ -212,7 +248,8 @@ public static class CatalogBuilders
                 { "bg_color_accent", CatalogLoader.GetColor(row, "bg_color_accent", new Color(0.14f, 0.04f, 0.08f, 1.0f)) },
                 { "fiber_color", CatalogLoader.GetColor(row, "fiber_color", new Color(0.22f, 0.18f, 0.32f, 0.35f)) },
                 { "unlocked", CatalogLoader.GetBool(row, "unlocked") },
-                { "hard_unlocked", CatalogLoader.GetBool(row, "hard_unlocked") }
+                { "hard_unlocked", CatalogLoader.GetBool(row, "hard_unlocked") },
+                { "effects", row.TryGetValue("effects", out Variant fxVal) ? fxVal : new Array() }
             };
         }
         GD.Print($"[Catalog] Loaded {table.Count} maps.");
@@ -241,7 +278,25 @@ public static class CatalogBuilders
                 { "base_speed", CatalogLoader.GetFloat(row, "base_speed", 230.0f) },
                 { "base_armor", CatalogLoader.GetFloat(row, "base_armor", 0.0f) },
                 { "trait_stat", CatalogLoader.GetString(row, "trait_stat") },
-                { "trait_stat_value", CatalogLoader.GetFloat(row, "trait_stat_value", 0.0f) }
+                { "trait_stat_value", CatalogLoader.GetFloat(row, "trait_stat_value", 0.0f) },
+                { "extra_stats", row.TryGetValue("extra_stats", out Variant esVal) ? esVal : new Dictionary() },
+                { "body_microns", CatalogLoader.GetFloat(row, "body_microns", 20.0f) },
+                { "deform_mag", CatalogLoader.GetFloat(row, "deform_mag", 10.0f) },
+                { "deform_speed", CatalogLoader.GetFloat(row, "deform_speed", 3.6f) },
+                { "deform_kind", CatalogLoader.GetString(row, "deform_kind", "standard") },
+                { "deform_arms", CatalogLoader.GetInt(row, "deform_arms", 0) },
+                { "noise_freq", CatalogLoader.GetFloat(row, "noise_freq", 0.65f) },
+                { "noise_octaves", CatalogLoader.GetInt(row, "noise_octaves", 2) },
+                { "cyto_color", CatalogLoader.GetString(row, "cyto_color", "#8099CC66") },
+                { "membrane_color", CatalogLoader.GetString(row, "membrane_color", "#CCEBFFCC") },
+                { "nucleus_color", CatalogLoader.GetString(row, "nucleus_color", "#663399E6") },
+                { "nucleus_points", CatalogLoader.GetInt(row, "nucleus_points", 32) },
+                { "nucleus_radius", CatalogLoader.GetFloat(row, "nucleus_radius", 18.0f) },
+                { "nucleus_kind", CatalogLoader.GetString(row, "nucleus_kind", "circle") },
+                { "nucleus_amp", CatalogLoader.GetFloat(row, "nucleus_amp", 0.0f) },
+                { "nucleus_freq", CatalogLoader.GetFloat(row, "nucleus_freq", 1.0f) },
+                { "innate_skill", CatalogLoader.GetString(row, "innate_skill") },
+                { "innate_slot", CatalogLoader.GetInt(row, "innate_slot", 0) }
             };
         }
         GD.Print($"[Catalog] Loaded {table.Count} classes.");

@@ -1,10 +1,10 @@
 using Godot;
 using Godot.Collections;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Tests;
+using Game.Core;
+using Game.Tests;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 public partial class MainMenu : Control
 {
@@ -49,7 +49,7 @@ public partial class MainMenu : Control
     public Label? ClassSkillLbl { get; set; }
     public Label? ClassStatusLbl { get; set; }
     public Button? ClassConfirmBtn { get; set; }
-    public BioRadarChart? ClassRadarChart { get; set; }
+    public RadarChart? ClassRadarChart { get; set; }
 
     // Passive Tree View Controls
     public Label? PassiveHeaderLbl { get; set; }
@@ -81,7 +81,7 @@ public partial class MainMenu : Control
     public Label? MapMechLbl { get; set; }
     public Label? MapThreatLbl { get; set; }
     public Label? MapLockStatusLbl { get; set; }
-    public HoloBodyScanner? HoloScanner { get; set; }
+    public StageSelectMap? HoloScanner { get; set; }
     public Button? DeployBtn { get; set; }
     public Button? EndlessBtn { get; set; }
     public OptionButton? DifficultyToggle { get; set; }
@@ -159,8 +159,8 @@ public partial class MainMenu : Control
         ClassSkillLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassSkillLabel");
         ClassStatusLbl = GetNodeOrNull<Label>("ClassView/HBox/DetailPanel/VBox/ClassStatusLabel");
         ClassConfirmBtn = GetNodeOrNull<Button>("ClassView/Buttons/ConfirmButton");
-        ClassRadarChart = GetNodeOrNull<BioRadarChart>("ClassView/HBox/DetailPanel/VBox/StatsRow/BioRadarChart")
-            ?? GetNodeOrNull<BioRadarChart>("ClassView/HBox/DetailPanel/VBox/BioRadarChart");
+        ClassRadarChart = GetNodeOrNull<RadarChart>("ClassView/HBox/DetailPanel/VBox/StatsRow/RadarChart")
+            ?? GetNodeOrNull<RadarChart>("ClassView/HBox/DetailPanel/VBox/RadarChart");
 
         PassiveHeaderLbl = GetNodeOrNull<Label>("PassiveView/PageHeader/Title");
         TreeLevelLbl = GetNodeOrNull<Label>("PassiveView/InfoHBox/TreeLevelLabel");
@@ -182,7 +182,7 @@ public partial class MainMenu : Control
         MapEnvLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapEnvLabel");
         MapMechLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapMechLabel");
         MapThreatLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapThreatLabel");
-        HoloScanner = GetNodeOrNull<HoloBodyScanner>("MapView/HBox/HoloBodyScanner");
+        HoloScanner = GetNodeOrNull<StageSelectMap>("MapView/HBox/StageSelectMap");
         DeployBtn = GetNodeOrNull<Button>("MapView/Buttons/DeployButton");
 
         // Endless Cytokine Storm entry (docs/endgame.md §2), injected beside Deploy.
@@ -230,7 +230,7 @@ public partial class MainMenu : Control
         EndlessSetupModal.Name = "EndgameSetupModal";
         AddChild(EndlessSetupModal);
 
-        // Lock status readout injected under the threat rows (MapData-driven)
+        // Lock status readout injected under the threat rows (StageData-driven)
         if (MapThreatLbl != null && MapThreatLbl.GetParent() is Control detailPanel)
         {
             MapLockStatusLbl = new Label
@@ -578,10 +578,10 @@ public partial class MainMenu : Control
         if (ClassListContainer == null)
             return;
 
-        foreach (var keyVar in GameManager.ClassData.Keys)
+        foreach (var keyVar in GameManager.PlayerClassData.Keys)
         {
             string key = keyVar.AsString();
-            var data = GameManager.GetClassInfo(key);
+            var data = GameManager.GetPlayerClass(key);
             bool unlocked = data.TryGetValue("unlocked", out Variant uVal) && uVal.AsBool();
 
             // Wire once; texts/styles refresh on every call (language/cheat changes).
@@ -607,7 +607,7 @@ public partial class MainMenu : Control
     public void SelectClass(string key)
     {
         ActiveClassKey = key;
-        var data = GameManager.GetClassInfo(key);
+        var data = GameManager.GetPlayerClass(key);
         bool unlocked = data.TryGetValue("unlocked", out Variant unlockedVal) && unlockedVal.AsBool();
 
         // Highlight selected button
@@ -942,10 +942,10 @@ public partial class MainMenu : Control
         if (MapListContainer == null)
             return;
 
-        foreach (var keyVar in GameManager.MapData.Keys)
+        foreach (var keyVar in GameManager.StageData.Keys)
         {
             string key = keyVar.AsString();
-            var data = GameManager.GetMapInfo(key);
+            var data = GameManager.GetStageInfo(key);
             string icon = data.TryGetValue("organ_icon", out var icVal) ? icVal.AsString() : "🌐";
             string name = data.TryGetValue("name", out var nmVal) ? nmVal.AsString() : key;
             int diff = data.TryGetValue("difficulty", out var diffVal) ? diffVal.AsInt32() : 1;
@@ -973,7 +973,7 @@ public partial class MainMenu : Control
     public void SelectMap(string key)
     {
         ActiveMapKey = key;
-        var data = GameManager.GetMapInfo(key);
+        var data = GameManager.GetStageInfo(key);
 
         string organ = data.TryGetValue("organ", out var ogVal) ? ogVal.AsString() : "";
         string icon = data.TryGetValue("organ_icon", out var icVal) ? icVal.AsString() : "🌐";

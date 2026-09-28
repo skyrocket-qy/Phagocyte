@@ -3,11 +3,11 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Tick-budget profiler for the 6fps-pin investigation: times the per-enemy
@@ -25,8 +25,8 @@ public partial class TestTickBudget : TestHarness
     private int _phase = 0;
     private int _framesWaited = 0;
     private bool _testDone = false;
-    private Main? _main;
-    private readonly List<BaseEnemy> _enemies = new();
+    private GameRoot? _main;
+    private readonly List<EnemyActor> _enemies = new();
 
     public override void _Initialize()
     {
@@ -90,7 +90,7 @@ public partial class TestTickBudget : TestHarness
         GameManager.SelectedMap = "acute_wound";
 
         var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
-        _main = mainScene.Instantiate<Main>();
+        _main = mainScene.Instantiate<GameRoot>();
         Root.AddChild(_main);
         MakePlayerInvulnerable(_main);
         RunTelemetryManager.SpikeLogPath = JsonStore.ResolvePath("test_tickbudget_spikes.json");
@@ -99,7 +99,7 @@ public partial class TestTickBudget : TestHarness
         {
             foreach (var child in _main.EnemyContainer.GetChildren())
             {
-                if (child is BaseEnemy enemy)
+                if (child is EnemyActor enemy)
                     enemy.Free();
             }
         }
@@ -107,7 +107,7 @@ public partial class TestTickBudget : TestHarness
         Vector2 center = _main.Player != null ? (_main.Player as Node2D)?.GlobalPosition ?? Vector2.Zero : Vector2.Zero;
         for (int i = 0; i < EnemyCount; i++)
         {
-            var enemy = PathogenSpawner.CreatePathogen("tb");
+            var enemy = EnemySpawner.CreateEnemy("tb");
             AssertThat(enemy).IsNotNull();
             enemy!.GlobalPosition = center + new Vector2((i % 30) * 40.0f - 600.0f, (i / 30) * 40.0f - 200.0f);
             _main.EnemyContainer!.AddChild(enemy);
@@ -134,7 +134,7 @@ public partial class TestTickBudget : TestHarness
     /// <summary>All 300 overlapping the player: one contact strike each.</summary>
     private void ProfileContactStorm()
     {
-        var cell = _main!.Player as BaseCell;
+        var cell = _main!.Player as PlayerActor;
         AssertThat(cell).IsNotNull();
         foreach (var enemy in _enemies)
             enemy.GlobalPosition = cell!.GlobalPosition;
@@ -157,7 +157,7 @@ public partial class TestTickBudget : TestHarness
     /// <summary>300 direct hits through the full cell pipeline (stats/HUD/toast/libs).</summary>
     private void ProfilePlayerDamage()
     {
-        var cell = _main!.Player as BaseCell;
+        var cell = _main!.Player as PlayerActor;
         AssertThat(cell).IsNotNull();
 
         var sw = Stopwatch.StartNew();
@@ -172,16 +172,16 @@ public partial class TestTickBudget : TestHarness
     /// <summary>Stats rolls + DR + max_hp lookup in isolation.</summary>
     private void ProfileStatsRolls()
     {
-        var cell = _main!.Player as BaseCell;
+        var cell = _main!.Player as PlayerActor;
         AssertThat(cell).IsNotNull();
 
         var sw = Stopwatch.StartNew();
         float sink = 0.0f;
         for (int i = 0; i < _enemies.Count; i++)
         {
-            if (cell!.Stats is CellStats cs && cs.RollEvasion())
+            if (cell!.Stats is ActorStats cs && cs.RollEvasion())
                 sink += 1.0f;
-            if (cell!.Stats is CellStats csBlock && csBlock.RollBlock())
+            if (cell!.Stats is ActorStats csBlock && csBlock.RollBlock())
                 sink += 1.0f;
             sink += cell!.Stats != null ? cell!.Stats.GetDamageReductionRatio() : 0.0f;
             sink += cell!.Stats != null ? cell!.Stats.GetStat("max_health") : 0.0f;
@@ -193,7 +193,7 @@ public partial class TestTickBudget : TestHarness
     /// <summary>StatsChanged emit + full HUD cascade, no damage math.</summary>
     private void ProfileStatsSignal()
     {
-        var cell = _main!.Player as BaseCell;
+        var cell = _main!.Player as PlayerActor;
         AssertThat(cell).IsNotNull();
 
         var sw = Stopwatch.StartNew();
@@ -204,3 +204,4 @@ public partial class TestTickBudget : TestHarness
         GD.Print($"[INFO] 5. StatsSignal x{_enemies.Count}: {sw.Elapsed.TotalMilliseconds:F1}ms = {perUsec:F2}us/emit.");
     }
 }
+

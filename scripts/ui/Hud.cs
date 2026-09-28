@@ -1,10 +1,10 @@
 using Godot;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Directors;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Directors;
+using Game.Player;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// HUD coordinator (mediator). Owns view assembly, player fan-out and the
@@ -224,14 +224,14 @@ public partial class Hud : CanvasLayer, IDirectorHud
         _tutorial?.ResetTutorialCues();
         if (_vitals != null) _vitals.PlayerRef = player;
         if (_skills != null) _skills.PlayerRef = player;
-        if (_tutorial != null && player is not BaseCell) _tutorial.PlayerRef = player;
+        if (_tutorial != null && player is not PlayerActor) _tutorial.PlayerRef = player;
         if (_pause != null)
         {
             _pause.PlayerRef = player;
             _pause.LastLevel = _vitals?.LastLevel ?? 1;
         }
 
-        if (player is BaseCell bc)
+        if (player is PlayerActor bc)
         {
             _vitals?.ConnectPlayer(bc);
             _tutorial?.ConnectPlayer(player);

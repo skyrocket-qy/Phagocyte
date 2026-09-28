@@ -1,63 +1,63 @@
 using Godot;
 using Godot.Collections;
 using System;
-using Phagocyte.Skills;
+using Game.Skills;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
-/// Manages Level-Up 3-Choice generation from Active Cytokines and Passive Gear.
+/// Manages Level-Up 3-Choice generation from Active Cytokines and Passive Equipment.
 /// </summary>
 public partial class UpgradeManager : RefCounted
 {
-    // All catalog active weapon classes (17). Display metadata comes from the
-    // single source of truth (GameManager.SkillCatalog); only the runtime class
-    // used by the reflection factory lives here.
+    // All catalog active weapons (18). Display metadata comes from the
+    // single source of truth (GameManager.SkillCatalog); instantiation is
+    // id-routed via SkillFactory, never reflection.
     public static Array<Dictionary> ActiveCatalog = new Array<Dictionary>()
     {
-        MakeEntry(SkillIds.PhagocyticGrasp, typeof(PhagocyticGraspSkill)),
-        MakeEntry(SkillIds.LysosomalOverload, typeof(LysosomalOverloadSkill)),
-        MakeEntry(SkillIds.RosTorrent, typeof(RosTorrentSkill)),
-        MakeEntry(SkillIds.PerforinLance, typeof(PerforinLanceSkill)),
-        MakeEntry(SkillIds.ComplementCascade, typeof(ComplementCascadeSkill)),
-        MakeEntry(SkillIds.AntibodySalvo, typeof(AntibodySalvoSkill)),
-        MakeEntry(SkillIds.PseudopodLunge, typeof(PseudopodLungeSkill)),
-        MakeEntry(SkillIds.NitricOxideHalo, typeof(NitricOxideHaloSkill)),
-        MakeEntry(SkillIds.NucleaseBlades, typeof(NucleaseBladesSkill)),
-        MakeEntry(SkillIds.GranzymeDetonation, typeof(GranzymeDetonationSkill)),
-        MakeEntry(SkillIds.InterferonWave, typeof(InterferonWaveSkill)),
-        MakeEntry(SkillIds.LysozymeRicochet, typeof(LysozymeRicochetSkill)),
-        MakeEntry(SkillIds.PhagolysosomeVent, typeof(PhagolysosomeVentSkill)),
-        MakeEntry(SkillIds.ProInflammatoryArc, typeof(ProInflammatoryArcSkill)),
-        MakeEntry(SkillIds.ExosomeSingularity, typeof(ExosomeSingularitySkill)),
-        MakeEntry(SkillIds.DefensinBarbs, typeof(DefensinBarbsSkill)),
-        MakeEntry(SkillIds.MhcTracerBeam, typeof(MhcTracerBeamSkill)),
-        MakeEntry(SkillIds.HistamineSurge, typeof(HistamineSurgeSkill))
+        MakeEntry(SkillIds.PhagocyticGrasp),
+        MakeEntry(SkillIds.LysosomalOverload),
+        MakeEntry(SkillIds.RosTorrent),
+        MakeEntry(SkillIds.PerforinLance),
+        MakeEntry(SkillIds.ComplementCascade),
+        MakeEntry(SkillIds.AntibodySalvo),
+        MakeEntry(SkillIds.PseudopodLunge),
+        MakeEntry(SkillIds.NitricOxideHalo),
+        MakeEntry(SkillIds.NucleaseBlades),
+        MakeEntry(SkillIds.GranzymeDetonation),
+        MakeEntry(SkillIds.InterferonWave),
+        MakeEntry(SkillIds.LysozymeRicochet),
+        MakeEntry(SkillIds.PhagolysosomeVent),
+        MakeEntry(SkillIds.ProInflammatoryArc),
+        MakeEntry(SkillIds.ExosomeSingularity),
+        MakeEntry(SkillIds.DefensinBarbs),
+        MakeEntry(SkillIds.MhcTracerBeam),
+        MakeEntry(SkillIds.HistamineSurge)
     };
 
     // All catalog passive trait classes (13)
     public static Array<Dictionary> PassiveCatalog = new Array<Dictionary>()
     {
-        MakeEntry(SkillIds.PassiveActin, typeof(PassiveActinPolymerization)),
-        MakeEntry(SkillIds.PassiveLysosome, typeof(PassiveLysosomePriming)),
-        MakeEntry(SkillIds.PassiveMitochondria, typeof(PassiveMitochondrialOverclock)),
-        MakeEntry(SkillIds.PassiveOpsonin, typeof(PassiveOpsoninAffinity)),
-        MakeEntry(SkillIds.PassiveChemokine, typeof(PassiveChemokineReceptors)),
-        MakeEntry(SkillIds.PassiveBilayer, typeof(PassiveBilayerHardening)),
-        MakeEntry(SkillIds.PassiveAutophagy, typeof(PassiveAutophagicRecycle)),
-        MakeEntry(SkillIds.PassiveGlycolysis, typeof(PassiveAerobicGlycolysis)),
-        MakeEntry(SkillIds.PassiveKinesin, typeof(PassiveKinesinTransit)),
-        MakeEntry(SkillIds.PassiveLongevity, typeof(PassiveCytokineLongevity)),
-        MakeEntry(SkillIds.PassiveVdj, typeof(PassiveVdjDiversity)),
-        MakeEntry(SkillIds.PassiveEndotoxin, typeof(PassiveEndotoxinBarrier)),
-        MakeEntry(SkillIds.PassiveHematopoietic, typeof(PassiveHematopoieticReserve))
+        MakeEntry(SkillIds.PassiveActin),
+        MakeEntry(SkillIds.PassiveLysosome),
+        MakeEntry(SkillIds.PassiveMitochondria),
+        MakeEntry(SkillIds.PassiveMark),
+        MakeEntry(SkillIds.PassiveChemokine),
+        MakeEntry(SkillIds.PassiveBilayer),
+        MakeEntry(SkillIds.PassiveAutophagy),
+        MakeEntry(SkillIds.PassiveGlycolysis),
+        MakeEntry(SkillIds.PassiveKinesin),
+        MakeEntry(SkillIds.PassiveLongevity),
+        MakeEntry(SkillIds.PassiveVdj),
+        MakeEntry(SkillIds.PassiveEndotoxin),
+        MakeEntry(SkillIds.PassiveHematopoietic)
     };
 
     /// <summary>
     /// Builds one catalog row from GameManager.SkillCatalog (names/descriptions/
-    /// icons/class gating) plus the runtime class used by the reflection factory.
+    /// icons/class gating). Instantiation is id-routed via SkillFactory.
     /// </summary>
-    private static Dictionary MakeEntry(string id, Type skillType)
+    private static Dictionary MakeEntry(string id)
     {
         var info = (Dictionary)GameManager.SkillCatalog[id];
         return new Dictionary
@@ -67,7 +67,6 @@ public partial class UpgradeManager : RefCounted
             { "desc", info["desc_key"] },
             { "icon", info["icon"] },
             { "image_path", AssetPaths.SkillIcon(id) },
-            { "class_type", skillType.AssemblyQualifiedName ?? "" },
             { "class_id", info["class_id"] }
         };
     }
@@ -82,7 +81,7 @@ public partial class UpgradeManager : RefCounted
     {
         { SkillIds.PerforinLance, SkillIds.PassiveLysosome },
         { SkillIds.ComplementCascade, SkillIds.PassiveActin },
-        { SkillIds.AntibodySalvo, SkillIds.PassiveOpsonin },
+        { SkillIds.AntibodySalvo, SkillIds.PassiveMark },
         { SkillIds.RosTorrent, SkillIds.PassiveMitochondria },
         { SkillIds.PseudopodLunge, SkillIds.PassiveChemokine }
     };
@@ -234,8 +233,7 @@ public partial class UpgradeManager : RefCounted
                         { "image_path", item.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : AssetPaths.SkillIcon(item["id"].AsString()) },
                         { "level", 1 },
                         { "badge", "BADGE_NEW_ACTIVE" },
-                        { "desc", item["desc"] },
-                        { "skill_class", item["class_type"] }
+                        { "desc", item["desc"] }
                     });
                 }
             }
@@ -259,8 +257,7 @@ public partial class UpgradeManager : RefCounted
                         { "image_path", item.TryGetValue("image_path", out var ipVal2) ? ipVal2.AsString() : AssetPaths.SkillIcon(item["id"].AsString()) },
                         { "level", 1 },
                         { "badge", "BADGE_NEW_PASSIVE" },
-                        { "desc", item["desc"] },
-                        { "skill_class", item["class_type"] }
+                        { "desc", item["desc"] }
                     };
                     ApplyCatalystFlag(player, newPassiveCandidate, id);
                     candidates.Add(newPassiveCandidate);
@@ -322,30 +319,22 @@ public partial class UpgradeManager : RefCounted
         {
             case "new_active":
             {
-                if (choice.TryGetValue("skill_class", out var classVal))
+                if (choice.TryGetValue("id", out var idVal))
                 {
-                    Type? skillType = Type.GetType(classVal.AsString());
-                    if (skillType != null)
-                    {
-                        BaseSkill? newSkill = (BaseSkill?)Activator.CreateInstance(skillType);
-                        if (newSkill != null)
-                            return sm.EquipActive(newSkill);
-                    }
+                    BaseSkill? newSkill = SkillFactory.CreateActive(idVal.AsString());
+                    if (newSkill != null)
+                        return sm.EquipActive(newSkill);
                 }
                 break;
             }
 
             case "new_passive":
             {
-                if (choice.TryGetValue("skill_class", out var classVal))
+                if (choice.TryGetValue("id", out var idVal2))
                 {
-                    Type? skillType = Type.GetType(classVal.AsString());
-                    if (skillType != null)
-                    {
-                        BaseSkill? newSkill = (BaseSkill?)Activator.CreateInstance(skillType);
-                        if (newSkill != null)
-                            return sm.EquipPassive(newSkill);
-                    }
+                    BaseSkill? newSkill = SkillFactory.CreatePassive(idVal2.AsString());
+                    if (newSkill != null)
+                        return sm.EquipPassive(newSkill);
                 }
                 break;
             }
@@ -357,20 +346,20 @@ public partial class UpgradeManager : RefCounted
                 // which acquires into the backpack then best-effort equips.
                 // Returns whether anything was acquired.
                 string gearId = choice.TryGetValue("id", out var gearIdVal) ? gearIdVal.AsString() : "";
-                if (string.IsNullOrEmpty(gearId) || !GearUnlockManager.IsUnlocked(gearId))
+                if (string.IsNullOrEmpty(gearId) || !EquipmentUnlockManager.IsUnlocked(gearId))
                     break;
-                var gearChamber = player.GetNodeOrNull<GearChamber>("GearChamber");
-                if (gearChamber == null || gearChamber.Owns(gearId))
+                var equipmentChamber = player.GetNodeOrNull<EquipmentChamber>("EquipmentChamber");
+                if (equipmentChamber == null || equipmentChamber.Owns(gearId))
                     break;
-                if (!gearChamber.AddToBackpack(gearId))
+                if (!equipmentChamber.AddToBackpack(gearId))
                     break;
-                for (int slot = 0; slot < GearChamber.MaxSlots; slot++)
+                for (int slot = 0; slot < EquipmentChamber.MaxSlots; slot++)
                 {
-                    if (!string.IsNullOrEmpty(gearChamber.GetSlot(slot)))
+                    if (!string.IsNullOrEmpty(equipmentChamber.GetSlot(slot)))
                         continue;
-                    if (gearChamber.CanEquip(gearId, slot, out _))
+                    if (equipmentChamber.CanEquip(gearId, slot, out _))
                     {
-                        gearChamber.Equip(gearId, slot);
+                        equipmentChamber.Equip(gearId, slot);
                         break;
                     }
                 }
@@ -397,7 +386,7 @@ public partial class UpgradeManager : RefCounted
                 if (player.HasMethod("Heal"))
                 {
                     Variant statsVar = player.Get("stats");
-                    if (statsVar.AsGodotObject() is CellStats stats)
+                    if (statsVar.AsGodotObject() is ActorStats stats)
                     {
                         float maxHp = stats.GetStat("max_health");
                         player.Call("Heal", maxHp * 0.35f);
@@ -411,3 +400,4 @@ public partial class UpgradeManager : RefCounted
         return false;
     }
 }
+

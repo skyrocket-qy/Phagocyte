@@ -2,11 +2,11 @@ using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Skills;
-using Phagocyte.UI;
+using Game.Core;
+using Game.Skills;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 [TestSuite]
 public partial class TestAchievementSystem : TestHarness
@@ -54,12 +54,12 @@ public partial class TestAchievementSystem : TestHarness
 
                 // --- Step 2: Skill Locking in UpgradeManager Choice Pool ---
                 var mockPlayer = new CharacterBody2D();
-                var stats = new CellStats { Name = "CellStats" };
+                var stats = new ActorStats { Name = "ActorStats" };
                 mockPlayer.AddChild(stats);
                 var sm = new SkillManager { Name = "SkillManager" };
                 mockPlayer.AddChild(sm);
                 sm.Setup(mockPlayer);
-                sm.EquipActive(new RosTorrentSkill(), 0);
+                sm.EquipActive(SkillFactory.CreateActive("ros_torrent")!, 0);
 
                 // While other 4 cells are locked, their active skills must NEVER be offered
                 string[] lockedSkillIds = ["perforin_lance", "complement_cascade", "antibody_salvo", "pseudopod_lunge"];
@@ -78,7 +78,7 @@ public partial class TestAchievementSystem : TestHarness
                 // --- Step 3: Event-Driven Achievement Unlocks & Cell Rewards ---
                 // Calibrated thresholds: sub-threshold values must stay locked
                 for (int i = 0; i < 199; i++)
-                    AchievementManager.RecordEvent("pathogen_killed", "staph");
+                    AchievementManager.RecordEvent("enemy_killed", "staph");
                 AssertThat(AchievementManager.IsUnlocked("engulf_20")).IsFalse();
                 AchievementManager.RecordEvent("level_up", 14);
                 AssertThat(AchievementManager.IsUnlocked("reach_level_5")).IsFalse();
@@ -89,7 +89,7 @@ public partial class TestAchievementSystem : TestHarness
                 GD.Print("[PASS] Step 3: Calibrated thresholds reject sub-threshold progress.");
 
                 // Test 3a: 200 kills -> Unlocks CTL and Perforin Lance
-                AchievementManager.RecordEvent("pathogen_killed", "staph");
+                AchievementManager.RecordEvent("enemy_killed", "staph");
                 AssertThat(AchievementManager.IsUnlocked("first_digestion")).IsTrue();
                 AssertThat(AchievementManager.IsUnlocked("engulf_20")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("ctl")).IsTrue();
@@ -114,7 +114,7 @@ public partial class TestAchievementSystem : TestHarness
 
                 // Test 3b: 500 kills -> Unlocks Neutrophil
                 for (int i = 0; i < 300; i++)
-                    AchievementManager.RecordEvent("pathogen_killed", "staph");
+                    AchievementManager.RecordEvent("enemy_killed", "staph");
                 AssertThat(AchievementManager.IsUnlocked("devour_50")).IsTrue();
                 AssertThat(GameManager.IsClassUnlocked("neutrophil")).IsTrue();
                 GD.Print("[PASS] Step 3b: 500 kills unlock Neutrophil.");
@@ -144,9 +144,9 @@ public partial class TestAchievementSystem : TestHarness
 
                 // Test 3g: PrPsc amyloid crystal shattered (non-prion kills must not count)
                 AssertThat(AchievementManager.IsUnlocked("prion_cleared")).IsFalse();
-                AchievementManager.RecordEvent("pathogen_killed", "tachyzoite");
+                AchievementManager.RecordEvent("enemy_killed", "tachyzoite");
                 AssertThat(AchievementManager.IsUnlocked("prion_cleared")).IsFalse();
-                AchievementManager.RecordEvent("pathogen_killed", "prpsc_amyloid_aggregate");
+                AchievementManager.RecordEvent("enemy_killed", "prpsc_amyloid_aggregate");
                 AssertThat(AchievementManager.IsUnlocked("prion_cleared")).IsTrue();
                 GD.Print("[PASS] Step 3g: Shattering a PrPsc amyloid crystal unlocks Protein Scavenger.");
 
@@ -243,7 +243,7 @@ public partial class TestAchievementSystem : TestHarness
                 AssertThat(AssetLoader.TryLoad<Texture2D>(galleryInfo["image_path"].AsString()) != null).IsTrue();
                 GD.Print("[PASS] Step 5: AchievementGallery fifth-view rendering, 3-state filter and Steam art fallback verified.");
 
-                // --- Step 6: Main Menu Locked Cell Status & Confirm Button Test ---
+                // --- Step 6: GameRoot Menu Locked Cell Status & Confirm Button Test ---
                 AchievementManager.ResetAll(); // Reset so cells are locked again
                 galleryMenu.QueueFree();
 
@@ -277,7 +277,7 @@ public partial class TestAchievementSystem : TestHarness
                 _menuInstance.SelectClass("ctl");
                 AssertThat(_menuInstance.ClassConfirmBtn.Disabled).IsFalse();
 
-                GD.Print("[PASS] Step 6: Main Menu locked condition UI and button disabling verified.");
+                GD.Print("[PASS] Step 6: GameRoot Menu locked condition UI and button disabling verified.");
                 GD.Print("==================================================================");
                 GD.Print(">>> ACHIEVEMENT & IMMUNE CELL PROGRESSION SUITE PASSED! <<<");
                 GD.Print("==================================================================");
@@ -305,3 +305,4 @@ public partial class TestAchievementSystem : TestHarness
         RestoreSaves();
     }
 }
+

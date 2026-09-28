@@ -1,10 +1,10 @@
 using Godot;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Shared scaffolding for the headless SceneTree test suites: frame-gated
@@ -59,8 +59,8 @@ public abstract partial class TestHarness : SceneTree
         AchievementManager.SavePath = JsonStore.ResolvePath($"test_{tag}_achievements.json");
         RunRecordManager.SavePath = JsonStore.ResolvePath($"test_{tag}_records.json");
         SettingsManager.SavePath = JsonStore.ResolvePath($"test_{tag}_settings.json");
-        LoadoutManager.SavePath = JsonStore.ResolvePath($"test_{tag}_loadouts.json");
-        GearUnlockManager.SavePath = JsonStore.ResolvePath($"test_{tag}_gear_unlocks.json");
+        LoadoutManager.SavePath = JsonStore.ResolvePath($"test_{tag}_equipment_loadouts.json");
+        EquipmentUnlockManager.SavePath = JsonStore.ResolvePath($"test_{tag}_gear_unlocks.json");
 
         // Clear leftovers from crashed earlier runs with the same tag.
         DeleteIfExists(PassiveTreeManager.SavePath);
@@ -68,17 +68,17 @@ public abstract partial class TestHarness : SceneTree
         DeleteIfExists(RunRecordManager.SavePath);
         DeleteIfExists(SettingsManager.SavePath);
         DeleteIfExists(LoadoutManager.SavePath);
-        DeleteIfExists(GearUnlockManager.SavePath);
+        DeleteIfExists(EquipmentUnlockManager.SavePath);
 
         _isolatedPaths.Add(PassiveTreeManager.SavePath);
         _isolatedPaths.Add(AchievementManager.SavePath);
         _isolatedPaths.Add(RunRecordManager.SavePath);
         _isolatedPaths.Add(SettingsManager.SavePath);
         _isolatedPaths.Add(LoadoutManager.SavePath);
-        _isolatedPaths.Add(GearUnlockManager.SavePath);
+        _isolatedPaths.Add(EquipmentUnlockManager.SavePath);
 
         // Determinism: gear drops must never fire unscripted in a suite.
-        GearUnlockManager.DropsEnabled = false;
+        EquipmentUnlockManager.DropsEnabled = false;
     }
 
     /// <summary>Restores the real save paths and removes the isolated files.</summary>
@@ -90,11 +90,11 @@ public abstract partial class TestHarness : SceneTree
         RunRecordManager.SavePath = "";
         SettingsManager.SavePath = "";
         LoadoutManager.SavePath = "";
-        GearUnlockManager.SavePath = "";
+        EquipmentUnlockManager.SavePath = "";
         LoadoutManager.ResetCache();
-        GearUnlockManager.ResetCache();
-        GearUnlockManager.DropsEnabled = true;
-        GearUnlockManager.DropChance = GearUnlockManager.DefaultDropChance;
+        EquipmentUnlockManager.ResetCache();
+        EquipmentUnlockManager.DropsEnabled = true;
+        EquipmentUnlockManager.DropChance = EquipmentUnlockManager.DefaultDropChance;
     }
 
     private static void DeleteIsolatedFiles()
@@ -116,24 +116,24 @@ public abstract partial class TestHarness : SceneTree
 
     /// <summary>
     /// Instantiates the main gameplay scene with physics disabled, for suites that
-    /// drive Main manually.
+    /// drive GameRoot manually.
     /// </summary>
-    protected Main InstantiateMain(string classId = "macrophage", string mapId = "acute_wound",
+    protected GameRoot InstantiateMain(string classId = "macrophage", string stageId = "acute_wound",
         string difficulty = RunRecordManager.DifficultyNormal, bool endless = false)
     {
         GameManager.SelectedClass = classId;
-        GameManager.SelectedMap = mapId;
+        GameManager.SelectedMap = stageId;
         GameManager.SelectedDifficulty = difficulty;
         GameManager.EndlessMode = endless;
 
-        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         Root.AddChild(main);
         main.SetPhysicsProcess(false);
         return main;
     }
 
-    /// <summary>Removes a Main instance created by <see cref="InstantiateMain"/>.</summary>
-    protected static void FreeMain(Main? main)
+    /// <summary>Removes a GameRoot instance created by <see cref="InstantiateMain"/>.</summary>
+    protected static void FreeMain(GameRoot? main)
     {
         if (main != null && IsInstanceValid(main))
         {
@@ -144,9 +144,9 @@ public abstract partial class TestHarness : SceneTree
     }
 
     /// <summary>Makes the run's player unkillable so settlement tests never die early.</summary>
-    protected static BaseCell? MakePlayerInvulnerable(Main main)
+    protected static PlayerActor? MakePlayerInvulnerable(GameRoot main)
     {
-        var player = main.Player as BaseCell;
+        var player = main.Player as PlayerActor;
         if (player == null)
             return null;
 
@@ -159,7 +159,7 @@ public abstract partial class TestHarness : SceneTree
     /// Drives the run past the clear threshold, kills the terminal boss and returns
     /// once the settlement has been recorded.
     /// </summary>
-    protected static void ForceVictory(Main main)
+    protected static void ForceVictory(GameRoot main)
     {
         main.EnvironmentTime = 900.1f;
         main._PhysicsProcess(0.02f);
@@ -172,7 +172,7 @@ public abstract partial class TestHarness : SceneTree
         GameManager.SelectedDifficulty = RunRecordManager.DifficultyNormal;
         GameManager.SelectedMap = "acute_wound";
         GameManager.EndlessMode = false;
-        PathogenSpawner.Reset();
+        EnemySpawner.Reset();
     }
 
     /// <summary>Prints the standard suite banner.</summary>
@@ -223,3 +223,4 @@ public abstract partial class TestHarness : SceneTree
         Quit(success ? 0 : 1);
     }
 }
+

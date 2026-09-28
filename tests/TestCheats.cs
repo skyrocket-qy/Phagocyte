@@ -2,11 +2,11 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
+using Game.Core;
+using Game.Player;
+using Game.Skills;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// One-call full-unlock / full-build setup for test demand (headless suites
@@ -46,7 +46,7 @@ public static class TestCheats
         foreach (string achId in ids)
             AchievementManager.Unlock(achId);
 
-        GearUnlockManager.UnlockAll();
+        EquipmentUnlockManager.UnlockAll();
         MaxTreeLevels(treeLevel);
     }
 
@@ -60,7 +60,7 @@ public static class TestCheats
     public static void LockToBaseline()
     {
         AchievementManager.ResetAll();
-        GearUnlockManager.ResetAll();
+        EquipmentUnlockManager.ResetAll();
         PassiveTreeManager.ResetAll();
         LoadoutManager.ResetCache();
         JsonStore.Delete(LoadoutManager.SavePath);
@@ -69,7 +69,7 @@ public static class TestCheats
     /// <summary>Records <paramref name="treeLevel"/> as the run level of every known cell.</summary>
     public static void MaxTreeLevels(int treeLevel = DefaultMetaTreeLevel)
     {
-        foreach (var keyVar in GameManager.ClassData.Keys)
+        foreach (var keyVar in GameManager.PlayerClassData.Keys)
             PassiveTreeManager.RecordRunLevel(keyVar.AsString(), treeLevel);
     }
 
@@ -81,11 +81,11 @@ public static class TestCheats
     /// Idempotent — safe to call twice (e.g. once plain, once with godmode).
     /// Returns false when the run has no usable player.
     /// </summary>
-    public static bool MaxOutPlayer(Main main, int runLevel = DefaultRunLevel, int skillLevel = DefaultSkillLevel, bool godmode = false)
+    public static bool MaxOutPlayer(GameRoot main, int runLevel = DefaultRunLevel, int skillLevel = DefaultSkillLevel, bool godmode = false)
     {
         if (main == null || !GodotObject.IsInstanceValid(main))
             return false;
-        if (main.Player is not BaseCell player || !GodotObject.IsInstanceValid(player))
+        if (main.Player is not PlayerActor player || !GodotObject.IsInstanceValid(player))
             return false;
 
         // Determinism: full-build suites must never dodge or block unscripted.
@@ -106,7 +106,7 @@ public static class TestCheats
 
         MaxOutSkills(player, skillLevel);
 
-        GearUnlockManager.UnlockAll();
+        EquipmentUnlockManager.UnlockAll();
         MaxOutChamber(player);
 
         if (godmode && player.Stats != null)
@@ -136,7 +136,7 @@ public static class TestCheats
     }
 
     /// <summary>Headed run entry: maxes the deployed player. Debug builds only; --godmode adds invulnerability.</summary>
-    public static void ApplyHeadedRunCheats(Main main)
+    public static void ApplyHeadedRunCheats(GameRoot main)
     {
         if (!OS.IsDebugBuild() || !HasUserArg(CheatArgAll))
             return;
@@ -172,7 +172,7 @@ public static class TestCheats
         return token;
     }
 
-    private static void MaxOutSkills(BaseCell player, int skillLevel)
+    private static void MaxOutSkills(PlayerActor player, int skillLevel)
     {
         var sm = player.CellSkillManager;
         if (sm == null || !GodotObject.IsInstanceValid(sm))
@@ -232,17 +232,16 @@ public static class TestCheats
     private static bool TryCreateUnseen(Godot.Collections.Array<Godot.Collections.Dictionary> catalog, HashSet<string> seen, out BaseSkill? skill)
     {
         skill = null;
+        bool passive = catalog == UpgradeManager.PassiveCatalog;
         foreach (var entry in catalog)
         {
-            if (!entry.TryGetValue("id", out var idVar) || !entry.TryGetValue("class_type", out var classVar))
+            if (!entry.TryGetValue("id", out var idVar))
                 continue;
             string id = idVar.AsString();
             if (string.IsNullOrEmpty(id) || seen.Contains(id))
                 continue;
-            Type? skillType = Type.GetType(classVar.AsString());
-            if (skillType == null)
-                continue;
-            if (Activator.CreateInstance(skillType) is not BaseSkill created)
+            BaseSkill? created = passive ? SkillFactory.CreatePassive(id) : SkillFactory.CreateActive(id);
+            if (created == null)
                 continue;
             seen.Add(id);
             skill = created;
@@ -251,14 +250,14 @@ public static class TestCheats
         return false;
     }
 
-    private static void MaxOutChamber(BaseCell player)
+    private static void MaxOutChamber(PlayerActor player)
     {
-        var chamber = player.CellGearChamber;
+        var chamber = player.Equipment;
         if (chamber == null || !GodotObject.IsInstanceValid(chamber))
             return;
 
         var ids = new List<string>();
-        foreach (var keyVar in GameManager.GearCatalog.Keys)
+        foreach (var keyVar in GameManager.EquipmentCatalog.Keys)
             ids.Add(keyVar.AsString());
         foreach (string id in ids)
         {
@@ -267,7 +266,7 @@ public static class TestCheats
         }
 
         // Best-effort equip: first legal backpack id per free slot.
-        for (int slot = 0; slot < GearChamber.MaxSlots; slot++)
+        for (int slot = 0; slot < EquipmentChamber.MaxSlots; slot++)
         {
             if (!string.IsNullOrEmpty(chamber.GetSlot(slot)))
                 continue;

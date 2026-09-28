@@ -1,6 +1,6 @@
 using System;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Cross-manager command bus (Phase 3): achievement side effects (class / map
@@ -45,16 +45,16 @@ public static class GameEvents
         ClassLockRequested?.Invoke(classId);
     }
 
-    public static void RaiseMapUnlock(string mapId)
+    public static void RaiseMapUnlock(string stageId)
     {
         EnsureInitialized();
-        MapUnlockRequested?.Invoke(mapId);
+        MapUnlockRequested?.Invoke(stageId);
     }
 
-    public static void RaiseMapHardUnlock(string mapId)
+    public static void RaiseMapHardUnlock(string stageId)
     {
         EnsureInitialized();
-        MapHardUnlockRequested?.Invoke(mapId);
+        MapHardUnlockRequested?.Invoke(stageId);
     }
 
     public static void RaiseMapsReset()

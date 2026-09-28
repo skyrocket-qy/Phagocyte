@@ -1,8 +1,8 @@
 using Godot;
 using Godot.Collections;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Achievement / overdrive toast banner (former <c>Hud</c> toast block).
@@ -41,17 +41,17 @@ public partial class ToastView : Node
         AchievementManager.AddUnlockListener(_achUnlockCallback);
 
         _gearUnlockCallback = Callable.From((string id, Dictionary entry) => OnGearUnlocked(id, entry));
-        GearUnlockManager.AddUnlockListener(_gearUnlockCallback);
+        EquipmentUnlockManager.AddUnlockListener(_gearUnlockCallback);
     }
 
     /// <summary>Removes the achievement listener. Call from Hud._ExitTree.</summary>
     public void Unbind()
     {
         AchievementManager.RemoveUnlockListener(_achUnlockCallback);
-        GearUnlockManager.RemoveUnlockListener(_gearUnlockCallback);
+        EquipmentUnlockManager.RemoveUnlockListener(_gearUnlockCallback);
     }
 
-    /// <summary>Gear drop collected: same banner, chamber-green accent.</summary>
+    /// <summary>Equipment drop collected: same banner, chamber-green accent.</summary>
     public void OnGearUnlocked(string _gearId, Dictionary entry)
     {
         string imagePath = entry.TryGetValue("image_path", out var ipVal) ? ipVal.AsString() : "";
@@ -80,7 +80,7 @@ public partial class ToastView : Node
 
         if (!string.IsNullOrEmpty(rewardCell))
         {
-            var cellInfo = GameManager.GetClassInfo(rewardCell);
+            var cellInfo = GameManager.GetPlayerClass(rewardCell);
             string cName = cellInfo.TryGetValue("name", out var cnVal) ? cnVal.AsString() : rewardCell;
             subText = TextFormatter.Format(Tr("TOAST_CELL_UNLOCKED"), cName);
         }

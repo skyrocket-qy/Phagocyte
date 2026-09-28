@@ -2,28 +2,28 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Phagocyte.Core;
-using Phagocyte.Endgame;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
+using Game.Core;
+using Game.Directors;
+using Game.Player;
+using Game.Skills;
 
-namespace Phagocyte.Directors;
+namespace Game.Directors;
 
 /// <summary>
 /// Run lifecycle owner: achievement event wiring plus combat settlement
 /// (victory/defeat validation, telemetry, records, leaderboards, modal).
-/// Extracted from <c>Main.EndRun / ConnectAchievementEvents / RecordTreeLevel</c>.
+/// Extracted from <c>GameRoot.EndRun / ConnectAchievementEvents / RecordTreeLevel</c>.
 /// Settlement is requested through <see cref="IRunContext.EndRun"/>; the
-/// <c>RunEnded</c> flag itself stays on <see cref="Main"/>.
+/// <c>RunEnded</c> flag itself stays on <see cref="GameRoot"/>.
 /// </summary>
 public partial class RunSettlementService : Node
 {
-    /// <summary>Run context (Main). Must be assigned before use.</summary>
+    /// <summary>Run context (GameRoot). Must be assigned before use.</summary>
     public IRunContext? Context { get; set; }
 
     /// <summary>
     /// Ends the run and persists the settlement record. Returns true when the
-    /// run actually settled (Main then raises its RunEnded flag).
+    /// run actually settled (GameRoot then raises its RunEnded flag).
     /// Victory (docs/record.md §3.1): survive to 15:00 AND neutralize the terminal boss.
     /// Defeat (docs/record.md §3.2): cell membrane integrity reaches zero (SIRS).
     /// </summary>
@@ -37,11 +37,11 @@ public partial class RunSettlementService : Node
         {
             if (ctx.IsEndlessRun)
             {
-                GD.PushWarning("[Main] Endless overdrive runs can only settle as defeat (membrane rupture).");
+                GD.PushWarning("[GameRoot] Endless overdrive runs can only settle as defeat (membrane rupture).");
             }
             else
             {
-                GD.PushWarning($"[Main] Victory rejected: 15:00 survival + terminal boss neutralization required " +
+                GD.PushWarning($"[GameRoot] Victory rejected: 15:00 survival + terminal boss neutralization required " +
                                $"(survival={ctx.EnvironmentTime:F1}s, boss_neutralized={ctx.TerminalBossNeutralized}).");
             }
             return false;
@@ -51,7 +51,7 @@ public partial class RunSettlementService : Node
         {
             AudioManager.Instance?.PlayBgm("victory", 0.3f);
             AudioManager.Instance?.PlaySfx("wave_complete");
-            AchievementManager.RecordMapClear(ctx.MapId, ctx.RunDifficulty == RunRecordManager.DifficultyHard);
+            AchievementManager.RecordMapClear(ctx.StageId, ctx.RunDifficulty == RunRecordManager.DifficultyHard);
         }
         else
         {
@@ -64,7 +64,7 @@ public partial class RunSettlementService : Node
             cause = victory ? RunRecordManager.CauseSpecificNeutralization : RunRecordManager.CauseMembraneRupture;
         }
 
-        var cell = ctx.Player as BaseCell;
+        var cell = ctx.Player as PlayerActor;
         string classId = GameManager.SelectedClass;
 
         var skillIds = new List<string>();
@@ -83,15 +83,15 @@ public partial class RunSettlementService : Node
 
         RunTelemetryManager.Instance?.EndRun();
 
-        float afflictionMultiplier = ctx.IsEndlessRun ? AfflictionManager.ScoreMultiplier : 1.0f;
+        float afflictionMultiplier = ctx.IsEndlessRun ? RunMutatorService.ScoreMultiplier : 1.0f;
         string[] afflictionIds = ctx.IsEndlessRun
-            ? AfflictionManager.SelectedIds.ToArray()
+            ? RunMutatorService.SelectedIds.ToArray()
             : Array.Empty<string>();
 
         var record = RunRecordManager.RecordRun(
             victory ? RunRecordManager.ResultVictory : RunRecordManager.ResultDefeat,
             classId,
-            ctx.MapId,
+            ctx.StageId,
             ctx.EnvironmentTime,
             cell?.CurrentLevel ?? 1,
             PassiveTreeManager.GetSpentPoints(classId),
@@ -140,7 +140,7 @@ public partial class RunSettlementService : Node
 
     /// <summary>
     /// Achievement wiring on typed C# signals plus membrane-rupture
-    /// settlement. Former <c>Main.ConnectAchievementEvents</c>.
+    /// settlement. Former <c>GameRoot.ConnectAchievementEvents</c>.
     /// </summary>
     public void ConnectRunEvents(CharacterBody2D player)
     {
@@ -148,7 +148,7 @@ public partial class RunSettlementService : Node
         if (ctx == null)
             return;
 
-        if (player is BaseCell bc)
+        if (player is PlayerActor bc)
         {
             bc.LevelUp += (lvl) =>
             {
@@ -182,7 +182,7 @@ public partial class RunSettlementService : Node
     private void RecordTreeLevel(int level)
     {
         string classId = GameManager.SelectedClass;
-        if (GameManager.ClassData.ContainsKey(classId))
+        if (GameManager.PlayerClassData.ContainsKey(classId))
             PassiveTreeManager.RecordRunLevel(classId, level);
     }
 }

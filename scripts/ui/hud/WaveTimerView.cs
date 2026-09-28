@@ -1,7 +1,7 @@
 using Godot;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Run timer + top-center capsule (former <c>Hud</c> timer block). Owns the

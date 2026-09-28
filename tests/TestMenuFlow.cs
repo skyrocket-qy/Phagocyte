@@ -1,11 +1,11 @@
 using Godot;
 using System;
-using Phagocyte.Core;
-using Phagocyte.UI;
+using Game.Core;
+using Game.UI;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 public partial class TestMenuFlow : TestHarness
 {
@@ -108,7 +108,7 @@ public partial class TestMenuFlow : TestHarness
 
         // Phase 1: the page offers the vault but the cell deploys bare, and the
         // vault is locked until pathogen drops unlock gear.
-        GearUnlockManager.ResetAll();
+        EquipmentUnlockManager.ResetAll();
         menu.RefreshLoadoutView();
         AssertThat(menu.LoadoutView.Chamber).IsNotNull();
         AssertThat(menu.LoadoutView.Chamber!.EquippedCount).IsEqual(0);
@@ -117,7 +117,7 @@ public partial class TestMenuFlow : TestHarness
         AssertThat(menu.LoadoutView.Chamber.EquippedCount).IsEqual(0);
         GD.Print("[PASS] Loadout page starts with an empty, fully locked vault.");
 
-        GearUnlockManager.UnlockAll();
+        EquipmentUnlockManager.UnlockAll();
         menu.RefreshLoadoutView();
         AssertThat(menu.LoadoutView.Chamber!.Backpack.Count).IsEqual(24);
         GD.Print("[PASS] Unlocking the vault makes every gear equippable.");
@@ -181,9 +181,9 @@ public partial class TestMenuFlow : TestHarness
         GD.Print("[PASS] Transition from PassiveView to MapView verified.");
 
         // 4. Test Map Selection & 5 Organ Battlefields
-        AssertThat(GameManager.MapData.Count).IsEqual(5);
+        AssertThat(GameManager.StageData.Count).IsEqual(5);
         AssertThat(menu.HoloScanner).IsNotNull();
-        GD.Print("[PASS] GameManager.MapData has 5 maps and HoloScanner is initialized.");
+        GD.Print("[PASS] GameManager.StageData has 5 maps and HoloScanner is initialized.");
 
         string[] allMaps = { "acute_wound", "alveolar_space", "hepatic_sinusoid", "gastric_lumen", "blood_brain_barrier" };
         foreach (var mapKey in allMaps)
@@ -191,29 +191,29 @@ public partial class TestMenuFlow : TestHarness
             menu.SelectMap(mapKey);
             AssertThat(menu.ActiveMapKey).IsEqual(mapKey);
             AssertThat(menu.HoloScanner!.ActiveMapKey).IsEqual(mapKey);
-            var info = GameManager.GetMapInfo(mapKey);
+            var info = GameManager.GetStageInfo(mapKey);
             AssertThat(info["name"].AsString()).IsNotEmpty();
             AssertThat(info["organ"].AsString()).IsNotEmpty();
             AssertThat((int)info["difficulty"] >= 1 && (int)info["difficulty"] <= 5).IsTrue();
         }
-        GD.Print("[PASS] All 5 organ battlefields selectable with synchronized HoloBodyScanner.");
+        GD.Print("[PASS] All 5 organ battlefields selectable with synchronized StageSelectMap.");
 
         // Test scanner signal selection
-        menu.HoloScanner!.EmitSignal(HoloBodyScanner.SignalName.OrganSelected, "hepatic_sinusoid");
+        menu.HoloScanner!.EmitSignal(StageSelectMap.SignalName.OrganSelected, "hepatic_sinusoid");
         AssertThat(menu.ActiveMapKey).IsEqual("hepatic_sinusoid");
-        GD.Print("[PASS] HoloBodyScanner interactive OrganSelected signal correctly switches map.");
+        GD.Print("[PASS] StageSelectMap interactive OrganSelected signal correctly switches map.");
 
-        // 5. Test Main Scene loading with selected map
+        // 5. Test GameRoot Scene loading with selected map
         menu.QueueFree();
 
         GameManager.SelectedMap = "hepatic_sinusoid";
         var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         AssertThat(mainScene).IsNotNull();
-        var main = mainScene!.Instantiate<Main>();
+        var main = mainScene!.Instantiate<GameRoot>();
         Root.AddChild(main);
 
-        AssertThat(main.MapId).IsEqual("hepatic_sinusoid");
-        GD.Print("[PASS] Main arena successfully configured with hepatic_sinusoid environment.");
+        AssertThat(main.StageId).IsEqual("hepatic_sinusoid");
+        GD.Print("[PASS] GameRoot arena successfully configured with hepatic_sinusoid environment.");
 
         main.QueueFree();
         AchievementManager.ResetAll();

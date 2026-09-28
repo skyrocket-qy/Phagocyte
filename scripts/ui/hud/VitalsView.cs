@@ -1,8 +1,8 @@
 using Godot;
-using Phagocyte.Core;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Player;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// HP / EXP / level / vitals readout (former <c>Hud</c> vitals block).
@@ -73,7 +73,7 @@ public partial class VitalsView : Node
     }
 
     /// <summary>Typed player subscription + initial render (called from Hud.ConnectPlayer).</summary>
-    public void ConnectPlayer(BaseCell bc)
+    public void ConnectPlayer(PlayerActor bc)
     {
         PlayerRef = bc;
         bc.StatsChanged += (h, mh, r) => OnPlayerStatsChanged(h, mh, r);
@@ -238,12 +238,12 @@ public partial class VitalsView : Node
 
         int kind = 0;
         float timer = 0.0f;
-        if (PlayerRef is BaseCell bc2 && bc2.InvertControlsTimer > 0.0f)
+        if (PlayerRef is PlayerActor bc2 && bc2.InvertControlsTimer > 0.0f)
         {
             kind = 2;
             timer = bc2.InvertControlsTimer;
         }
-        else if (PlayerRef is BaseCell bc3 && bc3.SlowTimer > 0.0f)
+        else if (PlayerRef is PlayerActor bc3 && bc3.SlowTimer > 0.0f)
         {
             kind = 3;
             timer = bc3.SlowTimer;
@@ -255,13 +255,13 @@ public partial class VitalsView : Node
         _lastBuffKind = kind;
         _lastBuffTenths = tenths;
 
-        if (kind == 2 && PlayerRef is BaseCell bcInv)
+        if (kind == 2 && PlayerRef is PlayerActor bcInv)
         {
             BuffTag.Visible = true;
             BuffTag.Text = $"🌀 {Tr("STATUS_CONFUSION")}: {bcInv.InvertControlsTimer:F1}s";
             BuffTag.Modulate = new Color(0.85f, 0.45f, 1.0f, 0.95f);
         }
-        else if (kind == 3 && PlayerRef is BaseCell bcSlow)
+        else if (kind == 3 && PlayerRef is PlayerActor bcSlow)
         {
             BuffTag.Visible = true;
             BuffTag.Text = $"🐌 {Tr("STATUS_SLOW")}: {bcSlow.SlowTimer:F1}s";
@@ -295,7 +295,7 @@ public partial class VitalsView : Node
         LastMaxHealth = maxHealth;
         LastRadiusRatio = radiusRatio;
 
-        if (PlayerRef is BaseCell bc)
+        if (PlayerRef is PlayerActor bc)
         {
             LastSpeed = bc.CurrentSpeed;
         }

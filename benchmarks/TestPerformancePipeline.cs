@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Combat;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
+using Game.Combat;
+using Game.Core;
+using Game.Enemies;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the high-concurrency performance pipeline (docs/spec.md Â§9 /
@@ -18,7 +18,7 @@ namespace Phagocyte.Tests;
 public partial class TestPerformancePipeline : TestHarness
 {
     private int _phase = 0;
-    private Main? _main = null;
+    private GameRoot? _main = null;
     private ProjectileManager? _projectiles = null;
 
     private static readonly Vector2 ArenaHalf = new(500.0f, 500.0f);
@@ -183,7 +183,7 @@ public partial class TestPerformancePipeline : TestHarness
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = "acute_wound";
 
-        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         _main = main;
         Root.AddChild(main);
         main.SetPhysicsProcess(false);
@@ -198,19 +198,21 @@ public partial class TestPerformancePipeline : TestHarness
         // Isolate a clean arena so the counts are deterministic
         foreach (var child in main.EnemyContainer!.GetChildren())
         {
-            if (child is BaseEnemy)
+            if (child is EnemyActor)
                 child.Free();
         }
 
-        var noroviruses = new List<BaseEnemy>();
+        var noroviruses = new List<EnemyActor>();
         for (int i = 0; i < 40; i++)
         {
-            var noro = new NorovirusEnemy { GlobalPosition = new Vector2(i * 4.0f, 0.0f) };
+            var noro = EnemySpawner.CreateEnemy("norovirus")!;
+            noro.GlobalPosition = new Vector2(i * 4.0f, 0.0f);
             main.EnemyContainer.AddChild(noro);
             noroviruses.Add(noro);
         }
 
-        var flu = new FluDriftEnemy { GlobalPosition = new Vector2(200.0f, 120.0f) };
+        var flu = EnemySpawner.CreateEnemy("flu_drift")!;
+        flu.GlobalPosition = new Vector2(200.0f, 120.0f);
         main.EnemyContainer.AddChild(flu);
 
         renderer.Enabled = true;
@@ -225,7 +227,7 @@ public partial class TestPerformancePipeline : TestHarness
         AssertThat(flu.Visible).IsFalse();
 
         // Instance transform mirrors the node transform
-        var multimesh = main.GetNode<MultiMeshInstance2D>("PathogenSwarmRenderer/SwarmBatchRoot/SwarmBatch_norovirus").Multimesh;
+        var multimesh = main.GetNode<MultiMeshInstance2D>("SwarmRenderer/SwarmBatchRoot/SwarmBatch_norovirus").Multimesh;
         Vector2 instanceOrigin = multimesh.GetInstanceTransform2D(0).Origin;
         AssertThat(instanceOrigin.IsEqualApprox(noroviruses[0].GlobalPosition)).IsTrue();
 
@@ -250,14 +252,15 @@ public partial class TestPerformancePipeline : TestHarness
         // it touches, so the target would never take the hit without this reset.
         foreach (var child in main.EnemyContainer!.GetChildren())
         {
-            if (child is BaseEnemy)
+            if (child is EnemyActor)
                 child.Free();
         }
 
         var renderer = main.SwarmRenderer!;
 
         // Batched (invisible) micro virus must still collide with projectiles.
-        var target = new NorovirusEnemy { GlobalPosition = new Vector2(60.0f, 0.0f) };
+        var target = EnemySpawner.CreateEnemy("norovirus")!;
+        target.GlobalPosition = new Vector2(60.0f, 0.0f);
         main.EnemyContainer!.AddChild(target);
         renderer.Enabled = true;
         renderer.Sync();
@@ -282,7 +285,8 @@ public partial class TestPerformancePipeline : TestHarness
 
     private void RunCollisionSetupTests()
     {
-        var probe = new StaphEnemy { GlobalPosition = new Vector2(40.0f, 40.0f) };
+        var probe = EnemySpawner.CreateEnemy("staph")!;
+        probe.GlobalPosition = new Vector2(40.0f, 40.0f);
         Root.AddChild(probe);
 
         AssertThat(probe.HitArea).IsNotNull();

@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 public static class TextFormatter
 {

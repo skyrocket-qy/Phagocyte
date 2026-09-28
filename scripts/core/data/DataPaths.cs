@@ -1,6 +1,6 @@
 using System;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Centralized path constants for all data files under res://assets/data/.
@@ -13,11 +13,12 @@ public static class DataPaths
     private const string SkillRoot = $"{Root}/skill";
     public const string ActiveSkills = $"{SkillRoot}/active.json";
     public const string PassiveSkills = $"{SkillRoot}/passive.json";
-    public const string Gear = $"{Root}/gear.json";
-    public const string Pathogens = $"{Root}/pathogens.json";
-    public const string Bosses = $"{Root}/bosses.json";
-    public const string Maps = $"{Root}/maps.json";
-    public const string Classes = $"{Root}/classes.json";
+    public const string Equipment = $"{Root}/equipment.json";
+    public const string Enemies = $"{Root}/enemy_codex.json";
+    public const string EnemyDefs = $"{Root}/enemies.json";
+    public const string Bosses = $"{Root}/boss_codex.json";
+    public const string Maps = $"{Root}/stages.json";
+    public const string Classes = $"{Root}/player_classes.json";
     public const string Achievements = $"{Root}/achievements.json";
     public const string PassiveTree = $"{Root}/passive_tree.json";
     public const string PassiveTraits = $"{Root}/passive_traits.json";
@@ -28,3 +29,4 @@ public static class DataPaths
 
     public const string AudioManifest = "res://assets/audio/manifest.json";
 }
+

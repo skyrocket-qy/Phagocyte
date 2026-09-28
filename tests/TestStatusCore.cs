@@ -3,10 +3,9 @@ using System;
 using System.Collections.Generic;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Combat;
-using StatusSystem;
+using Game.Combat;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the portable StatusCore engine (stacking rules, aggregation, move
@@ -203,10 +202,10 @@ public partial class TestStatusCore : TestHarness
     {
         // The real assets/data/ailments.json loads through the adapter with JSON defaults.
         var ailment = new AilmentController();
-        ailment.ApplyOpsonization();
-        AssertThat(ailment.IsOpsonized).IsTrue();
-        AssertThat(ailment.OpsonizationTimer).IsEqualApprox(4.0f, 0.01f);
-        AssertThat(ailment.OpsonizationMultiplier).IsEqualApprox(1.30f, 0.01f);
+        ailment.ApplyMarkation();
+        AssertThat(ailment.IsMarked).IsTrue();
+        AssertThat(ailment.MarkationTimer).IsEqualApprox(4.0f, 0.01f);
+        AssertThat(ailment.MarkationMultiplier).IsEqualApprox(1.30f, 0.01f);
 
         ailment.ApplyAgglutination();
         AssertThat(ailment.IsAgglutinated).IsTrue();
@@ -220,8 +219,8 @@ public partial class TestStatusCore : TestHarness
         AssertThat(ailment.IsToxic).IsTrue();
         AssertThat(ailment.EndotoxinStackCount).IsEqual(1);
 
-        ailment.ClearOpsonization();
-        AssertThat(ailment.IsOpsonized).IsFalse();
+        ailment.ClearMarkation();
+        AssertThat(ailment.IsMarked).IsFalse();
         ailment.ClearAll();
         AssertThat(ailment.IsOxidized).IsFalse();
         AssertThat(ailment.IsToxic).IsFalse();

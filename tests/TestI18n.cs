@@ -1,11 +1,11 @@
 using Godot;
 using System;
-using Phagocyte.Core;
-using Phagocyte.UI;
+using Game.Core;
+using Game.UI;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 public partial class TestI18n : TestHarness
 {
@@ -71,10 +71,10 @@ public partial class TestI18n : TestHarness
         GD.Print("[PASS] English (en) text rendering verified.");
 
         // 3. Test Metadata Translation
-        var macroEn = GameManager.GetClassInfo("macrophage");
+        var macroEn = GameManager.GetPlayerClass("macrophage");
         AssertThat(macroEn["role"].AsString().Contains("Melee Heavy Tank")).IsTrue();
 
-        var mapEn = GameManager.GetMapInfo("acute_wound");
+        var mapEn = GameManager.GetStageInfo("acute_wound");
         AssertThat(mapEn["name"].AsString().Contains("Acute Wound")).IsTrue();
         GD.Print("[PASS] Class and Map metadata translations verified.");
 

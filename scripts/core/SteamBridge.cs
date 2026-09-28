@@ -2,12 +2,12 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Steamworks SDK bridge — reserved integration point (docs/achievement.md §3).
 /// The actual SDK calls compile only when the <c>USE_STEAMWORKS</c> symbol is defined
-/// (add Steamworks.NET / GodotSteam and enable the symbol in Phagocyte.csproj).
+/// (add Steamworks.NET / GodotSteam and enable the symbol in Game.csproj).
 /// Without the symbol every method is a safe no-op so the game remains fully
 /// playable offline, with user://achievements.json as the source of truth.
 /// </summary>

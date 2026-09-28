@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
-using Phagocyte.UI;
+using Game.Core;
+using Game.Player;
+using Game.Skills;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Build stats preview: menu totals must equal run-assembled stats (same
@@ -82,7 +82,7 @@ public partial class TestBuildStatsPreview : TestHarness
     private void SetupBuild()
     {
         TestCheats.LockToBaseline();
-        GearUnlockManager.UnlockAll();
+        EquipmentUnlockManager.UnlockAll();
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 6)).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "thick_cytoplasm")).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "iron_membrane")).IsTrue();
@@ -92,15 +92,15 @@ public partial class TestBuildStatsPreview : TestHarness
         GD.Print("[PASS] Test 0: deterministic build staged (generator + 2 tree nodes).");
     }
 
-    private Macrophage? _player;
+    private PlayerActor? _player;
 
     private void StageRunMirror()
     {
-        // Run-side mirror: real player + Main's loadout/tree application order.
+        // Run-side mirror: real player + GameRoot's loadout/tree application order.
         _arena = new Node2D { Name = "PreviewArena" };
         Root.AddChild(_arena);
-        var playerScene = GameManager.GetCellScene("macrophage");
-        _player = playerScene.Instantiate<Macrophage>();
+        var playerScene = GameManager.GetPlayerScene("macrophage");
+        _player = playerScene.Instantiate<PlayerActor>();
         _arena.AddChild(_player);
         _player.SetPhysicsProcess(false);
     }
@@ -124,12 +124,12 @@ public partial class TestBuildStatsPreview : TestHarness
         AssertThat(GodotObject.IsInstanceValid(_player)).IsTrue();
         var player = _player!;
         string[] slots = LoadoutManager.GetActiveSlots("macrophage");
-        var chamber = player.CellGearChamber;
+        var chamber = player.Equipment;
         AssertThat(chamber).IsNotNull();
-        for (int i = 0; i < slots.Length && i < GearChamber.MaxSlots; i++)
+        for (int i = 0; i < slots.Length && i < EquipmentChamber.MaxSlots; i++)
         {
             string id = slots[i];
-            if (string.IsNullOrEmpty(id) || !GearUnlockManager.IsUnlocked(id))
+            if (string.IsNullOrEmpty(id) || !EquipmentUnlockManager.IsUnlocked(id))
                 continue;
             if (!chamber!.AddToBackpack(id))
                 continue;
@@ -229,3 +229,4 @@ public partial class TestBuildStatsPreview : TestHarness
         RestoreSaves();
     }
 }
+

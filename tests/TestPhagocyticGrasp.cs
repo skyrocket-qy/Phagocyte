@@ -2,13 +2,13 @@ using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
+using Game.Enemies;
+using Game.Player;
+using Game.Skills;
 
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Behavioral tests for the Macrophage innate active (吞噬偽足):
@@ -25,17 +25,17 @@ public partial class TestPhagocyticGrasp : TestHarness
     private ulong _physStart = ulong.MaxValue;
     private int _retryIn;
 
-    private Macrophage? _player;
-    private PhagocyticGraspSkill? _grasp;
+    private PlayerActor? _player;
+    private StrikeSkill? _grasp;
     private Node2D? _arena;
 
-    private TbEnemy? _tb1;
-    private TbEnemy? _tb2;
-    private TbEnemy? _ctrl;
-    private CandidaEnemy? _candida;
-    private TbEnemy? _tb3;
-    private TbEnemy? _tb4;
-    private TbEnemy? _tb5;
+    private EnemyActor? _tb1;
+    private EnemyActor? _tb2;
+    private EnemyActor? _ctrl;
+    private EnemyActor? _candida;
+    private EnemyActor? _tb3;
+    private EnemyActor? _tb4;
+    private EnemyActor? _tb5;
 
     public override void _Initialize()
     {
@@ -124,8 +124,8 @@ public partial class TestPhagocyticGrasp : TestHarness
                 GD.Print("[PASS] Test 1: default double-grasp damaged 2 in-reach foes, spared out-of-reach control.");
 
                 // TEST 2 setup: hyphae-extended candida takes grasp damage like anyone else.
-                _candida = Spawn<CandidaEnemy>(new Vector2(120, 0));
-                _candida.ExtendHyphae();
+                _candida = Spawn("candida", new Vector2(120, 0));
+                _candida!._PhysicsProcess(0.5);
                 _grasp!.Trigger();
                 _phase = 2;
                 return false;
@@ -158,9 +158,9 @@ public partial class TestPhagocyticGrasp : TestHarness
                 TeleportAway(_tb2);
                 _player!.Stats!.SetBase("amount", 1.0f);
                 AssertThat(_grasp!.GetCalculatedAmount(2)).IsEqual(3);
-                _tb3 = Spawn<TbEnemy>(new Vector2(100, 0));
-                _tb4 = Spawn<TbEnemy>(new Vector2(150, 0));
-                _tb5 = Spawn<TbEnemy>(new Vector2(200, 0));
+                _tb3 = Spawn("tb", new Vector2(100, 0));
+                _tb4 = Spawn("tb", new Vector2(150, 0));
+                _tb5 = Spawn("tb", new Vector2(200, 0));
                 _grasp.Trigger();
                 _phase = 3;
                 return false;
@@ -196,10 +196,10 @@ public partial class TestPhagocyticGrasp : TestHarness
         _arena = new Node2D { Name = "GraspArena" };
         Root.AddChild(_arena);
 
-        var playerScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+        var playerScene = AssetLoader.Load<PackedScene>("res://scenes/actors/player_base.tscn");
         if (playerScene == null)
             return false;
-        _player = playerScene.Instantiate<Macrophage>();
+        _player = playerScene.Instantiate<PlayerActor>();
         if (_player == null)
             return false;
         _arena.AddChild(_player);
@@ -217,20 +217,21 @@ public partial class TestPhagocyticGrasp : TestHarness
         // firings under test (no auto-fire loop, no drift).
         _player.SetPhysicsProcess(false);
 
-        _grasp = _player.CellSkillManager.GetActiveSlot(0) as PhagocyticGraspSkill;
+        _grasp = _player.CellSkillManager.GetActiveSlot(0) as StrikeSkill;
         if (_grasp == null)
             return false;
 
         // Reach is 280 * area(1.25) = 350; control sits far outside.
-        _tb1 = Spawn<TbEnemy>(new Vector2(100, 0));
-        _tb2 = Spawn<TbEnemy>(new Vector2(150, 0));
-        _ctrl = Spawn<TbEnemy>(new Vector2(800, 0));
+        _tb1 = Spawn("tb", new Vector2(100, 0));
+        _tb2 = Spawn("tb", new Vector2(150, 0));
+        _ctrl = Spawn("tb", new Vector2(800, 0));
         return _tb1 != null && _tb2 != null;
     }
 
-    private T Spawn<T>(Vector2 pos) where T : BaseEnemy, new()
+    private EnemyActor Spawn(string enemyId, Vector2 pos)
     {
-        var enemy = new T { GlobalPosition = pos };
+        var enemy = EnemySpawner.CreateEnemy(enemyId)!;
+        enemy.GlobalPosition = pos;
         _arena!.AddChild(enemy);
         return enemy;
     }
@@ -241,7 +242,7 @@ public partial class TestPhagocyticGrasp : TestHarness
     /// missing foe took lethal grasp damage (vital under re-fire, where a
     /// second volley can finish an already-damaged foe and flip it invalid).
     /// </summary>
-    private static bool IsDamagedOrGone(BaseEnemy? enemy)
+    private static bool IsDamagedOrGone(EnemyActor? enemy)
     {
         if (enemy == null)
             return false;
@@ -251,9 +252,12 @@ public partial class TestPhagocyticGrasp : TestHarness
     }
 
     /// <summary>Moves a living foe out of grasp reach; freed foes are already untargetable.</summary>
-    private static void TeleportAway(BaseEnemy? enemy)
+    private static void TeleportAway(EnemyActor? enemy)
     {
         if (enemy != null && GodotObject.IsInstanceValid(enemy) && !enemy.IsQueuedForDeletion())
             enemy.GlobalPosition = new Vector2(5000, 5000);
     }
 }
+
+
+

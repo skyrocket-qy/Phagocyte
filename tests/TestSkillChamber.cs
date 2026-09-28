@@ -1,12 +1,12 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
-using Phagocyte.Testing;
+using Game.Core;
+using Game.Player;
+using Game.Skills;
+using Game.Testing;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Deterministic, environment-independent test harness for all 18 active skills.
@@ -41,7 +41,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "phagocytic_grasp",
-            Factory = () => new PhagocyticGraspSkill(),
+            Factory = () => SkillFactory.CreateActive("phagocytic_grasp")!,
             Formation = DummyFormation.Single,
             PeakFrames = 5
         });
@@ -49,7 +49,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "perforin_lance",
-            Factory = () => new PerforinLanceSkill(),
+            Factory = () => SkillFactory.CreateActive("perforin_lance")!,
             Formation = DummyFormation.Line,
             PeakFrames = 4
         });
@@ -57,16 +57,15 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "complement_cascade",
-            Factory = () => new ComplementCascadeSkill(),
+            Factory = () => SkillFactory.CreateActive("complement_cascade")!,
             Formation = DummyFormation.Single,
             PeakFrames = 15,
             SpecialAction = chamber =>
             {
-                var mines = chamber.GetTree().GetNodesInGroup("MacAssemblyMines");
-                foreach (var m in mines)
+                foreach (var child in chamber.GetChildren())
                 {
-                    if (m is ComplementCascadeSkill.MacAssemblyMine mine)
-                        mine.AssemblyTime = 0.05f;
+                    if (child is ZoneSkill.ZoneNode zone)
+                        zone.Duration = 0.05f;
                 }
             }
         });
@@ -74,7 +73,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "antibody_salvo",
-            Factory = () => new AntibodySalvoSkill(),
+            Factory = () => SkillFactory.CreateActive("antibody_salvo")!,
             Formation = DummyFormation.Cluster,
             PeakFrames = 18
         });
@@ -82,14 +81,14 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "granzyme_detonation",
-            Factory = () => new GranzymeDetonationSkill(),
+            Factory = () => SkillFactory.CreateActive("granzyme_detonation")!,
             Formation = DummyFormation.Cluster,
             PeakFrames = 6,
             SpecialAction = chamber =>
             {
-                if (chamber.CurrentSkill is GranzymeDetonationSkill gran && chamber.Dummies.Count > 0)
+                if (chamber.CurrentSkill is NovaSkill nova && chamber.Dummies.Count > 0)
                 {
-                    gran.DetonateCaspase(chamber.Dummies[0].GlobalPosition);
+                    nova.DetonateAt(chamber.Dummies[0].GlobalPosition);
                 }
             }
         });
@@ -97,7 +96,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "mhc_tracer_beam",
-            Factory = () => new MhcTracerBeamSkill(),
+            Factory = () => SkillFactory.CreateActive("mhc_tracer_beam")!,
             Formation = DummyFormation.Single,
             PeakFrames = 4
         });
@@ -105,7 +104,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "lysosomal_overload",
-            Factory = () => new LysosomalOverloadSkill(),
+            Factory = () => SkillFactory.CreateActive("lysosomal_overload")!,
             Formation = DummyFormation.GroundHazard,
             PeakFrames = 8
         });
@@ -113,7 +112,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "ros_torrent",
-            Factory = () => new RosTorrentSkill(),
+            Factory = () => SkillFactory.CreateActive("ros_torrent")!,
             Formation = DummyFormation.Line,
             PeakFrames = 6
         });
@@ -121,7 +120,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "pseudopod_lunge",
-            Factory = () => new PseudopodLungeSkill(),
+            Factory = () => SkillFactory.CreateActive("pseudopod_lunge")!,
             Formation = DummyFormation.Single,
             PeakFrames = 5
         });
@@ -129,7 +128,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "nitric_oxide_halo",
-            Factory = () => new NitricOxideHaloSkill(),
+            Factory = () => SkillFactory.CreateActive("nitric_oxide_halo")!,
             Formation = DummyFormation.Radial,
             PeakFrames = 6
         });
@@ -137,7 +136,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "nuclease_blades",
-            Factory = () => new NucleaseBladesSkill(),
+            Factory = () => SkillFactory.CreateActive("nuclease_blades")!,
             Formation = DummyFormation.Radial,
             PeakFrames = 5
         });
@@ -145,7 +144,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "interferon_wave",
-            Factory = () => new InterferonWaveSkill(),
+            Factory = () => SkillFactory.CreateActive("interferon_wave")!,
             Formation = DummyFormation.Radial,
             PeakFrames = 6
         });
@@ -153,7 +152,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "lysozyme_ricochet",
-            Factory = () => new LysozymeRicochetSkill(),
+            Factory = () => SkillFactory.CreateActive("lysozyme_ricochet")!,
             Formation = DummyFormation.Cluster,
             PeakFrames = 8
         });
@@ -161,7 +160,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "phagolysosome_vent",
-            Factory = () => new PhagolysosomeVentSkill(),
+            Factory = () => SkillFactory.CreateActive("phagolysosome_vent")!,
             Formation = DummyFormation.GroundHazard,
             PeakFrames = 6
         });
@@ -169,7 +168,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "pro_inflammatory_arc",
-            Factory = () => new ProInflammatoryArcSkill(),
+            Factory = () => SkillFactory.CreateActive("pro_inflammatory_arc")!,
             Formation = DummyFormation.Cluster,
             PeakFrames = 5
         });
@@ -177,7 +176,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "exosome_singularity",
-            Factory = () => new ExosomeSingularitySkill(),
+            Factory = () => SkillFactory.CreateActive("exosome_singularity")!,
             Formation = DummyFormation.Cluster,
             PeakFrames = 8
         });
@@ -185,7 +184,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "defensin_barbs",
-            Factory = () => new DefensinBarbsSkill(),
+            Factory = () => SkillFactory.CreateActive("defensin_barbs")!,
             Formation = DummyFormation.Radial,
             PeakFrames = 6
         });
@@ -193,7 +192,7 @@ public partial class TestSkillChamber : TestHarness
         _skills.Add(new SkillTestDef
         {
             SkillId = "histamine_surge",
-            Factory = () => new HistamineSurgeSkill(),
+            Factory = () => SkillFactory.CreateActive("histamine_surge")!,
             Formation = DummyFormation.Radial,
             PeakFrames = 6
         });
@@ -208,7 +207,7 @@ public partial class TestSkillChamber : TestHarness
                 _chamber = new SkillTestChamber();
                 Root.AddChild(_chamber);
 
-                var macrophageScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+                var macrophageScene = AssetLoader.Load<PackedScene>("res://scenes/actors/player_base.tscn");
                 if (macrophageScene == null)
                 {
                     GD.PrintErr("[FAIL] Failed to load macrophage.tscn");
@@ -282,3 +281,5 @@ public partial class TestSkillChamber : TestHarness
         }
     }
 }
+
+

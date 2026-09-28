@@ -1,10 +1,10 @@
 using Godot;
 using Godot.Collections;
 
-namespace Phagocyte.Directors;
+namespace Game.Directors;
 
 /// <summary>
-/// Director-facing HUD surface. Implemented by <c>Phagocyte.UI.Hud</c>;
+/// Director-facing HUD surface. Implemented by <c>Game.UI.Hud</c>;
 /// lives here so directors never compile against concrete UI types
 /// (gameplay → UI is forbidden — see docs/architecture/ARCH_RULE.md).
 /// </summary>
@@ -17,7 +17,7 @@ public interface IDirectorHud
 
 /// <summary>
 /// Director-facing settlement modal surface. Implemented by
-/// <c>Phagocyte.UI.RunRecordsModal</c>; same inversion as
+/// <c>Game.UI.RunRecordsModal</c>; same inversion as
 /// <see cref="IDirectorHud"/> — directors resolve it via
 /// <c>GetNodeOrNull&lt;IRunSettlementModal&gt;</c>, never the concrete type.
 /// </summary>
@@ -28,10 +28,10 @@ public interface IRunSettlementModal
 
 /// <summary>
 /// Narrow run-scoped view of the orchestrator that director components are
-/// allowed to touch. Implemented by <see cref="Main"/>; breaks the
-/// <c>MapEnvironment ↔ Main</c> god-object cycle (suggestion 6) so directors
+/// allowed to touch. Implemented by <see cref="GameRoot"/>; breaks the
+/// <c>StageEnvironment ↔ GameRoot</c> god-object cycle (suggestion 6) so directors
 /// and organ environments can be unit-tested against a mock context.
-/// Cap tunables stay on <see cref="Main"/> — directors read them here so no
+/// Cap tunables stay on <see cref="GameRoot"/> — directors read them here so no
 /// spawn-cap state is ever duplicated.
 /// </summary>
 public interface IRunContext
@@ -41,7 +41,7 @@ public interface IRunContext
     float RunGoalSeconds { get; }
     bool IsEndlessRun { get; }
     bool RunEnded { get; }
-    string MapId { get; }
+    string StageId { get; }
     string RunDifficulty { get; }
     bool TerminalBossNeutralized { get; }
     CharacterBody2D? Player { get; }

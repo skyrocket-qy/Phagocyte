@@ -3,11 +3,11 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
+using Game.Core;
+using Game.Player;
+using Game.Skills;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 [TestSuite]
 public partial class TestExpandedSkills : SceneTree
@@ -27,31 +27,18 @@ public partial class TestExpandedSkills : SceneTree
         GD.Print("[PASS] Step 1: UpgradeManager.ActiveCatalog has 18 items and PassiveCatalog has 13 items.");
 
         // --- 2. Verify Every Active Skill Instantiation & Metadata ---
-        var activeTypes = new Type[]
+        var activeIds = new string[]
         {
-            typeof(PhagocyticGraspSkill),
-            typeof(LysosomalOverloadSkill),
-            typeof(RosTorrentSkill),
-            typeof(PerforinLanceSkill),
-            typeof(ComplementCascadeSkill),
-            typeof(AntibodySalvoSkill),
-            typeof(PseudopodLungeSkill),
-            typeof(NitricOxideHaloSkill),
-            typeof(NucleaseBladesSkill),
-            typeof(GranzymeDetonationSkill),
-            typeof(InterferonWaveSkill),
-            typeof(LysozymeRicochetSkill),
-            typeof(PhagolysosomeVentSkill),
-            typeof(ProInflammatoryArcSkill),
-            typeof(ExosomeSingularitySkill),
-            typeof(DefensinBarbsSkill),
-            typeof(MhcTracerBeamSkill),
-            typeof(HistamineSurgeSkill)
+            "phagocytic_grasp", "lysosomal_overload", "ros_torrent", "perforin_lance",
+            "complement_cascade", "antibody_salvo", "pseudopod_lunge", "nitric_oxide_halo",
+            "nuclease_blades", "granzyme_detonation", "interferon_wave", "lysozyme_ricochet",
+            "phagolysosome_vent", "pro_inflammatory_arc", "exosome_singularity", "defensin_barbs",
+            "mhc_tracer_beam", "histamine_surge"
         };
 
-        foreach (var type in activeTypes)
+        foreach (var id in activeIds)
         {
-            var skill = (BaseSkill?)Activator.CreateInstance(type);
+            var skill = SkillFactory.CreateActive(id);
             AssertThat(skill).IsNotNull();
             AssertThat(skill!.IsPassive).IsFalse();
             AssertThat(skill!.SkillId.Length > 0).IsTrue();
@@ -63,29 +50,19 @@ public partial class TestExpandedSkills : SceneTree
             // Verify entry exists in GameManager.SkillCatalog
             AssertThat(GameManager.SkillCatalog.ContainsKey(skill!.SkillId)).IsTrue();
         }
-        GD.Print($"[PASS] Step 2: All {activeTypes.Length} Active Weapons instantiated and verified in GameManager.SkillCatalog.");
+        GD.Print($"[PASS] Step 2: All {activeIds.Length} Active Weapons instantiated and verified in GameManager.SkillCatalog.");
 
         // --- 3. Verify Every Passive Skill Instantiation & Metadata ---
-        var passiveTypes = new Type[]
+        var passiveIds = new string[]
         {
-            typeof(PassiveActinPolymerization),
-            typeof(PassiveLysosomePriming),
-            typeof(PassiveMitochondrialOverclock),
-            typeof(PassiveOpsoninAffinity),
-            typeof(PassiveChemokineReceptors),
-            typeof(PassiveBilayerHardening),
-            typeof(PassiveAutophagicRecycle),
-            typeof(PassiveAerobicGlycolysis),
-            typeof(PassiveKinesinTransit),
-            typeof(PassiveCytokineLongevity),
-            typeof(PassiveVdjDiversity),
-            typeof(PassiveEndotoxinBarrier),
-            typeof(PassiveHematopoieticReserve)
+            "actin", "lysosome", "mitochondria", "opsonin", "chemokine", "bilayer",
+            "autophagy", "glycolysis", "kinesin", "longevity", "vdj", "endotoxin",
+            "hematopoietic"
         };
 
-        foreach (var type in passiveTypes)
+        foreach (var id in passiveIds)
         {
-            var skill = (BaseSkill?)Activator.CreateInstance(type);
+            var skill = SkillFactory.CreatePassive(id);
             AssertThat(skill).IsNotNull();
             AssertThat(skill!.IsPassive).IsTrue();
             AssertThat(skill!.SkillId.Length > 0).IsTrue();
@@ -97,17 +74,17 @@ public partial class TestExpandedSkills : SceneTree
             // Verify entry exists in GameManager.SkillCatalog
             AssertThat(GameManager.SkillCatalog.ContainsKey(skill!.SkillId)).IsTrue();
         }
-        GD.Print($"[PASS] Step 3: All {passiveTypes.Length} Passive Gear Traits instantiated and verified in GameManager.SkillCatalog.");
+        GD.Print($"[PASS] Step 3: All {passiveIds.Length} Passive Equipment Traits instantiated and verified in GameManager.SkillCatalog.");
 
         // --- 4. Verify 8 New Passives Stat Injections ---
         var dummyHost = new CharacterBody2D();
-        var cellStats = new CellStats { Name = "CellStats" };
+        var cellStats = new ActorStats { Name = "ActorStats" };
         dummyHost.AddChild(cellStats);
 
         // 4.1 Bilayer Hardening: MaxHP +15% / Armor +2 per level
         float baseHp = cellStats.GetStat("max_health");
         float baseArmor = cellStats.GetStat("armor");
-        var bilayer = new PassiveBilayerHardening();
+        var bilayer = SkillFactory.CreatePassive("bilayer")!;
         bilayer.Setup(dummyHost);
         AssertThat(cellStats.GetStat("max_health")).IsEqualApprox(baseHp * 1.15f, 0.01f);
         AssertThat(cellStats.GetStat("armor")).IsEqual(baseArmor + 2.0f);
@@ -119,7 +96,7 @@ public partial class TestExpandedSkills : SceneTree
         AssertThat(cellStats.GetStat("armor")).IsEqual(baseArmor);
 
         // 4.2 Autophagic Recycle: HealthRegen +0.4 HP/s per level
-        var autophagy = new PassiveAutophagicRecycle();
+        var autophagy = SkillFactory.CreatePassive("autophagy")!;
         autophagy.Setup(dummyHost);
         AssertThat(cellStats.GetStat("health_regen")).IsEqualApprox(0.4f, 0.01f);
         autophagy.Upgrade(); // Lv.2
@@ -128,14 +105,14 @@ public partial class TestExpandedSkills : SceneTree
         AssertThat(cellStats.GetStat("health_regen")).IsEqual(0.0f);
 
         // 4.3 Aerobic Glycolysis: Move Speed +6%, Might +5% per level
-        var glycolysis = new PassiveAerobicGlycolysis();
+        var glycolysis = SkillFactory.CreatePassive("glycolysis")!;
         glycolysis.Setup(dummyHost);
         AssertThat(cellStats.GetStat("move_speed")).IsEqualApprox(230.0f * 1.06f, 0.5f);
         AssertThat(cellStats.GetStat("might")).IsEqualApprox(1.05f, 0.01f);
         glycolysis.RemovePassiveModifiers();
 
         // 4.4 Kinesin Transit: Speed +15%, Pierce +1
-        var kinesin = new PassiveKinesinTransit();
+        var kinesin = SkillFactory.CreatePassive("kinesin")!;
         kinesin.Setup(dummyHost);
         AssertThat(cellStats.GetStat("projectile_speed")).IsEqualApprox(1.15f, 0.01f);
         AssertThat(cellStats.GetStat("pierce")).IsEqual(1.0f);
@@ -145,38 +122,38 @@ public partial class TestExpandedSkills : SceneTree
         AssertThat(cellStats.GetStat("pierce")).IsEqual(0.0f);
 
         // 4.5 Cytokine Longevity: Duration +15%, Knockback +10% per level
-        var longevity = new PassiveCytokineLongevity();
+        var longevity = SkillFactory.CreatePassive("longevity")!;
         longevity.Setup(dummyHost);
         AssertThat(cellStats.GetStat("duration")).IsEqualApprox(1.15f, 0.01f);
         AssertThat(cellStats.GetStat("knockback")).IsEqualApprox(1.10f, 0.01f);
         longevity.RemovePassiveModifiers();
 
         // 4.6 V(D)J Diversity: CritDamage +15%, CritChance +3% per level
-        var vdj = new PassiveVdjDiversity();
+        var vdj = SkillFactory.CreatePassive("vdj")!;
         vdj.Setup(dummyHost);
         AssertThat(cellStats.GetStat("crit_damage")).IsEqualApprox(2.30f, 0.01f);
         AssertThat(cellStats.GetStat("crit_chance")).IsEqualApprox(0.08f, 0.01f);
         vdj.RemovePassiveModifiers();
 
         // 4.7 Endotoxin Barrier: Armor +3, Block +4% per level
-        var endotoxin = new PassiveEndotoxinBarrier();
+        var endotoxin = SkillFactory.CreatePassive("endotoxin")!;
         endotoxin.Setup(dummyHost);
         AssertThat(cellStats.GetStat("armor")).IsEqual(3.0f);
         AssertThat(cellStats.GetStat("block")).IsEqualApprox(0.04f, 0.01f);
         endotoxin.RemovePassiveModifiers();
 
         // 4.8 Hematopoietic Reserve: MaxHP +10%, Block +3%
-        var hematopoietic = new PassiveHematopoieticReserve();
+        var hematopoietic = SkillFactory.CreatePassive("hematopoietic")!;
         hematopoietic.Setup(dummyHost);
         AssertThat(cellStats.GetStat("max_health")).IsEqualApprox(110.0f, 0.1f);
         AssertThat(cellStats.GetStat("block")).IsEqualApprox(0.03f, 0.01f);
         hematopoietic.RemovePassiveModifiers();
 
-        GD.Print("[PASS] Step 4: All 8 new Passive traits correctly inject, upgrade, and remove modifiers from CellStats.");
+        GD.Print("[PASS] Step 4: All 8 new Passive traits correctly inject, upgrade, and remove modifiers from ActorStats.");
 
-        // --- 5. Verify BaseCell Integration (Exp, Impulse, Damage) ---
-        var player = new BaseCell();
-        var playerStats = new CellStats { Name = "CellStats" };
+        // --- 5. Verify PlayerActor Integration (Exp, Impulse, Damage) ---
+        var player = new PlayerActor();
+        var playerStats = new ActorStats { Name = "ActorStats" };
         player.AddChild(playerStats);
         player.Stats = playerStats;
         Root.AddChild(player);
@@ -185,21 +162,21 @@ public partial class TestExpandedSkills : SceneTree
         float expBefore = player.CurrentExp;
         player.AddExp(15.0f);
         AssertThat(player.CurrentExp).IsEqualApprox(expBefore + 15.0f, 0.01f);
-        GD.Print("[PASS] Step 5.1: BaseCell AddExp works correctly.");
+        GD.Print("[PASS] Step 5.1: PlayerActor AddExp works correctly.");
 
         // 5.2 Armor damping in ApplyImpulse
         playerStats.AddModifier("armor", 50.0f, 0.0f); // 50% DR
         player.Velocity = Vector2.Zero;
         player.ApplyImpulse(new Vector2(100.0f, 0.0f));
         AssertThat(player.Velocity.X).IsEqualApprox(50.0f, 0.5f);
-        GD.Print("[PASS] Step 5.2: BaseCell ApplyImpulse respects armor dampening.");
+        GD.Print("[PASS] Step 5.2: PlayerActor ApplyImpulse respects armor dampening.");
 
         // 5.3 Fatal damage
         player.Health = 20.0f;
         player.TakeDamage(100.0f); // Lethal damage
         AssertThat(player.Health).IsEqual(0.0f);
         AssertThat(player.IsDead).IsTrue();
-        GD.Print("[PASS] Step 5.3: BaseCell TakeDamage handles fatal damage correctly.");
+        GD.Print("[PASS] Step 5.3: PlayerActor TakeDamage handles fatal damage correctly.");
 
         // --- 6. Verify Level Up Selection Pool with Expanded Skills ---
         var sm2 = new SkillManager { Name = "SkillManager" };

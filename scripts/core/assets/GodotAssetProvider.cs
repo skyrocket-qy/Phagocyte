@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Production <see cref="IAssetProvider"/> backed by the Godot resource system.

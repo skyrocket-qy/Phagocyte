@@ -1,11 +1,11 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Camera;
-using Phagocyte.Core;
-using Phagocyte.Hero;
+using Game.Camera;
+using Game.Core;
+using Game.Player;
 
-namespace Phagocyte.Combat;
+namespace Game.Combat;
 
 public enum TelegraphAttackShape
 {
@@ -15,8 +15,8 @@ public enum TelegraphAttackShape
 }
 
 /// <summary>
-/// Ground danger telegraph indicator for elite and boss pathogens.
-/// Visualizes an impending lethal strike with charging animations before resolving hits against BaseCell.
+/// Ground danger telegraph indicator for elite and boss enemies.
+/// Visualizes an impending lethal strike with charging animations before resolving hits against PlayerActor.
 /// </summary>
 public partial class TelegraphedAttack : Node2D
 {
@@ -123,7 +123,7 @@ public partial class TelegraphedAttack : Node2D
 
     public void ExecuteImpact()
     {
-        var player = (BaseCell?)GetTree().GetFirstNodeInGroup("player");
+        var player = (PlayerActor?)GetTree().GetFirstNodeInGroup("player");
         if (player == null || !GodotObject.IsInstanceValid(player))
             return;
 

@@ -1,13 +1,13 @@
 using Godot;
 using Godot.Collections;
 using System;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Level-Up 3-Choice Epigenetic Mutation Modal.
-/// Pauses the game, displays 3 distinct choices (Active/Passive/Gear).
+/// Pauses the game, displays 3 distinct choices (Active/Passive/Equipment).
 /// A gear card that cannot auto-equip opens an in-modal swap step:
 /// replace one chamber slot, store the item to the run backpack, or discard
 /// it for a small heal.
@@ -45,7 +45,7 @@ public partial class UpgradeModal : ModalBase
     private Node2D? _playerRef = null;
     private int _pendingLevels = 0;
     private string _pendingGear = "";
-    private readonly System.Collections.Generic.List<GearSlot> _swapCards = new();
+    private readonly System.Collections.Generic.List<EquipmentSlot> _swapCards = new();
 
     public override void _Ready()
     {
@@ -261,7 +261,7 @@ public partial class UpgradeModal : ModalBase
                     descLbl.Text = descKey == "UPGRADE_TO_LV"
                         ? TextFormatter.Format(Tr(descKey), descLvl)
                         : Tr(descKey);
-                    // Gear cards carry their energy cost under the description.
+                    // Equipment cards carry their energy cost under the description.
                     if (choice.TryGetValue("energy_cost", out var costVal))
                     {
                         int cost = costVal.AsInt32();
@@ -308,7 +308,7 @@ public partial class UpgradeModal : ModalBase
     private string SwapCandidateText()
     {
         if (string.IsNullOrEmpty(_pendingGear)
-            || !GameManager.GearCatalog.TryGetValue(_pendingGear, out var entryVar))
+            || !GameManager.EquipmentCatalog.TryGetValue(_pendingGear, out var entryVar))
         {
             return "";
         }
@@ -380,19 +380,19 @@ public partial class UpgradeModal : ModalBase
     }
 
     // ------------------------------------------------------------------
-    // Gear swap flow (Phase 2)
+    // Equipment swap flow (Phase 2)
     // ------------------------------------------------------------------
 
     /// <summary>Id pending placement ("" when the modal shows plain cards).</summary>
     public string PendingGear => _pendingGear;
 
-    private GearChamber? ResolveChamber()
+    private EquipmentChamber? ResolveChamber()
     {
-        return _playerRef?.GetNodeOrNull<GearChamber>("GearChamber");
+        return _playerRef?.GetNodeOrNull<EquipmentChamber>("EquipmentChamber");
     }
 
     /// <summary>
-    /// Gear cards always acquire into the run backpack first. When the new
+    /// Equipment cards always acquire into the run backpack first. When the new
     /// item auto-equips (free slot + legal energy) the draft resolves exactly
     /// like other choices; otherwise the swap step opens for replace / store /
     /// discard / cancel.
@@ -428,9 +428,9 @@ public partial class UpgradeModal : ModalBase
         EnterSwapMode(id);
     }
 
-    private static bool IsEquipped(GearChamber chamber, string id)
+    private static bool IsEquipped(EquipmentChamber chamber, string id)
     {
-        for (int i = 0; i < GearChamber.MaxSlots; i++)
+        for (int i = 0; i < EquipmentChamber.MaxSlots; i++)
         {
             if (chamber.GetSlot(i) == id)
                 return true;
@@ -457,10 +457,10 @@ public partial class UpgradeModal : ModalBase
             return;
 
         _swapCards.Clear();
-        for (int i = 0; i < GearChamber.MaxSlots; i++)
+        for (int i = 0; i < EquipmentChamber.MaxSlots; i++)
         {
             int slot = i;
-            var card = SwapSlotsContainer.GetNodeOrNull<GearSlot>($"SwapSlot{slot}");
+            var card = SwapSlotsContainer.GetNodeOrNull<EquipmentSlot>($"SwapSlot{slot}");
             if (card == null)
                 continue;
             card.Pressed += () => OnSwapSlotPressed(slot);
@@ -544,7 +544,7 @@ public partial class UpgradeModal : ModalBase
 
         if (_playerRef != null && _playerRef.HasMethod("Heal"))
         {
-            if (_playerRef.Get("stats").AsGodotObject() is CellStats stats)
+            if (_playerRef.Get("stats").AsGodotObject() is ActorStats stats)
                 _playerRef.Call("Heal", stats.GetStat("max_health") * DiscardHealRatio);
         }
         ResolveChoice(PendingChoice());

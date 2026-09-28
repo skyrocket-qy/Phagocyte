@@ -2,9 +2,9 @@ using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Enemies;
+using Game.Enemies;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the fixed pathological BaseScore table from docs/record.md §4.1.
@@ -12,7 +12,7 @@ namespace Phagocyte.Tests;
 [TestSuite]
 public partial class TestBaseScore : SceneTree
 {
-    private static readonly string[] AllPathogenIds = new[]
+    private static readonly string[] AllenemyIds = new[]
     {
         "staph", "s_virus", "flu_drift", "malignant_cell", "pseudomonas",
         "e_coli", "tb", "tetanus", "h_pylori", "anthrax_spore",
@@ -91,9 +91,9 @@ public partial class TestBaseScore : SceneTree
         AssertThat(Score("prion")).IsEqual(100);
 
         // Every standard pathogen exposes a positive score and compat accessor
-        foreach (string id in AllPathogenIds)
+        foreach (string id in AllenemyIds)
         {
-            var enemy = PathogenSpawner.CreatePathogen(id);
+            var enemy = EnemySpawner.CreateEnemy(id);
             AssertThat(enemy).IsNotNull();
             AssertThat(enemy!.BaseScore).IsGreater(0);
             AssertThat(enemy.GetBaseScore()).IsEqual(enemy.BaseScore);
@@ -102,21 +102,21 @@ public partial class TestBaseScore : SceneTree
         GD.Print("[PASS] 20 pathogen BaseScore tiers (5 / 15 / 35 / 100) verified.");
 
         // 09:00 sub-boss (600) and 15:00 terminal boss (3,000) tiers
-        foreach (string mapId in MapIds)
+        foreach (string stageId in MapIds)
         {
-            var subBoss = PathogenSpawner.CreateSubBoss(mapId);
+            var subBoss = EnemySpawner.CreateSubBoss(stageId);
             AssertThat(subBoss).IsNotNull();
             AssertThat(subBoss!.BaseScore).IsEqual(600);
             subBoss.Free();
 
-            var terminalBoss = PathogenSpawner.CreateTerminalBoss(mapId);
+            var terminalBoss = EnemySpawner.CreateTerminalBoss(stageId);
             AssertThat(terminalBoss).IsNotNull();
             AssertThat(terminalBoss!.BaseScore).IsEqual(3000);
             terminalBoss.Free();
         }
 
         // MRSA split children stay in the dangerous tier
-        var elite = new MrsaEnragedElite();
+        var elite = EnemySpawner.CreateEnemy("mrsa_enraged_elite")!;
         AssertThat(elite.BaseScore).IsEqual(35);
         elite.Free();
 
@@ -125,10 +125,12 @@ public partial class TestBaseScore : SceneTree
 
     private static int Score(string enemyId)
     {
-        var enemy = PathogenSpawner.CreatePathogen(enemyId);
+        var enemy = EnemySpawner.CreateEnemy(enemyId);
         AssertThat(enemy).IsNotNull();
         int score = enemy!.BaseScore;
         enemy.Free();
         return score;
     }
 }
+
+

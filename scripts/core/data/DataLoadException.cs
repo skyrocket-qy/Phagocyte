@@ -1,6 +1,6 @@
 using System;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Thrown when a data file is missing, unreadable or fails validation.

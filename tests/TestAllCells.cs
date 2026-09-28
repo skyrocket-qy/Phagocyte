@@ -1,12 +1,12 @@
-﻿using Godot;
+using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.UI;
+using Game.Core;
+using Game.Player;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 [TestSuite]
 public partial class TestAllCells : TestHarness
@@ -31,18 +31,19 @@ public partial class TestAllCells : TestHarness
                 string[] cellIds = ["macrophage", "ctl", "neutrophil", "b_cell", "dendritic"];
                 foreach (var cid in cellIds)
                 {
-                    var scene = GameManager.GetCellScene(cid);
+                    var scene = GameManager.GetPlayerScene(cid);
                     AssertThat(scene).IsNotNull();
                     var cell = scene!.Instantiate();
-                    AssertThat(cell is BaseCell).IsTrue();
-                    var baseCell = (BaseCell)cell;
+                    AssertThat(cell is PlayerActor).IsTrue();
+                    var baseCell = (PlayerActor)cell;
+                    baseCell.ClassId = cid;
                     Root.AddChild(baseCell);
 
                     AssertThat(baseCell.Stats).IsNotNull();
                     AssertThat(baseCell.CellSkillManager).IsNotNull();
 
                     // Check smooth organic deformation
-                    baseCell.UpdatePseudopodDeformation(0.016f);
+                    baseCell.UpdateBodyDeformation(0.016f);
                     AssertThat(baseCell.Cytoplasm!.Polygon.Length >= 64).IsTrue();
                     AssertThat(baseCell.EngulfCollider!.Polygon.Length).IsEqual(32);
                     AssertThat(baseCell.Nucleus!.Polygon.Length).IsGreaterEqual(16);
@@ -126,7 +127,7 @@ public partial class TestAllCells : TestHarness
                             break;
                     }
 
-                    GD.Print($"[PASS] Verified '{cid}': Base Stats, 32-Vertex Morphology, Nucleus, Innate Binding, Calibrated Stat Matrix.");
+                    GD.Print($"[PASS] Verified '{cid}': Base Stats, 32-Vertex BodyDeformation, Nucleus, Innate Binding, Calibrated Stat Matrix.");
                     baseCell.QueueFree();
                 }
 
@@ -146,12 +147,12 @@ public partial class TestAllCells : TestHarness
                 if (_frameCount < 4)
                     return false;
 
-                var main = Root.GetNodeOrNull<Main>("Main");
+                var main = Root.GetNodeOrNull<GameRoot>("GameRoot");
                 AssertThat(main).IsNotNull();
 
-                // Verify active player is CtlCell
+                // Verify active player carries the selected class id
                 AssertThat(main!.Player).IsNotNull();
-                AssertThat(main.Player is CtlCell).IsTrue();
+                AssertThat(((PlayerActor)main.Player!).ClassId).IsEqual("ctl");
                 AssertThat(main.Player!.IsInGroup("player")).IsTrue();
                 AssertThat(main.MainCamera!.GetParent()).IsEqual(main.Player);
                 AssertThat(main.HudNode!.PlayerRef).IsEqual(main.Player);
@@ -170,3 +171,4 @@ public partial class TestAllCells : TestHarness
         return false;
     }
 }
+

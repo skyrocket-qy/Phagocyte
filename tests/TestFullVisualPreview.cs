@@ -3,18 +3,18 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Combat;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
-using Phagocyte.UI;
+using Game.Combat;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
+using Game.Skills;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Comprehensive visual preview and regression harness covering ALL major UI
-/// views, modals, notifications, combat HUD, and active skill VFX in Phagocyte.
+/// views, modals, notifications, combat HUD, and active skill VFX in Game.
 /// Saves high-resolution viewport PNGs via <see cref="TestHarness.CaptureScreenshot"/>
 /// into PHAGOCYTE_CAPTURE_DIR (or tmp/visual_before).
 /// </summary>
@@ -27,8 +27,8 @@ public partial class TestFullVisualPreview : TestHarness
     private MainMenu? _menu;
     private UpgradeModal? _upgradeModal;
     private Node2D? _arena;
-    private Macrophage? _player;
-    private List<ComplementCascadeSkill.MacAssemblyMine>? _activeMines;
+    private PlayerActor? _player;
+    private List<ZoneSkill.ZoneNode>? _activeMines;
 
     public override void _Initialize()
     {
@@ -76,7 +76,7 @@ public partial class TestFullVisualPreview : TestHarness
                     return false;
 
                 case 3:
-                    // 3. Gear Loadout Chamber
+                    // 3. Equipment Loadout Chamber
                     if (!Gate(ref _frame, 6))
                         return false;
                     CaptureScreenshot("loadout_view.png");
@@ -232,11 +232,11 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Skill 1: Complement Cascade (MAC Assembly Mine)
                     ClearArenaForSkillPreview();
-                    var comp = new ComplementCascadeSkill();
+                    var comp = SkillFactory.CreateActive("complement_cascade")!;
                     EquipSkillForPreview(comp, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(160, 0));
+                    SpawnEnemy("tb", new Vector2(160, 0));
                     comp.Trigger();
-                    _activeMines = CollectNodes<ComplementCascadeSkill.MacAssemblyMine>(_main!);
+                    _activeMines = CollectNodes<ZoneSkill.ZoneNode>(_main!);
                     _frame = 0;
                     _stage = 17;
                     return false;
@@ -247,7 +247,7 @@ public partial class TestFullVisualPreview : TestHarness
                         return false;
                     CaptureScreenshot("skill_mac_mine.png");
                     if (_activeMines != null && _activeMines.Count > 0)
-                        _activeMines[0].AssemblyTime = 0.05f; // fast forward fuse
+                        _activeMines[0].Duration = 0.05f; // fast forward fuse
                     _frame = 0;
                     _stage = 18;
                     return false;
@@ -260,9 +260,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Skill 2: Antibody Salvo
                     ClearArenaForSkillPreview();
-                    var ab = new AntibodySalvoSkill();
+                    var ab = SkillFactory.CreateActive("antibody_salvo")!;
                     EquipSkillForPreview(ab, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(240, -40));
+                    SpawnEnemy("tb", new Vector2(240, -40));
                     ab.Trigger();
                     _frame = 0;
                     _stage = 19;
@@ -276,9 +276,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Skill 3: Perforin Lance
                     ClearArenaForSkillPreview();
-                    var perf = new PerforinLanceSkill();
+                    var perf = SkillFactory.CreateActive("perforin_lance")!;
                     EquipSkillForPreview(perf, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(170, 0));
+                    SpawnEnemy("tb", new Vector2(170, 0));
                     perf.Trigger();
                     _frame = 0;
                     _stage = 20;
@@ -292,9 +292,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Skill 4: Phagocytic Grasp Chain
                     ClearArenaForSkillPreview();
-                    var grasp = new PhagocyticGraspSkill();
+                    var grasp = SkillFactory.CreateActive("phagocytic_grasp")!;
                     EquipSkillForPreview(grasp, 0);
-                    SpawnEnemy<TbEnemy>(new Vector2(140, 0));
+                    SpawnEnemy("tb", new Vector2(140, 0));
                     grasp.Trigger();
                     _frame = 0;
                     _stage = 21;
@@ -308,9 +308,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Skill 5: ROS Torrent Jet
                     ClearArenaForSkillPreview();
-                    var ros = new RosTorrentSkill();
+                    var ros = SkillFactory.CreateActive("ros_torrent")!;
                     EquipSkillForPreview(ros, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(180, 0));
+                    SpawnEnemy("tb", new Vector2(180, 0));
                     ros.Trigger();
                     _frame = 0;
                     _stage = 22;
@@ -324,10 +324,10 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Granzyme Detonation
                     ClearArenaForSkillPreview();
-                    var gran = new GranzymeDetonationSkill();
+                    var gran = SkillFactory.CreateActive("granzyme_detonation")!;
                     EquipSkillForPreview(gran, 1);
-                    var granFoe = SpawnEnemy<TbEnemy>(new Vector2(160, 0));
-                    gran.DetonateCaspase(granFoe.GlobalPosition);
+                    var granFoe = SpawnEnemy("tb", new Vector2(160, 0));
+                    ((NovaSkill)gran).DetonateAt(granFoe.GlobalPosition);
                     _frame = 0;
                     _stage = 23;
                     return false;
@@ -340,9 +340,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Nuclease Blades
                     ClearArenaForSkillPreview();
-                    var nuc = new NucleaseBladesSkill();
+                    var nuc = SkillFactory.CreateActive("nuclease_blades")!;
                     EquipSkillForPreview(nuc, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(150, 0));
+                    SpawnEnemy("tb", new Vector2(150, 0));
                     nuc.Trigger();
                     _frame = 0;
                     _stage = 24;
@@ -356,9 +356,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Defensin Barbs
                     ClearArenaForSkillPreview();
-                    var def = new DefensinBarbsSkill();
+                    var def = SkillFactory.CreateActive("defensin_barbs")!;
                     EquipSkillForPreview(def, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(160, 0));
+                    SpawnEnemy("tb", new Vector2(160, 0));
                     def.Trigger();
                     _frame = 0;
                     _stage = 25;
@@ -372,10 +372,10 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Pro-Inflammatory Arc
                     ClearArenaForSkillPreview();
-                    var arc = new ProInflammatoryArcSkill();
+                    var arc = SkillFactory.CreateActive("pro_inflammatory_arc")!;
                     EquipSkillForPreview(arc, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(150, 0));
-                    SpawnEnemy<TbEnemy>(new Vector2(220, 30));
+                    SpawnEnemy("tb", new Vector2(150, 0));
+                    SpawnEnemy("tb", new Vector2(220, 30));
                     arc.Trigger();
                     _frame = 0;
                     _stage = 26;
@@ -389,9 +389,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Exosome Singularity
                     ClearArenaForSkillPreview();
-                    var exo = new ExosomeSingularitySkill();
+                    var exo = SkillFactory.CreateActive("exosome_singularity")!;
                     EquipSkillForPreview(exo, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(160, 0));
+                    SpawnEnemy("tb", new Vector2(160, 0));
                     exo.Trigger();
                     _frame = 0;
                     _stage = 27;
@@ -405,7 +405,7 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Phagolysosome Vent
                     ClearArenaForSkillPreview();
-                    var vent = new PhagolysosomeVentSkill();
+                    var vent = SkillFactory.CreateActive("phagolysosome_vent")!;
                     EquipSkillForPreview(vent, 1);
                     vent.Trigger();
                     _frame = 0;
@@ -420,9 +420,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger MHC Tracer Beam
                     ClearArenaForSkillPreview();
-                    var mhc = new MhcTracerBeamSkill();
+                    var mhc = SkillFactory.CreateActive("mhc_tracer_beam")!;
                     EquipSkillForPreview(mhc, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(160, 0));
+                    SpawnEnemy("tb", new Vector2(160, 0));
                     mhc.Trigger();
                     _frame = 0;
                     _stage = 29;
@@ -436,9 +436,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Histamine Surge
                     ClearArenaForSkillPreview();
-                    var hist = new HistamineSurgeSkill();
+                    var hist = SkillFactory.CreateActive("histamine_surge")!;
                     EquipSkillForPreview(hist, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(140, 0));
+                    SpawnEnemy("tb", new Vector2(140, 0));
                     hist.Trigger();
                     _frame = 0;
                     _stage = 30;
@@ -452,7 +452,7 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Nitric Oxide Halo
                     ClearArenaForSkillPreview();
-                    var no = new NitricOxideHaloSkill();
+                    var no = SkillFactory.CreateActive("nitric_oxide_halo")!;
                     EquipSkillForPreview(no, 1);
                     no.Trigger();
                     _frame = 0;
@@ -467,9 +467,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Interferon Wave
                     ClearArenaForSkillPreview();
-                    var ifn = new InterferonWaveSkill();
+                    var ifn = SkillFactory.CreateActive("interferon_wave")!;
                     EquipSkillForPreview(ifn, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(150, 0));
+                    SpawnEnemy("tb", new Vector2(150, 0));
                     ifn.Trigger();
                     _frame = 0;
                     _stage = 32;
@@ -483,9 +483,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Lysozyme Ricochet
                     ClearArenaForSkillPreview();
-                    var lyso = new LysozymeRicochetSkill();
+                    var lyso = SkillFactory.CreateActive("lysozyme_ricochet")!;
                     EquipSkillForPreview(lyso, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(160, 0));
+                    SpawnEnemy("tb", new Vector2(160, 0));
                     lyso.Trigger();
                     _frame = 0;
                     _stage = 33;
@@ -499,9 +499,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Pseudopod Lunge
                     ClearArenaForSkillPreview();
-                    var lunge = new PseudopodLungeSkill();
+                    var lunge = SkillFactory.CreateActive("pseudopod_lunge")!;
                     EquipSkillForPreview(lunge, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(160, 0));
+                    SpawnEnemy("tb", new Vector2(160, 0));
                     lunge.Trigger();
                     _frame = 0;
                     _stage = 34;
@@ -515,9 +515,9 @@ public partial class TestFullVisualPreview : TestHarness
 
                     // Trigger Lysosomal Overload
                     ClearArenaForSkillPreview();
-                    var lysoOverload = new LysosomalOverloadSkill();
+                    var lysoOverload = SkillFactory.CreateActive("lysosomal_overload")!;
                     EquipSkillForPreview(lysoOverload, 1);
-                    SpawnEnemy<TbEnemy>(new Vector2(150, 0));
+                    SpawnEnemy("tb", new Vector2(150, 0));
                     lysoOverload.Trigger();
                     _frame = 0;
                     _stage = 35;
@@ -667,14 +667,14 @@ public partial class TestFullVisualPreview : TestHarness
         if (descLbl != null) descLbl.Text = desc;
     }
 
-    private Main? _main;
+    private GameRoot? _main;
 
     private void SetupCombatArena()
     {
         _main = InstantiateMain();
         ClearArenaEntities(_main);
 
-        _player = _main.GetNodeOrNull<Macrophage>("Macrophage");
+        _player = _main.GetNodeOrNull<PlayerActor>("Player");
         if (_player == null)
             return;
 
@@ -693,12 +693,10 @@ public partial class TestFullVisualPreview : TestHarness
         _player.TakeDamage(25.0f);
     }
 
-    private T SpawnEnemy<T>(Vector2 offset) where T : BaseEnemy, new()
+    private EnemyActor SpawnEnemy(string enemyId, Vector2 offset)
     {
-        var enemy = new T
-        {
-            GlobalPosition = (_player != null ? _player.GlobalPosition : Vector2.Zero) + offset
-        };
+        var enemy = EnemySpawner.CreateEnemy(enemyId)!;
+        enemy.GlobalPosition = (_player != null ? _player.GlobalPosition : Vector2.Zero) + offset;
         if (_main != null)
             _main.AddChild(enemy);
         else
@@ -729,16 +727,11 @@ public partial class TestFullVisualPreview : TestHarness
         var toRemove = new List<Node>();
         foreach (var child in _main.GetChildren())
         {
-            if (child is BaseEnemy || child is RosJet || child is AntibodyMissile
-                || child is PerforinLanceSkill.LanceBeamVisual || child is PerforinLanceSkill.PoreDecal
-                || child is LysosomalOverloadSkill.LysosomeAcidPool || child is PhagolysosomeVentSkill.AcidPuddle
-                || child is ExosomeSingularitySkill.SingularityVortex || child is NucleaseBladesSkill.BladesCanvas
-                || child is MhcTracerBeamSkill.TracerVisual || child is ProInflammatoryArcSkill.ArcLightningVisual
-                || child is InterferonWaveSkill.WaveVisual || child is HistamineSurgeSkill.SurgeVisual
-                || child is ComplementCascadeSkill.MacAssemblyMine || child is ComplementCascadeSkill.MacDetonationBlast
-                || child is GranzymeDetonationSkill.ApoptosisBurstVisual || child is GranzymeDetonationSkill.ApoptosisMarker
-                || child is DefensinBarbsSkill.BarbProjectile || child is LysozymeRicochetSkill.RicochetVesicle
-                || child is PseudopodChainVisual)
+            if (child is EnemyActor || child is SalvoSkill.SalvoProjectile
+                || child is BeamSkill.BeamVisual
+                || child is NovaSkill.NovaVisual || child is NovaSkill.NovaMarker
+                || child is ZoneSkill.ZoneNode
+                || child is StrikeSkill.ChainVisual || child is AuraSkill.AuraVisual)
             {
                 toRemove.Add(child);
             }
@@ -781,7 +774,7 @@ public partial class TestFullVisualPreview : TestHarness
     {
         foreach (var child in root.GetChildren())
         {
-            if (child is BaseEnemy || child is DormantToxinVesicle || child is BioHazardArea)
+            if (child is EnemyActor || child is ProximityMine || child is HazardZone)
                 child.Free();
             else
                 ClearArenaEntities(child);
@@ -805,3 +798,7 @@ public partial class TestFullVisualPreview : TestHarness
         }
     }
 }
+
+
+
+

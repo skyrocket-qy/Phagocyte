@@ -2,11 +2,11 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Phagocyte.Combat;
-using Phagocyte.Enemies;
-using Phagocyte.UI;
+using Game.Combat;
+using Game.Enemies;
+using Game.UI;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// One over-threshold frame: wall-clock cost plus the population census and
@@ -141,10 +141,10 @@ public partial class RunTelemetryManager : Node
     public int BlockedCount { get; private set; } = 0;
     public float LifeStealHealed { get; private set; } = 0.0f;
 
-    /// <summary>Total pathogens killed this run (all damage sources).</summary>
+    /// <summary>Total enemies killed this run (all damage sources).</summary>
     public int KillCount { get; private set; } = 0;
 
-    /// <summary>Accumulated fixed base score of every killed pathogen (docs/record.md §4.1).</summary>
+    /// <summary>Accumulated fixed base score of every killed enemy (docs/record.md §4.1).</summary>
     public int KillScore { get; private set; } = 0;
 
     public Dictionary<string, float> SkillDamageMap { get; } = new(StringComparer.OrdinalIgnoreCase);
@@ -176,7 +176,7 @@ public partial class RunTelemetryManager : Node
         float processMs = (float)Performance.GetMonitor(Performance.Monitor.TimeProcess) * 1000.0f;
         FrameSpikeLog.Record(
             frameMs, physicsMs, processMs, (int)Engine.GetFramesPerSecond(),
-            BaseEnemy.ActiveEnemies.Count,
+            EnemyActor.ActiveEnemies.Count,
             ProjectileManager.Instance?.ActiveCount ?? 0,
             DamageNumberSpawner.Instance?.ActiveNumbers ?? 0);
     }
@@ -282,7 +282,7 @@ public partial class RunTelemetryManager : Node
     }
 
     /// <summary>
-    /// Log a pathogen kill. Score is the enemy's fixed base score
+    /// Log a enemy kill. Score is the enemy's fixed base score
     /// (0 for farming-neutral hazards).
     /// </summary>
     public void RecordKill(int baseScore)

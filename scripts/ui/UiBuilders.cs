@@ -1,8 +1,8 @@
 using Godot;
 using Godot.Collections;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Shared Control/cosmetic builders for HUD, codex and modal widgets.

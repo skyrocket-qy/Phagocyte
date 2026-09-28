@@ -3,11 +3,11 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.Combat;
-using Phagocyte.Enemies;
+using Game.Core;
+using Game.Combat;
+using Game.Enemies;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 public partial class MockEnemyForAilment : Node2D
 {
@@ -66,9 +66,9 @@ public partial class TestNewSystemsTriad : SceneTree
     private void RunAllTests()
     {
         // ====================================================================
-        // Test 1: CellStats AilmentDamage stat & calculation formulas
+        // Test 1: ActorStats AilmentDamage stat & calculation formulas
         // ====================================================================
-        var stats = new CellStats();
+        var stats = new ActorStats();
         AssertThat(stats.GetStat("ailment_damage")).IsEqual(1.0f);
 
         stats.AddModifier("ailment_damage", 0.0f, 0.40f); // +40%
@@ -81,7 +81,7 @@ public partial class TestNewSystemsTriad : SceneTree
         stats.AddModifier("duration", 0.0f, 0.50f); // +50% Duration -> 1.50f
         AssertThat(stats.CalculateAilmentDuration(4.0f)).IsEqualApprox(6.0f, 0.01f);
 
-        GD.Print("[PASS] Test 1: CellStats AilmentDamage, calculations & Duration scaling verified.");
+        GD.Print("[PASS] Test 1: ActorStats AilmentDamage, calculations & Duration scaling verified.");
 
         // ====================================================================
         // Test 2: VfxManager GPU particle pool & dispatch
@@ -109,7 +109,7 @@ public partial class TestNewSystemsTriad : SceneTree
         // Initial state
         AssertThat(ailment.IsOxidized).IsFalse();
         AssertThat(ailment.IsAgglutinated).IsFalse();
-        AssertThat(ailment.IsOpsonized).IsFalse();
+        AssertThat(ailment.IsMarked).IsFalse();
         AssertThat(ailment.IsLeaking).IsFalse();
         AssertThat(ailment.IsToxic).IsFalse();
 
@@ -118,10 +118,10 @@ public partial class TestNewSystemsTriad : SceneTree
         AssertThat(ailment.IsAgglutinated).IsTrue();
         AssertThat(ailment.SpeedMultiplier).IsEqualApprox(0.60f, 0.01f);
 
-        // 3b. Opsonization (Damage amplification)
-        ailment.ApplyOpsonization(duration: 3.0f, ampPct: 0.30f);
-        AssertThat(ailment.IsOpsonized).IsTrue();
-        AssertThat(ailment.OpsonizationMultiplier).IsEqualApprox(1.30f, 0.01f);
+        // 3b. Markation (Damage amplification)
+        ailment.ApplyMarkation(duration: 3.0f, ampPct: 0.30f);
+        AssertThat(ailment.IsMarked).IsTrue();
+        AssertThat(ailment.MarkationMultiplier).IsEqualApprox(1.30f, 0.01f);
 
         // 3c. Oxidative Burn (DoT)
         ailment.ApplyOxidativeBurn(dps: 10.0f, duration: 2.0f);
@@ -129,7 +129,7 @@ public partial class TestNewSystemsTriad : SceneTree
 
         // Simulate 1 second physics process
         // Frame DoT = 10.0f * 1.0s = 10.0f
-        // Amplified by Opsonization (1.30x) = 13.0f
+        // Amplified by Markation (1.30x) = 13.0f
         ailment._PhysicsProcess(1.0);
         AssertThat(mockEnemy.Health).IsEqualApprox(87.0f, 0.05f);
         AssertThat(ailment.BurnTimer).IsEqualApprox(1.0f, 0.01f);
@@ -160,7 +160,7 @@ public partial class TestNewSystemsTriad : SceneTree
         AssertThat(ailment.IsToxic).IsFalse();
 
         mockEnemy.QueueFree();
-        GD.Print("[PASS] Test 3: AilmentController biological effects (ROS, Slow, Opsonization, Leak, Endotoxin) verified.");
+        GD.Print("[PASS] Test 3: AilmentController biological effects (ROS, Slow, Markation, Leak, Endotoxin) verified.");
 
         // ====================================================================
         // Test 4: BossPhaseComponent transitions & Damage Reduction

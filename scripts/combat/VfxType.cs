@@ -1,4 +1,4 @@
-namespace Phagocyte.Combat;
+namespace Game.Combat;
 
 public enum VfxType
 {
@@ -7,6 +7,6 @@ public enum VfxType
     BarbImpact,
     BiofilmBurst,
     MacRingBurst,
-    OpsoninBind,
+    MarkBind,
     PerforinPore
 }

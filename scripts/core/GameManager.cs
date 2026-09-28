@@ -1,9 +1,9 @@
 using Godot;
 using Godot.Collections;
 using System.Collections.Generic;
-using Phagocyte.Endgame;
+using Game.Directors;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 public partial class GameManager : Node
 {
@@ -22,40 +22,40 @@ public partial class GameManager : Node
     // Static callback list for decoupled notification
     private static Array<Callable> _languageListeners = new Array<Callable>();
 
-    private static System.Collections.Generic.Dictionary<string, PackedScene>? _cellScenes;
-    private static System.Collections.Generic.Dictionary<string, PackedScene> CellScenes
+    private static System.Collections.Generic.Dictionary<string, PackedScene>? _playerScenes;
+    private static System.Collections.Generic.Dictionary<string, PackedScene> PlayerScenes
     {
         get
         {
-            if (_cellScenes == null)
+            if (_playerScenes == null)
             {
                 // Scene paths are data-owned (classes.json); loaded once and cached.
-                _cellScenes = new System.Collections.Generic.Dictionary<string, PackedScene>();
-                foreach (string key in ClassData.Keys)
+                _playerScenes = new System.Collections.Generic.Dictionary<string, PackedScene>();
+                foreach (string key in PlayerClassData.Keys)
                 {
-                    var d = (Dictionary)ClassData[key];
+                    var d = (Dictionary)PlayerClassData[key];
                     string path = d.TryGetValue("scene_path", out Variant v) ? v.AsString() : "";
                     if (!string.IsNullOrEmpty(path))
-                        _cellScenes[key] = AssetLoader.Load<PackedScene>(path);
+                        _playerScenes[key] = AssetLoader.Load<PackedScene>(path);
                 }
             }
-            return _cellScenes;
+            return _playerScenes;
         }
     }
 
-    public static PackedScene GetCellScene(string classId)
+    public static PackedScene GetPlayerScene(string classId)
     {
-        if (CellScenes.ContainsKey(classId))
+        if (PlayerScenes.ContainsKey(classId))
         {
-            return CellScenes[classId];
+            return PlayerScenes[classId];
         }
-        return CellScenes["macrophage"];
+        return PlayerScenes["macrophage"];
     }
 
     // Class Metadata referencing translation keys
     // Class Metadata referencing translation keys (data-owned: assets/data/classes.json).
     private static Dictionary? _classData;
-    public static Dictionary ClassData
+    public static Dictionary PlayerClassData
     {
         get
         {
@@ -69,7 +69,7 @@ public partial class GameManager : Node
     // Map Metadata referencing translation keys and holographic scanner positioning
     // (data-owned: assets/data/maps.json).
     private static Dictionary? _mapData;
-    public static Dictionary MapData
+    public static Dictionary StageData
     {
         get
         {
@@ -92,10 +92,10 @@ public partial class GameManager : Node
         }
     }
 
-    // Gear chamber catalog (TODO Phase 0): 2x2 equipment definitions
-    // (data-owned: assets/data/gear.json).
+    // Equipment chamber catalog (TODO Phase 0): 2x2 equipment definitions
+    // (data-owned: assets/data/equipment.json).
     private static Dictionary? _gearCatalog;
-    public static Dictionary GearCatalog
+    public static Dictionary EquipmentCatalog
     {
         get
         {
@@ -105,17 +105,37 @@ public partial class GameManager : Node
         }
     }
 
-    // Pathogen Catalog for Codex
-    // Pathogen Catalog for Codex (data-owned: assets/data/pathogens.json).
-    private static Dictionary? _pathogenCatalog;
-    public static Dictionary PathogenCatalog
+    // Enemy Catalog for Codex
+    // Enemy Catalog for Codex (data-owned: assets/data/enemies.json).
+    private static Dictionary? _enemyCatalog;
+    public static Dictionary EnemyCatalog
     {
         get
         {
-            _pathogenCatalog ??= CatalogBuilders.BuildPathogens();
+            _enemyCatalog ??= CatalogBuilders.BuildEnemies();
             DataValidator.EnsureValidated();
-            return _pathogenCatalog;
+            return _enemyCatalog;
         }
+    }
+
+    // Enemy simulation defs (data-owned: assets/data/enemies.json).
+    private static Dictionary? _enemyDefs;
+    public static Dictionary EnemyDefs
+    {
+        get
+        {
+            _enemyDefs ??= CatalogBuilders.BuildEnemyDefs();
+            DataValidator.EnsureValidated();
+            return _enemyDefs;
+        }
+    }
+
+    /// <summary>Simulation def for an enemy id, or an empty dict when unknown.</summary>
+    public static Dictionary GetEnemyDef(string enemyId)
+    {
+        if (string.IsNullOrEmpty(enemyId) || !EnemyDefs.ContainsKey(enemyId))
+            return new Dictionary();
+        return (Dictionary)EnemyDefs[enemyId];
     }
 
     // Boss Catalog for Codex (data-owned: assets/data/bosses.json).
@@ -183,39 +203,39 @@ public partial class GameManager : Node
 
     public static void UnlockClass(string key)
     {
-        if (ClassData.ContainsKey(key))
+        if (PlayerClassData.ContainsKey(key))
         {
-            var data = (Dictionary)ClassData[key];
+            var data = (Dictionary)PlayerClassData[key];
             data["unlocked"] = true;
         }
     }
 
     public static void LockClass(string key)
     {
-        if (ClassData.ContainsKey(key) && key != "macrophage")
+        if (PlayerClassData.ContainsKey(key) && key != "macrophage")
         {
-            var data = (Dictionary)ClassData[key];
+            var data = (Dictionary)PlayerClassData[key];
             data["unlocked"] = false;
         }
     }
 
     public static bool IsClassUnlocked(string key)
     {
-        if (ClassData.ContainsKey(key))
+        if (PlayerClassData.ContainsKey(key))
         {
-            var data = (Dictionary)ClassData[key];
+            var data = (Dictionary)PlayerClassData[key];
             return data["unlocked"].AsBool();
         }
         return false;
     }
 
-    public static Dictionary GetClassInfo(string key)
+    public static Dictionary GetPlayerClass(string key)
     {
-        if (!ClassData.ContainsKey(key))
+        if (!PlayerClassData.ContainsKey(key))
         {
             return new Dictionary();
         }
-        var d = (Dictionary)ClassData[key];
+        var d = (Dictionary)PlayerClassData[key];
         return new Dictionary {
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },
             { "role", TranslationServer.Translate(d["role_key"].AsString()) },
@@ -227,17 +247,35 @@ public partial class GameManager : Node
             { "base_speed", d.TryGetValue("base_speed", out Variant spVal) ? spVal : 230.0f },
             { "base_armor", d.TryGetValue("base_armor", out Variant arVal) ? arVal : 0.0f },
             { "trait_stat", d.TryGetValue("trait_stat", out Variant tsVal) ? tsVal : "" },
-            { "trait_stat_value", d.TryGetValue("trait_stat_value", out Variant tsvVal) ? tsvVal : 0.0f }
+            { "trait_stat_value", d.TryGetValue("trait_stat_value", out Variant tsvVal) ? tsvVal : 0.0f },
+            { "extra_stats", d.TryGetValue("extra_stats", out Variant esVal) ? esVal : new Dictionary() },
+            { "body_microns", d.TryGetValue("body_microns", out Variant bmVal) ? bmVal : 20.0f },
+            { "deform_mag", d.TryGetValue("deform_mag", out Variant dmVal) ? dmVal : 10.0f },
+            { "deform_speed", d.TryGetValue("deform_speed", out Variant dsVal) ? dsVal : 3.6f },
+            { "deform_kind", d.TryGetValue("deform_kind", out Variant dkVal) ? dkVal : "standard" },
+            { "deform_arms", d.TryGetValue("deform_arms", out Variant daVal) ? daVal : 0 },
+            { "noise_freq", d.TryGetValue("noise_freq", out Variant nfVal) ? nfVal : 0.65f },
+            { "noise_octaves", d.TryGetValue("noise_octaves", out Variant noVal) ? noVal : 2 },
+            { "cyto_color", CatalogLoader.GetColor(d, "cyto_color", new Color(0.5f, 0.6f, 0.8f, 0.4f)) },
+            { "membrane_color", CatalogLoader.GetColor(d, "membrane_color", new Color(0.8f, 0.9f, 1.0f, 0.8f)) },
+            { "nucleus_color", CatalogLoader.GetColor(d, "nucleus_color", new Color(0.4f, 0.2f, 0.6f, 0.9f)) },
+            { "nucleus_points", d.TryGetValue("nucleus_points", out Variant npVal) ? npVal : 32 },
+            { "nucleus_radius", d.TryGetValue("nucleus_radius", out Variant nrVal) ? nrVal : 18.0f },
+            { "nucleus_kind", d.TryGetValue("nucleus_kind", out Variant nkVal) ? nkVal : "circle" },
+            { "nucleus_amp", d.TryGetValue("nucleus_amp", out Variant naVal) ? naVal : 0.0f },
+            { "nucleus_freq", d.TryGetValue("nucleus_freq", out Variant nfqVal) ? nfqVal : 1.0f },
+            { "innate_skill", d.TryGetValue("innate_skill", out Variant isVal) ? isVal : "" },
+            { "innate_slot", d.TryGetValue("innate_slot", out Variant islVal) ? islVal : 0 }
         };
     }
 
-    public static Dictionary GetMapInfo(string key)
+    public static Dictionary GetStageInfo(string key)
     {
-        if (!MapData.ContainsKey(key))
+        if (!StageData.ContainsKey(key))
         {
             return new Dictionary();
         }
-        var d = (Dictionary)MapData[key];
+        var d = (Dictionary)StageData[key];
         return new Dictionary {
             { "id", key },
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },
@@ -256,39 +294,40 @@ public partial class GameManager : Node
             { "fiber_color", d.ContainsKey("fiber_color") ? d["fiber_color"] : new Color(0.2f, 0.3f, 0.4f, 0.35f) },
             { "unlocked", d["unlocked"] },
             { "hard_unlocked", d.ContainsKey("hard_unlocked") && d["hard_unlocked"].AsBool() },
+            { "effects", d.TryGetValue("effects", out Variant fxVal) ? fxVal : new Array() },
             { "biochemistry", d.ContainsKey("bio_key") ? TranslationServer.Translate(d["bio_key"].AsString()) : "" }
         };
     }
 
     // --- Organ map unlock chain (docs/achievement.md) ---
 
-    public static void UnlockMap(string mapId)
+    public static void UnlockMap(string stageId)
     {
-        if (MapData.ContainsKey(mapId))
+        if (StageData.ContainsKey(stageId))
         {
-            var d = (Dictionary)MapData[mapId];
+            var d = (Dictionary)StageData[stageId];
             d["unlocked"] = true;
         }
     }
 
-    public static void UnlockMapHard(string mapId)
+    public static void UnlockMapHard(string stageId)
     {
-        if (MapData.ContainsKey(mapId))
+        if (StageData.ContainsKey(stageId))
         {
-            var d = (Dictionary)MapData[mapId];
+            var d = (Dictionary)StageData[stageId];
             d["hard_unlocked"] = true;
         }
     }
 
-    public static bool IsMapUnlocked(string mapId)
+    public static bool IsMapUnlocked(string stageId)
     {
-        return MapData.ContainsKey(mapId) && ((Dictionary)MapData[mapId])["unlocked"].AsBool();
+        return StageData.ContainsKey(stageId) && ((Dictionary)StageData[stageId])["unlocked"].AsBool();
     }
 
-    public static bool IsMapHardUnlocked(string mapId)
+    public static bool IsMapHardUnlocked(string stageId)
     {
-        return MapData.ContainsKey(mapId)
-            && ((Dictionary)MapData[mapId]).TryGetValue("hard_unlocked", out var val)
+        return StageData.ContainsKey(stageId)
+            && ((Dictionary)StageData[stageId]).TryGetValue("hard_unlocked", out var val)
             && val.AsBool();
     }
 
@@ -299,11 +338,11 @@ public partial class GameManager : Node
     /// </summary>
     public static void ResetMapUnlocks()
     {
-        foreach (var keyVar in MapData.Keys)
+        foreach (var keyVar in StageData.Keys)
         {
-            string mapId = keyVar.AsString();
-            var d = (Dictionary)MapData[mapId];
-            d["unlocked"] = mapId == "acute_wound";
+            string stageId = keyVar.AsString();
+            var d = (Dictionary)StageData[stageId];
+            d["unlocked"] = stageId == "acute_wound";
             d["hard_unlocked"] = false;
         }
     }
@@ -330,13 +369,13 @@ public partial class GameManager : Node
         return info;
     }
 
-    public static Dictionary GetPathogenInfo(string key)
+    public static Dictionary GetEnemyInfo(string key)
     {
-        if (!PathogenCatalog.ContainsKey(key))
+        if (!EnemyCatalog.ContainsKey(key))
         {
             return new Dictionary();
         }
-        var d = (Dictionary)PathogenCatalog[key];
+        var d = (Dictionary)EnemyCatalog[key];
         return new Dictionary {
             { "id", d["id"] },
             { "name", TranslationServer.Translate(d["name_key"].AsString()) },
@@ -378,7 +417,7 @@ public partial class GameManager : Node
     public static void StartGame(SceneTree tree)
     {
         EndlessMode = false;
-        AfflictionManager.Clear();
+        RunMutatorService.Clear();
         Engine.TimeScale = 1.0;
         PauseManager.Clear(tree);
         AudioManager.Instance?.PlayGameStart();
@@ -389,7 +428,7 @@ public partial class GameManager : Node
     /// Launch an Endless Overdrive run on the selected organ. Returns false
     /// (without changing scenes) while the mode is still locked. Pass the
     /// affliction ids to activate (docs/endgame.md §4); null preserves the
-    /// current AfflictionManager selection.
+    /// current RunMutatorService selection.
     /// </summary>
     public static bool StartEndlessGame(SceneTree tree, IEnumerable<string>? afflictions = null)
     {
@@ -400,7 +439,7 @@ public partial class GameManager : Node
         }
 
         if (afflictions != null)
-            AfflictionManager.SetSelection(afflictions);
+            RunMutatorService.SetSelection(afflictions);
 
         SelectedDifficulty = RunRecordManager.DifficultyHard;
         EndlessMode = true;
@@ -425,3 +464,4 @@ public partial class GameManager : Node
         tree.ReloadCurrentScene();
     }
 }
+

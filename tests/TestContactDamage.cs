@@ -1,13 +1,13 @@
 using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
+using Game.Enemies;
+using Game.Player;
+using Game.Skills;
 
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies survivor-like contact damage: an overlapping monster hurts the
@@ -21,8 +21,8 @@ public partial class TestContactDamage : TestHarness
     private int _framesWaited = 0;
     private bool _testDone = false;
 
-    private Macrophage? _player;
-    private StaphEnemy? _staph;
+    private PlayerActor? _player;
+    private EnemyActor? _staph;
     private Node2D? _arena;
     private float _startHealth;
 
@@ -84,10 +84,10 @@ public partial class TestContactDamage : TestHarness
         _arena = new Node2D { Name = "ContactArena" };
         Root.AddChild(_arena);
 
-        var playerScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+        var playerScene = AssetLoader.Load<PackedScene>("res://scenes/actors/player_base.tscn");
         if (playerScene == null)
             return false;
-        _player = playerScene.Instantiate<Macrophage>();
+        _player = playerScene.Instantiate<PlayerActor>();
         if (_player == null)
             return false;
         _arena.AddChild(_player);
@@ -102,15 +102,18 @@ public partial class TestContactDamage : TestHarness
         _startHealth = _player.Health;
 
         // Park the grasp: contact damage is measured with skills silenced.
-        if (_player.CellSkillManager.GetActiveSlot(0) is PhagocyticGraspSkill grasp)
+        if (_player.CellSkillManager.GetActiveSlot(0) is StrikeSkill grasp)
         {
             grasp.Cooldown = 9999.0f;
             grasp.CooldownTimer = 9999.0f;
         }
 
         // Overlapping from frame one: well inside the contact sensor.
-        _staph = new StaphEnemy { GlobalPosition = new Vector2(10, 0) };
+        _staph = EnemySpawner.CreateEnemy("staph")!;
+        _staph.GlobalPosition = new Vector2(10, 0);
         _arena.AddChild(_staph);
         return true;
     }
 }
+
+

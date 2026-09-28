@@ -1,7 +1,7 @@
 using Godot;
 using Godot.Collections;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Shared JSON persistence for manager singletons. Resolves the per-file save

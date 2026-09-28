@@ -1,10 +1,10 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
+using Game.Core;
+using Game.Enemies;
 
-namespace Phagocyte.Combat;
+namespace Game.Combat;
 
 /// <summary>
 /// Extreme-density bullet-hell projectile manager.
@@ -29,15 +29,15 @@ public partial class ProjectileManager : Node2D
     private readonly List<MultiMeshInstance2D> _typeMultiMeshes = new();
     private int[] _typeActiveCounts = Array.Empty<int>();
 
-    // 2D QuadTree over the active pathogens: rebuilt once per physics frame and
+    // 2D QuadTree over the active enemies: rebuilt once per physics frame and
     // shared by every projectile, giving O(log n) neighborhood queries at the
     // 300-500 enemy concurrency budget (docs/spec.md §9 / TODO module 12).
     private const float ArenaQueryHalfExtent = 2600.0f;
-    private readonly QuadTree<BaseEnemy> _enemyTree = new(
+    private readonly QuadTree<EnemyActor> _enemyTree = new(
         new Rect2(-ArenaQueryHalfExtent, -ArenaQueryHalfExtent, ArenaQueryHalfExtent * 2.0f, ArenaQueryHalfExtent * 2.0f),
         capacity: 8,
         maxDepth: 6);
-    private readonly List<BaseEnemy> _enemyQuery = new(64);
+    private readonly List<EnemyActor> _enemyQuery = new(64);
 
     private Node2D? _hostNode;
     private static Texture2D? _cachedBulletTexture;
@@ -53,7 +53,7 @@ public partial class ProjectileManager : Node2D
 
         RegisterType("generic", null, new Vector2(16, 16));
         RegisterType("defensin_barb", null, new Vector2(22, 10));
-        RegisterType("antibody", null, new Vector2(16, 16));
+        RegisterType("seeker", null, new Vector2(16, 16));
 
         _typeActiveCounts = new int[_typeKeys.Count];
     }
@@ -252,7 +252,7 @@ public partial class ProjectileManager : Node2D
     {
         _enemyTree.Clear();
 
-        foreach (var enemy in BaseEnemy.ActiveEnemies)
+        foreach (var enemy in EnemyActor.ActiveEnemies)
         {
             if (enemy == null || !GodotObject.IsInstanceValid(enemy)) continue;
             _enemyTree.Insert(enemy.GlobalPosition, enemy);
@@ -271,7 +271,7 @@ public partial class ProjectileManager : Node2D
         Array.Clear(_typeActiveCounts, 0, _typeActiveCounts.Length);
 
         // Empty arena: bullets fly straight with no targets to index or query.
-        bool hasTargets = BaseEnemy.ActiveEnemies.Count > 0;
+        bool hasTargets = EnemyActor.ActiveEnemies.Count > 0;
         if (hasTargets)
             RebuildEnemyIndex();
 

@@ -8,7 +8,20 @@
     "id": "actin",
     "max_level": 5,
     "name_key": "SKILL_ACTIN_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "area",
+        "per_level": 0.12,
+        "mode": "mult"
+      },
+      {
+        "stat": "move_speed",
+        "per_level": 0.06,
+        "mode": "mult"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_LYSOSOME_BIO",
@@ -19,7 +32,20 @@
     "id": "lysosome",
     "max_level": 5,
     "name_key": "TREE_NODE_LYSOSOME_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "might",
+        "per_level": 0.1,
+        "mode": "mult"
+      },
+      {
+        "stat": "health_regen",
+        "per_level": 0.6,
+        "mode": "flat"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_MITOCHONDRIA_BIO",
@@ -30,7 +56,20 @@
     "id": "mitochondria",
     "max_level": 5,
     "name_key": "SKILL_MITOCHONDRIA_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "cooldown_reduction",
+        "per_level": 0.08,
+        "mode": "flat"
+      },
+      {
+        "stat": "duration",
+        "per_level": 0.1,
+        "mode": "mult"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_OPSONIN_BIO",
@@ -41,7 +80,20 @@
     "id": "opsonin",
     "max_level": 5,
     "name_key": "SKILL_OPSONIN_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "crit_chance",
+        "per_level": 0.05,
+        "mode": "flat"
+      },
+      {
+        "stat": "crit_damage",
+        "per_level": 0.25,
+        "mode": "mult"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_CHEMOKINE_BIO",
@@ -52,7 +104,20 @@
     "id": "chemokine",
     "max_level": 5,
     "name_key": "SKILL_CHEMOKINE_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "magnet",
+        "per_level": 0.25,
+        "mode": "mult"
+      },
+      {
+        "stat": "move_speed",
+        "per_level": 0.06,
+        "mode": "mult"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_BILAYER_BIO",
@@ -63,7 +128,20 @@
     "id": "bilayer",
     "max_level": 5,
     "name_key": "SKILL_BILAYER_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "max_health",
+        "per_level": 0.15,
+        "mode": "mult"
+      },
+      {
+        "stat": "armor",
+        "per_level": 2.0,
+        "mode": "flat"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_AUTOPHAGY_BIO",
@@ -74,7 +152,15 @@
     "id": "autophagy",
     "max_level": 5,
     "name_key": "SKILL_AUTOPHAGY_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "health_regen",
+        "per_level": 0.4,
+        "mode": "flat"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_GLYCOLYSIS_BIO",
@@ -85,7 +171,20 @@
     "id": "glycolysis",
     "max_level": 5,
     "name_key": "SKILL_GLYCOLYSIS_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "move_speed",
+        "per_level": 0.06,
+        "mode": "mult"
+      },
+      {
+        "stat": "might",
+        "per_level": 0.05,
+        "mode": "mult"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_KINESIN_BIO",
@@ -96,7 +195,20 @@
     "id": "kinesin",
     "max_level": 5,
     "name_key": "SKILL_KINESIN_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "projectile_speed",
+        "per_level": 0.15,
+        "mode": "mult"
+      },
+      {
+        "stat": "pierce",
+        "per_level": 1.0,
+        "mode": "flat_once"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_LONGEVITY_BIO",
@@ -107,7 +219,20 @@
     "id": "longevity",
     "max_level": 5,
     "name_key": "SKILL_LONGEVITY_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "duration",
+        "per_level": 0.15,
+        "mode": "mult"
+      },
+      {
+        "stat": "knockback",
+        "per_level": 0.1,
+        "mode": "mult"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_VDJ_BIO",
@@ -118,7 +243,20 @@
     "id": "vdj",
     "max_level": 5,
     "name_key": "SKILL_VDJ_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "crit_damage",
+        "per_level": 0.15,
+        "mode": "mult"
+      },
+      {
+        "stat": "crit_chance",
+        "per_level": 0.03,
+        "mode": "flat"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_ENDOTOXIN_BIO",
@@ -129,7 +267,20 @@
     "id": "endotoxin",
     "max_level": 5,
     "name_key": "SKILL_ENDOTOXIN_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "armor",
+        "per_level": 3.0,
+        "mode": "flat"
+      },
+      {
+        "stat": "block",
+        "per_level": 0.04,
+        "mode": "flat"
+      }
+    ]
   },
   {
     "bio_key": "SKILL_HEMATOPOIETIC_BIO",
@@ -140,6 +291,19 @@
     "id": "hematopoietic",
     "max_level": 5,
     "name_key": "SKILL_HEMATOPOIETIC_NAME",
-    "type": "passive"
+    "type": "passive",
+    "archetype": "passive",
+    "mods": [
+      {
+        "stat": "max_health",
+        "per_level": 0.1,
+        "mode": "mult"
+      },
+      {
+        "stat": "block",
+        "per_level": 0.03,
+        "mode": "flat"
+      }
+    ]
   }
 ]

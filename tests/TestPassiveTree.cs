@@ -3,13 +3,13 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
 using System.Collections.Generic;
-using Phagocyte;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
-using Phagocyte.UI;
+using Game;
+using Game.Core;
+using Game.Player;
+using Game.Skills;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 [TestSuite]
 public partial class TestPassiveTree : TestHarness
@@ -17,7 +17,7 @@ public partial class TestPassiveTree : TestHarness
     private int _phase = 0;
     private int _frameCount = 0;
     private MainMenu? _menu = null;
-    private Main? _main = null;
+    private GameRoot? _main = null;
 
     public override void _Initialize()
     {
@@ -81,7 +81,7 @@ public partial class TestPassiveTree : TestHarness
         PassiveTreeManager.ResetAll();
 
         var starts = new List<string>();
-        foreach (var cellId in GameManager.ClassData.Keys)
+        foreach (var cellId in GameManager.PlayerClassData.Keys)
         {
             string cell = cellId.AsString();
             string start = PassiveTreeManager.GetStartNode(cell);
@@ -297,7 +297,7 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(PassiveTreeManager.MaxCellLevel);
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 99)).IsFalse();
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 14)).IsFalse();
-        AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(PassiveTreeManager.MaxCellLevel - PassiveTreeManager.BaseCellLevel);
+        AssertThat(PassiveTreeManager.GetPointsAvailable("macrophage")).IsEqual(PassiveTreeManager.MaxCellLevel - PassiveTreeManager.PlayerActorLevel);
         GD.Print("[PASS] Cell levels cap at MaxCellLevel so builds stay selective.");
     }
 
@@ -384,7 +384,7 @@ public partial class TestPassiveTree : TestHarness
             }
             AssertThat(touching).IsTrue();
         }
-        foreach (var cellKey in GameManager.ClassData.Keys)
+        foreach (var cellKey in GameManager.PlayerClassData.Keys)
         {
             string cell = cellKey.AsString();
             AssertThat(PassiveTreeManager.TryGetNode(PassiveTreeManager.GetStartNode(cell), out var startNode)).IsTrue();
@@ -440,7 +440,7 @@ public partial class TestPassiveTree : TestHarness
     private static void TestStackedSkillModifiers()
     {
         var host = new CharacterBody2D();
-        var stats = new CellStats { Name = "CellStats" };
+        var stats = new ActorStats { Name = "ActorStats" };
         host.AddChild(stats);
 
         var skill = PassiveTreeManager.CreateSkill("opsonin");
@@ -448,13 +448,13 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(skill!.Level).IsEqual(1);
         host.AddChild(skill);
         skill.Setup(host);
-        // Start hubs carry no stat effects: only the CellStats base remains.
+        // Start hubs carry no stat effects: only the ActorStats base remains.
         AssertThat(stats.GetStat("crit_chance")).IsEqualApprox(0.05f, 0.001f);
 
         host.QueueFree();
 
         var bundleHost = new CharacterBody2D();
-        var bundleStats = new CellStats { Name = "CellStats" };
+        var bundleStats = new ActorStats { Name = "ActorStats" };
         bundleHost.AddChild(bundleStats);
         var bundle = PassiveTreeManager.CreateSkill("blood_price");
         AssertThat(bundle is TreeStatBundleSkill).IsTrue();
@@ -706,15 +706,15 @@ public partial class TestPassiveTree : TestHarness
         GameManager.SelectedClass = "ctl";
         var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         AssertThat(mainScene).IsNotNull();
-        _main = mainScene!.Instantiate<Main>();
+        _main = mainScene!.Instantiate<GameRoot>();
         Root.AddChild(_main);
     }
 
     private void TestRunIntegration()
     {
         AssertThat(_main).IsNotNull();
-        AssertThat(_main!.Player is BaseCell).IsTrue();
-        var player = (BaseCell)_main.Player!;
+        AssertThat(_main!.Player is PlayerActor).IsTrue();
+        var player = (PlayerActor)_main.Player!;
 
         // CTL base 15% + Precise Edge 2% = 17% (the opsonin hub carries no stats).
         AssertThat(player.Stats!.GetStat("crit_chance")).IsEqualApprox(0.17f, 0.001f);
@@ -732,12 +732,12 @@ public partial class TestPassiveTree : TestHarness
         GD.Print("[PASS] The in-game overlay exposes the active tree build and current stats.");
 
         var mockPlayer = new CharacterBody2D();
-        var stats = new CellStats { Name = "CellStats" };
+        var stats = new ActorStats { Name = "ActorStats" };
         mockPlayer.AddChild(stats);
         var sm = new SkillManager { Name = "SkillManager" };
         mockPlayer.AddChild(sm);
         sm.Setup(mockPlayer);
-        sm.EquipActive(new RosTorrentSkill(), 0);
+        sm.EquipActive(SkillFactory.CreateActive("ros_torrent")!, 0);
         for (int iter = 0; iter < 30; iter++)
         {
             foreach (var choice in UpgradeManager.GenerateChoices(mockPlayer, 3))

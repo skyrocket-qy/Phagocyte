@@ -1,16 +1,16 @@
-﻿using Godot;
+using Godot;
 using Godot.Collections;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Endgame;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
-using Phagocyte.UI;
+using Game.Core;
+using Game.Enemies;
+using Game.Directors;
+using Game.Player;
+using Game.Skills;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the first-run micro-cues and their supporting systems
@@ -21,7 +21,7 @@ namespace Phagocyte.Tests;
 public partial class TestTutorialCues : TestHarness
 {
     private int _phase = 0;
-    private Main? _main = null;
+    private GameRoot? _main = null;
 
     public override void _Initialize()
     {
@@ -73,10 +73,10 @@ public partial class TestTutorialCues : TestHarness
 
     private void RunDodgeModeTests()
     {
-        AfflictionManager.Clear();
+        RunMutatorService.Clear();
 
-        var cellScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
-        var cell = cellScene.Instantiate<Macrophage>();
+        var cellScene = AssetLoader.Load<PackedScene>("res://scenes/actors/player_base.tscn");
+        var cell = cellScene.Instantiate<PlayerActor>();
         Root.AddChild(cell);
         AssertThat(cell.Stats).IsNotNull();
 
@@ -148,13 +148,13 @@ public partial class TestTutorialCues : TestHarness
 
         // Microtubule Sclerosis (endless affliction) hard-disables the dodge:
         // genuine press edge, full charge stays unspent, no dash starts.
-        AfflictionManager.SetSelection(new[] { AfflictionManager.MicrotubuleSclerosis });
+        RunMutatorService.SetSelection(new[] { RunMutatorService.MicrotubuleSclerosis });
         Input.ActionPress("dodge");
         cell._PhysicsProcess(0.02);
         AssertThat(cell.IsDodging).IsFalse();
         AssertThat(cell.DodgeCharges).IsEqualApprox(1.0f, 0.001f);
         Input.ActionRelease("dodge");
-        AfflictionManager.Clear();
+        RunMutatorService.Clear();
         cell.QueueFree();
 
         GD.Print("[PASS] Dodge roll charges/dash/i-frames/recharge/steering and affliction override verified.");
@@ -162,14 +162,14 @@ public partial class TestTutorialCues : TestHarness
 
     private void RunCatalystResonanceTests()
     {
-        var probe = new BaseCell { Name = "CatalystProbe", GlobalPosition = new Vector2(60, 60) };
+        var probe = new PlayerActor { Name = "CatalystProbe", GlobalPosition = new Vector2(60, 60) };
         Root.AddChild(probe);
 
         var sm = new SkillManager { Name = "SkillManager" };
         probe.AddChild(sm);
         sm.Setup(probe);
 
-        var lance = new PerforinLanceSkill();
+        var lance = SkillFactory.CreateActive("perforin_lance")!;
         AssertThat(sm.EquipActive(lance)).IsTrue();
 
         AssertThat(UpgradeManager.IsCatalystReady(probe, "lysosome", out _)).IsFalse();
@@ -237,7 +237,7 @@ public partial class TestTutorialCues : TestHarness
         GameManager.SelectedMap = "acute_wound";
         SettingsManager.MapEffectsEnabled = true;
 
-        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         _main = main;
         Root.AddChild(main);
         main.SetPhysicsProcess(false);
@@ -246,7 +246,7 @@ public partial class TestTutorialCues : TestHarness
         int dormantGuides = 0;
         foreach (var child in main.EnemyContainer!.GetChildren())
         {
-            if (child is BaseEnemy be && be.StunTimer > 100.0f)
+            if (child is EnemyActor be && be.StunTimer > 100.0f)
                 dormantGuides++;
         }
         AssertThat(main.EnemyContainer.GetChildCount()).IsGreater(0);
@@ -275,7 +275,7 @@ public partial class TestTutorialCues : TestHarness
     {
         Paused = false;
         Engine.TimeScale = 1.0;
-        AfflictionManager.Clear();
+        RunMutatorService.Clear();
         Input.ActionRelease("dodge");
 
         if (_main != null && IsInstanceValid(_main))
@@ -287,3 +287,5 @@ public partial class TestTutorialCues : TestHarness
         }
     }
 }
+
+

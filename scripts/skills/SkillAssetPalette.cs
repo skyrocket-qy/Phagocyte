@@ -1,8 +1,8 @@
 using Godot;
 using System.Collections.Generic;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.Skills;
+namespace Game.Skills;
 
 /// <summary>
 /// Skill-icon palette table (Phase 4, TODO line 70: skill visuals must match

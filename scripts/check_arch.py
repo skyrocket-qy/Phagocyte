@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Architecture Layer Boundary Validator for Phagocyte (Godot C#).
+Architecture Layer Boundary Validator for Game (Godot C#).
 Enforces the layer rules in docs/architecture/ARCH_RULE.md against the
 current scripts/ layout (no file moves required):
 
@@ -8,12 +8,12 @@ current scripts/ layout (no file moves required):
   Layer 2: Autoload - global singletons + static services (scripts/core/ managers)
   Layer 3: Gameplay - entities/simulation (combat, player, enemies, skills,
                        directors, environment, gear, endgame, testing + core
-                       gameplay helpers like CellStats/GearChamber/UpgradeManager)
+                       gameplay helpers like ActorStats/EquipmentChamber/UpgradeManager)
   Layer 4: UI       - presentation (scripts/ui/, except autoload DamageNumberSpawner)
   Layer T: Tests    - verification (tests/, can import all — never checked)
 
 Ported from Vistrace-godot scripts/check_arch.py (same strip + dynamic-UI-types
-approach), adapted to Phagocyte's feature-folder layout.
+approach), adapted to Game's feature-folder layout.
 Run: python3 scripts/check_arch.py  (or: make check-arch)
 """
 
@@ -33,7 +33,7 @@ SCRIPTS_DIR = ROOT_DIR / "scripts"
 # autoloads together (AchievementManager -> GameManager via events).
 DOMAIN_FILES = {
     "scripts/core/IStatHost.cs",
-    "scripts/core/Morphology.cs",
+    "scripts/core/BodyDeformation.cs",
     "scripts/core/QuadTree.cs",
     "scripts/core/SkillIds.cs",
     "scripts/core/Stat.cs",
@@ -72,18 +72,17 @@ AUTOLOAD_FILES = {
 GAMEPLAY_PREFIXES = (
     "scripts/camera/",
     "scripts/combat/",
-    "scripts/hero/",
+    "scripts/player/",
     "scripts/enemies/",
     "scripts/skills/",
     "scripts/directors/",
-    "scripts/map/",
-    "scripts/gear/",
-    "scripts/endgame/",
+    "scripts/stages/",
+    "scripts/equipment/",
     "scripts/testing/",
 )
 GAMEPLAY_FILES = {
-    "scripts/core/CellStats.cs",
-    "scripts/core/GearChamber.cs",
+    "scripts/core/ActorStats.cs",
+    "scripts/core/EquipmentChamber.cs",
     "scripts/core/GearDrop.cs",
     "scripts/core/RunTelemetryManager.cs",
     "scripts/core/UpgradeManager.cs",
@@ -110,7 +109,7 @@ ALLOWLIST = [
 
 # Gameplay may use this ONE UI-namespace symbol: the DamageNumberSpawner
 # autoload (gameplay -> autoload is allowed; the file lives in scripts/ui/
-# for now). Every other Phagocyte.UI reference in gameplay is a violation.
+# for now). Every other Game.UI reference in gameplay is a violation.
 GAMEPLAY_UI_ALLOW = re.compile(r"\bDamageNumberSpawner\b|\bDamageNumberType\b")
 
 # Forbidden patterns per layer: list of (regex, description).
@@ -129,14 +128,14 @@ STATIC_DOMAIN_FORBIDDEN = [
     (r"\bGetFirstNodeInGroup\s*\(", "SceneTree lookup in domain"),
     (r"\bCurrentScene\b", "SceneTree 'CurrentScene' in domain"),
     # Concrete gameplay actors / components.
-    (r"(?<!\.)\bBaseCell\b", "Gameplay actor 'BaseCell' in domain"),
-    (r"(?<!\.)\bBaseEnemy\b", "Gameplay actor 'BaseEnemy' in domain"),
+    (r"(?<!\.)\bPlayerActor\b", "Gameplay actor 'PlayerActor' in domain"),
+    (r"(?<!\.)\bEnemyActor\b", "Gameplay actor 'EnemyActor' in domain"),
     (r"(?<!\.)\bBaseSkill\b", "Gameplay type 'BaseSkill' in domain"),
     (r"(?<!\.)\bSkillManager\b", "Gameplay type 'SkillManager' in domain"),
     (r"\bCombatComponent\b", "Gameplay component in domain"),
     (r"\bAilmentController\b", "Gameplay component in domain"),
-    (r"\bGearChamber\b", "Gameplay component 'GearChamber' in domain"),
-    (r"\bCellStats\b", "Gameplay component 'CellStats' in domain"),
+    (r"\bEquipmentChamber\b", "Gameplay component 'EquipmentChamber' in domain"),
+    (r"\bActorStats\b", "Gameplay component 'ActorStats' in domain"),
     # Autoload singletons (domain must not couple to globals).
     (r"\bGameManager\b", "Autoload 'GameManager' in domain"),
     (r"\bAudioManager\b", "Autoload 'AudioManager' in domain"),
@@ -148,13 +147,13 @@ STATIC_DOMAIN_FORBIDDEN = [
 
 STATIC_AUTOLOAD_FORBIDDEN = [
     (r"\bCharacterBody2D\b", "Physics actor 'CharacterBody2D' in autoload"),
-    (r"\bBaseCell\b", "Concrete actor 'BaseCell' in autoload"),
-    (r"\bBaseEnemy\b", "Concrete actor 'BaseEnemy' in autoload"),
+    (r"\bPlayerActor\b", "Concrete actor 'PlayerActor' in autoload"),
+    (r"\bEnemyActor\b", "Concrete actor 'EnemyActor' in autoload"),
     (r"\bSkillManager\b", "Gameplay 'SkillManager' in autoload"),
 ]
 
 STATIC_GAMEPLAY_FORBIDDEN = [
-    (r"use\s+Phagocyte\.UI\s*;", "Namespace 'Phagocyte.UI' imported in gameplay"),
+    (r"use\s+Game\.UI\s*;", "Namespace 'Game.UI' imported in gameplay"),
     (r"\bRunRecordsModal\b", "Concrete UI 'RunRecordsModal' in gameplay"),
     (r"\bUpgradeModal\b", "Concrete UI 'UpgradeModal' in gameplay"),
     (r"\bPassiveTreeView\b", "Concrete UI 'PassiveTreeView' in gameplay"),
@@ -298,7 +297,7 @@ def check_file(
             for pat, desc in STATIC_GAMEPLAY_FORBIDDEN:
                 if not re.search(pat, line):
                     continue
-                # 'using Phagocyte.UI;' is allowed ONLY when the file's sole
+                # 'using Game.UI;' is allowed ONLY when the file's sole
                 # UI-namespace use is the DamageNumberSpawner autoload. We
                 # check the whole file for other UI symbols at the end; here
                 # record the import and filter below.
@@ -316,20 +315,20 @@ def check_file(
         # 'ui' layer: imports allowed by design (UI may read gameplay intent
         # state). No static rules.
     if layer == "gameplay":
-        # Post-filter: drop the 'using Phagocyte.UI' hit when the file only
+        # Post-filter: drop the 'using Game.UI' hit when the file only
         # touches the DamageNumberSpawner autoload (allowed exception).
         uses_ui_ns = any(
-            "Phagocyte.UI" in v for v in violations
+            "Game.UI" in v for v in violations
         )
         if uses_ui_ns:
-            other_ui = [v for v in violations if "Phagocyte.UI" not in v]
+            other_ui = [v for v in violations if "Game.UI" not in v]
             non_spawner_ui = [
                 v
                 for v in other_ui
                 if "UI type" in v or "Concrete UI" in v or "UIOverlay" in v
             ]
             if not non_spawner_ui:
-                violations = [v for v in violations if "Phagocyte.UI" not in v]
+                violations = [v for v in violations if "Game.UI" not in v]
     return violations
 
 
@@ -370,3 +369,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b63xomb7v20td"]
 
 [ext_resource type="Theme" uid="uid://ppcyc41cyeh7" path="res://assets/theme/menu_buttons.tres" id="menu_theme"]
-[ext_resource type="Script" uid="uid://bspbhrqqpch6d" path="res://scripts/ui/BioRadarChart.cs" id="radar_script"]
+[ext_resource type="Script" uid="uid://bspbhrqqpch6d" path="res://scripts/ui/RadarChart.cs" id="radar_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/page_header.tscn" id="page_header"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]

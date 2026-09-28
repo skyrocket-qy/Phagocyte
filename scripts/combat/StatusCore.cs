@@ -1,7 +1,7 @@
 // StatusCore v1 — portable status/ailment engine.
 // Copy notice: this file is intentionally dependency-free apart from the Godot
 // SDK (Vector2/Mathf). It references NO game namespaces, so it can be copied
-// verbatim into any Godot 4 Mono project. Origin: phagocyte.
+// verbatim into any Godot 4 Mono project. Origin: engine core.
 // Games supply their own ailment set as data (see Configure); per-game wiring
 // (damage routing, VFX, special interactions) lives in a thin Node adapter.
 //
@@ -11,7 +11,7 @@
 // - Independent:     every application is its own stack; max_stacks > 0 drops oldest.
 // - Aggregation:     strongest slow wins, strongest amp wins (never multiplicative).
 // - AmpAppliesToOwnDot (option): whether DamageTakenMultiplier scales core DoT output.
-namespace StatusSystem;
+namespace Game.Combat;
 
 using Godot;
 using System;

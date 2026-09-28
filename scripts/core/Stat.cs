@@ -1,4 +1,4 @@
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Represents a single numerical character statistic with base, flat, and percent modifiers.

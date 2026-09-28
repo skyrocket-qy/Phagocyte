@@ -17,7 +17,7 @@
 		"hit_crit",
 		"player_hit",
 		"death",
-		"die_hero",
+		"die_player",
 		"level_upgrade",
 		"item_pickup",
 		"shoot",
@@ -52,3 +52,4 @@
 		"vortex"
 	]
 }
+

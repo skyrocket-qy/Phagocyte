@@ -1,9 +1,9 @@
 using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the frame-spike flight recorder: over-threshold frames are

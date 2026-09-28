@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Endgame;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Enemies;
+using Game.Directors;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the six Pathological Overload Afflictions (docs/endgame.md §4):
@@ -19,16 +19,16 @@ namespace Phagocyte.Tests;
 public partial class TestAfflictions : TestHarness
 {
     private int _phase = 0;
-    private Main? _main = null;
+    private GameRoot? _main = null;
 
     private static readonly string[] AllAfflictions =
     {
-        AfflictionManager.FebrileConvulsion,
-        AfflictionManager.Endotoxemia,
-        AfflictionManager.AutophagicFailure,
-        AfflictionManager.MicrotubuleSclerosis,
-        AfflictionManager.AntigenicDrift,
-        AfflictionManager.ExtremeViscosity
+        RunMutatorService.FebrileConvulsion,
+        RunMutatorService.Endotoxemia,
+        RunMutatorService.AutophagicFailure,
+        RunMutatorService.MicrotubuleSclerosis,
+        RunMutatorService.AntigenicDrift,
+        RunMutatorService.ExtremeViscosity
     };
 
     public override void _Initialize()
@@ -38,7 +38,7 @@ public partial class TestAfflictions : TestHarness
         IsolateSaves("afflictions");
         RunRecordManager.LoadFromDisk();
 
-        AfflictionManager.Clear();
+        RunMutatorService.Clear();
         GameManager.EndlessMode = false;
     }
 
@@ -83,33 +83,33 @@ public partial class TestAfflictions : TestHarness
 
     private void RunCatalogAndScoringTests()
     {
-        AssertThat(AfflictionManager.Definitions.Count).IsEqual(6);
+        AssertThat(RunMutatorService.Definitions.Count).IsEqual(6);
 
         int bonusSum = 0;
-        foreach (var def in AfflictionManager.Definitions)
+        foreach (var def in RunMutatorService.Definitions)
             bonusSum += def.BonusPercent;
         AssertThat(bonusSum).IsEqual(175);
-        AssertThat(AfflictionManager.Definitions[0].Id).IsEqual(AfflictionManager.FebrileConvulsion);
+        AssertThat(RunMutatorService.Definitions[0].Id).IsEqual(RunMutatorService.FebrileConvulsion);
 
-        AfflictionManager.Clear();
-        AssertThat(AfflictionManager.ScoreMultiplier).IsEqualApprox(1.0f, 0.0001f);
+        RunMutatorService.Clear();
+        AssertThat(RunMutatorService.ScoreMultiplier).IsEqualApprox(1.0f, 0.0001f);
 
-        AfflictionManager.SetSelected(AfflictionManager.FebrileConvulsion, true);
-        AssertThat(AfflictionManager.IsActive(AfflictionManager.FebrileConvulsion)).IsTrue();
-        AssertThat(AfflictionManager.ScoreMultiplier).IsEqualApprox(1.25f, 0.0001f);
+        RunMutatorService.SetSelected(RunMutatorService.FebrileConvulsion, true);
+        AssertThat(RunMutatorService.IsActive(RunMutatorService.FebrileConvulsion)).IsTrue();
+        AssertThat(RunMutatorService.ScoreMultiplier).IsEqualApprox(1.25f, 0.0001f);
 
         // Unknown ids are ignored
-        AfflictionManager.SetSelected("not_an_affliction", true);
-        AssertThat(AfflictionManager.ScoreBonus).IsEqualApprox(0.25f, 0.0001f);
+        RunMutatorService.SetSelected("not_an_affliction", true);
+        AssertThat(RunMutatorService.ScoreBonus).IsEqualApprox(0.25f, 0.0001f);
 
         // All six stack additively to the documented ×2.75 maximum
-        AfflictionManager.SetSelection(AllAfflictions);
-        AssertThat(AfflictionManager.IsActive(AfflictionManager.ExtremeViscosity)).IsTrue();
-        AssertThat(AfflictionManager.ScoreMultiplier).IsEqualApprox(2.75f, 0.0001f);
-        AssertThat(AfflictionManager.IncomingDamageMultiplier).IsEqualApprox(1.5f, 0.0001f);
-        AssertThat(AfflictionManager.BlocksHealthRegen).IsTrue();
-        AssertThat(AfflictionManager.DodgeDisabled).IsTrue();
-        AssertThat(AfflictionManager.MoveSpeedPercentPenalty).IsEqualApprox(-0.25f, 0.0001f);
+        RunMutatorService.SetSelection(AllAfflictions);
+        AssertThat(RunMutatorService.IsActive(RunMutatorService.ExtremeViscosity)).IsTrue();
+        AssertThat(RunMutatorService.ScoreMultiplier).IsEqualApprox(2.75f, 0.0001f);
+        AssertThat(RunMutatorService.IncomingDamageMultiplier).IsEqualApprox(1.5f, 0.0001f);
+        AssertThat(RunMutatorService.BlocksHealthRegen).IsTrue();
+        AssertThat(RunMutatorService.DodgeDisabled).IsTrue();
+        AssertThat(RunMutatorService.MoveSpeedPercentPenalty).IsEqualApprox(-0.25f, 0.0001f);
 
         // Score: (900×10 + 50,000 + 40×100) × 1.5 (Hard) × 2.75
         int boosted = RunRecordManager.ComputeScore(
@@ -133,12 +133,12 @@ public partial class TestAfflictions : TestHarness
 
     private void RunPlayerEffectTests()
     {
-        var cellScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
+        var cellScene = AssetLoader.Load<PackedScene>("res://scenes/actors/player_base.tscn");
 
         // Endotoxemia: ALL damage taken +50% through the single pipeline
         // (hazard, acid and febrile sources included — no bypass).
-        AfflictionManager.SetSelection(new[] { AfflictionManager.Endotoxemia });
-        var cell = cellScene.Instantiate<Macrophage>();
+        RunMutatorService.SetSelection(new[] { RunMutatorService.Endotoxemia });
+        var cell = cellScene.Instantiate<PlayerActor>();
         Root.AddChild(cell);
         AssertThat(cell.Stats).IsNotNull();
         // The damage comparison must not be nullified by the innate 8% block roll.
@@ -158,8 +158,8 @@ public partial class TestAfflictions : TestHarness
         cell.QueueFree();
 
         // Autophagic failure: health_regen is fully suppressed
-        AfflictionManager.SetSelection(new[] { AfflictionManager.AutophagicFailure });
-        var regenCell = cellScene.Instantiate<Macrophage>();
+        RunMutatorService.SetSelection(new[] { RunMutatorService.AutophagicFailure });
+        var regenCell = cellScene.Instantiate<PlayerActor>();
         Root.AddChild(regenCell);
         regenCell.Stats!.SetBase("health_regen", 10.0f);
         regenCell.Health = 50.0f;
@@ -167,8 +167,8 @@ public partial class TestAfflictions : TestHarness
         AssertThat(regenCell.Health).IsEqual(50.0f);
 
         // Control: without the affliction the same cell regenerates
-        AfflictionManager.Clear();
-        var controlCell = cellScene.Instantiate<Macrophage>();
+        RunMutatorService.Clear();
+        var controlCell = cellScene.Instantiate<PlayerActor>();
         Root.AddChild(controlCell);
         controlCell.Stats!.SetBase("health_regen", 10.0f);
         controlCell.Health = 50.0f;
@@ -182,12 +182,12 @@ public partial class TestAfflictions : TestHarness
 
     private void RunEndlessIntegrationTests()
     {
-        AfflictionManager.SetSelection(AllAfflictions);
+        RunMutatorService.SetSelection(AllAfflictions);
 
         var main = InstantiateMain(endless: true);
         _main = main;
 
-        var player = main.GetNodeOrNull<BaseCell>("Macrophage");
+        var player = main.GetNodeOrNull<PlayerActor>("Player");
         AssertThat(player).IsNotNull();
 
         // The febrile burn is a fixed 2% max-HP environmental tick; clear the
@@ -202,19 +202,19 @@ public partial class TestAfflictions : TestHarness
 
         // Febrile convulsion: 2% max HP environmental burn every 5s
         float hpBeforeBurn = player.Health;
-        main._PhysicsProcess(AfflictionManager.FebrileBurnInterval + 0.1f);
+        main._PhysicsProcess(RunMutatorService.FebrileBurnInterval + 0.1f);
         AssertThat(player.Health).IsLess(hpBeforeBurn);
 
         // Antigenic drift: vulnerability marks reset every 20s
-        var enemy = PathogenSpawner.CreatePathogen("staph");
+        var enemy = EnemySpawner.CreateEnemy("staph");
         AssertThat(enemy).IsNotNull();
         main.EnemyContainer!.AddChild(enemy!);
         AssertThat(enemy!.Ailments).IsNotNull();
-        enemy.Ailments!.ApplyOpsonization();
-        AssertThat(enemy.Ailments.IsOpsonized).IsTrue();
+        enemy.Ailments!.ApplyMarkation();
+        AssertThat(enemy.Ailments.IsMarked).IsTrue();
 
-        main._PhysicsProcess(AfflictionManager.AntigenicDriftInterval + 0.1f);
-        AssertThat(enemy.Ailments.IsOpsonized).IsFalse();
+        main._PhysicsProcess(RunMutatorService.AntigenicDriftInterval + 0.1f);
+        AssertThat(enemy.Ailments.IsMarked).IsFalse();
 
         GD.Print("[PASS] Endless integration: viscosity, febrile burn and antigenic drift verified.");
     }
@@ -223,7 +223,7 @@ public partial class TestAfflictions : TestHarness
     {
         Paused = false;
         GameManager.EndlessMode = false;
-        AfflictionManager.Clear();
+        RunMutatorService.Clear();
 
         FreeMain(_main);
         _main = null;
@@ -231,3 +231,6 @@ public partial class TestAfflictions : TestHarness
         RestoreSaves();
     }
 }
+
+
+

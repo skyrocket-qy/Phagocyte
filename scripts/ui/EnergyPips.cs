@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Circular energy pips (TODO Phase 1 revision): one disc per energy point.

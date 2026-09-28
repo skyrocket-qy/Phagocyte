@@ -1,9 +1,9 @@
 using Godot;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.Endgame;
+using Game.Core;
+using Game.Directors;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Pre-run setup for the Endless Cytokine Storm (docs/endgame.md §4): pick any
@@ -49,7 +49,7 @@ public partial class EndgameSetupModal : ModalBase
         if (AfflictionList == null)
             return;
 
-        foreach (var def in AfflictionManager.Definitions)
+        foreach (var def in RunMutatorService.Definitions)
         {
             var row = new VBoxContainer();
             row.AddThemeConstantOverride("separation", 0);
@@ -57,7 +57,7 @@ public partial class EndgameSetupModal : ModalBase
             var check = new CheckBox();
             check.Toggled += (bool pressed) =>
             {
-                AfflictionManager.SetSelected(def.Id, pressed);
+                RunMutatorService.SetSelected(def.Id, pressed);
                 UpdateTotal();
             };
             _checks[def.Id] = check;
@@ -81,7 +81,7 @@ public partial class EndgameSetupModal : ModalBase
     {
         foreach (var (id, check) in _checks)
         {
-            check.SetPressedNoSignal(AfflictionManager.IsActive(id));
+            check.SetPressedNoSignal(RunMutatorService.IsActive(id));
         }
 
         UpdateLocalizedTexts();
@@ -96,7 +96,7 @@ public partial class EndgameSetupModal : ModalBase
         if (ConfirmBtn != null) ConfirmBtn.Text = Tr("BTN_ENDLESS_CONFIRM");
         if (CancelBtn != null) CancelBtn.Text = Tr("BTN_ENDLESS_CANCEL");
 
-        foreach (var def in AfflictionManager.Definitions)
+        foreach (var def in RunMutatorService.Definitions)
         {
             if (_checks.TryGetValue(def.Id, out var check))
                 check.Text = $"{def.Icon} {Tr(def.NameKey)}  (+{def.BonusPercent}%)";
@@ -110,7 +110,7 @@ public partial class EndgameSetupModal : ModalBase
     private void UpdateTotal()
     {
         if (TotalLabel != null)
-            TotalLabel.Text = $"{Tr("ENDLESS_SETUP_TOTAL")}  ×{AfflictionManager.ScoreMultiplier:F2}";
+            TotalLabel.Text = $"{Tr("ENDLESS_SETUP_TOTAL")}  ×{RunMutatorService.ScoreMultiplier:F2}";
     }
 
     private void OnConfirmPressed()
@@ -118,7 +118,7 @@ public partial class EndgameSetupModal : ModalBase
         Visible = false;
         // Selection is owned by the checkboxes; pass it explicitly so the launch
         // can never wipe it via a null default.
-        GameManager.StartEndlessGame(GetTree(), AfflictionManager.SelectedIds);
+        GameManager.StartEndlessGame(GetTree(), RunMutatorService.SelectedIds);
     }
 
     private void OnCancelPressed()

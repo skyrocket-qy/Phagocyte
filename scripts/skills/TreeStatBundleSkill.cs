@@ -1,7 +1,7 @@
 using Godot;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.Skills;
+namespace Game.Skills;
 
 /// <summary>
 /// Applies one bundle of generic passive-tree stat modifiers.
@@ -29,7 +29,7 @@ public partial class TreeStatBundleSkill : BaseSkill
         foreach (var modifier in _modifiers)
         {
             var (flat, pct, scalingStat, scalePer, hasScaling) = PassiveTreeManager.SplitScaledModifier(modifier);
-            if (hasScaling && Stats is CellStats cs)
+            if (hasScaling && Stats is ActorStats cs)
                 cs.AddScaledModifier(modifier.Stat, flat, pct, scalingStat, scalePer);
             else
                 ApplyStat(modifier.Stat, flat, pct);
@@ -41,7 +41,7 @@ public partial class TreeStatBundleSkill : BaseSkill
         foreach (var modifier in _modifiers)
         {
             var (flat, pct, scalingStat, scalePer, hasScaling) = PassiveTreeManager.SplitScaledModifier(modifier);
-            if (hasScaling && Stats is CellStats cs)
+            if (hasScaling && Stats is ActorStats cs)
                 cs.RemoveScaledModifier(modifier.Stat, flat, pct, scalingStat, scalePer);
             else
                 RemoveStat(modifier.Stat, flat, pct);

@@ -2,10 +2,10 @@ using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
-using Phagocyte.Core;
-using Phagocyte.UI;
+using Game.Core;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Comprehensive multilingual verification suite across all 8 supported languages:

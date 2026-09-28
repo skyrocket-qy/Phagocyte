@@ -2,13 +2,13 @@ using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
-using Phagocyte.Combat;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
-using Phagocyte.UI;
+using Game.Combat;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Visual preview harness for the achievement gallery (not a pass/fail art
@@ -198,7 +198,7 @@ public partial class TestAchievementPreview : TestHarness
         }
         var main = InstantiateMain();
         ClearArenaEntities(main);
-        var player = main.GetNodeOrNull<Macrophage>("Macrophage");
+        var player = main.GetNodeOrNull<PlayerActor>("Player");
         AssertThat(player).IsNotNull();
         player!.Stats!.SetBase("block", 0.0f);
         player.Stats.SetBase("evasion", 0.0f);
@@ -214,10 +214,12 @@ public partial class TestAchievementPreview : TestHarness
     {
         foreach (var child in root.GetChildren())
         {
-            if (child is BaseEnemy || child is DormantToxinVesicle || child is BioHazardArea)
+            if (child is EnemyActor || child is ProximityMine || child is HazardZone)
                 child.Free();
             else
                 ClearArenaEntities(child);
         }
     }
 }
+
+

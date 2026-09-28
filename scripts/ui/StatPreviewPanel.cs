@@ -1,8 +1,8 @@
 using Godot;
 using System.Collections.Generic;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Fixed build-stats side panel (loadout + tree pages): final values for all

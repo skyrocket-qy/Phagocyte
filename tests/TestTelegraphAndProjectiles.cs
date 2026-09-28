@@ -4,13 +4,13 @@ using static GdUnit4.Assertions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
-using Phagocyte.Enemies;
-using Phagocyte.Combat;
+using Game.Core;
+using Game.Player;
+using Game.Skills;
+using Game.Enemies;
+using Game.Combat;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 [TestSuite]
 public partial class TestTelegraphAndProjectiles : SceneTree
@@ -91,9 +91,9 @@ public partial class TestTelegraphAndProjectiles : SceneTree
         lineAttack.QueueFree();
         GD.Print("[PASS] Step 1: TelegraphedAttack Circle & Line geometry math verified.");
 
-        // --- 2. TelegraphedAttack Execution & BaseCell Damage Resolution ---
-        var cell = new BaseCell { GlobalPosition = new Vector2(200, 200) };
-        var stats = new CellStats { Name = "CellStats" };
+        // --- 2. TelegraphedAttack Execution & PlayerActor Damage Resolution ---
+        var cell = new PlayerActor { GlobalPosition = new Vector2(200, 200) };
+        var stats = new ActorStats { Name = "ActorStats" };
         cell.AddChild(stats);
         cell.Stats = stats;
         cell.AddToGroup("player");
@@ -113,7 +113,7 @@ public partial class TestTelegraphAndProjectiles : SceneTree
 
         impactAttack.ExecuteImpact();
         AssertThat(cell.Health).IsLess(startingHp);
-        GD.Print("[PASS] Step 2: TelegraphedAttack cleanly executes impact against BaseCell.");
+        GD.Print("[PASS] Step 2: TelegraphedAttack cleanly executes impact against PlayerActor.");
 
         impactAttack.QueueFree();
 
@@ -145,15 +145,13 @@ public partial class TestTelegraphAndProjectiles : SceneTree
         GD.Print("[PASS] Step 3: ProjectileManager spawns 50 batch projectiles with zero allocation.");
 
         // --- 4. ProjectileManager 64px Spatial Grid & Enemy Collision ---
-        var enemy = new StaphEnemy
-        {
-            GlobalPosition = new Vector2(140, 100), // In front of bullets traveling Right from (100, 100)
-            CurrentHealth = 50.0f,
-            MaxHealth = 50.0f
-        };
+        var enemy = EnemySpawner.CreateEnemy("staph")!;
+        enemy.GlobalPosition = new Vector2(140, 100); // In front of bullets traveling Right from (100, 100)
+        enemy.CurrentHealth = 50.0f;
+        enemy.MaxHealth = 50.0f;
         Root.AddChild(enemy);
 
-        AssertThat(BaseEnemy.ActiveEnemies.Contains(enemy)).IsTrue();
+        AssertThat(EnemyActor.ActiveEnemies.Contains(enemy)).IsTrue();
 
         float enemyHpBefore = enemy.CurrentHealth;
 
@@ -172,8 +170,8 @@ public partial class TestTelegraphAndProjectiles : SceneTree
         cell.QueueFree();
 
         // --- 5. DefensinBarbsSkill Integration ---
-        var barbHost = new BaseCell { GlobalPosition = new Vector2(300, 300) };
-        var barbStats = new CellStats { Name = "CellStats" };
+        var barbHost = new PlayerActor { GlobalPosition = new Vector2(300, 300) };
+        var barbStats = new ActorStats { Name = "ActorStats" };
         barbHost.AddChild(barbStats);
         barbHost.Stats = barbStats;
         Root.AddChild(barbHost);
@@ -182,7 +180,7 @@ public partial class TestTelegraphAndProjectiles : SceneTree
         Root.AddChild(freshProjMgr);
         freshProjMgr.SetHost(barbHost);
 
-        var skill = new DefensinBarbsSkill();
+        var skill = SkillFactory.CreateActive("defensin_barbs")!;
         skill.Setup(barbHost);
 
         int activeBefore = freshProjMgr.ActiveCount;

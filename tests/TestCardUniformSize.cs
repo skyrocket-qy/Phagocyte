@@ -1,12 +1,12 @@
 using Godot;
 using System;
-using Phagocyte.UI;
+using Game.UI;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 public partial class TestCardUniformSize : SceneTree
 {

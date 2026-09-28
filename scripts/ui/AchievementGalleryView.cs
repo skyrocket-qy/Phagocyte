@@ -1,7 +1,7 @@
 using Godot;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Full-screen achievement gallery: the fifth MainMenu view (Title → Achievements).

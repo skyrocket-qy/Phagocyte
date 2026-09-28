@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Phagocyte.Combat;
+namespace Game.Combat;
 
 /// <summary>
 /// Typed contract for anything that accepts direct or DoT damage.

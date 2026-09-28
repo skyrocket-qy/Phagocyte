@@ -2,9 +2,9 @@ using Godot;
 using Godot.Collections;
 using System;
 using System.Text;
-using Phagocyte.Skills;
+using Game.Skills;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Persistent pre-run passive-tree state shared by every immune cell.
@@ -35,7 +35,7 @@ public static class PassiveTreeManager
     /// into flat/percent channels (mirrors the gear modifier
     /// convention: flat/percentage-points go flat, everything else percent).
     /// Used by both the run-time skill
-    /// (<see cref="Phagocyte.Skills.TreeStatBundleSkill"/>) and the menu
+    /// (<see cref="Game.Skills.TreeStatBundleSkill"/>) and the menu
     /// build preview so the two can never diverge.
     /// </summary>
     public static (float Flat, float Pct) SplitModifier(TreeStatModifier modifier)
@@ -84,7 +84,7 @@ public static class PassiveTreeManager
         TreeStatModifier[] Modifiers,
         int Ring);
 
-    public const int BaseCellLevel = 1;
+    public const int PlayerActorLevel = 1;
 
     /// <summary>
     /// Meta level cap per cell: 14 level points plus shared achievement bonus
@@ -394,7 +394,7 @@ public static class PassiveTreeManager
 
     public static bool IsKnownCell(string cellId)
     {
-        return !string.IsNullOrEmpty(cellId) && GameManager.ClassData.ContainsKey(cellId);
+        return !string.IsNullOrEmpty(cellId) && GameManager.PlayerClassData.ContainsKey(cellId);
     }
 
     public static bool IsKnownNode(string nodeId)
@@ -434,8 +434,8 @@ public static class PassiveTreeManager
     {
         EnsureLoaded();
         if (!IsKnownCell(cellId))
-            return BaseCellLevel;
-        return CellLevels.TryGetValue(cellId, out var level) ? Math.Min(MaxCellLevel, Math.Max(BaseCellLevel, level)) : BaseCellLevel;
+            return PlayerActorLevel;
+        return CellLevels.TryGetValue(cellId, out var level) ? Math.Min(MaxCellLevel, Math.Max(PlayerActorLevel, level)) : PlayerActorLevel;
     }
 
     public static bool RecordRunLevel(string cellId, int runLevel)
@@ -444,7 +444,7 @@ public static class PassiveTreeManager
         if (!IsKnownCell(cellId))
             return false;
 
-        int normalized = Math.Min(MaxCellLevel, Math.Max(BaseCellLevel, runLevel));
+        int normalized = Math.Min(MaxCellLevel, Math.Max(PlayerActorLevel, runLevel));
         int current = GetCellLevel(cellId);
         if (normalized <= current)
             return false;
@@ -690,7 +690,7 @@ public static class PassiveTreeManager
 
     public static int GetPointsAvailable(string cellId)
     {
-        return Math.Max(0, GetCellLevel(cellId) - BaseCellLevel + GetEarnedBonusPoints() - GetSpentPoints(cellId));
+        return Math.Max(0, GetCellLevel(cellId) - PlayerActorLevel + GetEarnedBonusPoints() - GetSpentPoints(cellId));
     }
 
     public static System.Collections.Generic.List<string> GetNeighbors(string nodeId)
@@ -849,7 +849,7 @@ public static class PassiveTreeManager
             {
                 string cellId = key.AsString();
                 if (IsKnownCell(cellId))
-                    CellLevels[cellId] = Math.Max(BaseCellLevel, levels[key].AsInt32());
+                    CellLevels[cellId] = Math.Max(PlayerActorLevel, levels[key].AsInt32());
             }
         }
 

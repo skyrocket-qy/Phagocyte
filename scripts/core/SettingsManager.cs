@@ -2,7 +2,7 @@ using Godot;
 using System;
 using Godot.Collections;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Manages audio volume, graphics display modes, and persistent configuration.

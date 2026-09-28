@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Remappable primary keys for the six gameplay actions (pause/back stays

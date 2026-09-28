@@ -1,16 +1,16 @@
 using Godot;
 using Godot.Collections;
 using System;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 public partial class CodexModal : ModalBase
 {
     public Button? TabSkillsBtn { get; set; }
     public Button? TabPassivesBtn { get; set; }
     public Button? TabCellsBtn { get; set; }
-    public Button? TabPathogensBtn { get; set; }
+    public Button? TabEnemiesBtn { get; set; }
     public Button? TabMapsBtn { get; set; }
     public Button? TabGearBtn { get; set; }
     public Button? TabBossesBtn { get; set; }
@@ -37,7 +37,7 @@ public partial class CodexModal : ModalBase
     public const int TabActives = 0;
     public const int TabPassives = 1;
     public const int TabCells = 2;
-    public const int TabPathogens = 3;
+    public const int TabEnemies = 3;
     public const int TabMaps = 4;
     public const int TabGear = 5;
     public const int TabBosses = 6;
@@ -47,7 +47,7 @@ public partial class CodexModal : ModalBase
         TabSkillsBtn = GetNodeOrNull<Button>("VBox/TabBar/SkillsTab");
         TabPassivesBtn = GetNodeOrNull<Button>("VBox/TabBar/PassivesTab");
         TabCellsBtn = GetNodeOrNull<Button>("VBox/TabBar/CellsTab");
-        TabPathogensBtn = GetNodeOrNull<Button>("VBox/TabBar/PathogensTab");
+        TabEnemiesBtn = GetNodeOrNull<Button>("VBox/TabBar/EnemiesTab");
         TabMapsBtn = GetNodeOrNull<Button>("VBox/TabBar/MapsTab");
         TabGearBtn = GetNodeOrNull<Button>("VBox/TabBar/GearTab");
         TabBossesBtn = GetNodeOrNull<Button>("VBox/TabBar/BossesTab");
@@ -69,8 +69,8 @@ public partial class CodexModal : ModalBase
             TabPassivesBtn.Pressed += () => SwitchTab(TabPassives);
         if (TabCellsBtn != null)
             TabCellsBtn.Pressed += () => SwitchTab(TabCells);
-        if (TabPathogensBtn != null)
-            TabPathogensBtn.Pressed += () => SwitchTab(TabPathogens);
+        if (TabEnemiesBtn != null)
+            TabEnemiesBtn.Pressed += () => SwitchTab(TabEnemies);
         if (TabMapsBtn != null)
             TabMapsBtn.Pressed += () => SwitchTab(TabMaps);
         if (TabGearBtn != null)
@@ -185,7 +185,7 @@ public partial class CodexModal : ModalBase
         if (TabSkillsBtn != null) TabSkillsBtn.Text = Tr("CODEX_TAB_ACTIVES");
         if (TabPassivesBtn != null) TabPassivesBtn.Text = Tr("CODEX_TAB_PASSIVES");
         if (TabCellsBtn != null) TabCellsBtn.Text = Tr("CODEX_TAB_CELLS");
-        if (TabPathogensBtn != null) TabPathogensBtn.Text = Tr("CODEX_TAB_PATHOGENS");
+        if (TabEnemiesBtn != null) TabEnemiesBtn.Text = Tr("CODEX_TAB_PATHOGENS");
         if (TabMapsBtn != null) TabMapsBtn.Text = Tr("CODEX_TAB_MAPS");
         if (TabGearBtn != null) TabGearBtn.Text = Tr("CODEX_TAB_ORGANELLES");
         if (TabBossesBtn != null) TabBossesBtn.Text = Tr("CODEX_TAB_BOSSES");
@@ -202,7 +202,7 @@ public partial class CodexModal : ModalBase
         UiBuilders.SetTabActive(TabSkillsBtn, tabIdx == TabActives);
         UiBuilders.SetTabActive(TabPassivesBtn, tabIdx == TabPassives);
         UiBuilders.SetTabActive(TabCellsBtn, tabIdx == TabCells);
-        UiBuilders.SetTabActive(TabPathogensBtn, tabIdx == TabPathogens);
+        UiBuilders.SetTabActive(TabEnemiesBtn, tabIdx == TabEnemies);
         UiBuilders.SetTabActive(TabMapsBtn, tabIdx == TabMaps);
         UiBuilders.SetTabActive(TabGearBtn, tabIdx == TabGear);
         UiBuilders.SetTabActive(TabBossesBtn, tabIdx == TabBosses);
@@ -234,8 +234,8 @@ public partial class CodexModal : ModalBase
             case TabCells:
                 RenderCellsTab();
                 break;
-            case TabPathogens:
-                RenderPathogensTab();
+            case TabEnemies:
+                RenderEnemiesTab();
                 break;
             case TabMaps:
                 RenderMapsTab();
@@ -349,12 +349,12 @@ public partial class CodexModal : ModalBase
             return;
 
         string firstKey = "";
-        foreach (var keyVar in GameManager.ClassData.Keys)
+        foreach (var keyVar in GameManager.PlayerClassData.Keys)
         {
             string key = keyVar.AsString();
             if (firstKey == "")
                 firstKey = key;
-            var d = GameManager.GetClassInfo(key);
+            var d = GameManager.GetPlayerClass(key);
             bool unlocked = d["unlocked"].AsBool();
             var btn = MakeItemButton((unlocked ? " ✅ " : " 🔒 ") + d["name"].AsString());
             string localKey = key;
@@ -363,7 +363,7 @@ public partial class CodexModal : ModalBase
             _itemButtons[localKey] = btn;
         }
 
-        string target = ActiveItemKey != "" && GameManager.ClassData.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
+        string target = ActiveItemKey != "" && GameManager.PlayerClassData.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
         if (target != "")
         {
             SelectCell(target);
@@ -373,7 +373,7 @@ public partial class CodexModal : ModalBase
     public void SelectCell(string key)
     {
         ActiveItemKey = key;
-        var d = GameManager.GetClassInfo(key);
+        var d = GameManager.GetPlayerClass(key);
         bool unlocked = d["unlocked"].AsBool();
 
         if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
@@ -422,36 +422,36 @@ public partial class CodexModal : ModalBase
         RefreshItemSelection();
     }
 
-    private void RenderPathogensTab()
+    private void RenderEnemiesTab()
     {
         if (ItemList == null)
             return;
 
         string firstKey = "";
-        foreach (var keyVar in GameManager.PathogenCatalog.Keys)
+        foreach (var keyVar in GameManager.EnemyCatalog.Keys)
         {
             string key = keyVar.AsString();
             if (firstKey == "")
                 firstKey = key;
-            var d = GameManager.GetPathogenInfo(key);
+            var d = GameManager.GetEnemyInfo(key);
             var btn = MakeItemButton(" " + d["name"].AsString());
             string localKey = key;
-            btn.Pressed += () => SelectPathogen(localKey);
+            btn.Pressed += () => SelectEnemy(localKey);
             ItemList.AddChild(btn);
             _itemButtons[localKey] = btn;
         }
 
-        string target = ActiveItemKey != "" && GameManager.PathogenCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
+        string target = ActiveItemKey != "" && GameManager.EnemyCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
         if (target != "")
         {
-            SelectPathogen(target);
+            SelectEnemy(target);
         }
     }
 
-    public void SelectPathogen(string key)
+    public void SelectEnemy(string key)
     {
         ActiveItemKey = key;
-        var d = GameManager.GetPathogenInfo(key);
+        var d = GameManager.GetEnemyInfo(key);
         if (!d.ContainsKey("name"))
             d = GameManager.GetBossInfo(key);
         if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
@@ -495,12 +495,12 @@ public partial class CodexModal : ModalBase
             return;
 
         string firstKey = "";
-        foreach (var keyVar in GameManager.MapData.Keys)
+        foreach (var keyVar in GameManager.StageData.Keys)
         {
             string key = keyVar.AsString();
             if (firstKey == "")
                 firstKey = key;
-            var d = GameManager.GetMapInfo(key);
+            var d = GameManager.GetStageInfo(key);
             var btn = MakeItemButton(" " + d["name"].AsString());
             string localKey = key;
             btn.Pressed += () => SelectMap(localKey);
@@ -508,7 +508,7 @@ public partial class CodexModal : ModalBase
             _itemButtons[localKey] = btn;
         }
 
-        string target = ActiveItemKey != "" && GameManager.MapData.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
+        string target = ActiveItemKey != "" && GameManager.StageData.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
         if (target != "")
         {
             SelectMap(target);
@@ -518,7 +518,7 @@ public partial class CodexModal : ModalBase
     private void SelectMap(string key)
     {
         ActiveItemKey = key;
-        var d = GameManager.GetMapInfo(key);
+        var d = GameManager.GetStageInfo(key);
         if (DetailTitle != null) DetailTitle.Text = d["name"].AsString();
 
         if (DetailIcon != null)
@@ -563,7 +563,7 @@ public partial class CodexModal : ModalBase
             var bd = GameManager.GetBossInfo(key);
             var bbtn = MakeItemButton("👑 " + bd["name"].AsString());
             string localBossKey = key;
-            bbtn.Pressed += () => SelectPathogen(localBossKey);
+            bbtn.Pressed += () => SelectEnemy(localBossKey);
             ItemList.AddChild(bbtn);
             _itemButtons[localBossKey] = bbtn;
         }
@@ -571,7 +571,7 @@ public partial class CodexModal : ModalBase
         string target = ActiveItemKey != "" && GameManager.BossCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
         if (target != "")
         {
-            SelectPathogen(target);
+            SelectEnemy(target);
         }
     }
 
@@ -581,12 +581,12 @@ public partial class CodexModal : ModalBase
             return;
 
         string firstKey = "";
-        foreach (var keyVar in GameManager.GearCatalog.Keys)
+        foreach (var keyVar in GameManager.EquipmentCatalog.Keys)
         {
             string key = keyVar.AsString();
             if (firstKey == "")
                 firstKey = key;
-            var entry = (Dictionary)GameManager.GearCatalog[key];
+            var entry = (Dictionary)GameManager.EquipmentCatalog[key];
             var btn = MakeItemButton(" " + Tr(entry["name_key"].AsString()));
             string localKey = key;
             btn.Pressed += () => SelectGear(localKey);
@@ -594,7 +594,7 @@ public partial class CodexModal : ModalBase
             _itemButtons[localKey] = btn;
         }
 
-        string target = ActiveItemKey != "" && GameManager.GearCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
+        string target = ActiveItemKey != "" && GameManager.EquipmentCatalog.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
         if (target != "")
         {
             SelectGear(target);
@@ -604,9 +604,9 @@ public partial class CodexModal : ModalBase
     private void SelectGear(string key)
     {
         ActiveItemKey = key;
-        if (!GameManager.GearCatalog.ContainsKey(key))
+        if (!GameManager.EquipmentCatalog.ContainsKey(key))
             return;
-        var entry = (Dictionary)GameManager.GearCatalog[key];
+        var entry = (Dictionary)GameManager.EquipmentCatalog[key];
 
         if (DetailTitle != null) DetailTitle.Text = Tr(entry["name_key"].AsString());
 
@@ -620,7 +620,7 @@ public partial class CodexModal : ModalBase
         if (DetailBadge != null)
         {
             DetailBadge.Text = "[ " + Tr("ORGANELLE_CAT_" + category.ToUpperInvariant()) + " ]";
-            DetailBadge.Modulate = GearSlot.CategoryColor(category);
+            DetailBadge.Modulate = EquipmentSlot.CategoryColor(category);
         }
         int cost = entry["energy_cost"].AsInt32();
         string costText = cost < 0 ? $"+{-cost}" : cost.ToString();
@@ -631,3 +631,4 @@ public partial class CodexModal : ModalBase
     }
 
 }
+

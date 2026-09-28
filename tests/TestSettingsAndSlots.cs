@@ -1,12 +1,12 @@
 using Godot;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Skills;
-using Phagocyte.UI;
+using Game.Core;
+using Game.Skills;
+using Game.UI;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 public partial class TestSettingsAndSlots : TestHarness
 {
@@ -38,10 +38,10 @@ public partial class TestSettingsAndSlots : TestHarness
             return false;
 
         _testDone = true;
-        var main = Root.GetNodeOrNull<Node>("Main");
+        var main = Root.GetNodeOrNull<Node>("GameRoot");
         if (main == null)
         {
-            GD.PrintErr("[FAIL] Main scene not found");
+            GD.PrintErr("[FAIL] GameRoot scene not found");
             Quit(1);
             return true;
         }
@@ -109,7 +109,7 @@ public partial class TestSettingsAndSlots : TestHarness
         var skillMgr = player!.GetNodeOrNull<SkillManager>("SkillManager");
         AssertThat(skillMgr).IsNotNull();
 
-        var mito = new PassiveMitochondrialOverclock();
+        var mito = SkillFactory.CreatePassive("mitochondria")!;
         // Passive slot 0 is the cell's innate trait; equip into the next free slot
         // (slot 1 in passives = Slot 6 in the UI grid).
         bool equipped = skillMgr!.EquipPassive(mito, 1);
@@ -176,7 +176,7 @@ public partial class TestSettingsAndSlots : TestHarness
         GD.Print("[PASS] 7. SettingsModal in in-game Pause Menu opens and closes via top-left back button.");
 
         // =========================================================================
-        // TEST 7: SettingsModal in Main Menu
+        // TEST 7: SettingsModal in GameRoot Menu
         // =========================================================================
         var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         AssertThat(menuScene).IsNotNull();
@@ -216,7 +216,7 @@ public partial class TestSettingsAndSlots : TestHarness
         AssertThat(menuCloseBtn).IsNotNull();
         menuCloseBtn!.EmitSignal(Button.SignalName.Pressed);
         AssertThat(menuSettingsModal.Visible).IsFalse();
-        GD.Print("[PASS] 8. Main Menu Settings button, tabs (Audio/Graphics/Keys), and top-left back button verified.");
+        GD.Print("[PASS] 8. GameRoot Menu Settings button, tabs (Audio/Graphics/Keys), and top-left back button verified.");
 
         menuNode.QueueFree();
         main.QueueFree();

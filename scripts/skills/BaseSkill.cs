@@ -1,14 +1,14 @@
 using Godot;
 using Godot.Collections;
 using System;
-using Phagocyte.Combat;
-using Phagocyte.Core;
+using Game.Combat;
+using Game.Core;
 
-namespace Phagocyte.Skills;
+namespace Game.Skills;
 
 /// <summary>
-/// Base class for all Active Cytokine Weapons and Passive Gear Traits in Phagocyte.
-/// Interacts directly with the universal CellStats system.
+/// Base class for all Active weapons and Passive Equipment Traits in Game.
+/// Interacts directly with the universal ActorStats system.
 /// </summary>
 public partial class BaseSkill : Node2D
 {
@@ -102,9 +102,9 @@ public partial class BaseSkill : Node2D
 
         if (Host != null)
         {
-            if (Host.HasNode("CellStats"))
+            if (Host.HasNode("ActorStats"))
             {
-                Stats = Host.GetNode<Node>("CellStats");
+                Stats = Host.GetNode<Node>("ActorStats");
             }
             else
             {
@@ -189,7 +189,7 @@ public partial class BaseSkill : Node2D
 
     /// <summary>
     /// Registers one flat/percent stat modifier on the host, routing to the
-    /// typed CellStats API and falling back to a GDScript add_modifier method.
+    /// typed ActorStats API and falling back to a GDScript add_modifier method.
     /// </summary>
     protected void ApplyStat(string stat, float flat, float percent)
     {
@@ -216,6 +216,37 @@ public partial class BaseSkill : Node2D
         }
     }
 
+    /// <summary>
+    /// Archetype params for this skill id (assets/data/skill/*.json "params").
+    /// Empty when the catalog row carries none.
+    /// </summary>
+    protected Godot.Collections.Dictionary SkillParams()
+    {
+        if (!string.IsNullOrEmpty(SkillId) && GameManager.SkillCatalog.TryGetValue(SkillId, out var raw)
+            && raw.VariantType == Variant.Type.Dictionary)
+        {
+            var info = (Godot.Collections.Dictionary)raw;
+            if (info.TryGetValue("params", out Variant pv) && pv.VariantType == Variant.Type.Dictionary)
+                return (Godot.Collections.Dictionary)pv;
+        }
+        return new Godot.Collections.Dictionary();
+    }
+
+    protected float ParamFloat(Godot.Collections.Dictionary p, string key, float fallback)
+    {
+        return CatalogLoader.GetFloat(p, key, fallback);
+    }
+
+    protected int ParamInt(Godot.Collections.Dictionary p, string key, int fallback)
+    {
+        return CatalogLoader.GetInt(p, key, fallback);
+    }
+
+    protected string ParamString(Godot.Collections.Dictionary p, string key, string fallback = "")
+    {
+        return CatalogLoader.GetString(p, key, fallback);
+    }
+
     public float GetCalculatedCooldown()
     {
         float baseCd = GetBaseCooldownForLevel(Cooldown);
@@ -237,7 +268,7 @@ public partial class BaseSkill : Node2D
 
     public DamageResult GetCalculatedDamage(float baseDmg)
     {
-        if (Stats is CellStats cs)
+        if (Stats is ActorStats cs)
         {
             float might = cs.GetStat("might");
             float dmg = baseDmg * might;
@@ -352,3 +383,4 @@ public partial class BaseSkill : Node2D
         };
     }
 }
+

@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Phagocyte.Combat;
+namespace Game.Combat;
 
 /// <summary>
 /// Value-type data container for high-density projectile batch simulation.

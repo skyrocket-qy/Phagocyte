@@ -1,23 +1,23 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.UI;
-using StatusSystem;
+using Game.Core;
+using Game.UI;
+using Game.Combat;
 
-namespace Phagocyte.Combat;
+namespace Game.Combat;
 
 /// <summary>
-/// Phagocyte adapter over the portable <see cref="StatusController"/> core:
+/// Game adapter over the portable <see cref="StatusController"/> core:
 /// owns the Node lifecycle, loads ailment defs from assets/data/ailments.json,
 /// routes DoT into TakeDoTDamage and batches floating numbers. Game-specific
-/// hooks (antigenic drift clears opsonization) stay here, not in the core.
+/// hooks (antigenic drift clears marked) stay here, not in the core.
 /// </summary>
 public partial class AilmentController : Node
 {
     public const string BurnId = "oxidative_burn";
     public const string AgglutinationId = "agglutination";
-    public const string OpsonizationId = "opsonization";
+    public const string MarkedId = "opsonization";
     public const string LeakId = "membrane_leak";
     public const string EndotoxinId = "endotoxin";
 
@@ -34,16 +34,16 @@ public partial class AilmentController : Node
 
     public bool IsOxidized => _core.IsActive(BurnId);
     public bool IsAgglutinated => _core.IsActive(AgglutinationId);
-    public bool IsOpsonized => _core.IsActive(OpsonizationId);
+    public bool IsMarked => _core.IsActive(MarkedId);
     public bool IsLeaking => _core.IsActive(LeakId);
     public bool IsToxic => _core.IsActive(EndotoxinId);
 
-    public float OpsonizationMultiplier => _core.DamageTakenMultiplier;
+    public float MarkationMultiplier => _core.DamageTakenMultiplier;
     public float SpeedMultiplier => _core.SpeedMultiplier;
 
     public float BurnTimer => _core.GetTimer(BurnId);
     public float AgglutinationTimer => _core.GetTimer(AgglutinationId);
-    public float OpsonizationTimer => _core.GetTimer(OpsonizationId);
+    public float MarkationTimer => _core.GetTimer(MarkedId);
     public float LeakTimer => _core.GetTimer(LeakId);
     public int EndotoxinStackCount => _core.GetStackCount(EndotoxinId);
 
@@ -68,13 +68,13 @@ public partial class AilmentController : Node
     }
 
     /// <summary>
-    /// Marks target with Opsonin (C3b / antibody Fc), amplifying all damage taken.
+    /// Marks the target as vulnerable, amplifying all damage taken.
     /// </summary>
-    public void ApplyOpsonization(float duration = -1.0f, float ampPct = -1.0f)
+    public void ApplyMarkation(float duration = -1.0f, float ampPct = -1.0f)
     {
         EnsureConfigured();
-        if (!_core.Apply(OpsonizationId, ampPct, duration))
-            GD.PushWarning($"[AilmentController] Unknown ailment '{OpsonizationId}'.");
+        if (!_core.Apply(MarkedId, ampPct, duration))
+            GD.PushWarning($"[AilmentController] Unknown ailment '{MarkedId}'.");
     }
 
     /// <summary>
@@ -106,12 +106,12 @@ public partial class AilmentController : Node
 
     /// <summary>
     /// Antigenic drift (docs/endgame.md §4): strips the specific-vulnerability
-    /// mark (opsonization) while leaving all other ailments untouched.
+    /// mark (marked) while leaving all other ailments untouched.
     /// </summary>
-    public void ClearOpsonization()
+    public void ClearMarkation()
     {
         EnsureConfigured();
-        _core.Clear(OpsonizationId);
+        _core.Clear(MarkedId);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -129,7 +129,7 @@ public partial class AilmentController : Node
 
         float frameDot = _core.Tick(dt, velocity);
 
-        // frameDot already carries move-mult and (per JSON flag) opsonization amp.
+        // frameDot already carries move-mult and (per JSON flag) marked amp.
         if (frameDot > 0.0f)
         {
             ApplyDoTToParent(frameDot);
@@ -246,3 +246,4 @@ public partial class AilmentController : Node
         };
     }
 }
+

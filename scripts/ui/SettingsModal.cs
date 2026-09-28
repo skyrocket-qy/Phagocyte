@@ -1,10 +1,10 @@
 using Godot;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Map;
-using Phagocyte.Map.Vfx;
+using Game.Core;
+using Game.Stages;
+using Game.Stages.Vfx;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 public partial class SettingsModal : ModalBase
 {

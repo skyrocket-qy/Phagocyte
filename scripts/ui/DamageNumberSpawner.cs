@@ -1,7 +1,7 @@
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 using Godot;
-using Phagocyte.Core;
+using Game.Core;
 using System;
 
 public enum DamageNumberType

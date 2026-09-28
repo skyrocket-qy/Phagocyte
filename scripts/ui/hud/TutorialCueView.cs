@@ -1,9 +1,9 @@
 using Godot;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// First-run micro-cues: one-shot dodge hint
@@ -52,7 +52,7 @@ public partial class TutorialCueView : Node
     public void ConnectPlayer(Node2D player)
     {
         PlayerRef = player;
-        if (player is BaseCell bc)
+        if (player is PlayerActor bc)
         {
             bc.LevelUp += (lvl) => OnPlayerLevelUp((int)lvl);
         }
@@ -80,8 +80,8 @@ public partial class TutorialCueView : Node
             if (_nearbyCheckTimer <= 0.0f)
             {
                 _nearbyCheckTimer = 0.25f;
-                bool hurt = PlayerRef is BaseCell hurtCell && hurtCell.HasTakenDamage;
-                if (hurt || CountNearbyPathogens(Hud.DodgeHintNearbyRadius) > Hud.DodgeHintNearbyThreshold)
+                bool hurt = PlayerRef is PlayerActor hurtCell && hurtCell.HasTakenDamage;
+                if (hurt || CountNearbyEnemies(Hud.DodgeHintNearbyRadius) > Hud.DodgeHintNearbyThreshold)
                     ShowDodgeHint();
             }
         }
@@ -120,14 +120,14 @@ public partial class TutorialCueView : Node
         return TranslationServer.Translate(gamepad ? "HUD_DODGE_HINT_PAD" : "HUD_DODGE_HINT");
     }
 
-    public int CountNearbyPathogens(float radius)
+    public int CountNearbyEnemies(float radius)
     {
         if (PlayerRef == null)
             return 0;
 
         float radiusSq = radius * radius;
         int count = 0;
-        foreach (var enemy in BaseEnemy.ActiveEnemies)
+        foreach (var enemy in EnemyActor.ActiveEnemies)
         {
             if (!GodotObject.IsInstanceValid(enemy))
                 continue;
@@ -188,3 +188,4 @@ public partial class TutorialCueView : Node
         tween.TweenMethod(Callable.From<float>(v => Engine.TimeScale = v), Engine.TimeScale, 1.0f, 0.3f);
     }
 }
+

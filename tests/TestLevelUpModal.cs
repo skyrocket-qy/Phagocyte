@@ -1,17 +1,17 @@
-﻿using Godot;
+using Godot;
 using Godot.Collections;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Combat;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
-using Phagocyte.UI;
+using Game.Combat;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
+using Game.Skills;
+using Game.UI;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 public partial class TestLevelUpModal : TestHarness
 {
@@ -27,7 +27,7 @@ public partial class TestLevelUpModal : TestHarness
 
         // --- Test 1: UpgradeManager Card Generation ---
         var mockPlayer = new CharacterBody2D();
-        var stats = new CellStats { Name = "CellStats" };
+        var stats = new ActorStats { Name = "ActorStats" };
         mockPlayer.AddChild(stats);
 
         var sm = new SkillManager { Name = "SkillManager" };
@@ -35,7 +35,7 @@ public partial class TestLevelUpModal : TestHarness
         sm.Setup(mockPlayer);
 
         // Equip Slot 0 with ROS Torrent Lv.1
-        var ros = new RosTorrentSkill();
+        var ros = SkillFactory.CreateActive("ros_torrent")!;
         sm.EquipActive(ros, 0);
 
         var choices = UpgradeManager.GenerateChoices(mockPlayer, 3);
@@ -56,8 +56,7 @@ public partial class TestLevelUpModal : TestHarness
         var newActiveChoice = new Dictionary
         {
             { "type", "new_active" },
-            { "id", "perforin_lance" },
-            { "skill_class", typeof(PerforinLanceSkill).AssemblyQualifiedName ?? "" }
+            { "id", "perforin_lance" }
         };
         bool resActive = UpgradeManager.ApplyChoice(mockPlayer, newActiveChoice);
         AssertThat(resActive).IsTrue();
@@ -67,8 +66,7 @@ public partial class TestLevelUpModal : TestHarness
         var newPassiveChoice = new Dictionary
         {
             { "type", "new_passive" },
-            { "id", "actin" },
-            { "skill_class", typeof(PassiveActinPolymerization).AssemblyQualifiedName ?? "" }
+            { "id", "actin" }
         };
         bool resPassive = UpgradeManager.ApplyChoice(mockPlayer, newPassiveChoice);
         AssertThat(resPassive).IsTrue();
@@ -91,9 +89,9 @@ public partial class TestLevelUpModal : TestHarness
         GD.Print("[PASS] Test 3: Upgrading existing skill properly increments level and updates stats.");
 
         // --- Test 4: Slot Overflow Boundaries (Max 5 Actives / Max 5 Passives) ---
-        sm.EquipActive(new ComplementCascadeSkill());
-        sm.EquipActive(new AntibodySalvoSkill());
-        sm.EquipActive(new PseudopodLungeSkill());
+        sm.EquipActive(SkillFactory.CreateActive("complement_cascade")!);
+        sm.EquipActive(SkillFactory.CreateActive("antibody_salvo")!);
+        sm.EquipActive(SkillFactory.CreateActive("pseudopod_lunge")!);
 
         foreach (var s in sm.ActiveSlots)
         {
@@ -111,10 +109,10 @@ public partial class TestLevelUpModal : TestHarness
         }
 
         // Fill remaining 4 passive slots to reach 5/5
-        sm.EquipPassive(new PassiveLysosomePriming());
-        sm.EquipPassive(new PassiveMitochondrialOverclock());
-        sm.EquipPassive(new PassiveOpsoninAffinity());
-        sm.EquipPassive(new PassiveChemokineReceptors());
+        sm.EquipPassive(SkillFactory.CreatePassive("lysosome")!);
+        sm.EquipPassive(SkillFactory.CreatePassive("mitochondria")!);
+        sm.EquipPassive(SkillFactory.CreatePassive("opsonin")!);
+        sm.EquipPassive(SkillFactory.CreatePassive("chemokine")!);
 
         foreach (var s in sm.PassiveSlots)
         {
@@ -134,7 +132,7 @@ public partial class TestLevelUpModal : TestHarness
 
         mockPlayer.QueueFree();
 
-        // --- Test 5: In-game Runtime Integration with Main Scene ---
+        // --- Test 5: In-game Runtime Integration with GameRoot Scene ---
         var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         if (mainScene == null)
         {
@@ -150,7 +148,7 @@ public partial class TestLevelUpModal : TestHarness
     {
         foreach (var child in root.GetChildren())
         {
-            if (child is BaseEnemy || child is DormantToxinVesicle || child is BioHazardArea)
+            if (child is EnemyActor || child is ProximityMine || child is HazardZone)
                 child.Free();
             else
                 ClearArenaEntities(child);
@@ -158,7 +156,7 @@ public partial class TestLevelUpModal : TestHarness
     }
 
     /// <summary>
-    /// Freeze the spawner driver, clear everything Main._Ready spawned and
+    /// Freeze the spawner driver, clear everything GameRoot._Ready spawned and
     /// restore the pristine player baseline. Must run on a live frame: nodes
     /// added during MainLoop._Initialize don't enter the tree (no _Ready)
     /// until the first iteration, so _Initialize-time isolation is a no-op.
@@ -166,12 +164,12 @@ public partial class TestLevelUpModal : TestHarness
     /// </summary>
     private void IsolateArena()
     {
-        var main = Root.GetNodeOrNull<Main>("Main");
+        var main = Root.GetNodeOrNull<GameRoot>("GameRoot");
         if (main == null)
             return;
         main.SetPhysicsProcess(false);
         ClearArenaEntities(main);
-        var player = (main.Player ?? main.GetNodeOrNull<BaseCell>("Macrophage")) as BaseCell;
+        var player = (main.Player ?? main.GetNodeOrNull<PlayerActor>("Player")) as PlayerActor;
         if (player != null)
         {
             player.CurrentLevel = 1;
@@ -220,15 +218,15 @@ public partial class TestLevelUpModal : TestHarness
         // tweened during the settle frames would otherwise level the cell up
         // before the scripted draft (docs/AGENTS.md determinism rules).
         IsolateArena();
-        var main = Root.GetNodeOrNull<Main>("Main");
+        var main = Root.GetNodeOrNull<GameRoot>("GameRoot");
         if (main == null)
         {
-            GD.PrintErr("[FAIL] Main scene not found");
+            GD.PrintErr("[FAIL] GameRoot scene not found");
             Quit(1);
             return true;
         }
 
-        var player = (main.Player ?? main.GetNodeOrNull<BaseCell>("Macrophage")) as BaseCell;
+        var player = (main.Player ?? main.GetNodeOrNull<PlayerActor>("Player")) as PlayerActor;
         if (player == null)
         {
             GD.PrintErr("[FAIL] Macrophage not found");
@@ -288,3 +286,6 @@ public partial class TestLevelUpModal : TestHarness
         return true;
     }
 }
+
+
+

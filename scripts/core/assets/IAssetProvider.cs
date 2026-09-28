@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Abstraction over the engine resource backend. The default

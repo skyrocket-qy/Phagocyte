@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Combat;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
-using Phagocyte.UI;
+using Game.Combat;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the Endless Cytokine Storm entry (docs/endgame.md §2-3):
@@ -20,7 +20,7 @@ namespace Phagocyte.Tests;
 public partial class TestEndlessMode : TestHarness
 {
     private int _phase = 0;
-    private Main? _main = null;
+    private GameRoot? _main = null;
 
     public override void _Initialize()
     {
@@ -98,50 +98,50 @@ public partial class TestEndlessMode : TestHarness
     private void RunOverdriveLadderTests()
     {
         // Cycle boundaries: 15:00-18:00, 18:00-21:00, 21:00-24:00, 24:00-27:00, 27:00+
-        AssertThat(PathogenSpawner.GetOverdriveCycle(899.9f)).IsEqual(0);
-        AssertThat(PathogenSpawner.GetOverdriveCycle(900.0f)).IsEqual(1);
-        AssertThat(PathogenSpawner.GetOverdriveCycle(1079.9f)).IsEqual(1);
-        AssertThat(PathogenSpawner.GetOverdriveCycle(1080.0f)).IsEqual(2);
-        AssertThat(PathogenSpawner.GetOverdriveCycle(1260.0f)).IsEqual(3);
-        AssertThat(PathogenSpawner.GetOverdriveCycle(1440.0f)).IsEqual(4);
-        AssertThat(PathogenSpawner.GetOverdriveCycle(1620.0f)).IsEqual(5);
+        AssertThat(EnemySpawner.GetOverdriveCycle(899.9f)).IsEqual(0);
+        AssertThat(EnemySpawner.GetOverdriveCycle(900.0f)).IsEqual(1);
+        AssertThat(EnemySpawner.GetOverdriveCycle(1079.9f)).IsEqual(1);
+        AssertThat(EnemySpawner.GetOverdriveCycle(1080.0f)).IsEqual(2);
+        AssertThat(EnemySpawner.GetOverdriveCycle(1260.0f)).IsEqual(3);
+        AssertThat(EnemySpawner.GetOverdriveCycle(1440.0f)).IsEqual(4);
+        AssertThat(EnemySpawner.GetOverdriveCycle(1620.0f)).IsEqual(5);
 
         // HP ladder: +50% / +120% / +220% / +360%, then exponential (×2 per extra cycle)
-        AssertThat(PathogenSpawner.GetOverdriveHealthMultiplier(1000.0f)).IsEqualApprox(1.5f, 0.001f);
-        AssertThat(PathogenSpawner.GetOverdriveHealthMultiplier(1100.0f)).IsEqualApprox(2.2f, 0.001f);
-        AssertThat(PathogenSpawner.GetOverdriveHealthMultiplier(1300.0f)).IsEqualApprox(3.2f, 0.001f);
-        AssertThat(PathogenSpawner.GetOverdriveHealthMultiplier(1500.0f)).IsEqualApprox(4.6f, 0.001f);
-        AssertThat(PathogenSpawner.GetOverdriveHealthMultiplier(1700.0f)).IsEqualApprox(9.2f, 0.001f);
-        AssertThat(PathogenSpawner.GetOverdriveHealthMultiplier(1900.0f)).IsEqualApprox(18.4f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveHealthMultiplier(1000.0f)).IsEqualApprox(1.5f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveHealthMultiplier(1100.0f)).IsEqualApprox(2.2f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveHealthMultiplier(1300.0f)).IsEqualApprox(3.2f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveHealthMultiplier(1500.0f)).IsEqualApprox(4.6f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveHealthMultiplier(1700.0f)).IsEqualApprox(9.2f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveHealthMultiplier(1900.0f)).IsEqualApprox(18.4f, 0.001f);
 
         // Speed ladder: +15% / +30% / +50% / +70%, capped at +100%
-        AssertThat(PathogenSpawner.GetOverdriveSpeedMultiplier(1000.0f)).IsEqualApprox(1.15f, 0.001f);
-        AssertThat(PathogenSpawner.GetOverdriveSpeedMultiplier(1100.0f)).IsEqualApprox(1.30f, 0.001f);
-        AssertThat(PathogenSpawner.GetOverdriveSpeedMultiplier(1300.0f)).IsEqualApprox(1.50f, 0.001f);
-        AssertThat(PathogenSpawner.GetOverdriveSpeedMultiplier(1500.0f)).IsEqualApprox(1.70f, 0.001f);
-        AssertThat(PathogenSpawner.GetOverdriveSpeedMultiplier(1700.0f)).IsEqualApprox(2.00f, 0.001f);
-        AssertThat(PathogenSpawner.GetOverdriveSpeedMultiplier(2600.0f)).IsEqualApprox(2.00f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveSpeedMultiplier(1000.0f)).IsEqualApprox(1.15f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveSpeedMultiplier(1100.0f)).IsEqualApprox(1.30f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveSpeedMultiplier(1300.0f)).IsEqualApprox(1.50f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveSpeedMultiplier(1500.0f)).IsEqualApprox(1.70f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveSpeedMultiplier(1700.0f)).IsEqualApprox(2.00f, 0.001f);
+        AssertThat(EnemySpawner.GetOverdriveSpeedMultiplier(2600.0f)).IsEqualApprox(2.00f, 0.001f);
 
         // Endless screen cap constant (docs/endgame.md §3.4)
-        AssertThat(PathogenSpawner.MaxActiveEndless).IsEqual(500);
+        AssertThat(EnemySpawner.MaxActiveEndless).IsEqual(500);
 
         // Scaling is gated on the overdrive flag and uses tier 2 (+120% HP) at 18:00
-        PathogenSpawner.ConfigureOverdrive(false);
-        var unscaled = PathogenSpawner.CreatePathogen("staph");
+        EnemySpawner.ConfigureOverdrive(false);
+        var unscaled = EnemySpawner.CreateEnemy("staph");
         AssertThat(unscaled).IsNotNull();
         float baselineHp = unscaled!.MaxHealth;
-        PathogenSpawner.ApplyOverdriveScaling(unscaled, 1080.0f);
+        EnemySpawner.ApplyOverdriveScaling(unscaled, 1080.0f);
         AssertThat(unscaled.MaxHealth).IsEqualApprox(baselineHp, 0.001f);
         unscaled.Free();
 
-        PathogenSpawner.ConfigureOverdrive(true);
-        var scaled = PathogenSpawner.CreatePathogen("staph");
+        EnemySpawner.ConfigureOverdrive(true);
+        var scaled = EnemySpawner.CreateEnemy("staph");
         AssertThat(scaled).IsNotNull();
         float scaledBaseHp = scaled!.MaxHealth;
-        PathogenSpawner.ApplyOverdriveScaling(scaled, 1080.0f);
+        EnemySpawner.ApplyOverdriveScaling(scaled, 1080.0f);
         AssertThat(scaled.MaxHealth).IsEqualApprox(scaledBaseHp * 2.2f, 0.01f);
         scaled.Free();
-        PathogenSpawner.ConfigureOverdrive(false);
+        EnemySpawner.ConfigureOverdrive(false);
 
         GD.Print("[PASS] Overdrive ladder cycles, exponential terminal tier, speed cap and 500 screen cap verified.");
     }
@@ -165,7 +165,7 @@ public partial class TestEndlessMode : TestHarness
         AssertThat(main.RunEnded).IsFalse();
         AssertThat(main.OverdriveCycle).IsEqual(1);
         AssertThat(main.OverdriveHealthMultiplier).IsEqualApprox(1.5f, 0.001f);
-        AssertThat(main.ActiveScreenCap).IsEqual(PathogenSpawner.MaxActiveEndless);
+        AssertThat(main.ActiveScreenCap).IsEqual(EnemySpawner.MaxActiveEndless);
 
         // Neutralizing the primary boss continues the overdrive instead of ending the run
         main.TerminalBoss!.TakeDamage(9999999.0f);
@@ -196,7 +196,7 @@ public partial class TestEndlessMode : TestHarness
         AssertThat(main.RaidBosses.Count).IsEqual(2);
 
         // Clear the field so the later siege count is deterministic
-        var twinSnapshot = new List<BaseEnemy>(main.RaidBosses);
+        var twinSnapshot = new List<EnemyActor>(main.RaidBosses);
         foreach (var raidBoss in twinSnapshot)
             raidBoss.TakeDamage(9999999.0f);
         AssertThat(main.RaidBosses.Count).IsEqual(0);
@@ -207,7 +207,7 @@ public partial class TestEndlessMode : TestHarness
         AssertThat(main.AcidSafeRadius).IsGreater(800.0f);
 
         main.EnvironmentTime = 1620.0f;
-        var player = main.GetNodeOrNull<BaseCell>("Macrophage");
+        var player = main.GetNodeOrNull<PlayerActor>("Player");
         AssertThat(player).IsNotNull();
         // Zero the block/evasion rolls so the acid-tick and kill-blow asserts below are deterministic.
         player!.Stats!.SetBase("block", 0.0f);
@@ -219,7 +219,7 @@ public partial class TestEndlessMode : TestHarness
         player.GlobalPosition = Vector2.Zero;
 
         // 30:00+ terminal siege escalates to a triple-boss assault
-        var preSiege = new List<BaseEnemy>(main.RaidBosses);
+        var preSiege = new List<EnemyActor>(main.RaidBosses);
         foreach (var raidBoss in preSiege)
             raidBoss.TakeDamage(9999999.0f);
         AssertThat(main.RaidBosses.Count).IsEqual(0);
@@ -320,3 +320,5 @@ public partial class TestEndlessMode : TestHarness
         RestoreSaves();
     }
 }
+
+

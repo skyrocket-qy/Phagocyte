@@ -3,9 +3,9 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the unified AssetLoader pipeline: fail-fast Load, nullable

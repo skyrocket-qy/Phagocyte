@@ -1,7 +1,7 @@
-namespace Phagocyte.Camera;
+namespace Game.Camera;
 
 using Godot;
-using Phagocyte.Core;
+using Game.Core;
 using System;
 
 /// <summary>

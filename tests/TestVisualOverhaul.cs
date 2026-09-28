@@ -1,14 +1,14 @@
-﻿using Godot;
+using Godot;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Enemies;
-using Phagocyte.Map;
-using Phagocyte.Map.Vfx;
+using Game.Core;
+using Game.Player;
+using Game.Enemies;
+using Game.Stages;
+using Game.Stages.Vfx;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 public partial class TestVisualOverhaul : TestHarness
 {
@@ -41,18 +41,18 @@ public partial class TestVisualOverhaul : TestHarness
             return false;
 
         _testDone = true;
-        var main = Root.GetNodeOrNull<Main>("Main");
+        var main = Root.GetNodeOrNull<GameRoot>("GameRoot");
         if (main == null)
         {
-            GD.PrintErr("[FAIL] Main scene not found");
+            GD.PrintErr("[FAIL] GameRoot scene not found");
             Quit(1);
             return true;
         }
 
-        var player = (main.Player as BaseCell) ?? main.GetNodeOrNull<BaseCell>("Macrophage");
+        var player = (main.Player as PlayerActor) ?? main.GetNodeOrNull<PlayerActor>("Player");
         if (player == null)
         {
-            GD.PrintErr("[FAIL] Player not found in Main scene");
+            GD.PrintErr("[FAIL] Player not found in GameRoot scene");
             Quit(1);
             return true;
         }
@@ -60,7 +60,7 @@ public partial class TestVisualOverhaul : TestHarness
         // =========================================================================
         // TEST 1: Catmull-Rom Polygon Smoothing (32 -> 128 high-density vertices)
         // =========================================================================
-        player.UpdatePseudopodDeformation(0.016f);
+        player.UpdateBodyDeformation(0.016f);
         AssertThat(player.Cytoplasm!.Polygon.Length).IsEqual(128);
         AssertThat(player.Membrane!.Points.Length).IsEqual(129);
         AssertThat(player.EngulfCollider!.Polygon.Length).IsEqual(32);
@@ -134,17 +134,15 @@ public partial class TestVisualOverhaul : TestHarness
         GD.Print($"[PASS] 6. Full-screen Microscope Post-Process verified (Vignette r={vigParam}, Chromatic Aberration={caParam}).");
 
         // =========================================================================
-        // TEST 7: Pathogen Breathing Oscillation & 3D Shading
+        // TEST 7: Enemy Breathing Oscillation & 3D Shading
         // =========================================================================
-        var staphScene = AssetLoader.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
-        AssertThat(staphScene).IsNotNull();
-        var staph = staphScene!.Instantiate<StaphEnemy>();
+        var staph = EnemySpawner.CreateEnemy("staph")!;
         main.AddChild(staph);
         staph._PhysicsProcess(0.016);
         float initialScale = staph.Scale.X;
         AssertThat(initialScale >= 0.9f && initialScale <= 1.1f).IsTrue();
         staph.QueueFree();
-        GD.Print("[PASS] 7. Pathogen organic breathing scale oscillation verified.");
+        GD.Print("[PASS] 7. Enemy organic breathing scale oscillation verified.");
 
         main.QueueFree();
         GD.Print("==================================================================");
@@ -154,3 +152,5 @@ public partial class TestVisualOverhaul : TestHarness
         return true;
     }
 }
+
+

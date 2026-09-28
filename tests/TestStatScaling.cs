@@ -1,11 +1,11 @@
 using Godot;
 using Godot.Collections;
 using System;
-using Phagocyte.Core;
+using Game.Core;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Engine verification for Vistrace-style stat scaling on top of the
@@ -54,9 +54,9 @@ public partial class TestStatScaling : TestHarness
         return true;
     }
 
-    private static CellStats NewStats()
+    private static ActorStats NewStats()
     {
-        return new CellStats { Name = "ScaleStats" };
+        return new ActorStats { Name = "ScaleStats" };
     }
 
     /// <summary>Unscaled path is untouched: add/remove round-trips exactly.</summary>
@@ -198,7 +198,7 @@ public partial class TestStatScaling : TestHarness
                 { "scale_per", 50.0f }
             }
         };
-        GameManager.GearCatalog[testId] = new Dictionary
+        GameManager.EquipmentCatalog[testId] = new Dictionary
         {
             { "id", testId },
             { "category", "metabolism" },
@@ -214,14 +214,14 @@ public partial class TestStatScaling : TestHarness
         };
 
         var mock = new CharacterBody2D { Name = "ScaleHost" };
-        var stats = new CellStats { Name = "CellStats" };
+        var stats = new ActorStats { Name = "ActorStats" };
         mock.AddChild(stats);
-        var chamber = new GearChamber { Name = "GearChamber" };
+        var chamber = new EquipmentChamber { Name = "EquipmentChamber" };
         mock.AddChild(chamber);
         chamber.Setup(mock);
         try
         {
-            AssertThat(GearUnlockManager.Unlock(testId)).IsTrue();
+            AssertThat(EquipmentUnlockManager.Unlock(testId)).IsTrue();
             AssertThat(chamber.AddToBackpack(testId)).IsTrue();
             AssertThat(chamber.Equip(testId, 0)).IsTrue();
             // max_health base 100: armor = 1 * (100 / 50) = 2.
@@ -232,9 +232,9 @@ public partial class TestStatScaling : TestHarness
         }
         finally
         {
-            GameManager.GearCatalog.Remove(testId);
-            GearUnlockManager.ResetCache();
-            GearUnlockManager.ResetAll();
+            GameManager.EquipmentCatalog.Remove(testId);
+            EquipmentUnlockManager.ResetCache();
+            EquipmentUnlockManager.ResetAll();
             mock.QueueFree();
         }
     }

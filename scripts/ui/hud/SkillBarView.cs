@@ -1,9 +1,9 @@
 using Godot;
 using Godot.Collections;
-using Phagocyte.Core;
-using Phagocyte.Skills;
+using Game.Core;
+using Game.Skills;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// 10-slot skill bar + cooldown overlays + hover tooltips (former <c>Hud</c>
@@ -561,12 +561,12 @@ public partial class SkillBarView : Node
     /// </summary>
     public void UpdateChamberRow()
     {
-        GearChamber? chamber = null;
+        EquipmentChamber? chamber = null;
         if (PlayerRef != null && GodotObject.IsInstanceValid(PlayerRef))
-            chamber = PlayerRef.GetNodeOrNull<GearChamber>("GearChamber");
+            chamber = PlayerRef.GetNodeOrNull<EquipmentChamber>("EquipmentChamber");
 
         int used = chamber?.UsedEnergy ?? 0;
-        int max = chamber?.MaxEnergy ?? GearChamber.BaseEnergy;
+        int max = chamber?.MaxEnergy ?? EquipmentChamber.BaseEnergy;
         int gens = chamber?.GeneratorCount ?? 0;
         bool engaged = (chamber?.EquippedCount ?? 0) > 0 || (chamber?.Backpack.Count ?? 0) > 0;
         bool overloaded = used > max;

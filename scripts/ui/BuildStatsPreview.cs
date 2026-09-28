@@ -1,17 +1,17 @@
 using Godot;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Player;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Menu build preview (class → chamber → tree): assembles the exact final
 /// stats a deploy would produce, so the loadout and tree pages can show
 /// live totals while crafting. Rules are never duplicated here — class bases
-/// run through the real <c>BaseCell.ApplyClassBaseStats</c>, chamber entries
-/// through a real <see cref="GearChamber"/> (same skip + energy rules
-/// as <c>Main.ApplyChamberLoadout</c>), tree entries through
+/// run through the real <c>PlayerActor.ApplyClassBaseStats</c>, chamber entries
+/// through a real <see cref="EquipmentChamber"/> (same skip + energy rules
+/// as <c>GameRoot.ApplyChamberLoadout</c>), tree entries through
 /// <see cref="PassiveTreeManager.ApplyModifier"/>. Nothing enters the tree;
 /// all scratch nodes are freed before return.
 /// </summary>
@@ -48,15 +48,15 @@ public static class BuildStatsPreview
             return result;
 
         CharacterBody2D? host = null;
-        BaseCell? cell = null;
+        PlayerActor? cell = null;
         try
         {
-            cell = GameManager.GetCellScene(classId).Instantiate<BaseCell>();
-            // Same identity pass as BaseCell._Ready (export defaults, then
+            cell = GameManager.GetPlayerScene(classId).Instantiate<PlayerActor>();
+            // Same identity pass as PlayerActor._Ready (export defaults, then
             // per-class identity, then bases) — SetupCellIdentity is
             // field-only in every class, safe off-tree.
             cell.SetupCellIdentity();
-            var stats = new CellStats { Name = "CellStats" };
+            var stats = new ActorStats { Name = "ActorStats" };
             cell.Stats = stats;
             stats.SetBase("max_health", cell.MaxHealth);
             stats.SetBase("move_speed", cell.BaseSpeed);
@@ -64,18 +64,18 @@ public static class BuildStatsPreview
 
             host = new CharacterBody2D { Name = "BuildPreviewHost" };
             host.AddChild(stats);
-            var chamber = new GearChamber { Name = "GearChamber" };
+            var chamber = new EquipmentChamber { Name = "EquipmentChamber" };
             host.AddChild(chamber);
             chamber.Setup(host);
 
             // Chamber entries through a real chamber: same locked skip as
-            // Main.ApplyChamberLoadout, same energy rules via Equip itself.
+            // GameRoot.ApplyChamberLoadout, same energy rules via Equip itself.
             // Slot position is stat-neutral, so profile indices are reused.
             string[] slots = LoadoutManager.GetActiveSlots(classId);
-            for (int i = 0; i < slots.Length && i < GearChamber.MaxSlots; i++)
+            for (int i = 0; i < slots.Length && i < EquipmentChamber.MaxSlots; i++)
             {
                 string id = slots[i];
-                if (string.IsNullOrEmpty(id) || !GearUnlockManager.IsUnlocked(id))
+                if (string.IsNullOrEmpty(id) || !EquipmentUnlockManager.IsUnlocked(id))
                     continue;
                 if (!chamber.AddToBackpack(id))
                     continue;

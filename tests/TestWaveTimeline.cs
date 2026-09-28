@@ -2,12 +2,12 @@ using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Combat;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Combat;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the 15:00 standard wave timeline and the 3-minute escalation loop
@@ -19,7 +19,7 @@ public partial class TestWaveTimeline : TestHarness
     private int _frame = 0;
     private bool _done = false;
     private Node2D? _container;
-    private Main? _main;
+    private GameRoot? _main;
 
     public override void _Initialize()
     {
@@ -62,17 +62,17 @@ public partial class TestWaveTimeline : TestHarness
 
     private void RunTimelineMathTests()
     {
-        AssertThat(PathogenSpawner.StandardRunDuration).IsEqual(900.0f);
-        AssertThat(PathogenSpawner.GetPhaseIndex(0.0f)).IsEqual(0);
-        AssertThat(PathogenSpawner.GetPhaseIndex(179.9f)).IsEqual(0);
-        AssertThat(PathogenSpawner.GetPhaseIndex(180.0f)).IsEqual(1);
-        AssertThat(PathogenSpawner.GetPhaseIndex(359.9f)).IsEqual(1);
-        AssertThat(PathogenSpawner.GetPhaseIndex(360.0f)).IsEqual(2);
-        AssertThat(PathogenSpawner.GetPhaseIndex(540.0f)).IsEqual(3);
-        AssertThat(PathogenSpawner.GetPhaseIndex(720.0f)).IsEqual(4);
-        AssertThat(PathogenSpawner.GetPhaseIndex(900.0f)).IsEqual(4);
+        AssertThat(EnemySpawner.StandardRunDuration).IsEqual(900.0f);
+        AssertThat(EnemySpawner.GetPhaseIndex(0.0f)).IsEqual(0);
+        AssertThat(EnemySpawner.GetPhaseIndex(179.9f)).IsEqual(0);
+        AssertThat(EnemySpawner.GetPhaseIndex(180.0f)).IsEqual(1);
+        AssertThat(EnemySpawner.GetPhaseIndex(359.9f)).IsEqual(1);
+        AssertThat(EnemySpawner.GetPhaseIndex(360.0f)).IsEqual(2);
+        AssertThat(EnemySpawner.GetPhaseIndex(540.0f)).IsEqual(3);
+        AssertThat(EnemySpawner.GetPhaseIndex(720.0f)).IsEqual(4);
+        AssertThat(EnemySpawner.GetPhaseIndex(900.0f)).IsEqual(4);
 
-        var terminalPool = PathogenSpawner.GetPhasePool(4);
+        var terminalPool = EnemySpawner.GetPhasePool(4);
         AssertThat(Array.IndexOf(terminalPool, "malignant_cell") >= 0).IsTrue();
         AssertThat(Array.IndexOf(terminalPool, "prion") >= 0).IsTrue();
 
@@ -84,27 +84,27 @@ public partial class TestWaveTimeline : TestHarness
         _container = new Node2D { Name = "WaveTimelineContainer" };
         Root.AddChild(_container);
 
-        var player = new BaseCell { Name = "TimelineHost", GlobalPosition = new Vector2(400, 400) };
+        var player = new PlayerActor { Name = "TimelineHost", GlobalPosition = new Vector2(400, 400) };
         _container.AddChild(player);
 
         var arena = new Vector2(4800.0f, 4800.0f);
 
-        var elite = PathogenSpawner.SpawnElite(_container, player, arena, 10.0f, 2);
+        var elite = EnemySpawner.SpawnElite(_container, player, arena, 10.0f, 2);
         AssertThat(elite).IsNotNull();
         AssertThat(elite!.IsElite).IsTrue();
-        var baseline = PathogenSpawner.CreatePathogen(elite.EnemyId);
+        var baseline = EnemySpawner.CreateEnemy(elite.EnemyId);
         AssertThat(baseline).IsNotNull();
         AssertThat(elite.MaxHealth).IsGreater(baseline!.MaxHealth);
 
-        int spawned = PathogenSpawner.SpawnSwarm(_container, player, arena, 200.0f, 2);
+        int spawned = EnemySpawner.SpawnSwarm(_container, player, arena, 200.0f, 2);
         AssertThat(spawned).IsGreater(0);
 
-        var subBoss = PathogenSpawner.SpawnSubBoss(_container, player, arena, "acute_wound");
+        var subBoss = EnemySpawner.SpawnSubBoss(_container, player, arena, "acute_wound");
         AssertThat(subBoss).IsNotNull();
         AssertThat(subBoss!.IsBoss).IsTrue();
         AssertThat(subBoss.GetNodeOrNull<BossPhaseComponent>("BossPhaseComponent")).IsNotNull();
 
-        var terminalBoss = PathogenSpawner.SpawnTerminalBoss(_container, player, arena, "acute_wound");
+        var terminalBoss = EnemySpawner.SpawnTerminalBoss(_container, player, arena, "acute_wound");
         AssertThat(terminalBoss).IsNotNull();
         AssertThat(terminalBoss!.IsBoss).IsTrue();
         AssertThat(terminalBoss.MaxHealth).IsGreater(subBoss.MaxHealth);
@@ -121,18 +121,18 @@ public partial class TestWaveTimeline : TestHarness
         AssertThat(main.RunGoalSeconds).IsEqual(900.0f);
 
         // 03:00 elite raid
-        main.EnvironmentTime = PathogenSpawner.EscalationInterval - 0.01f;
+        main.EnvironmentTime = EnemySpawner.EscalationInterval - 0.01f;
         main._PhysicsProcess(0.02f);
         AssertThat(main.EliteRaidTriggered).IsTrue();
         AssertThat(main.FirstSwarmTriggered).IsFalse();
 
         // 06:00 first swarm + elite pincer
-        main.EnvironmentTime = PathogenSpawner.EscalationInterval * 2.0f - 0.01f;
+        main.EnvironmentTime = EnemySpawner.EscalationInterval * 2.0f - 0.01f;
         main._PhysicsProcess(0.02f);
         AssertThat(main.FirstSwarmTriggered).IsTrue();
 
         // 09:00 sub-boss showdown + guaranteed reward
-        main.EnvironmentTime = PathogenSpawner.EscalationInterval * 3.0f - 0.01f;
+        main.EnvironmentTime = EnemySpawner.EscalationInterval * 3.0f - 0.01f;
         main._PhysicsProcess(0.02f);
         AssertThat(main.SubBossTriggered).IsTrue();
         AssertThat(main.SubBoss).IsNotNull();
@@ -141,7 +141,7 @@ public partial class TestWaveTimeline : TestHarness
         AssertThat(main.SubBossRewardGranted).IsTrue();
 
         // 12:00 extreme swarm
-        main.EnvironmentTime = PathogenSpawner.EscalationInterval * 4.0f - 0.01f;
+        main.EnvironmentTime = EnemySpawner.EscalationInterval * 4.0f - 0.01f;
         main._PhysicsProcess(0.02f);
         AssertThat(main.ExtremeSwarmTriggered).IsTrue();
 
@@ -177,3 +177,4 @@ public partial class TestWaveTimeline : TestHarness
         RestoreSaves();
     }
 }
+

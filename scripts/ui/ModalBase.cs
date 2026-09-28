@@ -1,7 +1,7 @@
 using Godot;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Shared scaffolding for the panel modals: hidden-on-ready state, the header

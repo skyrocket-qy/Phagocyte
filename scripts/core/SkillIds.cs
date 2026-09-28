@@ -1,4 +1,4 @@
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Canonical skill identifiers shared by the upgrade catalog, the unlock
@@ -6,7 +6,7 @@ namespace Phagocyte.Core;
 /// </summary>
 public static class SkillIds
 {
-    // --- Active cytokine weapons ---
+    // --- Active weapons ---
     public const string PhagocyticGrasp = "phagocytic_grasp";
     public const string LysosomalOverload = "lysosomal_overload";
     public const string RosTorrent = "ros_torrent";
@@ -30,7 +30,7 @@ public static class SkillIds
     public const string PassiveActin = "actin";
     public const string PassiveLysosome = "lysosome";
     public const string PassiveMitochondria = "mitochondria";
-    public const string PassiveOpsonin = "opsonin";
+    public const string PassiveMark = "opsonin";
     public const string PassiveChemokine = "chemokine";
     public const string PassiveBilayer = "bilayer";
     public const string PassiveAutophagy = "autophagy";
@@ -41,3 +41,4 @@ public static class SkillIds
     public const string PassiveEndotoxin = "endotoxin";
     public const string PassiveHematopoietic = "hematopoietic";
 }
+

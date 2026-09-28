@@ -1,15 +1,15 @@
-﻿using Godot;
+using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
-using Phagocyte.Enemies;
-using Phagocyte.UI;
+using Game.Player;
+using Game.Skills;
+using Game.Enemies;
+using Game.UI;
 
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 [TestSuite]
 public partial class TestSkillSystem : TestHarness
@@ -36,10 +36,10 @@ public partial class TestSkillSystem : TestHarness
             return false;
 
         _testDone = true;
-        var main = Root.GetNodeOrNull<Main>("Main");
+        var main = Root.GetNodeOrNull<GameRoot>("GameRoot");
         AssertThat(main).IsNotNull();
 
-        var player = main!.GetNodeOrNull<Macrophage>("Macrophage");
+        var player = main!.GetNodeOrNull<PlayerActor>("Player");
         AssertThat(player).IsNotNull();
 
         var enemyContainer = main.GetNodeOrNull<Node2D>("EnemyContainer");
@@ -57,10 +57,10 @@ public partial class TestSkillSystem : TestHarness
 
         // 2. Verify Active Slot 0: innate Phagocytic Grasp (吞噬偽足)
         var innateActive = sm.GetActiveSlot(0);
-        AssertThat(innateActive is PhagocyticGraspSkill).IsTrue();
+        AssertThat(innateActive is StrikeSkill).IsTrue();
         AssertThat(innateActive!.SkillId).IsEqual("phagocytic_grasp");
         AssertThat(innateActive.IsInnate).IsTrue();
-        GD.Print("[PASS] Active Slot 0 correctly contains the innate PhagocyticGraspSkill.");
+        GD.Print("[PASS] Active Slot 0 correctly contains the innate strike skill.");
 
         // 3. Verify Active Slots 1-4 start empty (slot 0 is the innate grasp)
         for (int i = 1; i < 5; i++)
@@ -77,16 +77,15 @@ public partial class TestSkillSystem : TestHarness
         GD.Print("[PASS] Passive Slots 0 to 4 are initially empty and available.");
 
         // 5. Verify smooth deformation & 32-vertex collision sync
-        player.UpdatePseudopodDeformation(0.016f);
+        player.UpdateBodyDeformation(0.016f);
         AssertThat(player.Cytoplasm!.Polygon.Length >= 64).IsTrue();
         AssertThat(player.EngulfCollider!.Polygon.Length).IsEqual(32);
         GD.Print($"[PASS] Smooth {player.Cytoplasm!.Polygon.Length}-vertex organic pseudopod deformation & CollisionPolygon2D sync verified.");
 
         // 6. Test ROS Torrent auto-targeting & firing (drafted into active slot 1; slot 0 is the innate)
-        var ros = new RosTorrentSkill();
+        var ros = SkillFactory.CreateActive("ros_torrent")!;
         AssertThat(sm.EquipActive(ros, 1)).IsTrue();
-        var staphScene = AssetLoader.Load<PackedScene>("res://scenes/enemies/staph_enemy.tscn");
-        var enemy = staphScene.Instantiate<StaphEnemy>();
+        var enemy = EnemySpawner.CreateEnemy("staph")!;
         enemy.GlobalPosition = player.GlobalPosition + new Vector2(150, 0);
         enemyContainer!.AddChild(enemy);
 
@@ -94,7 +93,7 @@ public partial class TestSkillSystem : TestHarness
         bool projectileFound = false;
         foreach (var child in main.GetChildren())
         {
-            if (child is RosJet rj)
+            if (child is SalvoSkill.SalvoProjectile rj)
             {
                 projectileFound = true;
                 AssertThat(rj.GlobalPosition.DistanceTo(player.GlobalPosition)).IsLessEqual(60.0f);
@@ -105,7 +104,7 @@ public partial class TestSkillSystem : TestHarness
         GD.Print("[PASS] ROS Torrent projectile emission & target acquisition verified.");
 
         // 7. Test equipping a passive trait into passive slot 0
-        var actin = new PassiveActinPolymerization();
+        var actin = SkillFactory.CreatePassive("actin")!;
         float initialArea = player.Stats!.GetStat("area");
         sm.EquipPassive(actin, 0);
         AssertThat(sm.GetPassiveSlot(0)).IsEqual(actin);
@@ -135,3 +134,5 @@ public partial class TestSkillSystem : TestHarness
         return true;
     }
 }
+
+

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Centralized runtime asset paths. Single source of truth — update here if
@@ -23,7 +23,7 @@ public static class AssetPaths
     /// <summary>Passive-tree trait icon: res://assets/gen/passive_tree/{id}.png.</summary>
     public static string TraitIcon(string traitId) => $"{GenRoot}/passive_tree/{traitId}.png";
 
-    /// <summary>Gear chamber equipment icon: res://assets/gen/gear/{id}.png.</summary>
+    /// <summary>Equipment chamber equipment icon: res://assets/gen/gear/{id}.png.</summary>
     public static string GearIcon(string gearId) => $"{GenRoot}/gear/{gearId}.png";
 
     /// <summary>UI icon: res://assets/gen/ui/{id}.png.</summary>

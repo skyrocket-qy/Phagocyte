@@ -2,10 +2,10 @@ using Godot;
 using Godot.Collections;
 using System;
 
-namespace Phagocyte.Skills;
+namespace Game.Skills;
 
 /// <summary>
-/// Manages 5 Active Cytokine Weapon slots and 5 Passive Gear Trait slots.
+/// Manages 5 Active weapon slots and 5 Passive Equipment Trait slots.
 /// Separates weapon ticks and stat modifier lifecycles cleanly.
 /// </summary>
 public partial class SkillManager : Node2D
@@ -229,3 +229,4 @@ public partial class SkillManager : Node2D
         };
     }
 }
+

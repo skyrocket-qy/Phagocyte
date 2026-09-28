@@ -1,16 +1,16 @@
 using Godot;
-using Phagocyte.Combat;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
+using Game.Combat;
+using Game.Core;
+using Game.Enemies;
 
-namespace Phagocyte.Testing;
+namespace Game.Testing;
 
 /// <summary>
 /// Static, non-aggressive biological test dummy for isolated skill testing.
-/// Never drops EXP (AtpValue = 0), never moves (physics disabled),
+/// Never drops EXP (XpValue = 0), never moves (physics disabled),
 /// maintains high/resetting health, and presents a standard HitArea on Layer 2.
 /// </summary>
-public partial class TargetDummy : BaseEnemy
+public partial class TargetDummy : EnemyActor
 {
     public float DamageAccumulated { get; private set; }
     public int HitsReceived { get; private set; }
@@ -21,7 +21,7 @@ public partial class TargetDummy : BaseEnemy
         DisplayNameKey = "TARGET_DUMMY";
         MaxHealth = 999999.0f;
         CurrentHealth = 999999.0f;
-        AtpValue = 0.0f;
+        XpValue = 0.0f;
         BaseScore = 0;
         FloatSpeed = 0.0f;
         ThreatMode = EnemyThreatMode.Drifter;
@@ -35,7 +35,7 @@ public partial class TargetDummy : BaseEnemy
         SetProcess(false);
     }
 
-    protected override float GetCollisionRadius() => 20.0f;
+    public override float GetCollisionRadius() => 20.0f;
 
     public override void TakeDamage(float damage, Node2D? source, bool isCrit)
     {

@@ -1,14 +1,14 @@
 using Godot;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
 
-namespace Phagocyte.Directors;
+namespace Game.Directors;
 
 /// <summary>
 /// Sub-lord + terminal-boss lifecycle (09:00 sub-boss showdown, 15:00 terminal
-/// lockdown) plus endless multi-boss incursions. Extracted from Main; the 09:00
+/// lockdown) plus endless multi-boss incursions. Extracted from GameRoot; the 09:00
 /// trigger is evaluated here so <see cref="WaveDirectorComponent"/> never
 /// touches boss state — the 15:00 lockdown arrives via
 /// <see cref="WaveDirectorComponent.TerminalPhaseReached"/>.
@@ -17,23 +17,23 @@ namespace Phagocyte.Directors;
 /// </summary>
 public partial class BossEncounterManager : Node
 {
-    /// <summary>Run context (Main). Must be assigned before the first physics tick.</summary>
+    /// <summary>Run context (GameRoot). Must be assigned before the first physics tick.</summary>
     public IRunContext? Context { get; set; }
 
     public bool SubBossTriggered { get; private set; } = false;
     public bool BossLockdownActive { get; private set; } = false;
     public bool SubBossRewardGranted { get; private set; } = false;
-    public BaseEnemy? SubBoss { get; private set; }
-    public BaseEnemy? TerminalBoss { get; private set; }
+    public EnemyActor? SubBoss { get; private set; }
+    public EnemyActor? TerminalBoss { get; private set; }
 
     /// <summary>Set only when the terminal primary boss is actually killed (victory criterion).</summary>
     public bool TerminalBossNeutralized { get; private set; } = false;
 
-    private readonly List<BaseEnemy> _raidBosses = new();
+    private readonly List<EnemyActor> _raidBosses = new();
     private int _nextRaidCycle = 2; // first incursion at 18:00 (cycle 2)
 
     /// <summary>Alive multi-boss incursion bosses drawn from other organs.</summary>
-    public IReadOnlyList<BaseEnemy> RaidBosses => _raidBosses;
+    public IReadOnlyList<EnemyActor> RaidBosses => _raidBosses;
 
     /// <summary>Evaluates the 09:00 sub-boss trigger. Call once per physics frame.</summary>
     public void PhysicsTick(float dt)
@@ -42,7 +42,7 @@ public partial class BossEncounterManager : Node
         if (ctx == null)
             return;
 
-        if (!SubBossTriggered && ctx.EnvironmentTime >= PathogenSpawner.EscalationInterval * 3.0f)
+        if (!SubBossTriggered && ctx.EnvironmentTime >= EnemySpawner.EscalationInterval * 3.0f)
         {
             SubBossTriggered = true;
             TriggerSubBossEncounter();
@@ -58,7 +58,7 @@ public partial class BossEncounterManager : Node
         if (container == null || player == null || ctx == null)
             return;
 
-        SubBoss = PathogenSpawner.SpawnSubBoss(container, player, ctx.ArenaSize, ctx.MapId, ctx.EnvironmentTime);
+        SubBoss = EnemySpawner.SpawnSubBoss(container, player, ctx.ArenaSize, ctx.StageId, ctx.EnvironmentTime);
         if (SubBoss != null)
         {
             SubBoss.EnemyDied += OnSubBossDefeated;
@@ -83,7 +83,7 @@ public partial class BossEncounterManager : Node
             return;
         }
 
-        TerminalBoss = PathogenSpawner.SpawnTerminalBoss(container, player, ctx.ArenaSize, ctx.MapId, ctx.EnvironmentTime);
+        TerminalBoss = EnemySpawner.SpawnTerminalBoss(container, player, ctx.ArenaSize, ctx.StageId, ctx.EnvironmentTime);
         if (TerminalBoss == null)
         {
             // No boss entity available for this map: the clear condition cannot be met.
@@ -97,18 +97,18 @@ public partial class BossEncounterManager : Node
         GD.Print("[WaveDirector] 15:00 Terminal boss lockdown! Specific neutralization required.");
     }
 
-    private void OnSubBossDefeated(BaseEnemy boss)
+    private void OnSubBossDefeated(EnemyActor boss)
     {
         if (SubBossRewardGranted)
             return;
         SubBossRewardGranted = true;
 
         AudioManager.Instance?.PlaySfx("wave_complete");
-        AudioManager.Instance?.PlayMapBgm(Context?.MapId ?? "");
+        AudioManager.Instance?.PlayMapBgm(Context?.StageId ?? "");
 
         // Guaranteed superweapon chest: the epigenetic evolution system is not
         // online yet, so the reward is currently a guaranteed level-up draft.
-        if (Context?.Player is BaseCell cell)
+        if (Context?.Player is PlayerActor cell)
         {
             float missing = Mathf.Max(0.0f, cell.ExpToNextLevel - cell.CurrentExp);
             if (missing > 0.0f)
@@ -118,7 +118,7 @@ public partial class BossEncounterManager : Node
         GD.Print("[WaveDirector] Sub-boss neutralized. Guaranteed evolution reward granted.");
     }
 
-    private void OnTerminalBossDefeated(BaseEnemy boss)
+    private void OnTerminalBossDefeated(EnemyActor boss)
     {
         var ctx = Context;
         if (ctx == null || ctx.RunEnded)
@@ -170,7 +170,7 @@ public partial class BossEncounterManager : Node
     /// Multi-boss incursion (docs/endgame.md §3.3): every 3-minute overdrive
     /// cycle from 18:00 draws two terminal bosses from other organs onto the
     /// field; from 30:00 the siege escalates to a triple-boss assault.
-    /// Trigger timing is owned by <see cref="OverdriveDirector"/>; the raid
+    /// Trigger timing is owned by <see cref="EndlessDirector"/>; the raid
     /// lifecycle lives here with all other boss state.
     /// </summary>
     public void ProcessBossRaids(int cycle)
@@ -190,10 +190,10 @@ public partial class BossEncounterManager : Node
         int count = tripleSiege ? 3 : 2;
 
         var candidates = new List<string>();
-        foreach (var keyVar in GameManager.MapData.Keys)
+        foreach (var keyVar in GameManager.StageData.Keys)
         {
             string candidateMap = keyVar.AsString();
-            if (candidateMap != ctx.MapId)
+            if (candidateMap != ctx.StageId)
                 candidates.Add(candidateMap);
         }
 
@@ -208,7 +208,7 @@ public partial class BossEncounterManager : Node
         for (int i = 0; i < count && i < candidates.Count; i++)
         {
             float angle = Mathf.Tau * i / count + (float)GD.RandRange(-0.4, 0.4);
-            var boss = PathogenSpawner.SpawnRaidBoss(container, player, ctx.ArenaSize, candidates[i], ctx.EnvironmentTime, angle);
+            var boss = EnemySpawner.SpawnRaidBoss(container, player, ctx.ArenaSize, candidates[i], ctx.EnvironmentTime, angle);
             if (boss == null)
                 continue;
 
@@ -228,7 +228,7 @@ public partial class BossEncounterManager : Node
         }
     }
 
-    private void OnRaidBossDefeated(BaseEnemy boss)
+    private void OnRaidBossDefeated(EnemyActor boss)
     {
         _raidBosses.Remove(boss);
         AudioManager.Instance?.PlaySfx("wave_complete", -2.0f);

@@ -2,11 +2,11 @@
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the screen active cap (300 / 450) and the kill-driven dynamic backfill loop.
@@ -48,15 +48,15 @@ public partial class TestDynamicBackfill : TestHarness
     private void RunTests()
     {
         // 1. Screen cap constants
-        AssertThat(PathogenSpawner.MaxActiveNormal).IsEqual(300);
-        AssertThat(PathogenSpawner.MaxActiveSwarm).IsEqual(450);
+        AssertThat(EnemySpawner.MaxActiveNormal).IsEqual(300);
+        AssertThat(EnemySpawner.MaxActiveSwarm).IsEqual(450);
 
         // 2. Offscreen spawn points always land outside the expanded camera view
         var arena = new Vector2(4800.0f, 4800.0f);
         var view = new Vector2(1200.0f, 700.0f);
         for (int i = 0; i < 40; i++)
         {
-            Vector2 point = PathogenSpawner.GetOffscreenSpawnPoint(Vector2.Zero, arena, view, 200.0f);
+            Vector2 point = EnemySpawner.GetOffscreenSpawnPoint(Vector2.Zero, arena, view, 200.0f);
             bool outside = Mathf.Abs(point.X) > view.X * 0.5f + 100.0f
                         || Mathf.Abs(point.Y) > view.Y * 0.5f + 100.0f;
             AssertThat(outside).IsTrue();
@@ -66,18 +66,18 @@ public partial class TestDynamicBackfill : TestHarness
         // 3. Backfill spawns the exact deficit amount
         var container = new Node2D { Name = "BackfillContainer" };
         Root.AddChild(container);
-        var host = new BaseCell { Name = "BackfillHost" };
+        var host = new PlayerActor { Name = "BackfillHost" };
         container.AddChild(host);
 
-        int spawned = PathogenSpawner.Backfill(container, host, arena, view, 200.0f, 7);
+        int spawned = EnemySpawner.Backfill(container, host, arena, view, 200.0f, 7);
         AssertThat(spawned).IsEqual(7);
         AssertThat(container.GetChildCount()).IsEqual(8);
 
-        // 4. Main integration: kill-driven refill to normal and swarm caps
+        // 4. GameRoot integration: kill-driven refill to normal and swarm caps
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = "acute_wound";
 
-        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
+        var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         main.ScreenCapNormal = 10;
         main.ScreenCapSwarm = 14;
         Root.AddChild(main);
@@ -89,28 +89,28 @@ public partial class TestDynamicBackfill : TestHarness
         main._PhysicsProcess(0.02f);
         main._PhysicsProcess(0.02f);
         AssertThat(main.ActiveScreenCap).IsEqual(10);
-        AssertThat(main.ActivePathogenCount).IsEqual(10);
+        AssertThat(main.ActiveEnemyCount).IsEqual(10);
         GD.Print("[PASS] Normal cap backfilled from an empty arena (300 base cap constant verified).");
 
         // Kills release slots and are refilled on the next polls (<0.15s)
         FreeChildren(enemies);
         main._PhysicsProcess(0.02f);
         main._PhysicsProcess(0.02f);
-        AssertThat(main.ActivePathogenCount).IsEqual(10);
+        AssertThat(main.ActiveEnemyCount).IsEqual(10);
         GD.Print("[PASS] Mass kill deficit refilled within two polls.");
 
         // 06:00 swarm event raises the cap and refills to it
-        main.EnvironmentTime = PathogenSpawner.EscalationInterval * 2.0f - 0.01f;
+        main.EnvironmentTime = EnemySpawner.EscalationInterval * 2.0f - 0.01f;
         main._PhysicsProcess(0.02f);
         AssertThat(main.FirstSwarmTriggered).IsTrue();
         AssertThat(main.ActiveScreenCap).IsEqual(14);
         FreeChildren(enemies);
         main._PhysicsProcess(0.02f);
         main._PhysicsProcess(0.02f);
-        AssertThat(main.ActivePathogenCount).IsEqual(14);
+        AssertThat(main.ActiveEnemyCount).IsEqual(14);
 
         // Swarm window expiry drops the cap back to normal
-        main._PhysicsProcess(PathogenSpawner.SwarmWindowSeconds + 0.1f);
+        main._PhysicsProcess(EnemySpawner.SwarmWindowSeconds + 0.1f);
         AssertThat(main.ActiveScreenCap).IsEqual(10);
         AssertThat(main.SwarmWindowTimer).IsEqual(0.0f);
         GD.Print("[PASS] Swarm window dynamically raised the cap (450 base constant) and expired back to normal.");

@@ -1,10 +1,10 @@
 using Godot;
 using Godot.Collections;
 using System.Text;
-using Phagocyte.Core;
-using Phagocyte.Hero;
+using Game.Core;
+using Game.Player;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Pause menu + codex/settings modals + passive-tree overlay (former <c>Hud</c>
@@ -183,7 +183,7 @@ public partial class PauseMenuView : Node
             return;
 
         string classId = GameManager.SelectedClass;
-        var classInfo = GameManager.GetClassInfo(classId);
+        var classInfo = GameManager.GetPlayerClass(classId);
         string className = classInfo.TryGetValue("name", out var nameVal) ? nameVal.AsString() : classId;
         var allocation = PassiveTreeManager.GetAllocation(classId);
         var text = new StringBuilder();
@@ -219,7 +219,7 @@ public partial class PauseMenuView : Node
         }
 
         text.AppendLine();
-        if (PlayerRef is BaseCell bc && bc.Stats != null)
+        if (PlayerRef is PlayerActor bc && bc.Stats != null)
         {
             AppendStatGroup(text, "STATS_GROUP_COMBAT", BuildStatsPreview.CombatKeys, bc);
             AppendStatGroup(text, "STATS_GROUP_DEFENSE", BuildStatsPreview.DefenseKeys, bc);
@@ -234,7 +234,7 @@ public partial class PauseMenuView : Node
         TreeOverlayText.Text = text.ToString();
     }
 
-    private void AppendStatGroup(StringBuilder text, string titleKey, string[] statKeys, BaseCell bc)
+    private void AppendStatGroup(StringBuilder text, string titleKey, string[] statKeys, PlayerActor bc)
     {
         text.AppendLine("[b]◆ " + Tr(titleKey) + "[/b]");
         foreach (string statKey in statKeys)

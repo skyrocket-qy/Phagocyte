@@ -1,8 +1,8 @@
-namespace Phagocyte.Enemies;
+namespace Game.Enemies;
 
 /// <summary>
-/// Tactical threat intent driving enemy steering (docs/pathogen.md steering model).
-/// Every pathogen should exert pressure; pure idle wandering is reserved for
+/// Tactical threat intent driving enemy steering (docs/enemy.md steering model).
+/// Every enemy should exert pressure; pure idle wandering is reserved for
 /// environment-neutral matter only.
 /// </summary>
 public enum EnemyThreatMode

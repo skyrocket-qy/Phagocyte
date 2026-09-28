@@ -1,4 +1,4 @@
-namespace Phagocyte.Combat;
+namespace Game.Combat;
 
 /// <summary>
 /// Stack-allocated damage outcome: final damage + crit flag.

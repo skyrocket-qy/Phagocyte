@@ -1,12 +1,12 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Hero;
+using Game.Player;
 
-namespace Phagocyte.Enemies;
+namespace Game.Enemies;
 
 /// <summary>
-/// Shared threat-intent steering helpers. Every pathogen uses one of four tactical
+/// Shared threat-intent steering helpers. Every enemy uses one of four tactical
 /// modes (see <see cref="EnemyThreatMode"/>) so the horde applies real positioning
 /// pressure instead of aimless wandering. Pure drifting is reserved for neutral
 /// environment matter and scripted bosses.
@@ -24,7 +24,7 @@ public static class EnemySteering
     private static readonly List<Vector2> TissueAnchors = new();
     private static Vector2 _arenaSize = new(4800.0f, 4800.0f);
 
-    private static BaseCell? _cachedPlayer;
+    private static PlayerActor? _cachedPlayer;
 
     /// <summary>
     /// Registers the current arena dimensions so invaders can pick host-tissue anchors.
@@ -37,14 +37,14 @@ public static class EnemySteering
 
     /// <summary>
     /// Cached player lookup (re-resolved only when the cell is freed), avoiding a
-    /// scene-tree group query for every one of the 300-450 active pathogens.
+    /// scene-tree group query for every one of the 300-450 active enemies.
     /// </summary>
-    public static BaseCell? GetPlayer(Node node)
+    public static PlayerActor? GetPlayer(Node node)
     {
         if (_cachedPlayer != null && GodotObject.IsInstanceValid(_cachedPlayer))
             return _cachedPlayer;
 
-        _cachedPlayer = node.GetTree().GetFirstNodeInGroup("player") as BaseCell;
+        _cachedPlayer = node.GetTree().GetFirstNodeInGroup("player") as PlayerActor;
         return _cachedPlayer;
     }
 
@@ -52,7 +52,7 @@ public static class EnemySteering
     /// Resolves the desired steering direction for the enemy's threat mode.
     /// Returns <see cref="Vector2.Zero"/> to fall back to neutral Brownian drift.
     /// </summary>
-    public static Vector2 GetDirection(BaseEnemy enemy, float dt)
+    public static Vector2 GetDirection(EnemyActor enemy, float dt)
     {
         return enemy.ThreatMode switch
         {
@@ -65,7 +65,7 @@ public static class EnemySteering
     }
 
     /// <summary>Direct chemo-chase along the shortest vector to the cell.</summary>
-    public static Vector2 SeekPlayer(BaseEnemy enemy, float jitterAmplitude)
+    public static Vector2 SeekPlayer(EnemyActor enemy, float jitterAmplitude)
     {
         var player = GetPlayer(enemy);
         if (player == null || player.IsDead)
@@ -82,7 +82,7 @@ public static class EnemySteering
     /// Flanker interception: aims at a point 100-200px ahead of the player's current
     /// travel vector, punishing one-directional kiting / edge-circling.
     /// </summary>
-    public static Vector2 InterceptPlayer(BaseEnemy enemy)
+    public static Vector2 InterceptPlayer(EnemyActor enemy)
     {
         var player = GetPlayer(enemy);
         if (player == null || player.IsDead)
@@ -92,7 +92,7 @@ public static class EnemySteering
     }
 
     /// <summary>Pure interception math, exposed for deterministic tests.</summary>
-    public static Vector2 AimAtIntercept(BaseEnemy enemy, Vector2 playerPosition, Vector2 playerVelocity)
+    public static Vector2 AimAtIntercept(EnemyActor enemy, Vector2 playerPosition, Vector2 playerVelocity)
     {
         Vector2 aimPoint = playerPosition;
         if (playerVelocity.LengthSquared() > 1.0f)
@@ -111,7 +111,7 @@ public static class EnemySteering
     /// <summary>
     /// Standoff artillery: approach when far, back off when crowded, orbit sideways in band.
     /// </summary>
-    public static Vector2 Standoff(BaseEnemy enemy)
+    public static Vector2 Standoff(EnemyActor enemy)
     {
         var player = GetPlayer(enemy);
         if (player == null || player.IsDead)
@@ -138,7 +138,7 @@ public static class EnemySteering
     /// Tissue invader: ignores the player and drives at the nearest host-tissue anchor.
     /// Returns Zero once latched so the invader can ulcerate in place.
     /// </summary>
-    public static Vector2 InvadeTissue(BaseEnemy enemy)
+    public static Vector2 InvadeTissue(EnemyActor enemy)
     {
         Vector2 anchor = GetNearestTissueAnchor(enemy.GlobalPosition);
         enemy.SteeringAnchor = anchor;
@@ -151,7 +151,7 @@ public static class EnemySteering
     }
 
     /// <summary>True when an invader reached its anchor and is ulcerating in place.</summary>
-    public static bool IsInvaderLatched(BaseEnemy enemy)
+    public static bool IsInvaderLatched(EnemyActor enemy)
     {
         Vector2 anchor = enemy.SteeringAnchor;
         return anchor != Vector2.Zero
@@ -194,7 +194,7 @@ public static class EnemySteering
         }
     }
 
-    private static Vector2 ApplyJitter(BaseEnemy enemy, Vector2 direction, float amplitude)
+    private static Vector2 ApplyJitter(EnemyActor enemy, Vector2 direction, float amplitude)
     {
         if (amplitude <= 0.0f)
             return direction;

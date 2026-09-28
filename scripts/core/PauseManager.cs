@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Pause ownership: the tree pause flag is shared by the pause menu, the

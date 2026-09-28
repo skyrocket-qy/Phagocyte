@@ -1,11 +1,11 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
+using Game.Core;
+using Game.Player;
+using Game.Skills;
 
-namespace Phagocyte.Testing;
+namespace Game.Testing;
 
 public enum DummyFormation
 {
@@ -25,7 +25,7 @@ public partial class SkillTestChamber : Node2D
 {
     public static readonly Vector2 Center = new(640, 360);
 
-    public BaseCell? Subject { get; private set; }
+    public PlayerActor? Subject { get; private set; }
     public BaseSkill? CurrentSkill { get; private set; }
     public List<TargetDummy> Dummies { get; } = new();
 
@@ -66,7 +66,7 @@ public partial class SkillTestChamber : Node2D
             Subject = null;
         }
 
-        Subject = cellScene.Instantiate<BaseCell>();
+        Subject = cellScene.Instantiate<PlayerActor>();
         AddChild(Subject);
 
         Subject.GlobalPosition = Center;

@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Combat;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Combat;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Headless and headed stress benchmark evaluating horde performance, frame pacing,
@@ -20,11 +20,11 @@ public partial class TestHordeBenchmark : TestHarness
 {
     private int _phase = 0;
     private int _frame = 0;
-    private Main? _main = null;
+    private GameRoot? _main = null;
     private readonly List<double> _frameTimes100 = new();
     private readonly List<double> _frameTimes300 = new();
     private readonly List<double> _frameTimes500 = new();
-    private readonly List<BaseEnemy> _spawnedEnemies = new();
+    private readonly List<EnemyActor> _spawnedEnemies = new();
 
     private const int FramesPerTier = 60;
 
@@ -46,27 +46,27 @@ public partial class TestHordeBenchmark : TestHarness
         {
             switch (_phase)
             {
-                case 0: // Setup Main scene
+                case 0: // Setup GameRoot scene
                     SetupArena();
                     _phase++;
                     _frame = 0;
                     return false;
 
-                case 1: // Tier 1: 100 Pathogens
+                case 1: // Tier 1: 100 Enemies
                     if (!RunTierBenchmark(100, _frameTimes100, delta))
                         return false;
                     _phase++;
                     _frame = 0;
                     return false;
 
-                case 2: // Tier 2: 300 Pathogens
+                case 2: // Tier 2: 300 Enemies
                     if (!RunTierBenchmark(300, _frameTimes300, delta))
                         return false;
                     _phase++;
                     _frame = 0;
                     return false;
 
-                case 3: // Tier 3: 500 Pathogens
+                case 3: // Tier 3: 500 Enemies
                     if (!RunTierBenchmark(500, _frameTimes500, delta))
                         return false;
                     _phase++;
@@ -102,7 +102,7 @@ public partial class TestHordeBenchmark : TestHarness
         GameManager.SelectedMap = "acute_wound";
 
         var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
-        var main = mainScene.Instantiate<Main>();
+        var main = mainScene.Instantiate<GameRoot>();
         _main = main;
         Root.AddChild(main);
 
@@ -113,7 +113,7 @@ public partial class TestHordeBenchmark : TestHarness
         {
             foreach (var child in main.EnemyContainer.GetChildren())
             {
-                if (child is BaseEnemy enemy)
+                if (child is EnemyActor enemy)
                     enemy.Free();
             }
         }
@@ -153,8 +153,8 @@ public partial class TestHordeBenchmark : TestHarness
 
         for (int i = 0; i < toAdd; i++)
         {
-            string pathogenId = SamplePathogens[rng.Next(SamplePathogens.Length)];
-            var enemy = PathogenSpawner.CreatePathogen(pathogenId);
+            string enemyId = SamplePathogens[rng.Next(SamplePathogens.Length)];
+            var enemy = EnemySpawner.CreateEnemy(enemyId);
             if (enemy != null)
             {
                 float angle = (float)(rng.NextDouble() * Math.PI * 2.0);
@@ -180,9 +180,9 @@ public partial class TestHordeBenchmark : TestHarness
         GD.Print("------------------------------------------------------------------");
         GD.Print("| Horde Tier | Active Entities | Avg FPS | 1% Low FPS | Max Spike |");
         GD.Print("------------------------------------------------------------------");
-        GD.Print($"| Tier 1     | 100 Pathogens   | {avgFps100,7:F1} | {p99Fps100,10:F1} | {maxMs100,7:F2}ms |");
-        GD.Print($"| Tier 2     | 300 Pathogens   | {avgFps300,7:F1} | {p99Fps300,10:F1} | {maxMs300,7:F2}ms |");
-        GD.Print($"| Tier 3     | 500 Pathogens   | {avgFps500,7:F1} | {p99Fps500,10:F1} | {maxMs500,7:F2}ms |");
+        GD.Print($"| Tier 1     | 100 Enemies   | {avgFps100,7:F1} | {p99Fps100,10:F1} | {maxMs100,7:F2}ms |");
+        GD.Print($"| Tier 2     | 300 Enemies   | {avgFps300,7:F1} | {p99Fps300,10:F1} | {maxMs300,7:F2}ms |");
+        GD.Print($"| Tier 3     | 500 Enemies   | {avgFps500,7:F1} | {p99Fps500,10:F1} | {maxMs500,7:F2}ms |");
         GD.Print("------------------------------------------------------------------");
         GD.Print($"[Horde Benchmark] MultiMesh Swarm Batching Batched Entities: {batchedCount}");
         GD.Print($"[Horde Benchmark] 500-Entity Swarm Stability: PASS");
@@ -219,3 +219,4 @@ public partial class TestHordeBenchmark : TestHarness
         ResetRunGlobals();
     }
 }
+

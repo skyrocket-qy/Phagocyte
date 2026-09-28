@@ -2,10 +2,10 @@ using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Core;
-using Phagocyte.UI;
+using Game.Core;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the organ-map lock UX: locked map list entries, requirement readouts,
@@ -86,8 +86,8 @@ public partial class TestMapLockUi : TestHarness
         AssertThat(lockedBtn.Text.Contains("🔒")).IsTrue();
 
         // Holographic scanner lock state
-        AssertThat(HoloBodyScanner.IsOrganLocked("acute_wound")).IsFalse();
-        AssertThat(HoloBodyScanner.IsOrganLocked("alveolar_space")).IsTrue();
+        AssertThat(StageSelectMap.IsOrganLocked("acute_wound")).IsFalse();
+        AssertThat(StageSelectMap.IsOrganLocked("alveolar_space")).IsTrue();
         menu.HoloScanner!.SelectOrgan("alveolar_space");
         AssertThat(menu.HoloScanner.ActiveMapKey).IsEqual("alveolar_space");
 
@@ -104,7 +104,7 @@ public partial class TestMapLockUi : TestHarness
         AssertThat(menu.IsActiveMapLocked).IsFalse();
         AssertThat(menu.DeployBtn!.Disabled).IsFalse();
         AssertThat(menu.MapLockStatusLbl!.Visible).IsFalse();
-        AssertThat(HoloBodyScanner.IsOrganLocked("alveolar_space")).IsFalse();
+        AssertThat(StageSelectMap.IsOrganLocked("alveolar_space")).IsFalse();
         GD.Print("[PASS] Clearing the prerequisite unlocks the next organ map in list, scanner and Deploy.");
 
         menu.QueueFree();

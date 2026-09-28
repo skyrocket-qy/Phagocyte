@@ -2,7 +2,7 @@ using Godot;
 using Godot.Collections;
 using System.Collections.Generic;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Validates cross-references between all data catalogs after loading.
@@ -31,14 +31,14 @@ public static class DataValidator
         {
             var entry = GameManager.SkillCatalog[skillId].AsGodotDictionary();
             string classId = CatalogLoader.GetString(entry, "class_id");
-            if (!string.IsNullOrEmpty(classId) && !GameManager.ClassData.ContainsKey(classId))
+            if (!string.IsNullOrEmpty(classId) && !GameManager.PlayerClassData.ContainsKey(classId))
                 errors.Add($"Skill '{skillId}' references class '{classId}' missing from classes.json.");
         }
 
         // Classes → achievements + scenes.
-        foreach (string classId in GameManager.ClassData.Keys)
+        foreach (string classId in GameManager.PlayerClassData.Keys)
         {
-            var entry = GameManager.ClassData[classId].AsGodotDictionary();
+            var entry = GameManager.PlayerClassData[classId].AsGodotDictionary();
             string ach = CatalogLoader.GetString(entry, "unlock_achievement");
             if (!string.IsNullOrEmpty(ach) && !AchievementManager.Achievements.ContainsKey(ach))
                 errors.Add($"Class '{classId}' references achievement '{ach}' missing from achievements.json.");
@@ -52,13 +52,13 @@ public static class DataValidator
         {
             var entry = AchievementManager.Achievements[achId].AsGodotDictionary();
             string rewardCell = CatalogLoader.GetString(entry, "reward_cell");
-            if (!string.IsNullOrEmpty(rewardCell) && !GameManager.ClassData.ContainsKey(rewardCell))
+            if (!string.IsNullOrEmpty(rewardCell) && !GameManager.PlayerClassData.ContainsKey(rewardCell))
                 errors.Add($"Achievement '{achId}' rewards class '{rewardCell}' missing from classes.json.");
             foreach (string mapKey in new[] { "map_id", "unlock_map", "unlock_hard_map" })
             {
-                string mapId = CatalogLoader.GetString(entry, mapKey);
-                if (!string.IsNullOrEmpty(mapId) && !GameManager.MapData.ContainsKey(mapId))
-                    errors.Add($"Achievement '{achId}' references map '{mapId}' ({mapKey}) missing from maps.json.");
+                string stageId = CatalogLoader.GetString(entry, mapKey);
+                if (!string.IsNullOrEmpty(stageId) && !GameManager.StageData.ContainsKey(stageId))
+                    errors.Add($"Achievement '{achId}' references map '{stageId}' ({mapKey}) missing from maps.json.");
             }
         }
 
@@ -100,17 +100,17 @@ public static class DataValidator
     }
 
     /// <summary>
-    /// Gear art lands in Phase 3 — a missing icon is a warning, not an
+    /// Equipment art lands in Phase 3 — a missing icon is a warning, not an
     /// error: the runtime legally falls back to <see cref="AssetPaths.PlaceholderIcon"/>.
     /// </summary>
     private static void WarnMissingGearArt()
     {
-        foreach (string id in GameManager.GearCatalog.Keys)
+        foreach (string id in GameManager.EquipmentCatalog.Keys)
         {
-            var entry = GameManager.GearCatalog[id].AsGodotDictionary();
+            var entry = GameManager.EquipmentCatalog[id].AsGodotDictionary();
             string imagePath = CatalogLoader.GetString(entry, "image_path");
             if (!string.IsNullOrEmpty(imagePath) && !AssetLoader.Exists(imagePath))
-                GD.PushWarning($"[Catalog] Gear '{id}' art '{imagePath}' is missing (PlaceholderIcon fallback; Phase 3).");
+                GD.PushWarning($"[Catalog] Equipment '{id}' art '{imagePath}' is missing (PlaceholderIcon fallback; Phase 3).");
         }
     }
 
@@ -123,11 +123,11 @@ public static class DataValidator
 
         var missing = new HashSet<string>();
         CheckKeys(GameManager.SkillCatalog, missing, known, "skill");
-        CheckKeys(GameManager.GearCatalog, missing, known, "gear");
-        CheckKeys(GameManager.PathogenCatalog, missing, known, "pathogen");
+        CheckKeys(GameManager.EquipmentCatalog, missing, known, "gear");
+        CheckKeys(GameManager.EnemyCatalog, missing, known, "pathogen");
         CheckKeys(GameManager.BossCatalog, missing, known, "boss");
-        CheckKeys(GameManager.MapData, missing, known, "map");
-        CheckKeys(GameManager.ClassData, missing, known, "class");
+        CheckKeys(GameManager.StageData, missing, known, "map");
+        CheckKeys(GameManager.PlayerClassData, missing, known, "class");
         CheckKeys(AchievementManager.Achievements, missing, known, "achievement");
         foreach (var trait in PassiveTreeManager.Traits.Values)
         {

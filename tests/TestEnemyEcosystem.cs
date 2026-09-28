@@ -1,20 +1,21 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Enemies;
+using Game.Core;
+using Game.Combat;
+using Game.Player;
+using Game.Enemies;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 public partial class TestEnemyEcosystem : SceneTree
 {
     private int _framesWaited = 0;
     private bool _testDone = false;
 
-    private static readonly string[] AllPathogenIds = new[]
+    private static readonly string[] AllenemyIds = new[]
     {
         "staph", "s_virus", "flu_drift", "malignant_cell", "pseudomonas",
         "e_coli", "tb", "tetanus", "h_pylori", "anthrax_spore",
@@ -60,26 +61,26 @@ public partial class TestEnemyEcosystem : SceneTree
     private void RunAllTests()
     {
         // -------------------------------------------------------------
-        // TEST 1: Instantiation & Base Properties of All 20 Pathogens
+        // TEST 1: Instantiation & Base Properties of All 20 Enemies
         // -------------------------------------------------------------
         var testContainer = new Node2D { Name = "TestContainer" };
         Root.AddChild(testContainer);
 
-        var instantiatedEnemies = new List<BaseEnemy>();
-        foreach (var id in AllPathogenIds)
+        var instantiatedEnemies = new List<EnemyActor>();
+        foreach (var id in AllenemyIds)
         {
-            var enemy = PathogenSpawner.CreatePathogen(id);
+            var enemy = EnemySpawner.CreateEnemy(id);
             AssertThat(enemy).IsNotNull();
-            AssertThat(enemy is BaseEnemy).IsTrue();
+            AssertThat(enemy is EnemyActor).IsTrue();
             AssertThat(enemy!.EnemyId).IsEqual(id);
             AssertThat(enemy.MaxHealth > 0.0f).IsTrue();
-            AssertThat(enemy.AtpValue > 0.0f).IsTrue();
+            AssertThat(enemy.XpValue > 0.0f).IsTrue();
 
             testContainer.AddChild(enemy);
             instantiatedEnemies.Add(enemy);
         }
         AssertThat(instantiatedEnemies.Count).IsEqual(20);
-        GD.Print("[PASS] Test 1: All 20 biological pathogens successfully instantiated with BaseEnemy inheritance.");
+        GD.Print("[PASS] Test 1: All 20 biological pathogens successfully instantiated with EnemyActor inheritance.");
 
         // -------------------------------------------------------------
         // TEST 2: Procedural _Draw execution without exceptions
@@ -93,18 +94,19 @@ public partial class TestEnemyEcosystem : SceneTree
         // -------------------------------------------------------------
         // TEST 3: Staph Fibrin Armor Shield
         // -------------------------------------------------------------
-        var playerScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
-        var player = playerScene.Instantiate<BaseCell>();
+        var playerScene = AssetLoader.Load<PackedScene>("res://scenes/actors/player_base.tscn");
+        var player = playerScene.Instantiate<PlayerActor>();
         testContainer.AddChild(player);
 
-        var staph = new StaphEnemy { FibrinShield = 1 };
+        var staph = EnemySpawner.CreateEnemy("staph")!;
+        staph.ShieldCharges = 1;
         testContainer.AddChild(staph);
-        AssertThat(staph.FibrinShield).IsEqual(1);
+        AssertThat(staph.ShieldCharges).IsEqual(1);
 
         // First hit breaks the shield, health untouched
         float staphHp = staph.CurrentHealth;
         staph.TakeDamage(10.0f);
-        AssertThat(staph.FibrinShield).IsEqual(0);
+        AssertThat(staph.ShieldCharges).IsEqual(0);
         AssertThat(staph.CurrentHealth).IsEqual(staphHp);
 
         // Second hit lands: unarmored coccus takes full damage
@@ -115,7 +117,7 @@ public partial class TestEnemyEcosystem : SceneTree
         // -------------------------------------------------------------
         // TEST 4: E. coli Charge & Stagger
         // -------------------------------------------------------------
-        var ecoli = new EColiEnemy();
+        var ecoli = EnemySpawner.CreateEnemy("e_coli")!;
         testContainer.AddChild(ecoli);
         ecoli.TakeDamage(5.0f);
         AssertThat(ecoli.CurrentHealth).IsEqual(23.0f);
@@ -124,15 +126,16 @@ public partial class TestEnemyEcosystem : SceneTree
         // -------------------------------------------------------------
         // TEST 5: Pseudomonas Biofilm Secretion
         // -------------------------------------------------------------
-        var pseudo = new PseudomonasEnemy { GlobalPosition = new Vector2(100, 100) };
+        var pseudo = EnemySpawner.CreateEnemy("pseudomonas")!;
+        pseudo.GlobalPosition = new Vector2(100, 100);
         testContainer.AddChild(pseudo);
         pseudo.Die(player);
 
-        // Find spawned BiofilmArea
-        BiofilmArea? biofilm = null;
+        // Find spawned hazard zone from the death drop
+        HazardZone? biofilm = null;
         foreach (var child in testContainer.GetChildren())
         {
-            if (child is BiofilmArea ba)
+            if (child is HazardZone ba)
             {
                 biofilm = ba;
                 break;
@@ -147,7 +150,7 @@ public partial class TestEnemyEcosystem : SceneTree
         // -------------------------------------------------------------
         // TEST 6: TB Mycolic Wax Armor
         // -------------------------------------------------------------
-        var tb = new TbEnemy();
+        var tb = EnemySpawner.CreateEnemy("tb")!;
         testContainer.AddChild(tb);
         tb.TakeDamage(10.0f);
         AssertThat(tb.CurrentHealth).IsEqual(35.0f - Mathf.Max(1.0f, 10.0f - tb.Armor));
@@ -163,14 +166,15 @@ public partial class TestEnemyEcosystem : SceneTree
         // -------------------------------------------------------------
         // TEST 8: Anthrax Spore Two-Stage Hard Shell
         // -------------------------------------------------------------
-        var anthrax = new AnthraxSporeEnemy { GlobalPosition = new Vector2(200, 200) };
+        var anthrax = EnemySpawner.CreateEnemy("anthrax_spore")!;
+        anthrax.GlobalPosition = new Vector2(200, 200);
         testContainer.AddChild(anthrax);
         anthrax.Die(player);
 
-        AnthraxBacillus? bacillus = null;
+        EnemyActor? bacillus = null;
         foreach (var child in testContainer.GetChildren())
         {
-            if (child is AnthraxBacillus ab)
+            if (child is EnemyActor ab && ab.EnemyId == "anthrax_bacillus")
             {
                 bacillus = ab;
                 break;
@@ -182,18 +186,19 @@ public partial class TestEnemyEcosystem : SceneTree
         // -------------------------------------------------------------
         // TEST 9: Candida Yeast-to-Hyphae Puncture Elite
         // -------------------------------------------------------------
-        var candida = new CandidaEnemy();
+        var candida = EnemySpawner.CreateEnemy("candida")!;
+        candida.GlobalPosition = player.GlobalPosition;
         testContainer.AddChild(candida);
-        candida.ExtendHyphae();
-        AssertThat(candida.IsHyphaeExtended).IsTrue();
-        candida.RetractHyphae();
-        AssertThat(candida.IsHyphaeExtended).IsFalse();
+        candida._PhysicsProcess(0.016);
+        AssertThat(candida.VariantActive).IsTrue();
+        candida._PhysicsProcess(1.7);
+        AssertThat(candida.VariantActive).IsFalse();
         GD.Print("[PASS] Test 9: Candida albicans hyphae sprouting & retraction verified.");
 
         // -------------------------------------------------------------
         // TEST 10: Prion Amyloid Aggregation Boss
         // -------------------------------------------------------------
-        var prion = new PrionEnemy();
+        var prion = EnemySpawner.CreateEnemy("prion")!;
         testContainer.AddChild(prion);
         AssertThat(prion.IsBoss).IsTrue();
 
@@ -202,42 +207,46 @@ public partial class TestEnemyEcosystem : SceneTree
         int fragCount = 0;
         foreach (var child in testContainer.GetChildren())
         {
-            if (child is PrionFragment)
+            if (child is EnemyActor frag && frag.EnemyId == "prion_fragment")
                 fragCount++;
         }
         AssertThat(fragCount >= 2).IsTrue();
         GD.Print("[PASS] Test 10: Prion Aggregate protease resistance & amyloid fragment splitting verified.");
 
         // -------------------------------------------------------------
-        // TEST 11: GameManager.PathogenCatalog 20 Entries & Localization
+        // TEST 11: GameManager.EnemyCatalog 20 Entries & Localization
         // -------------------------------------------------------------
-        AssertThat(GameManager.PathogenCatalog.Count).IsEqual(20);
-        foreach (var id in AllPathogenIds)
+        AssertThat(GameManager.EnemyCatalog.Count).IsEqual(20);
+        foreach (var id in AllenemyIds)
         {
-            AssertThat(GameManager.PathogenCatalog.ContainsKey(id)).IsTrue();
-            var info = GameManager.GetPathogenInfo(id);
+            AssertThat(GameManager.EnemyCatalog.ContainsKey(id)).IsTrue();
+            var info = GameManager.GetEnemyInfo(id);
             AssertThat(info["name"].AsString().Length > 0).IsTrue();
             AssertThat(info["description"].AsString().Length > 0).IsTrue();
             AssertThat(info["trait"].AsString().Length > 0).IsTrue();
             AssertThat(info["icon"].AsString().Length > 0).IsTrue();
         }
-        GD.Print("[PASS] Test 11: GameManager.PathogenCatalog has 20 complete, fully-localized biological entries.");
+        GD.Print("[PASS] Test 11: GameManager.EnemyCatalog has 20 complete, fully-localized biological entries.");
 
         // -------------------------------------------------------------
-        // TEST 12: PathogenSpawner Wave Director Progression
+        // TEST 12: EnemySpawner Wave Director Progression
         // -------------------------------------------------------------
         var spawnerContainer = new Node2D();
         testContainer.AddChild(spawnerContainer);
 
         // Phase 1 (10s)
-        PathogenSpawner.SpawnWave(spawnerContainer, player, new Vector2(4800, 4800), 10.0f, 2);
+        EnemySpawner.SpawnWave(spawnerContainer, player, new Vector2(4800, 4800), 10.0f, 2);
         AssertThat(spawnerContainer.GetChildCount() > 0).IsTrue();
 
         // Phase 2 (200s - local inflammation escalation)
-        PathogenSpawner.SpawnWave(spawnerContainer, player, new Vector2(4800, 4800), 200.0f, 1);
+        EnemySpawner.SpawnWave(spawnerContainer, player, new Vector2(4800, 4800), 200.0f, 1);
         AssertThat(spawnerContainer.GetChildCount() > 1).IsTrue();
-        GD.Print("[PASS] Test 12: PathogenSpawner wave director multi-phase biological escalation verified.");
+        GD.Print("[PASS] Test 12: EnemySpawner wave director multi-phase biological escalation verified.");
 
         testContainer.QueueFree();
     }
 }
+
+
+
+

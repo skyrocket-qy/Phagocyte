@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using Dictionary = Godot.Collections.Dictionary;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Persists per-run settlement records (victory / defeat) and exposes
@@ -60,7 +60,7 @@ public partial class RunRecordManager : Node
     public const int ClearBonus = 10000;
     public const float HardDifficultyMultiplier = 1.5f;
 
-    /// <summary>Kill flux: pathogens killed per minute of survival.</summary>
+    /// <summary>Kill flux: enemies killed per minute of survival.</summary>
     public static float ComputeKpm(int kills, float survivalTime)
     {
         if (survivalTime <= 0.01f)
@@ -135,7 +135,7 @@ public partial class RunRecordManager : Node
 
     /// <summary>
     /// Canonical victory criteria (docs/record.md): survive to 15:00 AND
-    /// successfully neutralize the terminal primary pathogen boss.
+    /// successfully neutralize the terminal primary enemy boss.
     /// </summary>
     public static bool IsVictoryCriteriaMet(float survivalTime, bool bossNeutralized)
     {
@@ -143,7 +143,7 @@ public partial class RunRecordManager : Node
     }
 
     /// <summary>
-    /// Single settlement decision shared by the run lifecycle (Main.EndRun) and
+    /// Single settlement decision shared by the run lifecycle (GameRoot.EndRun) and
     /// the record store (RecordRun): endless overdrive runs can only settle as
     /// defeat, and standard victories must meet the canonical criteria.
     /// </summary>
@@ -174,7 +174,7 @@ public partial class RunRecordManager : Node
     public static Dictionary RecordRun(
         string result,
         string classId,
-        string mapId,
+        string stageId,
         float survivalTime,
         int level,
         int pointsSpent,
@@ -218,7 +218,7 @@ public partial class RunRecordManager : Node
 
         if (result == ResultVictory && !criteriaMet)
         {
-            GD.PushWarning($"[RunRecord] Rejected invalid victory on '{mapId}' " +
+            GD.PushWarning($"[RunRecord] Rejected invalid victory on '{stageId}' " +
                            $"(survival={survivalTime:F1}s, boss_neutralized={bossNeutralized}); recording as defeat.");
             result = ResultDefeat;
         }
@@ -240,7 +240,7 @@ public partial class RunRecordManager : Node
             { "result", result },
             { "cause", cause },
             { "class_id", classId },
-            { "map_id", mapId },
+            { "map_id", stageId },
             { "difficulty", difficulty },
             { "endless", endless },
             { "afflictions", afflictionList },

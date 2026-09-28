@@ -3,14 +3,14 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
 using System.Collections.Generic;
-using Phagocyte.Core;
-using Phagocyte.Camera;
-using Phagocyte.Hero;
-using Phagocyte.UI;
-using Phagocyte.Combat;
-using Phagocyte.Enemies;
+using Game.Core;
+using Game.Camera;
+using Game.Player;
+using Game.UI;
+using Game.Combat;
+using Game.Enemies;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 [TestSuite]
 public partial class TestNewSystemsBundle : SceneTree
@@ -119,9 +119,9 @@ public partial class TestNewSystemsBundle : SceneTree
         GD.Print("[PASS] Step 2: RunTelemetryManager DPS ranking, defense proc logging and serialization verified.");
         tele.QueueFree();
 
-        // --- 3. BioHazardArea & BiofilmArea Verification ---
-        var player = new BaseCell { GlobalPosition = new Vector2(50, 50) };
-        var pStats = new CellStats { Name = "CellStats" };
+        // --- 3. HazardZone & BiofilmArea Verification ---
+        var player = new PlayerActor { GlobalPosition = new Vector2(50, 50) };
+        var pStats = new ActorStats { Name = "ActorStats" };
         player.AddChild(pStats);
         player.Stats = pStats;
         player.AddToGroup("player");
@@ -129,7 +129,7 @@ public partial class TestNewSystemsBundle : SceneTree
 
         float hpBeforeHazard = player.Health;
 
-        var hazard = new BioHazardArea
+        var hazard = new HazardZone
         {
             GlobalPosition = new Vector2(50, 50),
             Radius = 80.0f,
@@ -145,7 +145,7 @@ public partial class TestNewSystemsBundle : SceneTree
 
         AssertThat(player.Health).IsLess(hpBeforeHazard);
         AssertThat(player.SlowTimer).IsGreater(0.0f);
-        GD.Print("[PASS] Step 3: BioHazardArea periodic tick damage and biological slow application verified.");
+        GD.Print("[PASS] Step 3: HazardZone periodic tick damage and biological slow application verified.");
 
         hazard.QueueFree();
         player.QueueFree();

@@ -1,13 +1,13 @@
-﻿using Godot;
+using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
-using Phagocyte.UI;
+using Game.Core;
+using Game.Player;
+using Game.Skills;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 [TestSuite]
 public partial class TestStatAndSkills : TestHarness
@@ -32,8 +32,8 @@ public partial class TestStatAndSkills : TestHarness
         AssertThat(s.GetValue()).IsEqualApprox(20.0f, 0.001f);
         GD.Print("[PASS] Test 1: Stat math calculation (base + flat) * (1 + pct) verified.");
 
-        // --- Test 2: CellStats 18 universal stats & caps ---
-        var cs = new CellStats();
+        // --- Test 2: ActorStats 18 universal stats & caps ---
+        var cs = new ActorStats();
         AssertThat(cs.GetStat("might")).IsEqual(1.0f);
         AssertThat(cs.GetStat("area")).IsEqual(1.0f);
         AssertThat(cs.GetStat("cooldown_reduction")).IsEqual(0.0f);
@@ -63,15 +63,15 @@ public partial class TestStatAndSkills : TestHarness
         // Test Armor percentage formula
         cs.AddModifier("armor", 50.0f, 0.0f);
         AssertThat(cs.GetDamageReductionRatio()).IsEqualApprox(0.50f, 0.001f);
-        GD.Print("[PASS] Test 2: CellStats 18 universal stats, clamps (CDR, evasion, block, life steal) & armor formula verified.");
+        GD.Print("[PASS] Test 2: ActorStats 18 universal stats, clamps (CDR, evasion, block, life steal) & armor formula verified.");
 
         // --- Test 3: SkillManager 5 Active + 5 Passive Routing ---
         var sm = new SkillManager();
         AssertThat(sm.ActiveSlots.Count).IsEqual(5);
         AssertThat(sm.PassiveSlots.Count).IsEqual(5);
 
-        var ros = new RosTorrentSkill();
-        var actin = new PassiveActinPolymerization();
+        var ros = SkillFactory.CreateActive("ros_torrent")!;
+        var actin = SkillFactory.CreatePassive("actin")!;
 
         bool eqActive = sm.EquipSkill(ros);
         AssertThat(eqActive).IsTrue();
@@ -89,7 +89,7 @@ public partial class TestStatAndSkills : TestHarness
 
         // --- Test 4: Passive Skill Universal Stat Injection & Upgrade ---
         var mockHost = new CharacterBody2D();
-        var mockStats = new CellStats { Name = "CellStats" };
+        var mockStats = new ActorStats { Name = "ActorStats" };
         mockHost.AddChild(mockStats);
 
         var mockSm = new SkillManager();
@@ -99,7 +99,7 @@ public partial class TestStatAndSkills : TestHarness
         AssertThat(mockStats.GetStat("area")).IsEqualApprox(1.0f, 0.001f);
         AssertThat(mockStats.GetStat("move_speed")).IsEqualApprox(230.0f, 0.001f);
 
-        var passiveItem = new PassiveActinPolymerization();
+        var passiveItem = SkillFactory.CreatePassive("actin")!;
         mockSm.EquipPassive(passiveItem, 0);
 
         // Level 1 Actin: area +12%, speed +6%
@@ -113,7 +113,7 @@ public partial class TestStatAndSkills : TestHarness
         AssertThat(mockStats.GetStat("move_speed")).IsEqualApprox(230.0f * 1.12f, 0.01f);
 
         // Equip Lysosome: might +10%, health_regen +0.6
-        var lyso = new PassiveLysosomePriming();
+        var lyso = SkillFactory.CreatePassive("lysosome")!;
         mockSm.EquipPassive(lyso, 1);
         AssertThat(mockStats.GetStat("might")).IsEqualApprox(1.10f, 0.001f);
         AssertThat(mockStats.GetStat("health_regen")).IsEqualApprox(0.60f, 0.001f);
@@ -121,7 +121,7 @@ public partial class TestStatAndSkills : TestHarness
         GD.Print("[PASS] Test 4: Passive traits universal stat injection, leveling and stacking verified.");
 
         // --- Test 5: Active Skill Stat Consumption ---
-        var activeWeapon = new RosTorrentSkill();
+        var activeWeapon = SkillFactory.CreateActive("ros_torrent")!;
         mockSm.EquipActive(activeWeapon, 0);
 
         // Cooldown with 0% CDR
@@ -164,10 +164,10 @@ public partial class TestStatAndSkills : TestHarness
             return false;
 
         _testDone = true;
-        var main = Root.GetNodeOrNull<Main>("Main");
+        var main = Root.GetNodeOrNull<GameRoot>("GameRoot");
         AssertThat(main).IsNotNull();
 
-        var player = main!.GetNodeOrNull<Macrophage>("Macrophage");
+        var player = main!.GetNodeOrNull<PlayerActor>("Player");
         AssertThat(player).IsNotNull();
         AssertThat(player!.Stats).IsNotNull();
 
@@ -177,17 +177,17 @@ public partial class TestStatAndSkills : TestHarness
         AssertThat(sm.PassiveSlots.Count).IsEqual(5);
 
         // Macrophage innate 吞噬偽足 occupies active slot 0; passive slots start empty
-        AssertThat(sm.GetActiveSlot(0) is PhagocyticGraspSkill).IsTrue();
+        AssertThat(sm.GetActiveSlot(0) is StrikeSkill).IsTrue();
         AssertThat(sm.GetPassiveSlot(0)).IsNull();
 
-        // Verify Macrophage movement speed bound to CellStats
+        // Verify Macrophage movement speed bound to ActorStats
         AssertThat(player.CurrentSpeed).IsEqual(player.Stats!.GetStat("move_speed"));
 
         // Verify HUD exists
         var hud = main.GetNodeOrNull<Hud>("HUD");
         AssertThat(hud).IsNotNull();
 
-        GD.Print("[PASS] Test 6: In-game Main scene integration with Macrophage, CellStats & HUD verified.");
+        GD.Print("[PASS] Test 6: In-game GameRoot scene integration with Macrophage, ActorStats & HUD verified.");
         GD.Print("==================================================================");
         GD.Print(">>> ALL UNIVERSAL STAT & 5+5 SKILL TESTS PASSED SUCCESSFULLY! <<<");
         GD.Print("==================================================================");
@@ -195,3 +195,4 @@ public partial class TestStatAndSkills : TestHarness
         return true;
     }
 }
+

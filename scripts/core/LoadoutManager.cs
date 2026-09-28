@@ -3,13 +3,13 @@ using Godot.Collections;
 using System;
 using System.Collections.Generic;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Persistent pre-run gear loadouts (TODO Phase 1). Each cell keeps up to
 /// <see cref="MaxProfiles"/> named builds of four chamber slots. A fresh cell
 /// deploys with <b>no equipment at all</b>: the default profile is four empty
-/// slots. Legality is delegated to <see cref="GearChamber.ValidateSlots"/>
+/// slots. Legality is delegated to <see cref="EquipmentChamber.ValidateSlots"/>
 /// so the page, the apply step and the runtime chamber share one contract.
 /// </summary>
 public static class LoadoutManager
@@ -18,9 +18,9 @@ public static class LoadoutManager
     public const int MaxProfiles = 3;
 
     /// <summary>Chamber slot count (2x2).</summary>
-    public const int SlotCount = GearChamber.MaxSlots;
+    public const int SlotCount = EquipmentChamber.MaxSlots;
 
-    private static readonly JsonStore.SavePathSlot _savePath = new("gear_loadouts.json");
+    private static readonly JsonStore.SavePathSlot _savePath = new("equipment_loadouts.json");
     public static string SavePath
     {
         get => _savePath.Value;
@@ -45,7 +45,7 @@ public static class LoadoutManager
 
     public static bool IsKnownCell(string cellId)
     {
-        return !string.IsNullOrEmpty(cellId) && GameManager.ClassData.ContainsKey(cellId);
+        return !string.IsNullOrEmpty(cellId) && GameManager.PlayerClassData.ContainsKey(cellId);
     }
 
     /// <summary>An all-empty slot row — the default "no equipment" deployment.</summary>
@@ -178,11 +178,11 @@ public static class LoadoutManager
         EnsureLoaded();
         if (!IsKnownCell(cellId))
             return false;
-        if (!GearChamber.ValidateSlots(slots, out _))
+        if (!EquipmentChamber.ValidateSlots(slots, out _))
             return false;
         foreach (string id in slots)
         {
-            if (!string.IsNullOrEmpty(id) && !GearUnlockManager.IsUnlocked(id))
+            if (!string.IsNullOrEmpty(id) && !EquipmentUnlockManager.IsUnlocked(id))
                 return false;
         }
         var list = GetProfileList(cellId);
@@ -293,14 +293,14 @@ public static class LoadoutManager
         for (int i = 0; i < SlotCount && i < raw.Count; i++)
         {
             string id = raw[i].AsString();
-            if (!string.IsNullOrEmpty(id) && GameManager.GearCatalog.ContainsKey(id)
-                && GearUnlockManager.IsUnlocked(id))
+            if (!string.IsNullOrEmpty(id) && GameManager.EquipmentCatalog.ContainsKey(id)
+                && EquipmentUnlockManager.IsUnlocked(id))
             {
                 row[i] = id;
             }
         }
 
-        if (!GearChamber.ValidateSlots(row, out string reason))
+        if (!EquipmentChamber.ValidateSlots(row, out string reason))
         {
             GD.PushWarning($"[Loadout] Illegal saved profile sanitized to empty (reason: {reason}).");
             return EmptySlots();
@@ -316,3 +316,4 @@ public static class LoadoutManager
         ActiveProfiles.Clear();
     }
 }
+

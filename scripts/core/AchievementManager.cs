@@ -2,7 +2,7 @@ using Godot;
 using Godot.Collections;
 using System.Collections.Generic;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Manages game achievements, milestone tracking, persistent unlocks, and class rewards.
@@ -141,7 +141,7 @@ public partial class AchievementManager : Node
     {
         switch (eventName)
         {
-            case "pathogen_killed":
+            case "enemy_killed":
                 // Kill counter drives the digestion-line achievements (re-keyed
                 // to kills) plus the PrPsc amyloid clear.
                 float kills = ProgressData.GetValueOrDefault("kills", 0.0f).AsSingle() + 1.0f;
@@ -211,15 +211,15 @@ public partial class AchievementManager : Node
     /// Reports a cleared organ map run and unlocks the matching difficulty
     /// achievement from the catalog (docs/achievement.md unlock chain).
     /// </summary>
-    public static void RecordMapClear(string mapId, bool hard = false)
+    public static void RecordMapClear(string stageId, bool hard = false)
     {
-        if (string.IsNullOrEmpty(mapId))
+        if (string.IsNullOrEmpty(stageId))
             return;
 
         foreach (string achId in Achievements.Keys)
         {
             var ach = Achievements[achId].AsGodotDictionary();
-            if (ach.GetValueOrDefault("map_id", "").AsString() != mapId)
+            if (ach.GetValueOrDefault("map_id", "").AsString() != stageId)
                 continue;
 
             bool isHardAchievement = ach.GetValueOrDefault("difficulty", "normal").AsString() == "hard";
@@ -256,7 +256,7 @@ public partial class AchievementManager : Node
     }
 
     /// <summary>
-    /// Rebuilds GameManager.MapData lock state from the persisted achievement chain.
+    /// Rebuilds GameManager.StageData lock state from the persisted achievement chain.
     /// Baseline: acute_wound Normal only; everything else must be earned.
     /// </summary>
     private static void SyncMapUnlocks()
@@ -387,12 +387,12 @@ public partial class AchievementManager : Node
     /// Helper: Get unlock condition text for a locked organ map
     /// (the prerequisite achievement that unlocks its Normal variant).
     /// </summary>
-    public static string GetMapUnlockRequirementText(string mapId)
+    public static string GetMapUnlockRequirementText(string stageId)
     {
         foreach (string achId in Achievements.Keys)
         {
             var ach = Achievements[achId].AsGodotDictionary();
-            if (ach.GetValueOrDefault("unlock_map", "").AsString() == mapId)
+            if (ach.GetValueOrDefault("unlock_map", "").AsString() == stageId)
             {
                 string title = TranslationServer.Translate(ach["title_key"].AsString());
                 string desc = TranslationServer.Translate(ach["desc_key"].AsString());
@@ -400,7 +400,7 @@ public partial class AchievementManager : Node
             }
         }
 
-        if (GameManager.IsMapHardUnlocked(mapId))
+        if (GameManager.IsMapHardUnlocked(stageId))
             return TranslationServer.Translate("STATUS_UNLOCKED");
 
         return TranslationServer.Translate("STATUS_LOCKED");
@@ -505,3 +505,4 @@ public partial class AchievementManager : Node
         JsonStore.Delete(SavePath);
     }
 }
+

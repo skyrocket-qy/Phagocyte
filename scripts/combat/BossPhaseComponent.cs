@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace Phagocyte.Combat;
+namespace Game.Combat;
 
 /// <summary>
 /// Configuration data for an encounter phase.

@@ -2,11 +2,11 @@ using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.UI;
+using Game.Core;
+using Game.Enemies;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the dual-track difficulty system (docs/map.md §2 / TODO module 3):
@@ -17,7 +17,7 @@ namespace Phagocyte.Tests;
 public partial class TestDifficultyTracks : TestHarness
 {
     private int _phase = 0;
-    private Main? _main = null;
+    private GameRoot? _main = null;
 
     public override void _Initialize()
     {
@@ -72,37 +72,37 @@ public partial class TestDifficultyTracks : TestHarness
 
     private void RunHardSpawnScalingTests()
     {
-        PathogenSpawner.ConfigureHardMode(false);
-        PathogenSpawner.ConfigureOverdrive(false);
+        EnemySpawner.ConfigureHardMode(false);
+        EnemySpawner.ConfigureOverdrive(false);
 
-        var baseline = PathogenSpawner.CreatePathogen("staph");
+        var baseline = EnemySpawner.CreateEnemy("staph");
         AssertThat(baseline).IsNotNull();
         float baseHp = baseline!.MaxHealth;
         float baseSpeed = baseline.FloatSpeed;
         baseline.Free();
 
         // Hard: +40% health, +20% move speed.
-        PathogenSpawner.ConfigureHardMode(true);
-        var hard = PathogenSpawner.CreatePathogen("staph");
+        EnemySpawner.ConfigureHardMode(true);
+        var hard = EnemySpawner.CreateEnemy("staph");
         AssertThat(hard).IsNotNull();
-        PathogenSpawner.ApplySpawnScaling(hard!, 0.0f);
-        AssertThat(hard!.MaxHealth).IsEqualApprox(baseHp * PathogenSpawner.HardHealthMultiplier, 0.01f);
-        AssertThat(hard.FloatSpeed).IsEqualApprox(baseSpeed * PathogenSpawner.HardSpeedMultiplier, 0.01f);
+        EnemySpawner.ApplySpawnScaling(hard!, 0.0f);
+        AssertThat(hard!.MaxHealth).IsEqualApprox(baseHp * EnemySpawner.HardHealthMultiplier, 0.01f);
+        AssertThat(hard.FloatSpeed).IsEqualApprox(baseSpeed * EnemySpawner.HardSpeedMultiplier, 0.01f);
         hard.Free();
 
         // Hard + endless overdrive stack multiplicatively (18:00 cycle = +120% HP).
-        PathogenSpawner.ConfigureOverdrive(true);
-        var compounded = PathogenSpawner.CreatePathogen("staph");
+        EnemySpawner.ConfigureOverdrive(true);
+        var compounded = EnemySpawner.CreateEnemy("staph");
         AssertThat(compounded).IsNotNull();
-        PathogenSpawner.ApplySpawnScaling(compounded!, 1080.0f);
+        EnemySpawner.ApplySpawnScaling(compounded!, 1080.0f);
         AssertThat(compounded!.MaxHealth).IsEqualApprox(
-            baseHp * PathogenSpawner.HardHealthMultiplier * 2.2f, 0.05f);
+            baseHp * EnemySpawner.HardHealthMultiplier * 2.2f, 0.05f);
         AssertThat(compounded.FloatSpeed).IsEqualApprox(
-            baseSpeed * PathogenSpawner.HardSpeedMultiplier * 1.3f, 0.05f);
+            baseSpeed * EnemySpawner.HardSpeedMultiplier * 1.3f, 0.05f);
         compounded.Free();
 
-        PathogenSpawner.ConfigureHardMode(false);
-        PathogenSpawner.ConfigureOverdrive(false);
+        EnemySpawner.ConfigureHardMode(false);
+        EnemySpawner.ConfigureOverdrive(false);
         GD.Print("[PASS] Hard adds +40% HP / +20% speed and stacks with the endless ladder.");
     }
 
@@ -113,12 +113,12 @@ public partial class TestDifficultyTracks : TestHarness
 
         AssertThat(main.IsHardRun).IsTrue();
         AssertThat(main.RunDifficulty).IsEqual(RunRecordManager.DifficultyHard);
-        AssertThat(PathogenSpawner.HardMode).IsTrue();
-        AssertThat(main.OrganEnvironment).IsNotNull();
-        AssertThat(main.OrganEnvironment!.HardMode).IsTrue();
+        AssertThat(EnemySpawner.HardMode).IsTrue();
+        AssertThat(main.Stage).IsNotNull();
+        AssertThat(main.Stage!.HardMode).IsTrue();
 
         // Environment hazards run on the +50% frequency timer under Hard.
-        var wound = (Phagocyte.Map.AcuteWoundEnvironment)main.OrganEnvironment;
+        var wound = main.Stage!;
         AssertThat(wound.HardMode).IsTrue();
 
         // A Hard clear settles as a Hard record, unlocks its Hard achievement and
@@ -138,7 +138,7 @@ public partial class TestDifficultyTracks : TestHarness
         GD.Print("[PASS] Hard runs flag the spawner, the environment and settle as a Hard record with rewards.");
         CleanupMain();
         GameManager.SelectedDifficulty = RunRecordManager.DifficultyNormal;
-        PathogenSpawner.ConfigureHardMode(false);
+        EnemySpawner.ConfigureHardMode(false);
     }
 
     private void RunDifficultyToggleTests()
@@ -196,3 +196,4 @@ public partial class TestDifficultyTracks : TestHarness
         RestoreSaves();
     }
 }
+

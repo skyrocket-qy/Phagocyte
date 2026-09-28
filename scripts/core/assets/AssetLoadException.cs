@@ -1,6 +1,6 @@
 using System;
 
-namespace Phagocyte.Core;
+namespace Game.Core;
 
 /// <summary>
 /// Thrown when a required runtime asset is missing or fails to load.

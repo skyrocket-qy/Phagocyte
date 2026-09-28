@@ -1,10 +1,10 @@
 using Godot;
-using Phagocyte.Enemies;
+using Game.Enemies;
 
-namespace Phagocyte.Combat;
+namespace Game.Combat;
 
 /// <summary>
-/// Shared pathogen targeting queries for skills, projectiles and hazards.
+/// Shared enemy targeting queries for skills, projectiles and hazards.
 /// Iterates the active-enemy registry instead of issuing a scene-tree group
 /// query, so call sites do not repeat the filter boilerplate.
 /// </summary>
@@ -17,14 +17,14 @@ public static class TargetingService
     }
 
     /// <summary>
-    /// True when the node is a valid, living pathogen that accepts damage.
+    /// True when the node is a valid, living enemy that accepts damage.
     /// Used by gear that scan for contact targets.
     /// </summary>
     public static bool IsAttackable(Node? node)
     {
         if (node is not Node2D n || !GodotObject.IsInstanceValid(n))
             return false;
-        if (n is BaseEnemy enemy && enemy.CurrentHealth <= 0.0f)
+        if (n is EnemyActor enemy && enemy.CurrentHealth <= 0.0f)
             return false;
         if (n is IDamageable)
             return true;
@@ -32,17 +32,17 @@ public static class TargetingService
     }
 
     /// <summary>
-    /// Nearest pathogen within <paramref name="maxRange"/> of
+    /// Nearest enemy within <paramref name="maxRange"/> of
     /// <paramref name="origin"/>, or null when none is in range.
     /// </summary>
-    public static BaseEnemy? FindNearest(
+    public static EnemyActor? FindNearest(
         Node2D origin,
         float maxRange,
-        System.Func<BaseEnemy, bool>? predicate = null)
+        System.Func<EnemyActor, bool>? predicate = null)
     {
-        BaseEnemy? best = null;
+        EnemyActor? best = null;
         float bestSq = maxRange * maxRange;
-        foreach (var enemy in BaseEnemy.ActiveEnemies)
+        foreach (var enemy in EnemyActor.ActiveEnemies)
         {
             if (!IsValidTarget(enemy))
                 continue;
@@ -60,7 +60,7 @@ public static class TargetingService
         return best;
     }
 
-    /// <summary>Direction from origin to the nearest pathogen, or fallback when none.</summary>
+    /// <summary>Direction from origin to the nearest enemy, or fallback when none.</summary>
     public static Vector2 FindTargetDirection(Node2D origin, float maxRange, Vector2 fallbackDir)
     {
         var nearest = FindNearest(origin, maxRange);
@@ -71,17 +71,17 @@ public static class TargetingService
     }
 
     /// <summary>
-    /// Appends every pathogen within <paramref name="radius"/> of
+    /// Appends every enemy within <paramref name="radius"/> of
     /// <paramref name="center"/> into <paramref name="results"/> and returns the count.
     /// </summary>
     public static int CollectInRadius(
         Vector2 center,
         float radius,
-        System.Collections.Generic.List<BaseEnemy> results)
+        System.Collections.Generic.List<EnemyActor> results)
     {
         int added = 0;
         float radiusSq = radius * radius;
-        foreach (var enemy in BaseEnemy.ActiveEnemies)
+        foreach (var enemy in EnemyActor.ActiveEnemies)
         {
             if (!IsValidTarget(enemy))
                 continue;
@@ -97,16 +97,16 @@ public static class TargetingService
     }
 
     /// <summary>
-    /// Invokes <paramref name="action"/> for every pathogen within
+    /// Invokes <paramref name="action"/> for every enemy within
     /// <paramref name="radius"/> of <paramref name="center"/>.
     /// </summary>
     public static void ForEachInRadius(
         Vector2 center,
         float radius,
-        System.Action<BaseEnemy> action)
+        System.Action<EnemyActor> action)
     {
         float radiusSq = radius * radius;
-        foreach (var enemy in BaseEnemy.ActiveEnemies)
+        foreach (var enemy in EnemyActor.ActiveEnemies)
         {
             if (!IsValidTarget(enemy))
                 continue;
@@ -117,13 +117,13 @@ public static class TargetingService
     }
 
     /// <summary>
-    /// True when at least one pathogen lies within <paramref name="radius"/> of
+    /// True when at least one enemy lies within <paramref name="radius"/> of
     /// <paramref name="center"/>.
     /// </summary>
     public static bool AnyInRadius(Vector2 center, float radius)
     {
         float radiusSq = radius * radius;
-        foreach (var enemy in BaseEnemy.ActiveEnemies)
+        foreach (var enemy in EnemyActor.ActiveEnemies)
         {
             if (!IsValidTarget(enemy))
                 continue;
@@ -136,17 +136,17 @@ public static class TargetingService
     }
 
     /// <summary>
-    /// Counts pathogens within <paramref name="radius"/> of <paramref name="center"/>,
+    /// Counts enemies within <paramref name="radius"/> of <paramref name="center"/>,
     /// optionally restricted by <paramref name="predicate"/>.
     /// </summary>
     public static int CountInRadius(
         Vector2 center,
         float radius,
-        System.Func<BaseEnemy, bool>? predicate = null)
+        System.Func<EnemyActor, bool>? predicate = null)
     {
         int count = 0;
         float radiusSq = radius * radius;
-        foreach (var enemy in BaseEnemy.ActiveEnemies)
+        foreach (var enemy in EnemyActor.ActiveEnemies)
         {
             if (!IsValidTarget(enemy))
                 continue;

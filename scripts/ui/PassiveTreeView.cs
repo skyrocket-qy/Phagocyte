@@ -1,8 +1,8 @@
 using Godot;
 using System.Collections.Generic;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Confocal-fluorescence grid board for the shared passive tree.

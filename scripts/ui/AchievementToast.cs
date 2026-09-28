@@ -1,8 +1,8 @@
 using Godot;
 using System;
-using Phagocyte.Core;
+using Game.Core;
 
-namespace Phagocyte.UI;
+namespace Game.UI;
 
 /// <summary>
 /// Real-time HUD banner celebrating achievement and immune cell archetype unlocks.

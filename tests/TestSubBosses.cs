@@ -2,10 +2,11 @@ using Godot;
 using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
+using Game.Enemies;
+using Game.Combat;
+using Game.Player;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 /// <summary>
 /// Verifies the five 09:00 map sub-bosses and their signature mechanics.
@@ -16,7 +17,7 @@ public partial class TestSubBosses : SceneTree
     private int _frame = 0;
     private bool _done = false;
     private Node2D? _container;
-    private BaseCell? _player;
+    private PlayerActor? _player;
 
     public override bool _Process(double delta)
     {
@@ -50,7 +51,7 @@ public partial class TestSubBosses : SceneTree
     {
         _container = new Node2D { Name = "SubBossTestContainer" };
         Root.AddChild(_container);
-        _player = new BaseCell { Name = "SubBossHost", GlobalPosition = new Vector2(400, 400) };
+        _player = new PlayerActor { Name = "SubBossHost", GlobalPosition = new Vector2(400, 400) };
         _container.AddChild(_player);
 
         TestMapMapping();
@@ -65,13 +66,13 @@ public partial class TestSubBosses : SceneTree
 
     private void TestMapMapping()
     {
-        AssertThat(PathogenSpawner.CreateSubBoss("acute_wound") is StreptococcusChainLord).IsTrue();
-        AssertThat(PathogenSpawner.CreateSubBoss("alveolar_space") is FluDriftCyclone).IsTrue();
-        AssertThat(PathogenSpawner.CreateSubBoss("hepatic_sinusoid") is TbGranulomaBehemoth).IsTrue();
-        AssertThat(PathogenSpawner.CreateSubBoss("gastric_lumen") is VacASecretor).IsTrue();
-        AssertThat(PathogenSpawner.CreateSubBoss("blood_brain_barrier") is ToxoplasmaMegaCyst).IsTrue();
+        AssertThat(EnemySpawner.CreateSubBoss("acute_wound")!.EnemyId).IsEqual("streptococcus_chain_lord");
+        AssertThat(EnemySpawner.CreateSubBoss("alveolar_space")!.EnemyId).IsEqual("flu_drift_cyclone");
+        AssertThat(EnemySpawner.CreateSubBoss("hepatic_sinusoid")!.EnemyId).IsEqual("tb_granuloma_behemoth");
+        AssertThat(EnemySpawner.CreateSubBoss("gastric_lumen")!.EnemyId).IsEqual("vaca_secretor");
+        AssertThat(EnemySpawner.CreateSubBoss("blood_brain_barrier")!.EnemyId).IsEqual("toxoplasma_mega_cyst");
 
-        var spawned = PathogenSpawner.SpawnSubBoss(_container!, _player!, new Vector2(4800, 4800), "acute_wound");
+        var spawned = EnemySpawner.SpawnSubBoss(_container!, _player!, new Vector2(4800, 4800), "acute_wound");
         AssertThat(spawned).IsNotNull();
         AssertThat(spawned!.IsBoss).IsTrue();
         AssertThat(spawned.GetNodeOrNull("BossPhaseComponent")).IsNotNull();
@@ -82,7 +83,8 @@ public partial class TestSubBosses : SceneTree
 
     private void TestChainLord()
     {
-        var lord = new StreptococcusChainLord { GlobalPosition = _player!.GlobalPosition + new Vector2(90, 0) };
+        var lord = EnemySpawner.CreateEnemy("streptococcus_chain_lord")!;
+        lord.GlobalPosition = _player!.GlobalPosition + new Vector2(90, 0);
         _container!.AddChild(lord);
 
         float healthBefore = _player.Health;
@@ -98,21 +100,23 @@ public partial class TestSubBosses : SceneTree
 
     private void TestFluDriftCyclone()
     {
-        var cyclone = new FluDriftCyclone { GlobalPosition = new Vector2(1000, 1000) };
+        var cyclone = EnemySpawner.CreateEnemy("flu_drift_cyclone")!;
+        cyclone.GlobalPosition = new Vector2(1000, 1000);
         _container!.AddChild(cyclone);
 
-        var marked = new StaphEnemy { GlobalPosition = new Vector2(1050, 1000) };
+        var marked = EnemySpawner.CreateEnemy("staph")!;
+        marked.GlobalPosition = new Vector2(1050, 1000);
         _container.AddChild(marked);
         marked.SetMeta("mhc_marked", true);
 
-        cyclone.TriggerAntigenicDrift();
+        cyclone._PhysicsProcess(30.1);
 
         AssertThat(marked.HasMeta("mhc_marked")).IsFalse();
 
         bool waveFound = false;
         foreach (var child in _container.GetChildren())
         {
-            if (child is DriftWave)
+            if (child is Game.Combat.ShockRing)
             {
                 waveFound = true;
                 break;
@@ -126,15 +130,16 @@ public partial class TestSubBosses : SceneTree
 
     private void TestTbGranuloma()
     {
-        var behemoth = new TbGranulomaBehemoth { GlobalPosition = new Vector2(1600, 1600) };
+        var behemoth = EnemySpawner.CreateEnemy("tb_granuloma_behemoth")!;
+        behemoth.GlobalPosition = new Vector2(1600, 1600);
         _container!.AddChild(behemoth);
 
         behemoth.TakeDamage(9999999.0f);
 
-        CaseousNecrosis? debris = null;
+        BlockerObstacle? debris = null;
         foreach (var child in _container.GetChildren())
         {
-            if (child is CaseousNecrosis found)
+            if (child is BlockerObstacle found)
             {
                 debris = found;
                 break;
@@ -150,16 +155,17 @@ public partial class TestSubBosses : SceneTree
 
     private void TestVacASecretor()
     {
-        var secretor = new VacASecretor { GlobalPosition = new Vector2(2200, 2200) };
+        var secretor = EnemySpawner.CreateEnemy("vaca_secretor")!;
+        secretor.GlobalPosition = new Vector2(2200, 2200);
         _container!.AddChild(secretor);
 
-        VacAAcidPool? pool = null;
+        HazardZone? pool = null;
         for (int i = 0; i < 220 && pool == null; i++)
         {
             secretor._PhysicsProcess(1.0 / 60.0);
             foreach (var child in _container.GetChildren())
             {
-                if (child is VacAAcidPool found)
+                if (child is HazardZone found && found.GrowRate > 0.0f)
                 {
                     pool = found;
                     break;
@@ -168,16 +174,17 @@ public partial class TestSubBosses : SceneTree
         }
 
         AssertThat(pool).IsNotNull();
-        float radiusBefore = pool!.Radius;
+        float radiusBefore = pool!.CurrentRadius;
         pool._PhysicsProcess(1.0);
-        AssertThat(pool.Radius).IsGreater(radiusBefore);
+        AssertThat(pool.CurrentRadius).IsGreater(radiusBefore);
         GD.Print("[PASS] VacA Secretor trailed an expanding acid mucus pool.");
         secretor.QueueFree();
     }
 
     private void TestToxoplasmaMegaCyst()
     {
-        var cyst = new ToxoplasmaMegaCyst { GlobalPosition = new Vector2(3000, 3000) };
+        var cyst = EnemySpawner.CreateEnemy("toxoplasma_mega_cyst")!;
+        cyst.GlobalPosition = new Vector2(3000, 3000);
         _container!.AddChild(cyst);
 
         cyst.CurrentHealth = cyst.MaxHealth * 0.2f;
@@ -186,7 +193,7 @@ public partial class TestSubBosses : SceneTree
         int tachyzoites = 0;
         foreach (var child in _container.GetChildren())
         {
-            if (child is Tachyzoite)
+            if (child is EnemyActor tachy && tachy.EnemyId == "tachyzoite")
                 tachyzoites++;
         }
 
@@ -195,7 +202,7 @@ public partial class TestSubBosses : SceneTree
 
         foreach (var child in _container.GetChildren())
         {
-            if (child is Tachyzoite tachy)
+            if (child is EnemyActor tachy && tachy.EnemyId == "tachyzoite")
                 tachy.QueueFree();
         }
         cyst.QueueFree();

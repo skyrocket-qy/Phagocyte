@@ -1,11 +1,11 @@
 using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
-using Phagocyte.Core;
-using Phagocyte.Hero;
-using Phagocyte.Skills;
+using Game.Core;
+using Game.Player;
+using Game.Skills;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 public partial class TestCheatUnlocks : TestHarness
 {
@@ -14,7 +14,7 @@ public partial class TestCheatUnlocks : TestHarness
 
     private int _frame = 0;
     private bool _done = false;
-    private Main? _main;
+    private GameRoot? _main;
 
     public override void _Initialize()
     {
@@ -41,7 +41,7 @@ public partial class TestCheatUnlocks : TestHarness
 
         _done = true;
         AssertThat(_main).IsNotNull();
-        var player = _main!.Player as BaseCell;
+        var player = _main!.Player as PlayerActor;
         AssertThat(player).IsNotNull();
 
         AssertThat(TestCheats.MaxOutPlayer(_main)).IsTrue();
@@ -74,9 +74,9 @@ public partial class TestCheatUnlocks : TestHarness
         AssertThat(passives).IsEqual(SkillManager.MaxPassiveSlots);
         GD.Print("[PASS] MaxOutPlayer fills and maxes 5 actives + 5 passives.");
 
-        var chamber = player.CellGearChamber;
+        var chamber = player.Equipment;
         AssertThat(chamber).IsNotNull();
-        foreach (var keyVar in GameManager.GearCatalog.Keys)
+        foreach (var keyVar in GameManager.EquipmentCatalog.Keys)
             AssertThat(chamber!.Owns(keyVar.AsString())).IsTrue();
         GD.Print("[PASS] MaxOutPlayer unlocks the full gear vault.");
 
@@ -112,8 +112,8 @@ public partial class TestCheatUnlocks : TestHarness
                 AssertThat(GameManager.IsMapUnlocked(map)).IsFalse();
             AssertThat(GameManager.IsMapHardUnlocked(map)).IsFalse();
         }
-        AssertThat(GearUnlockManager.UnlockedCount).IsEqual(0);
-        AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(PassiveTreeManager.BaseCellLevel);
+        AssertThat(EquipmentUnlockManager.UnlockedCount).IsEqual(0);
+        AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(PassiveTreeManager.PlayerActorLevel);
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(0);
         GD.Print($"[PASS] Baseline {stage}: fresh profile (macrophage-only, wound-only, vault locked).");
     }
@@ -128,7 +128,7 @@ public partial class TestCheatUnlocks : TestHarness
             AssertThat(GameManager.IsMapHardUnlocked(map)).IsTrue();
         }
         AssertThat(AchievementManager.IsEndlessUnlocked()).IsTrue();
-        AssertThat(GearUnlockManager.UnlockedCount).IsEqual(GameManager.GearCatalog.Count);
+        AssertThat(EquipmentUnlockManager.UnlockedCount).IsEqual(GameManager.EquipmentCatalog.Count);
         AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(TestCheats.DefaultMetaTreeLevel);
         // No granted points anymore: the earned bonus is derived from unlocks,
         // so full unlock yields exactly the catalog total (11 today).

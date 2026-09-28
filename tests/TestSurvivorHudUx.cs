@@ -2,13 +2,13 @@ using Godot;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
-using Phagocyte.Combat;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
-using Phagocyte.Hero;
-using Phagocyte.UI;
+using Game.Combat;
+using Game.Core;
+using Game.Enemies;
+using Game.Player;
+using Game.UI;
 
-namespace Phagocyte.Tests;
+namespace Game.Tests;
 
 [TestSuite]
 public partial class TestSurvivorHudUx : TestHarness
@@ -31,7 +31,7 @@ public partial class TestSurvivorHudUx : TestHarness
     private bool _isolated = false;
 
     /// <summary>
-    /// Freeze the spawner driver, clear everything Main._Ready spawned and
+    /// Freeze the spawner driver, clear everything GameRoot._Ready spawned and
     /// restore the pristine player baseline. Must run on a live frame: nodes
     /// added during MainLoop._Initialize don't enter the tree (no _Ready)
     /// until the first iteration, so _Initialize-time isolation is a no-op.
@@ -39,12 +39,12 @@ public partial class TestSurvivorHudUx : TestHarness
     /// </summary>
     private void IsolateArena()
     {
-        var main = Root.GetNodeOrNull<Main>("Main");
+        var main = Root.GetNodeOrNull<GameRoot>("GameRoot");
         if (main == null)
             return;
         main.SetPhysicsProcess(false);
         ClearArenaEntities(main);
-        var player = main.GetNodeOrNull<Macrophage>("Macrophage");
+        var player = main.GetNodeOrNull<PlayerActor>("Player");
         if (player != null)
         {
             player.CurrentLevel = 1;
@@ -78,7 +78,7 @@ public partial class TestSurvivorHudUx : TestHarness
     {
         foreach (var child in root.GetChildren())
         {
-            if (child is BaseEnemy || child is DormantToxinVesicle || child is BioHazardArea)
+            if (child is EnemyActor || child is ProximityMine || child is HazardZone)
                 child.Free();
             else
                 ClearArenaEntities(child);
@@ -105,10 +105,10 @@ public partial class TestSurvivorHudUx : TestHarness
         // during the settle frames would open the draft modal and pause the
         // tree before these HUD assertions (docs/AGENTS.md determinism rules).
         IsolateArena();
-        var main = Root.GetNodeOrNull<Node2D>("Main");
+        var main = Root.GetNodeOrNull<Node2D>("GameRoot");
         AssertThat(main).IsNotNull();
 
-        var player = main!.GetNodeOrNull<Macrophage>("Macrophage");
+        var player = main!.GetNodeOrNull<PlayerActor>("Player");
         AssertThat(player).IsNotNull();
 
         var hud = main.GetNodeOrNull<Hud>("HUD");
@@ -263,3 +263,5 @@ public partial class TestSurvivorHudUx : TestHarness
         return true;
     }
 }
+
+

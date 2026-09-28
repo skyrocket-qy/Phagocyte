@@ -1,12 +1,12 @@
 using Godot;
-using Phagocyte.Core;
-using Phagocyte.Enemies;
+using Game.Core;
+using Game.Enemies;
 
-namespace Phagocyte.Directors;
+namespace Game.Directors;
 
 /// <summary>
 /// 15:00 wave timeline + kill-driven dynamic backfill (docs/map.md §4.2).
-/// Extracted from <c>Main.ProcessWaveDirector / ProcessDynamicBackfill</c>:
+/// Extracted from <c>GameRoot.ProcessWaveDirector / ProcessDynamicBackfill</c>:
 /// 03:00 elite raid, 06:00 swarm + elite pincer, 09:00 sub-boss (delegated to
 /// <see cref="BossEncounterManager"/>), 12:00 extreme swarm, 15:00 terminal
 /// lockdown (raised as <see cref="TerminalPhaseReached"/> so this component
@@ -17,7 +17,7 @@ public partial class WaveDirectorComponent : Node
     /// <summary>Raised once when <see cref="IRunContext.RunGoalSeconds"/> is crossed.</summary>
     public event System.Action? TerminalPhaseReached;
 
-    /// <summary>Run context (Main). Must be assigned before the first physics tick.</summary>
+    /// <summary>Run context (GameRoot). Must be assigned before the first physics tick.</summary>
     public IRunContext? Context { get; set; }
 
     public bool EliteRaidTriggered { get; private set; } = false;
@@ -39,16 +39,16 @@ public partial class WaveDirectorComponent : Node
             var ctx = Context;
             if (ctx == null)
                 return 0;
-            if (ctx.IsEndlessRun && ctx.EnvironmentTime >= PathogenSpawner.OverdriveStartSeconds)
-                return PathogenSpawner.MaxActiveEndless;
+            if (ctx.IsEndlessRun && ctx.EnvironmentTime >= EnemySpawner.OverdriveStartSeconds)
+                return EnemySpawner.MaxActiveEndless;
             return SwarmWindowTimer > 0.0f ? ctx.ScreenCapSwarm : ctx.ScreenCapNormal;
         }
     }
 
     /// <summary>
-    /// Live pathogen count only (hazards, telegraphs and FX nodes never consume screen-cap slots).
+    /// Live enemy count only (hazards, telegraphs and FX nodes never consume screen-cap slots).
     /// </summary>
-    public int ActivePathogenCount
+    public int ActiveEnemyCount
     {
         get
         {
@@ -59,33 +59,33 @@ public partial class WaveDirectorComponent : Node
             int count = 0;
             foreach (var child in container.GetChildren())
             {
-                if (child is BaseEnemy)
+                if (child is EnemyActor)
                     count++;
             }
             return count;
         }
     }
 
-    /// <summary>3-minute escalation dispatcher + swarm-window decay. Same-frame order as Main had.</summary>
+    /// <summary>3-minute escalation dispatcher + swarm-window decay. Same-frame order as GameRoot had.</summary>
     public void PhysicsTick(float dt)
     {
         var ctx = Context;
         if (ctx == null)
             return;
 
-        if (!EliteRaidTriggered && ctx.EnvironmentTime >= PathogenSpawner.EscalationInterval)
+        if (!EliteRaidTriggered && ctx.EnvironmentTime >= EnemySpawner.EscalationInterval)
         {
             EliteRaidTriggered = true;
             TriggerEliteRaid();
         }
 
-        if (!FirstSwarmTriggered && ctx.EnvironmentTime >= PathogenSpawner.EscalationInterval * 2.0f)
+        if (!FirstSwarmTriggered && ctx.EnvironmentTime >= EnemySpawner.EscalationInterval * 2.0f)
         {
             FirstSwarmTriggered = true;
             TriggerFirstSwarm();
         }
 
-        if (!ExtremeSwarmTriggered && ctx.EnvironmentTime >= PathogenSpawner.EscalationInterval * 4.0f)
+        if (!ExtremeSwarmTriggered && ctx.EnvironmentTime >= EnemySpawner.EscalationInterval * 4.0f)
         {
             ExtremeSwarmTriggered = true;
             TriggerExtremeSwarm();
@@ -103,7 +103,7 @@ public partial class WaveDirectorComponent : Node
 
     /// <summary>
     /// Kill-Driven Dynamic Backfill (docs/map.md §4.2): refill the deficit
-    /// between the screen cap and the active pathogen count just outside the
+    /// between the screen cap and the active enemy count just outside the
     /// camera view. Skipped during boss lockdown (caller returns early there).
     /// </summary>
     public void ProcessBackfill()
@@ -114,12 +114,12 @@ public partial class WaveDirectorComponent : Node
         if (container == null || player == null || ctx == null)
             return;
 
-        int deficit = ActiveScreenCap - ActivePathogenCount;
+        int deficit = ActiveScreenCap - ActiveEnemyCount;
         if (deficit <= 0)
             return;
 
-        int batch = Mathf.Min(deficit, PathogenSpawner.MaxBackfillPerTick);
-        PathogenSpawner.Backfill(container, player, ctx.ArenaSize, GetVisibleWorldSize(), ctx.EnvironmentTime, batch);
+        int batch = Mathf.Min(deficit, EnemySpawner.MaxBackfillPerTick);
+        EnemySpawner.Backfill(container, player, ctx.ArenaSize, GetVisibleWorldSize(), ctx.EnvironmentTime, batch);
     }
 
     public Vector2 GetVisibleWorldSize()
@@ -151,7 +151,7 @@ public partial class WaveDirectorComponent : Node
             return;
 
         // Single mechanic elite: pure positioning check.
-        PathogenSpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 1);
+        EnemySpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 1);
         FrameSpikeLog.MarkWave();
         AudioManager.Instance?.PlayWaveStart();
         GD.Print("[WaveDirector] 03:00 Elite raid incoming.");
@@ -166,9 +166,9 @@ public partial class WaveDirectorComponent : Node
             return;
 
         // Elite pincer from both flanks; backfill raises the screen cap to 450 for the swarm tide.
-        PathogenSpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 1, 0.0f);
-        PathogenSpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 1, Mathf.Pi);
-        SwarmWindowTimer = PathogenSpawner.SwarmWindowSeconds;
+        EnemySpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 1, 0.0f);
+        EnemySpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 1, Mathf.Pi);
+        SwarmWindowTimer = EnemySpawner.SwarmWindowSeconds;
         FrameSpikeLog.MarkWave();
         AudioManager.Instance?.PlayWaveStart();
         GD.Print("[WaveDirector] 06:00 First swarm tide + double elite pincer.");
@@ -183,9 +183,9 @@ public partial class WaveDirectorComponent : Node
             return;
 
         // Backfill floods the arena to the 450 swarm cap over the next frames.
-        SwarmWindowTimer = PathogenSpawner.SwarmWindowSeconds;
+        SwarmWindowTimer = EnemySpawner.SwarmWindowSeconds;
         FrameSpikeLog.MarkWave();
-        PathogenSpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 2);
+        EnemySpawner.SpawnElite(container, player, ctx.ArenaSize, ctx.EnvironmentTime, 2);
         AudioManager.Instance?.PlayWaveStart();
         GD.Print("[WaveDirector] 12:00 Extreme swarm + mixed forces.");
     }
