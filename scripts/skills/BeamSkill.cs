@@ -77,8 +77,7 @@ public partial class BeamSkill : BaseSkill
                     break;
                 struck++;
                 DamageService.DealDamage(enemy, dmg, Host, crit);
-                if (p.ContainsKey("mark_duration") && enemy.Ailments != null)
-                    enemy.Ailments.ApplyMarkation(ParamFloat(p, "mark_duration", 2.5f), ParamFloat(p, "mark_amp", 0.15f));
+                ApplyOnHitEffects(enemy, p, dmg);
                 VfxManager.Instance?.Play(VfxType.PerforinPore, enemy.GlobalPosition);
             }
             SpawnBeamFx(start, end, width);

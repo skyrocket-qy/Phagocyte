@@ -15,15 +15,13 @@ namespace Game.Combat;
 /// </summary>
 public partial class AilmentController : Node
 {
-    public const string BurnId = "oxidative_burn";
-    public const string AgglutinationId = "agglutination";
-    public const string MarkedId = "opsonization";
-    public const string LeakId = "membrane_leak";
-    public const string EndotoxinId = "endotoxin";
-
     private static List<StatusDef>? _sharedDefs;
     private static StatusOptions? _sharedOptions;
     private static readonly object _defLock = new();
+    /// <summary>First def carrying the slow channel (JSON owns which ailment "the slow" is).</summary>
+    private static string _slowCarrierId = "";
+    /// <summary>Parsed hit-VFX per def id (fail fast on unknown names at load).</summary>
+    private static readonly Dictionary<string, VfxType> _vfxById = new(StringComparer.OrdinalIgnoreCase);
 
     private readonly StatusController _core = new();
     private bool _configured;
@@ -32,69 +30,90 @@ public partial class AilmentController : Node
     private float _visualTickTimer = 0.0f;
     private float _accumulatedVisualDot = 0.0f;
 
-    public bool IsOxidized => _core.IsActive(BurnId);
-    public bool IsAgglutinated => _core.IsActive(AgglutinationId);
-    public bool IsMarked => _core.IsActive(MarkedId);
-    public bool IsLeaking => _core.IsActive(LeakId);
-    public bool IsToxic => _core.IsActive(EndotoxinId);
-
-    public float MarkationMultiplier => _core.DamageTakenMultiplier;
+    /// <summary>Strongest active damage-taken amp wins; 1.0 when clean.</summary>
+    public float DamageTakenMultiplier => _core.DamageTakenMultiplier;
     public float SpeedMultiplier => _core.SpeedMultiplier;
-
-    public float BurnTimer => _core.GetTimer(BurnId);
-    public float AgglutinationTimer => _core.GetTimer(AgglutinationId);
-    public float MarkationTimer => _core.GetTimer(MarkedId);
-    public float LeakTimer => _core.GetTimer(LeakId);
-    public int EndotoxinStackCount => _core.GetStackCount(EndotoxinId);
-
-    /// <summary>
-    /// Applies or refreshes ROS Oxidative Burn DoT. Negative args fall back to JSON defaults.
-    /// </summary>
-    public void ApplyOxidativeBurn(float dps, float duration = -1.0f)
+    /// <summary>True while any slow-channel ailment is active.</summary>
+    public bool HasSlow => _core.SpeedMultiplier < 1.0f;
+    /// <summary>Longest remaining timer across slow-channel defs (0 when clean).</summary>
+    public float SlowTimer
     {
-        EnsureConfigured();
-        if (!_core.Apply(BurnId, dps, duration))
-            GD.PushWarning($"[AilmentController] Unknown ailment '{BurnId}'.");
+        get
+        {
+            EnsureConfigured();
+            float longest = 0.0f;
+            foreach (var def in _sharedDefs!)
+            {
+                if (HasChannel(def, "slow"))
+                    longest = Mathf.Max(longest, _core.GetTimer(def.Id));
+            }
+            return longest;
+        }
     }
 
     /// <summary>
-    /// Applies or refreshes Agglutination slow. Stronger slow overrides weaker (PoE strongest-wins).
+    /// Generic apply by ailment id (ids live in assets/data/ailments.json, never
+    /// in code). Negative args fall back to def defaults. Plays the def's hit
+    /// VFX on success. Unknown ids warn (combat never throws).
     /// </summary>
-    public void ApplyAgglutination(float duration = -1.0f, float slowPct = -1.0f)
+    public bool Apply(string id, float magnitude = -1.0f, float duration = -1.0f)
     {
         EnsureConfigured();
-        if (!_core.Apply(AgglutinationId, slowPct, duration))
-            GD.PushWarning($"[AilmentController] Unknown ailment '{AgglutinationId}'.");
+        if (!_core.Apply(id, magnitude, duration))
+        {
+            GD.PushWarning($"[AilmentController] Unknown ailment '{id}'.");
+            return false;
+        }
+        if (_vfxById.TryGetValue(id, out var vfx) && GetParent() is Node2D parent)
+            VfxManager.Instance?.Play(vfx, parent.GlobalPosition);
+        return true;
     }
 
-    /// <summary>
-    /// Marks the target as vulnerable, amplifying all damage taken.
-    /// </summary>
-    public void ApplyMarkation(float duration = -1.0f, float ampPct = -1.0f)
+    /// <summary>Generic slow by channel (routes to the slow-carrier def from JSON).</summary>
+    public void ApplySlow(float duration = -1.0f, float slowPct = -1.0f)
     {
         EnsureConfigured();
-        if (!_core.Apply(MarkedId, ampPct, duration))
-            GD.PushWarning($"[AilmentController] Unknown ailment '{MarkedId}'.");
+        if (string.IsNullOrEmpty(_slowCarrierId))
+        {
+            GD.PushWarning("[AilmentController] No slow-channel ailment defined.");
+            return;
+        }
+        Apply(_slowCarrierId, slowPct, duration);
     }
 
-    /// <summary>
-    /// Punctures target membrane, causing leakage that intensifies 3x when moving.
-    /// </summary>
-    public void ApplyMembraneLeak(float dps, float duration = -1.0f)
+    public bool IsActive(string id)
     {
         EnsureConfigured();
-        if (!_core.Apply(LeakId, dps, duration))
-            GD.PushWarning($"[AilmentController] Unknown ailment '{LeakId}'.");
+        return _core.IsActive(id);
     }
 
-    /// <summary>
-    /// Adds an independent Endotoxin poison stack.
-    /// </summary>
-    public void ApplyEndotoxin(float dps, float duration = -1.0f)
+    public float GetTimer(string id)
     {
         EnsureConfigured();
-        if (!_core.Apply(EndotoxinId, dps, duration))
-            GD.PushWarning($"[AilmentController] Unknown ailment '{EndotoxinId}'.");
+        return _core.GetTimer(id);
+    }
+
+    public int GetStackCount(string id)
+    {
+        EnsureConfigured();
+        return _core.GetStackCount(id);
+    }
+
+    public void Clear(string id)
+    {
+        EnsureConfigured();
+        _core.Clear(id);
+    }
+
+    /// <summary>Clears every def carrying a channel (e.g. antigenic drift clears "amp").</summary>
+    public void ClearChannel(string channel)
+    {
+        EnsureConfigured();
+        foreach (var def in _sharedDefs!)
+        {
+            if (HasChannel(def, channel))
+                _core.Clear(def.Id);
+        }
     }
 
     public void ClearAll()
@@ -102,16 +121,6 @@ public partial class AilmentController : Node
         EnsureConfigured();
         _core.ClearAll();
         _accumulatedVisualDot = 0f;
-    }
-
-    /// <summary>
-    /// Antigenic drift (docs/endgame.md §4): strips the specific-vulnerability
-    /// mark (marked) while leaving all other ailments untouched.
-    /// </summary>
-    public void ClearMarkation()
-    {
-        EnsureConfigured();
-        _core.Clear(MarkedId);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -218,12 +227,27 @@ public partial class AilmentController : Node
                         MoveMultiplier = CatalogLoader.GetFloat(d, "move_multiplier", 1.0f),
                         MaxStacks = CatalogLoader.GetInt(d, "max_stacks", 0),
                         MinMagnitude = GetOptionalFloat(d, "min_magnitude"),
-                        MaxMagnitude = GetOptionalFloat(d, "max_magnitude")
+                        MaxMagnitude = GetOptionalFloat(d, "max_magnitude"),
+                        Vfx = CatalogLoader.GetString(d, "vfx")
                     });
                 }
 
                 // Fail fast on invalid defs before any controller consumes them.
                 new StatusController().Configure(defs, options);
+                // Fail fast on unknown hit-VFX names; cache the slow carrier.
+                _vfxById.Clear();
+                _slowCarrierId = "";
+                foreach (var def in defs)
+                {
+                    if (!string.IsNullOrEmpty(def.Vfx))
+                    {
+                        if (!Enum.TryParse<VfxType>(def.Vfx, true, out var vfx))
+                            throw new DataLoadException(DataPaths.Ailments, $"Unknown vfx '{def.Vfx}' on ailment '{def.Id}'.");
+                        _vfxById[def.Id] = vfx;
+                    }
+                    if (_slowCarrierId == "" && HasChannel(def, "slow"))
+                        _slowCarrierId = def.Id;
+                }
                 _sharedDefs = defs;
                 _sharedOptions = options;
             }
@@ -232,6 +256,16 @@ public partial class AilmentController : Node
                 throw new DataLoadException(DataPaths.Ailments, ex.Message, ex);
             }
         }
+    }
+
+    private static bool HasChannel(StatusDef def, string channel)
+    {
+        foreach (var ch in def.Channels)
+        {
+            if (string.Equals(ch, channel, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        return false;
     }
 
     private static float GetOptionalFloat(Godot.Collections.Dictionary d, string key)

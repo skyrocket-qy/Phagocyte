@@ -200,32 +200,32 @@ public partial class TestStatusCore : TestHarness
 
     private void RunLoaderTests()
     {
-        // The real assets/data/ailments.json loads through the adapter with JSON defaults.
+        // The real assets/data/ailments.json loads through the generic adapter.
         var ailment = new AilmentController();
-        ailment.ApplyMarkation();
-        AssertThat(ailment.IsMarked).IsTrue();
-        AssertThat(ailment.MarkationTimer).IsEqualApprox(4.0f, 0.01f);
-        AssertThat(ailment.MarkationMultiplier).IsEqualApprox(1.30f, 0.01f);
+        ailment.Apply("opsonization");
+        AssertThat(ailment.IsActive("opsonization")).IsTrue();
+        AssertThat(ailment.GetTimer("opsonization")).IsEqualApprox(4.0f, 0.01f);
+        AssertThat(ailment.DamageTakenMultiplier).IsEqualApprox(1.30f, 0.01f);
 
-        ailment.ApplyAgglutination();
-        AssertThat(ailment.IsAgglutinated).IsTrue();
+        ailment.ApplySlow();
+        AssertThat(ailment.HasSlow).IsTrue();
         AssertThat(ailment.SpeedMultiplier).IsEqualApprox(0.60f, 0.01f);
 
-        ailment.ApplyOxidativeBurn(10.0f);
-        ailment.ApplyMembraneLeak(5.0f);
-        ailment.ApplyEndotoxin(2.0f, 2.0f);
-        AssertThat(ailment.IsOxidized).IsTrue();
-        AssertThat(ailment.IsLeaking).IsTrue();
-        AssertThat(ailment.IsToxic).IsTrue();
-        AssertThat(ailment.EndotoxinStackCount).IsEqual(1);
+        ailment.Apply("oxidative_burn", 10.0f);
+        ailment.Apply("membrane_leak", 5.0f);
+        ailment.Apply("endotoxin", 2.0f, 2.0f);
+        AssertThat(ailment.IsActive("oxidative_burn")).IsTrue();
+        AssertThat(ailment.IsActive("membrane_leak")).IsTrue();
+        AssertThat(ailment.IsActive("endotoxin")).IsTrue();
+        AssertThat(ailment.GetStackCount("endotoxin")).IsEqual(1);
 
-        ailment.ClearMarkation();
-        AssertThat(ailment.IsMarked).IsFalse();
+        ailment.ClearChannel("amp");
+        AssertThat(ailment.IsActive("opsonization")).IsFalse();
         ailment.ClearAll();
-        AssertThat(ailment.IsOxidized).IsFalse();
-        AssertThat(ailment.IsToxic).IsFalse();
+        AssertThat(ailment.IsActive("oxidative_burn")).IsFalse();
+        AssertThat(ailment.IsActive("endotoxin")).IsFalse();
         ailment.QueueFree();
 
-        GD.Print("[PASS] AilmentController JSON loader defaults and adapter surface.");
+        GD.Print("[PASS] AilmentController JSON loader defaults and generic adapter surface.");
     }
 }

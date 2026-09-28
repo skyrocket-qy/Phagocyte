@@ -1078,10 +1078,10 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
 
     public void ApplySlow(float duration, float factor)
     {
-        // Factor is a 0-1 speed multiplier; the ailment channel takes a slow
+        // Factor is a 0-1 speed multiplier; the slow channel takes a removed
         // fraction (SpeedMultiplier = 1 - strongest). This stays only as the
         // ISlowable dispatch endpoint; state lives in data.
-        Ailments?.ApplyAgglutination(duration, 1.0f - factor);
+        Ailments?.ApplySlow(duration, 1.0f - factor);
     }
 
     public void ApplyStun(float duration)

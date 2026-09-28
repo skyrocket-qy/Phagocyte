@@ -158,34 +158,7 @@ public partial class SalvoSkill : BaseSkill
         var fx0 = default(EffectSpec);
         var fx1 = default(EffectSpec);
         var fx2 = default(EffectSpec);
-        int fxCount = 0;
-        if (CatalogLoader.GetBool(p, "mark", false))
-        {
-            fx0 = new EffectSpec { EffectId = AilmentController.MarkedId, Magnitude = -1.0f, Duration = -1.0f };
-            fxCount = 1;
-        }
-        if (p.ContainsKey("agglutinate_duration"))
-        {
-            var fx = new EffectSpec
-            {
-                EffectId = AilmentController.AgglutinationId,
-                Magnitude = ParamFloat(p, "agglutinate_slow", 0.35f),
-                Duration = ParamFloat(p, "agglutinate_duration", 1.5f)
-            };
-            if (fxCount == 0) fx0 = fx; else if (fxCount == 1) fx1 = fx; else fx2 = fx;
-            fxCount = Mathf.Min(3, fxCount + 1);
-        }
-        if (p.ContainsKey("burn_mult"))
-        {
-            var fx = new EffectSpec
-            {
-                EffectId = AilmentController.BurnId,
-                Magnitude = dmg * ParamFloat(p, "burn_mult", 0.35f),
-                Duration = ParamFloat(p, "burn_duration", 2.0f)
-            };
-            if (fxCount == 0) fx0 = fx; else if (fxCount == 1) fx1 = fx; else fx2 = fx;
-            fxCount = Mathf.Min(3, fxCount + 1);
-        }
+        int fxCount = BuildOnHitEffects(p, dmg, out fx0, out fx1, out fx2);
         mgr.Spawn(
             Host!.GlobalPosition, dir,
             GetCalculatedSpeed(ParamFloat(p, "speed", 420.0f)), dmg, crit,

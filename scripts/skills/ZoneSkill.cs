@@ -41,28 +41,7 @@ public partial class ZoneSkill : BaseSkill
                 return;
             var fx0 = default(EffectSpec);
             var fx1 = default(EffectSpec);
-            int fxCount = 0;
-            if (p.ContainsKey("burn_mult"))
-            {
-                fx0 = new EffectSpec
-                {
-                    EffectId = AilmentController.BurnId,
-                    Magnitude = dmg * ParamFloat(p, "burn_mult", 0.4f),
-                    Duration = ParamFloat(p, "burn_duration", 1.5f)
-                };
-                fxCount = 1;
-            }
-            if (p.ContainsKey("leak_mult"))
-            {
-                var fx = new EffectSpec
-                {
-                    EffectId = AilmentController.LeakId,
-                    Magnitude = dmg * ParamFloat(p, "leak_mult", 0.3f),
-                    Duration = ParamFloat(p, "leak_duration", 2.0f)
-                };
-                if (fxCount == 0) fx0 = fx; else fx1 = fx;
-                fxCount = Mathf.Min(2, fxCount + 1);
-            }
+            int fxCount = BuildOnHitEffects(p, dmg, out fx0, out fx1, out _);
             parent.AddChild(new Zone
             {
                 SourceTeam = Team.Player,

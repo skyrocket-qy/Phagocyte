@@ -276,9 +276,10 @@ Branch paths:
 
 ### Status path (slow example)
 1. Sources (Zone ticks, NovaSkill, contact/slow-aura traits, stage dot-scan, acid tide) carry `EffectSpec` or call `SlowService.ApplySlow(node,dur,factor)` — never concrete types
-2. Dispatch: `ISlowable.ApplySlow` → `Ailments.ApplyAgglutination(dur, 1−factor)` (agglutination channel, `assets/data/ailments.json`)
+2. Dispatch: `ISlowable.ApplySlow` → `Ailments.ApplySlow(dur, 1−factor)` (slow-channel carrier from `assets/data/ailments.json` — authored in `tools/config/src/data/ailments.ts`, never named in code)
 3. State: `StatusController` (strongest-wins, `SpeedMultiplier = 1−strongest`, `IsActive(id)` for synergies); movement reads `Ailments.SpeedMultiplier` every frame
-4. No `SlowTimer/SlowFactor` fields exist — timed slow via `ActorStats` is unsupported (modifiers are permanent); HUD reads `AgglutinationTimer`
+4. No `SlowTimer/SlowFactor` fields exist — timed slow via `ActorStats` is unsupported (modifiers are permanent); HUD reads `Ailments.SlowTimer` (longest slow-channel timer)
+5. Spawner hit effects are `on_hit` rows (`tools/config/src/data/skills/active.ts`): `{ailment, mult/flat, duration}` → `EffectSpec`/`Apply`; unknown ids fail `make check-config`. VFX rides the ailment def (`vfx` field), played by the adapter.
 
 ### Hands-on
 Zero RNG per `AGENTS.md`: `Stats.SetBase("block",0)`, `Stats.SetBase("evasion",0)` before asserting damage in tests. Find one usage in `tests/TestContactDamage.cs:100`.
@@ -488,7 +489,7 @@ Run: `TestAssetLoader`, `TestAudioAssets`, `TestStatAndSkills`, `TestMenuFlow`, 
 - Innate — slot-0 un-overwritable starter weapon per cell.
 - Catalyst — L5 active + paired passive → epigenetic superweapon.
 - ShieldCharges — hit-absorbing shield (cluster spawns start with 1).
-- Marked — damage-taken multiplier (drift clears it).
+- Marked — damage-taken multiplier from any amp-channel ailment (drift clears the channel).
 - Backfill — kill-driven refill up to `ActiveScreenCap`, max 7/tick.
 - Lockdown — 15:00 terminal-boss phase, backfill paused.
 - Overdrive — endless ≥15:00 escalation, cycles/180s.

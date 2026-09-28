@@ -1,10 +1,16 @@
-.PHONY: build check-arch check-assets process-assets test-slice py-env bk
+.PHONY: build check-arch check-assets check-config config-export process-assets test-slice py-env bk
 
 build:
 	dotnet build Phagocyte.csproj --warnaserror
 
 check-arch:
 	python3 tools/check_arch.py
+
+check-config:
+	cd tools/config && npm run check
+
+config-export:
+	cd tools/config && npm run build
 
 check-assets:
 	python3 tools/asset_check/main.py

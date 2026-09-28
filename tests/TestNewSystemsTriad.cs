@@ -107,37 +107,37 @@ public partial class TestNewSystemsTriad : SceneTree
         Root.AddChild(mockEnemy);
 
         // Initial state
-        AssertThat(ailment.IsOxidized).IsFalse();
-        AssertThat(ailment.IsAgglutinated).IsFalse();
-        AssertThat(ailment.IsMarked).IsFalse();
-        AssertThat(ailment.IsLeaking).IsFalse();
-        AssertThat(ailment.IsToxic).IsFalse();
+        AssertThat(ailment.IsActive("oxidative_burn")).IsFalse();
+        AssertThat(ailment.HasSlow).IsFalse();
+        AssertThat(ailment.IsActive("opsonization")).IsFalse();
+        AssertThat(ailment.IsActive("membrane_leak")).IsFalse();
+        AssertThat(ailment.IsActive("endotoxin")).IsFalse();
 
-        // 3a. Agglutination (Slow)
-        ailment.ApplyAgglutination(duration: 2.0f, slowPct: 0.40f);
-        AssertThat(ailment.IsAgglutinated).IsTrue();
+        // 3a. Slow channel (data: agglutination row)
+        ailment.ApplySlow(duration: 2.0f, slowPct: 0.40f);
+        AssertThat(ailment.HasSlow).IsTrue();
         AssertThat(ailment.SpeedMultiplier).IsEqualApprox(0.60f, 0.01f);
 
-        // 3b. Markation (Damage amplification)
-        ailment.ApplyMarkation(duration: 3.0f, ampPct: 0.30f);
-        AssertThat(ailment.IsMarked).IsTrue();
-        AssertThat(ailment.MarkationMultiplier).IsEqualApprox(1.30f, 0.01f);
+        // 3b. Amp channel (data: opsonization row)
+        ailment.Apply("opsonization", 0.30f, 3.0f);
+        AssertThat(ailment.IsActive("opsonization")).IsTrue();
+        AssertThat(ailment.DamageTakenMultiplier).IsEqualApprox(1.30f, 0.01f);
 
-        // 3c. Oxidative Burn (DoT)
-        ailment.ApplyOxidativeBurn(dps: 10.0f, duration: 2.0f);
-        AssertThat(ailment.IsOxidized).IsTrue();
+        // 3c. DoT channel (data: oxidative_burn row)
+        ailment.Apply("oxidative_burn", 10.0f, 2.0f);
+        AssertThat(ailment.IsActive("oxidative_burn")).IsTrue();
 
         // Simulate 1 second physics process
         // Frame DoT = 10.0f * 1.0s = 10.0f
-        // Amplified by Markation (1.30x) = 13.0f
+        // Amplified by amp (1.30x) = 13.0f
         ailment._PhysicsProcess(1.0);
         AssertThat(mockEnemy.Health).IsEqualApprox(87.0f, 0.05f);
-        AssertThat(ailment.BurnTimer).IsEqualApprox(1.0f, 0.01f);
+        AssertThat(ailment.GetTimer("oxidative_burn")).IsEqualApprox(1.0f, 0.01f);
 
-        // 3d. Membrane Leak (Moving 3x multiplier)
+        // 3d. Move-scaled DoT (data: membrane_leak row, 3x while moving)
         mockEnemy.Velocity = new Vector2(100.0f, 0.0f); // moving
-        ailment.ApplyMembraneLeak(dps: 5.0f, duration: 2.0f);
-        AssertThat(ailment.IsLeaking).IsTrue();
+        ailment.Apply("membrane_leak", 5.0f, 2.0f);
+        AssertThat(ailment.IsActive("membrane_leak")).IsTrue();
 
         // Next 1 second:
         // Burn: 10.0 * 1.0 = 10.0
@@ -146,21 +146,21 @@ public partial class TestNewSystemsTriad : SceneTree
         ailment._PhysicsProcess(1.0);
         AssertThat(mockEnemy.Health).IsEqualApprox(87.0f - 32.5f, 0.1f);
 
-        // 3e. Endotoxin (Independent stacks)
-        ailment.ApplyEndotoxin(dps: 2.0f, duration: 2.0f);
-        ailment.ApplyEndotoxin(dps: 3.0f, duration: 4.0f);
-        AssertThat(ailment.EndotoxinStackCount).IsEqual(2);
+        // 3e. Independent stacks (data: endotoxin row)
+        ailment.Apply("endotoxin", 2.0f, 2.0f);
+        ailment.Apply("endotoxin", 3.0f, 4.0f);
+        AssertThat(ailment.GetStackCount("endotoxin")).IsEqual(2);
 
         // Process 2.0s: first stack should expire, second should remain
         ailment._PhysicsProcess(2.01);
-        AssertThat(ailment.EndotoxinStackCount).IsEqual(1);
+        AssertThat(ailment.GetStackCount("endotoxin")).IsEqual(1);
 
         ailment.ClearAll();
-        AssertThat(ailment.IsOxidized).IsFalse();
-        AssertThat(ailment.IsToxic).IsFalse();
+        AssertThat(ailment.IsActive("oxidative_burn")).IsFalse();
+        AssertThat(ailment.IsActive("endotoxin")).IsFalse();
 
         mockEnemy.QueueFree();
-        GD.Print("[PASS] Test 3: AilmentController biological effects (ROS, Slow, Markation, Leak, Endotoxin) verified.");
+        GD.Print("[PASS] Test 3: generic ailment effects (DoT, slow/amp channels, move scaling, stacks) verified.");
 
         // ====================================================================
         // Test 4: BossPhaseComponent transitions & Damage Reduction

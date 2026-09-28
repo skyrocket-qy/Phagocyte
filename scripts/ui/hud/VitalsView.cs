@@ -243,10 +243,10 @@ public partial class VitalsView : Node
             kind = 2;
             timer = bc2.InvertControlsTimer;
         }
-        else if (PlayerRef is PlayerActor bc3 && bc3.Ailments != null && bc3.Ailments.IsAgglutinated)
+        else if (PlayerRef is PlayerActor bc3 && bc3.Ailments != null && bc3.Ailments.HasSlow)
         {
             kind = 3;
-            timer = bc3.Ailments.AgglutinationTimer;
+            timer = bc3.Ailments.SlowTimer;
         }
 
         int tenths = kind == 0 ? 0 : Mathf.RoundToInt(timer * 10.0f);
@@ -264,7 +264,7 @@ public partial class VitalsView : Node
         else if (kind == 3 && PlayerRef is PlayerActor bcSlow)
         {
             BuffTag.Visible = true;
-            BuffTag.Text = $"🐌 {Tr("STATUS_SLOW")}: {(bcSlow.Ailments?.AgglutinationTimer ?? 0.0f):F1}s";
+            BuffTag.Text = $"🐌 {Tr("STATUS_SLOW")}: {(bcSlow.Ailments?.SlowTimer ?? 0.0f):F1}s";
             BuffTag.Modulate = new Color(0.4f, 0.8f, 0.5f, 0.95f);
         }
         else

@@ -851,7 +851,7 @@ public partial class EnemyActor
                 {
                     if (other.HasMeta("mhc_marked"))
                         other.RemoveMeta("mhc_marked");
-                    other.Ailments?.ClearMarkation();
+                    other.Ailments?.ClearChannel("amp");
                 }
             }
         }
@@ -889,13 +889,8 @@ public partial class EnemyActor
             Radius = CatalogLoader.GetFloat(def, "radius", 46.0f),
             Damage = CatalogLoader.GetFloat(def, "damage", 4.0f),
             TickInterval = lesionTick,
-            Effect0 = new EffectSpec
-            {
-                EffectId = AilmentController.AgglutinationId,
-                Magnitude = 1.0f - CatalogLoader.GetFloat(def, "slow_factor", 0.6f),
-                Duration = lesionTick * 1.5f
-            },
-            EffectCount = 1
+            SlowFactor = CatalogLoader.GetFloat(def, "slow_factor", 0.6f),
+            SlowDuration = lesionTick * 1.5f
         };
         ApplyZoneColors(zone, def);
         parent.AddChild(zone);
@@ -927,13 +922,8 @@ public partial class EnemyActor
             Radius = CatalogLoader.GetFloat(def, "radius", 40.0f),
             Damage = zoneDps * zoneTick,
             TickInterval = zoneTick,
-            Effect0 = new EffectSpec
-            {
-                EffectId = AilmentController.AgglutinationId,
-                Magnitude = 1.0f - CatalogLoader.GetFloat(def, "slow_factor", 0.55f),
-                Duration = zoneTick * 1.5f
-            },
-            EffectCount = 1,
+            SlowFactor = CatalogLoader.GetFloat(def, "slow_factor", 0.55f),
+            SlowDuration = zoneTick * 1.5f,
             GrowFrom = CatalogLoader.GetFloat(def, "radius", 40.0f),
             GrowRate = CatalogLoader.GetFloat(def, "grow_rate", 0.0f)
         };
@@ -1095,20 +1085,13 @@ public partial class EnemyActor
             Radius = CatalogLoader.GetFloat(def, "radius", 100.0f),
             Damage = dps * tick,
             TickInterval = tick,
-            EffectCount = 0,
+            SlowFactor = CatalogLoader.GetBool(def, "slow", true)
+                ? CatalogLoader.GetFloat(def, "slow_factor", 0.5f)
+                : -1.0f,
+            SlowDuration = tick * 1.5f,
             GrowFrom = CatalogLoader.GetFloat(def, "grow_from", -1.0f),
             GrowTime = CatalogLoader.GetFloat(def, "grow_time", 1.5f)
         };
-        if (CatalogLoader.GetBool(def, "slow", true))
-        {
-            zone.Effect0 = new EffectSpec
-            {
-                EffectId = AilmentController.AgglutinationId,
-                Magnitude = 1.0f - CatalogLoader.GetFloat(def, "slow_factor", 0.5f),
-                Duration = tick * 1.5f
-            };
-            zone.EffectCount = 1;
-        }
         ApplyZoneColors(zone, def);
         parent.AddChild(zone);
     }

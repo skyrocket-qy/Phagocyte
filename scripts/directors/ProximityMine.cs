@@ -111,13 +111,8 @@ public partial class ProximityMine : Node2D
                 Radius = BlastRadius * 0.85f,
                 Damage = 5.0f,
                 TickInterval = 0.6f,
-                Effect0 = new EffectSpec
-                {
-                    EffectId = AilmentController.AgglutinationId,
-                    Magnitude = 1.0f - 0.55f,
-                    Duration = 0.6f * 1.5f
-                },
-                EffectCount = 1,
+                SlowFactor = 0.55f,
+                SlowDuration = 0.9f,
                 CoreColor = new Color(0.45f, 0.30f, 0.55f, 0.35f),
                 RimColor = new Color(0.75f, 0.45f, 0.95f, 0.65f)
             };

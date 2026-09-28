@@ -125,7 +125,7 @@ public partial class EndlessDirector : Node
                 foreach (var enemy in EnemyActor.ActiveEnemies)
                 {
                     if (GodotObject.IsInstanceValid(enemy))
-                        enemy.Ailments?.ClearMarkation();
+                        enemy.Ailments?.ClearChannel("amp");
                 }
                 GD.Print("[Affliction] Antigenic drift: vulnerability marks reset.");
             }

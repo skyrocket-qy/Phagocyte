@@ -48,8 +48,7 @@ public partial class AuraSkill : BaseSkill
         {
             hitAny = true;
             DamageService.DealDamage(enemy, dmg, Host, crit);
-            if (enemy.Ailments != null && p.ContainsKey("leak_mult"))
-                enemy.Ailments.ApplyMembraneLeak(dmg * ParamFloat(p, "leak_mult", 0.25f), ParamFloat(p, "leak_duration", 1.5f));
+            ApplyOnHitEffects(enemy, p, dmg);
         });
         if (sfx != "" && hitAny)
             AudioManager.Instance?.PlaySfx(sfx);

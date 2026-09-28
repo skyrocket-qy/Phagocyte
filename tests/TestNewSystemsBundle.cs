@@ -140,13 +140,8 @@ public partial class TestNewSystemsBundle : SceneTree
             GlobalPosition = new Vector2(50, 50),
             Radius = 80.0f,
             Damage = 8.0f,
-            Effect0 = new EffectSpec
-            {
-                EffectId = AilmentController.AgglutinationId,
-                Magnitude = 0.5f,
-                Duration = 0.15f
-            },
-            EffectCount = 1,
+            SlowFactor = 0.5f,
+            SlowDuration = 0.15f,
             TickInterval = 0.1f
         };
         Root.AddChild(hazard);
@@ -155,8 +150,8 @@ public partial class TestNewSystemsBundle : SceneTree
         hazard._PhysicsProcess(0.12);
 
         AssertThat(player.Health).IsLess(hpBeforeHazard);
-        AssertThat(player.Ailments != null && player.Ailments.IsAgglutinated).IsTrue();
-        GD.Print("[PASS] Step 3: Zone periodic tick damage and biological slow application verified.");
+        AssertThat(player.Ailments != null && player.Ailments.HasSlow).IsTrue();
+        GD.Print("[PASS] Step 3: Zone periodic tick damage and channel slow application verified.");
 
         hazard.QueueFree();
         player.QueueFree();

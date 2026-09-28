@@ -123,13 +123,8 @@ public partial class NeutralPropManager : Node
             Radius = 70.0f,
             Damage = 5.0f,
             TickInterval = 0.6f,
-            Effect0 = new EffectSpec
-            {
-                EffectId = AilmentController.AgglutinationId,
-                Magnitude = 1.0f - 0.7f,
-                Duration = 0.6f * 1.5f
-            },
-            EffectCount = 1,
+            SlowFactor = 0.7f,
+            SlowDuration = 0.9f,
             CoreColor = new Color(0.45f, 0.22f, 0.12f, 0.30f),
             RimColor = new Color(0.85f, 0.45f, 0.20f, 0.60f)
         };

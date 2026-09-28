@@ -355,7 +355,7 @@ public partial class ProjectileManager : Node2D
                     {
                         p.AddHitTarget(playerId);
                         DamageService.DealDamage(player, p.Damage, null, p.IsCrit);
-                        EffectSpec.ApplyAll(player, p.Damage, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
+                        EffectSpec.ApplyAll(player, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
                         if (p.PierceRemaining > 0)
                             p.PierceRemaining--;
                         else
@@ -399,7 +399,7 @@ public partial class ProjectileManager : Node2D
                         {
                             p.AddHitTarget(enemyId);
                             DamageService.DealDamage(enemy, p.Damage, _hostNode, p.IsCrit);
-                            EffectSpec.ApplyAll(enemy, p.Damage, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
+                            EffectSpec.ApplyAll(enemy, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
 
                             if (p.PierceRemaining > 0)
                             {

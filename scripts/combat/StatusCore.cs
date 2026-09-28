@@ -62,6 +62,13 @@ public sealed class StatusDef
 
     [JsonPropertyName("max_magnitude")]
     public float MaxMagnitude { get; set; } = float.NaN;
+
+    /// <summary>
+    /// Optional hit VFX id (resolves to the game's VfxType in the adapter;
+    /// empty = none). Plain string so the core stays dependency-free.
+    /// </summary>
+    [JsonPropertyName("vfx")]
+    public string Vfx { get; set; } = "";
 }
 
 /// <summary>Core-level options, supplied alongside the defs (data, not code).</summary>

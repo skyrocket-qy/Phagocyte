@@ -237,6 +237,75 @@ public partial class BaseSkill : Node2D
         return CatalogLoader.GetFloat(p, key, fallback);
     }
 
+    /// <summary>
+    /// Parses one on_hit entry (data: ailment id + mult/flat/duration).
+    /// magnitude = mult != null ? dmg * mult : flat (both absent = def default).
+    /// </summary>
+    private static bool TryParseOnHit(Variant item, float dmg, out string ailment, out float mag, out float dur)
+    {
+        ailment = "";
+        mag = -1.0f;
+        dur = -1.0f;
+        if (item.VariantType != Variant.Type.Dictionary)
+            return false;
+        var e = item.AsGodotDictionary();
+        ailment = CatalogLoader.GetString(e, "ailment");
+        if (ailment == "")
+            return false;
+        if (e.TryGetValue("mult", out var mv) && mv.VariantType != Variant.Type.Nil)
+            mag = dmg * CatalogLoader.ToFloat(mv);
+        else if (e.TryGetValue("flat", out var fv) && fv.VariantType != Variant.Type.Nil)
+            mag = CatalogLoader.ToFloat(fv);
+        dur = CatalogLoader.GetFloat(e, "duration", -1.0f);
+        return true;
+    }
+
+    /// <summary>
+    /// Bakes on_hit entries into pooled EffectSpecs for spawn-time handoff
+    /// (salvo/zone). Truncates past 3 with a warning (hit-rate paths only).
+    /// </summary>
+    protected int BuildOnHitEffects(Dictionary p, float dmg, out EffectSpec e0, out EffectSpec e1, out EffectSpec e2)
+    {
+        e0 = default;
+        e1 = default;
+        e2 = default;
+        if (!p.TryGetValue("on_hit", out var v) || v.VariantType != Variant.Type.Array)
+            return 0;
+        int n = 0;
+        foreach (var item in v.AsGodotArray())
+        {
+            if (!TryParseOnHit(item, dmg, out string ailment, out float mag, out float dur))
+                continue;
+            var fx = new EffectSpec { EffectId = ailment, Magnitude = mag, Duration = dur };
+            if (n == 0) e0 = fx;
+            else if (n == 1) e1 = fx;
+            else if (n == 2) e2 = fx;
+            else
+            {
+                GD.PushWarning($"[BaseSkill] on_hit truncated past 3 for '{SkillId}'.");
+                break;
+            }
+            n++;
+        }
+        return n;
+    }
+
+    /// <summary>
+    /// Applies on_hit entries directly (beam/aura hit-time paths, zero alloc).
+    /// </summary>
+    protected void ApplyOnHitEffects(Node? target, Dictionary p, float dmg)
+    {
+        if (target is not IAilmentHost host || host.Ailments == null)
+            return;
+        if (!p.TryGetValue("on_hit", out var v) || v.VariantType != Variant.Type.Array)
+            return;
+        foreach (var item in v.AsGodotArray())
+        {
+            if (TryParseOnHit(item, dmg, out string ailment, out float mag, out float dur))
+                host.Ailments.Apply(ailment, mag, dur);
+        }
+    }
+
     protected int ParamInt(Godot.Collections.Dictionary p, string key, int fallback)
     {
         return CatalogLoader.GetInt(p, key, fallback);

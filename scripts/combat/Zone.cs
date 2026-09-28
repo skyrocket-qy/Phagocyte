@@ -37,6 +37,14 @@ public partial class Zone : Node2D
     public float Pull { get; set; }
     public float PullEff { get; set; } = 0.4f;
 
+    /// <summary>
+    /// Channel slow as a 0-1 speed multiplier (applied via the slow-carrier
+    /// def, no ailment id anywhere). Negative = no slow.
+    /// </summary>
+    public float SlowFactor { get; set; } = -1.0f;
+    /// <summary>Slow duration; negative falls back to tick × 1.5.</summary>
+    public float SlowDuration { get; set; } = -1.0f;
+
     /// <summary>Mine rows skip ticking and detonate via <see cref="Expired"/> on expiry.</summary>
     public bool NovaOnExpiry { get; set; }
     public float NovaRadius { get; set; }
@@ -129,6 +137,7 @@ public partial class Zone : Node2D
         _fx0 = Effect0;
         _fx1 = Effect1;
         _fx2 = Effect2;
+        float slowDur = SlowDuration < 0.0f ? TickInterval * 1.5f : SlowDuration;
         if (SourceTeam == Team.Enemy)
         {
             var player = EnemySteering.GetPlayer(this);
@@ -138,7 +147,9 @@ public partial class Zone : Node2D
                 return;
             if (Damage > 0.0f)
                 DamageService.DealDamage(player, Damage, null, false);
-            EffectSpec.ApplyAll(player, Damage, in _fx0, in _fx1, in _fx2, EffectCount);
+            EffectSpec.ApplyAll(player, in _fx0, in _fx1, in _fx2, EffectCount);
+            if (SlowFactor >= 0.0f)
+                player.Ailments?.ApplySlow(slowDur, 1.0f - SlowFactor);
             return;
         }
 
@@ -146,10 +157,13 @@ public partial class Zone : Node2D
         float damage = Damage;
         Node2D? source = Source;
         bool crit = IsCrit;
+        float slowFactor = SlowFactor;
         TargetingService.ForEachInRadius(GlobalPosition, radius, enemy =>
         {
             DamageService.DealDamage(enemy, damage, source, crit);
-            EffectSpec.ApplyAll(enemy, damage, in _fx0, in _fx1, in _fx2, EffectCount);
+            EffectSpec.ApplyAll(enemy, in _fx0, in _fx1, in _fx2, EffectCount);
+            if (slowFactor >= 0.0f && enemy.Ailments != null)
+                enemy.Ailments.ApplySlow(slowDur, 1.0f - slowFactor);
         });
     }
 

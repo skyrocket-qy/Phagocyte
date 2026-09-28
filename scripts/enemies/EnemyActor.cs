@@ -316,9 +316,9 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IA
             damage = BossPhase.ApplyDamageReduction(damage);
         }
 
-        if (Ailments != null && Ailments.IsMarked)
+        if (Ailments != null)
         {
-            damage *= Ailments.MarkationMultiplier;
+            damage *= Ailments.DamageTakenMultiplier;
         }
 
         float effectiveDmg = Mathf.Max(1.0f, damage - Armor);
@@ -478,9 +478,9 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IA
 
     public void ApplySlow(float duration, float factor)
     {
-        // Slow state lives in data (agglutination channel, strongest wins);
+        // Slow state lives in data (slow-channel carrier, strongest wins);
         // this stays only as the ISlowable dispatch endpoint.
-        Ailments?.ApplyAgglutination(duration, 1.0f - factor);
+        Ailments?.ApplySlow(duration, 1.0f - factor);
     }
 
     public void ApplyStun(float duration)
