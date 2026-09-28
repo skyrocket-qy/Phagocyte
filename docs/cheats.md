@@ -1,18 +1,18 @@
 # Test Cheats — full-unlock / full-build testing guide (測試作弊指南)
 
 One-call setup for testing with everything unlocked and maxed out.
-Core: `tests/TestCheats.cs`. Self-check: `tests/TestCheatUnlocks.cs`.
+Core: `scripts/testing/CheatTools.cs`. Self-check: `tests/TestCheatUnlocks.cs`.
 
 ## What "full" means
 
-`TestCheats.UnlockAllMeta()` unlocks:
+`CheatTools.UnlockAllMeta()` unlocks:
 
 - All 19 achievements → all 5 cells, all 5 organ maps + Hard modes, Endless mode, talent points
 - All 24 organelles (`GearUnlockManager.UnlockAll()`)
 - Tree level 15 (meta cap) for every cell; talent bonus is derived from unlocks
   (catalog total, 11 today) — no granted points, re-running is idempotent
 
-`TestCheats.MaxOutPlayer(main)` builds the run: level 30, innate kept + 4 actives / 5 passives
+`CheatTools.MaxOutPlayer(main)` builds the run: level 30, innate kept + 4 actives / 5 passives
 filled and maxed, full vault + best-effort chamber, block/evasion RNG zeroed.
 
 By design the passive tree is **never pre-allocated** — suites spend the granted points explicitly.
@@ -40,12 +40,12 @@ or `Godot --path . -- --cheats-reset`. Headless suites are unaffected (isolated 
 public override bool _Process(double delta)
 {
     // ... frame gate ...
-    TestCheats.LockToBaseline();   // exact state first (UnlockAllMeta is additive)
-    TestCheats.UnlockAllMeta();    // everything unlocked
+    CheatTools.LockToBaseline();   // exact state first (UnlockAllMeta is additive)
+    CheatTools.UnlockAllMeta();    // everything unlocked
     var main = InstantiateMain();  // TestHarness: isolated saves, physics off
     // ... settle frames ...
-    TestCheats.MaxOutPlayer(main);              // full build, mortal
-    TestCheats.MaxOutPlayer(main, godmode: true); // only when the suite must survive
+    CheatTools.MaxOutPlayer(main);              // full build, mortal
+    CheatTools.MaxOutPlayer(main, godmode: true); // only when the suite must survive
     // ... asserts ...
     FreeMain(main);
     ResetRunGlobals();
@@ -75,3 +75,4 @@ Green = no `[FAIL]` / `TestFailedException` + `PASSED SUCCESSFULLY` footer.
 gates organ fluid drift, hazards and the fluid-arrow cues. Arena tints stay always-on.
 Headless suites run with effects off unless they opt in (`TestMapEnvironments`,
 `TestTutorialCues` set it true); visuals-only checks need nothing.
+

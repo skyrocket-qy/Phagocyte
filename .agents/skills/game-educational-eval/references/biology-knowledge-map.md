@@ -27,7 +27,7 @@ This document is the Single Source of Truth (SSOT) mapping real-world immunology
 | **Acidified Lysosome** | V-ATPase proton pump drops pH to 4.5, activating hydrolytic cathepsins/lipases. | Digestion | `acidic_lysosome` | Might +12%, Ailment Damage +15% (Energy cost: 3). |
 | **Proteasome Sieve** | Multicatalytic protease complex recycling ubiquitin-tagged damaged proteins. | Digestion | `proteasome_sieve` | Ailment Damage +8%, Health Regen +0.3 (Energy cost: 1). |
 | **Bile Salt Pool** | Amphipathic sterol detergents emulsifying lipid bilayers into micelles. | Digestion | `bile_salt_pool` | Ailment Damage +10%, Health Regen +0.4 (Energy cost: 2). |
-| **Phagolysosome Core** | Final digestive reactor fusing phagosome and lysosome to destroy engulfed prey. | Digestion | `phagolysosome_core` | Might +15%, Life Steal +5% (Energy cost: 4). |
+| **Phagolysosome Core** | Final digestive reactor fusing phagosome and lysosome to destroy engulfed prey. | Digestion | `phagolysosome_core` | Might +12%, Life Steal +5% (Energy cost: 4). |
 | **Flagellar Base** | Bacterial-derived basal body rotary motor converting proton motive force to torque. | Cytoskeleton | `flagellar_base` | Move Speed +12%, Knockback +20% (Energy cost: 3). |
 | **Microtubule Anchor** | Tubulin polymer tracks serving as railways for kinesin/dynein cargo motors. | Cytoskeleton | `microtubule_anchor` | Move Speed +4%, Area +4% (Energy cost: 1). |
 | **Actin Mesh** | Branched Arp2/3 filamentous cortex providing membrane tension and protrusion. | Cytoskeleton | `actin_mesh` | Skill Area +8%, Evasion +2% (Energy cost: 2). |

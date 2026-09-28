@@ -363,7 +363,7 @@
       {
         "stat": "might",
         "unit": "percent",
-        "value": 0.15
+        "value": 0.12
       },
       {
         "stat": "life_steal",

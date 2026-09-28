@@ -44,6 +44,9 @@ public partial class TestSurvivorHudUx : TestHarness
             return;
         main.SetPhysicsProcess(false);
         ClearArenaEntities(main);
+        // Ambient kills before isolation leave a stale KillCount behind: the
+        // capsule asserts an exact 0 baseline, so reset telemetry here.
+        RunTelemetryManager.Instance?.StartRun();
         var player = main.GetNodeOrNull<PlayerActor>("Player");
         if (player != null)
         {
@@ -66,6 +69,10 @@ public partial class TestSurvivorHudUx : TestHarness
             hud.LastExpToNext = 30.0f;
             hud.LastLevel = 1;
             hud.UpdateExpDisplay();
+            // Re-sync the kill capsule to the zeroed telemetry: the label
+            // otherwise keeps its pre-isolation count until the next tick.
+            if (player != null)
+                hud.ConnectPlayer(player);
             if (hud.CellUpgradeModal != null)
                 hud.CellUpgradeModal.Visible = false;
             hud.ResetTutorialCues();

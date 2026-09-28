@@ -70,10 +70,11 @@ Godot --headless --path . -s res://tests/<Suite>.cs
 - `benchmarks/` (HordeBenchmark, PerformancePipeline, TickBudget) are load
   instruments, not checks — never run in sweep loops (54 runnable suites).
 - Known-red at HEAD (fix or explicitly re-baseline, never silently delete):
-  TestCheats (static helper, uninstantiable as a suite), TestDifficultyTracks
-  (never opts into MapEffectsEnabled), TestGearBalance opener bound
-  (data grants 15% might vs 12% pin), TestPerformancePipeline species count
+  TestPerformancePipeline species count
   (parked in benchmarks/, do not fix in passing).
+  Fixed this pass: TestCheats (helper moved to scripts/testing/CheatTools.cs),
+  TestDifficultyTracks (suite now opts into MapEffectsEnabled),
+  TestGearBalance opener bound (phagolysosome_core might 0.15 → 0.12).
 - Frame-gate async work with `Gate(ref _frame, n)`; saves are auto-isolated
   (`IsolateSaves`, `user://test_*`) so suites never touch real profiles.
 

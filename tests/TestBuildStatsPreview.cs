@@ -6,6 +6,7 @@ using static GdUnit4.Assertions;
 using Game.Core;
 using Game.Player;
 using Game.Skills;
+using Game.Testing;
 using Game.UI;
 
 namespace Game.Tests;
@@ -81,7 +82,7 @@ public partial class TestBuildStatsPreview : TestHarness
 
     private void SetupBuild()
     {
-        TestCheats.LockToBaseline();
+        CheatTools.LockToBaseline();
         EquipmentUnlockManager.UnlockAll();
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 6)).IsTrue();
         AssertThat(PassiveTreeManager.Purchase("macrophage", "thick_cytoplasm")).IsTrue();
@@ -225,8 +226,9 @@ public partial class TestBuildStatsPreview : TestHarness
         _arena = null;
         Paused = false;
         PauseManager.Clear(this);
-        TestCheats.LockToBaseline();
+        CheatTools.LockToBaseline();
         RestoreSaves();
     }
 }
+
 

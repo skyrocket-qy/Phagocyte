@@ -6,18 +6,21 @@ using Game.Core;
 using Game.Player;
 using Game.Skills;
 
-namespace Game.Tests;
+namespace Game.Testing;
 
 /// <summary>
 /// One-call full-unlock / full-build setup for test demand (headless suites
-/// and headed debug runs). The meta helpers compose the scattered per-suite
-/// unlock loops into a single entry point; <see cref="MaxOutPlayer"/> builds
-/// a max-level run loadout on top. Everything is additive — call
+/// and headed debug runs). Lives in scripts/testing/ (NOT tests/) so the
+/// headless sweep never tries to instantiate it as a suite AND production
+/// debug hooks (GameRoot, MainMenu) can use it without depending on tests/.
+/// The meta helpers compose the scattered per-suite unlock loops into a
+/// single entry point; <see cref="MaxOutPlayer"/> builds a max-level run
+/// loadout on top. Everything is additive — call
 /// <see cref="LockToBaseline"/> first when an exact state is required.
 /// The passive tree is intentionally left unallocated: suites spend the
 /// granted points explicitly.
 /// </summary>
-public static class TestCheats
+public static class CheatTools
 {
     /// <summary>Headed user arg (after `--`): unlock everything + max the run build.</summary>
     public const string CheatArgAll = "--cheats=all";

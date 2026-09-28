@@ -29,6 +29,9 @@ public partial class TestDifficultyTracks : TestHarness
         AchievementManager.ResetAll();
         PassiveTreeManager.ResetAll();
         ResetRunGlobals();
+        // Hard-run integration asserts a live Stage: the global flag defaults
+        // to off, and mechanics suites must opt in (cf. TestStageEnvironments).
+        SettingsManager.MapEffectsEnabled = true;
     }
 
     public override bool _Process(double delta)
@@ -190,6 +193,7 @@ public partial class TestDifficultyTracks : TestHarness
         Paused = false;
         CleanupMain();
         ResetRunGlobals();
+        SettingsManager.MapEffectsEnabled = false;
 
         AchievementManager.ResetAll();
         PassiveTreeManager.ResetAll();

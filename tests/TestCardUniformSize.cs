@@ -86,6 +86,9 @@ public partial class TestCardUniformSize : SceneTree
 
         modal.QueueFree();
         GD.Print("[PASS] All 3 cards have 100% IDENTICAL dimensions!");
+        GD.Print("==================================================================");
+        GD.Print(">>> ALL CARD UNIFORM SIZE TESTS PASSED SUCCESSFULLY! <<<");
+        GD.Print("==================================================================");
         Quit(0);
         return true;
     }

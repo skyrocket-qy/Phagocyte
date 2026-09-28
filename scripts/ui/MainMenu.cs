@@ -2,7 +2,7 @@ using Godot;
 using Godot.Collections;
 using System;
 using Game.Core;
-using Game.Tests;
+using Game.Testing;
 
 namespace Game.UI;
 
@@ -360,7 +360,7 @@ public partial class MainMenu : Control
             DeployBtn.Pressed += OnDeployPressed;
 
         // Test-demand full-unlock cheat (debug builds only, --cheats=all / --cheats-reset).
-        TestCheats.ApplyHeadedMenuCheats();
+        CheatTools.ApplyHeadedMenuCheats();
 
         UpdateAllTexts();
 
@@ -387,14 +387,14 @@ public partial class MainMenu : Control
             return;
         if (key.Keycode == Key.F9)
         {
-            TestCheats.UnlockAllMeta();
+            CheatTools.UnlockAllMeta();
             GD.Print("[Cheats] All meta progression unlocked (F9).");
             RefreshCheatViews();
             GetViewport().SetInputAsHandled();
         }
         else if (key.Keycode == Key.F10)
         {
-            TestCheats.LockToBaseline();
+            CheatTools.LockToBaseline();
             GD.Print("[Cheats] Meta progression reset to a fresh profile (F10).");
             RefreshCheatViews();
             GetViewport().SetInputAsHandled();
@@ -1134,3 +1134,4 @@ public partial class MainMenu : Control
             EndlessBtn.TooltipText = Tr("ENDLESS_ABOUT_HINT");
     }
 }
+

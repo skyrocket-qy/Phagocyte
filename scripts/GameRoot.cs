@@ -8,7 +8,7 @@ using Game.Enemies;
 using Game.Stages;
 using Game.Stages.Vfx;
 using Game.Player;
-using Game.Tests;
+using Game.Testing;
 using Game.UI;
 
 namespace Game;
@@ -235,7 +235,7 @@ public partial class GameRoot : Node2D, IRunContext
         AudioManager.Instance?.PlayMapBgm(GameManager.SelectedMap, 0.6f);
 
         // Test-demand full-build cheat (debug builds only, --cheats=all [--godmode]).
-        TestCheats.ApplyHeadedRunCheats(this);
+        CheatTools.ApplyHeadedRunCheats(this);
     }
 
     /// <summary>
@@ -248,7 +248,7 @@ public partial class GameRoot : Node2D, IRunContext
             return;
         if (key.Keycode == Key.F9)
         {
-            if (TestCheats.MaxOutPlayer(this, godmode: key.ShiftPressed))
+            if (CheatTools.MaxOutPlayer(this, godmode: key.ShiftPressed))
                 GD.Print("[Cheats] Run player maxed out (F9).");
             GetViewport().SetInputAsHandled();
         }
@@ -467,4 +467,5 @@ public static class HostUlceration
         Pulses = 0;
     }
 }
+
 

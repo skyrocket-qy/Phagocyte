@@ -4,6 +4,7 @@ using static GdUnit4.Assertions;
 using Game.Core;
 using Game.Player;
 using Game.Skills;
+using Game.Testing;
 
 namespace Game.Tests;
 
@@ -31,7 +32,7 @@ public partial class TestCheatUnlocks : TestHarness
         if (_frame == 1)
         {
             ResetAndAssertBaseline("fresh");
-            TestCheats.UnlockAllMeta();
+            CheatTools.UnlockAllMeta();
             AssertFullUnlock();
             _main = InstantiateMain();
             return false;
@@ -44,8 +45,8 @@ public partial class TestCheatUnlocks : TestHarness
         var player = _main!.Player as PlayerActor;
         AssertThat(player).IsNotNull();
 
-        AssertThat(TestCheats.MaxOutPlayer(_main)).IsTrue();
-        AssertThat(player!.CurrentLevel).IsEqual(TestCheats.DefaultRunLevel);
+        AssertThat(CheatTools.MaxOutPlayer(_main)).IsTrue();
+        AssertThat(player!.CurrentLevel).IsEqual(CheatTools.DefaultRunLevel);
         AssertThat(player.CurrentExp).IsEqual(0.0f);
         AssertThat(player.Stats).IsNotNull();
         AssertThat(player.Stats!.GetStatObj("block")!.BaseValue).IsEqual(0.0f);
@@ -82,7 +83,7 @@ public partial class TestCheatUnlocks : TestHarness
 
         AssertThat(player.Health).IsLess(999999.0f);
         GD.Print("[PASS] Godmode defaults to off.");
-        AssertThat(TestCheats.MaxOutPlayer(_main, godmode: true)).IsTrue();
+        AssertThat(CheatTools.MaxOutPlayer(_main, godmode: true)).IsTrue();
         AssertThat(player.Health).IsEqual(999999.0f);
         GD.Print("[PASS] Godmode opt-in makes the player invulnerable.");
 
@@ -97,7 +98,7 @@ public partial class TestCheatUnlocks : TestHarness
 
     private static void ResetAndAssertBaseline(string stage)
     {
-        TestCheats.LockToBaseline();
+        CheatTools.LockToBaseline();
         AssertThat(GameManager.IsClassUnlocked("macrophage")).IsTrue();
         foreach (string cell in AllClasses)
         {
@@ -129,7 +130,7 @@ public partial class TestCheatUnlocks : TestHarness
         }
         AssertThat(AchievementManager.IsEndlessUnlocked()).IsTrue();
         AssertThat(EquipmentUnlockManager.UnlockedCount).IsEqual(GameManager.EquipmentCatalog.Count);
-        AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(TestCheats.DefaultMetaTreeLevel);
+        AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(CheatTools.DefaultMetaTreeLevel);
         // No granted points anymore: the earned bonus is derived from unlocks,
         // so full unlock yields exactly the catalog total (11 today).
         int expectedBonus = 0;
@@ -142,8 +143,9 @@ public partial class TestCheatUnlocks : TestHarness
         AssertThat(expectedBonus).IsEqual(11);
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(expectedBonus);
         // Re-running the cheat is idempotent: nothing stacks.
-        TestCheats.UnlockAllMeta();
+        CheatTools.UnlockAllMeta();
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(expectedBonus);
         GD.Print("[PASS] UnlockAllMeta unlocks all classes, maps+hard, endless, gear and tree levels.");
     }
 }
+
