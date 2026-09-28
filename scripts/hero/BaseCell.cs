@@ -846,21 +846,11 @@ public partial class BaseCell : CharacterBody2D
     }
 
     /// <summary>
-    /// Pathogen damage. Endotoxemia (docs/endgame.md §4) amplifies everything
-    /// that is not explicitly environmental.
+    /// Damage intake. Endotoxemia (docs/endgame.md §4) amplifies all damage taken.
     /// </summary>
     public void TakeDamage(float amount)
     {
         ApplyDamage(amount * AfflictionManager.IncomingDamageMultiplier);
-    }
-
-    /// <summary>
-    /// Environmental damage (acid tide, fibrin/toxin hazards, febrile burn):
-    /// bypasses the endotoxemia pathogen-damage amplification.
-    /// </summary>
-    public void TakeEnvironmentalDamage(float amount)
-    {
-        ApplyDamage(amount);
     }
 
     private void ApplyDamage(float amount)

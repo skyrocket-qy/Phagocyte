@@ -135,7 +135,8 @@ public partial class TestAfflictions : TestHarness
     {
         var cellScene = AssetLoader.Load<PackedScene>("res://scenes/characters/macrophage.tscn");
 
-        // Endotoxemia: pathogen damage +50%, environmental damage unaffected
+        // Endotoxemia: ALL damage taken +50% through the single pipeline
+        // (hazard, acid and febrile sources included — no bypass).
         AfflictionManager.SetSelection(new[] { AfflictionManager.Endotoxemia });
         var cell = cellScene.Instantiate<Macrophage>();
         Root.AddChild(cell);
@@ -144,15 +145,16 @@ public partial class TestAfflictions : TestHarness
         cell.Stats!.SetBase("block", 0.0f);
         cell.Stats.SetBase("evasion", 0.0f);
 
-        float hpBeforePathogen = cell.Health;
+        float hpBeforeFirst = cell.Health;
         cell.TakeDamage(10.0f);
-        float pathogenLoss = hpBeforePathogen - cell.Health;
+        float firstLoss = hpBeforeFirst - cell.Health;
 
-        float hpBeforeEnv = cell.Health;
-        cell.TakeEnvironmentalDamage(10.0f);
-        float environmentalLoss = hpBeforeEnv - cell.Health;
+        float hpBeforeSecond = cell.Health;
+        cell.TakeDamage(10.0f);
+        float secondLoss = hpBeforeSecond - cell.Health;
 
-        AssertThat(pathogenLoss).IsEqualApprox(environmentalLoss * 1.5f, 0.01f);
+        AssertThat(firstLoss).IsEqualApprox(secondLoss, 0.01f);
+        AssertThat(firstLoss).IsGreater(10.0f);
         cell.QueueFree();
 
         // Autophagic failure: health_regen is fully suppressed
@@ -175,7 +177,7 @@ public partial class TestAfflictions : TestHarness
         controlCell.QueueFree();
         regenCell.QueueFree();
 
-        GD.Print("[PASS] Endotoxemia amplification, environmental bypass and regen lock verified.");
+        GD.Print("[PASS] Endotoxemia amplification, single damage pipeline and regen lock verified.");
     }
 
     private void RunEndlessIntegrationTests()

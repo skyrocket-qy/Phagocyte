@@ -72,7 +72,7 @@ public sealed class GastricEnvironment : MapEnvironment
             if (child is AcidSurge surge && GodotObject.IsInstanceValid(surge)
                 && surge.Contains(player.GlobalPosition))
             {
-                player.TakeEnvironmentalDamage(SurgeDamagePerSecond * dt);
+                player.TakeDamage(SurgeDamagePerSecond * dt);
                 player.ApplySlow(0.3f, 0.7f);
                 break;
             }

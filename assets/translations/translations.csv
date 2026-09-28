@@ -498,7 +498,7 @@ BTN_ENDLESS_CANCEL,Cancel,取消,取消,中止,Abbrechen,Annuler,Отмена,Ca
 AFFLICTION_FEBRILE_NAME,Febrile Convulsion,高熱驚厥,高熱驚厥,熱性痙攣,Fieberkrampf,Convulsion fébrile,Фебрильная судорога,Convulsión febril
 AFFLICTION_FEBRILE_DESC,Take 2% of max HP as environmental burn every 5 seconds.,每 5 秒承受最大生命 2% 的環境灼傷。,每 5 秒承受最大生命 2% 的環境灼傷。,5秒毎に最大体力2%の環境灼焼。,Alle 5s 2 % max. LP als Umgebungsbrand.,Brûlure environnementale de 2 % PV max toutes les 5s.,Ожог среды 2 % макс. HP каждые 5с.,Quemadura ambiental del 2 % PV máx. cada 5s.
 AFFLICTION_ENDOTOXEMIA_NAME,Endotoxemia,內毒素血症,內毒素血症,内毒素血症,Endotoxinämie,Endotoxinémie,Эндотоксинемия,Endotoxinemia
-AFFLICTION_ENDOTOXEMIA_DESC,All pathogen damage taken +50%.,受到的一切病原體碰撞傷害 +50%。,受到的一切病原體碰撞傷害 +50%。,被病原体傷害+50%。,Erlittener Pathogenschaden +50 %.,Dégâts pathogènes subis +50 %.,Получаемый урон патогенов +50 %.,Daño de patógenos recibido +50 %.
+AFFLICTION_ENDOTOXEMIA_DESC,All damage taken +50%.,受到的所有伤害+50%。,受到的所有傷害+50%。,被傷害+50%。,Aller erlittener Schaden +50 %.,Tous dégâts subis +50 %.,Весь получаемый урон +50 %.,Todo el daño recibido +50 %.
 AFFLICTION_AUTOPHAGY_NAME,Autophagic Failure,自噬衰竭,自噬衰竭,自噬不全,Autophagie-Versagen,Défaillance autophagique,Аутофагическая недостаточность,Fallo autofágico
 AFFLICTION_AUTOPHAGY_DESC,Global health_regen is forced to zero.,全局生命回复强制归零（无法自然回血）。,全域生命回復強制歸零（無法自然回血）。,全域体力自然回復を零に固定。,Globale Gesundheitsregen. auf null fixiert.,Régén. santé globale forcée à zéro.,Глобальный реген. здоровья принудительно ноль.,Regen. de salud global forzada a cero.
 AFFLICTION_MICROTUBULE_NAME,Microtubule Sclerosis,微管硬化,微管硬化,微小管硬化,Mikrotubuli-Sklerose,Sclérose microtubulaire,Склероз микротрубочек,Esclerosis microtubular

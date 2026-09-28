@@ -112,7 +112,7 @@ public partial class OverdriveDirector : Node
                 if (ctx.Player is BaseCell fevrile && fevrile.Stats != null)
                 {
                     float burn = fevrile.Stats.GetStat("max_health") * AfflictionManager.FebrileBurnHealthFraction;
-                    fevrile.TakeEnvironmentalDamage(burn);
+                    fevrile.TakeDamage(burn);
                 }
             }
         }
@@ -233,7 +233,7 @@ public partial class OverdriveDirector : Node
                     _acidTickAccumulator -= 1.0f;
                     if (ctx.Player is BaseCell burned)
                     {
-                        burned.TakeEnvironmentalDamage(6.0f);
+                        burned.TakeDamage(6.0f);
                         burned.ApplySlow(1.2f, 0.6f);
                     }
                 }
