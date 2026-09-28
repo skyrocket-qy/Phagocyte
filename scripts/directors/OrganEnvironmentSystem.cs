@@ -1,6 +1,6 @@
 using Godot;
 using Phagocyte.Core;
-using Phagocyte.Environment;
+using Phagocyte.Map;
 using Phagocyte.Hero;
 
 namespace Phagocyte.Directors;

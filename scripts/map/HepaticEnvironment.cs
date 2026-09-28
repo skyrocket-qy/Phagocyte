@@ -1,7 +1,7 @@
 using Godot;
 using Phagocyte.Directors;
 
-namespace Phagocyte.Environment;
+namespace Phagocyte.Map;
 
 /// <summary>
 /// 03. 肝血竇微循環 (hepatic_sinusoid) — slow sinusoidal flow drags the cell;

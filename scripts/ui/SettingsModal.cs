@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using Phagocyte.Core;
-using Phagocyte.Environment;
+using Phagocyte.Map;
 
 namespace Phagocyte.UI;
 

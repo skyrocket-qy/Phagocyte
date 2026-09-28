@@ -2,7 +2,7 @@ using Godot;
 using Phagocyte.Directors;
 using Phagocyte.Hero;
 
-namespace Phagocyte.Environment;
+namespace Phagocyte.Map;
 
 /// <summary>
 /// Per-organ fluid mechanics and physiological environment that act directly on

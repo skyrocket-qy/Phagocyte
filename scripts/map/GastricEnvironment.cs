@@ -2,7 +2,7 @@ using Godot;
 using Phagocyte.Directors;
 using Phagocyte.Hero;
 
-namespace Phagocyte.Environment;
+namespace Phagocyte.Map;
 
 /// <summary>
 /// 04. 胃腔極酸黏膜 (gastric_lumen) — periodic acid surges flood the floor with

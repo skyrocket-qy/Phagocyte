@@ -1,7 +1,7 @@
 using Godot;
 using Phagocyte.Directors;
 
-namespace Phagocyte.Environment;
+namespace Phagocyte.Map;
 
 /// <summary>
 /// 02. 肺泡氣體微腔 (alveolar_space) — a 12s respiratory cycle: 3s inhale pushes

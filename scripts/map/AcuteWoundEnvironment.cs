@@ -2,7 +2,7 @@ using Godot;
 using Phagocyte.Directors;
 using Phagocyte.Hero;
 
-namespace Phagocyte.Environment;
+namespace Phagocyte.Map;
 
 /// <summary>
 /// 01. 皮下創口 (acute_wound) — wound exudate suction drags the cell up-right and

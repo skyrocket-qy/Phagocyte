@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Phagocyte.Environment;
+namespace Phagocyte.Map;
 
 /// <summary>
 /// Fullscreen fill-rate switch (FPS survey §1). Performance mode drops the

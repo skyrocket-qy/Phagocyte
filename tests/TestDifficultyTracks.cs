@@ -118,7 +118,7 @@ public partial class TestDifficultyTracks : TestHarness
         AssertThat(main.OrganEnvironment!.HardMode).IsTrue();
 
         // Environment hazards run on the +50% frequency timer under Hard.
-        var wound = (Phagocyte.Environment.AcuteWoundEnvironment)main.OrganEnvironment;
+        var wound = (Phagocyte.Map.AcuteWoundEnvironment)main.OrganEnvironment;
         AssertThat(wound.HardMode).IsTrue();
 
         // A Hard clear settles as a Hard record, unlocks its Hard achievement and

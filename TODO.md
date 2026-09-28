@@ -62,7 +62,7 @@ Combat visuals verified live (godot-ai headed screenshots) plus headless suites
 `TestMapEnvironments`, `TestPhagocyticGrasp` green; build zero warnings):
 
 - [x] **Visceral Capillary & Tissue Arena Floor**:
-  - New `CapillaryTissueLayer` (`scripts/environment/CapillaryTissueLayer.cs`,
+  - New `CapillaryTissueLayer` (`scripts/map/CapillaryTissueLayer.cs`,
     seeded 9-vessel branching network with lumen/wall/sheen + drifting
     fluid-current dashes, 0.55x camera parallax) wired into `main.tscn` as
     `Background/CapillaryTissue` between the tissue shader and the RBC plane.

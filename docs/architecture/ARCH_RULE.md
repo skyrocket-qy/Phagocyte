@@ -17,7 +17,7 @@ scripts/
 │   LoadoutManager.cs, PassiveTreeManager.cs, PauseManager.cs,
 │   JsonStore.cs, KeyBindings.cs, SteamBridge.cs, GameEvents.cs,
 │   data/CatalogBuilders.cs, data/DataValidator.cs
-├── combat/, hero/, camera/, enemies/, skills/, directors/, environment/,  # [L3] GAMEPLAY
+├── combat/, hero/, camera/, enemies/, skills/, directors/, map/,  # [L3] GAMEPLAY
 │   gear/, endgame/, testing/
 │   + core/CellStats.cs, GearChamber.cs, GearDrop.cs,
 │     RunTelemetryManager.cs, UpgradeManager.cs

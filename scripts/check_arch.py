@@ -76,7 +76,7 @@ GAMEPLAY_PREFIXES = (
     "scripts/enemies/",
     "scripts/skills/",
     "scripts/directors/",
-    "scripts/environment/",
+    "scripts/map/",
     "scripts/gear/",
     "scripts/endgame/",
     "scripts/testing/",

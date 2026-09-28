@@ -1,7 +1,7 @@
 using Godot;
 using Phagocyte.Directors;
 
-namespace Phagocyte.Environment;
+namespace Phagocyte.Map;
 
 /// <summary>
 /// 05. 血腦屏障毛細血管 (blood_brain_barrier) — extremely narrow high-shear flow

@@ -2,7 +2,7 @@ using Godot;
 using Phagocyte.Combat;
 using Phagocyte.Hero;
 
-namespace Phagocyte.Environment;
+namespace Phagocyte.Map;
 
 /// <summary>
 /// 01. 皮下創口 fibrin clot (docs/map.md §3): pale fibrin gel on the wound floor.
