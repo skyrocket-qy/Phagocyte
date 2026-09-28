@@ -15,7 +15,7 @@ namespace Phagocyte.Tests;
 /// <summary>
 /// Verifies the first-run micro-cues and their supporting systems
 /// (docs/tutorial.md §2): dodge roll, catalyst resonance pairing, opening
-/// guide pathogens, WASD ring timing and dodge hint.
+/// guide pathogens and dodge hint.
 /// </summary>
 [TestSuite]
 public partial class TestTutorialCues : TestHarness
@@ -254,15 +254,11 @@ public partial class TestTutorialCues : TestHarness
 
         main._PhysicsProcess(0.02f);
 
-        // Hud cues: opening WASD ring expires after 5s
+        // Hud cues: overlay wires up on first frames
         var hud = main.HudNode;
         AssertThat(hud).IsNotNull();
         hud!._Process(0.1);
         AssertThat(hud.TutorialOverlayNode).IsNotNull();
-        AssertThat(hud.TutorialOverlayNode!.ShowMoveCue).IsTrue();
-
-        hud._Process(Hud.MoveCueSeconds);
-        AssertThat(hud.TutorialOverlayNode.ShowMoveCue).IsFalse();
 
         // Cue 3: dodge hint fires once per run
         hud.ResetTutorialCues();
@@ -272,7 +268,7 @@ public partial class TestTutorialCues : TestHarness
         hud.ShowDodgeHint();
         AssertThat(hud.DodgeHintShownOnce).IsTrue();
 
-        GD.Print("[PASS] Guide pathogens, WASD cue window and dodge hint verified.");
+        GD.Print("[PASS] Guide pathogens and dodge hint verified.");
     }
 
     private void Cleanup()

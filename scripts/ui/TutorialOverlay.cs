@@ -1,28 +1,20 @@
 using Godot;
-using Phagocyte.Hero;
 
 namespace Phagocyte.UI;
 
 /// <summary>
 /// Screen-space overlay for the first-run micro-cues (docs/tutorial.md §2):
-/// the WASD breathing ring, the dodge roll hint above the cell, and the
-/// microscopic fluid-shear arrow trails at the screen edges. Drawn behind the
+/// the dodge roll hint above the cell. Drawn behind the
 /// HUD panels (ZIndex = -1) so it never blocks interaction.
 /// </summary>
 public partial class TutorialOverlay : Control
 {
     public Node2D? PlayerRef { get; set; }
 
-    /// <summary>Cue 1: WASD breathing ring around the cell (opening 5 seconds).</summary>
-    public bool ShowMoveCue { get; set; }
-    public float MoveCueProgress { get; set; } = 0.0f; // 1 -> 0 over the cue window
-
     /// <summary>Cue 3: floating dodge hint above the cell.</summary>
     public bool ShowDodgeHint { get; set; }
     public string DodgeHintText { get; set; } = "";
     public float DodgeHintAlpha { get; set; } = 1.0f;
-
-    private float _phase = 0.0f;
 
     public override void _Ready()
     {
@@ -33,7 +25,6 @@ public partial class TutorialOverlay : Control
 
     public override void _Process(double delta)
     {
-        _phase += (float)delta;
         QueueRedraw();
     }
 
@@ -44,40 +35,8 @@ public partial class TutorialOverlay : Control
 
         Vector2 cellScreen = PlayerRef.GetGlobalTransformWithCanvas().Origin;
 
-        if (ShowMoveCue)
-            DrawMoveCue(cellScreen);
-
         if (ShowDodgeHint)
             DrawDodgeHint(cellScreen);
-    }
-
-    private void DrawMoveCue(Vector2 center)
-    {
-        float breathe = 0.5f + 0.5f * Mathf.Sin(_phase * 2.4f);
-        float fade = Mathf.Clamp(MoveCueProgress * 3.0f, 0.0f, 1.0f);
-        float alpha = (0.42f + 0.28f * breathe) * fade;
-
-        var ringColor = new Color(0.55f, 0.92f, 1.0f, alpha);
-        float ringRadius = 92.0f + 5.0f * breathe;
-        DrawArc(center, ringRadius, 0.0f, Mathf.Tau, 72, ringColor, 2.4f, true);
-
-        var font = GetThemeDefaultFont();
-        int fontSize = 18;
-        var keyColor = new Color(0.72f, 0.97f, 1.0f, Mathf.Min(1.0f, alpha * 1.8f));
-
-        DrawKeyCap(center + new Vector2(0.0f, -ringRadius - 6.0f), "W", font, fontSize, keyColor);
-        DrawKeyCap(center + new Vector2(-ringRadius - 6.0f, 0.0f), "A", font, fontSize, keyColor);
-        DrawKeyCap(center + new Vector2(0.0f, ringRadius + 6.0f), "S", font, fontSize, keyColor);
-        DrawKeyCap(center + new Vector2(ringRadius + 6.0f, 0.0f), "D", font, fontSize, keyColor);
-    }
-
-    private void DrawKeyCap(Vector2 center, string label, Font font, int fontSize, Color color)
-    {
-        var cap = new Rect2(center - new Vector2(16.0f, 16.0f), new Vector2(32.0f, 32.0f));
-        DrawRect(cap, new Color(0.03f, 0.10f, 0.14f, color.A * 0.55f));
-        DrawRect(cap, color, false, 1.8f);
-        DrawString(font, center + new Vector2(-8.0f, 6.5f), label,
-            HorizontalAlignment.Left, -1, fontSize, color);
     }
 
     private void DrawDodgeHint(Vector2 center)

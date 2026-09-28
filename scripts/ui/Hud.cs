@@ -20,7 +20,6 @@ public partial class Hud : CanvasLayer, IDirectorHud
     public static PackedScene UpgradeModalScene => AssetLoader.Load<PackedScene>("res://scenes/ui/upgrade_modal.tscn");
 
     // --- First-run micro-cues (docs/tutorial.md §2) ---
-    public const float MoveCueSeconds = 5.0f;
     public const float DodgeHintSeconds = 6.0f;
     public const int DodgeHintNearbyThreshold = 15;
     public const float DodgeHintNearbyRadius = 300.0f;

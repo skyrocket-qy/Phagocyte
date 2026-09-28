@@ -6,8 +6,8 @@ using Phagocyte.Hero;
 namespace Phagocyte.UI;
 
 /// <summary>
-/// First-run micro-cues: WASD breathing ring, one-shot dodge hint,
-/// fluid-shear arrows and the first level-up bullet-time (docs/tutorial.md §2).
+/// First-run micro-cues: one-shot dodge hint
+/// and the first level-up bullet-time (docs/tutorial.md §2).
 /// Driven explicitly by <see cref="Hud"/> (no <c>_Process</c> of its own).
 /// </summary>
 public partial class TutorialCueView : Node
@@ -17,7 +17,6 @@ public partial class TutorialCueView : Node
     public Node2D? PlayerRef { get; set; }
     public UpgradeModal? CellUpgradeModal { get; set; }
 
-    private float _moveCueTimer = 0.0f;
     private float _dodgeHintTimer = 0.0f;
     private bool _dodgeHintShown = false;
     private float _nearbyCheckTimer = 0.0f;
@@ -64,8 +63,8 @@ public partial class TutorialCueView : Node
     }
 
     /// <summary>
-    /// Drives the non-intrusive micro-cues (docs/tutorial.md §2): the opening
-    /// WASD ring and the one-shot dodge hint.
+    /// Drives the non-intrusive micro-cues (docs/tutorial.md §2):
+    /// the one-shot dodge hint.
     /// </summary>
     public void UpdateTutorialCues(float delta)
     {
@@ -73,12 +72,6 @@ public partial class TutorialCueView : Node
             return;
 
         TutorialOverlayNode.PlayerRef = PlayerRef;
-
-        // Cue 1: opening 5 seconds breathing ring
-        if (_moveCueTimer > 0.0f)
-            _moveCueTimer = Mathf.Max(0.0f, _moveCueTimer - delta);
-        TutorialOverlayNode.ShowMoveCue = _moveCueTimer > 0.0f && PlayerRef != null;
-        TutorialOverlayNode.MoveCueProgress = _moveCueTimer / Hud.MoveCueSeconds;
 
         // Cue 3: first damage or >15 nearby pathogens -> floating dodge hint
         if (!_dodgeHintShown)
@@ -111,10 +104,9 @@ public partial class TutorialCueView : Node
         GD.Print("[Tutorial] Dodge roll hint shown.");
     }
 
-    /// <summary>Resets the per-run micro-cue state and restarts the move cue window.</summary>
+    /// <summary>Resets the per-run micro-cue state.</summary>
     public void ResetTutorialCues()
     {
-        _moveCueTimer = Hud.MoveCueSeconds;
         _dodgeHintTimer = 0.0f;
         _dodgeHintShown = false;
         _nearbyCheckTimer = 0.0f;
