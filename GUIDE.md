@@ -212,7 +212,7 @@ CharacterBody2D → PlayerActor (ClassId-driven, one class for all heroes)
 Node2D → BaseSkill → salvo/beam/nova/zone/strike/aura archetypes + StatPassive / TreeStatBundleSkill
 Node2D → SkillManager (container, NOT a skill)
 Node2D → EquipmentPiece → ContactSpikes
-Area2D → SalvoSkill.SalvoProjectile (generic homing/linear/chain shot)
+Area2D → batched structs (`ProjectileData` in `ProjectileManager`: faction + steering + `EffectSpec`)
 Node2D visuals (transient, palette-flavored): BeamVisual, NovaVisual/Marker, ZoneNode, ChainVisual, AuraVisual
 ```
 New skills are JSON rows (`assets/data/skill/active.json`: `archetype` + `params`); new behavior extends an archetype — never a new skill class. Instantiation is id-routed via `SkillFactory` (no reflection).
@@ -251,7 +251,8 @@ Trace any damage number from trigger to death.
 ### Files
 - `scripts/combat/DamageService.cs`
 - `scripts/combat/SlowService.cs`
-- `scripts/combat/IDamageable.cs`, `ISlowable.cs`
+- `scripts/combat/IDamageable.cs`, `ISlowable.cs`, `IStunnable.cs`, `IAilmentHost.cs`
+- `scripts/combat/Team.cs`, `EffectSpec.cs`, `ProjectileData.cs`
 - `scripts/combat/StatusCore.cs`, `AilmentController.cs` (+ `assets/data/ailments.json`)
 - `scripts/combat/TargetingService.cs`
 - `scripts/combat/ProjectileManager.cs`
@@ -268,9 +269,8 @@ Trace any damage number from trigger to death.
 6. Numbers: `ShowDamage` (yellow/13, gold crit/18), `ShowPlayerDamage` (red), `ShowHeal`, `ShowEvaded/Blocked`
 
 Branch paths:
-- Batched: `SalvoSkill` radial pattern → `ProjectileManager.Spawn(...)` (circular buffer + `ProjectileData` + QuadTree query + multimesh sync). Fallback when no singleton: `SalvoProjectile` nodes.
-- Homing: `SalvoProjectile` (homing steering, assigned-target bind + mark).
-- Chain: `SalvoProjectile` (reacquire + bounces) / `BeamSkill` chain mode.
+- Projectiles (all batched): `SalvoSkill` / enemy `ranged` trait → `ProjectileManager.Spawn(...)` with `Team` + `EffectSpec` + steering data (circular buffer + `ProjectileData` + QuadTree query + multimesh sync). No per-shot nodes exist.
+- Homing: `ProjectileData.SteeringHoming` (locked-target id or nearest + mark) / chain: `SteeringChain` (reacquire + pierce redirect) / `BeamSkill` chain mode.
 - Contact/equipment: `PlayerActor.ProcessContactDamage` → `enemy.TryContactStrike` (1 hit/s); `ContactSpikes._PhysicsProcess` → `Intercept`.
 - Player intake (reverse): `PlayerActor.ApplyDamage`: invuln→evaded→`RollEvasion`→`RollBlock`→armor DR→`ShowPlayerDamage`→death/trauma/flash.
 
@@ -297,7 +297,7 @@ Know how 500 entities stay alive without melting CPU.
 - `scripts/enemies/EnemyActor.cs` + `EnemyTraits.cs` (def + trait engine)
 - `scripts/enemies/EnemySpawner.cs` (id pools, scaling, boss tables)
 - `scripts/enemies/EnemySteering.cs`, `EnemyThreatMode.cs`
-- `scripts/combat/hazards/` — `EnemyProjectile.cs`, `ProximityMine.cs`, `BlockerObstacle.cs`
+- `scripts/combat/hazards/` — `ProximityMine.cs`, `BlockerObstacle.cs` (enemy pellets are `ProjectileManager` shots with `Team.Enemy`)
 - `scripts/enemies/BossPhaseComponent.cs`
 - `assets/data/enemies.json` — 35 defs (stats + steering + traits)
 

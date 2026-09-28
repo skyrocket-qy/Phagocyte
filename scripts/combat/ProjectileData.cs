@@ -22,6 +22,27 @@ public struct ProjectileData
     public int ProjectileTypeIndex;
     public bool IsActive;
 
+    /// <summary>Source faction: Player shots query the enemy tree, Enemy shots the player cell.</summary>
+    public Team SourceTeam;
+    /// <summary>Steering mode: 0 linear, 1 homing, 2 chain.</summary>
+    public byte Steering;
+    public float TurnRate;
+    public float WobbleFreq;
+    public float WobbleAmp;
+    public float ReacquireRadius;
+    public float Phase;
+    /// <summary>Instance id of the assigned homing target (0 = steer to nearest).</summary>
+    public ulong HomingTargetId;
+    /// <summary>Inline on-hit effects (value types: zero heap allocation per spawn).</summary>
+    public EffectSpec Effect0;
+    public EffectSpec Effect1;
+    public EffectSpec Effect2;
+    public int EffectCount;
+
+    public const byte SteeringLinear = 0;
+    public const byte SteeringHoming = 1;
+    public const byte SteeringChain = 2;
+
     public ulong HitTarget0;
     public ulong HitTarget1;
     public ulong HitTarget2;

@@ -189,6 +189,20 @@ public partial class TestTelegraphAndProjectiles : SceneTree
         GD.Print($"[PASS] Step 5: DefensinBarbsSkill seamlessly routed {freshProjMgr.ActiveCount} barbs to ProjectileManager.");
 
         skill.QueueFree();
+
+        // --- 6. Enemy-faction batched shot damages + stuns the player cell ---
+        barbHost.Stats!.SetBase("block", 0.0f);
+        barbHost.Stats.SetBase("evasion", 0.0f);
+        float cellHpBefore = barbHost.Health;
+        freshProjMgr.Spawn(
+            barbHost.GlobalPosition + new Vector2(30, 0), Vector2.Left,
+            400.0f, 10.0f, false, 0, 2.0f, 10.0f, "enemy_pellet", Team.Enemy,
+            new EffectSpec { EffectId = "stun", Duration = 0.5f }, default, default, 1);
+        freshProjMgr._PhysicsProcess(0.12);
+        AssertThat(barbHost.Health).IsLess(cellHpBefore);
+        AssertThat(barbHost.StunTimer).IsGreater(0.0f);
+        GD.Print("[PASS] Step 6: enemy-faction batched shot damages and stuns the player cell.");
+
         freshProjMgr.QueueFree();
         barbHost.QueueFree();
     }

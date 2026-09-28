@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using Game.Enemies;
+using Game.Combat;
 using Game.Player;
 using Game.Skills;
 
@@ -84,8 +85,8 @@ public partial class TestSkillVisuals : TestHarness
                     return false;
                 _frameCount = 0;
 
-                var missiles = Collect<SalvoSkill.SalvoProjectile>(_arena!);
-                AssertThat(missiles.Count).IsGreater(0);
+                var missiles = ProjectileManager.Instance!.CountForTeam(Team.Player);
+                AssertThat(missiles).IsGreater(0);
                 GD.Print("[PASS] Test 3: Y-shaped antibody missile in flight.");
 
                 // Perforin beam + pore decals spawn synchronously.
@@ -112,8 +113,9 @@ public partial class TestSkillVisuals : TestHarness
                 var ros = SkillFactory.CreateActive("ros_torrent")!;
                 ForceEquip(ros, 1);
                 Spawn("tb", new Vector2(120, 0));
+                int rosBefore = ProjectileManager.Instance!.CountForTeam(Team.Player);
                 ros.Trigger();
-                AssertThat(Collect<SalvoSkill.SalvoProjectile>(_arena!).Count).IsGreater(0);
+                AssertThat(ProjectileManager.Instance!.CountForTeam(Team.Player)).IsGreater(rosBefore);
                 GD.Print("[PASS] Test 6: ROS torrent jet visual spawned.");
 
                 // Test 7: Granzyme Detonation
@@ -135,8 +137,9 @@ public partial class TestSkillVisuals : TestHarness
                 // Test 9: Defensin Barbs
                 var def = SkillFactory.CreateActive("defensin_barbs")!;
                 ForceEquip(def, 4);
+                int defBefore = ProjectileManager.Instance!.CountForTeam(Team.Player);
                 def.Trigger();
-                AssertThat(Collect<SalvoSkill.SalvoProjectile>(_arena!).Count).IsGreater(0);
+                AssertThat(ProjectileManager.Instance!.CountForTeam(Team.Player)).IsGreater(defBefore);
                 GD.Print("[PASS] Test 9: Defensin barbs projectile visual spawned.");
 
                 _phase = 4;
@@ -199,8 +202,9 @@ public partial class TestSkillVisuals : TestHarness
                 var lyso = SkillFactory.CreateActive("lysozyme_ricochet")!;
                 ForceEquip(lyso, 4);
                 Spawn("tb", new Vector2(100, 0));
+                int lysoBefore = ProjectileManager.Instance!.CountForTeam(Team.Player);
                 lyso.Trigger();
-                AssertThat(Collect<SalvoSkill.SalvoProjectile>(_arena!).Count).IsGreater(0);
+                AssertThat(ProjectileManager.Instance!.CountForTeam(Team.Player)).IsGreater(lysoBefore);
                 GD.Print("[PASS] Test 17a: Lysozyme ricochet enzyme capsule visual spawned.");
 
                 var lunge = SkillFactory.CreateActive("pseudopod_lunge")!;
@@ -249,6 +253,9 @@ public partial class TestSkillVisuals : TestHarness
         _arena.AddChild(_player);
         if (_player.Stats == null || _player.CellSkillManager == null)
             return false;
+        var projMgr = new ProjectileManager { Name = "ProjectileManager" };
+        _arena.AddChild(projMgr);
+        projMgr.SetHost(_player);
         _player.GlobalPosition = Vector2.Zero;
         _player.Stats.SetBase("crit_chance", 0.0f);
         _player.Stats.SetBase("max_health", 999999.0f);

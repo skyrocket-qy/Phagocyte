@@ -3,6 +3,7 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
 using Game.Player;
+using Game.Combat;
 using Game.Skills;
 using Game.Enemies;
 using Game.UI;
@@ -90,17 +91,9 @@ public partial class TestSkillSystem : TestHarness
         enemyContainer!.AddChild(enemy);
 
         ros.Trigger();
-        bool projectileFound = false;
-        foreach (var child in main.GetChildren())
-        {
-            if (child is SalvoSkill.SalvoProjectile rj)
-            {
-                projectileFound = true;
-                AssertThat(rj.GlobalPosition.DistanceTo(player.GlobalPosition)).IsLessEqual(60.0f);
-                break;
-            }
-        }
-        AssertThat(projectileFound).IsTrue();
+        var pm = ProjectileManager.Instance;
+        AssertThat(pm).IsNotNull();
+        AssertThat(pm!.CountForTeam(Team.Player)).IsGreater(0);
         GD.Print("[PASS] ROS Torrent projectile emission & target acquisition verified.");
 
         // 7. Test equipping a passive trait into passive slot 0

@@ -8,7 +8,7 @@ using Game.UI;
 
 namespace Game.Enemies;
 
-public partial class EnemyActor : Node2D, IDamageable, ISlowable
+public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IAilmentHost
 {
     [Signal]
     public delegate void EnemyDiedEventHandler(EnemyActor enemy);

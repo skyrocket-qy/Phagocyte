@@ -16,7 +16,7 @@ namespace Game.Player;
 /// Encapsulates universal stats, physics movement, 32-vertex organic deformation,
 /// and experience progression.
 /// </summary>
-public partial class PlayerActor : CharacterBody2D, ISlowable
+public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStunnable, IAilmentHost
 {
     [Signal]
     public delegate void StatsChangedEventHandler(float health, float maxHealth, float radiusRatio);
@@ -963,6 +963,29 @@ public partial class PlayerActor : CharacterBody2D, ISlowable
     public void TakeDamage(float amount)
     {
         ApplyDamage(amount * RunMutatorService.IncomingDamageMultiplier);
+    }
+
+    /// <summary>Generic damage entry (IDamageable): full pipeline, source/crit unused.</summary>
+    public void TakeDamage(float damage, Node2D? source, bool isCrit) => TakeDamage(damage);
+
+    /// <summary>Generic DoT entry (IDamageable): direct HP loss, bypasses evasion/block.</summary>
+    public void TakeDoTDamage(float dotDamage)
+    {
+        if (IsDead || dotDamage <= 0.0f)
+            return;
+        float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
+        Health = Mathf.Clamp(Health - dotDamage, 0.0f, maxHp);
+        HasTakenDamage = true;
+        RunTelemetryManager.Instance?.RecordDamageTaken(dotDamage);
+        if (Health <= 0.0f)
+        {
+            Health = 0.0f;
+            IsDead = true;
+            AudioManager.Instance?.PlayPlayerDeath();
+            CameraFollow.Instance?.AddTrauma(0.65f);
+            EmitSignal(SignalName.Died);
+        }
+        EmitStatsSignal();
     }
 
     private void ApplyDamage(float amount)

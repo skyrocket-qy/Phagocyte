@@ -727,7 +727,7 @@ public partial class TestFullVisualPreview : TestHarness
         var toRemove = new List<Node>();
         foreach (var child in _main.GetChildren())
         {
-            if (child is EnemyActor || child is SalvoSkill.SalvoProjectile
+            if (child is EnemyActor
                 || child is BeamSkill.BeamVisual
                 || child is NovaSkill.NovaVisual || child is NovaSkill.NovaMarker
                 || child is ZoneSkill.ZoneNode
@@ -741,6 +741,7 @@ public partial class TestFullVisualPreview : TestHarness
             _main.RemoveChild(n);
             n.QueueFree();
         }
+        ProjectileManager.Instance?.ClearAll();
 
         if (_player.CellSkillManager != null)
         {

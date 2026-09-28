@@ -11,8 +11,9 @@ namespace Game.Skills;
 /// Projectile-salvo archetype (data: assets/data/skill/active.json).
 /// Covers homing volleys, radial bursts, chaining shots and fan sprays:
 /// count projectiles fly with linear / homing / chain steering and apply
-/// per-skill hit effects (mark, agglutination, burn). Radial uniform
-/// patterns may route through the pooled ProjectileManager.
+/// generic <see cref="EffectSpec"/> hits (mark, agglutination, burn). All
+/// shots route through the pooled <see cref="ProjectileManager"/> (batched
+/// structs, zero per-shot nodes); steering and effects ride as spawn data.
 /// </summary>
 public partial class SalvoSkill : BaseSkill
 {
@@ -121,227 +122,79 @@ public partial class SalvoSkill : BaseSkill
 
     private void FireRadial(Dictionary p, int count, float speed, float dmg, bool crit)
     {
-        if (ParamBool(p, "via_manager", false) && ProjectileManager.Instance != null)
+        var mgr = ProjectileManager.Instance;
+        if (mgr == null || !HasValidHost())
         {
-            for (int i = 0; i < count; i++)
-            {
-                Vector2 dir = Vector2.FromAngle(i * Mathf.Tau / count);
-                ProjectileManager.Instance.Spawn(Host!.GlobalPosition, dir, speed, dmg, crit,
-                    GetCalculatedPierce(ParamInt(p, "pierce", 2)),
-                    ParamFloat(p, "lifetime", 1.6f), ParamFloat(p, "hit_radius", 20.0f), "defensin_barb");
-            }
+            GD.PushWarning("[SalvoSkill] No ProjectileManager: radial salvo dropped.");
             return;
         }
         for (int i = 0; i < count; i++)
-            FireOne(Vector2.FromAngle(i * Mathf.Tau / count), null, dmg, crit);
+        {
+            Vector2 dir = Vector2.FromAngle(i * Mathf.Tau / count);
+            mgr.Spawn(Host!.GlobalPosition, dir, speed, dmg, crit,
+                GetCalculatedPierce(ParamInt(p, "pierce", 2)),
+                ParamFloat(p, "lifetime", 1.6f), ParamFloat(p, "hit_radius", 20.0f), "defensin_barb");
+        }
     }
 
     private void FireOne(Vector2 dir, EnemyActor? target, float dmg, bool crit)
     {
         if (!HasValidHost())
             return;
-        var p = SkillParams();
-        var parent = Host!.GetParent();
-        if (parent == null)
+        var mgr = ProjectileManager.Instance;
+        if (mgr == null)
+        {
+            GD.PushWarning("[SalvoSkill] No ProjectileManager: salvo shot dropped.");
             return;
-        parent.AddChild(new SalvoProjectile
+        }
+        var p = SkillParams();
+        ulong lockId = target != null && GodotObject.IsInstanceValid(target) ? target.GetInstanceId() : 0;
+        int steering = ParamString(p, "steering", "linear") switch
         {
-            SkillRef = this,
-            GlobalPosition = Host.GlobalPosition,
-            Direction = dir,
-            AssignedTarget = target,
-            Speed = GetCalculatedSpeed(ParamFloat(p, "speed", 420.0f)),
-            Damage = dmg,
-            IsCrit = crit,
-            Lifetime = GetCalculatedDuration(ParamFloat(p, "lifetime", 2.0f)),
-            HitRadius = ParamFloat(p, "hit_radius", 20.0f),
-            BouncesLeft = GetCalculatedPierce(ParamInt(p, "pierce", ParamInt(p, "bounces", 0)))
-        });
+            "homing" => ProjectileData.SteeringHoming,
+            "chain" => ProjectileData.SteeringChain,
+            _ => ProjectileData.SteeringLinear,
+        };
+        var fx0 = default(EffectSpec);
+        var fx1 = default(EffectSpec);
+        var fx2 = default(EffectSpec);
+        int fxCount = 0;
+        if (CatalogLoader.GetBool(p, "mark", false))
+        {
+            fx0 = new EffectSpec { EffectId = AilmentController.MarkedId, Magnitude = -1.0f, Duration = -1.0f };
+            fxCount = 1;
+        }
+        if (p.ContainsKey("agglutinate_duration"))
+        {
+            var fx = new EffectSpec
+            {
+                EffectId = AilmentController.AgglutinationId,
+                Magnitude = ParamFloat(p, "agglutinate_slow", 0.35f),
+                Duration = ParamFloat(p, "agglutinate_duration", 1.5f)
+            };
+            if (fxCount == 0) fx0 = fx; else if (fxCount == 1) fx1 = fx; else fx2 = fx;
+            fxCount = Mathf.Min(3, fxCount + 1);
+        }
+        if (p.ContainsKey("burn_mult"))
+        {
+            var fx = new EffectSpec
+            {
+                EffectId = AilmentController.BurnId,
+                Magnitude = dmg * ParamFloat(p, "burn_mult", 0.35f),
+                Duration = ParamFloat(p, "burn_duration", 2.0f)
+            };
+            if (fxCount == 0) fx0 = fx; else if (fxCount == 1) fx1 = fx; else fx2 = fx;
+            fxCount = Mathf.Min(3, fxCount + 1);
+        }
+        mgr.Spawn(
+            Host!.GlobalPosition, dir,
+            GetCalculatedSpeed(ParamFloat(p, "speed", 420.0f)), dmg, crit,
+            GetCalculatedPierce(ParamInt(p, "pierce", 0)),
+            GetCalculatedDuration(ParamFloat(p, "lifetime", 2.0f)),
+            ParamFloat(p, "hit_radius", 20.0f), "generic", Team.Player,
+            fx0, fx1, fx2, fxCount, steering,
+            ParamFloat(p, "turn", 6.0f), ParamFloat(p, "wobble_freq", 0.0f), ParamFloat(p, "wobble_amp", 0.0f),
+            ParamFloat(p, "reacquire", 350.0f), lockId);
     }
 
-    private bool ParamBool(Dictionary p, string key, bool fallback)
-    {
-        return CatalogLoader.GetBool(p, key, fallback);
-    }
-
-    /// <summary>Single salvo projectile: linear / homing / chaining flight with hit effects.</summary>
-    public partial class SalvoProjectile : Area2D
-    {
-        public SalvoSkill? SkillRef { get; set; }
-        public Vector2 Direction { get; set; } = Vector2.Right;
-        public EnemyActor? AssignedTarget { get; set; }
-        public float Speed { get; set; } = 420.0f;
-        public float Damage { get; set; }
-        public bool IsCrit { get; set; }
-        public float Lifetime { get; set; } = 2.0f;
-        public float HitRadius { get; set; } = 20.0f;
-        public int BouncesLeft { get; set; }
-
-        private float _age;
-        private float _phase;
-        private float _stickTimer;
-        private Vector2 _stickOffset = Vector2.Zero;
-        private readonly HashSet<EnemyActor> _visited = new();
-
-        public override void _Ready()
-        {
-            CollisionLayer = 0;
-            CollisionMask = 2;
-            AddChild(new CollisionShape2D
-            {
-                Name = "CollisionShape2D",
-                Shape = new CircleShape2D { Radius = 8.0f }
-            });
-            BodyEntered += OnBodyEntered;
-            ZIndex = 4;
-        }
-
-        public override void _PhysicsProcess(double delta)
-        {
-            float dt = (float)delta;
-            _age += dt;
-            if (_age >= Lifetime)
-            {
-                QueueFree();
-                return;
-            }
-            var skill = SkillRef;
-            var p = skill?.SkillParams() ?? new Dictionary();
-            string steering = skill != null ? skill.ParamString(p, "steering", "linear") : "linear";
-
-            if (_stickTimer > 0.0f)
-            {
-                _stickTimer -= dt;
-                if (AssignedTarget != null && GodotObject.IsInstanceValid(AssignedTarget))
-                    GlobalPosition = AssignedTarget.GlobalPosition + _stickOffset;
-                if (_stickTimer <= 0.0f)
-                    QueueFree();
-                return;
-            }
-
-            if (steering == "homing" && AssignedTarget != null)
-            {
-                if (!GodotObject.IsInstanceValid(AssignedTarget))
-                {
-                    QueueFree();
-                    return;
-                }
-                Vector2 desired = (AssignedTarget.GlobalPosition - GlobalPosition).Normalized();
-                Direction = Direction.Lerp(desired, Mathf.Clamp(skill!.ParamFloat(p, "turn", 6.0f) * dt, 0.0f, 1.0f)).Normalized();
-                _phase += dt * skill.ParamFloat(p, "wobble_freq", 14.0f);
-                Vector2 perp = Direction.Orthogonal();
-                Position += (Direction * Speed + perp * Mathf.Sin(_phase) * skill.ParamFloat(p, "wobble_amp", 0.25f) * Speed) * dt;
-            }
-            else
-            {
-                Position += Direction * Speed * dt;
-            }
-            Rotation = Direction.Angle();
-
-            if (steering == "chain")
-                ScanChain(p, skill);
-            else
-                ScanHit(p, skill);
-        }
-
-        private void ScanHit(Dictionary p, SalvoSkill? skill)
-        {
-            var target = AssignedTarget;
-            if (target != null)
-            {
-                if (!GodotObject.IsInstanceValid(target))
-                {
-                    QueueFree();
-                    return;
-                }
-                if (GlobalPosition.DistanceSquaredTo(target.GlobalPosition) <= HitRadius * HitRadius)
-                    HitTarget(target, p, skill);
-                return;
-            }
-            var found = TargetingService.FindNearest(this, HitRadius, e => e != null && !_visited.Contains(e));
-            if (found == null)
-                return;
-            _visited.Add(found);
-            HitTarget(found, p, skill);
-        }
-
-        private void ScanChain(Dictionary p, SalvoSkill? skill)
-        {
-            var found = TargetingService.FindNearest(this, HitRadius, e => e != null && !_visited.Contains(e));
-            if (found == null)
-                return;
-            _visited.Add(found);
-            HitTarget(found, p, skill);
-            if (BouncesLeft <= 0)
-                return;
-            var next = TargetingService.FindNearest(found, skill?.ParamFloat(p, "reacquire", 350.0f) ?? 350.0f,
-                e => e != null && e != found && !_visited.Contains(e));
-            if (next != null)
-                Direction = (next.GlobalPosition - GlobalPosition).Normalized();
-            else
-                Direction = Direction.Rotated((float)GD.RandRange(1.8f, 2.5f));
-        }
-
-        private void HitTarget(EnemyActor target, Dictionary p, SalvoSkill? skill)
-        {
-            DamageService.DealDamage(target, Damage, skill?.Host, IsCrit);
-            if (skill != null && skill.ParamBool(p, "mark", false) && target.Ailments != null)
-            {
-                target.Ailments.ApplyMarkation();
-                VfxManager.Instance?.Play(VfxType.MarkBind, target.GlobalPosition);
-            }
-            if (skill != null && p.ContainsKey("agglutinate_duration") && target.Ailments != null)
-                target.Ailments.ApplyAgglutination(skill.ParamFloat(p, "agglutinate_duration", 1.5f), skill.ParamFloat(p, "agglutinate_slow", 0.35f));
-            if (skill != null && p.ContainsKey("burn_mult") && target.Ailments != null)
-                target.Ailments.ApplyOxidativeBurn(Damage * skill.ParamFloat(p, "burn_mult", 0.35f), skill.ParamFloat(p, "burn_duration", 2.0f));
-
-            AssignedTarget = target;
-            _visited.Add(target);
-            float stick = skill?.ParamFloat(p, "stick_time", 0.0f) ?? 0.0f;
-            if (stick > 0.0f)
-            {
-                _stickTimer = stick;
-                _stickOffset = (GlobalPosition - target.GlobalPosition).Normalized() * skill!.ParamFloat(p, "stick_dist", 20.0f);
-                SetDeferred("monitoring", false);
-                return;
-            }
-            if (BouncesLeft > 0 && (skill?.ParamString(p, "steering", "linear") == "chain" || skill?.ParamString(p, "steering", "linear") == "linear"))
-            {
-                BouncesLeft--;
-                if (BouncesLeft <= 0)
-                {
-                    QueueFree();
-                    return;
-                }
-                return;
-            }
-            QueueFree();
-        }
-
-        private void OnBodyEntered(Node2D body)
-        {
-            if (body is EnemyActor enemy && GodotObject.IsInstanceValid(enemy))
-            {
-                var skill = SkillRef;
-                var p = skill?.SkillParams() ?? new Dictionary();
-                HitTarget(enemy, p, skill);
-            }
-            else
-            {
-                QueueFree();
-            }
-        }
-
-        public override void _Draw()
-        {
-            var skill = SkillRef;
-            Color accent = skill != null ? SkillAssetPalette.Accent(skill.SkillId, new Color(0.5f, 0.9f, 1.0f)) : new Color(0.5f, 0.9f, 1.0f);
-            Color core = skill != null ? SkillAssetPalette.Core(skill.SkillId, Colors.White) : Colors.White;
-            Vector2 fwd = Vector2.FromAngle(Rotation);
-            DrawLine(-fwd * 12.0f, Vector2.Zero, new Color(accent, 0.35f), 5.0f);
-            DrawLine(-fwd * 10.0f, fwd * 8.0f, accent, 3.0f);
-            DrawLine(-fwd * 10.0f, fwd * 8.0f, core, 1.4f);
-            DrawCircle(Vector2.Zero, 4.0f, core);
-        }
-    }
 }

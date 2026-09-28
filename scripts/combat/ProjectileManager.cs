@@ -3,13 +3,19 @@ using System;
 using System.Collections.Generic;
 using Game.Core;
 using Game.Enemies;
+using Game.Player;
 
 namespace Game.Combat;
 
 /// <summary>
-/// Extreme-density bullet-hell projectile manager.
-/// Uses MultiMeshInstance2D batch rendering and a 64px spatial hash grid
-/// for zero-GC, O(1) collision queries capable of handling 4096+ projectiles at 60 FPS.
+/// Extreme-density bullet-hell projectile manager for every faction.
+/// Uses MultiMeshInstance2D batch rendering and a QuadTree over the enemy
+/// registry for zero-GC, O(log n) collision queries capable of handling
+/// 4096+ projectiles at 60 FPS. Player-team shots query the enemy tree and
+/// route damage through <see cref="DamageService"/> with the host as source
+/// (preserves life-steal); enemy-team shots fly at the player cell.
+/// Per-node pellets are gone: steering (homing/chain/wobble) and on-hit
+/// effects ride in <see cref="ProjectileData"/> as data.
 /// </summary>
 public partial class ProjectileManager : Node2D
 {
@@ -54,6 +60,7 @@ public partial class ProjectileManager : Node2D
         RegisterType("generic", null, new Vector2(16, 16));
         RegisterType("defensin_barb", null, new Vector2(22, 10));
         RegisterType("seeker", null, new Vector2(16, 16));
+        RegisterType("enemy_pellet", null, new Vector2(16, 16));
 
         _typeActiveCounts = new int[_typeKeys.Count];
     }
@@ -185,7 +192,18 @@ public partial class ProjectileManager : Node2D
         int pierce = 0,
         float lifetime = 2.5f,
         float radius = 10.0f,
-        string projType = "generic")
+        string projType = "generic",
+        Team team = Team.Player,
+        EffectSpec effect0 = default,
+        EffectSpec effect1 = default,
+        EffectSpec effect2 = default,
+        int effectCount = 0,
+        int steering = 0,
+        float turnRate = 6.0f,
+        float wobbleFreq = 0.0f,
+        float wobbleAmp = 0.0f,
+        float reacquireRadius = 350.0f,
+        ulong homingTargetId = 0)
     {
         if (dir == Vector2.Zero) dir = Vector2.Right;
         else dir = dir.Normalized();
@@ -215,7 +233,19 @@ public partial class ProjectileManager : Node2D
                     HitTarget0 = 0,
                     HitTarget1 = 0,
                     HitTarget2 = 0,
-                    HitTarget3 = 0
+                    HitTarget3 = 0,
+                    SourceTeam = team,
+                    Steering = (byte)steering,
+                    TurnRate = turnRate,
+                    WobbleFreq = wobbleFreq,
+                    WobbleAmp = wobbleAmp,
+                    ReacquireRadius = reacquireRadius,
+                    Phase = 0.0f,
+                    HomingTargetId = homingTargetId,
+                    Effect0 = effect0,
+                    Effect1 = effect1,
+                    Effect2 = effect2,
+                    EffectCount = effectCount
                 };
                 MarkActive(slot);
                 _nextSpawnIndex = (slot + 1) % MaxTotalProjectiles;
@@ -242,7 +272,19 @@ public partial class ProjectileManager : Node2D
             HitTarget0 = 0,
             HitTarget1 = 0,
             HitTarget2 = 0,
-            HitTarget3 = 0
+            HitTarget3 = 0,
+            SourceTeam = team,
+            Steering = (byte)steering,
+            TurnRate = turnRate,
+            WobbleFreq = wobbleFreq,
+            WobbleAmp = wobbleAmp,
+            ReacquireRadius = reacquireRadius,
+            Phase = 0.0f,
+            HomingTargetId = homingTargetId,
+            Effect0 = effect0,
+            Effect1 = effect1,
+            Effect2 = effect2,
+            EffectCount = effectCount
         };
         MarkActive(overwriteSlot);
         _nextSpawnIndex = (_nextSpawnIndex + 1) % MaxTotalProjectiles;
@@ -261,8 +303,8 @@ public partial class ProjectileManager : Node2D
 
     public override void _PhysicsProcess(double delta)
     {
-        // Idle frames (no bullets in flight) skip the enemy-index rebuild,
-        // the per-bullet queries and the multimesh sync entirely. The
+        // Idle frames (no bullets in flight) skip the enemy-index rebuild, the
+        // per-bullet queries and the multimesh sync entirely. The
         // transition frame already zeroed every VisibleInstanceCount.
         if (_activeCount == 0)
             return;
@@ -274,6 +316,14 @@ public partial class ProjectileManager : Node2D
         bool hasTargets = EnemyActor.ActiveEnemies.Count > 0;
         if (hasTargets)
             RebuildEnemyIndex();
+
+        // Enemy-team shots fly at the player cell (the host doubles as the
+        // damage source for player-team shots, preserving life-steal).
+        PlayerActor? player = _hostNode as PlayerActor ?? EnemySteering.GetPlayer(this);
+        bool playerValid = player != null && GodotObject.IsInstanceValid(player) && !player.IsDead;
+        Vector2 playerPos = playerValid ? player!.GlobalPosition : Vector2.Zero;
+        float playerRadius = playerValid ? player!.CurrentRadius : 0.0f;
+        ulong playerId = playerValid ? player!.GetInstanceId() : 0;
 
         for (int a = _activeCount - 1; a >= 0; a--)
         {
@@ -292,40 +342,76 @@ public partial class ProjectileManager : Node2D
                 continue;
             }
 
-            p.Position += p.Direction * p.Speed * dt;
-
-            bool projectileAlive = true;
-            if (hasTargets)
+            bool projectileAlive;
+            if (p.SourceTeam == Team.Enemy)
             {
-                // QuadTree neighborhood query: O(log n + k) candidate lookup
-                float queryRadius = p.Radius + 18.0f;
-                float hitDistSq = queryRadius * queryRadius;
-                _enemyQuery.Clear();
-                _enemyTree.QueryCircle(p.Position, queryRadius, _enemyQuery);
-
-                for (int b = 0; b < _enemyQuery.Count && projectileAlive; b++)
+                p.Position += p.Direction * p.Speed * dt;
+                p.Rotation = p.Direction.Angle();
+                projectileAlive = true;
+                if (playerValid && !p.HasHitTarget(playerId))
                 {
-                    var enemy = _enemyQuery[b];
-                    if (enemy == null || !GodotObject.IsInstanceValid(enemy)) continue;
-
-                    ulong enemyId = enemy.GetInstanceId();
-                    if (p.HasHitTarget(enemyId)) continue;
-
-                    if (p.Position.DistanceSquaredTo(enemy.GlobalPosition) <= hitDistSq)
+                    float reach = p.Radius + playerRadius;
+                    if (p.Position.DistanceSquaredTo(playerPos) <= reach * reach)
                     {
-                        p.AddHitTarget(enemyId);
-
-                        // Apply direct combat damage and stats
-                        enemy.TakeDamage(p.Damage, _hostNode, p.IsCrit);
-
+                        p.AddHitTarget(playerId);
+                        DamageService.DealDamage(player, p.Damage, null, p.IsCrit);
+                        EffectSpec.ApplyAll(player, p.Damage, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
                         if (p.PierceRemaining > 0)
-                        {
                             p.PierceRemaining--;
-                        }
                         else
                         {
                             projectileAlive = false;
                             MarkInactive(slot);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (hasTargets && p.Steering == ProjectileData.SteeringHoming)
+                    SteerHoming(ref p, dt);
+                p.Position += p.Direction * p.Speed * dt;
+                if (p.WobbleAmp > 0.0f && p.WobbleFreq > 0.0f)
+                {
+                    p.Phase += dt * p.WobbleFreq;
+                    p.Position += p.Direction.Orthogonal() * (Mathf.Sin(p.Phase) * p.WobbleAmp * p.Speed * dt);
+                }
+                p.Rotation = p.Direction.Angle();
+
+                projectileAlive = true;
+                if (hasTargets)
+                {
+                    // QuadTree neighborhood query: O(log n + k) candidate lookup
+                    float queryRadius = p.Radius + 18.0f;
+                    float hitDistSq = queryRadius * queryRadius;
+                    _enemyQuery.Clear();
+                    _enemyTree.QueryCircle(p.Position, queryRadius, _enemyQuery);
+
+                    for (int b = 0; b < _enemyQuery.Count && projectileAlive; b++)
+                    {
+                        var enemy = _enemyQuery[b];
+                        if (enemy == null || !GodotObject.IsInstanceValid(enemy)) continue;
+
+                        ulong enemyId = enemy.GetInstanceId();
+                        if (p.HasHitTarget(enemyId)) continue;
+
+                        if (p.Position.DistanceSquaredTo(enemy.GlobalPosition) <= hitDistSq)
+                        {
+                            p.AddHitTarget(enemyId);
+                            DamageService.DealDamage(enemy, p.Damage, _hostNode, p.IsCrit);
+                            EffectSpec.ApplyAll(enemy, p.Damage, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
+
+                            if (p.PierceRemaining > 0)
+                            {
+                                p.PierceRemaining--;
+                                if (p.Steering == ProjectileData.SteeringChain)
+                                    RedirectChain(ref p);
+                            }
+                            else
+                            {
+                                projectileAlive = false;
+                                MarkInactive(slot);
+                            }
                         }
                     }
                 }
@@ -352,6 +438,106 @@ public partial class ProjectileManager : Node2D
         {
             _typeMultiMeshes[t].Multimesh.VisibleInstanceCount = _typeActiveCounts[t];
         }
+    }
+
+    /// <summary>
+    /// Homing steer toward the locked target while it is still indexed, else
+    /// the nearest indexed enemy. Lock ids come from the spawner; 0 steers to
+    /// nearest (matches the old unassigned-target fallback).
+    /// </summary>
+    private void SteerHoming(ref ProjectileData p, float dt)
+    {
+        _enemyQuery.Clear();
+        _enemyTree.QueryCircle(p.Position, Mathf.Max(p.ReacquireRadius, 64.0f), _enemyQuery);
+
+        Vector2? aim = null;
+        float bestSq = float.MaxValue;
+        Vector2? locked = null;
+        foreach (var enemy in _enemyQuery)
+        {
+            if (enemy == null || !GodotObject.IsInstanceValid(enemy)) continue;
+            float dSq = p.Position.DistanceSquaredTo(enemy.GlobalPosition);
+            if (p.HomingTargetId != 0 && enemy.GetInstanceId() == p.HomingTargetId)
+            {
+                locked = enemy.GlobalPosition;
+                break;
+            }
+            if (dSq < bestSq)
+            {
+                bestSq = dSq;
+                aim = enemy.GlobalPosition;
+            }
+        }
+        Vector2? target = locked ?? aim;
+        if (target == null)
+            return;
+        Vector2 desired = (target.Value - p.Position).Normalized();
+        if (desired == Vector2.Zero)
+            return;
+        p.Direction = p.Direction.Lerp(desired, Mathf.Clamp(p.TurnRate * dt, 0.0f, 1.0f));
+        if (p.Direction.LengthSquared() < 0.000001f)
+            p.Direction = desired;
+        else
+            p.Direction = p.Direction.Normalized();
+    }
+
+    /// <summary>Chain redirect: nearest unhit enemy, else a random deflection.</summary>
+    private void RedirectChain(ref ProjectileData p)
+    {
+        _enemyQuery.Clear();
+        _enemyTree.QueryCircle(p.Position, Mathf.Max(p.ReacquireRadius, 64.0f), _enemyQuery);
+
+        float bestSq = float.MaxValue;
+        Vector2? best = null;
+        foreach (var enemy in _enemyQuery)
+        {
+            if (enemy == null || !GodotObject.IsInstanceValid(enemy)) continue;
+            if (p.HasHitTarget(enemy.GetInstanceId())) continue;
+            float dSq = p.Position.DistanceSquaredTo(enemy.GlobalPosition);
+            if (dSq < bestSq)
+            {
+                bestSq = dSq;
+                best = enemy.GlobalPosition;
+            }
+        }
+        if (best != null)
+        {
+            Vector2 dir = (best.Value - p.Position).Normalized();
+            if (dir != Vector2.Zero)
+                p.Direction = dir;
+        }
+        else
+        {
+            p.Direction = p.Direction.Rotated((float)GD.RandRange(1.8f, 2.5f));
+        }
+    }
+
+    /// <summary>Test hook: active shots for one faction.</summary>
+    public int CountForTeam(Team team)
+    {
+        int n = 0;
+        for (int i = 0; i < _activeCount; i++)
+        {
+            ref var p = ref _projectiles[_activeSlots[i]];
+            if (p.IsActive && p.SourceTeam == team)
+                n++;
+        }
+        return n;
+    }
+
+    /// <summary>Test hook: any active shot of one faction carrying an effect.</summary>
+    public bool TeamHasEffect(Team team, string effectId)
+    {
+        for (int i = 0; i < _activeCount; i++)
+        {
+            ref var p = ref _projectiles[_activeSlots[i]];
+            if (!p.IsActive || p.SourceTeam != team || p.EffectCount <= 0)
+                continue;
+            if (p.Effect0.EffectId == effectId) return true;
+            if (p.EffectCount > 1 && p.Effect1.EffectId == effectId) return true;
+            if (p.EffectCount > 2 && p.Effect2.EffectId == effectId) return true;
+        }
+        return false;
     }
 
     public void ClearAll()

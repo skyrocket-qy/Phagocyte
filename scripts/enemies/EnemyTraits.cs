@@ -471,27 +471,29 @@ public partial class EnemyActor
             return;
         state.Timer = interval;
 
-        if (!EnemyProjectile.CanSpawn())
+        var mgr = ProjectileManager.Instance;
+        if (mgr == null)
             return;
         Vector2 dir = (player.GlobalPosition - GlobalPosition).Normalized();
         if (dir.LengthSquared() < 0.0001f)
             dir = Vector2.Right;
-        var parent = GetParent();
-        if (parent == null)
-            return;
-        string coreHex = CatalogLoader.GetString(def, "core_color");
-        string auraHex = CatalogLoader.GetString(def, "aura_color");
-        parent.AddChild(new EnemyProjectile
+        var fx = default(EffectSpec);
+        int fxCount = 0;
+        float stun = CatalogLoader.GetFloat(def, "stun", 0.0f);
+        if (stun > 0.0f)
         {
-            GlobalPosition = GlobalPosition + dir * CatalogLoader.GetFloat(def, "spawn_offset", 16.0f),
-            Direction = dir,
-            Speed = CatalogLoader.GetFloat(def, "speed", 300.0f),
-            Damage = CatalogLoader.GetFloat(def, "damage", 9.0f),
-            Lifetime = CatalogLoader.GetFloat(def, "lifetime", 5.0f),
-            StunDuration = CatalogLoader.GetFloat(def, "stun", 0.0f),
-            CoreColor = coreHex != "" ? new Color(coreHex) : new Color(1.0f, 0.65f, 0.2f, 0.95f),
-            AuraColor = auraHex != "" ? new Color(auraHex) : new Color(0.95f, 0.4f, 0.4f, 0.35f)
-        });
+            fx = new EffectSpec { EffectId = "stun", Duration = stun };
+            fxCount = 1;
+        }
+        mgr.Spawn(
+            GlobalPosition + dir * CatalogLoader.GetFloat(def, "spawn_offset", 16.0f),
+            dir,
+            CatalogLoader.GetFloat(def, "speed", 300.0f),
+            CatalogLoader.GetFloat(def, "damage", 9.0f),
+            false, 0,
+            CatalogLoader.GetFloat(def, "lifetime", 5.0f),
+            8.0f, "enemy_pellet", Team.Enemy,
+            fx, default, default, fxCount);
     }
 
     private void TickReplicate(Dictionary def, float dt)

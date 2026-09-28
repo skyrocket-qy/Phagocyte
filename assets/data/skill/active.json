@@ -252,8 +252,6 @@
       "wobble_amp": 0.25,
       "stagger_base": 0.2,
       "stagger_step": 0.05,
-      "stick_time": 0.4,
-      "stick_dist": 20.0,
       "mark": true,
       "agglutinate_duration": 1.5,
       "agglutinate_slow": 0.35,
@@ -499,7 +497,7 @@
       "spread": 0.35,
       "steering": "chain",
       "reacquire": 350.0,
-      "bounces": 4,
+      "pierce": 4,
       "sfx": "cold_snap"
     }
   },
@@ -658,7 +656,6 @@
       "pattern": "radial",
       "steering": "linear",
       "pierce": 2,
-      "via_manager": true,
       "sfx": "ethereal_knives"
     }
   },

@@ -160,37 +160,23 @@ public partial class TestEnemySteering : SceneTree
         artillery.GlobalPosition = new Vector2(250, 0);
         _container!.AddChild(artillery);
 
-        artillery._PhysicsProcess(2.6);
-        EnemyProjectile? pellet = null;
-        foreach (var child in _container.GetChildren())
-        {
-            if (child is EnemyProjectile found)
-            {
-                pellet = found;
-                break;
-            }
-        }
-        AssertThat(pellet).IsNotNull();
-        AssertThat(pellet!.IsInGroup("enemy_shots")).IsTrue();
+        var mgr = new ProjectileManager { Name = "PelletMgr" };
+        _container.AddChild(mgr);
+        mgr.SetHost(_player);
 
-        // Soft cap holds under pressure
-        for (int i = 0; i < EnemyProjectile.MaxActivePellets + 40; i++)
+        artillery._PhysicsProcess(2.6);
+        AssertThat(mgr.CountForTeam(Team.Enemy)).IsGreater(0);
+
+        // Shared pool holds under pressure (overwrite-oldest, never grows)
+        for (int i = 0; i < ProjectileManager.MaxTotalProjectiles + 100; i++)
         {
             artillery._PhysicsProcess(2.6);
         }
-        AssertThat(EnemyProjectile.ActiveCount).IsLessEqual(EnemyProjectile.MaxActivePellets);
-        GD.Print($"[PASS] Standoff pellets spawn and the soft cap holds at {EnemyProjectile.MaxActivePellets}.");
+        AssertThat(mgr.ActiveCount).IsLessEqual(ProjectileManager.MaxTotalProjectiles);
+        GD.Print($"[PASS] Standoff pellets spawn batched and the pool caps at {ProjectileManager.MaxTotalProjectiles}.");
         artillery.QueueFree();
-        foreach (var child in _container.GetChildren())
-        {
-            // Immediate removal (not QueueFree): the freed-pending count must
-            // not pollute the tetanus artillery test below.
-            if (child is EnemyProjectile spent)
-            {
-                _container.RemoveChild(spent);
-                spent.Free();
-            }
-        }
+        _container.RemoveChild(mgr);
+        mgr.Free();
     }
 
     private void TestTissueInvader()
@@ -232,25 +218,22 @@ public partial class TestEnemySteering : SceneTree
         tetanus.GlobalPosition = new Vector2(480, 0);
         _container!.AddChild(tetanus);
 
+        var mgr = new ProjectileManager { Name = "PulseMgr" };
+        _container.AddChild(mgr);
+        mgr.SetHost(_player);
+
         for (int i = 0; i < 320; i++)
         {
             tetanus._PhysicsProcess(1.0 / 60.0);
         }
 
-        EnemyProjectile? pulse = null;
-        foreach (var child in _container.GetChildren())
-        {
-            if (child is EnemyProjectile found && found.StunDuration > 0.0f)
-            {
-                pulse = found;
-                break;
-            }
-        }
-
-        AssertThat(pulse).IsNotNull();
+        AssertThat(mgr.CountForTeam(Team.Enemy)).IsGreater(0);
+        AssertThat(mgr.TeamHasEffect(Team.Enemy, "stun")).IsTrue();
         AssertThat(tetanus.ThreatMode).IsEqual(EnemyThreatMode.Standoff);
-        GD.Print("[PASS] Tetanus keeps its bespoke standoff artillery behavior (pulse fired).");
+        GD.Print("[PASS] Tetanus keeps its bespoke standoff artillery behavior (stun pulse fired).");
         tetanus.QueueFree();
+        _container.RemoveChild(mgr);
+        mgr.Free();
     }
 }
 
