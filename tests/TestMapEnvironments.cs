@@ -3,6 +3,7 @@ using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using Phagocyte.Core;
+using Phagocyte.Combat;
 using Phagocyte.Enemies;
 using Phagocyte.Map;
 using Phagocyte.Hero;
@@ -117,36 +118,19 @@ public partial class TestMapEnvironments : TestHarness
         var main = SpawnMain("acute_wound");
         AssertThat(main.OrganEnvironment).IsInstanceOf<AcuteWoundEnvironment>();
 
+        // Wound floor is a cleared arena: ticking past the old clot interval
+        // spawns no hazards.
         main._PhysicsProcess(0.02);
-
-        // Fibrin clots congeal across the wound floor; the first appears after ~2.5s.
-        main._PhysicsProcess(3.0f);
-        FibrinClot? clot = null;
+        main._PhysicsProcess(10.0f);
+        int hazards = 0;
         foreach (var child in main.EnemyContainer!.GetChildren())
         {
-            if (child is FibrinClot found)
-            {
-                clot = found;
-                break;
-            }
+            if (child is BioHazardArea)
+                hazards++;
         }
-        AssertThat(clot).IsNotNull();
-        AssertThat(clot!.DealsDamage).IsFalse();
-        AssertThat(clot.IsInGroup("neutral_matter")).IsTrue();
-        AssertThat(clot.BlockRadius).IsEqualApprox(clot.Radius, 0.01f);
+        AssertThat(hazards).IsEqual(0);
 
-        // Fibrin mesh absorbs enemy projectiles.
-        var pellet = new EnemyPellet { GlobalPosition = clot.GlobalPosition, Direction = Vector2.Right };
-        main.EnemyContainer.AddChild(pellet);
-        pellet._PhysicsProcess(0.02);
-        AssertThat(pellet.IsQueuedForDeletion()).IsTrue();
-
-        // Hard difficulty biofilm corrodes the membrane instead of just slowing.
-        var biofilm = new FibrinClot { HardBiofilm = true, GlobalPosition = new Vector2(500, 500) };
-        main.EnemyContainer.AddChild(biofilm);
-        AssertThat(biofilm.DealsDamage).IsTrue();
-
-        GD.Print("[PASS] Acute wound fibrin slow and projectile absorption verified.");
+        GD.Print("[PASS] Acute wound builds with no environmental hazards.");
     }
 
     private void RunAlveolarTests()

@@ -314,7 +314,7 @@ Bosses: `SubBossEnemy (BaseScore=600, Contact=16)`, `TerminalBossEnemy (BaseScor
 ### Steering + layers
 Modes: `Drifter/ChemoChaser/Interceptor/Standoff/Invader` (`EnemyThreatMode.cs`).
 `ConfigureArena` → 6 anchors on 0.82-ring. `SeekPlayer` (jitter 0.22), `InterceptPlayer` (lead `clamp(vel*0.6,100,200)`), `Standoff` (approach >1.15×, retreat <0.6×, orbit), `InvadeTissue` (latch ≤max(8,40) → Zero for ulceration).
-Layers: enemies passive `Layer2/Mask0`; skills `Layer0/Mask2`; enemy shots `Layer0/Mask1`; player body `1|4`, sensor `1|2`; fibrin walls `Layer4/Mask0`. Organ/overdrive drift writes `Position` directly, skipping `is_being_eaten`.
+Layers: enemies passive `Layer2/Mask0`; skills `Layer0/Mask2`; enemy shots `Layer0/Mask1`; player body `1|4`, sensor `1|2`. Organ/overdrive drift writes `Position` directly, skipping `is_being_eaten`.
 
 ### Hands-on
 Read `PathogenSpawner.cs:9-17` (timeline doc) + `SpawnSingle:513-558`. Then `EnemySteering.cs:55-65` dispatch.
@@ -354,12 +354,12 @@ Boss (`BossEncounterManager`):
 - `ProcessBossRaids(cycle)`: `cycle≥2` (18:00 first), `≥1800s` triple else twin, other-organ maps, HUD alert
 
 Overdrive (endless only, `OverdriveDirector`):
-- Cycle announce, fibrin nets every 4.5s (9s/90px/slow 0.45), `cycle≥3` bile surge (strip armor 3s every 15s), `cycle≥4` acid tide (safe radius 2300→850, 6dps + slow 0.6 outside), `cycle≥5` composite + exponential HP
+- Cycle announce, `cycle≥3` bile surge (strip armor 3s every 15s), `cycle≥4` acid tide (safe radius 2300→850, 6dps + slow 0.6 outside), `cycle≥5` composite + exponential HP
 - `ProcessAfflictions`: viscosity move penalty, febrile burn (%maxHP/5s), antigenic drift clears opsonize/20s
 
 Organ (`OrganEnvironmentSystem` + `scripts/map/`):
 - `Initialize(hard)`, `ConfigureArenaVisuals`, `PhysicsTick`: `Current.Tick` drives props/hazards. Gated by `SettingsManager.MapEffectsEnabled` (off → tints only).
-- Wound: suction (16,10), fibrin clots/7s max 6; Alveolar: 12s breath + CDR pockets/6s max 3; Hepatic: flow drag + armor-strip/18s + fenestra walls/24s max 3; Gastric: churn + safe zones/9s max 3 + acid surges/14s; BBB: shear (±26,±12) + 5 astrocyte pillars + invert pulse/11s×1.6s
+- Wound: no env hazards; Alveolar: 12s breath + CDR pockets/6s max 3; Hepatic: flow drag + armor-strip/18s + fenestra walls/24s max 3; Gastric: churn + safe zones/9s max 3 + acid surges/14s; BBB: shear (±26,±12) + 5 astrocyte pillars + invert pulse/11s×1.6s
 
 Settlement (`RunSettlementService.TryEndRun :32-140`):
 - Guard `RunEnded`; victory validated by `CanSettleVictory(time,bossNeutralized,endless)` = `!endless && bossNeutralized && time≥900-0.01`. Endless victory always rejected. Shortfall warns, returns false (Main does NOT raise `RunEnded`).
@@ -521,7 +521,7 @@ Hands-on: open `BaseSkill.cs:30-102` and classify each member as lifecycle (`Set
 
 1. Scenes are composition: `scenes/main.tscn:1-18` `ExtResource` decls + `60-183` nodes; `main_menu.tscn:133-143` composes 6 views via `instance=ExtResource`. Each `.tscn` must be self-contained (all `ExtResource/SubResource` declared in-file). Review rule: scene diff must show matching `id="..."` decl for every `ExtResource("...")` use.
 2. Autoloads = always-alive singletons: `project.godot:18-26`. Review rule: new global state belongs in an existing autoload/static, not a new autoload.
-3. Groups = runtime registry: `player` (`BaseCell.cs:207`, `Main.cs:172`), `pathogens` (`BaseEnemy.cs:79`), `hazards` (`BioHazardArea.cs:32`), `neutral_matter` (`EnvironmentProps.cs:36`), `telegraphed_attacks` (`TelegraphedAttack.cs:51`), `enemy_shots` (`EnemyPellet.cs:47`). `TargetingService` iterates `BaseEnemy.ActiveEnemies`, not groups. Review rule: missing `AddToGroup` = invisible to scans/HUD.
+3. Groups = runtime registry: `player` (`BaseCell.cs:207`, `Main.cs:172`), `pathogens` (`BaseEnemy.cs:79`), `hazards` (`BioHazardArea.cs:32`), `neutral_matter` (`DormantToxinVesicle.cs:32`), `telegraphed_attacks` (`TelegraphedAttack.cs:51`), `enemy_shots` (`EnemyPellet.cs:47`). `TargetingService` iterates `BaseEnemy.ActiveEnemies`, not groups. Review rule: missing `AddToGroup` = invisible to scans/HUD.
 4. Physics layers (`project.godot:96-98`): 1=Player, 2=Pathogens, 4=Environment. Enemies are passive `Area2D Layer2/Mask0/Monitoring=false` (`BaseEnemy.cs:185-214`) — detected BY player sensors/skills, cutting broadphase at 300-500 bodies. Skills `Layer0/Mask2`, enemy shots `Layer0/Mask1`, player body `1|4` sensor `1|2`. Review rule: any new `CollisionShape` must state layer/mask or it defaults wrong.
 5. Node lifecycle: `_Ready` (wire once) vs `_PhysicsProcess` (deterministic tick) vs `_Process` (render/sync). `Main._PhysicsProcess` order is contract (wave→boss→organ→overdrive→neutral→backfill). `Main._Process` only syncs `SwarmRenderer`. Review rule: gameplay logic in `_Process` = frame-rate dependent bug.
 6. No C# hot-reload: after `dotnet build`, restart run (`stop` → `project_run(main)`), drive with `game_eval`, then `editor_screenshot source="game"`. Review rule: screenshot from stale session = false evidence.

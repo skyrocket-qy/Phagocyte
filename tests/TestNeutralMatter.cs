@@ -5,14 +5,13 @@ using static GdUnit4.Assertions;
 using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Enemies;
-using Phagocyte.Map;
 using Phagocyte.Hero;
 
 namespace Phagocyte.Tests;
 
 /// <summary>
-/// Verifies neutral environment matter (dormant toxin vesicles, fibrin-clot
-/// cover) and the host ulceration meter.
+/// Verifies neutral environment matter (dormant toxin vesicles)
+/// and the host ulceration meter.
 /// </summary>
 [TestSuite]
 public partial class TestNeutralMatter : TestHarness
@@ -42,7 +41,6 @@ public partial class TestNeutralMatter : TestHarness
                 return false;
             }
 
-            TestPelletCover();
             TestToxinVesicle();
             TestUlcerationMeter();
             TestMainIntegration();
@@ -73,34 +71,6 @@ public partial class TestNeutralMatter : TestHarness
         Root.AddChild(_container);
         _player = new BaseCell { Name = "NeutralMatterHost", GlobalPosition = new Vector2(500, 500) };
         _container.AddChild(_player);
-    }
-
-    private void TestPelletCover()
-    {
-        _player!.GlobalPosition = new Vector2(-900, -900);
-        var clot = new FibrinClot { GlobalPosition = Vector2.Zero };
-        _container!.AddChild(clot);
-
-        var pellet = new EnemyPellet
-        {
-            GlobalPosition = new Vector2(-200, 0),
-            Direction = Vector2.Right,
-            Speed = 300.0f,
-            Damage = 5.0f
-        };
-        _container.AddChild(pellet);
-
-        for (int i = 0; i < 20 && !pellet.IsQueuedForDeletion(); i++)
-        {
-            pellet._PhysicsProcess(0.05);
-        }
-
-        AssertThat(pellet.IsQueuedForDeletion()).IsTrue();
-        GD.Print("[PASS] Enemy pellets are absorbed by neutral fibrin-clot cover.");
-        // Free immediately: this synchronous suite runs every phase in one frame,
-        // so a leftover clot at the origin would pollute later phase counts.
-        _container.RemoveChild(clot);
-        clot.Free();
     }
 
     private void TestToxinVesicle()
@@ -193,7 +163,7 @@ public partial class TestNeutralMatter : TestHarness
         int hazardsBefore = 0;
         foreach (var child in main.EnemyContainer.GetChildren())
         {
-            if (child is BioHazardArea && child is not FibrinClot)
+            if (child is BioHazardArea)
                 hazardsBefore++;
         }
 
@@ -202,7 +172,7 @@ public partial class TestNeutralMatter : TestHarness
         int hazardsAfter = 0;
         foreach (var child in main.EnemyContainer.GetChildren())
         {
-            if (child is BioHazardArea && child is not FibrinClot)
+            if (child is BioHazardArea)
                 hazardsAfter++;
         }
         AssertThat(hazardsAfter).IsEqual(hazardsBefore + 1);

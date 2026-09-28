@@ -1,5 +1,4 @@
 using Godot;
-using Phagocyte.Combat;
 using Phagocyte.Core;
 using Phagocyte.Endgame;
 using Phagocyte.Enemies;
@@ -10,7 +9,7 @@ namespace Phagocyte.Directors;
 /// <summary>
 /// Endless overdrive environment ladder (docs/endgame.md §3.2) + pathological
 /// overload afflictions (§4). Effects are cumulative per 3-minute cycle:
-///   1) 15:00+ escalation + fibrin nets congeal;
+///   1) 15:00+ escalation;
 ///   2) 18:00+ cross-organ boss incursion;
 ///   3) 21:00+ bile-acid surge strips all armor for 3s periodically;
 ///   4) 24:00+ gastric acid tide shrinks the safe zone;
@@ -26,7 +25,6 @@ public partial class OverdriveDirector : Node
     /// <summary>Cross-organ raid spawns are served by the boss manager.</summary>
     public BossEncounterManager? BossManager { get; set; }
 
-    private float _fibrinNetTimer = 0.0f;
     private float _armorBreakCooldown = 0.0f;
     private float _armorBreakTimer = 0.0f;
     private float _armorBreakAmount = 0.0f;
@@ -153,14 +151,6 @@ public partial class OverdriveDirector : Node
         if (cycle >= 2)
             BossManager?.ProcessBossRaids(cycle);
 
-        // Cycle 1+: fibrin nets (slow-only webs) congeal across the battlefield.
-        _fibrinNetTimer -= delta;
-        if (_fibrinNetTimer <= 0.0f)
-        {
-            _fibrinNetTimer = 4.5f;
-            SpawnFibrinNet();
-        }
-
         // Cycle 3+: bile-acid surge strips the whole arena's armor for 3 seconds.
         if (cycle >= 3)
         {
@@ -247,37 +237,6 @@ public partial class OverdriveDirector : Node
         }
         _acidRing.Points = points;
         _acidRing.Visible = true;
-    }
-
-    private void SpawnFibrinNet()
-    {
-        var ctx = Context;
-        var container = ctx?.EnemyContainer;
-        var player = ctx?.Player;
-        if (container == null || player == null || ctx == null)
-            return;
-
-        float angle = GD.Randf() * Mathf.Tau;
-        float dist = (float)GD.RandRange(220.0, 620.0);
-        var pos = player.GlobalPosition + Vector2.FromAngle(angle) * dist;
-        float halfW = (ctx.ArenaSize.X * 0.5f) - 120.0f;
-        float halfH = (ctx.ArenaSize.Y * 0.5f) - 120.0f;
-        pos.X = Mathf.Clamp(pos.X, -halfW, halfW);
-        pos.Y = Mathf.Clamp(pos.Y, -halfH, halfH);
-
-        var net = new BioHazardArea
-        {
-            Name = "FibrinNet",
-            Duration = 9.0f,
-            Radius = 90.0f,
-            SlowFactor = 0.45f,
-            SlowsTarget = true,
-            DealsDamage = false,
-            CoreColor = new Color(0.72f, 0.68f, 0.55f, 0.28f),
-            RimColor = new Color(0.88f, 0.84f, 0.68f, 0.55f),
-            GlobalPosition = pos
-        };
-        container.AddChild(net);
     }
 
     private void AnnounceOverdriveCycle(int cycle)

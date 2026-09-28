@@ -1,50 +1,7 @@
 using Godot;
-using Phagocyte.Combat;
 using Phagocyte.Hero;
 
 namespace Phagocyte.Map;
-
-/// <summary>
-/// 01. 皮下創口 fibrin clot (docs/map.md §3): pale fibrin gel on the wound floor.
-/// Slows the player by 20% and absorbs enemy projectiles; on Hard it becomes an
-/// acidic biofilm that also corrodes the membrane.
-/// </summary>
-public partial class FibrinClot : BioHazardArea
-{
-    public const float SlowPercent = 0.20f;
-
-    [Export] public bool HardBiofilm { get; set; } = false;
-
-    /// <summary>Cover radius used by enemy-projectile absorption.</summary>
-    public float BlockRadius => Radius;
-
-    public FibrinClot()
-    {
-        Duration = 14.0f;
-        Radius = 95.0f;
-        SlowFactor = 1.0f - SlowPercent;
-        SlowsTarget = true;
-        DealsDamage = false;
-        TickInterval = 0.35f;
-        CoreColor = new Color(0.86f, 0.80f, 0.58f, 0.30f);
-        RimColor = new Color(0.96f, 0.90f, 0.66f, 0.70f);
-    }
-
-    public override void _Ready()
-    {
-        // Cover matter: enemy pellets are absorbed by the clot mesh.
-        AddToGroup("neutral_matter");
-        base._Ready();
-
-        if (HardBiofilm)
-        {
-            DealsDamage = true;
-            Damage = 4.0f;
-            CoreColor = new Color(0.58f, 0.88f, 0.18f, 0.32f);
-            RimColor = new Color(0.72f, 1.00f, 0.28f, 0.80f);
-        }
-    }
-}
 
 /// <summary>
 /// 02. 肺泡高氧激發力場 hyperoxic pocket (docs/map.md §3): floating cyan bubble.

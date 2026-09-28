@@ -68,49 +68,9 @@ public partial class EnemyPellet : Area2D
             return;
         }
 
-        if (BlockedByNeutralMatter())
-        {
-            QueueFree();
-            return;
-        }
-
         Position += Direction * Speed * dt;
         Rotation = Direction.Angle();
         QueueRedraw();
-    }
-
-    /// <summary>
-    /// Toxin vesicles and fibrin clots act as drifting cover and
-    /// absorb enemy pellets. Cover nodes may expose a BlockRadius/CollisionRadius.
-    /// </summary>
-    private bool BlockedByNeutralMatter()
-    {
-        var neutrals = GetTree().GetNodesInGroup("neutral_matter");
-        if (neutrals.Count == 0)
-            return false;
-
-        foreach (var node in neutrals)
-        {
-            if (node is not Node2D neutral || !GodotObject.IsInstanceValid(neutral))
-                continue;
-
-            float blockRadius = 26.0f;
-            var blockValue = neutral.Get("BlockRadius");
-            if (blockValue.VariantType == Variant.Type.Float)
-            {
-                blockRadius = blockValue.AsSingle();
-            }
-            else
-            {
-                var collisionValue = neutral.Get("CollisionRadius");
-                if (collisionValue.VariantType == Variant.Type.Float)
-                    blockRadius = collisionValue.AsSingle() + 8.0f;
-            }
-
-            if (GlobalPosition.DistanceSquaredTo(neutral.GlobalPosition) <= blockRadius * blockRadius)
-                return true;
-        }
-        return false;
     }
 
     private void OnBodyEntered(Node2D body)
