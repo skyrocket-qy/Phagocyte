@@ -31,8 +31,8 @@ scripts/core/data/         # CatalogBuilders/Loader, DataPaths, DataValidator
 scripts/player/            # PlayerActor (ClassId + classes.json def)
 scripts/camera/         # CameraFollow (hero-agnostic follow + trauma shake)
 scripts/skills/            # BaseSkill, SkillManager, 7 archetypes + generic visuals
-scripts/combat/            # DamageService, IDamageable, ProjectileManager, VfxManager, Targeting
-scripts/enemies/           # EnemyActor + traits, EnemySpawner, steering, hazards/
+scripts/combat/            # Damage/SlowService, StatusCore/Ailments, Targeting, Projectiles, Vfx, hazards/
+scripts/enemies/           # EnemyActor + traits, EnemySpawner, steering, BossPhaseComponent
 scripts/directors/         # Wave, Boss, Endless, Stage, Settlement, Neutral, IRunContext
 scripts/stages/            # data-driven StageEnvironment + generic props + vfx/
 scripts/equipment/         # EquipmentPiece, ContactSpikes
@@ -40,10 +40,11 @@ scripts/ui/ + ui/hud/      # MainMenu, Hud, modals, views
 gen/<cat>/                 # source-of-truth PNGs (prefix-free)
 assets/gen/                # pipeline artifact (do not edit directly)
 assets/audio/manifest.json # BGM/SFX SSOT (11 bgm, 37 sfx)
-assets/data/*.json         # player_classes/stages/skills/equipment/enemies/bosses/achievements
+assets/data/*.json         # player_classes/stages/skills/equipment/enemies/bosses/achievements/ailments
 docs/*.md                  # 15 design docs (spec, stat, skill, map, pathogen, etc.)
 tests/Test*.cs             # 54 suites incl. TestHarness scaffolding
 tools/asset_check/         # lint: missing/naming/dedup/orphans/resolution/quality/audio
+tools/check_arch.py        # layer-boundary enforcement (make check-arch)
 ```
 
 ### Commands (SSOT: `AGENTS.md`, `Makefile`)
@@ -249,7 +250,9 @@ Trace any damage number from trigger to death.
 
 ### Files
 - `scripts/combat/DamageService.cs`
-- `scripts/combat/IDamageable.cs`
+- `scripts/combat/SlowService.cs`
+- `scripts/combat/IDamageable.cs`, `ISlowable.cs`
+- `scripts/combat/StatusCore.cs`, `AilmentController.cs` (+ `assets/data/ailments.json`)
 - `scripts/combat/TargetingService.cs`
 - `scripts/combat/ProjectileManager.cs`
 - `scripts/combat/VfxManager.cs`, `VfxType.cs`
@@ -270,6 +273,12 @@ Branch paths:
 - Chain: `SalvoProjectile` (reacquire + bounces) / `BeamSkill` chain mode.
 - Contact/equipment: `PlayerActor.ProcessContactDamage` → `enemy.TryContactStrike` (1 hit/s); `ContactSpikes._PhysicsProcess` → `Intercept`.
 - Player intake (reverse): `PlayerActor.ApplyDamage`: invuln→evaded→`RollEvasion`→`RollBlock`→armor DR→`ShowPlayerDamage`→death/trauma/flash.
+
+### Status path (slow example)
+1. Sources (HazardZone, NovaSkill, contact/slow-aura traits, stage dot-scan, acid tide) call `SlowService.ApplySlow(node,dur,factor)` — never concrete types
+2. Dispatch: `ISlowable.ApplySlow` → `Ailments.ApplyAgglutination(dur, 1−factor)` (agglutination channel, `assets/data/ailments.json`)
+3. State: `StatusController` (strongest-wins, `SpeedMultiplier = 1−strongest`, `IsActive(id)` for synergies); movement reads `Ailments.SpeedMultiplier` every frame
+4. No `SlowTimer/SlowFactor` fields exist — timed slow via `ActorStats` is unsupported (modifiers are permanent); HUD reads `AgglutinationTimer`
 
 ### Hands-on
 Zero RNG per `AGENTS.md`: `Stats.SetBase("block",0)`, `Stats.SetBase("evasion",0)` before asserting damage in tests. Find one usage in `tests/TestContactDamage.cs:100`.
@@ -294,8 +303,8 @@ Know how 500 entities stay alive without melting CPU.
 
 ### Enemy lifecycle
 One concrete `EnemyActor` for all 35 ids. `CreateEnemy(id)` → `ApplyDef` (stats, threat, tint, steering, traits) → `AddChild` → `_Ready`: `AddToGroup("enemies")`, `CurrentHealth=MaxHealth`, randomize drift/breathe/wander, ensure `AilmentController`, cache `BossPhaseComponent`, `EnsureCollisionNodes` (passive `Area2D Layer2/Mask0/Monitoring=false` — cuts broadphase).
-`_PhysicsProcess`: cull (headless skip; non-boss off-screen return), stun/slow, pre-drift lock → `HandleBrownianDrift` → `TickTraits`, 30Hz breathe scale.
-Movement: `FloatSpeed*SlowFactor` × agglutinate × `BossPhase.CurrentSpeedMult`, steering via `EnemySteering.GetDirection` or wander, `Position+=Velocity*dt` (pure `Node2D`).
+`_PhysicsProcess`: cull (headless skip; non-boss off-screen return), stun tick (slow/DoT/amp tick inside child `AilmentController`), pre-drift lock → `HandleBrownianDrift` → `TickTraits`, 30Hz breathe scale.
+Movement: `FloatSpeed` × `Ailments.SpeedMultiplier` × `BossPhase.CurrentSpeedMult`, steering via `EnemySteering.GetDirection` or wander, `Position+=Velocity*dt` (pure `Node2D`).
 
 Contact: per-def `contact_damage`, `TryContactStrike` 1 hit/s. Contact debuffs (slow/invert/drain) are traits.
 
