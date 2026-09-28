@@ -33,6 +33,7 @@ SCRIPTS_DIR = ROOT_DIR / "scripts"
 # autoloads together (AchievementManager -> GameManager via events).
 DOMAIN_FILES = {
     "scripts/core/IStatHost.cs",
+    "scripts/core/StatBlock.cs",
     "scripts/core/BodyDeformation.cs",
     "scripts/core/QuadTree.cs",
     "scripts/core/SkillIds.cs",

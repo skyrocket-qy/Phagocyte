@@ -12,6 +12,13 @@ earned the hard way (red suites, broken builds, ghost diffs).
 - No compat shims for renames: no `[Obsolete]` aliases, no old↔new key maps. Rename directly, fix call sites forward (extends "Code size" rule below).
 - Verify with zero-residual grep before declaring done: `BaseCell|BaseEnemy|Pathogen|Fibrin|Opson|Macrophage|Phagocyte\.` must return zero hits in `scripts/` (JSON/locale/art exempt).
 
+## Performance budget (1000+ entities — constraint, not aspiration)
+
+- Every design assumes 1000+ live entities. Current caps (300/450/500) are tuning, not architecture limits.
+- No per-entity Nodes for pure state: numbers/timers/status live in POCO containers, ticked inline in the owner's existing `_PhysicsProcess`. A `Node` wrapper is justified only by scene-tree membership (drawing, collision, grouping) — never by code organization. Precedent: `StatusController` (plain) + `AilmentController` (adapter); `StatBlock` (plain) + `ActorStats` (adapter).
+- Hot paths (per-frame, per-projectile, per-query): no linear `ActiveEnemies` scans — QuadTree/spatial hash; no per-frame allocations (structs, pools, buffers); cache per-tick values in locals, never repeat dictionary/signal reads in a loop.
+- Scaling is validated through `benchmarks/`, never by assertion. A benchmark regression means the design is wrong, not the benchmark.
+
 ## Session start (capability probe — never skip)
 
 Never assert a tool is missing without probing. Before claiming anything

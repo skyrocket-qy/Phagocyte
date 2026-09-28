@@ -146,3 +146,11 @@ Goal: `Game.*` engine knows only ids/stats/tags/timings; all phagocyte names liv
 - [x] **7.4 Strings/assets decoupling (done)**: `die_hero` → `die_player` (file+manifest+code, reimported); `characters/` → `actors/player_base.tscn`; `classes/maps/gear/pathogens/bosses.json` → `player_classes/stages/equipment/enemy_codex/boss_codex.json`; `GetCellScene/GetClassInfo/GetMapInfo/MapData/ClassData/MapId` → `GetPlayerScene/GetPlayerClass/GetStageInfo/StageData/PlayerClassData/StageId`; `PATHOGEN_BASE` → `ENEMY_BASE`; audio + asset checks green.
 - [x] **7.5 Gates + docs (done)**: `AGENTS.md` Phase-0 rule, `ARCH_RULE.md` layers, `GUIDE.md` hero/skills/combat/enemy/director/appendix sections updated; build 0 warnings, arch clean, banned-token grep zero in `scripts/`, asset/audio checks green.
 - [x] **7.6 Test-fix pass (done)**: former known-reds fixed — `TestCheats` helper moved to `scripts/testing/CheatTools.cs` (`Game.Testing`, sweep no longer probes it), `TestDifficultyTracks` opts into `MapEffectsEnabled`, `TestGearBalance` opener re-pinned (`phagolysosome_core` might 0.15 → 0.12); flakes hardened — `TestSurvivorHudUx` resets telemetry in isolation, `TestCardUniformSize` gained its `SUCCESSFULLY` footer; orphan `organelle_slot.tscn` deleted; stale `check_arch.py` map fixed. Full sweep **52/52 green, 0 FAIL** (3 suites use non-standard footers: Expanded/Multilingual/RunRecords — all verified passing).
+
+## [TODO] Phase 8: Stat decoupling (host-agnostic profiles + POCO)
+
+Goal: stats work on any host (hero full set, enemy/minion subsets), 1000+ entity budget (AGENTS.md performance rule).
+
+- [x] **8.1 Schema-ized container (done)**: `StatBlock` POCO (L1, no SceneTree) + `StatProfiles.{Full,Enemy,Minion}` + `HasStat`; `ActorStats` thin Node adapter (signals) delegating 1:1, zero behavior change. `IStatHost.RemoveScaledModifier` returns bool (silent-absent preserved).
+- [ ] **8.2 Enemy adoption**: `EnemyActor` holds enemy-profile `StatBlock`; delete `MaxHealth/FloatSpeed/Armor` fields, fix spawner/traits/tests forward (`TestDifficultyTracks`, `TestEndlessMode`, `TestTerminalBosses` et al.).
+- [ ] **8.3 Ailment tick inline**: fold `AilmentController._PhysicsProcess` into `EnemyActor._PhysicsProcess` (kill the per-entity node callback).

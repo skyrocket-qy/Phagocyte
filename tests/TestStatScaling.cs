@@ -44,6 +44,8 @@ public partial class TestStatScaling : TestHarness
             RunCapTests();
             RunChamberIntegrationTests();
             RunTreeSplitTests();
+            RunProfileTests();
+            RunPocoParityTests();
             Finish(true, "ALL STAT SCALING TESTS");
         }
         catch (Exception ex)
@@ -256,5 +258,59 @@ public partial class TestStatScaling : TestHarness
         AssertThat(s2.ScalePer).IsEqual(50.0f);
         AssertThat(s2.HasScaling).IsTrue();
         GD.Print("[PASS] TreeStatModifier split covers plain and scaled entries.");
+    }
+
+    /// <summary>Subset schemas register only their keys; unknown keys fail safe.</summary>
+    private void RunProfileTests()
+    {
+        var enemy = new StatBlock(StatProfiles.Enemy);
+        AssertThat(enemy.HasStat("max_health")).IsTrue();
+        AssertThat(enemy.HasStat("armor")).IsTrue();
+        AssertThat(enemy.HasStat("move_speed")).IsTrue();
+        AssertThat(enemy.HasStat("might")).IsFalse();
+        AssertThat(enemy.GetStat("might")).IsEqual(0.0f);
+        enemy.AddModifier("might", 1.0f, 0.0f);
+        AssertThat(enemy.GetStat("might")).IsEqual(0.0f);
+        AssertThat(enemy.GetStat("max_health")).IsEqual(100.0f);
+
+        var minion = new StatBlock(StatProfiles.Minion);
+        AssertThat(minion.HasStat("armor")).IsFalse();
+        AssertThat(minion.HasStat("move_speed")).IsTrue();
+
+        var full = new StatBlock();
+        AssertThat(full.HasStat("magnet")).IsTrue();
+        GD.Print("[PASS] Subset schemas register only their keys; unknown keys fail safe.");
+    }
+
+    /// <summary>POCO/node parity: same mutation sequence, identical finals.</summary>
+    private void RunPocoParityTests()
+    {
+        var block = new StatBlock();
+        var node = NewStats();
+        try
+        {
+            block.AddModifier("might", 0.5f, 0.25f);
+            node.AddModifier("might", 0.5f, 0.25f);
+            block.AddScaledModifier("armor", 1.0f, 0.0f, "max_health", 50.0f);
+            node.AddScaledModifier("armor", 1.0f, 0.0f, "max_health", 50.0f);
+            block.AddStatRule("health_regen", "max_health", 0.5f);
+            node.AddStatRule("health_regen", "max_health", 0.5f);
+            block.SetBase("max_health", 140.0f);
+            node.SetBase("max_health", 140.0f);
+            // The POCO never recomputes on its own (the Node adapter does it
+            // in its change notification); the owner recomputes explicitly.
+            block.RecomputeScaled();
+            foreach (string key in StatProfiles.Full)
+                AssertThat(block.GetStat(key)).IsEqual(node.GetStat(key));
+            AssertThat(block.RemoveScaledModifier("armor", 1.0f, 0.0f, "max_health", 50.0f)).IsTrue();
+            AssertThat(node.RemoveScaledModifier("armor", 1.0f, 0.0f, "max_health", 50.0f)).IsTrue();
+            block.RecomputeScaled();
+            AssertThat(block.GetStat("armor")).IsEqual(node.GetStat("armor"));
+            GD.Print("[PASS] StatBlock POCO and ActorStats node compute identical finals.");
+        }
+        finally
+        {
+            node.Free();
+        }
     }
 }

@@ -45,7 +45,7 @@ graph TD
 
 $$\text{FinalValue} = (\text{BaseValue} + \text{FlatBonus}) \times (1.0 + \text{PercentBonus})$$
 
-Flat/Pct 池由三種來源組成（Vistrace 式，見 `CellStats.ScaledRecord` / `StatRule`）：直接加成、縮放加成、內建跨屬性規則。
+Flat/Pct 池由三種來源組成（Vistrace 式，見 `StatBlock.ScaledRecord` / `StatRule`）：直接加成、縮放加成、內建跨屬性規則。
 
 縮放加成（per-modifier scaling）：`value × (sourceStat / scalePer)`，由 `scaling_stat` / `scale_per`
 在 modifier 條目中顯式聲明（gear / 天賦皆可選配，缺省即為舊行為）；任何屬性變動都會觸發

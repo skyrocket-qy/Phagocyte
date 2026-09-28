@@ -8,7 +8,7 @@ Ported from Vistrace-godot's 5-layer model, adapted to Phagocyte's
 
 ```text
 scripts/
-├── core/GameEvents.cs, IStatHost.cs, BodyDeformation.cs, QuadTree.cs,   # [L1] DOMAIN
+├── core/GameEvents.cs, IStatHost.cs, StatBlock.cs, BodyDeformation.cs, QuadTree.cs,   # [L1] DOMAIN
 │   SkillIds.cs, Stat.cs, TextFormatter.cs
 ├── core/assets/* (except none), core/data/CatalogLoader.cs,       # [L1] DOMAIN-infra
 │   DataPaths.cs, DataLoadException.cs

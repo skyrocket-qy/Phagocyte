@@ -127,6 +127,11 @@ public partial class TestNewSystemsBundle : SceneTree
         player.AddToGroup("player");
         Root.AddChild(player);
 
+        // Determinism (AGENTS.md): the class block roll (8%) would randomly
+        // negate the probe hit and flake the damage assert below.
+        pStats.SetBase("block", 0.0f);
+        pStats.SetBase("evasion", 0.0f);
+
         float hpBeforeHazard = player.Health;
 
         var hazard = new HazardZone
