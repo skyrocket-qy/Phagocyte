@@ -20,7 +20,7 @@ public partial class TestBaseScore : SceneTree
         "candida", "aspergillus", "plasmodium", "toxoplasma", "prion"
     };
 
-    private static readonly string[] MapIds = new[]
+    private static readonly string[] StageIds = new[]
     {
         "acute_wound", "alveolar_space", "hepatic_sinusoid", "gastric_lumen", "blood_brain_barrier"
     };
@@ -102,7 +102,7 @@ public partial class TestBaseScore : SceneTree
         GD.Print("[PASS] 20 pathogen BaseScore tiers (5 / 15 / 35 / 100) verified.");
 
         // 09:00 sub-boss (600) and 15:00 terminal boss (3,000) tiers
-        foreach (string stageId in MapIds)
+        foreach (string stageId in StageIds)
         {
             var subBoss = EnemySpawner.CreateSubBoss(stageId);
             AssertThat(subBoss).IsNotNull();
@@ -120,7 +120,7 @@ public partial class TestBaseScore : SceneTree
         AssertThat(elite.BaseScore).IsEqual(35);
         elite.Free();
 
-        GD.Print("[PASS] Sub-boss (600) and terminal boss (3,000) score tiers verified across all five maps.");
+        GD.Print("[PASS] Sub-boss (600) and terminal boss (3,000) score tiers verified across all five stages.");
     }
 
     private static int Score(string enemyId)

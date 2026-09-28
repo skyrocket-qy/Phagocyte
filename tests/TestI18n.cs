@@ -64,7 +64,7 @@ public partial class TestI18n : TestHarness
 
         AssertThat(menu.StartBtn?.Text.Contains("Start") ?? false).IsTrue();
         AssertThat(menu.ClassHeaderLbl?.Text.Contains("Select Cell") ?? false).IsTrue();
-        AssertThat(menu.MapHeaderLbl?.Text.Contains("Stage") ?? false).IsTrue();
+        AssertThat(menu.StageHeaderLbl?.Text.Contains("Stage") ?? false).IsTrue();
         AssertThat(menu.AchievementsBtn?.Text.Contains("Achievements") ?? false).IsTrue();
         AssertThat(menu.AchievementView?.HeaderLabel?.Text.Contains("Achievements") ?? false).IsTrue();
         AssertThat(menu.GlobalBackBtn?.Text.Contains("Back") ?? false).IsTrue();
@@ -74,9 +74,9 @@ public partial class TestI18n : TestHarness
         var macroEn = GameManager.GetPlayerClass("macrophage");
         AssertThat(macroEn["role"].AsString().Contains("Melee Heavy Tank")).IsTrue();
 
-        var mapEn = GameManager.GetStageInfo("acute_wound");
-        AssertThat(mapEn["name"].AsString().Contains("Acute Wound")).IsTrue();
-        GD.Print("[PASS] Class and Map metadata translations verified.");
+        var stageEn = GameManager.GetStageInfo("acute_wound");
+        AssertThat(stageEn["name"].AsString().Contains("Acute Wound")).IsTrue();
+        GD.Print("[PASS] Class and Stage metadata translations verified.");
 
         // 4. Test Toggle Functionality (en -> zh_CN -> zh_TW -> ja -> de -> fr -> ru -> es -> en)
         string newLang = GameManager.ToggleLanguage();

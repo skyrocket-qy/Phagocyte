@@ -47,18 +47,18 @@ public static class DataValidator
                 errors.Add($"Class '{classId}' references scene '{scene}' which does not exist.");
         }
 
-        // Achievements → classes + maps.
+        // Achievements → classes + stages.
         foreach (string achId in AchievementManager.Achievements.Keys)
         {
             var entry = AchievementManager.Achievements[achId].AsGodotDictionary();
             string rewardCell = CatalogLoader.GetString(entry, "reward_cell");
             if (!string.IsNullOrEmpty(rewardCell) && !GameManager.PlayerClassData.ContainsKey(rewardCell))
                 errors.Add($"Achievement '{achId}' rewards class '{rewardCell}' missing from classes.json.");
-            foreach (string mapKey in new[] { "map_id", "unlock_map", "unlock_hard_map" })
+            foreach (string stageKey in new[] { "stage_id", "unlock_stage", "unlock_hard_stage" })
             {
-                string stageId = CatalogLoader.GetString(entry, mapKey);
+                string stageId = CatalogLoader.GetString(entry, stageKey);
                 if (!string.IsNullOrEmpty(stageId) && !GameManager.StageData.ContainsKey(stageId))
-                    errors.Add($"Achievement '{achId}' references map '{stageId}' ({mapKey}) missing from maps.json.");
+                    errors.Add($"Achievement '{achId}' references stage '{stageId}' ({stageKey}) missing from stages.json.");
             }
         }
 
@@ -126,7 +126,7 @@ public static class DataValidator
         CheckKeys(GameManager.EquipmentCatalog, missing, known, "gear");
         CheckKeys(GameManager.EnemyCatalog, missing, known, "pathogen");
         CheckKeys(GameManager.BossCatalog, missing, known, "boss");
-        CheckKeys(GameManager.StageData, missing, known, "map");
+        CheckKeys(GameManager.StageData, missing, known, "stage");
         CheckKeys(GameManager.PlayerClassData, missing, known, "class");
         CheckKeys(AchievementManager.Achievements, missing, known, "achievement");
         foreach (var trait in PassiveTreeManager.Traits.Values)

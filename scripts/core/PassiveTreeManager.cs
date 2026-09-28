@@ -359,7 +359,7 @@ public static class PassiveTreeManager
     public static Dictionary<string, int> ActiveProfiles = new();
 
     /// <summary>
-    /// Extra talent points from meta progression (achievement map clears).
+    /// Extra talent points from meta progression (achievement stage clears).
     /// Derived live from the catalog + unlock state on every read — never
     /// stored, so no path (cheats included) can inflate the total beyond what
     /// the unlocked achievements justify. Shared across every cell so

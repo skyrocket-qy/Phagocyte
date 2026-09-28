@@ -87,7 +87,7 @@ public partial class TestTickBudget : TestHarness
     private void SetupArena()
     {
         GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
+        GameManager.SelectedStage = "acute_wound";
 
         var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         _main = mainScene.Instantiate<GameRoot>();

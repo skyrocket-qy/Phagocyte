@@ -79,7 +79,7 @@ flowchart TD
     "seed": 4829104817,
     "game_time_seconds": 362.4,
     "game_time_formatted": "06:02.4",
-    "map_id": "alveolar_space",
+    "stage_id": "alveolar_space",
     "difficulty": "hard",
     "cell_class": "macrophage",
     "level": 24,

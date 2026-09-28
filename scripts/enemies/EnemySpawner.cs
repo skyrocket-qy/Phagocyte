@@ -85,7 +85,7 @@ public static class EnemySpawner
         _active.Overdrive = enabled;
     }
 
-    // --- Dual-track difficulty: Hard (Acute Crisis) spawn modifiers (docs/map.md §2) ---
+    // --- Dual-track difficulty: Hard (Acute Crisis) spawn modifiers (docs/stages.md §2) ---
     /// <summary>Hard difficulty enemy health multiplier (+40%).</summary>
     public const float HardHealthMultiplier = 1.40f;
 
@@ -329,7 +329,7 @@ public static class EnemySpawner
     }
 
     /// <summary>
-    /// Instantiates the map-specific 09:00 sub-boss entity (id-routed).
+    /// Instantiates the stage-specific 09:00 sub-boss entity (id-routed).
     /// </summary>
     public static EnemyActor? CreateSubBoss(string stageId)
     {
@@ -388,7 +388,7 @@ public static class EnemySpawner
     }
 
     /// <summary>
-    /// Instantiates the map-specific 15:00 terminal boss entity.
+    /// Instantiates the stage-specific 15:00 terminal boss entity.
     /// </summary>
     public static EnemyActor? CreateTerminalBoss(string stageId)
     {

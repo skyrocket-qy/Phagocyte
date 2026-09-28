@@ -51,7 +51,7 @@ public partial class RunSettlementService : Node
         {
             AudioManager.Instance?.PlayBgm("victory", 0.3f);
             AudioManager.Instance?.PlaySfx("wave_complete");
-            AchievementManager.RecordMapClear(ctx.StageId, ctx.RunDifficulty == RunRecordManager.DifficultyHard);
+            AchievementManager.RecordStageClear(ctx.StageId, ctx.RunDifficulty == RunRecordManager.DifficultyHard);
         }
         else
         {

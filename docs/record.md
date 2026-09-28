@@ -52,7 +52,7 @@ var record = new Godot.Collections.Dictionary
 {
     { "result", result },              // "victory" 或 "defeat"
     { "class_id", classId },          // 出戰細胞 ("macrophage", "ctl", 等)
-    { "map_id", mapId },              // 戰鬥器官 ("acute_wound", 等)
+    { "stage_id", stageId },           // 戰鬥器官 ("acute_wound", 等)
     { "survival_time", survivalTime },// 存活時間 (秒)
     { "level", level },                // 終末細胞等級 (Cell Level)
     { "kills", kills },                // 總擊殺數 (Total Kills: 所有傷害來源擊殺)

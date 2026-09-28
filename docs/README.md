@@ -85,7 +85,7 @@ graph TD
 - **[passivetree.md](file:///Users/zelin/project/Phagocyte/docs/passivetree.md)**：融合 DBD 血網與 PoE 星盤靈感的 90 度正交微管棋盤系統，詳解五大細胞獨立起點中心、曼哈頓層級與零 Scaling 純屬性節點。
 
 ### 🦠 關卡與病原體
-- **[map.md](file:///Users/zelin/project/Phagocyte/docs/map.md)**：詳解 5 大微觀人體器官切片（皮下創口、肺泡微腔、肝血竇、胃黏膜、血腦屏障）的專屬流體力學、15 分鐘波次導演與「殺越快生越快」同屏動態回補系統。
+- **[stages.md](file:///Users/zelin/project/Phagocyte/docs/stages.md)**：詳解 5 大微觀人體器官切片（皮下創口、肺泡微腔、肝血竇、胃黏膜、血腦屏障）的專屬流體力學、15 分鐘波次導演與「殺越快生越快」同屏動態回補系統。
 - **[pathogen.md](file:///Users/zelin/project/Phagocyte/docs/pathogen.md)**：百科全書式的病原體圖鑑，涵蓋細菌、病毒、真菌、寄生蟲、朊病毒與惡性腫瘤等 20 餘種真實微生物的純屬性矩陣與 AI 運動學行為。
 
 ### 🏆 局外養成與結算

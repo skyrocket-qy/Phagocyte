@@ -12,9 +12,9 @@ namespace Game.Tests;
 
 /// <summary>
 /// Verifies data-driven stage environments: every stage id resolves to a
-/// StageEnvironment whose effects come from assets/data/maps.json, and each
+/// StageEnvironment whose effects come from assets/data/stages.json, and each
 /// effect kind (spawner, volley, dot_scan, stat_strip, scramble, scatter)
-/// behaves per its parameters (docs/map.md §3 / TODO module 3).
+/// behaves per its parameters (docs/stages.md §3 / TODO module 3).
 /// </summary>
 [TestSuite]
 public partial class TestStageEnvironments : TestHarness
@@ -31,7 +31,7 @@ public partial class TestStageEnvironments : TestHarness
         GD.Print("==================================================================");
         Paused = false;
         // Mechanics suites opt in: the global flag defaults to off.
-        SettingsManager.MapEffectsEnabled = true;
+        SettingsManager.StageEffectsEnabled = true;
     }
 
     public override bool _Process(double delta)
@@ -97,7 +97,7 @@ public partial class TestStageEnvironments : TestHarness
     {
         Cleanup();
         GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = stageId;
+        GameManager.SelectedStage = stageId;
         var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         _main = main;
         Root.AddChild(main);
@@ -109,12 +109,12 @@ public partial class TestStageEnvironments : TestHarness
     {
         foreach (string stageId in new[] { "acute_wound", "alveolar_space", "hepatic_sinusoid", "gastric_lumen", "blood_brain_barrier" })
         {
-            var env = StageEnvironment.ForMap(stageId);
+            var env = StageEnvironment.ForStage(stageId);
             AssertThat(env).IsNotNull();
             AssertThat(env.StageId).IsEqual(stageId);
         }
         // Unknown ids fall back to an empty (cleared-arena) environment.
-        AssertThat(StageEnvironment.ForMap("no_such_stage").StageId).IsEqual("no_such_stage");
+        AssertThat(StageEnvironment.ForStage("no_such_stage").StageId).IsEqual("no_such_stage");
         GD.Print("[PASS] One data-driven environment per stage id.");
     }
 
@@ -296,7 +296,7 @@ public partial class TestStageEnvironments : TestHarness
 
     private void RunDisabledFlagTests()
     {
-        SettingsManager.MapEffectsEnabled = false;
+        SettingsManager.StageEffectsEnabled = false;
         var main = SpawnMain("acute_wound");
         AssertThat(main.Stage).IsNull();
         GD.Print("[PASS] With the flag off, no environment builds and only tints apply.");
@@ -315,6 +315,6 @@ public partial class TestStageEnvironments : TestHarness
             _main = null;
         }
 
-        GameManager.SelectedMap = "acute_wound";
+        GameManager.SelectedStage = "acute_wound";
     }
 }

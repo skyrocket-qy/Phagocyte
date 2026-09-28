@@ -3,7 +3,7 @@ using System;
 namespace Game.Core;
 
 /// <summary>
-/// Cross-manager command bus (Phase 3): achievement side effects (class / map
+/// Cross-manager command bus (Phase 3): achievement side effects (class / stage
 /// unlocks, talent points) travel as synchronous C# events instead of direct
 /// static calls, breaking the AchievementManager → GameManager /
 /// PassiveTreeManager compile-time edges. Queries (IsUnlocked, unlock text)
@@ -15,9 +15,9 @@ public static class GameEvents
 {
     public static event Action<string>? ClassUnlockRequested;
     public static event Action<string>? ClassLockRequested;
-    public static event Action<string>? MapUnlockRequested;
-    public static event Action<string>? MapHardUnlockRequested;
-    public static event Action? MapsResetRequested;
+    public static event Action<string>? StageUnlockRequested;
+    public static event Action<string>? StageHardUnlockRequested;
+    public static event Action? StagesResetRequested;
 
     private static bool _initialized = false;
 
@@ -28,9 +28,9 @@ public static class GameEvents
         _initialized = true;
         ClassUnlockRequested += GameManager.UnlockClass;
         ClassLockRequested += GameManager.LockClass;
-        MapUnlockRequested += GameManager.UnlockMap;
-        MapHardUnlockRequested += GameManager.UnlockMapHard;
-        MapsResetRequested += GameManager.ResetMapUnlocks;
+        StageUnlockRequested += GameManager.UnlockStage;
+        StageHardUnlockRequested += GameManager.UnlockStageHard;
+        StagesResetRequested += GameManager.ResetStageUnlocks;
     }
 
     public static void RaiseClassUnlock(string classId)
@@ -45,21 +45,21 @@ public static class GameEvents
         ClassLockRequested?.Invoke(classId);
     }
 
-    public static void RaiseMapUnlock(string stageId)
+    public static void RaiseStageUnlock(string stageId)
     {
         EnsureInitialized();
-        MapUnlockRequested?.Invoke(stageId);
+        StageUnlockRequested?.Invoke(stageId);
     }
 
-    public static void RaiseMapHardUnlock(string stageId)
+    public static void RaiseStageHardUnlock(string stageId)
     {
         EnsureInitialized();
-        MapHardUnlockRequested?.Invoke(stageId);
+        StageHardUnlockRequested?.Invoke(stageId);
     }
 
-    public static void RaiseMapsReset()
+    public static void RaiseStagesReset()
     {
         EnsureInitialized();
-        MapsResetRequested?.Invoke();
+        StagesResetRequested?.Invoke();
     }
 }

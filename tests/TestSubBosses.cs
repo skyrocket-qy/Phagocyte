@@ -9,7 +9,7 @@ using Game.Player;
 namespace Game.Tests;
 
 /// <summary>
-/// Verifies the five 09:00 map sub-bosses and their signature mechanics.
+/// Verifies the five 09:00 stage sub-bosses and their signature mechanics.
 /// </summary>
 [TestSuite]
 public partial class TestSubBosses : SceneTree
@@ -41,7 +41,7 @@ public partial class TestSubBosses : SceneTree
         }
 
         GD.Print("==================================================================");
-        GD.Print(">>> ALL MAP SUB-BOSS TESTS PASSED SUCCESSFULLY! <<<");
+        GD.Print(">>> ALL STAGE SUB-BOSS TESTS PASSED SUCCESSFULLY! <<<");
         GD.Print("==================================================================");
         Quit(0);
         return true;
@@ -54,7 +54,7 @@ public partial class TestSubBosses : SceneTree
         _player = new PlayerActor { Name = "SubBossHost", GlobalPosition = new Vector2(400, 400) };
         _container.AddChild(_player);
 
-        TestMapMapping();
+        TestStageMapping();
         TestChainLord();
         TestFluDriftCyclone();
         TestTbGranuloma();
@@ -64,7 +64,7 @@ public partial class TestSubBosses : SceneTree
         _container.QueueFree();
     }
 
-    private void TestMapMapping()
+    private void TestStageMapping()
     {
         AssertThat(EnemySpawner.CreateSubBoss("acute_wound")!.EnemyId).IsEqual("streptococcus_chain_lord");
         AssertThat(EnemySpawner.CreateSubBoss("alveolar_space")!.EnemyId).IsEqual("flu_drift_cyclone");
@@ -78,7 +78,7 @@ public partial class TestSubBosses : SceneTree
         AssertThat(spawned.GetNodeOrNull("BossPhaseComponent")).IsNotNull();
         spawned.QueueFree();
 
-        GD.Print("[PASS] All five maps map to their dedicated sub-boss entity with boss phases.");
+        GD.Print("[PASS] All five stages map to their dedicated sub-boss entity with boss phases.");
     }
 
     private void TestChainLord()

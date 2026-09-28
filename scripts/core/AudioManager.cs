@@ -334,10 +334,10 @@ public partial class AudioManager : Node
     }
 
     /// <summary>
-    /// Per-organ battle BGM (TODO Phase 5): each map id resolves to its own
+    /// Per-organ battle BGM (TODO Phase 5): each stage id resolves to its own
     /// track; unknown ids fall back to the default battle theme.
     /// </summary>
-    private static readonly Dictionary<string, string> MapBgmTracks = new()
+    private static readonly Dictionary<string, string> StageBgmTracks = new()
     {
         ["acute_wound"] = "battle_bgm",
         ["alveolar_space"] = "echoes_of_the_aether",
@@ -346,9 +346,9 @@ public partial class AudioManager : Node
         ["blood_brain_barrier"] = "dimension",
     };
 
-    public void PlayMapBgm(string mapKey, float fadeTime = 0.6f)
+    public void PlayStageBgm(string stageKey, float fadeTime = 0.6f)
     {
-        if (!MapBgmTracks.TryGetValue(mapKey ?? "", out string? track))
+        if (!StageBgmTracks.TryGetValue(stageKey ?? "", out string? track))
             track = "battle_bgm";
         PlayBgm(track, fadeTime);
     }

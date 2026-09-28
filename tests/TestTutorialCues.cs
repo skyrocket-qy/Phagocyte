@@ -234,8 +234,8 @@ public partial class TestTutorialCues : TestHarness
     private void RunWorldCueTests()
     {
         GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
-        SettingsManager.MapEffectsEnabled = true;
+        GameManager.SelectedStage = "acute_wound";
+        SettingsManager.StageEffectsEnabled = true;
 
         var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         _main = main;

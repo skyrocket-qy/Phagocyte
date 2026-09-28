@@ -212,7 +212,7 @@ public partial class RunRecordsModal : ModalBase, IRunSettlementModal
         if (SummaryScroll != null)
             SummaryScroll.Visible = true;
         string classId = detail.GetValueOrDefault("class_id", "").AsString();
-        string stageId = detail.GetValueOrDefault("map_id", "").AsString();
+        string stageId = detail.GetValueOrDefault("stage_id", "").AsString();
         string rank = GetRank(detail);
         bool chronicChart = detail.GetValueOrDefault("endless", false).AsBool();
 
@@ -224,7 +224,7 @@ public partial class RunRecordsModal : ModalBase, IRunSettlementModal
             AddSummaryRow("RECORDS_CHRONIC_HEADER", Tr("RECORDS_CHRONIC_DIAGNOSIS"), new Color(1.0f, 0.85f, 0.45f));
         }
         AddSummaryRow("RECORDS_CLASS", GetClassName(classId));
-        AddSummaryRow("RECORDS_MAP", GetMapName(stageId));
+        AddSummaryRow("RECORDS_MAP", GetStageName(stageId));
         AddSummaryRow("RECORDS_DIFFICULTY", GetDifficultyName(detail.GetValueOrDefault("difficulty", RunRecordManager.DifficultyNormal).AsString()));
         AddSummaryRow("RECORDS_TIME", RunRecordManager.FormatTime(detail.GetValueOrDefault("survival_time", 0.0f).AsSingle()));
         AddSummaryRow("RECORDS_DATE", RunRecordManager.FormatTimestamp(detail.GetValueOrDefault("timestamp", 0.0).AsDouble()));
@@ -361,7 +361,7 @@ public partial class RunRecordsModal : ModalBase, IRunSettlementModal
         bool victory = rec.GetValueOrDefault("result", "").AsString() == RunRecordManager.ResultVictory;
         bool chronic = rec.GetValueOrDefault("endless", false).AsBool();
         string classId = rec.GetValueOrDefault("class_id", "").AsString();
-        string stageId = rec.GetValueOrDefault("map_id", "").AsString();
+        string stageId = rec.GetValueOrDefault("stage_id", "").AsString();
         bool selected = !SettlementMode && ReferenceEquals(rec, SelectedRecord);
 
         var row = new PanelContainer
@@ -424,7 +424,7 @@ public partial class RunRecordsModal : ModalBase, IRunSettlementModal
 
         var second = new Label
         {
-            Text = $"   {GetClassName(classId)} · {GetMapName(stageId)}",
+            Text = $"   {GetClassName(classId)} · {GetStageName(stageId)}",
             Modulate = new Color(0.65f, 0.75f, 0.85f)
         };
         vbox.AddChild(second);
@@ -544,7 +544,7 @@ public partial class RunRecordsModal : ModalBase, IRunSettlementModal
         return info.TryGetValue("name", out var nameVal) ? nameVal.AsString() : classId;
     }
 
-    private static string GetMapName(string stageId)
+    private static string GetStageName(string stageId)
     {
         var info = GameManager.GetStageInfo(stageId);
         return info.TryGetValue("name", out var nameVal) ? nameVal.AsString() : stageId;

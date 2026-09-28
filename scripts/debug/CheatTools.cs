@@ -36,7 +36,7 @@ public static class CheatTools
     public const int DefaultSkillLevel = 5;
 
     /// <summary>
-    /// Unlocks every achievement (cascades to all classes, maps + Hard modes
+    /// Unlocks every achievement (cascades to all classes, stages + Hard modes
     /// and Endless), every gear and max tree levels for every cell.
     /// Talent points follow automatically: the earned bonus is derived from
     /// unlocks, so no point grant is needed (or possible) here.
@@ -134,7 +134,7 @@ public static class CheatTools
         if (HasUserArg(CheatArgAll))
         {
             UnlockAllMeta();
-            GD.Print("[Cheats] All meta progression unlocked (classes, maps+hard, endless, gear, tree levels).");
+            GD.Print("[Cheats] All meta progression unlocked (classes, stages+hard, endless, gear, tree levels).");
         }
     }
 

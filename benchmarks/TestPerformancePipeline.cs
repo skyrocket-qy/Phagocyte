@@ -181,7 +181,7 @@ public partial class TestPerformancePipeline : TestHarness
     private void RunSwarmBatchTests()
     {
         GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
+        GameManager.SelectedStage = "acute_wound";
 
         var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         _main = main;

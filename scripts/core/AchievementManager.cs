@@ -106,9 +106,9 @@ public partial class AchievementManager : Node
             GameEvents.RaiseClassUnlock(rewardC);
         }
 
-        // Apply organ-map unlock chain rewards (maps, Hard modes, talent points)
-        ApplyMapRewards(data);
-        SyncMapUnlocks();
+        // Apply organ-stage unlock chain rewards (stages, Hard modes, talent points)
+        ApplyStageRewards(data);
+        SyncStageUnlocks();
 
         SaveToDisk();
 
@@ -150,7 +150,7 @@ public partial class AchievementManager : Node
                 EvaluateThreshold("engulf_20");
                 EvaluateThreshold("devour_50");
 
-                // PrPsc amyloid crystals (regular prion aggregate or the map-5 terminal boss)
+                // PrPsc amyloid crystals (regular prion aggregate or the stage-5 terminal boss)
                 string enemyId = value.Obj != null ? value.AsString() : "";
                 if (enemyId == "prion" || enemyId == "prpsc_amyloid_aggregate")
                 {
@@ -208,10 +208,10 @@ public partial class AchievementManager : Node
     }
 
     /// <summary>
-    /// Reports a cleared organ map run and unlocks the matching difficulty
+    /// Reports a cleared organ stage run and unlocks the matching difficulty
     /// achievement from the catalog (docs/achievement.md unlock chain).
     /// </summary>
-    public static void RecordMapClear(string stageId, bool hard = false)
+    public static void RecordStageClear(string stageId, bool hard = false)
     {
         if (string.IsNullOrEmpty(stageId))
             return;
@@ -219,7 +219,7 @@ public partial class AchievementManager : Node
         foreach (string achId in Achievements.Keys)
         {
             var ach = Achievements[achId].AsGodotDictionary();
-            if (ach.GetValueOrDefault("map_id", "").AsString() != stageId)
+            if (ach.GetValueOrDefault("stage_id", "").AsString() != stageId)
                 continue;
 
             bool isHardAchievement = ach.GetValueOrDefault("difficulty", "normal").AsString() == "hard";
@@ -240,15 +240,15 @@ public partial class AchievementManager : Node
         return IsUnlocked("wound_hard_clear");
     }
 
-    private static void ApplyMapRewards(Godot.Collections.Dictionary achievementData)
+    private static void ApplyStageRewards(Godot.Collections.Dictionary achievementData)
     {
-        string nextMap = achievementData.GetValueOrDefault("unlock_map", "").AsString();
-        if (!string.IsNullOrEmpty(nextMap))
-            GameEvents.RaiseMapUnlock(nextMap);
+        string nextStage = achievementData.GetValueOrDefault("unlock_stage", "").AsString();
+        if (!string.IsNullOrEmpty(nextStage))
+            GameEvents.RaiseStageUnlock(nextStage);
 
-        string hardMap = achievementData.GetValueOrDefault("unlock_hard_map", "").AsString();
-        if (!string.IsNullOrEmpty(hardMap))
-            GameEvents.RaiseMapHardUnlock(hardMap);
+        string hardStage = achievementData.GetValueOrDefault("unlock_hard_stage", "").AsString();
+        if (!string.IsNullOrEmpty(hardStage))
+            GameEvents.RaiseStageHardUnlock(hardStage);
 
         // Talent points are NOT granted here: PassiveTreeManager derives the
         // earned bonus live from unlocks, so rewards apply automatically with
@@ -259,9 +259,9 @@ public partial class AchievementManager : Node
     /// Rebuilds GameManager.StageData lock state from the persisted achievement chain.
     /// Baseline: acute_wound Normal only; everything else must be earned.
     /// </summary>
-    private static void SyncMapUnlocks()
+    private static void SyncStageUnlocks()
     {
-        GameEvents.RaiseMapsReset();
+        GameEvents.RaiseStagesReset();
 
         foreach (string achId in Achievements.Keys)
         {
@@ -269,13 +269,13 @@ public partial class AchievementManager : Node
                 continue;
 
             var raw = Achievements[achId].AsGodotDictionary();
-            string nextMap = raw.GetValueOrDefault("unlock_map", "").AsString();
-            if (!string.IsNullOrEmpty(nextMap))
-                GameEvents.RaiseMapUnlock(nextMap);
+            string nextStage = raw.GetValueOrDefault("unlock_stage", "").AsString();
+            if (!string.IsNullOrEmpty(nextStage))
+                GameEvents.RaiseStageUnlock(nextStage);
 
-            string hardMap = raw.GetValueOrDefault("unlock_hard_map", "").AsString();
-            if (!string.IsNullOrEmpty(hardMap))
-                GameEvents.RaiseMapHardUnlock(hardMap);
+            string hardStage = raw.GetValueOrDefault("unlock_hard_stage", "").AsString();
+            if (!string.IsNullOrEmpty(hardStage))
+                GameEvents.RaiseStageHardUnlock(hardStage);
         }
     }
 
@@ -384,15 +384,15 @@ public partial class AchievementManager : Node
     }
 
     /// <summary>
-    /// Helper: Get unlock condition text for a locked organ map
+    /// Helper: Get unlock condition text for a locked organ stage
     /// (the prerequisite achievement that unlocks its Normal variant).
     /// </summary>
-    public static string GetMapUnlockRequirementText(string stageId)
+    public static string GetStageUnlockRequirementText(string stageId)
     {
         foreach (string achId in Achievements.Keys)
         {
             var ach = Achievements[achId].AsGodotDictionary();
-            if (ach.GetValueOrDefault("unlock_map", "").AsString() == stageId)
+            if (ach.GetValueOrDefault("unlock_stage", "").AsString() == stageId)
             {
                 string title = TranslationServer.Translate(ach["title_key"].AsString());
                 string desc = TranslationServer.Translate(ach["desc_key"].AsString());
@@ -400,7 +400,7 @@ public partial class AchievementManager : Node
             }
         }
 
-        if (GameManager.IsMapHardUnlocked(stageId))
+        if (GameManager.IsStageHardUnlocked(stageId))
             return TranslationServer.Translate("STATUS_UNLOCKED");
 
         return TranslationServer.Translate("STATUS_LOCKED");
@@ -429,7 +429,7 @@ public partial class AchievementManager : Node
         if (data == null)
         {
             SyncUnlockedClasses();
-            SyncMapUnlocks();
+            SyncStageUnlocks();
             return;
         }
 
@@ -455,7 +455,7 @@ public partial class AchievementManager : Node
         }
 
         SyncUnlockedClasses();
-        SyncMapUnlocks();
+        SyncStageUnlocks();
     }
 
     /// <summary>
@@ -500,7 +500,7 @@ public partial class AchievementManager : Node
             { "prion_cleared", 0.0f }
         };
         SyncUnlockedClasses();
-        SyncMapUnlocks();
+        SyncStageUnlocks();
 
         JsonStore.Delete(SavePath);
     }

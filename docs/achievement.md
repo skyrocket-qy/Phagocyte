@@ -79,10 +79,10 @@ public static bool Unlock(string achId)
     }
 
     // 2. 若成就獎勵包含解鎖地圖
-    string rewardMap = data.GetValueOrDefault("reward_map", "").AsString();
-    if (!string.IsNullOrEmpty(rewardMap))
+    string rewardStage = data.GetValueOrDefault("reward_stage", "").AsString();
+    if (!string.IsNullOrEmpty(rewardStage))
     {
-        GameManager.UnlockMap(rewardMap);
+        GameManager.UnlockStage(rewardStage);
     }
 
     SaveToDisk();

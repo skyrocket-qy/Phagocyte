@@ -75,7 +75,7 @@ public partial class TestDynamicBackfill : TestHarness
 
         // 4. GameRoot integration: kill-driven refill to normal and swarm caps
         GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
+        GameManager.SelectedStage = "acute_wound";
 
         var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         main.ScreenCapNormal = 10;

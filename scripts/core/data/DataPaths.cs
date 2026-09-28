@@ -17,7 +17,7 @@ public static class DataPaths
     public const string Enemies = $"{Root}/enemy_codex.json";
     public const string EnemyDefs = $"{Root}/enemies.json";
     public const string Bosses = $"{Root}/boss_codex.json";
-    public const string Maps = $"{Root}/stages.json";
+    public const string Stages = $"{Root}/stages.json";
     public const string Classes = $"{Root}/player_classes.json";
     public const string Achievements = $"{Root}/achievements.json";
     public const string PassiveTree = $"{Root}/passive_tree.json";

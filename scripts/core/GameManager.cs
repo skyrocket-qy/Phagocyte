@@ -9,7 +9,7 @@ public partial class GameManager : Node
 {
     // Runtime Player Selections
     public static string SelectedClass = "macrophage";
-    public static string SelectedMap = "acute_wound";
+    public static string SelectedStage = "acute_wound";
     public static string SelectedDifficulty = RunRecordManager.DifficultyNormal;
     public static string CurrentLanguage = "en";
 
@@ -65,17 +65,17 @@ public partial class GameManager : Node
         }
     }
 
-    // Map Metadata referencing translation keys and holographic scanner positioning
-    // Map Metadata referencing translation keys and holographic scanner positioning
-    // (data-owned: assets/data/maps.json).
-    private static Dictionary? _mapData;
+    // Stage metadata referencing translation keys and holographic scanner positioning
+    // Stage metadata referencing translation keys and holographic scanner positioning
+    // (data-owned: assets/data/stages.json).
+    private static Dictionary? _stageData;
     public static Dictionary StageData
     {
         get
         {
-            _mapData ??= CatalogBuilders.BuildMaps();
+            _stageData ??= CatalogBuilders.BuildStages();
             DataValidator.EnsureValidated();
-            return _mapData;
+            return _stageData;
         }
     }
 
@@ -299,9 +299,9 @@ public partial class GameManager : Node
         };
     }
 
-    // --- Organ map unlock chain (docs/achievement.md) ---
+    // --- Organ stage unlock chain (docs/achievement.md) ---
 
-    public static void UnlockMap(string stageId)
+    public static void UnlockStage(string stageId)
     {
         if (StageData.ContainsKey(stageId))
         {
@@ -310,7 +310,7 @@ public partial class GameManager : Node
         }
     }
 
-    public static void UnlockMapHard(string stageId)
+    public static void UnlockStageHard(string stageId)
     {
         if (StageData.ContainsKey(stageId))
         {
@@ -319,12 +319,12 @@ public partial class GameManager : Node
         }
     }
 
-    public static bool IsMapUnlocked(string stageId)
+    public static bool IsStageUnlocked(string stageId)
     {
         return StageData.ContainsKey(stageId) && ((Dictionary)StageData[stageId])["unlocked"].AsBool();
     }
 
-    public static bool IsMapHardUnlocked(string stageId)
+    public static bool IsStageHardUnlocked(string stageId)
     {
         return StageData.ContainsKey(stageId)
             && ((Dictionary)StageData[stageId]).TryGetValue("hard_unlocked", out var val)
@@ -333,10 +333,10 @@ public partial class GameManager : Node
 
     /// <summary>
     /// Restores the baseline lock state: only acute_wound (Normal) is available,
-    /// every other organ map and every Hard difficulty starts locked.
+    /// every other organ stage and every Hard difficulty starts locked.
     /// The achievement chain re-applies earned unlocks afterwards.
     /// </summary>
-    public static void ResetMapUnlocks()
+    public static void ResetStageUnlocks()
     {
         foreach (var keyVar in StageData.Keys)
         {
@@ -407,7 +407,7 @@ public partial class GameManager : Node
 
     /// <summary>
     /// Endless Cytokine Storm entry (docs/endgame.md §2): unlocked by clearing any
-    /// organ map on Hard (achievement wound_hard_clear).
+    /// organ stage on Hard (achievement wound_hard_clear).
     /// </summary>
     public static bool IsEndlessAvailable()
     {

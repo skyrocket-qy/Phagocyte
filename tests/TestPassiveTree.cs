@@ -587,7 +587,7 @@ public partial class TestPassiveTree : TestHarness
         PassiveTreeManager.ResetAll();
         GameManager.SetLanguage("en");
         GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
+        GameManager.SelectedStage = "acute_wound";
 
         var menuScene = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn");
         AssertThat(menuScene).IsNotNull();
@@ -605,7 +605,7 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(_menu.LoadoutView!.Visible).IsTrue();
         _menu.OnLoadoutConfirmPressed();
         AssertThat(_menu.PassiveView!.Visible).IsTrue();
-        AssertThat(_menu.MapView!.Visible).IsFalse();
+        AssertThat(_menu.StageView!.Visible).IsFalse();
 
         AssertThat(PassiveTreeManager.RecordRunLevel("macrophage", 4)).IsTrue();
         _menu.SelectPassiveBuild("macrophage");
@@ -692,8 +692,8 @@ public partial class TestPassiveTree : TestHarness
         _menu.OnTreeNodeActivated("thick_cytoplasm");
         _menu.OnPassiveConfirmPressed();
         AssertThat(_menu.PassiveView.Visible).IsFalse();
-        AssertThat(_menu.MapView.Visible).IsTrue();
-        GD.Print("[PASS] Refunds and the tree-to-map transition behave correctly.");
+        AssertThat(_menu.StageView.Visible).IsTrue();
+        GD.Print("[PASS] Refunds and the tree-to-stage transition behave correctly.");
     }
 
     private void SetupRun()

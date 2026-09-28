@@ -139,7 +139,7 @@ public partial class TestNeutralMatter : TestHarness
     {
         HostUlceration.Reset();
         GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
+        GameManager.SelectedStage = "acute_wound";
 
         var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<GameRoot>();
         Root.AddChild(main);

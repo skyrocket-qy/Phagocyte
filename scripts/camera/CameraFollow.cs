@@ -5,7 +5,7 @@ using Game.Core;
 using System;
 
 /// <summary>
-/// Smooth camera follow system with mouse wheel zoom and map boundary clamping.
+/// Smooth camera follow system with mouse wheel zoom and stage boundary clamping.
 /// </summary>
 public partial class CameraFollow : Camera2D
 {
@@ -32,13 +32,13 @@ public partial class CameraFollow : Camera2D
     public float ZoomStep { get; set; } = 0.08f;
 
     [Export]
-    public float MapWidth { get; set; } = 3200f;
+    public float StageWidth { get; set; } = 3200f;
 
     [Export]
-    public float MapHeight { get; set; } = 3200f;
+    public float StageHeight { get; set; } = 3200f;
 
     [Export]
-    public bool EnableMapLimits { get; set; } = true;
+    public bool EnableStageLimits { get; set; } = true;
 
     private float _currentZoomScale = 1.0f;
     private float _targetZoomScale = 1.0f;
@@ -58,9 +58,9 @@ public partial class CameraFollow : Camera2D
         PositionSmoothingEnabled = true;
         PositionSmoothingSpeed = 8.0f;
 
-        if (EnableMapLimits && MapWidth > 0 && MapHeight > 0)
+        if (EnableStageLimits && StageWidth > 0 && StageHeight > 0)
         {
-            SetMapBounds(MapWidth, MapHeight);
+            SetStageBounds(StageWidth, StageHeight);
         }
     }
 
@@ -80,7 +80,7 @@ public partial class CameraFollow : Camera2D
         _trauma = Mathf.Clamp(_trauma + amount, 0.0f, 1.0f);
     }
 
-    public void SetMapBounds(float width, float height)
+    public void SetStageBounds(float width, float height)
     {
         LimitLeft = (int)(-width * 0.5f);
         LimitTop = (int)(-height * 0.5f);

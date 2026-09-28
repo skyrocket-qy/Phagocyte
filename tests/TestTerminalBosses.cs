@@ -9,7 +9,7 @@ using Game.Player;
 namespace Game.Tests;
 
 /// <summary>
-/// Verifies the five 15:00 map terminal bosses and their signature mechanics.
+/// Verifies the five 15:00 stage terminal bosses and their signature mechanics.
 /// </summary>
 [TestSuite]
 public partial class TestTerminalBosses : SceneTree
@@ -54,7 +54,7 @@ public partial class TestTerminalBosses : SceneTree
         _player = new PlayerActor { Name = "TerminalBossHost", GlobalPosition = new Vector2(400, 400) };
         _container.AddChild(_player);
 
-        TestMapMapping();
+        TestStageMapping();
         TestMrsaSuperColony();
         TestSyncytialMegaCapsid();
         TestPlasmodiumMacroSchizont();
@@ -64,7 +64,7 @@ public partial class TestTerminalBosses : SceneTree
         _container.QueueFree();
     }
 
-    private void TestMapMapping()
+    private void TestStageMapping()
     {
         AssertThat(EnemySpawner.CreateTerminalBoss("acute_wound")!.EnemyId).IsEqual("mrsa_super_colony");
         AssertThat(EnemySpawner.CreateTerminalBoss("alveolar_space")!.EnemyId).IsEqual("syncytial_mega_capsid");
@@ -78,7 +78,7 @@ public partial class TestTerminalBosses : SceneTree
         AssertThat(spawned.GetNodeOrNull("BossPhaseComponent")).IsNotNull();
         spawned.QueueFree();
 
-        GD.Print("[PASS] All five maps map to their dedicated terminal boss entity with boss phases.");
+        GD.Print("[PASS] All five stages map to their dedicated terminal boss entity with boss phases.");
     }
 
     private void TestMrsaSuperColony()

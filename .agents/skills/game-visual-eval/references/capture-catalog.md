@@ -20,7 +20,7 @@ All captures must be saved under the project-local `tmp/` directory:
 | 2 | `class_view.png` | Class Selection | `res://scenes/ui/class_view.tscn` | Immune defense cell dossier, cell selection buttons, baseline vitals, innate skill icon |
 | 3 | `loadout_view.png` | Organelle Chamber | `res://scenes/ui/loadout_view.tscn` | Sockets, ATP energy capacity, organelle inventory backpack, stats delta readout |
 | 4 | `passive_view.png` | Epigenetic Talent Tree | `res://scenes/ui/passive_view.tscn` | Branching tree nodes, fluorophore allocation status, profile tabs |
-| 5 | `map_view.png` | Map Selection & Scanner | `res://scenes/ui/map_view.tscn` | Holographic body scanner, organ sites, difficulty selector, hazard chips |
+| 5 | `map_view.png` | Map Selection & Scanner | `res://scenes/ui/stage_view.tscn` | Holographic body scanner, organ sites, difficulty selector, hazard chips |
 | 6 | `gallery_all.png` | Achievement Gallery (All) | `res://scenes/ui/achievement_gallery.tscn` | Unlocked fluorophore badges, locked cards, progress counters, scroll list |
 | 7 | `gallery_locked.png` | Achievement Gallery (Locked) | `res://scenes/ui/achievement_gallery.tscn` | Filtered locked achievements, unachieved grayscale variants |
 | 8 | `endgame_setup.png` | Endgame Affliction Setup | `res://scenes/ui/endgame_setup_modal.tscn` | Overdrive afflictions, modifier cards, confirm/cancel buttons |

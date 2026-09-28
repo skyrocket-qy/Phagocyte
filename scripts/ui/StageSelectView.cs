@@ -7,18 +7,18 @@ namespace Game.UI;
 
 /// <summary>
 /// Holographic Host Body Scanner (全息透視人體掃描儀)
-/// High-precision 2D layered medical diagnostic interface for map selection.
+/// High-precision 2D layered medical diagnostic interface for stage selection.
 /// Features high-fidelity transparent cybernetic human body, additive-blended
 /// anatomical organ overlays with breathing pulse tweens, laser scanline,
 /// target reticles, and dynamic HUD callout lead lines to the detail card.
 /// </summary>
-public partial class StageSelectMap : Control
+public partial class StageSelectView : Control
 {
     [Signal]
-    public delegate void OrganSelectedEventHandler(string mapKey);
+    public delegate void StageSelectedEventHandler(string stageKey);
 
-    public string ActiveMapKey { get; set; } = "acute_wound";
-    public string? HoveredMapKey { get; set; } = null;
+    public string ActiveStageKey { get; set; } = "acute_wound";
+    public string? HoveredStageKey { get; set; } = null;
 
     private float _time = 0.0f;
     private float _scanYRatio = 0.2f;
@@ -43,7 +43,7 @@ public partial class StageSelectMap : Control
     // Internal HUD overlay control to render on top of textures
     private partial class HoloHudOverlay : Control
     {
-        public StageSelectMap? Scanner { get; set; }
+        public StageSelectView? Scanner { get; set; }
 
         public override void _Draw()
         {
@@ -118,10 +118,10 @@ public partial class StageSelectMap : Control
         }
 
         // Set initial alpha for active organ
-        if (_fadeAlphas.ContainsKey(ActiveMapKey))
+        if (_fadeAlphas.ContainsKey(ActiveStageKey))
         {
-            _fadeAlphas[ActiveMapKey] = 1.0f;
-            if (_overlayRects.TryGetValue(ActiveMapKey, out var activeRect))
+            _fadeAlphas[ActiveStageKey] = 1.0f;
+            if (_overlayRects.TryGetValue(ActiveStageKey, out var activeRect))
             {
                 activeRect.Modulate = new Color(1, 1, 1, 1);
             }
@@ -192,9 +192,9 @@ public partial class StageSelectMap : Control
         {
             string key = kvp.Key;
             var rect = kvp.Value;
-            bool isActive = (key == ActiveMapKey);
-            bool isHovered = (key == HoveredMapKey);
-            bool isLocked = !GameManager.IsMapUnlocked(key);
+            bool isActive = (key == ActiveStageKey);
+            bool isHovered = (key == HoveredStageKey);
+            bool isLocked = !GameManager.IsStageUnlocked(key);
 
             // Locked organs render with a heavy dimmed filter instead of the healthy glow
             float activeAlpha = isLocked ? 0.16f : 1.0f;
@@ -212,30 +212,30 @@ public partial class StageSelectMap : Control
         _hudOverlay?.QueueRedraw();
     }
 
-    public void SelectOrgan(string mapKey)
+    public void SelectStage(string stageKey)
     {
-        if (GameManager.StageData.ContainsKey(mapKey))
+        if (GameManager.StageData.ContainsKey(stageKey))
         {
-            ActiveMapKey = mapKey;
+            ActiveStageKey = stageKey;
             QueueRedraw();
             _hudOverlay?.QueueRedraw();
         }
     }
 
-    /// <summary>True when the given organ map is still locked by the achievement chain.</summary>
-    public static bool IsOrganLocked(string mapKey)
+    /// <summary>True when the given organ stage is still locked by the achievement chain.</summary>
+    public static bool IsStageLocked(string stageKey)
     {
-        return !GameManager.IsMapUnlocked(mapKey);
+        return !GameManager.IsStageUnlocked(stageKey);
     }
 
     public override void _GuiInput(InputEvent @event)
     {
         if (@event is InputEventMouseMotion mm)
         {
-            string? foundKey = HitTestOrgan(mm.Position);
-            if (foundKey != HoveredMapKey)
+            string? foundKey = HitTestStage(mm.Position);
+            if (foundKey != HoveredStageKey)
             {
-                HoveredMapKey = foundKey;
+                HoveredStageKey = foundKey;
                 MouseDefaultCursorShape = foundKey != null ? CursorShape.PointingHand : CursorShape.Arrow;
                 QueueRedraw();
                 _hudOverlay?.QueueRedraw();
@@ -243,11 +243,11 @@ public partial class StageSelectMap : Control
         }
         else if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
         {
-            string? clickedKey = HitTestOrgan(mb.Position);
+            string? clickedKey = HitTestStage(mb.Position);
             if (clickedKey != null)
             {
-                ActiveMapKey = clickedKey;
-                EmitSignal(SignalName.OrganSelected, clickedKey);
+                ActiveStageKey = clickedKey;
+                EmitSignal(SignalName.StageSelected, clickedKey);
                 QueueRedraw();
                 _hudOverlay?.QueueRedraw();
                 AcceptEvent();
@@ -255,7 +255,7 @@ public partial class StageSelectMap : Control
         }
     }
 
-    private string? HitTestOrgan(Vector2 mousePos)
+    private string? HitTestStage(Vector2 mousePos)
     {
         var bodyRect = GetBodyRect();
         foreach (var keyVar in GameManager.StageData.Keys)
@@ -373,9 +373,9 @@ public partial class StageSelectMap : Control
             var screenPos = bodyRect.Position + normPos * bodyRect.Size;
             var nodeColor = data.TryGetValue("color_code", out var ccVal) ? ccVal.AsColor() : new Color(0.3f, 0.7f, 1.0f);
 
-            bool isActive = key == ActiveMapKey;
-            bool isHovered = key == HoveredMapKey;
-            bool isLocked = !GameManager.IsMapUnlocked(key);
+            bool isActive = key == ActiveStageKey;
+            bool isHovered = key == HoveredStageKey;
+            bool isLocked = !GameManager.IsStageUnlocked(key);
 
             if (isActive)
             {
@@ -507,7 +507,7 @@ public partial class StageSelectMap : Control
         );
 
         // Bottom inspection readout
-        string activeKey = ActiveMapKey;
+        string activeKey = ActiveStageKey;
         if (GameManager.StageData.ContainsKey(activeKey))
         {
             var data = (Godot.Collections.Dictionary)GameManager.StageData[activeKey];
@@ -516,7 +516,7 @@ public partial class StageSelectMap : Control
             string subtitle = data.TryGetValue("subtitle_key", out var skVal) ? TranslationServer.Translate(skVal.AsString()) : "";
             Color c = data.TryGetValue("color_code", out var ccVal) ? ccVal.AsColor() : new Color(0.3f, 0.8f, 1.0f);
 
-            bool locked = !GameManager.IsMapUnlocked(activeKey);
+            bool locked = !GameManager.IsStageUnlocked(activeKey);
             Font hudFont = canvas.GetThemeFont("font", "Label") ?? ThemeDB.FallbackFont;
 
             string line1 = locked
@@ -540,7 +540,7 @@ public partial class StageSelectMap : Control
                 canvas.DrawMultilineString(
                     hudFont,
                     new Vector2(16, size.Y - 12),
-                    AchievementManager.GetMapUnlockRequirementText(activeKey),
+                    AchievementManager.GetStageUnlockRequirementText(activeKey),
                     HorizontalAlignment.Left,
                     size.X - 32.0f,
                     11,

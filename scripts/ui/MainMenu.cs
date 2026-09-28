@@ -13,7 +13,7 @@ public partial class MainMenu : Control
     public Control? ClassView { get; set; }
     public LoadoutView? LoadoutView { get; set; }
     public Control? PassiveView { get; set; }
-    public Control? MapView { get; set; }
+    public Control? StageView { get; set; }
     public AchievementGalleryView? AchievementView { get; set; }
     public CodexModal? CellCodexModal { get; set; }
     public SettingsModal? CellSettingsModal { get; set; }
@@ -70,18 +70,18 @@ public partial class MainMenu : Control
     public Button? TreeZoomOutBtn { get; set; }
     public Button? TreeZoomInBtn { get; set; }
 
-    // Map View Controls
-    public Label? MapHeaderLbl { get; set; }
-    public VBoxContainer? MapListContainer { get; set; }
+    // Stage View Controls
+    public Label? StageHeaderLbl { get; set; }
+    public VBoxContainer? StageListContainer { get; set; }
     public Label? OrganBadgeLbl { get; set; }
     public Label? DifficultyLbl { get; set; }
-    public Label? MapNameLbl { get; set; }
-    public Label? MapSubtitleLbl { get; set; }
-    public Label? MapEnvLbl { get; set; }
-    public Label? MapMechLbl { get; set; }
-    public Label? MapThreatLbl { get; set; }
-    public Label? MapLockStatusLbl { get; set; }
-    public StageSelectMap? HoloScanner { get; set; }
+    public Label? StageNameLbl { get; set; }
+    public Label? StageSubtitleLbl { get; set; }
+    public Label? StageEnvLbl { get; set; }
+    public Label? StageMechLbl { get; set; }
+    public Label? StageThreatLbl { get; set; }
+    public Label? StageLockStatusLbl { get; set; }
+    public StageSelectView? HoloScanner { get; set; }
     public Button? DeployBtn { get; set; }
     public Button? EndlessBtn { get; set; }
     public OptionButton? DifficultyToggle { get; set; }
@@ -89,10 +89,10 @@ public partial class MainMenu : Control
     public string ActiveClassKey { get; set; } = "macrophage";
     public string ActiveTreeClassKey { get; set; } = "macrophage";
     public string ActiveTreeNodeId { get; set; } = "";
-    public string ActiveMapKey { get; set; } = "acute_wound";
+    public string ActiveStageKey { get; set; } = "acute_wound";
 
-    /// <summary>True when the currently inspected organ map is still locked.</summary>
-    public bool IsActiveMapLocked => !GameManager.IsMapUnlocked(ActiveMapKey);
+    /// <summary>True when the currently inspected organ stage is still locked.</summary>
+    public bool IsActiveStageLocked => !GameManager.IsStageUnlocked(ActiveStageKey);
 
     // Title LabelSettings per locale: EN tracking 6px, ZH tracking 9px.
     private static readonly LabelSettings TitleSettingsEn =
@@ -129,7 +129,7 @@ public partial class MainMenu : Control
         ClassView = GetNodeOrNull<Control>("ClassView");
         LoadoutView = GetNodeOrNull<LoadoutView>("LoadoutView");
         PassiveView = GetNodeOrNull<Control>("PassiveView");
-        MapView = GetNodeOrNull<Control>("MapView");
+        StageView = GetNodeOrNull<Control>("MapView");
         AchievementView = GetNodeOrNull<AchievementGalleryView>("AchievementView");
         CellCodexModal = GetNodeOrNull<CodexModal>("CodexModal");
         CellSettingsModal = GetNodeOrNull<SettingsModal>("SettingsModal");
@@ -172,17 +172,17 @@ public partial class MainMenu : Control
         TreeZoomOutBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ZoomOutButton");
         TreeZoomInBtn = GetNodeOrNull<Button>("PassiveView/Buttons/ZoomInButton");
 
-        MapHeaderLbl = GetNodeOrNull<Label>("MapView/PageHeader/Title");
-        MapListContainer = GetNodeOrNull<VBoxContainer>("MapView/HBox/MapList");
+        StageHeaderLbl = GetNodeOrNull<Label>("MapView/PageHeader/Title");
+        StageListContainer = GetNodeOrNull<VBoxContainer>("MapView/HBox/MapList");
         OrganBadgeLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TopHBox/OrganBadge");
         DifficultyLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TopHBox/DifficultyLabel");
-        MapNameLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TitleVBox/MapNameLabel")
+        StageNameLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TitleVBox/MapNameLabel")
             ?? GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapNameLabel");
-        MapSubtitleLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TitleVBox/MapSubtitleLabel");
-        MapEnvLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapEnvLabel");
-        MapMechLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapMechLabel");
-        MapThreatLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapThreatLabel");
-        HoloScanner = GetNodeOrNull<StageSelectMap>("MapView/HBox/StageSelectMap");
+        StageSubtitleLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/TitleVBox/MapSubtitleLabel");
+        StageEnvLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapEnvLabel");
+        StageMechLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapMechLabel");
+        StageThreatLbl = GetNodeOrNull<Label>("MapView/HBox/DetailPanel/VBox/MapThreatLabel");
+        HoloScanner = GetNodeOrNull<StageSelectView>("MapView/HBox/StageSelectMap");
         DeployBtn = GetNodeOrNull<Button>("MapView/Buttons/DeployButton");
 
         // Endless Cytokine Storm entry (docs/endgame.md §2), injected beside Deploy.
@@ -197,20 +197,20 @@ public partial class MainMenu : Control
             EndlessBtn.AddThemeColorOverride("font_color", new Color(1.0f, 0.78f, 0.35f));
             EndlessBtn.Pressed += () =>
             {
-                if (!GameManager.IsMapUnlocked(ActiveMapKey))
+                if (!GameManager.IsStageUnlocked(ActiveStageKey))
                 {
-                    SelectMap(ActiveMapKey);
+                    SelectStage(ActiveStageKey);
                     return;
                 }
-                GameManager.SelectedMap = ActiveMapKey;
+                GameManager.SelectedStage = ActiveStageKey;
                 EndlessSetupModal?.OpenSetup();
             };
             deployRow.AddChild(EndlessBtn);
             deployRow.MoveChild(EndlessBtn, DeployBtn.GetIndex() + 1);
         }
 
-        // Dual-track difficulty toggle (docs/map.md §2): Normal vs Hard (急性危象),
-        // unlocked per organ by clearing the prerequisite map on Normal.
+        // Dual-track difficulty toggle (docs/stages.md §2): Normal vs Hard (急性危象),
+        // unlocked per organ by clearing the prerequisite stage on Normal.
         if (DeployBtn != null && DeployBtn.GetParent() is Container difficultyRow)
         {
             DifficultyToggle = new OptionButton
@@ -231,23 +231,23 @@ public partial class MainMenu : Control
         AddChild(EndlessSetupModal);
 
         // Lock status readout injected under the threat rows (StageData-driven)
-        if (MapThreatLbl != null && MapThreatLbl.GetParent() is Control detailPanel)
+        if (StageThreatLbl != null && StageThreatLbl.GetParent() is Control detailPanel)
         {
-            MapLockStatusLbl = new Label
+            StageLockStatusLbl = new Label
             {
                 Name = "MapLockStatusLabel",
                 Visible = false,
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
                 CustomMinimumSize = new Vector2(0, 36)
             };
-            MapLockStatusLbl.AddThemeColorOverride("font_color", new Color(1.0f, 0.45f, 0.4f));
-            MapLockStatusLbl.AddThemeFontSizeOverride("font_size", 13);
-            detailPanel.AddChild(MapLockStatusLbl);
+            StageLockStatusLbl.AddThemeColorOverride("font_color", new Color(1.0f, 0.45f, 0.4f));
+            StageLockStatusLbl.AddThemeFontSizeOverride("font_size", 13);
+            detailPanel.AddChild(StageLockStatusLbl);
         }
 
         if (HoloScanner != null)
         {
-            HoloScanner.OrganSelected += (string mapKey) => SelectMap(mapKey);
+            HoloScanner.StageSelected += (string stageKey) => SelectStage(stageKey);
         }
 
         if (TitleView != null)
@@ -406,8 +406,8 @@ public partial class MainMenu : Control
         UpdateAllTexts();
         if (ClassView != null && ClassView.Visible)
             SetupClassButtons();
-        if (MapView != null && MapView.Visible)
-            SelectMap(ActiveMapKey);
+        if (StageView != null && StageView.Visible)
+            SelectStage(ActiveStageKey);
     }
 
     private static bool IsEscapePressed(InputEvent @event)
@@ -489,7 +489,7 @@ public partial class MainMenu : Control
         RefreshProfileTexts();
         if (TreeZoomInBtn != null) TreeZoomInBtn.Text = Tr("TREE_ZOOM_IN");
 
-        if (MapHeaderLbl != null) MapHeaderLbl.Text = Tr("HEADER_SELECT_MAP");
+        if (StageHeaderLbl != null) StageHeaderLbl.Text = Tr("HEADER_SELECT_MAP");
         if (DeployBtn != null) DeployBtn.Text = Tr("BTN_DEPLOY");
         if (DifficultyToggle != null)
         {
@@ -504,16 +504,16 @@ public partial class MainMenu : Control
         }
 
         SetupClassButtons();
-        SetupMapButtons();
+        SetupStageButtons();
         SelectClass(ActiveClassKey);
         RefreshPassiveView();
         RefreshLoadoutView();
-        SelectMap(ActiveMapKey);
+        SelectStage(ActiveStageKey);
     }
 
     private void SwitchToView(Control targetView)
     {
-        Control?[] views = { TitleView, ClassView, LoadoutView, PassiveView, MapView, AchievementView };
+        Control?[] views = { TitleView, ClassView, LoadoutView, PassiveView, StageView, AchievementView };
         foreach (var view in views)
         {
             if (view != null)
@@ -526,13 +526,13 @@ public partial class MainMenu : Control
 
     /// <summary>
     /// The single back affordance for all views. Targets mirror the forward
-    /// flow: Map re-enters the passive build (refreshing the tree), Passive
+    /// flow: Stage re-enters the passive build (refreshing the tree), Passive
     /// returns to the gear loadout, Loadout returns to class selection,
     /// everything else to title.
     /// </summary>
     public void OnGlobalBackPressed()
     {
-        if (_currentView == MapView && PassiveView != null)
+        if (_currentView == StageView && PassiveView != null)
         {
             SelectPassiveBuild(ActiveTreeClassKey);
             SwitchToView(PassiveView);
@@ -932,14 +932,14 @@ public partial class MainMenu : Control
     public void OnPassiveConfirmPressed()
     {
         GameManager.SelectedClass = ActiveTreeClassKey;
-        if (MapView != null)
-            SwitchToView(MapView);
-        SelectMap(ActiveMapKey);
+        if (StageView != null)
+            SwitchToView(StageView);
+        SelectStage(ActiveStageKey);
     }
 
-    public void SetupMapButtons()
+    public void SetupStageButtons()
     {
-        if (MapListContainer == null)
+        if (StageListContainer == null)
             return;
 
         foreach (var keyVar in GameManager.StageData.Keys)
@@ -950,9 +950,9 @@ public partial class MainMenu : Control
             string name = data.TryGetValue("name", out var nmVal) ? nmVal.AsString() : key;
             int diff = data.TryGetValue("difficulty", out var diffVal) ? diffVal.AsInt32() : 1;
             string stars = new string('★', diff) + new string('☆', 5 - diff);
-            bool unlocked = GameManager.IsMapUnlocked(key);
+            bool unlocked = GameManager.IsStageUnlocked(key);
 
-            var btn = MapListContainer.GetNodeOrNull<Button>($"MapBtn_{key}");
+            var btn = StageListContainer.GetNodeOrNull<Button>($"MapBtn_{key}");
             if (btn == null)
                 continue;
             btn.Text = unlocked
@@ -964,15 +964,15 @@ public partial class MainMenu : Control
             {
                 btn.SetMeta("_select_wired", true);
                 string localKey = key;
-                btn.Pressed += () => SelectMap(localKey);
+                btn.Pressed += () => SelectStage(localKey);
             }
         }
-        AudioManager.Instance?.WireClicks(MapListContainer);
+        AudioManager.Instance?.WireClicks(StageListContainer);
     }
 
-    public void SelectMap(string key)
+    public void SelectStage(string key)
     {
-        ActiveMapKey = key;
+        ActiveStageKey = key;
         var data = GameManager.GetStageInfo(key);
 
         string organ = data.TryGetValue("organ", out var ogVal) ? ogVal.AsString() : "";
@@ -994,44 +994,44 @@ public partial class MainMenu : Control
             DifficultyLbl.Text = $"{Tr("LABEL_DIFFICULTY")}{stars}";
         }
 
-        if (MapNameLbl != null)
+        if (StageNameLbl != null)
         {
-            MapNameLbl.Text = name;
-            MapNameLbl.Modulate = col;
+            StageNameLbl.Text = name;
+            StageNameLbl.Modulate = col;
         }
 
-        if (MapSubtitleLbl != null)
+        if (StageSubtitleLbl != null)
         {
-            MapSubtitleLbl.Text = subtitle;
+            StageSubtitleLbl.Text = subtitle;
         }
 
-        if (MapEnvLbl != null)
+        if (StageEnvLbl != null)
         {
-            MapEnvLbl.Text = $"🔬 {Tr("LABEL_ECO_SLICE")}{data["environment"].AsString()}";
+            StageEnvLbl.Text = $"🔬 {Tr("LABEL_ECO_SLICE")}{data["environment"].AsString()}";
         }
 
-        if (MapMechLbl != null)
+        if (StageMechLbl != null)
         {
-            MapMechLbl.Text = $"🌊 {Tr("LABEL_FLUID_MECH")}{data["mechanic"].AsString()}";
+            StageMechLbl.Text = $"🌊 {Tr("LABEL_FLUID_MECH")}{data["mechanic"].AsString()}";
         }
 
-        if (MapThreatLbl != null)
+        if (StageThreatLbl != null)
         {
-            MapThreatLbl.Text = $"☣️ {Tr("LABEL_KEY_THREATS")}{data["threat"].AsString()}";
+            StageThreatLbl.Text = $"☣️ {Tr("LABEL_KEY_THREATS")}{data["threat"].AsString()}";
         }
 
         if (HoloScanner != null)
         {
-            HoloScanner.SelectOrgan(key);
+            HoloScanner.SelectStage(key);
         }
 
-        bool unlocked = GameManager.IsMapUnlocked(key);
-        if (MapLockStatusLbl != null)
+        bool unlocked = GameManager.IsStageUnlocked(key);
+        if (StageLockStatusLbl != null)
         {
-            MapLockStatusLbl.Visible = !unlocked;
-            MapLockStatusLbl.Text = unlocked
+            StageLockStatusLbl.Visible = !unlocked;
+            StageLockStatusLbl.Text = unlocked
                 ? ""
-                : $"🔒 {Tr("MAP_LOCKED_HINT")}\n{AchievementManager.GetMapUnlockRequirementText(key)}";
+                : $"🔒 {Tr("MAP_LOCKED_HINT")}\n{AchievementManager.GetStageUnlockRequirementText(key)}";
         }
 
         if (DeployBtn != null)
@@ -1043,9 +1043,9 @@ public partial class MainMenu : Control
         UpdateEndlessAvailability();
         RefreshDifficultyToggle();
 
-        if (MapListContainer != null)
+        if (StageListContainer != null)
         {
-            foreach (var child in MapListContainer.GetChildren())
+            foreach (var child in StageListContainer.GetChildren())
             {
                 if (child is Button b)
                 {
@@ -1061,15 +1061,15 @@ public partial class MainMenu : Control
 
     private void OnDeployPressed()
     {
-        if (!GameManager.IsMapUnlocked(ActiveMapKey))
+        if (!GameManager.IsStageUnlocked(ActiveStageKey))
         {
             // Locked organ: refresh the requirement readout instead of deploying
-            SelectMap(ActiveMapKey);
+            SelectStage(ActiveStageKey);
             AudioManager.Instance?.PlayError();
             return;
         }
 
-        GameManager.SelectedMap = ActiveMapKey;
+        GameManager.SelectedStage = ActiveStageKey;
         GameManager.SelectedDifficulty = DifficultyToggle != null && DifficultyToggle.Selected == 1
             ? RunRecordManager.DifficultyHard
             : RunRecordManager.DifficultyNormal;
@@ -1078,14 +1078,14 @@ public partial class MainMenu : Control
 
     /// <summary>
     /// Hard (Acute Crisis) is per-organ: selectable only once the prerequisite
-    /// map has been cleared on Normal (docs/map.md §2).
+    /// stage has been cleared on Normal (docs/stages.md §2).
     /// </summary>
     private void RefreshDifficultyToggle()
     {
         if (DifficultyToggle == null)
             return;
 
-        bool hardUnlocked = GameManager.IsMapHardUnlocked(ActiveMapKey);
+        bool hardUnlocked = GameManager.IsStageHardUnlocked(ActiveStageKey);
         DifficultyToggle.SetItemDisabled(1, !hardUnlocked);
 
         if (!hardUnlocked && GameManager.SelectedDifficulty == RunRecordManager.DifficultyHard)
@@ -1099,7 +1099,7 @@ public partial class MainMenu : Control
 
     private void OnDifficultySelected(long index)
     {
-        if (index == 1 && !GameManager.IsMapHardUnlocked(ActiveMapKey))
+        if (index == 1 && !GameManager.IsStageHardUnlocked(ActiveStageKey))
         {
             if (DifficultyToggle != null)
                 DifficultyToggle.Selected = 0;
@@ -1116,7 +1116,7 @@ public partial class MainMenu : Control
     /// Endless availability readout: requires the Hard clear achievement
     /// (wound_hard_clear) and an unlocked organ. The tooltip always
     /// explains something: the unlock requirement when locked, the organ
-    /// lock reason when the map itself is locked, and a one-line mode
+    /// lock reason when the stage itself is locked, and a one-line mode
     /// summary once the button is actually usable.
     /// </summary>
     private void UpdateEndlessAvailability()
@@ -1125,10 +1125,10 @@ public partial class MainMenu : Control
             return;
 
         bool endlessReady = GameManager.IsEndlessAvailable();
-        EndlessBtn.Disabled = !endlessReady || IsActiveMapLocked;
+        EndlessBtn.Disabled = !endlessReady || IsActiveStageLocked;
         if (!endlessReady)
             EndlessBtn.TooltipText = Tr("ENDLESS_LOCKED_HINT");
-        else if (IsActiveMapLocked)
+        else if (IsActiveStageLocked)
             EndlessBtn.TooltipText = Tr("MAP_LOCKED_DEPLOY");
         else
             EndlessBtn.TooltipText = Tr("ENDLESS_ABOUT_HINT");

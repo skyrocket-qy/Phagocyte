@@ -5,7 +5,7 @@ using Game.Enemies;
 namespace Game.Directors;
 
 /// <summary>
-/// 15:00 wave timeline + kill-driven dynamic backfill (docs/map.md §4.2).
+/// 15:00 wave timeline + kill-driven dynamic backfill (docs/stages.md §4.2).
 /// Extracted from <c>GameRoot.ProcessWaveDirector / ProcessDynamicBackfill</c>:
 /// 03:00 elite raid, 06:00 swarm + elite pincer, 09:00 sub-boss (delegated to
 /// <see cref="BossEncounterManager"/>), 12:00 extreme swarm, 15:00 terminal
@@ -102,7 +102,7 @@ public partial class WaveDirectorComponent : Node
     }
 
     /// <summary>
-    /// Kill-Driven Dynamic Backfill (docs/map.md §4.2): refill the deficit
+    /// Kill-Driven Dynamic Backfill (docs/stages.md §4.2): refill the deficit
     /// between the screen cap and the active enemy count just outside the
     /// camera view. Skipped during boss lockdown (caller returns early there).
     /// </summary>

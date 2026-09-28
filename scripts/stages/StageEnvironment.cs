@@ -8,9 +8,9 @@ using Game.Player;
 namespace Game.Stages;
 
 /// <summary>
-/// Data-driven stage environment (docs/map.md §3). One instance is created
+/// Data-driven stage environment (docs/stages.md §3). One instance is created
 /// by GameRoot per run; behavior comes wholly from the stage row's
-/// "effects" array in assets/data/maps.json — never a per-stage subclass.
+/// "effects" array in assets/data/stages.json — never a per-stage subclass.
 /// Effect kinds: spawner, volley, dot_scan, stat_strip, scramble, scatter.
 /// </summary>
 public sealed class StageEnvironment
@@ -308,7 +308,7 @@ public sealed class StageEnvironment
         return point;
     }
 
-    public static StageEnvironment ForMap(string stageId)
+    public static StageEnvironment ForStage(string stageId)
     {
         return new StageEnvironment(stageId);
     }

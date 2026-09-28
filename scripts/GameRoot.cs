@@ -88,11 +88,11 @@ public partial class GameRoot : Node2D, IRunContext
     public ColorRect? ArenaBg { get; set; }
     public Line2D? ArenaBorders { get; set; }
 
-    /// <summary>Whether the current organ map is unlocked in the achievement chain.</summary>
-    public bool CurrentMapUnlocked => GameManager.IsMapUnlocked(StageId);
+    /// <summary>Whether the current organ stage is unlocked in the achievement chain.</summary>
+    public bool CurrentStageUnlocked => GameManager.IsStageUnlocked(StageId);
 
-    /// <summary>Whether the current organ map's Hard (Acute Crisis) mode is unlocked.</summary>
-    public bool CurrentMapHardUnlocked => GameManager.IsMapHardUnlocked(StageId);
+    /// <summary>Whether the current organ stage's Hard (Acute Crisis) mode is unlocked.</summary>
+    public bool CurrentStageHardUnlocked => GameManager.IsStageHardUnlocked(StageId);
 
     public float EnvironmentTime { get; set; } = 0.0f;
     public string StageId { get; set; } = "acute_wound";
@@ -200,15 +200,15 @@ public partial class GameRoot : Node2D, IRunContext
             AddChild(vfxMgr);
         }
 
-        // Read map configuration from GM
-        StageId = GameManager.SelectedMap;
+        // Read stage configuration from GM
+        StageId = GameManager.SelectedStage;
         StageSystem?.ConfigureArenaVisuals(ArenaBg, ArenaBorders, StageId);
 
-        // Organ-specific fluid mechanics & physiology acting on the player (docs/map.md §3)
+        // Organ-specific fluid mechanics & physiology acting on the player (docs/stages.md §3)
         StageSystem?.Initialize(IsHardRun);
 
-        // Fill-rate switch (FPS survey §1): applied after the map tint so the
-        // stashed "full" material already carries the per-map shader params.
+        // Fill-rate switch (FPS survey §1): applied after the stage tint so the
+        // stashed "full" material already carries the per-stage shader params.
         BackdropQuality.ApplyTo(this, SettingsManager.PerformanceMode);
 
         // Initial enemy wave (balance tuning: throttled to ~30% pacing, was 35).
@@ -216,7 +216,7 @@ public partial class GameRoot : Node2D, IRunContext
             EnemySpawner.SpawnWave(EnemyContainer, Player, ArenaSize, EnvironmentTime, 10);
 
         // GPU swarm batch renderer for the microscopic species (docs/spec.md §9).
-        // Parented to GameRoot (not EnemyContainer) so the map fluid mechanics never
+        // Parented to GameRoot (not EnemyContainer) so the stage fluid mechanics never
         // drift the batch layer, and inserted before EnemyContainer so it draws
         // above the arena backdrop but under the individually drawn enemies.
         if (EnemyContainer != null)
@@ -232,7 +232,7 @@ public partial class GameRoot : Node2D, IRunContext
         // Neutral environment matter (dormant toxin vesicles)
         NeutralMatter?.SeedInitialPopulation();
 
-        AudioManager.Instance?.PlayMapBgm(GameManager.SelectedMap, 0.6f);
+        AudioManager.Instance?.PlayStageBgm(GameManager.SelectedStage, 0.6f);
 
         // Test-demand full-build cheat (debug builds only, --cheats=all [--godmode]).
         CheatTools.ApplyHeadedRunCheats(this);
@@ -387,7 +387,7 @@ public partial class GameRoot : Node2D, IRunContext
 
         BossManager?.PhysicsTick(dt);
 
-        // Map mechanics (environment ticks first so its fluid current is same-frame)
+        // Stage mechanics (environment ticks first so its fluid current is same-frame)
         StageSystem?.PhysicsTick(dt);
         Overdrive?.PhysicsTick(dt);
         Overdrive?.ProcessMutators(dt);

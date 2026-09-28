@@ -122,7 +122,7 @@ public abstract partial class TestHarness : SceneTree
         string difficulty = RunRecordManager.DifficultyNormal, bool endless = false)
     {
         GameManager.SelectedClass = classId;
-        GameManager.SelectedMap = stageId;
+        GameManager.SelectedStage = stageId;
         GameManager.SelectedDifficulty = difficulty;
         GameManager.EndlessMode = endless;
 
@@ -170,7 +170,7 @@ public abstract partial class TestHarness : SceneTree
     protected static void ResetRunGlobals()
     {
         GameManager.SelectedDifficulty = RunRecordManager.DifficultyNormal;
-        GameManager.SelectedMap = "acute_wound";
+        GameManager.SelectedStage = "acute_wound";
         GameManager.EndlessMode = false;
         EnemySpawner.Reset();
     }

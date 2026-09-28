@@ -10,7 +10,7 @@ using Game.Player;
 namespace Game.Tests;
 
 /// <summary>
-/// Verifies the map first-clear talent point pipeline and the innately lit start
+/// Verifies the stage first-clear talent point pipeline and the innately lit start
 /// hub (docs/passivetree.md §2/§5, docs/achievement.md §2.1):
 /// 5 organs x Normal/Hard clears award talent points, and every deployed cell's
 /// start hub is permanently active at zero cost.
@@ -18,7 +18,7 @@ namespace Game.Tests;
 [TestSuite]
 public partial class TestTalentPipeline : TestHarness
 {
-    private static readonly string[] MapIds =
+    private static readonly string[] StageIds =
     {
         "acute_wound", "alveolar_space", "hepatic_sinusoid", "gastric_lumen", "blood_brain_barrier"
     };
@@ -51,7 +51,7 @@ public partial class TestTalentPipeline : TestHarness
                 _phase++;
                 return false; // let the scene tree settle
             case 1:
-                RunMapClearPointTests();
+                RunStageClearPointTests();
                 _phase++;
                 return false;
             case 2:
@@ -80,20 +80,20 @@ public partial class TestTalentPipeline : TestHarness
         }
     }
 
-    private void RunMapClearPointTests()
+    private void RunStageClearPointTests()
     {
         // Catalog: all 5 organs have a Normal and a Hard first-clear achievement,
         // each awarding at least one microtube talent point.
         int normalClears = 0;
         int hardClears = 0;
-        foreach (string stageId in MapIds)
+        foreach (string stageId in StageIds)
         {
             bool foundNormal = false;
             bool foundHard = false;
             foreach (string achId in AchievementManager.Achievements.Keys)
             {
                 var ach = AchievementManager.Achievements[achId].AsGodotDictionary();
-                if (ach.GetValueOrDefault("map_id", "").AsString() != stageId)
+                if (ach.GetValueOrDefault("stage_id", "").AsString() != stageId)
                     continue;
 
                 bool hard = ach.GetValueOrDefault("difficulty", "normal").AsString() == "hard";
@@ -123,17 +123,17 @@ public partial class TestTalentPipeline : TestHarness
 
         // First clears grant points exactly once each (derived from unlocks).
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(0);
-        AchievementManager.RecordMapClear("acute_wound");
+        AchievementManager.RecordStageClear("acute_wound");
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(1);
 
-        AchievementManager.RecordMapClear("acute_wound");
+        AchievementManager.RecordStageClear("acute_wound");
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(1);
 
-        AchievementManager.RecordMapClear("alveolar_space", true);
+        AchievementManager.RecordStageClear("alveolar_space", true);
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(2);
         AssertThat(AchievementManager.IsUnlocked("alveolar_hard_clear")).IsTrue();
 
-        AchievementManager.RecordMapClear("blood_brain_barrier");
+        AchievementManager.RecordStageClear("blood_brain_barrier");
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(4);
 
         GD.Print("[PASS] 5 organs x Normal/Hard first clears award talent points exactly once.");

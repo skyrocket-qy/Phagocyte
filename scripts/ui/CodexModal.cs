@@ -11,7 +11,7 @@ public partial class CodexModal : ModalBase
     public Button? TabPassivesBtn { get; set; }
     public Button? TabCellsBtn { get; set; }
     public Button? TabEnemiesBtn { get; set; }
-    public Button? TabMapsBtn { get; set; }
+    public Button? TabStagesBtn { get; set; }
     public Button? TabGearBtn { get; set; }
     public Button? TabBossesBtn { get; set; }
 
@@ -38,7 +38,7 @@ public partial class CodexModal : ModalBase
     public const int TabPassives = 1;
     public const int TabCells = 2;
     public const int TabEnemies = 3;
-    public const int TabMaps = 4;
+    public const int TabStages = 4;
     public const int TabGear = 5;
     public const int TabBosses = 6;
 
@@ -48,7 +48,7 @@ public partial class CodexModal : ModalBase
         TabPassivesBtn = GetNodeOrNull<Button>("VBox/TabBar/PassivesTab");
         TabCellsBtn = GetNodeOrNull<Button>("VBox/TabBar/CellsTab");
         TabEnemiesBtn = GetNodeOrNull<Button>("VBox/TabBar/EnemiesTab");
-        TabMapsBtn = GetNodeOrNull<Button>("VBox/TabBar/MapsTab");
+        TabStagesBtn = GetNodeOrNull<Button>("VBox/TabBar/MapsTab");
         TabGearBtn = GetNodeOrNull<Button>("VBox/TabBar/GearTab");
         TabBossesBtn = GetNodeOrNull<Button>("VBox/TabBar/BossesTab");
 
@@ -71,8 +71,8 @@ public partial class CodexModal : ModalBase
             TabCellsBtn.Pressed += () => SwitchTab(TabCells);
         if (TabEnemiesBtn != null)
             TabEnemiesBtn.Pressed += () => SwitchTab(TabEnemies);
-        if (TabMapsBtn != null)
-            TabMapsBtn.Pressed += () => SwitchTab(TabMaps);
+        if (TabStagesBtn != null)
+            TabStagesBtn.Pressed += () => SwitchTab(TabStages);
         if (TabGearBtn != null)
             TabGearBtn.Pressed += () => SwitchTab(TabGear);
         if (TabBossesBtn != null)
@@ -186,7 +186,7 @@ public partial class CodexModal : ModalBase
         if (TabPassivesBtn != null) TabPassivesBtn.Text = Tr("CODEX_TAB_PASSIVES");
         if (TabCellsBtn != null) TabCellsBtn.Text = Tr("CODEX_TAB_CELLS");
         if (TabEnemiesBtn != null) TabEnemiesBtn.Text = Tr("CODEX_TAB_PATHOGENS");
-        if (TabMapsBtn != null) TabMapsBtn.Text = Tr("CODEX_TAB_MAPS");
+        if (TabStagesBtn != null) TabStagesBtn.Text = Tr("CODEX_TAB_MAPS");
         if (TabGearBtn != null) TabGearBtn.Text = Tr("CODEX_TAB_ORGANELLES");
         if (TabBossesBtn != null) TabBossesBtn.Text = Tr("CODEX_TAB_BOSSES");
 
@@ -203,7 +203,7 @@ public partial class CodexModal : ModalBase
         UiBuilders.SetTabActive(TabPassivesBtn, tabIdx == TabPassives);
         UiBuilders.SetTabActive(TabCellsBtn, tabIdx == TabCells);
         UiBuilders.SetTabActive(TabEnemiesBtn, tabIdx == TabEnemies);
-        UiBuilders.SetTabActive(TabMapsBtn, tabIdx == TabMaps);
+        UiBuilders.SetTabActive(TabStagesBtn, tabIdx == TabStages);
         UiBuilders.SetTabActive(TabGearBtn, tabIdx == TabGear);
         UiBuilders.SetTabActive(TabBossesBtn, tabIdx == TabBosses);
 
@@ -237,8 +237,8 @@ public partial class CodexModal : ModalBase
             case TabEnemies:
                 RenderEnemiesTab();
                 break;
-            case TabMaps:
-                RenderMapsTab();
+            case TabStages:
+                RenderStagesTab();
                 break;
             case TabGear:
                 RenderGearTab();
@@ -489,7 +489,7 @@ public partial class CodexModal : ModalBase
         RefreshItemSelection();
     }
 
-    private void RenderMapsTab()
+    private void RenderStagesTab()
     {
         if (ItemList == null)
             return;
@@ -503,7 +503,7 @@ public partial class CodexModal : ModalBase
             var d = GameManager.GetStageInfo(key);
             var btn = MakeItemButton(" " + d["name"].AsString());
             string localKey = key;
-            btn.Pressed += () => SelectMap(localKey);
+            btn.Pressed += () => SelectStage(localKey);
             ItemList.AddChild(btn);
             _itemButtons[localKey] = btn;
         }
@@ -511,11 +511,11 @@ public partial class CodexModal : ModalBase
         string target = ActiveItemKey != "" && GameManager.StageData.ContainsKey(ActiveItemKey) ? ActiveItemKey : firstKey;
         if (target != "")
         {
-            SelectMap(target);
+            SelectStage(target);
         }
     }
 
-    private void SelectMap(string key)
+    private void SelectStage(string key)
     {
         ActiveItemKey = key;
         var d = GameManager.GetStageInfo(key);
@@ -544,8 +544,8 @@ public partial class CodexModal : ModalBase
         if (DetailStats != null) DetailStats.Text = Tr("LABEL_ENV") + d["environment"].AsString();
         if (DetailDesc != null) DetailDesc.Text = Tr("CODEX_HEADER_MECH") + "\n" + d["mechanic"].AsString();
         if (DetailBio != null) DetailBio.Text = Tr("CODEX_HEADER_THREAT") + "\n" + d["threat"].AsString()
-            + (d.TryGetValue("biochemistry", out var mapBio) && mapBio.AsString() != ""
-                ? "\n\n" + Tr("CODEX_HEADER_BIO") + "\n" + UiBuilders.StripLeadingLabel(mapBio.AsString()) : "");
+            + (d.TryGetValue("biochemistry", out var stageBio) && stageBio.AsString() != ""
+                ? "\n\n" + Tr("CODEX_HEADER_BIO") + "\n" + UiBuilders.StripLeadingLabel(stageBio.AsString()) : "");
         RefreshItemSelection();
     }
 

@@ -6,7 +6,7 @@ namespace Game.Directors;
 
 /// <summary>
 /// Drifting neutral matter (dormant toxin mines) plus host ulceration ambient
-/// acid mist (docs/map.md §4.3). Extracted from GameRoot.
+/// acid mist (docs/stages.md §4.3). Extracted from GameRoot.
 /// Neutrals are not <see cref="EnemyActor"/> nodes, so they never consume
 /// screen-cap slots.
 /// </summary>
@@ -94,7 +94,7 @@ public partial class NeutralPropManager : Node
     }
 
     /// <summary>
-    /// Host ulceration (docs/map.md): accumulated invader acid degrades the arena by
+    /// Host ulceration (docs/stages.md): accumulated invader acid degrades the arena by
     /// spawning ambient acid mist near the battle as the ulceration level rises.
     /// </summary>
     private void ProcessHostUlceration(float dt)

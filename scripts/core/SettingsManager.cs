@@ -39,11 +39,11 @@ public partial class SettingsManager : Node
     public static int MaxFps = 0;
 
     /// <summary>
-    /// Organ map mechanics master switch (docs/map.md §3): fluid drift,
+    /// Organ stage mechanics master switch (docs/stages.md §3): fluid drift,
     /// hazards and the fluid-arrow cues. Visual tints stay always-on.
     /// Default off so runs are mechanically neutral unless opted in.
     /// </summary>
-    public static bool MapEffectsEnabled = false;
+    public static bool StageEffectsEnabled = false;
 
     public SettingsManager()
     {
@@ -169,7 +169,7 @@ public partial class SettingsManager : Node
             { "performance_mode", PerformanceMode },
             { "show_fps", ShowFps },
             { "max_fps", MaxFps },
-            { "map_effects_enabled", MapEffectsEnabled },
+            { "stage_effects_enabled", StageEffectsEnabled },
             { "keybindings", KeyBindings.ToDict() }
         };
         JsonStore.Write(SavePath, payload);
@@ -190,7 +190,7 @@ public partial class SettingsManager : Node
         PerformanceMode = d.ContainsKey("performance_mode") ? (bool)d["performance_mode"] : false;
         ShowFps = d.ContainsKey("show_fps") ? (bool)d["show_fps"] : false;
         MaxFps = d.ContainsKey("max_fps") ? (int)d["max_fps"] : 0;
-        MapEffectsEnabled = d.ContainsKey("map_effects_enabled") ? (bool)d["map_effects_enabled"] : false;
+        StageEffectsEnabled = d.ContainsKey("stage_effects_enabled") ? (bool)d["stage_effects_enabled"] : false;
         if (d.TryGetValue("keybindings", out var kbVal) && kbVal.VariantType == Variant.Type.Dictionary)
             KeyBindings.FromDict(kbVal.AsGodotDictionary());
         else

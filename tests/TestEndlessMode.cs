@@ -88,7 +88,7 @@ public partial class TestEndlessMode : TestHarness
         AssertThat(GameManager.EndlessMode).IsFalse();
 
         // Clearing any organ on Hard unlocks the entry (docs/endgame.md §2)
-        AchievementManager.RecordMapClear("acute_wound", true);
+        AchievementManager.RecordStageClear("acute_wound", true);
         AssertThat(AchievementManager.IsEndlessUnlocked()).IsTrue();
         AssertThat(GameManager.IsEndlessAvailable()).IsTrue();
 

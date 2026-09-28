@@ -11,7 +11,7 @@ namespace Game.Tests;
 public partial class TestCheatUnlocks : TestHarness
 {
     private static readonly string[] AllClasses = { "macrophage", "ctl", "neutrophil", "b_cell", "dendritic" };
-    private static readonly string[] AllMaps = { "acute_wound", "alveolar_space", "hepatic_sinusoid", "gastric_lumen", "blood_brain_barrier" };
+    private static readonly string[] AllStages = { "acute_wound", "alveolar_space", "hepatic_sinusoid", "gastric_lumen", "blood_brain_barrier" };
 
     private int _frame = 0;
     private bool _done = false;
@@ -106,12 +106,12 @@ public partial class TestCheatUnlocks : TestHarness
                 continue;
             AssertThat(GameManager.IsClassUnlocked(cell)).IsFalse();
         }
-        AssertThat(GameManager.IsMapUnlocked("acute_wound")).IsTrue();
-        foreach (string map in AllMaps)
+        AssertThat(GameManager.IsStageUnlocked("acute_wound")).IsTrue();
+        foreach (string stageId in AllStages)
         {
-            if (map != "acute_wound")
-                AssertThat(GameManager.IsMapUnlocked(map)).IsFalse();
-            AssertThat(GameManager.IsMapHardUnlocked(map)).IsFalse();
+            if (stageId != "acute_wound")
+                AssertThat(GameManager.IsStageUnlocked(stageId)).IsFalse();
+            AssertThat(GameManager.IsStageHardUnlocked(stageId)).IsFalse();
         }
         AssertThat(EquipmentUnlockManager.UnlockedCount).IsEqual(0);
         AssertThat(PassiveTreeManager.GetCellLevel("macrophage")).IsEqual(PassiveTreeManager.PlayerActorLevel);
@@ -123,10 +123,10 @@ public partial class TestCheatUnlocks : TestHarness
     {
         foreach (string cell in AllClasses)
             AssertThat(GameManager.IsClassUnlocked(cell)).IsTrue();
-        foreach (string map in AllMaps)
+        foreach (string stageId in AllStages)
         {
-            AssertThat(GameManager.IsMapUnlocked(map)).IsTrue();
-            AssertThat(GameManager.IsMapHardUnlocked(map)).IsTrue();
+            AssertThat(GameManager.IsStageUnlocked(stageId)).IsTrue();
+            AssertThat(GameManager.IsStageHardUnlocked(stageId)).IsTrue();
         }
         AssertThat(AchievementManager.IsEndlessUnlocked()).IsTrue();
         AssertThat(EquipmentUnlockManager.UnlockedCount).IsEqual(GameManager.EquipmentCatalog.Count);
@@ -145,7 +145,7 @@ public partial class TestCheatUnlocks : TestHarness
         // Re-running the cheat is idempotent: nothing stacks.
         CheatTools.UnlockAllMeta();
         AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(expectedBonus);
-        GD.Print("[PASS] UnlockAllMeta unlocks all classes, maps+hard, endless, gear and tree levels.");
+        GD.Print("[PASS] UnlockAllMeta unlocks all classes, stages+hard, endless, gear and tree levels.");
     }
 }
 

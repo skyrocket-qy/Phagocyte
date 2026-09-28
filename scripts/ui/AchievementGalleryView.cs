@@ -289,7 +289,7 @@ public partial class AchievementGalleryView : Control
 
     /// <summary>
     /// Accent color by achievement family: Hard clears read red, cell-unlock
-    /// rewards green, normal map clears blue, generic milestones gold.
+    /// rewards green, normal stage clears blue, generic milestones gold.
     /// Derived from the info dict so no extra catalog lookups are needed.
     /// </summary>
     public static Color CategoryColor(Godot.Collections.Dictionary info)

@@ -9,7 +9,7 @@ using Game.UI;
 namespace Game.Tests;
 
 /// <summary>
-/// Verifies the dual-track difficulty system (docs/map.md §2 / TODO module 3):
+/// Verifies the dual-track difficulty system (docs/stages.md §2 / TODO module 3):
 /// per-organ Normal / Hard selection, Hard spawn modifiers (+40% HP / +20% speed),
 /// environment frequency scaling and the unlock gating.
 /// </summary>
@@ -31,7 +31,7 @@ public partial class TestDifficultyTracks : TestHarness
         ResetRunGlobals();
         // Hard-run integration asserts a live Stage: the global flag defaults
         // to off, and mechanics suites must opt in (cf. TestStageEnvironments).
-        SettingsManager.MapEffectsEnabled = true;
+        SettingsManager.StageEffectsEnabled = true;
     }
 
     public override bool _Process(double delta)
@@ -125,7 +125,7 @@ public partial class TestDifficultyTracks : TestHarness
         AssertThat(wound.HardMode).IsTrue();
 
         // A Hard clear settles as a Hard record, unlocks its Hard achievement and
-        // awards the Hard talent point (docs/map.md §2 / docs/passivetree.md §5.2).
+        // awards the Hard talent point (docs/stages.md §2 / docs/passivetree.md §5.2).
         int bonusBefore = PassiveTreeManager.GetEarnedBonusPoints();
         var player = MakePlayerInvulnerable(main);
         AssertThat(player).IsNotNull();
@@ -146,14 +146,14 @@ public partial class TestDifficultyTracks : TestHarness
 
     private void RunDifficultyToggleTests()
     {
-        GameManager.ResetMapUnlocks();
+        GameManager.ResetStageUnlocks();
         GameManager.SelectedDifficulty = RunRecordManager.DifficultyNormal;
 
         var menu = AssetLoader.Load<PackedScene>("res://scenes/ui/main_menu.tscn").Instantiate<MainMenu>();
         Root.AddChild(menu);
 
         AssertThat(menu.DifficultyToggle).IsNotNull();
-        menu.SelectMap("acute_wound");
+        menu.SelectStage("acute_wound");
         AssertThat(menu.DifficultyToggle!.IsItemDisabled(1)).IsTrue();
         AssertThat(menu.DifficultyToggle.TooltipText).IsEqual(menu.Tr("HARD_LOCKED_HINT"));
 
@@ -162,10 +162,10 @@ public partial class TestDifficultyTracks : TestHarness
         menu.DifficultyToggle.EmitSignal(OptionButton.SignalName.ItemSelected, 1);
         AssertThat(GameManager.SelectedDifficulty).IsEqual(RunRecordManager.DifficultyNormal);
 
-        // Clearing the organ on Normal unlocks its Hard mode (docs/map.md §2).
-        AchievementManager.RecordMapClear("acute_wound");
-        menu.SelectMap("acute_wound");
-        AssertThat(GameManager.IsMapHardUnlocked("acute_wound")).IsTrue();
+        // Clearing the organ on Normal unlocks its Hard mode (docs/stages.md §2).
+        AchievementManager.RecordStageClear("acute_wound");
+        menu.SelectStage("acute_wound");
+        AssertThat(GameManager.IsStageHardUnlocked("acute_wound")).IsTrue();
         AssertThat(menu.DifficultyToggle.IsItemDisabled(1)).IsFalse();
         AssertThat(menu.DifficultyToggle.TooltipText).IsEqual("");
 
@@ -174,7 +174,7 @@ public partial class TestDifficultyTracks : TestHarness
         AssertThat(GameManager.SelectedDifficulty).IsEqual(RunRecordManager.DifficultyHard);
 
         // Switching to an organ whose Hard is still locked falls back to Normal.
-        menu.SelectMap("alveolar_space");
+        menu.SelectStage("alveolar_space");
         AssertThat(menu.DifficultyToggle.IsItemDisabled(1)).IsTrue();
         AssertThat(GameManager.SelectedDifficulty).IsEqual(RunRecordManager.DifficultyNormal);
 
@@ -193,7 +193,7 @@ public partial class TestDifficultyTracks : TestHarness
         Paused = false;
         CleanupMain();
         ResetRunGlobals();
-        SettingsManager.MapEffectsEnabled = false;
+        SettingsManager.StageEffectsEnabled = false;
 
         AchievementManager.ResetAll();
         PassiveTreeManager.ResetAll();

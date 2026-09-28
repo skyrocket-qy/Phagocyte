@@ -66,7 +66,7 @@ public partial class TestAchievementGallery : TestHarness
         }
         GD.Print($"[PASS] All {AchievementManager.Achievements.Count} achievements carry image_path + steam_api_name.");
 
-        // Category accents: hard = red, cell unlocks = green, map clears = blue, milestones = gold
+        // Category accents: hard = red, cell unlocks = green, stage clears = blue, milestones = gold
         AssertThat(AchievementGalleryView.CategoryColor(AchievementManager.GetAchievementInfo("wound_hard_clear")))
             .IsEqual(new Color(1.0f, 0.45f, 0.4f));
         AssertThat(AchievementGalleryView.CategoryColor(AchievementManager.GetAchievementInfo("engulf_20")))
@@ -128,12 +128,12 @@ public partial class TestAchievementGallery : TestHarness
         AssertThat(menu.GlobalBackBtn.Visible).IsFalse();
         GD.Print("[PASS] Shared top-left back returns to TitleView and hides itself.");
 
-        // Per-view back targets: Map -> Passive -> Loadout -> Class -> Title
+        // Per-view back targets: Stage -> Passive -> Loadout -> Class -> Title
         menu.OnStartPressed();
         menu.OnClassConfirmPressed();
         menu.OnLoadoutConfirmPressed();
         menu.OnPassiveConfirmPressed();
-        AssertThat(menu.MapView!.Visible).IsTrue();
+        AssertThat(menu.StageView!.Visible).IsTrue();
         AssertThat(menu.GlobalBackBtn.Visible).IsTrue();
         menu.GlobalBackBtn.EmitSignal(Button.SignalName.Pressed);
         AssertThat(menu.PassiveView!.Visible).IsTrue();
@@ -144,7 +144,7 @@ public partial class TestAchievementGallery : TestHarness
         menu.GlobalBackBtn.EmitSignal(Button.SignalName.Pressed);
         AssertThat(menu.TitleView.Visible).IsTrue();
         AssertThat(menu.GlobalBackBtn.Visible).IsFalse();
-        GD.Print("[PASS] Shared back walks Map -> Passive -> Loadout -> Class -> Title.");
+        GD.Print("[PASS] Shared back walks Stage -> Passive -> Loadout -> Class -> Title.");
 
         return menu;
     }

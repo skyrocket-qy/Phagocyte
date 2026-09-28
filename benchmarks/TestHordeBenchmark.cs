@@ -99,7 +99,7 @@ public partial class TestHordeBenchmark : TestHarness
     private void SetupArena()
     {
         GameManager.SelectedClass = "macrophage";
-        GameManager.SelectedMap = "acute_wound";
+        GameManager.SelectedStage = "acute_wound";
 
         var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         var main = mainScene.Instantiate<GameRoot>();

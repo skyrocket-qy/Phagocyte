@@ -240,7 +240,7 @@ public partial class RunRecordManager : Node
             { "result", result },
             { "cause", cause },
             { "class_id", classId },
-            { "map_id", stageId },
+            { "stage_id", stageId },
             { "difficulty", difficulty },
             { "endless", endless },
             { "afflictions", afflictionList },

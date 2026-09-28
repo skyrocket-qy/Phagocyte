@@ -89,7 +89,7 @@ Understand how the game starts and who ticks every frame.
 5. `ApplyTreeLoadout`, `ApplyChamberLoadout`, `Overdrive.ApplyMutatorLoadout`, `HudNode.ConnectPlayer`
 6. Ensure `ProjectileManager`, `RunTelemetryManager`, `VfxManager` exist
 7. `StageId=GameManager.SelectedMap`, `StageSystem.ConfigureArenaVisuals+Initialize`
-8. Backdrop quality, initial `SpawnWave`, `SwarmRenderer`, `SpawnTutorialGuides` (2 dormant guides at +150px), `NeutralPropManager.SeedInitialPopulation`, `PlayMapBgm`
+8. Backdrop quality, initial `SpawnWave`, `SwarmRenderer`, `SpawnTutorialGuides` (2 dormant guides at +150px), `NeutralPropManager.SeedInitialPopulation`, `PlayStageBgm`
 
 `_PhysicsProcess()` order - memorize this:
 1. `EnvironmentTime+=dt; AchievementManager.RecordEvent("survival_time",...)`
@@ -117,10 +117,10 @@ Know global state vs run-scoped state. This fixes 50% of "where is this stored?"
 | Singleton | Autoload? | File | Responsibility |
 |---|---|---|---|
 | `GameManager` | yes `project.godot:20` | `scripts/core/GameManager.cs:1-424` | `SelectedClass/Map/Difficulty/Language`, `EndlessMode`, catalogs, `StartGame/StartEndlessGame/GoToMenu/RestartGame` |
-| `AchievementManager` | yes | `scripts/core/AchievementManager.cs:22,55` | definitions/progress/unlocks, `RecordEvent`, `RecordMapClear`, Steam sync, map/class unlock chain |
-| `SettingsManager` | yes | `scripts/core/SettingsManager.cs:19,53` | `settings.json`, Master/SFX/BGM dB, fullscreen/VSync/MaxFps, `PerformanceMode`, `MapEffectsEnabled` |
+| `AchievementManager` | yes | `scripts/core/AchievementManager.cs:22,55` | definitions/progress/unlocks, `RecordEvent`, `RecordStageClear`, Steam sync, map/class unlock chain |
+| `SettingsManager` | yes | `scripts/core/SettingsManager.cs:19,53` | `settings.json`, Master/SFX/BGM dB, fullscreen/VSync/MaxFps, `PerformanceMode`, `StageEffectsEnabled` |
 | `RunRecordManager` | yes | `scripts/core/RunRecordManager.cs:132,160` | `run_records.json` cap 50, KPM, rank D-C-B-A-S + SSS/EX, `ComputeScore/Rank`, `RecordRun`, `CanSettleVictory` |
-| `AudioManager` | yes | `scripts/core/AudioManager.cs:12,42` | 24-voice SFX pool, fading BGM, `PlayMapBgm`, `WireClicks`, manifest validation |
+| `AudioManager` | yes | `scripts/core/AudioManager.cs:12,42` | 24-voice SFX pool, fading BGM, `PlayStageBgm`, `WireClicks`, manifest validation |
 | `DamageNumberSpawner` | yes `project.godot:24` | `scripts/ui/DamageNumberSpawner.cs:19-23` | pooled 256 floating numbers |
 
 Non-autoload (common mistake):
@@ -133,16 +133,16 @@ Non-autoload (common mistake):
 
 Key APIs to read:
 - `GameManager`: `GetPlayerScene`, `GetSkillInfo`, `GetEnemyInfo`, `GetBossInfo`, `IsMapUnlocked/IsMapHardUnlocked`, `StartGame`, `StartEndlessGame`
-- `AchievementManager`: `Unlock`, `RecordEvent`, `RecordMapClear`, `IsEndlessUnlocked` (checks `wound_hard_clear`), `SaveToDisk/LoadFromDisk`
+- `AchievementManager`: `Unlock`, `RecordEvent`, `RecordStageClear`, `IsEndlessUnlocked` (checks `wound_hard_clear`), `SaveToDisk/LoadFromDisk`
 - `RunRecordManager`: `StandardClearSeconds=900`, `ComputeKpm`, `ComputeRank`, `ComputeScore`, `IsVictoryCriteriaMet/CanSettleVictory`, `RecordRun`
 - `SettingsManager`: `ApplySettings`, setters
-- `AudioManager`: `ValidateAudioManifest`, `PlayBgm/PlaySfx`, `PlayMapBgm`, `MapBgmTracks`
+- `AudioManager`: `ValidateAudioManifest`, `PlayBgm/PlaySfx`, `PlayStageBgm`, `StageBgmTracks`
 
 Connections to `GameRoot`:
 - `GameRoot.IsEndlessRun=GameManager.EndlessMode`, `RunDifficulty=GameManager.SelectedDifficulty`
 - `GameRoot.CurrentMapUnlocked/HardUnlocked` → `GameManager.IsMapUnlocked/HardUnlocked`
 - `GameRoot._PhysicsProcess` → `AchievementManager.RecordEvent("survival_time",...)` every tick
-- `GameRoot._Ready` → `AudioManager.PlayMapBgm(SelectedMap)`
+- `GameRoot._Ready` → `AudioManager.PlayStageBgm(SelectedStage)`
 
 ### Hands-on
 Grep `Instance` in `AudioManager`, `AchievementManager`, `RunRecordManager`, `SettingsManager`. Confirm none of `PassiveTreeManager/LoadoutManager/UpgradeManager` have `Instance` (they are static).
@@ -367,12 +367,12 @@ Overdrive (endless only, `EndlessDirector`):
 - Run mutators: viscosity move penalty, burn (%maxHP/5s), drift clears marks/20s
 
 Stage (`StageSystem` + `scripts/stages/`):
-- `Initialize(hard)`, `ConfigureArenaVisuals`, `PhysicsTick`: `Current.Tick` drives data-driven effects. Gated by `SettingsManager.MapEffectsEnabled` (off → tints only).
+- `Initialize(hard)`, `ConfigureArenaVisuals`, `PhysicsTick`: `Current.Tick` drives data-driven effects. Gated by `SettingsManager.StageEffectsEnabled` (off → tints only).
 - Wound: no env hazards; Alveolar: buff-zone spawner/6s max 3; Hepatic: stat-strip/18s + blocker walls/24s max 3; Gastric: safe zones/9s max 3 + dot volleys/14s + dot scan; BBB: blocker scatter ×5 + scramble pulse/11s×1.6s. All params in `stages.json` effects; props are generic (`BuffZone/BlockerWall/DotZone/SafeZone/BlockerPillar`).
 
 Settlement (`RunSettlementService.TryEndRun :32-140`):
 - Guard `RunEnded`; victory validated by `CanSettleVictory(time,bossNeutralized,endless)` = `!endless && bossNeutralized && time≥900-0.01`. Endless victory always rejected. Shortfall warns, returns false (Main does NOT raise `RunEnded`).
-- Victory: BGM victory + `RecordMapClear`; defeat: BGM defeat. Causes: `specific_neutralization` / `membrane_rupture` / `system_failure`.
+- Victory: BGM victory + `RecordStageClear`; defeat: BGM defeat. Causes: `specific_neutralization` / `membrane_rupture` / `system_failure`.
 - `RecordRun` (downgrades unearned victory), endless → `SteamBridge.SubmitEndlessLeaderboard`, open `RunRecordsModal.OpenSettlement` + `PauseManager.PushHold(Settlement)`
 - Rule: **standard victory = 15:00 + terminal-boss kill** (`docs/record.md §3.1`); **defeat = membrane zero**; **endless = defeat-only**; boss-vanish = `system_failure`.
 
@@ -403,7 +403,7 @@ Flow (`MainMenu.cs:515-526,722-1078`):
 `Title.Start → ClassView → (Confirm) LoadoutView → (Confirmed signal) PassiveView → (Confirm) MapView → (Deploy) GameManager.StartGame → main.tscn`
 Back: `Map→Passive→Loadout→Class→Title` (`OnGlobalBackPressed:534-554`, ESC `TryHandleEscapeAsBack:429-458`). Settlement `RecordsModal` consumes ESC.
 
-Per-view: Class (`SetupClassButtons`, `SelectClass`, radar `RadarChart.SetStats`, lock via `AchievementManager`), Loadout (`RefreshLoadoutView → LoadoutView.Open`), Passive (`SelectPassiveBuild`, `Purchase/Refund/Reset`, profile tabs code-built), Map (`SetupMapButtons`, `SelectMap`, `StageSelectMap.SelectOrgan`, difficulty/endless gates), Title auxiliaries (Codex/Records/Achievements/Settings/Quit).
+Per-view: Class (`SetupClassButtons`, `SelectClass`, radar `RadarChart.SetStats`, lock via `AchievementManager`), Loadout (`RefreshLoadoutView → LoadoutView.Open`), Passive (`SelectPassiveBuild`, `Purchase/Refund/Reset`, profile tabs code-built), Stage (`SetupStageButtons`, `SelectStage`, `StageSelectView.SelectStage`, difficulty/endless gates), Title auxiliaries (Codex/Records/Achievements/Settings/Quit).
 
 Run root (`scenes/main.tscn`): `GameRoot` + `Background/{ArenaBG,MicroscopeParallax,CapillaryTissue,FluidParticles,ArenaBorders}` + `ArenaBoundaries` + `EnemyContainer` + directors + instanced `Player` + `Camera2D(CameraFollow)` + `MicroscopePostProcess` + instanced `HUD` + `UIOverlay/RunRecordsModal`.
 
@@ -433,7 +433,7 @@ Open `hud.tscn`. Find `HPContainer`, `EXPContainer`, `BottomExpBar`, `HealthBar`
 Understand out-of-run progression.
 
 - Passive tree (`PassiveTreeManager.cs`): topology `passive_tree.json`, per-class levels/3 profiles, connectivity/purchase/refund, `CreateSkill` factory, live bonus from achievements. `GameRoot.ApplyTreeLoadout` attaches `TreeStatBundleSkill`s. View: `PassiveTreeView.cs` (shell in `passive_view.tscn`, graph code-drawn, nodes `TreeNode_{id}`).
-- Achievements (`AchievementManager.cs`): `achievements.json` + Steam, `RecordEvent/EvaluateThreshold/RecordMapClear`, `IsEndlessUnlocked` (needs `wound_hard_clear`), `ApplyMapRewards/SyncMapUnlocks`, gallery `AchievementGalleryView/Card/Toast`.
+- Achievements (`AchievementManager.cs`): `achievements.json` + Steam, `RecordEvent/EvaluateThreshold/RecordStageClear`, `IsEndlessUnlocked` (needs `wound_hard_clear`), `ApplyStageRewards/SyncStageUnlocks`, gallery `AchievementGalleryView/Card/Toast`.
 - Records (`RunRecordManager.cs` + `RunRecordsModal.cs`): `OpenHistory` vs `OpenSettlement`, grades, KPM/score.
 - Loadouts (`LoadoutManager.cs` + `LoadoutView.cs`): loadout JSON, scratch chamber, `BuildBackpackCards` instantiates `equipment_slot.tscn`, profile tabs code-built.
 - Unlocks (`EquipmentUnlockManager.cs`): `IsUnlocked`, `TrySpawnDrop`.
@@ -498,7 +498,7 @@ Run: `TestAssetLoader`, `TestAudioAssets`, `TestStatAndSkills`, `TestMenuFlow`, 
 
 ## Appendix B — Key docs map
 
-`docs/spec.md` (master GDD), `stat.md` (19 stats), `skill.md` (18+13+catalyst), `cell.md` (5 classes), `pathogen.md` (enemies), `map.md` (5 stages), `passivetree.md`, `achievement.md`, `record.md` (victory rule §3.1), `tutorial.md` (§2 cues), `endgame.md` (§3.1 endless), `real.md` (bio fidelity), `feedback.md`, `cheats.md`, `README.md`.
+`docs/spec.md` (master GDD), `stat.md` (19 stats), `skill.md` (18+13+catalyst), `cell.md` (5 classes), `pathogen.md` (enemies), `stages.md` (5 stages), `passivetree.md`, `achievement.md`, `record.md` (victory rule §3.1), `tutorial.md` (§2 cues), `endgame.md` (§3.1 endless), `real.md` (bio fidelity), `feedback.md`, `cheats.md`, `README.md`.
 
 ## Appendix C — Anti-vibe-coding workflow (going forward)
 

@@ -96,7 +96,7 @@ public partial class TestFullVisualPreview : TestHarness
                     return false;
 
                 case 5:
-                    // 5. Map Selection View
+                    // 5. Stage Selection View
                     if (!Gate(ref _frame, 6))
                         return false;
                     CaptureScreenshot("map_view.png");

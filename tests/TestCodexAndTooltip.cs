@@ -150,10 +150,10 @@ public partial class TestCodexAndTooltip : TestHarness
         codexModal.SelectEnemy("fludust_cyclone");
         GD.Print("[PASS] Codex boss archive tab lists 11 bosses with historical lore.");
 
-        // Switch to Tab 4 (Maps)
+        // Switch to Tab 4 (Stages)
         codexModal.SwitchTab(4);
         AssertThat(itemList.GetChildCount() >= 2).IsTrue();
-        GD.Print($"[PASS] Codex Pathological Stages tab displays {itemList.GetChildCount()} maps.");
+        GD.Print($"[PASS] Codex Pathological Stages tab displays {itemList.GetChildCount()} stages.");
 
         // Switch to Tab 5 (Equipment)
         codexModal.SwitchTab(5);

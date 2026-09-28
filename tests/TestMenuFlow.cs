@@ -50,8 +50,8 @@ public partial class TestMenuFlow : TestHarness
         AssertThat(menu.TitleView != null && menu.TitleView.Visible).IsTrue();
         AssertThat(menu.ClassView != null && menu.ClassView.Visible).IsFalse();
         AssertThat(menu.PassiveView != null && menu.PassiveView.Visible).IsFalse();
-        AssertThat(menu.MapView != null && menu.MapView.Visible).IsFalse();
-        GD.Print("[PASS] TitleView initially visible; class, tree, and map views hidden.");
+        AssertThat(menu.StageView != null && menu.StageView.Visible).IsFalse();
+        GD.Print("[PASS] TitleView initially visible; class, tree, and stage views hidden.");
 
         // 2. Test Transition to Class Selection
         menu.OnStartPressed();
@@ -102,7 +102,7 @@ public partial class TestMenuFlow : TestHarness
         AssertThat(menu.LoadoutView).IsNotNull();
         AssertThat(menu.LoadoutView!.Visible).IsTrue();
         AssertThat(menu.PassiveView != null && menu.PassiveView.Visible).IsFalse();
-        AssertThat(menu.MapView != null && menu.MapView.Visible).IsFalse();
+        AssertThat(menu.StageView != null && menu.StageView.Visible).IsFalse();
         AssertThat(GameManager.SelectedClass).IsEqual("macrophage");
         GD.Print("[PASS] Transition to LoadoutView with GameManager.selected_class = 'macrophage' verified.");
 
@@ -177,36 +177,36 @@ public partial class TestMenuFlow : TestHarness
 
         menu.OnPassiveConfirmPressed();
         AssertThat(menu.PassiveView!.Visible).IsFalse();
-        AssertThat(menu.MapView != null && menu.MapView.Visible).IsTrue();
-        GD.Print("[PASS] Transition from PassiveView to MapView verified.");
+        AssertThat(menu.StageView != null && menu.StageView.Visible).IsTrue();
+        GD.Print("[PASS] Transition from PassiveView to StageView verified.");
 
-        // 4. Test Map Selection & 5 Organ Battlefields
+        // 4. Test Stage Selection & 5 Organ Battlefields
         AssertThat(GameManager.StageData.Count).IsEqual(5);
         AssertThat(menu.HoloScanner).IsNotNull();
-        GD.Print("[PASS] GameManager.StageData has 5 maps and HoloScanner is initialized.");
+        GD.Print("[PASS] GameManager.StageData has 5 stages and HoloScanner is initialized.");
 
-        string[] allMaps = { "acute_wound", "alveolar_space", "hepatic_sinusoid", "gastric_lumen", "blood_brain_barrier" };
-        foreach (var mapKey in allMaps)
+        string[] allStages = { "acute_wound", "alveolar_space", "hepatic_sinusoid", "gastric_lumen", "blood_brain_barrier" };
+        foreach (var stageKey in allStages)
         {
-            menu.SelectMap(mapKey);
-            AssertThat(menu.ActiveMapKey).IsEqual(mapKey);
-            AssertThat(menu.HoloScanner!.ActiveMapKey).IsEqual(mapKey);
-            var info = GameManager.GetStageInfo(mapKey);
+            menu.SelectStage(stageKey);
+            AssertThat(menu.ActiveStageKey).IsEqual(stageKey);
+            AssertThat(menu.HoloScanner!.ActiveStageKey).IsEqual(stageKey);
+            var info = GameManager.GetStageInfo(stageKey);
             AssertThat(info["name"].AsString()).IsNotEmpty();
             AssertThat(info["organ"].AsString()).IsNotEmpty();
             AssertThat((int)info["difficulty"] >= 1 && (int)info["difficulty"] <= 5).IsTrue();
         }
-        GD.Print("[PASS] All 5 organ battlefields selectable with synchronized StageSelectMap.");
+        GD.Print("[PASS] All 5 organ battlefields selectable with synchronized StageSelectView.");
 
         // Test scanner signal selection
-        menu.HoloScanner!.EmitSignal(StageSelectMap.SignalName.OrganSelected, "hepatic_sinusoid");
-        AssertThat(menu.ActiveMapKey).IsEqual("hepatic_sinusoid");
-        GD.Print("[PASS] StageSelectMap interactive OrganSelected signal correctly switches map.");
+        menu.HoloScanner!.EmitSignal(StageSelectView.SignalName.StageSelected, "hepatic_sinusoid");
+        AssertThat(menu.ActiveStageKey).IsEqual("hepatic_sinusoid");
+        GD.Print("[PASS] StageSelectView interactive StageSelected signal correctly switches stage.");
 
-        // 5. Test GameRoot Scene loading with selected map
+        // 5. Test GameRoot Scene loading with selected stage
         menu.QueueFree();
 
-        GameManager.SelectedMap = "hepatic_sinusoid";
+        GameManager.SelectedStage = "hepatic_sinusoid";
         var mainScene = AssetLoader.Load<PackedScene>("res://scenes/main.tscn");
         AssertThat(mainScene).IsNotNull();
         var main = mainScene!.Instantiate<GameRoot>();

@@ -86,7 +86,7 @@ public partial class BossEncounterManager : Node
         TerminalBoss = EnemySpawner.SpawnTerminalBoss(container, player, ctx.ArenaSize, ctx.StageId, ctx.EnvironmentTime);
         if (TerminalBoss == null)
         {
-            // No boss entity available for this map: the clear condition cannot be met.
+            // No boss entity available for this stage: the clear condition cannot be met.
             ctx.EndRun(false, RunRecordManager.CauseSystemFailure);
             return;
         }
@@ -104,7 +104,7 @@ public partial class BossEncounterManager : Node
         SubBossRewardGranted = true;
 
         AudioManager.Instance?.PlaySfx("wave_complete");
-        AudioManager.Instance?.PlayMapBgm(Context?.StageId ?? "");
+        AudioManager.Instance?.PlayStageBgm(Context?.StageId ?? "");
 
         // Guaranteed superweapon chest: the epigenetic evolution system is not
         // online yet, so the reward is currently a guaranteed level-up draft.
@@ -192,9 +192,9 @@ public partial class BossEncounterManager : Node
         var candidates = new List<string>();
         foreach (var keyVar in GameManager.StageData.Keys)
         {
-            string candidateMap = keyVar.AsString();
-            if (candidateMap != ctx.StageId)
-                candidates.Add(candidateMap);
+            string candidateStage = keyVar.AsString();
+            if (candidateStage != ctx.StageId)
+                candidates.Add(candidateStage);
         }
 
         // Fisher-Yates shuffle: random cross-organ draw without duplicates.

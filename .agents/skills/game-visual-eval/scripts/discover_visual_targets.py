@@ -135,7 +135,7 @@ def run_discovery_audit(root_dir: Path, capture_dir: Path) -> bool:
         "class_view": "class_view.png",
         "loadout_view": "loadout_view.png",
         "passive_view": "passive_view.png",
-        "map_view": "map_view.png",
+        "stage_view": "map_view.png",
         "achievement_gallery": "gallery_all.png",
         "endgame_setup_modal": "endgame_setup.png",
         "codex_modal": "codex_modal.png",

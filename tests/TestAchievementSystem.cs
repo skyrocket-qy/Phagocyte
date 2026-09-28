@@ -41,14 +41,14 @@ public partial class TestAchievementSystem : TestHarness
                 AssertThat(GameManager.IsClassUnlocked("b_cell")).IsFalse();
                 AssertThat(GameManager.IsClassUnlocked("dendritic")).IsFalse();
 
-                // Only the tutorial organ map is unlocked; other maps and all Hard modes are locked
-                AssertThat(GameManager.IsMapUnlocked("acute_wound")).IsTrue();
-                AssertThat(GameManager.IsMapUnlocked("alveolar_space")).IsFalse();
-                AssertThat(GameManager.IsMapUnlocked("hepatic_sinusoid")).IsFalse();
-                AssertThat(GameManager.IsMapUnlocked("gastric_lumen")).IsFalse();
-                AssertThat(GameManager.IsMapUnlocked("blood_brain_barrier")).IsFalse();
-                AssertThat(GameManager.IsMapHardUnlocked("acute_wound")).IsFalse();
-                AssertThat(GameManager.IsMapHardUnlocked("alveolar_space")).IsFalse();
+                // Only the tutorial organ stage is unlocked; other stages and all Hard modes are locked
+                AssertThat(GameManager.IsStageUnlocked("acute_wound")).IsTrue();
+                AssertThat(GameManager.IsStageUnlocked("alveolar_space")).IsFalse();
+                AssertThat(GameManager.IsStageUnlocked("hepatic_sinusoid")).IsFalse();
+                AssertThat(GameManager.IsStageUnlocked("gastric_lumen")).IsFalse();
+                AssertThat(GameManager.IsStageUnlocked("blood_brain_barrier")).IsFalse();
+                AssertThat(GameManager.IsStageHardUnlocked("acute_wound")).IsFalse();
+                AssertThat(GameManager.IsStageHardUnlocked("alveolar_space")).IsFalse();
 
                 GD.Print("[PASS] Step 1: Default state strictly enforces only Macrophage and Acute Wound unlocked.");
 
@@ -171,45 +171,45 @@ public partial class TestAchievementSystem : TestHarness
                 AssertThat(GameManager.IsClassUnlocked("dendritic")).IsTrue();
                 GD.Print("[PASS] Step 4: Full disk persistence (isolated achievement save) verified.");
 
-                // --- Step 4b: Organ Map Unlock Chain (docs/achievement.md §2) ---
-                AchievementManager.RecordMapClear("acute_wound");
+                // --- Step 4b: Organ Stage Unlock Chain (docs/achievement.md §2) ---
+                AchievementManager.RecordStageClear("acute_wound");
                 AssertThat(AchievementManager.IsUnlocked("wound_clear")).IsTrue();
-                AssertThat(GameManager.IsMapUnlocked("alveolar_space")).IsTrue();
-                AssertThat(GameManager.IsMapHardUnlocked("acute_wound")).IsTrue();
+                AssertThat(GameManager.IsStageUnlocked("alveolar_space")).IsTrue();
+                AssertThat(GameManager.IsStageHardUnlocked("acute_wound")).IsTrue();
 
-                AchievementManager.RecordMapClear("alveolar_space");
+                AchievementManager.RecordStageClear("alveolar_space");
                 AssertThat(AchievementManager.IsUnlocked("alveolar_clear")).IsTrue();
-                AssertThat(GameManager.IsMapUnlocked("hepatic_sinusoid")).IsTrue();
-                AssertThat(GameManager.IsMapHardUnlocked("alveolar_space")).IsTrue();
+                AssertThat(GameManager.IsStageUnlocked("hepatic_sinusoid")).IsTrue();
+                AssertThat(GameManager.IsStageHardUnlocked("alveolar_space")).IsTrue();
 
-                AchievementManager.RecordMapClear("hepatic_sinusoid");
-                AssertThat(GameManager.IsMapUnlocked("gastric_lumen")).IsTrue();
-                AssertThat(GameManager.IsMapHardUnlocked("hepatic_sinusoid")).IsTrue();
+                AchievementManager.RecordStageClear("hepatic_sinusoid");
+                AssertThat(GameManager.IsStageUnlocked("gastric_lumen")).IsTrue();
+                AssertThat(GameManager.IsStageHardUnlocked("hepatic_sinusoid")).IsTrue();
 
-                AchievementManager.RecordMapClear("gastric_lumen");
-                AssertThat(GameManager.IsMapUnlocked("blood_brain_barrier")).IsTrue();
-                AssertThat(GameManager.IsMapHardUnlocked("gastric_lumen")).IsTrue();
+                AchievementManager.RecordStageClear("gastric_lumen");
+                AssertThat(GameManager.IsStageUnlocked("blood_brain_barrier")).IsTrue();
+                AssertThat(GameManager.IsStageHardUnlocked("gastric_lumen")).IsTrue();
 
                 int bonusBefore = PassiveTreeManager.GetEarnedBonusPoints();
-                AchievementManager.RecordMapClear("blood_brain_barrier");
+                AchievementManager.RecordStageClear("blood_brain_barrier");
                 AssertThat(AchievementManager.IsUnlocked("bbb_clear")).IsTrue();
-                AssertThat(GameManager.IsMapHardUnlocked("blood_brain_barrier")).IsTrue();
+                AssertThat(GameManager.IsStageHardUnlocked("blood_brain_barrier")).IsTrue();
                 AssertThat(PassiveTreeManager.GetEarnedBonusPoints()).IsEqual(bonusBefore + 2);
 
                 AssertThat(AchievementManager.IsEndlessUnlocked()).IsFalse();
-                AchievementManager.RecordMapClear("acute_wound", true);
+                AchievementManager.RecordStageClear("acute_wound", true);
                 AssertThat(AchievementManager.IsUnlocked("wound_hard_clear")).IsTrue();
                 AssertThat(AchievementManager.IsEndlessUnlocked()).IsTrue();
 
-                // Map lock state is derived from the achievement save and survives a reload
+                // Stage lock state is derived from the achievement save and survives a reload
                 AchievementManager.SaveToDisk();
-                GameManager.ResetMapUnlocks();
-                AssertThat(GameManager.IsMapUnlocked("alveolar_space")).IsFalse();
+                GameManager.ResetStageUnlocks();
+                AssertThat(GameManager.IsStageUnlocked("alveolar_space")).IsFalse();
                 AchievementManager.LoadFromDisk();
-                AssertThat(GameManager.IsMapUnlocked("alveolar_space")).IsTrue();
-                AssertThat(GameManager.IsMapHardUnlocked("blood_brain_barrier")).IsTrue();
+                AssertThat(GameManager.IsStageUnlocked("alveolar_space")).IsTrue();
+                AssertThat(GameManager.IsStageHardUnlocked("blood_brain_barrier")).IsTrue();
 
-                GD.Print("[PASS] Step 4b: Organ map unlock chain, +2 talent points and Endless unlock verified.");
+                GD.Print("[PASS] Step 4b: Organ stage unlock chain, +2 talent points and Endless unlock verified.");
 
                 // --- Step 5: MainMenu Achievement Gallery (independent fifth view) ---
                 // Achievements no longer live in Codex Tab 4; the gallery owns them.

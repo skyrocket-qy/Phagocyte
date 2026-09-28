@@ -221,15 +221,15 @@ public static class CatalogBuilders
         return table;
     }
 
-    public static Dictionary BuildMaps()
+    public static Dictionary BuildStages()
     {
         var table = new Dictionary();
         var seen = new HashSet<string>();
-        foreach (var row in CatalogLoader.LoadArray(DataPaths.Maps))
+        foreach (var row in CatalogLoader.LoadArray(DataPaths.Stages))
         {
             string id = CatalogLoader.GetString(row, "id");
             if (string.IsNullOrEmpty(id) || !seen.Add(id))
-                throw new DataLoadException(DataPaths.Maps, $"Duplicate or missing map id '{id}'.");
+                throw new DataLoadException(DataPaths.Stages, $"Duplicate or missing stage id '{id}'.");
             table[id] = new Dictionary
             {
                 { "id", id },
@@ -252,7 +252,7 @@ public static class CatalogBuilders
                 { "effects", row.TryGetValue("effects", out Variant fxVal) ? fxVal : new Array() }
             };
         }
-        GD.Print($"[Catalog] Loaded {table.Count} maps.");
+        GD.Print($"[Catalog] Loaded {table.Count} stages.");
         return table;
     }
 
@@ -327,8 +327,8 @@ public static class CatalogBuilders
             // Path = res://assets/gen/achievement/{id}.png (+ _unachieved variant).
             // Missing files fall back to the emoji icon at render time.
             entry["image_path"] = AssetPaths.AchievementSprite(id);
-            // Map-clear chain extras (absent on generic achievements).
-            foreach (string opt in new[] { "map_id", "difficulty", "unlock_map", "unlock_hard_map" })
+            // Stage-clear chain extras (absent on generic achievements).
+            foreach (string opt in new[] { "stage_id", "difficulty", "unlock_stage", "unlock_hard_stage" })
             {
                 string v = CatalogLoader.GetString(row, opt);
                 if (!string.IsNullOrEmpty(v))
