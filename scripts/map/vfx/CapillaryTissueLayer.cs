@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace Phagocyte.Map;
+namespace Phagocyte.Map.Vfx;
 
 /// <summary>
 /// Mid-depth microvascular tissue layer (Phase 4): seeded branching capillary

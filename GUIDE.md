@@ -35,7 +35,7 @@ scripts/skills/            # BaseSkill, SkillManager, 17 active + 13 passive + v
 scripts/combat/            # CombatHelper, IDamageable, ProjectileManager, VfxManager, Targeting
 scripts/enemies/           # BaseEnemy, PathogenSpawner, steering, bosses/, hazards/
 scripts/directors/         # Wave, Boss, Overdrive, Organ, Settlement, Neutral, IRunContext
-scripts/map/               # 5 organ environments + parallax/tissue layers
+scripts/map/               # 5 organ environments + vfx/ (parallax/tissue/backdrop layers)
 scripts/gear/        # Gear, ReceptorSpikes
 scripts/ui/ + ui/hud/      # MainMenu, Hud, modals, views
 gen/<cat>/                 # source-of-truth PNGs (prefix-free)

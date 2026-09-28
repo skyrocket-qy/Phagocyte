@@ -4,6 +4,7 @@ using Phagocyte.Core;
 using Phagocyte.Hero;
 using Phagocyte.Enemies;
 using Phagocyte.Map;
+using Phagocyte.Map.Vfx;
 using GdUnit4;
 using static GdUnit4.Assertions;
 

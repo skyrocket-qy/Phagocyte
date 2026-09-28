@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace Phagocyte.Map;
+namespace Phagocyte.Map.Vfx;
 
 /// <summary>
 /// Procedural Microscope Optical Depth-of-Field (DoF) System.
