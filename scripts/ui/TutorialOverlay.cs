@@ -22,10 +22,6 @@ public partial class TutorialOverlay : Control
     public string DodgeHintText { get; set; } = "";
     public float DodgeHintAlpha { get; set; } = 1.0f;
 
-    /// <summary>Cue 5: fluid field arrows at the screen edges.</summary>
-    public bool FluidFieldActive { get; set; }
-    public Vector2 FluidVector { get; set; }
-
     private float _phase = 0.0f;
 
     public override void _Ready()
@@ -53,9 +49,6 @@ public partial class TutorialOverlay : Control
 
         if (ShowDodgeHint)
             DrawDodgeHint(cellScreen);
-
-        if (FluidFieldActive)
-            DrawFluidTrails();
     }
 
     private void DrawMoveCue(Vector2 center)
@@ -102,38 +95,4 @@ public partial class TutorialOverlay : Control
         DrawString(font, pos, DodgeHintText, HorizontalAlignment.Left, -1, fontSize, color);
     }
 
-    private void DrawFluidTrails()
-    {
-        Vector2 dir = FluidVector;
-        if (dir.LengthSquared() <= 0.0001f)
-            return;
-
-        dir = dir.Normalized();
-        Vector2 perp = new Vector2(-dir.Y, dir.X);
-        Vector2 screen = GetViewportRect().Size;
-        if (screen.X <= 1.0f || screen.Y <= 1.0f)
-            return;
-
-        var origin = screen * 0.5f;
-        float travel = 140.0f; // hysteresis length toward the field direction
-        float pulse = 0.5f + 0.5f * Mathf.Sin(_phase * 1.6f);
-
-        for (int i = -2; i <= 2; i++)
-        {
-            Vector2 anchor = origin
-                + perp * (i * Mathf.Min(screen.X, screen.Y) * 0.18f)
-                - dir * Mathf.Min(screen.X, screen.Y) * 0.28f;
-
-            float scroll = ((_phase * 90.0f) + i * 47.0f) % travel;
-            Vector2 tail = anchor + dir * scroll;
-            Vector2 head = tail + dir * 34.0f;
-
-            float alpha = (0.14f + 0.14f * pulse) * (1.0f - scroll / travel);
-            var trailColor = new Color(0.5f, 0.85f, 1.0f, alpha);
-
-            DrawLine(tail, head, trailColor, 1.6f, true);
-            DrawLine(head, head - dir * 12.0f + perp * 6.0f, trailColor, 1.4f, true);
-            DrawLine(head, head - dir * 12.0f - perp * 6.0f, trailColor, 1.4f, true);
-        }
-    }
 }

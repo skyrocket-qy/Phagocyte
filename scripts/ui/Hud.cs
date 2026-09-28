@@ -35,12 +35,6 @@ public partial class Hud : CanvasLayer, IDirectorHud
     private Label? _fpsLabel;
     private float _fpsAccum;
 
-    /// <summary>
-    /// Fluid-field provider (set by Main). Replaces the old
-    /// <c>GetParent() is Main</c> coupling for the tutorial fluid cues.
-    /// </summary>
-    public Func<Vector2>? FluidVectorProvider { get; set; }
-
     public Node2D? PlayerRef { get; set; } = null;
     public UpgradeModal? CellUpgradeModal { get; set; } = null;
 
@@ -215,8 +209,7 @@ public partial class Hud : CanvasLayer, IDirectorHud
         _vitals?.SyncKillCount();
         _skills?.TickSkillSlots();
         TickFps(dt);
-        Vector2 fluid = FluidVectorProvider?.Invoke() ?? Vector2.Zero;
-        _tutorial?.UpdateTutorialCues(dt, fluid);
+        _tutorial?.UpdateTutorialCues(dt);
     }
 
     public override void _Input(InputEvent @event)

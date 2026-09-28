@@ -10,8 +10,8 @@ using Phagocyte.Hero;
 namespace Phagocyte.Tests;
 
 /// <summary>
-/// Verifies the five organ-specific fluid mechanics and physiological
-/// environments that act directly on the player cell (docs/map.md Â§3 / TODO module 3).
+/// Verifies the five organ-specific mechanics and physiological
+/// props that act on the arena (docs/map.md §3 / TODO module 3).
 /// </summary>
 [TestSuite]
 public partial class TestMapEnvironments : TestHarness
@@ -24,7 +24,7 @@ public partial class TestMapEnvironments : TestHarness
     public override void _Initialize()
     {
         GD.Print("==================================================================");
-        GD.Print(">>> STARTING ORGAN FLUID MECHANICS & ENVIRONMENT VERIFICATION <<<");
+        GD.Print(">>> STARTING ORGAN MECHANICS & ENVIRONMENT VERIFICATION <<<");
         GD.Print("==================================================================");
         Paused = false;
         // Mechanics suites opt in: the global flag defaults to off.
@@ -69,10 +69,6 @@ public partial class TestMapEnvironments : TestHarness
                 _phase++;
                 return false;
             case 8:
-                RunPlayerDriftIntegrationTests();
-                _phase++;
-                return false;
-            case 9:
                 RunDisabledFlagTests();
                 _phase++;
                 return false;
@@ -122,11 +118,6 @@ public partial class TestMapEnvironments : TestHarness
         AssertThat(main.OrganEnvironment).IsInstanceOf<AcuteWoundEnvironment>();
 
         main._PhysicsProcess(0.02);
-        AssertThat(main.OrganEnvironment!.PlayerDrift.IsEqualApprox(new Vector2(16.0f, 10.0f))).IsTrue();
-        AssertThat(((BaseCell)main.Player!).EnvironmentDrift.IsEqualApprox(new Vector2(16.0f, 10.0f))).IsTrue();
-        // Pathogen fluid current is the 40% suction drag owned by the environment.
-        AssertThat(main.OrganEnvironment.FluidVector.IsEqualApprox(new Vector2(6.4f, 4.0f))).IsTrue();
-        AssertThat(main.CurrentFluidVector.IsEqualApprox(new Vector2(6.4f, 4.0f))).IsTrue();
 
         // Fibrin clots congeal across the wound floor; the first appears after ~2.5s.
         main._PhysicsProcess(3.0f);
@@ -155,7 +146,7 @@ public partial class TestMapEnvironments : TestHarness
         main.EnemyContainer.AddChild(biofilm);
         AssertThat(biofilm.DealsDamage).IsTrue();
 
-        GD.Print("[PASS] Acute wound exudate suction, fibrin slow and projectile absorption verified.");
+        GD.Print("[PASS] Acute wound fibrin slow and projectile absorption verified.");
     }
 
     private void RunAlveolarTests()
@@ -165,22 +156,8 @@ public partial class TestMapEnvironments : TestHarness
         AssertThat(environment).IsNotNull();
         var player = (BaseCell)main.Player!;
 
-        // 12s cycle: inhale pushes down for 3s, exhale pushes up for 3s.
-        environment!.Tick(main, 0.5f);
-        AssertThat(environment.PlayerDrift.IsEqualApprox(new Vector2(0.0f, 35.0f))).IsTrue();
-        environment.Tick(main, 6.5f); // t = 7.0 -> exhale window
-        AssertThat(environment.PlayerDrift.IsEqualApprox(new Vector2(0.0f, -35.0f))).IsTrue();
-        environment.Tick(main, 3.5f); // t = 10.5 -> rest
-        AssertThat(environment.PlayerDrift).IsEqual(Vector2.Zero);
-
-        // Respiratory airflow is the 60% sinusoidal current at the run clock (t = 10.5).
-        Vector2 expectedFlow = new Vector2(
-            Mathf.Sin(main.EnvironmentTime * 1.2f) * 28.0f,
-            Mathf.Sin(main.EnvironmentTime * 0.6f) * 12.0f) * 0.6f;
-        AssertThat(environment.FluidVector.IsEqualApprox(expectedFlow)).IsTrue();
-
         // Hyperoxic pocket grants temporal CDR when entered.
-        environment.Tick(main, 7.0f); // push pocket spawn timer past its interval
+        environment!.Tick(main, 7.0f); // push pocket spawn timer past its interval
         HyperoxicPocket? pocket = null;
         foreach (var child in main.EnemyContainer!.GetChildren())
         {
@@ -198,7 +175,7 @@ public partial class TestMapEnvironments : TestHarness
         AssertThat(pocket.Consumed).IsTrue();
         AssertThat(player.Stats.GetStat("cooldown_reduction")).IsEqualApprox(HyperoxicPocket.BuffBonus, 0.001f);
 
-        GD.Print("[PASS] Alveolar 12s breathing shear and hyperoxic CDR pockets verified.");
+        GD.Print("[PASS] Alveolar hyperoxic CDR pockets verified.");
     }
 
     private void RunHepaticTestsPart1()
@@ -222,9 +199,6 @@ public partial class TestMapEnvironments : TestHarness
         AssertThat(environment.ArmorBroken).IsFalse();
         AssertThat(player.Stats.GetStat("armor")).IsEqualApprox(baseArmor, 0.001f);
 
-        // Sinusoid flow drag also drives the pathogen current.
-        AssertThat(environment.FluidVector.LengthSquared()).IsGreater(0.0f);
-
         // Endothelial fenestrae block enlarged cells; dodging never phases terrain.
         environment.Tick(main, HepaticEnvironment.FenestraInterval + 1.0f);
         FenestraWall? wall = null;
@@ -240,7 +214,6 @@ public partial class TestMapEnvironments : TestHarness
         _fenestraWall = wall;
 
         Input.ActionRelease("dodge");
-        player.EnvironmentDrift = Vector2.Zero;
         wall!._PhysicsProcess(0.02);
         AssertThat(((CollisionShape2D)wall.GetChild(0)).Disabled).IsFalse();
 
@@ -270,8 +243,6 @@ public partial class TestMapEnvironments : TestHarness
 
         // Force a surge and park the player on top of the acid pool.
         main.OrganEnvironment!.Tick(main, 7.0f);
-        // Churn current drives the pathogen population.
-        AssertThat(main.OrganEnvironment.FluidVector.LengthSquared()).IsGreater(0.0f);
         AcidSurge? surge = null;
         foreach (var child in main.EnemyContainer!.GetChildren())
         {
@@ -322,30 +293,12 @@ public partial class TestMapEnvironments : TestHarness
         AssertThat(pillars).IsEqual(BloodBrainBarrierEnvironment.PillarCount);
 
         main.OrganEnvironment!.Tick(main, 0.4f);
-        AssertThat(main.OrganEnvironment.PlayerDrift.LengthSquared()).IsGreater(0.0f);
-        // Synaptic micro-vibration current is owned by the environment too.
-        AssertThat(main.OrganEnvironment.FluidVector.LengthSquared()).IsGreater(0.0f);
 
         // Neural electric pulses periodically scramble the movement direction.
         main.OrganEnvironment.Tick(main, BloodBrainBarrierEnvironment.PulseInterval + 0.5f);
         AssertThat(player.InvertControlsTimer).IsGreater(0.0f);
 
-        GD.Print("[PASS] BBB shear drag, astrocyte maze and neural pulse interference verified.");
-    }
-
-    private void RunPlayerDriftIntegrationTests()
-    {
-        var main = SpawnMain("acute_wound");
-        var player = (BaseCell)main.Player!;
-
-        // Fluid current keeps dragging the cell even with no input.
-        player.Velocity = Vector2.Zero;
-        player.EnvironmentDrift = new Vector2(16.0f, 10.0f);
-        player._PhysicsProcess(0.1);
-        AssertThat(player.Velocity.LengthSquared()).IsGreater(0.0f);
-        AssertThat(player.Velocity.Normalized().Dot(new Vector2(16.0f, 10.0f).Normalized())).IsGreater(0.5f);
-
-        GD.Print("[PASS] Organ drift is stacked onto the player's swim velocity.");
+        GD.Print("[PASS] BBB astrocyte maze and neural pulse interference verified.");
     }
 
     private void RunDisabledFlagTests()
@@ -353,9 +306,7 @@ public partial class TestMapEnvironments : TestHarness
         SettingsManager.MapEffectsEnabled = false;
         var main = SpawnMain("acute_wound");
         AssertThat(main.OrganEnvironment).IsNull();
-        AssertThat(main.CurrentFluidVector).IsEqual(Vector2.Zero);
-        AssertThat(((BaseCell)main.Player!).EnvironmentDrift).IsEqual(Vector2.Zero);
-        GD.Print("[PASS] With the flag off, no environment builds and drift/arrows stay zero.");
+        GD.Print("[PASS] With the flag off, no environment builds and only tints apply.");
     }
 
     private void Cleanup()

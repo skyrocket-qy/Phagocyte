@@ -47,10 +47,21 @@ public partial class DefensinBarbsSkill : BaseSkill
 
         AudioManager.Instance?.PlaySfx("ethereal_knives");
 
+        // Prefer the batched ProjectileManager when live; fall back to
+        // per-enemy nodes when no singleton exists (tests, isolated arenas).
+        var mgr = ProjectileManager.Instance;
+        bool batched = mgr != null && GodotObject.IsInstanceValid(mgr);
+
         for (int i = 0; i < count; i++)
         {
             float angle = i * (Mathf.Tau / count);
             Vector2 dir = Vector2.FromAngle(angle);
+
+            if (batched)
+            {
+                mgr!.Spawn(Host.GlobalPosition, dir, speed, dmg, isCrit, pierce, 1.6f, 20.0f, "defensin_barb");
+                continue;
+            }
 
             var barb = new BarbProjectile
             {

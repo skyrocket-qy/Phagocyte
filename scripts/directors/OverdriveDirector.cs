@@ -10,11 +10,11 @@ namespace Phagocyte.Directors;
 /// <summary>
 /// Endless overdrive environment ladder (docs/endgame.md §3.2) + pathological
 /// overload afflictions (§4). Effects are cumulative per 3-minute cycle:
-///   1) 15:00+ tissue-fluid suction intensifies + fibrin nets congeal;
-///   2) 18:00+ respiratory shear storm thrust (+ cross-organ boss incursion);
+///   1) 15:00+ escalation + fibrin nets congeal;
+///   2) 18:00+ cross-organ boss incursion;
 ///   3) 21:00+ bile-acid surge strips all armor for 3s periodically;
 ///   4) 24:00+ gastric acid tide shrinks the safe zone;
-///   5) 27:00+ terminal composite: shear storm and acid tide coexist.
+///   5) 27:00+ terminal composite: bile surge and acid tide coexist.
 /// Extracted verbatim from Main; raid spawns delegate to
 /// <see cref="BossEncounterManager"/> so all boss lifecycle stays in one place.
 /// </summary>
@@ -159,29 +159,6 @@ public partial class OverdriveDirector : Node
         {
             _fibrinNetTimer = 4.5f;
             SpawnFibrinNet();
-        }
-
-        // Cycle 2+: respiratory shear storm drives periodic violent thrust.
-        if (cycle >= 2 && ctx.EnemyContainer != null)
-        {
-            float strength = 34.0f + 18.0f * Mathf.Min(cycle, 5);
-            var shearVec = new Vector2(
-                Mathf.Sin(ctx.EnvironmentTime * 1.6f) * strength,
-                Mathf.Cos(ctx.EnvironmentTime * 1.1f) * strength * 0.5f);
-            ctx.CurrentFluidVector += shearVec * 0.7f;
-
-            foreach (var child in ctx.EnemyContainer.GetChildren())
-            {
-                if (child is not Node2D enemy)
-                    continue;
-                var eaten = enemy.Get("is_being_eaten");
-                if (eaten.VariantType == Variant.Type.Bool && (bool)eaten)
-                    continue;
-                enemy.Position += shearVec * delta * 0.7f;
-            }
-
-            if (ctx.Player is BaseCell host)
-                host.ApplyImpulse(shearVec * delta * 0.35f);
         }
 
         // Cycle 3+: bile-acid surge strips the whole arena's armor for 3 seconds.

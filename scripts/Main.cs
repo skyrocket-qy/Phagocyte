@@ -72,12 +72,6 @@ public partial class Main : Node2D, IRunContext
         ?? PathogenSpawner.GetOverdriveSpeedMultiplier(EnvironmentTime);
     public float AcidSafeRadius => Overdrive?.AcidSafeRadius ?? 0.0f;
 
-    /// <summary>
-    /// World-space fluid field vector currently acting on the arena (map current
-    /// + overdrive shear). Drives the tutorial fluid-ripple cues (docs/tutorial.md §2 cue 5).
-    /// </summary>
-    public Vector2 CurrentFluidVector { get; set; } = Vector2.Zero;
-
     // ---- Neutral matter facades ----
     public const int MaxToxinVesicles = NeutralMatterManager.MaxToxinVesicles;
     public const float NeutralSpawnInterval = NeutralMatterManager.NeutralSpawnInterval;
@@ -86,7 +80,6 @@ public partial class Main : Node2D, IRunContext
     // ---- Organ environment facades ----
     public MapEnvironment? OrganEnvironment => OrganSystem?.Current;
     public string EnvironmentId => OrganSystem?.EnvironmentId ?? "";
-    public Vector2 EnvironmentPlayerDrift => OrganSystem?.EnvironmentPlayerDrift ?? Vector2.Zero;
 
     public CharacterBody2D? Player { get; set; }
     public Hud? HudNode { get; set; }
@@ -178,7 +171,6 @@ public partial class Main : Node2D, IRunContext
             {
                 HudNode.GoalSeconds = RunGoalSeconds;
                 HudNode.EndlessMode = IsEndlessRun;
-                HudNode.FluidVectorProvider = () => CurrentFluidVector;
                 HudNode.ConnectPlayer(Player);
             }
 

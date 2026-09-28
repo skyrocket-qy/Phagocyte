@@ -54,7 +54,7 @@ To prevent runaway exponential math that crashes or trivializes the late game:
 
 ## 4. Horde Scalability & Performance Benchmarks
 
-All balance changes, new pathogens, and weapon VFX must satisfy the following performance constraints verified via `tests/TestHordeBenchmark.cs`:
+All balance changes, new pathogens, and weapon VFX must satisfy the following performance constraints verified via `benchmarks/TestHordeBenchmark.cs`:
 
 | Stress Tier | Target Average FPS | Target 1% Low FPS | Max Frame Spike |
 |:---|:---:|:---:|:---:|

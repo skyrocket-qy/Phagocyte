@@ -13,9 +13,9 @@ using Phagocyte.UI;
 namespace Phagocyte.Tests;
 
 /// <summary>
-/// Verifies the five first-run micro-cues and their supporting systems
+/// Verifies the first-run micro-cues and their supporting systems
 /// (docs/tutorial.md §2): dodge roll, catalyst resonance pairing, opening
-/// guide pathogens, WASD ring timing, dodge hint and fluid arrow field data.
+/// guide pathogens, WASD ring timing and dodge hint.
 /// </summary>
 [TestSuite]
 public partial class TestTutorialCues : TestHarness
@@ -235,7 +235,6 @@ public partial class TestTutorialCues : TestHarness
     {
         GameManager.SelectedClass = "macrophage";
         GameManager.SelectedMap = "acute_wound";
-        // Cue 5 needs the fluid field: opt into map mechanics (default off).
         SettingsManager.MapEffectsEnabled = true;
 
         var main = AssetLoader.Load<PackedScene>("res://scenes/main.tscn").Instantiate<Main>();
@@ -253,17 +252,14 @@ public partial class TestTutorialCues : TestHarness
         AssertThat(main.EnemyContainer.GetChildCount()).IsGreater(0);
         AssertThat(dormantGuides).IsEqual(2);
 
-        // Cue 5: map fluid field data is exposed for the arrow overlay
         main._PhysicsProcess(0.02f);
-        AssertThat(main.CurrentFluidVector.LengthSquared()).IsGreater(0.0f);
 
-        // Hud cues: opening WASD ring expires after 5s, fluid field flagged
+        // Hud cues: opening WASD ring expires after 5s
         var hud = main.HudNode;
         AssertThat(hud).IsNotNull();
         hud!._Process(0.1);
         AssertThat(hud.TutorialOverlayNode).IsNotNull();
         AssertThat(hud.TutorialOverlayNode!.ShowMoveCue).IsTrue();
-        AssertThat(hud.TutorialOverlayNode.FluidFieldActive).IsTrue();
 
         hud._Process(Hud.MoveCueSeconds);
         AssertThat(hud.TutorialOverlayNode.ShowMoveCue).IsFalse();
@@ -276,7 +272,7 @@ public partial class TestTutorialCues : TestHarness
         hud.ShowDodgeHint();
         AssertThat(hud.DodgeHintShownOnce).IsTrue();
 
-        GD.Print("[PASS] Guide pathogens, WASD cue window, dodge hint and fluid field verified.");
+        GD.Print("[PASS] Guide pathogens, WASD cue window and dodge hint verified.");
     }
 
     private void Cleanup()

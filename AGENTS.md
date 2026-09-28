@@ -57,7 +57,14 @@ Godot --headless --path . -s res://tests/<Suite>.cs
 - `TestHarness` is abstract scaffolding — never run it directly.
 - `TestAchievementPreview` is the visual preview harness: under `--headless`
   it only verifies logic (capture is skipped); real pixels need a headed run
-  (below). Exclude both from full-sweep loops (43 runnable suites).
+  (below). Exclude it from full-sweep loops.
+- `benchmarks/` (HordeBenchmark, PerformancePipeline, TickBudget) are load
+  instruments, not checks — never run in sweep loops (54 runnable suites).
+- Known-red at HEAD (fix or explicitly re-baseline, never silently delete):
+  TestCheats (static helper, uninstantiable as a suite), TestDifficultyTracks
+  (never opts into MapEffectsEnabled), TestGearBalance opener bound
+  (data grants 15% might vs 12% pin), TestPerformancePipeline species count
+  (parked in benchmarks/, do not fix in passing).
 - Frame-gate async work with `Gate(ref _frame, n)`; saves are auto-isolated
   (`IsolateSaves`, `user://test_*`) so suites never touch real profiles.
 
@@ -161,4 +168,4 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
   Suites must be green before pushing.
 - Hot files (`Hud.cs`, `MainMenu.cs`, shared scenes): coordinate parallel edits
   — concurrent changes here have broken builds before. When in doubt, run the
-  full sweep (all 43 suites, ~7 min) before declaring victory.
+  full sweep (all 54 suites, ~7 min) before declaring victory.

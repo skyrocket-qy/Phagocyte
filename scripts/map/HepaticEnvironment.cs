@@ -4,16 +4,15 @@ using Phagocyte.Directors;
 namespace Phagocyte.Map;
 
 /// <summary>
-/// 03. 肝血竇微循環 (hepatic_sinusoid) — slow sinusoidal flow drags the cell;
-/// the bile-acid hydrolysis surge periodically strips the whole arena's armor for
-/// 3 seconds; endothelial fenestrae are narrow pores that only fit a small
-/// cell — dodging never phases terrain (docs/map.md §3).
+/// 03. 肝血竇微循環 (hepatic_sinusoid) — the bile-acid hydrolysis surge
+/// periodically strips the whole arena's armor for 3 seconds; endothelial
+/// fenestrae are narrow pores that only fit a small cell — dodging never
+/// phases terrain (docs/map.md §3).
 /// </summary>
 public sealed class HepaticEnvironment : MapEnvironment
 {
     public override string MapId => "hepatic_sinusoid";
 
-    public const float FlowDragX = 10.0f;
     public const float BileSurgeInterval = 18.0f;
     public const float BileArmorBreakSeconds = 3.0f;
     public const float FenestraInterval = 24.0f;
@@ -29,10 +28,6 @@ public sealed class HepaticEnvironment : MapEnvironment
 
     protected override void Process(IRunContext context, float dt)
     {
-        PlayerDrift = new Vector2(FlowDragX, Mathf.Sin(Time * 0.8f) * 6.0f) * 0.35f;
-        // Hepatic sinusoid slow-flow drag on the pathogen population.
-        FluidVector = new Vector2(FlowDragX, Mathf.Sin(context.EnvironmentTime * 0.8f) * 6.0f) * 0.35f;
-
         var player = Cell(context);
         if (player?.Stats == null)
             return;

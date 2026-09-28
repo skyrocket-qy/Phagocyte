@@ -89,12 +89,6 @@ public partial class BaseCell : CharacterBody2D, ISlowable
     /// <summary>Set on the first real HP loss — drives the dodge tutorial cue.</summary>
     public bool HasTakenDamage { get; private set; } = false;
 
-    /// <summary>
-    /// Organ fluid-mechanics velocity offset (docs/map.md §3). Added straight onto
-    /// the swim velocity by <see cref="HandleMovement"/>.
-    /// </summary>
-    public Vector2 EnvironmentDrift { get; set; } = Vector2.Zero;
-
     // Inertial Nucleus offset
     public Vector2 NucleusOffset { get; set; } = Vector2.Zero;
     public Vector2 NucleusVelocity { get; set; } = Vector2.Zero;
@@ -466,7 +460,7 @@ public partial class BaseCell : CharacterBody2D, ISlowable
         if (IsDodging)
         {
             // Dodge roll: locked-direction burst, no steering mid-dash.
-            Velocity = DodgeDirection * DodgeDashSpeed + EnvironmentDrift;
+            Velocity = DodgeDirection * DodgeDashSpeed;
             MoveAndSlide();
             return;
         }
@@ -474,13 +468,8 @@ public partial class BaseCell : CharacterBody2D, ISlowable
         if (inputVec != Vector2.Zero)
         {
             inputVec = inputVec.Normalized();
-            Vector2 targetVelocity = inputVec * CurrentSpeed + EnvironmentDrift;
+            Vector2 targetVelocity = inputVec * CurrentSpeed;
             Velocity = Velocity.MoveToward(targetVelocity, CurrentSpeed * 5.0f * delta);
-        }
-        else if (EnvironmentDrift != Vector2.Zero)
-        {
-            // Fluid current keeps dragging the cell even without input (docs/map.md §3).
-            Velocity = Velocity.MoveToward(EnvironmentDrift, CurrentSpeed * 4.0f * delta);
         }
         else
         {

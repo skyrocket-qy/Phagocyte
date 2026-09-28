@@ -79,7 +79,7 @@ Understand how the game starts and who ticks every frame.
 - `ActiveScreenCap`, `SwarmWindowTimer`, `ActivePathogenCount`, `EliteRaidTriggered`, `FirstSwarmTriggered`, `ExtremeSwarmTriggered` (`Main.cs:47-55`)
 - `SubBossTriggered`, `BossLockdownActive`, `SubBoss`, `TerminalBoss`, `TerminalBossNeutralized`, `RaidBosses` (`Main.cs:58-64`)
 - `OverdriveCycle`, `OverdriveHealthMultiplier`, `OverdriveSpeedMultiplier`, `AcidSafeRadius` (`Main.cs:67-73`)
-- `OrganEnvironment`, `EnvironmentId`, `EnvironmentPlayerDrift` (`Main.cs:87-89`)
+- `OrganEnvironment`, `EnvironmentId` (`Main.cs:87-88`)
 
 `_Ready()` order (`Main.cs:130-246`):
 1. `EnemySteering.ConfigureArena`, `HostUlceration.Reset`, `PathogenSpawner.ConfigureRun(HardMode, Overdrive)`
@@ -354,11 +354,11 @@ Boss (`BossEncounterManager`):
 - `ProcessBossRaids(cycle)`: `cycle≥2` (18:00 first), `≥1800s` triple else twin, other-organ maps, HUD alert
 
 Overdrive (endless only, `OverdriveDirector`):
-- Cycle announce, `cycle≥2` shear storm (`34+18*min(cycle,5)`, sinusoidal, `CurrentFluidVector*0.7`), fibrin nets every 4.5s (9s/90px/slow 0.45), `cycle≥3` bile surge (strip armor 3s every 15s), `cycle≥4` acid tide (safe radius 2300→850, 6dps + slow 0.6 outside), `cycle≥5` composite + exponential HP
+- Cycle announce, fibrin nets every 4.5s (9s/90px/slow 0.45), `cycle≥3` bile surge (strip armor 3s every 15s), `cycle≥4` acid tide (safe radius 2300→850, 6dps + slow 0.6 outside), `cycle≥5` composite + exponential HP
 - `ProcessAfflictions`: viscosity move penalty, febrile burn (%maxHP/5s), antigenic drift clears opsonize/20s
 
 Organ (`OrganEnvironmentSystem` + `scripts/map/`):
-- `Initialize(hard)`, `ConfigureArenaVisuals`, `PhysicsTick`: `Current.Tick→PlayerDrift`, `CurrentFluidVector=FluidVector`. Gated by `SettingsManager.MapEffectsEnabled` (off → tints only).
+- `Initialize(hard)`, `ConfigureArenaVisuals`, `PhysicsTick`: `Current.Tick` drives props/hazards. Gated by `SettingsManager.MapEffectsEnabled` (off → tints only).
 - Wound: suction (16,10), fibrin clots/7s max 6; Alveolar: 12s breath + CDR pockets/6s max 3; Hepatic: flow drag + armor-strip/18s + fenestra walls/24s max 3; Gastric: churn + safe zones/9s max 3 + acid surges/14s; BBB: shear (±26,±12) + 5 astrocyte pillars + invert pulse/11s×1.6s
 
 Settlement (`RunSettlementService.TryEndRun :32-140`):

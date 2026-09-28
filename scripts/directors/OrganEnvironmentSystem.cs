@@ -1,15 +1,13 @@
 using Godot;
 using Phagocyte.Core;
 using Phagocyte.Map;
-using Phagocyte.Hero;
 
 namespace Phagocyte.Directors;
 
 /// <summary>
-/// Organ fluid-mechanics driver (docs/map.md §3). Owns the per-run
+/// Organ environment driver (docs/map.md §3). Owns the per-run
 /// <see cref="MapEnvironment"/>, ticks it through <see cref="IRunContext"/>
-/// (never the <c>Main</c> god object), hands the drift to the player cell and
-/// applies the fluid current to the free pathogen population.
+/// (never the <c>Main</c> god object).
 /// Also owns the arena backdrop/border tint (former <c>Main.ConfigureMapEnvironment</c>).
 /// </summary>
 public partial class OrganEnvironmentSystem : Node
@@ -23,16 +21,11 @@ public partial class OrganEnvironmentSystem : Node
     /// <summary>GDScript/HUD-friendly view of the active organ environment id.</summary>
     public string EnvironmentId => Current?.MapId ?? "";
 
-    /// <summary>GDScript/HUD-friendly view of the organ drift currently applied to the player.</summary>
-    public Vector2 EnvironmentPlayerDrift => Current?.PlayerDrift ?? Vector2.Zero;
-
     /// <summary>
     /// Builds the organ environment for this run. Call once from _Ready.
     /// Gated by <see cref="SettingsManager.MapEffectsEnabled"/>: while off,
-    /// no environment is built (drift, hazards and fluid-arrow cues stay
-    /// zero) and only the arena tints apply. Read at deploy; toggling the
-    /// flag mid-run stops drift immediately but building one requires a
-    /// re-deploy.
+    /// no environment is built and only the arena tints apply. Read at deploy;
+    /// toggling the flag mid-run is unsupported and requires a re-deploy.
     /// </summary>
     public void Initialize(bool hardRun)
     {
@@ -74,8 +67,7 @@ public partial class OrganEnvironmentSystem : Node
     }
 
     /// <summary>
-    /// Drives the organ fluid mechanics and hands their velocity offset to the
-    /// player cell (docs/map.md §3), then applies the fluid current to free pathogens.
+    /// Drives the organ environment props and hazards (docs/map.md §3).
     /// </summary>
     public void PhysicsTick(float dt)
     {
@@ -86,25 +78,5 @@ public partial class OrganEnvironmentSystem : Node
             return;
 
         Current.Tick(ctx, dt);
-
-        if (ctx.Player is BaseCell cell)
-            cell.EnvironmentDrift = Current.PlayerDrift;
-
-        // The organ environment owns its fluid current (docs/map.md §3); Main only
-        // applies it to the free pathogen population.
-        ctx.CurrentFluidVector = Current.FluidVector;
-
-        var container = ctx.EnemyContainer;
-        if (container == null)
-            return;
-
-        foreach (var child in container.GetChildren())
-        {
-            if (child is not Node2D enemy)
-                continue;
-            if (enemy.Get("is_being_eaten").AsBool())
-                continue;
-            enemy.Position += ctx.CurrentFluidVector * dt;
-        }
     }
 }

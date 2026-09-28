@@ -64,7 +64,7 @@ radar-chart
 ```mermaid
 flowchart TD
     A["Step 1: Run Combat Feel Audit<br/>(scripts/audit_combat_feel.py)"] --> B["Step 2: Check Audio Manifest & SFX Candidates"]
-    B --> C["Step 3: Run In-Engine Swarm Benchmark<br/>(tests/TestHordeBenchmark.cs)"]
+    B --> C["Step 3: Run In-Engine Swarm Benchmark<br/>(benchmarks/TestHordeBenchmark.cs)"]
     C --> D["Step 4: Inspect Rubrics & Readability Checklist"]
     D --> E["Step 5: Multimodal Screenshot Inspection<br/>(godot-ai editor_screenshot)"]
     E --> F["Step 6: Generate CQS Audit Report"]
@@ -93,7 +93,7 @@ Run the headless benchmark suite to test frame pacing and collision performance 
 
 ```bash
 /Applications/Godot_mono.app/Contents/MacOS/Godot \
-  --headless --path . -s res://tests/TestHordeBenchmark.cs
+  --headless --path . -s res://benchmarks/TestHordeBenchmark.cs
 ```
 
 Verify that:

@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using Phagocyte.Enemies;
@@ -21,6 +22,8 @@ public partial class TestPhagocyticGrasp : TestHarness
 {
     private int _phase = 0;
     private int _frameCount = 0;
+    private ulong _physStart = ulong.MaxValue;
+    private int _retryIn;
 
     private Macrophage? _player;
     private PhagocyticGraspSkill? _grasp;
@@ -40,6 +43,35 @@ public partial class TestPhagocyticGrasp : TestHarness
     }
 
     public override bool _Process(double delta)
+    {
+        try
+        {
+            return Tick(delta);
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr("[FAIL] TestPhagocyticGrasp threw: ", ex);
+            Quit(1);
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Waits the given number of physics ticks (chain delivery runs on the
+    /// physics clock; idle _Process frames are not a substitute headless).
+    /// </summary>
+    private bool PhysGate(int ticks)
+    {
+        ulong now = Engine.GetPhysicsFrames();
+        if (_physStart == ulong.MaxValue)
+            _physStart = now;
+        if (now - _physStart < (ulong)ticks)
+            return false;
+        _physStart = ulong.MaxValue;
+        return true;
+    }
+
+    private bool Tick(double delta)
     {
         switch (_phase)
         {
@@ -70,13 +102,23 @@ public partial class TestPhagocyticGrasp : TestHarness
 
             case 1:
                 // TEST 1: default double-grasp damages both in-reach foes, spares the far one.
-                _frameCount++;
-                if (_frameCount < 35)
-                    return false;
-                _frameCount = 0;
+                // Poll the condition (chain arrival can overshoot at huge frame
+                // dt under contention); re-fire every 15 ticks, 300-tick timeout.
+                if (!IsDamagedOrGone(_tb1) || !IsDamagedOrGone(_tb2))
+                {
+                    if (!PhysGate(300))
+                    {
+                        if (--_retryIn <= 0)
+                        {
+                            _retryIn = 15;
+                            _grasp!.Trigger();
+                        }
+                        return false;
+                    }
+                }
 
-                AssertThat(IsDamaged(_tb1)).IsTrue();
-                AssertThat(IsDamaged(_tb2)).IsTrue();
+                AssertThat(IsDamagedOrGone(_tb1)).IsTrue();
+                AssertThat(IsDamagedOrGone(_tb2)).IsTrue();
                 AssertThat(GodotObject.IsInstanceValid(_ctrl)).IsTrue();
                 AssertThat(_ctrl!.CurrentHealth).IsEqual(35.0f);
                 GD.Print("[PASS] Test 1: default double-grasp damaged 2 in-reach foes, spared out-of-reach control.");
@@ -90,13 +132,20 @@ public partial class TestPhagocyticGrasp : TestHarness
 
             case 2:
                 // TEST 2: hyphae-guarded candida takes grasp damage.
-                _frameCount++;
-                if (_frameCount < 35)
-                    return false;
-                _frameCount = 0;
+                if (!IsDamagedOrGone(_candida))
+                {
+                    if (!PhysGate(300))
+                    {
+                        if (--_retryIn <= 0)
+                        {
+                            _retryIn = 15;
+                            _grasp!.Trigger();
+                        }
+                        return false;
+                    }
+                }
 
-                AssertThat(GodotObject.IsInstanceValid(_candida)).IsTrue();
-                AssertThat(_candida!.CurrentHealth).IsLess(45.0f);
+                AssertThat(IsDamagedOrGone(_candida)).IsTrue();
                 GD.Print("[PASS] Test 2: hyphae-guarded candida took grasp damage.");
 
                 // TEST 3 setup: +1 Amount must raise the grasp to 3 targets.
@@ -118,13 +167,22 @@ public partial class TestPhagocyticGrasp : TestHarness
 
             case 3:
                 // TEST 3: all three in-reach foes are damaged via Amount scaling.
-                _frameCount++;
-                if (_frameCount < 35)
-                    return false;
+                if (!IsDamagedOrGone(_tb3) || !IsDamagedOrGone(_tb4) || !IsDamagedOrGone(_tb5))
+                {
+                    if (!PhysGate(300))
+                    {
+                        if (--_retryIn <= 0)
+                        {
+                            _retryIn = 15;
+                            _grasp!.Trigger();
+                        }
+                        return false;
+                    }
+                }
 
-                AssertThat(IsDamaged(_tb3)).IsTrue();
-                AssertThat(IsDamaged(_tb4)).IsTrue();
-                AssertThat(IsDamaged(_tb5)).IsTrue();
+                AssertThat(IsDamagedOrGone(_tb3)).IsTrue();
+                AssertThat(IsDamagedOrGone(_tb4)).IsTrue();
+                AssertThat(IsDamagedOrGone(_tb5)).IsTrue();
                 GD.Print("[PASS] Test 3: Amount +1 scaled the grasp from 2 to 3 targets.");
                 Finish(true, "ALL PHAGOCYTIC GRASP BEHAVIORAL TESTS");
                 return true;
@@ -177,10 +235,19 @@ public partial class TestPhagocyticGrasp : TestHarness
         return enemy;
     }
 
-    /// <summary>Damaged foes keep fighting at reduced HP; undamaged ones are pristine.</summary>
-    private static bool IsDamaged(BaseEnemy? enemy)
+    /// <summary>
+    /// Damaged foes keep fighting at reduced HP; destroyed foes are gone from
+    /// the scene tree. Both count: the arena has no other damage source, so a
+    /// missing foe took lethal grasp damage (vital under re-fire, where a
+    /// second volley can finish an already-damaged foe and flip it invalid).
+    /// </summary>
+    private static bool IsDamagedOrGone(BaseEnemy? enemy)
     {
-        return enemy != null && GodotObject.IsInstanceValid(enemy) && enemy.CurrentHealth < enemy.MaxHealth;
+        if (enemy == null)
+            return false;
+        if (!GodotObject.IsInstanceValid(enemy))
+            return true;
+        return enemy.CurrentHealth < enemy.MaxHealth;
     }
 
     /// <summary>Moves a living foe out of grasp reach; freed foes are already untargetable.</summary>

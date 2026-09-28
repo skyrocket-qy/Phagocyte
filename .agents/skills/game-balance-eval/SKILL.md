@@ -65,7 +65,7 @@ radar-chart
 ```mermaid
 flowchart TD
     A["Step 1: Run Build Balance Audit<br/>(scripts/audit_build_balance.py)"] --> B["Step 2: Inspect Synergy Graph & Archetypes<br/>(references/build-archetypes.md)"]
-    B --> C["Step 3: Run Horde Stress Benchmark<br/>(tests/TestHordeBenchmark.cs)"]
+    B --> C["Step 3: Run Horde Stress Benchmark<br/>(benchmarks/TestHordeBenchmark.cs)"]
     C --> D{"All 3 Tiers<br/>Pass FPS Targets?"}
     D -- "Yes" --> E["Step 4: Verify Class Parity & Math Caps"]
     D -- "No (Frame Drop)" --> F["Step 5: Inspect MultiMesh Batching & Hot Loops"]
@@ -96,7 +96,7 @@ Execute the automated GdUnit4 C# horde benchmark to measure FPS and frame pacing
 
 ```bash
 /Applications/Godot_mono.app/Contents/MacOS/Godot \
-  --headless --path . -s res://tests/TestHordeBenchmark.cs
+  --headless --path . -s res://benchmarks/TestHordeBenchmark.cs
 ```
 
 Verify that:

@@ -50,6 +50,5 @@ public interface IRunContext
     IDirectorHud? HudNode { get; }
     int ScreenCapNormal { get; }
     int ScreenCapSwarm { get; }
-    Vector2 CurrentFluidVector { get; set; }
     void EndRun(bool victory, string cause = "");
 }

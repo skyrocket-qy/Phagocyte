@@ -4,17 +4,14 @@ using Phagocyte.Directors;
 namespace Phagocyte.Map;
 
 /// <summary>
-/// 05. 血腦屏障毛細血管 (blood_brain_barrier) — extremely narrow high-shear flow
-/// drags the cell, astrocyte foot-process pillars form a static maze, and random
-/// neural electric pulses scramble the player's movement direction
-/// (docs/map.md §3).
+/// 05. 血腦屏障毛細血管 (blood_brain_barrier) — astrocyte foot-process pillars
+/// form a static maze, and random neural electric pulses scramble the player's
+/// movement direction (docs/map.md §3).
 /// </summary>
 public sealed class BloodBrainBarrierEnvironment : MapEnvironment
 {
     public override string MapId => "blood_brain_barrier";
 
-    public const float ShearAmplitudeX = 26.0f;
-    public const float ShearAmplitudeY = 12.0f;
     public const float PulseInterval = 11.0f;
     public const float PulseDuration = 1.6f;
     public const int PillarCount = 5;
@@ -44,19 +41,8 @@ public sealed class BloodBrainBarrierEnvironment : MapEnvironment
 
     protected override void Process(IRunContext context, float dt)
     {
-        // High-shear capillary flow: strong oscillating lateral drag. Hard mode is
-        // a permanent acute crisis: the shear is stronger and the neural pulses
-        // scramble the controls for longer (docs/map.md §2).
-        float shearScale = HardMode ? 1.3f : 1.0f;
-        PlayerDrift = new Vector2(
-            Mathf.Sin(Time * 1.4f) * ShearAmplitudeX * shearScale,
-            Mathf.Cos(Time * 0.9f) * ShearAmplitudeY * shearScale);
-
-        // High-frequency synaptic micro-vibrations on the pathogen population.
-        FluidVector = new Vector2(
-            Mathf.Sin(context.EnvironmentTime * 5.0f) * 8.0f,
-            Mathf.Cos(context.EnvironmentTime * 4.0f) * 8.0f) * 0.25f;
-
+        // Neural electric pulses periodically scramble the movement direction.
+        // Hard mode is a permanent acute crisis: pulses last longer (docs/map.md §2).
         var player = Cell(context);
         if (player == null)
             return;

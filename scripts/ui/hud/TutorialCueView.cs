@@ -65,9 +65,9 @@ public partial class TutorialCueView : Node
 
     /// <summary>
     /// Drives the non-intrusive micro-cues (docs/tutorial.md §2): the opening
-    /// WASD ring, the one-shot dodge hint and the fluid-shear arrow trails.
+    /// WASD ring and the one-shot dodge hint.
     /// </summary>
-    public void UpdateTutorialCues(float delta, Vector2 fluidVector)
+    public void UpdateTutorialCues(float delta)
     {
         if (TutorialOverlayNode == null)
             return;
@@ -99,10 +99,6 @@ public partial class TutorialCueView : Node
         TutorialOverlayNode.ShowDodgeHint = _dodgeHintTimer > 0.0f;
         TutorialOverlayNode.DodgeHintText = _dodgeHintShown ? LocalizedDodgeHint() : "";
         TutorialOverlayNode.DodgeHintAlpha = Mathf.Min(1.0f, _dodgeHintTimer);
-
-        // Cue 5: fluid-shear arrow trails while an environmental field is active
-        TutorialOverlayNode.FluidVector = fluidVector;
-        TutorialOverlayNode.FluidFieldActive = fluidVector.LengthSquared() > 0.01f;
     }
 
     public void ShowDodgeHint()

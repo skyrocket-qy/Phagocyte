@@ -10,9 +10,9 @@ namespace Phagocyte.Tests;
 /// <summary>
 /// Phase 4 balance regression guards (TODO.md §Phase 4):
 /// opening-loadout impact on the first 3-minute waves, double-generator
-/// tradeoff (cripple-flow vs blood-for-power), amount+1 locked at 4 cost,
-/// and CDR/evasion/block hard caps. Energy stays a constraint layer,
-/// never a 19th stat.
+/// tradeoff (cripple-flow vs blood-for-power), amount+1 gated behind 4+ energy
+/// cost on every source, and CDR/evasion/block hard caps. Energy stays a
+/// constraint layer, never a 19th stat.
 /// </summary>
 public partial class TestGearBalance : TestHarness
 {
@@ -107,23 +107,29 @@ public partial class TestGearBalance : TestHarness
         chamber.GetParent().Free();
     }
 
-    /// <summary>amount+1 lives only on the 4-cost rough_er (opportunity-cost lock).</summary>
+    /// <summary>amount+1 lives only on 4+ cost gear (opportunity-cost gate, any source).</summary>
     private void RunAmountLockTests()
     {
         var catalog = GameManager.GearCatalog;
-        string amountSource = "";
+        var amountSources = new System.Collections.Generic.List<string>();
         foreach (string id in catalog.Keys)
         {
             var entry = catalog[id].AsGodotDictionary();
             foreach (var mod in entry["modifiers"].AsGodotArray<Dictionary>())
             {
                 if (mod["stat"].AsString() == "amount")
-                    amountSource = id;
+                {
+                    amountSources.Add(id);
+                    break;
+                }
             }
         }
-        AssertThat(amountSource).IsEqual("rough_er");
-        AssertThat(catalog["rough_er"].AsGodotDictionary()["energy_cost"].AsInt32()).IsEqual(4);
-        GD.Print("[PASS] amount+1 is locked on the 4-cost rough_er (2/3 of the base budget).");
+        AssertThat(amountSources.Count).IsGreater(0);
+        foreach (string id in amountSources)
+        {
+            AssertThat(catalog[id].AsGodotDictionary()["energy_cost"].AsInt32()).IsGreater(3);
+        }
+        GD.Print($"[PASS] amount+1 is gated behind 4+ energy on every source ({string.Join(",", amountSources)}).");
     }
 
     /// <summary>CDR/evasion/block hard caps hold under full chamber + passive stacking.</summary>

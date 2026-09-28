@@ -5,29 +5,16 @@ using Phagocyte.Hero;
 namespace Phagocyte.Map;
 
 /// <summary>
-/// Per-organ fluid mechanics and physiological environment that act directly on
-/// the player cell (docs/map.md §3 / TODO module 3). One instance is created by
-/// Main per run; <see cref="PlayerDrift"/> is added to the player's swim velocity
-/// and <see cref="Process"/> spawns/drives the organ's environmental props.
+/// Per-organ physiological environment (docs/map.md §3 / TODO module 3).
+/// One instance is created by Main per run; <see cref="Process"/>
+/// spawns/drives the organ's environmental props.
 /// </summary>
 public abstract class MapEnvironment
 {
     public abstract string MapId { get; }
 
-    /// <summary>World-space velocity offset applied to the player's swim velocity.</summary>
-    public Vector2 PlayerDrift { get; protected set; } = Vector2.Zero;
-
-    /// <summary>
-    /// Fluid current applied to free pathogens (world-space px/s). Owned by the
-    /// organ environment so Main applies one generic drift instead of repeating
-    /// per-map formulas.
-    /// </summary>
-    public Vector2 FluidVector { get; protected set; } = Vector2.Zero;
-
     /// <summary>Hard (Acute Crisis) variant: exclusive organ hazards go permanent.</summary>
     public bool HardMode { get; set; }
-
-    protected float Time { get; private set; }
 
     protected RandomNumberGenerator Rng { get; } = new();
 
@@ -38,7 +25,6 @@ public abstract class MapEnvironment
 
     public void Tick(IRunContext context, float dt)
     {
-        Time += dt;
         Process(context, dt);
     }
 
