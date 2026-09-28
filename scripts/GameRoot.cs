@@ -8,7 +8,7 @@ using Game.Enemies;
 using Game.Stages;
 using Game.Stages.Vfx;
 using Game.Player;
-using Game.Testing;
+using Game.Debug;
 using Game.UI;
 
 namespace Game;

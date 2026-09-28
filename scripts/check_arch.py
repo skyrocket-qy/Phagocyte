@@ -7,7 +7,7 @@ current scripts/ layout (no file moves required):
   Layer 1: Domain   - pure data/logic (explicit file list under scripts/core/)
   Layer 2: Autoload - global singletons + static services (scripts/core/ managers)
   Layer 3: Gameplay - entities/simulation (combat, player, enemies, skills,
-                       directors, stages, equipment, testing + core
+                       directors, stages, equipment, debug + core
                        gameplay helpers like ActorStats/EquipmentChamber/UpgradeManager)
   Layer 4: UI       - presentation (scripts/ui/, except autoload DamageNumberSpawner)
   Layer T: Tests    - verification (tests/, can import all — never checked)
@@ -78,7 +78,7 @@ GAMEPLAY_PREFIXES = (
     "scripts/directors/",
     "scripts/stages/",
     "scripts/equipment/",
-    "scripts/testing/",
+    "scripts/debug/",
 )
 GAMEPLAY_FILES = {
     "scripts/core/ActorStats.cs",

@@ -1,7 +1,7 @@
 # Test Cheats — full-unlock / full-build testing guide (測試作弊指南)
 
 One-call setup for testing with everything unlocked and maxed out.
-Core: `scripts/testing/CheatTools.cs`. Self-check: `tests/TestCheatUnlocks.cs`.
+Core: `scripts/debug/CheatTools.cs`. Self-check: `tests/TestCheatUnlocks.cs`.
 
 ## What "full" means
 

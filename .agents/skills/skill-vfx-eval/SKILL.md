@@ -42,14 +42,14 @@ To eliminate all visual contamination, all skill VFX testing **must be conducted
 ```
 
 ### 2.1 Core Components
-- **`SkillTestChamber` ([`scripts/testing/SkillTestChamber.cs`](file:///c:/Users/skyro/project/phagocyte/scripts/testing/SkillTestChamber.cs))**:
+- **`SkillTestChamber` ([`scripts/debug/SkillTestChamber.cs`](file:///c:/Users/skyro/project/phagocyte/scripts/debug/SkillTestChamber.cs))**:
   - **Coordinates**: Standard 1280×720 viewport with `Center = Vector2(640, 360)`.
   - **Backdrop**: Solid `#0a0d14` `ColorRect` (no moving textures or shader noise).
   - **Grid Overlay**: Static Cartesian coordinate crosshairs and concentric millimeter range rings (100px, 200px, 300px) centered exactly on `Subject`.
   - **Skill Isolation**: Disarms other skill slots (`CooldownTimer = 999999f`) to prevent auto-firing cross-talk.
   - **EXP Shielding**: Subject configured with `ExpToNextLevel = int.MaxValue` to prevent mutation modals.
   - **Transient Cleanup**: `ClearTransientVfx()` purges projectile beams and particles between skill tests.
-- **`TargetDummy` ([`scripts/testing/TargetDummy.cs`](file:///c:/Users/skyro/project/phagocyte/scripts/testing/TargetDummy.cs))**:
+- **`TargetDummy` ([`scripts/debug/TargetDummy.cs`](file:///c:/Users/skyro/project/phagocyte/scripts/debug/TargetDummy.cs))**:
   - Inherits `BaseEnemy`, `EnemyId = "target_dummy"`.
   - `AtpValue = 0` (zero EXP drops).
   - `CurrentHealth = MaxHealth` auto-reset on damage (never dies, triggers no death telemetry).

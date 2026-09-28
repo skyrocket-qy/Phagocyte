@@ -6,11 +6,11 @@ using Game.Core;
 using Game.Player;
 using Game.Skills;
 
-namespace Game.Testing;
+namespace Game.Debug;
 
 /// <summary>
 /// One-call full-unlock / full-build setup for test demand (headless suites
-/// and headed debug runs). Lives in scripts/testing/ (NOT tests/) so the
+/// and headed debug runs). Lives in scripts/debug/ (NOT tests/) so the
 /// headless sweep never tries to instantiate it as a suite AND production
 /// debug hooks (GameRoot, MainMenu) can use it without depending on tests/.
 /// The meta helpers compose the scattered per-suite unlock loops into a

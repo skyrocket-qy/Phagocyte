@@ -3,7 +3,7 @@ using Game.Combat;
 using Game.Core;
 using Game.Enemies;
 
-namespace Game.Testing;
+namespace Game.Debug;
 
 /// <summary>
 /// Static, non-aggressive biological test dummy for isolated skill testing.

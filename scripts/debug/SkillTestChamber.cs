@@ -5,7 +5,7 @@ using Game.Core;
 using Game.Player;
 using Game.Skills;
 
-namespace Game.Testing;
+namespace Game.Debug;
 
 public enum DummyFormation
 {

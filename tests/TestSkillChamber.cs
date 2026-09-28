@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Game.Core;
 using Game.Player;
 using Game.Skills;
-using Game.Testing;
+using Game.Debug;
 
 namespace Game.Tests;
 

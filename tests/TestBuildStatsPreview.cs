@@ -6,7 +6,7 @@ using static GdUnit4.Assertions;
 using Game.Core;
 using Game.Player;
 using Game.Skills;
-using Game.Testing;
+using Game.Debug;
 using Game.UI;
 
 namespace Game.Tests;

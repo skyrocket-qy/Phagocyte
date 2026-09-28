@@ -288,8 +288,8 @@ Know how 500 entities stay alive without melting CPU.
 - `scripts/enemies/EnemyActor.cs` + `EnemyTraits.cs` (def + trait engine)
 - `scripts/enemies/EnemySpawner.cs` (id pools, scaling, boss tables)
 - `scripts/enemies/EnemySteering.cs`, `EnemyThreatMode.cs`
-- `scripts/enemies/hazards/` — `EnemyProjectile.cs`, `ProximityMine.cs`, `BlockerObstacle.cs`
-- `scripts/combat/BossPhaseComponent.cs`
+- `scripts/combat/hazards/` — `EnemyProjectile.cs`, `ProximityMine.cs`, `BlockerObstacle.cs`
+- `scripts/enemies/BossPhaseComponent.cs`
 - `assets/data/enemies.json` — 35 defs (stats + steering + traits)
 
 ### Enemy lifecycle

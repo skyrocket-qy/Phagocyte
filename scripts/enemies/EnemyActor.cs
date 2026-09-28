@@ -455,7 +455,7 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable
         base._ExitTree();
     }
 
-    // Virtual for the testing dummy (Game.Testing.TargetDummy), which
+    // Virtual for the testing dummy (Game.Debug.TargetDummy), which
     // suppresses death/exp. Production enemies never subclass.
     public virtual void Die(Node2D? killer)
     {

@@ -17,8 +17,8 @@ scripts/
 │   LoadoutManager.cs, PassiveTreeManager.cs, PauseManager.cs,
 │   JsonStore.cs, KeyBindings.cs, SteamBridge.cs, GameEvents.cs,
 │   data/CatalogBuilders.cs, data/DataValidator.cs
-├── combat/, player/, camera/, enemies/, skills/, directors/, stages/,  # [L3] GAMEPLAY
-│   equipment/, testing/
+├── combat/ (incl. hazards/), player/, camera/, enemies/, skills/,  # [L3] GAMEPLAY
+│   directors/, stages/, equipment/, debug/
 │   + core/ActorStats.cs, EquipmentChamber.cs, EquipmentDrop.cs,
 │     RunTelemetryManager.cs, UpgradeManager.cs
 ├── ui/ (except DamageNumberSpawner.cs)                             # [L4] UI

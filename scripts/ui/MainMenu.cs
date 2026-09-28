@@ -2,7 +2,7 @@ using Godot;
 using Godot.Collections;
 using System;
 using Game.Core;
-using Game.Testing;
+using Game.Debug;
 
 namespace Game.UI;
 
