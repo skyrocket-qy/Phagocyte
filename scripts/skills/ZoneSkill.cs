@@ -29,6 +29,7 @@ public partial class ZoneSkill : BaseSkill
         GetDamage(baseDmg, out float dmg, out bool crit);
 
         int count = GetCalculatedAmount(ParamInt(p, "count", 1));
+        bool mineRow = p.ContainsKey("nova_radius");
         for (int i = 0; i < count; i++)
         {
             Vector2 at = center;
@@ -38,15 +39,50 @@ public partial class ZoneSkill : BaseSkill
             var parent = Host!.GetParent();
             if (parent == null)
                 return;
-            parent.AddChild(new ZoneNode
+            var fx0 = default(EffectSpec);
+            var fx1 = default(EffectSpec);
+            int fxCount = 0;
+            if (p.ContainsKey("burn_mult"))
             {
-                SkillRef = this,
+                fx0 = new EffectSpec
+                {
+                    EffectId = AilmentController.BurnId,
+                    Magnitude = dmg * ParamFloat(p, "burn_mult", 0.4f),
+                    Duration = ParamFloat(p, "burn_duration", 1.5f)
+                };
+                fxCount = 1;
+            }
+            if (p.ContainsKey("leak_mult"))
+            {
+                var fx = new EffectSpec
+                {
+                    EffectId = AilmentController.LeakId,
+                    Magnitude = dmg * ParamFloat(p, "leak_mult", 0.3f),
+                    Duration = ParamFloat(p, "leak_duration", 2.0f)
+                };
+                if (fxCount == 0) fx0 = fx; else fx1 = fx;
+                fxCount = Mathf.Min(2, fxCount + 1);
+            }
+            parent.AddChild(new Zone
+            {
+                SourceTeam = Team.Player,
+                Source = Host,
                 GlobalPosition = at,
                 Radius = GetCalculatedArea(ParamFloat(p, "radius", 65.0f)),
                 Duration = GetCalculatedDuration(ParamFloat(p, "duration", ParamFloat(p, "fuse", 4.0f))),
                 TickInterval = ParamFloat(p, "tick", 0.35f),
                 Damage = dmg,
-                IsCrit = crit
+                IsCrit = crit,
+                Effect0 = fx0,
+                Effect1 = fx1,
+                EffectCount = fxCount,
+                Pull = ParamFloat(p, "pull", 0.0f),
+                PullEff = ParamFloat(p, "pull_eff", 0.4f),
+                CoreColor = SkillAssetPalette.Core(SkillId, Colors.White),
+                RimColor = SkillAssetPalette.Accent(SkillId, new Color(0.4f, 0.9f, 0.7f)),
+                NovaOnExpiry = mineRow,
+                NovaRadius = GetCalculatedArea(ParamFloat(p, "nova_radius", 80.0f)),
+                Expired = mineRow ? center => ExpireNova(center, p, dmg, crit) : null
             });
         }
     }
@@ -92,98 +128,5 @@ public partial class ZoneSkill : BaseSkill
                 ConeHalfAngle = -1.0f,
                 Aim = Vector2.Right
             });
-    }
-
-    /// <summary>Stationary timed field: damage ticks, ailments, pull, mine expiry.</summary>
-    public partial class ZoneNode : Node2D
-    {
-        public ZoneSkill? SkillRef { get; set; }
-        public float Radius { get; set; } = 65.0f;
-        public float Duration { get; set; } = 4.0f;
-        public float TickInterval { get; set; } = 0.35f;
-        public float Damage { get; set; }
-        public bool IsCrit { get; set; }
-
-        private float _age;
-        private float _tickTimer;
-        private float _phase;
-        private float _pullAccum;
-
-        public override void _PhysicsProcess(double delta)
-        {
-            float dt = (float)delta;
-            _age += dt;
-            _phase += dt;
-            if (_age >= Duration)
-            {
-                Expire();
-                return;
-            }
-
-            var skill = SkillRef;
-            var p = skill?.SkillParams() ?? new Dictionary();
-
-            float pull = skill?.ParamFloat(p, "pull", 0.0f) ?? 0.0f;
-            if (pull > 0.0f)
-            {
-                _pullAccum += dt;
-                if (_pullAccum >= 1.0f / 30.0f)
-                {
-                    float step = pull * (skill?.ParamFloat(p, "pull_eff", 0.4f) ?? 0.4f) * _pullAccum;
-                    TargetingService.ForEachInRadius(GlobalPosition, Radius, enemy =>
-                    {
-                        Vector2 toCenter = GlobalPosition - enemy.GlobalPosition;
-                        if (toCenter.Length() > 10.0f)
-                            enemy.Position += toCenter.Normalized() * step;
-                    });
-                    _pullAccum = 0.0f;
-                }
-            }
-
-            _tickTimer -= dt;
-            if (_tickTimer > 0.0f)
-                return;
-            _tickTimer = TickInterval;
-            if (skill == null || !skill.HasValidHost())
-                return;
-            if (p.ContainsKey("nova_radius"))
-                return; // mine rows only detonate on expiry
-            TargetingService.ForEachInRadius(GlobalPosition, Radius, enemy =>
-            {
-                DamageService.DealDamage(enemy, Damage, skill.Host, IsCrit);
-                if (enemy.Ailments == null)
-                    return;
-                if (p.ContainsKey("burn_mult"))
-                    enemy.Ailments.ApplyOxidativeBurn(Damage * skill.ParamFloat(p, "burn_mult", 0.4f), skill.ParamFloat(p, "burn_duration", 1.5f));
-                if (p.ContainsKey("leak_mult"))
-                    enemy.Ailments.ApplyMembraneLeak(Damage * skill.ParamFloat(p, "leak_mult", 0.3f), skill.ParamFloat(p, "leak_duration", 2.0f));
-            });
-        }
-
-        private void Expire()
-        {
-            var skill = SkillRef;
-            var p = skill?.SkillParams() ?? new Dictionary();
-            if (skill != null && p.ContainsKey("nova_radius"))
-                skill.ExpireNova(GlobalPosition, p, Damage, IsCrit);
-            QueueFree();
-        }
-
-        public override void _Process(double delta)
-        {
-            QueueRedraw();
-        }
-
-        public override void _Draw()
-        {
-            var skill = SkillRef;
-            Color accent = skill != null ? SkillAssetPalette.Accent(skill.SkillId, new Color(0.4f, 0.9f, 0.7f)) : new Color(0.4f, 0.9f, 0.7f);
-            Color core = skill != null ? SkillAssetPalette.Core(skill.SkillId, Colors.White) : Colors.White;
-            float alpha = Mathf.Clamp(1.0f - _age / Mathf.Max(0.01f, Duration), 0.0f, 1.0f);
-            float breathe = 1.0f + 0.04f * Mathf.Sin(_phase * 4.0f);
-            DrawCircle(Vector2.Zero, Radius * breathe, new Color(accent, 0.12f * alpha));
-            DrawArc(Vector2.Zero, Radius * breathe, 0.0f, Mathf.Tau, 40, new Color(accent, 0.6f * alpha), 2.5f);
-            DrawCircle(Vector2.Zero, Radius * 0.45f * breathe, new Color(core, 0.20f * alpha));
-        }
     }
 }

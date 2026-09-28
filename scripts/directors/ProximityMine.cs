@@ -1,14 +1,14 @@
 using Godot;
 using System;
 using Game.Combat;
+using Game.Enemies;
 using Game.Player;
 
-namespace Game.Enemies;
+namespace Game.Directors;
 
 /// <summary>
-/// Dormant toxin vesicle: a drifting microscopic mine.
-/// Detonates into a toxic acid cloud when any entity (cell, pathogen or
-/// projectile) touches it.
+/// Dormant toxin vesicle: drifting neutral matter (see <see cref="NeutralPropManager"/>).
+/// Detonates into a toxic acid cloud when the cell or a pathogen touches it.
 /// </summary>
 public partial class ProximityMine : Node2D
 {
@@ -70,8 +70,6 @@ public partial class ProximityMine : Node2D
 
     private bool CheckTriggers()
     {
-        var tree = GetTree();
-
         var player = EnemySteering.GetPlayer(this);
         if (player != null && GodotObject.IsInstanceValid(player) && !player.IsDead)
         {
@@ -86,16 +84,6 @@ public partial class ProximityMine : Node2D
         {
             Explode();
             return true;
-        }
-
-        foreach (var node in tree.GetNodesInGroup("enemy_shots"))
-        {
-            if (node is Node2D shot && GodotObject.IsInstanceValid(shot)
-                && GlobalPosition.DistanceTo(shot.GlobalPosition) <= TriggerRadius + 8.0f)
-            {
-                Explode();
-                return true;
-            }
         }
 
         return false;
@@ -115,16 +103,21 @@ public partial class ProximityMine : Node2D
         var parent = GetParent();
         if (parent != null)
         {
-            var cloud = new HazardZone
+            var cloud = new Zone
             {
+                SourceTeam = Team.Enemy,
                 GlobalPosition = GlobalPosition,
                 Duration = 5.0f,
                 Radius = BlastRadius * 0.85f,
                 Damage = 5.0f,
                 TickInterval = 0.6f,
-                SlowFactor = 0.55f,
-                SlowsTarget = true,
-                DealsDamage = true,
+                Effect0 = new EffectSpec
+                {
+                    EffectId = AilmentController.AgglutinationId,
+                    Magnitude = 1.0f - 0.55f,
+                    Duration = 0.6f * 1.5f
+                },
+                EffectCount = 1,
                 CoreColor = new Color(0.45f, 0.30f, 0.55f, 0.35f),
                 RimColor = new Color(0.75f, 0.45f, 0.95f, 0.65f)
             };

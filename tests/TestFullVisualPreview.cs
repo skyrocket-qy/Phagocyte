@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Game.Combat;
 using Game.Core;
+using Game.Directors;
 using Game.Enemies;
 using Game.Player;
 using Game.Skills;
@@ -28,7 +29,7 @@ public partial class TestFullVisualPreview : TestHarness
     private UpgradeModal? _upgradeModal;
     private Node2D? _arena;
     private PlayerActor? _player;
-    private List<ZoneSkill.ZoneNode>? _activeMines;
+    private List<Zone>? _activeMines;
 
     public override void _Initialize()
     {
@@ -236,7 +237,7 @@ public partial class TestFullVisualPreview : TestHarness
                     EquipSkillForPreview(comp, 1);
                     SpawnEnemy("tb", new Vector2(160, 0));
                     comp.Trigger();
-                    _activeMines = CollectNodes<ZoneSkill.ZoneNode>(_main!);
+                    _activeMines = CollectNodes<Zone>(_main!);
                     _frame = 0;
                     _stage = 17;
                     return false;
@@ -730,7 +731,7 @@ public partial class TestFullVisualPreview : TestHarness
             if (child is EnemyActor
                 || child is BeamSkill.BeamVisual
                 || child is NovaSkill.NovaVisual || child is NovaSkill.NovaMarker
-                || child is ZoneSkill.ZoneNode
+                || child is Zone
                 || child is StrikeSkill.ChainVisual || child is AuraSkill.AuraVisual)
             {
                 toRemove.Add(child);
@@ -775,7 +776,7 @@ public partial class TestFullVisualPreview : TestHarness
     {
         foreach (var child in root.GetChildren())
         {
-            if (child is EnemyActor || child is ProximityMine || child is HazardZone)
+            if (child is EnemyActor || child is ProximityMine || child is Zone)
                 child.Free();
             else
                 ClearArenaEntities(child);

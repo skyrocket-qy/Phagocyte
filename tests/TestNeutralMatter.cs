@@ -4,6 +4,7 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using Game.Combat;
 using Game.Core;
+using Game.Directors;
 using Game.Enemies;
 using Game.Player;
 
@@ -82,11 +83,11 @@ public partial class TestNeutralMatter : TestHarness
         var vesicle = new ProximityMine { GlobalPosition = _player.GlobalPosition };
         _container!.AddChild(vesicle);
 
-        int hazardsBefore = CountChildren<HazardZone>();
+        int hazardsBefore = CountChildren<Zone>();
         vesicle._PhysicsProcess(0.016);
 
         AssertThat(vesicle.HasExploded).IsTrue();
-        AssertThat(CountChildren<HazardZone>()).IsEqual(hazardsBefore + 1);
+        AssertThat(CountChildren<Zone>()).IsEqual(hazardsBefore + 1);
 
         // Enemy contact also triggers the mine (friendly fire)
         var staph = EnemySpawner.CreateEnemy("staph")!;
@@ -126,11 +127,11 @@ public partial class TestNeutralMatter : TestHarness
         invader.GlobalPosition = new Vector2(220, 0);
         invader.GlobalPosition = EnemySteering.GetNearestTissueAnchor(invader.GlobalPosition);
         EnemySteering.GetDirection(invader, 0.016f);
-        int lesionsBefore = CountChildren<HazardZone>();
+        int lesionsBefore = CountChildren<Zone>();
         invader._PhysicsProcess(1.1);
         AssertThat(HostUlceration.Pulses).IsEqual(1);
         AssertThat(invader.LatchPulses).IsEqual(1);
-        AssertThat(CountChildren<HazardZone>()).IsEqual(lesionsBefore + 1);
+        AssertThat(CountChildren<Zone>()).IsEqual(lesionsBefore + 1);
         GD.Print("[PASS] Host ulceration registers pulses and secretes acid lesions.");
         invader.QueueFree();
     }
@@ -168,7 +169,7 @@ public partial class TestNeutralMatter : TestHarness
         int hazardsBefore = 0;
         foreach (var child in main.EnemyContainer.GetChildren())
         {
-            if (child is HazardZone)
+            if (child is Zone)
                 hazardsBefore++;
         }
 
@@ -177,7 +178,7 @@ public partial class TestNeutralMatter : TestHarness
         int hazardsAfter = 0;
         foreach (var child in main.EnemyContainer.GetChildren())
         {
-            if (child is HazardZone)
+            if (child is Zone)
                 hazardsAfter++;
         }
         AssertThat(hazardsAfter).IsEqual(hazardsBefore + 1);

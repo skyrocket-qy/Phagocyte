@@ -203,7 +203,7 @@ public partial class TestEnemySteering : SceneTree
         int lesions = 0;
         foreach (var child in _container.GetChildren())
         {
-            if (child is HazardZone)
+            if (child is Zone)
                 lesions++;
         }
         AssertThat(lesions).IsEqual(1);

@@ -4,6 +4,7 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using Game.Enemies;
 using Game.Combat;
+using Game.Stages;
 using Game.Player;
 
 namespace Game.Tests;
@@ -136,10 +137,10 @@ public partial class TestSubBosses : SceneTree
 
         behemoth.TakeDamage(9999999.0f);
 
-        BlockerObstacle? debris = null;
+        DebrisWall? debris = null;
         foreach (var child in _container.GetChildren())
         {
-            if (child is BlockerObstacle found)
+            if (child is DebrisWall found)
             {
                 debris = found;
                 break;
@@ -159,13 +160,13 @@ public partial class TestSubBosses : SceneTree
         secretor.GlobalPosition = new Vector2(2200, 2200);
         _container!.AddChild(secretor);
 
-        HazardZone? pool = null;
+        Zone? pool = null;
         for (int i = 0; i < 220 && pool == null; i++)
         {
             secretor._PhysicsProcess(1.0 / 60.0);
             foreach (var child in _container.GetChildren())
             {
-                if (child is HazardZone found && found.GrowRate > 0.0f)
+                if (child is Zone found && found.GrowRate > 0.0f)
                 {
                     pool = found;
                     break;

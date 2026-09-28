@@ -52,7 +52,7 @@ public partial class TestSkillVisuals : TestHarness
                 AssertThat(_player!.CellSkillManager!.EquipActive(comp, 1)).IsTrue();
                 Spawn("tb", new Vector2(150, 0));
                 comp.Trigger();
-                var mines = Collect<ZoneSkill.ZoneNode>(_arena!);
+                var mines = Collect<Zone>(_arena!);
                 AssertThat(mines.Count).IsGreater(0);
                 GD.Print("[PASS] Test 1: MAC assembly mine visual spawned on trigger.");
 
@@ -158,14 +158,14 @@ public partial class TestSkillVisuals : TestHarness
                 var exo = SkillFactory.CreateActive("exosome_singularity")!;
                 ForceEquip(exo, 2);
                 exo.Trigger();
-                AssertThat(Collect<ZoneSkill.ZoneNode>(_arena!).Count).IsGreater(0);
+                AssertThat(Collect<Zone>(_arena!).Count).IsGreater(0);
                 GD.Print("[PASS] Test 11: Exosome singularity vortex visual spawned.");
 
                 // Test 12: Phagolysosome Vent
                 var vent = SkillFactory.CreateActive("phagolysosome_vent")!;
                 ForceEquip(vent, 3);
                 vent.Trigger();
-                AssertThat(Collect<ZoneSkill.ZoneNode>(_arena!).Count).IsGreater(0);
+                AssertThat(Collect<Zone>(_arena!).Count).IsGreater(0);
                 GD.Print("[PASS] Test 12: Phagolysosome vent acid puddle visual spawned.");
 
                 // Test 13: MHC Tracer Beam

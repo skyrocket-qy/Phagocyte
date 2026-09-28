@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Game.Combat;
 using Game.Core;
+using Game.Directors;
 using Game.Enemies;
 using Game.Player;
 using Game.Skills;
@@ -148,7 +149,7 @@ public partial class TestLevelUpModal : TestHarness
     {
         foreach (var child in root.GetChildren())
         {
-            if (child is EnemyActor || child is ProximityMine || child is HazardZone)
+            if (child is EnemyActor || child is ProximityMine || child is Zone)
                 child.Free();
             else
                 ClearArenaEntities(child);

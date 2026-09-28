@@ -213,7 +213,7 @@ Node2D → BaseSkill → salvo/beam/nova/zone/strike/aura archetypes + StatPassi
 Node2D → SkillManager (container, NOT a skill)
 Node2D → EquipmentPiece → ContactSpikes
 Area2D → batched structs (`ProjectileData` in `ProjectileManager`: faction + steering + `EffectSpec`)
-Node2D visuals (transient, palette-flavored): BeamVisual, NovaVisual/Marker, ZoneNode, ChainVisual, AuraVisual
+Node2D visuals (transient, palette-flavored): BeamVisual, NovaVisual/Marker, Zone (unified timed field), ChainVisual, AuraVisual
 ```
 New skills are JSON rows (`assets/data/skill/active.json`: `archetype` + `params`); new behavior extends an archetype — never a new skill class. Instantiation is id-routed via `SkillFactory` (no reflection).
 
@@ -275,7 +275,7 @@ Branch paths:
 - Player intake (reverse): `PlayerActor.ApplyDamage`: invuln→evaded→`RollEvasion`→`RollBlock`→armor DR→`ShowPlayerDamage`→death/trauma/flash.
 
 ### Status path (slow example)
-1. Sources (HazardZone, NovaSkill, contact/slow-aura traits, stage dot-scan, acid tide) call `SlowService.ApplySlow(node,dur,factor)` — never concrete types
+1. Sources (Zone ticks, NovaSkill, contact/slow-aura traits, stage dot-scan, acid tide) carry `EffectSpec` or call `SlowService.ApplySlow(node,dur,factor)` — never concrete types
 2. Dispatch: `ISlowable.ApplySlow` → `Ailments.ApplyAgglutination(dur, 1−factor)` (agglutination channel, `assets/data/ailments.json`)
 3. State: `StatusController` (strongest-wins, `SpeedMultiplier = 1−strongest`, `IsActive(id)` for synergies); movement reads `Ailments.SpeedMultiplier` every frame
 4. No `SlowTimer/SlowFactor` fields exist — timed slow via `ActorStats` is unsupported (modifiers are permanent); HUD reads `AgglutinationTimer`
@@ -297,7 +297,7 @@ Know how 500 entities stay alive without melting CPU.
 - `scripts/enemies/EnemyActor.cs` + `EnemyTraits.cs` (def + trait engine)
 - `scripts/enemies/EnemySpawner.cs` (id pools, scaling, boss tables)
 - `scripts/enemies/EnemySteering.cs`, `EnemyThreatMode.cs`
-- `scripts/combat/hazards/` — `ProximityMine.cs`, `BlockerObstacle.cs` (enemy pellets are `ProjectileManager` shots with `Team.Enemy`)
+- `scripts/combat/` — `Zone.cs` (unified timed field, `Team` + `EffectSpec`), `ProximityMine.cs` lives in `scripts/directors/` (neutral matter), `DebrisWall.cs` in `scripts/stages/` (solid debris; distinct from `BlockerWall` pore terrain). No `hazards/` folder: things are classified by mechanism (zone / prop / wall), faction is data.
 - `scripts/enemies/BossPhaseComponent.cs`
 - `assets/data/enemies.json` — 35 defs (stats + steering + traits)
 
@@ -530,7 +530,7 @@ Hands-on: open `BaseSkill.cs:30-102` and classify each member as lifecycle (`Set
 
 1. Scenes are composition: `scenes/main.tscn:1-18` `ExtResource` decls + `60-183` nodes; `main_menu.tscn:133-143` composes 6 views via `instance=ExtResource`. Each `.tscn` must be self-contained (all `ExtResource/SubResource` declared in-file). Review rule: scene diff must show matching `id="..."` decl for every `ExtResource("...")` use.
 2. Autoloads = always-alive singletons: `project.godot:18-26`. Review rule: new global state belongs in an existing autoload/static, not a new autoload.
-3. Groups = runtime registry: `player`, `enemies`, `hazards`, `neutral_props`, `telegraphed_attacks`, `enemy_shots`. `TargetingService` iterates `EnemyActor.ActiveEnemies`, not groups. Review rule: missing `AddToGroup` = invisible to scans/HUD.
+3. Groups = runtime registry: `player`, `enemies`, `neutral_props`, `proximity_mine`, `telegraphed_attacks`. `TargetingService` iterates `EnemyActor.ActiveEnemies`, not groups. Review rule: missing `AddToGroup` = invisible to scans/HUD.
 4. Physics layers (`project.godot`): 1=Player, 2=Enemies, 4=Environment. Enemies are passive `Area2D Layer2/Mask0/Monitoring=false` — detected BY player sensors/skills, cutting broadphase at 300-500 bodies. Skills `Layer0/Mask2`, enemy shots `Layer0/Mask1`, player body `1|4` sensor `1|2`. Review rule: any new `CollisionShape` must state layer/mask or it defaults wrong.
 5. Node lifecycle: `_Ready` (wire once) vs `_PhysicsProcess` (deterministic tick) vs `_Process` (render/sync). `GameRoot._PhysicsProcess` order is contract (wave→boss→stage→endless→neutral→backfill). `GameRoot._Process` only syncs `SwarmRenderer`. Review rule: gameplay logic in `_Process` = frame-rate dependent bug.
 6. No C# hot-reload: after `dotnet build`, restart run (`stop` → `project_run(main)`), drive with `game_eval`, then `editor_screenshot source="game"`. Review rule: screenshot from stale session = false evidence.

@@ -131,7 +131,7 @@ public partial class TestStageEnvironments : TestHarness
         int hazards = 0;
         foreach (var child in main.EnemyContainer!.GetChildren())
         {
-            if (child is HazardZone)
+            if (child is Zone)
                 hazards++;
         }
         AssertThat(hazards).IsEqual(0);

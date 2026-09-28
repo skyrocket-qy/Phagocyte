@@ -115,16 +115,21 @@ public partial class NeutralPropManager : Node
         _ulcerHazardTimer = HostUlceration.Pulses >= HostUlceration.SevereThreshold ? 6.0f : 12.0f;
 
         Vector2 offset = Vector2.FromAngle(GD.Randf() * Mathf.Tau) * (float)GD.RandRange(160.0, 360.0);
-        var mist = new HazardZone
+        var mist = new Zone
         {
+            SourceTeam = Team.Enemy,
             GlobalPosition = player.GlobalPosition + offset,
             Duration = 6.0f,
             Radius = 70.0f,
             Damage = 5.0f,
             TickInterval = 0.6f,
-            SlowFactor = 0.7f,
-            SlowsTarget = true,
-            DealsDamage = true,
+            Effect0 = new EffectSpec
+            {
+                EffectId = AilmentController.AgglutinationId,
+                Magnitude = 1.0f - 0.7f,
+                Duration = 0.6f * 1.5f
+            },
+            EffectCount = 1,
             CoreColor = new Color(0.45f, 0.22f, 0.12f, 0.30f),
             RimColor = new Color(0.85f, 0.45f, 0.20f, 0.60f)
         };

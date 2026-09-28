@@ -119,7 +119,7 @@ public partial class TestNewSystemsBundle : SceneTree
         GD.Print("[PASS] Step 2: RunTelemetryManager DPS ranking, defense proc logging and serialization verified.");
         tele.QueueFree();
 
-        // --- 3. HazardZone & BiofilmArea Verification ---
+        // --- 3. Zone & BiofilmArea Verification ---
         var player = new PlayerActor { GlobalPosition = new Vector2(50, 50) };
         var pStats = new ActorStats { Name = "ActorStats" };
         player.AddChild(pStats);
@@ -134,13 +134,19 @@ public partial class TestNewSystemsBundle : SceneTree
 
         float hpBeforeHazard = player.Health;
 
-        var hazard = new HazardZone
+        var hazard = new Zone
         {
+            SourceTeam = Team.Enemy,
             GlobalPosition = new Vector2(50, 50),
             Radius = 80.0f,
             Damage = 8.0f,
-            SlowsTarget = true,
-            DealsDamage = true,
+            Effect0 = new EffectSpec
+            {
+                EffectId = AilmentController.AgglutinationId,
+                Magnitude = 0.5f,
+                Duration = 0.15f
+            },
+            EffectCount = 1,
             TickInterval = 0.1f
         };
         Root.AddChild(hazard);
@@ -150,7 +156,7 @@ public partial class TestNewSystemsBundle : SceneTree
 
         AssertThat(player.Health).IsLess(hpBeforeHazard);
         AssertThat(player.Ailments != null && player.Ailments.IsAgglutinated).IsTrue();
-        GD.Print("[PASS] Step 3: HazardZone periodic tick damage and biological slow application verified.");
+        GD.Print("[PASS] Step 3: Zone periodic tick damage and biological slow application verified.");
 
         hazard.QueueFree();
         player.QueueFree();

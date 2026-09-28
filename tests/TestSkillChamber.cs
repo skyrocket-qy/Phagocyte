@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Game.Core;
+using Game.Combat;
 using Game.Player;
 using Game.Skills;
 using Game.Debug;
@@ -64,7 +65,7 @@ public partial class TestSkillChamber : TestHarness
             {
                 foreach (var child in chamber.GetChildren())
                 {
-                    if (child is ZoneSkill.ZoneNode zone)
+                    if (child is Zone zone)
                         zone.Duration = 0.05f;
                 }
             }

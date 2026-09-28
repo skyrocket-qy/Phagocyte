@@ -3,6 +3,7 @@ using Godot.Collections;
 using Game.Combat;
 using Game.Core;
 using Game.Player;
+using Game.Stages;
 
 namespace Game.Enemies;
 
@@ -64,7 +65,7 @@ public partial class EnemyActor
         public bool Flag;
         public Vector2 Dir = Vector2.Right;
         public Vector2[] Segs = System.Array.Empty<Vector2>();
-        public System.Collections.Generic.List<HazardZone> Zones = new();
+        public System.Collections.Generic.List<Zone> Zones = new();
     }
 
     private readonly System.Collections.Generic.Dictionary<string, TraitState> _traitStates = new();
@@ -270,7 +271,7 @@ public partial class EnemyActor
         {
             var parent = GetParent();
             if (parent != null)
-                parent.AddChild(new BlockerObstacle
+                parent.AddChild(new DebrisWall
                 {
                     Radius = CatalogLoader.GetFloat(obstacle, "radius", 46.0f),
                     GlobalPosition = GlobalPosition
@@ -879,16 +880,22 @@ public partial class EnemyActor
         var parent = GetParent();
         if (parent == null)
             return;
-        var zone = new HazardZone
+        float lesionTick = CatalogLoader.GetFloat(def, "tick", 0.6f);
+        var zone = new Zone
         {
+            SourceTeam = Team.Enemy,
             GlobalPosition = GlobalPosition,
             Duration = CatalogLoader.GetFloat(def, "lifetime", 4.0f),
             Radius = CatalogLoader.GetFloat(def, "radius", 46.0f),
             Damage = CatalogLoader.GetFloat(def, "damage", 4.0f),
-            TickInterval = CatalogLoader.GetFloat(def, "tick", 0.6f),
-            SlowFactor = CatalogLoader.GetFloat(def, "slow_factor", 0.6f),
-            SlowsTarget = true,
-            DealsDamage = true
+            TickInterval = lesionTick,
+            Effect0 = new EffectSpec
+            {
+                EffectId = AilmentController.AgglutinationId,
+                Magnitude = 1.0f - CatalogLoader.GetFloat(def, "slow_factor", 0.6f),
+                Duration = lesionTick * 1.5f
+            },
+            EffectCount = 1
         };
         ApplyZoneColors(zone, def);
         parent.AddChild(zone);
@@ -910,16 +917,23 @@ public partial class EnemyActor
         var parent = GetParent();
         if (parent == null)
             return;
-        var zone = new HazardZone
+        float zoneTick = CatalogLoader.GetFloat(def, "tick", 0.5f);
+        float zoneDps = CatalogLoader.GetFloat(def, "dps", 6.0f);
+        var zone = new Zone
         {
+            SourceTeam = Team.Enemy,
             GlobalPosition = GlobalPosition,
             Duration = CatalogLoader.GetFloat(def, "lifetime", 9.0f),
             Radius = CatalogLoader.GetFloat(def, "radius", 40.0f),
-            Damage = CatalogLoader.GetFloat(def, "dps", 6.0f) * CatalogLoader.GetFloat(def, "tick", 0.5f),
-            TickInterval = CatalogLoader.GetFloat(def, "tick", 0.5f),
-            SlowFactor = CatalogLoader.GetFloat(def, "slow_factor", 0.55f),
-            SlowsTarget = true,
-            DealsDamage = CatalogLoader.GetFloat(def, "dps", 6.0f) > 0.0f,
+            Damage = zoneDps * zoneTick,
+            TickInterval = zoneTick,
+            Effect0 = new EffectSpec
+            {
+                EffectId = AilmentController.AgglutinationId,
+                Magnitude = 1.0f - CatalogLoader.GetFloat(def, "slow_factor", 0.55f),
+                Duration = zoneTick * 1.5f
+            },
+            EffectCount = 1,
             GrowFrom = CatalogLoader.GetFloat(def, "radius", 40.0f),
             GrowRate = CatalogLoader.GetFloat(def, "grow_rate", 0.0f)
         };
@@ -1072,24 +1086,34 @@ public partial class EnemyActor
         if (parent == null)
             return;
         float tick = CatalogLoader.GetFloat(def, "tick", 0.5f);
-        var zone = new HazardZone
+        float dps = CatalogLoader.GetFloat(def, "dps", 8.0f);
+        var zone = new Zone
         {
+            SourceTeam = Team.Enemy,
             GlobalPosition = at,
             Duration = CatalogLoader.GetFloat(def, "lifetime", 6.0f),
             Radius = CatalogLoader.GetFloat(def, "radius", 100.0f),
-            Damage = CatalogLoader.GetFloat(def, "dps", 8.0f) * tick,
+            Damage = dps * tick,
             TickInterval = tick,
-            SlowFactor = CatalogLoader.GetFloat(def, "slow_factor", 0.5f),
-            SlowsTarget = CatalogLoader.GetBool(def, "slow", true),
-            DealsDamage = CatalogLoader.GetFloat(def, "dps", 8.0f) > 0.0f,
+            EffectCount = 0,
             GrowFrom = CatalogLoader.GetFloat(def, "grow_from", -1.0f),
             GrowTime = CatalogLoader.GetFloat(def, "grow_time", 1.5f)
         };
+        if (CatalogLoader.GetBool(def, "slow", true))
+        {
+            zone.Effect0 = new EffectSpec
+            {
+                EffectId = AilmentController.AgglutinationId,
+                Magnitude = 1.0f - CatalogLoader.GetFloat(def, "slow_factor", 0.5f),
+                Duration = tick * 1.5f
+            };
+            zone.EffectCount = 1;
+        }
         ApplyZoneColors(zone, def);
         parent.AddChild(zone);
     }
 
-    private static void ApplyZoneColors(HazardZone zone, Dictionary def)
+    private static void ApplyZoneColors(Zone zone, Dictionary def)
     {
         string coreHex = CatalogLoader.GetString(def, "core_color");
         string rimHex = CatalogLoader.GetString(def, "rim_color");

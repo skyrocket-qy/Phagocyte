@@ -1,12 +1,13 @@
 using Godot;
 
-namespace Game.Enemies;
+namespace Game.Stages;
 
 /// <summary>
-/// Permanent collision obstacle dropped by death traits (granuloma wall).
-/// Static geometry on the environment layer; pure data (radius).
+/// Solid circular debris chunk dropped by death traits (granuloma wall).
+/// Static stage geometry on the environment layer; pure data (radius).
+/// Distinct from <see cref="BlockerWall"/> (gapped fenestra pore terrain).
 /// </summary>
-public partial class BlockerObstacle : StaticBody2D
+public partial class DebrisWall : StaticBody2D
 {
     public float Radius { get; set; } = 44.0f;
 
@@ -15,7 +16,6 @@ public partial class BlockerObstacle : StaticBody2D
         CollisionLayer = 4;
         CollisionMask = 0;
         ZIndex = 1;
-        AddToGroup("hazards");
         AddChild(new CollisionShape2D
         {
             Name = "CollisionShape2D",

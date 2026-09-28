@@ -132,10 +132,10 @@ public partial class TestEnemyEcosystem : SceneTree
         pseudo.Die(player);
 
         // Find spawned hazard zone from the death drop
-        HazardZone? biofilm = null;
+        Zone? biofilm = null;
         foreach (var child in testContainer.GetChildren())
         {
-            if (child is HazardZone ba)
+            if (child is Zone ba)
             {
                 biofilm = ba;
                 break;

@@ -155,10 +155,10 @@ public partial class TestTerminalBosses : SceneTree
         _container!.AddChild(core);
 
         core._PhysicsProcess(6.1);
-        HazardZone? scar = null;
+        Zone? scar = null;
         foreach (var child in _container.GetChildren())
         {
-            if (child is HazardZone found)
+            if (child is Zone found)
             {
                 scar = found;
                 break;

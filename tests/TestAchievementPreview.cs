@@ -4,6 +4,7 @@ using static GdUnit4.Assertions;
 using System;
 using Game.Combat;
 using Game.Core;
+using Game.Directors;
 using Game.Enemies;
 using Game.Player;
 using Game.UI;
@@ -214,7 +215,7 @@ public partial class TestAchievementPreview : TestHarness
     {
         foreach (var child in root.GetChildren())
         {
-            if (child is EnemyActor || child is ProximityMine || child is HazardZone)
+            if (child is EnemyActor || child is ProximityMine || child is Zone)
                 child.Free();
             else
                 ClearArenaEntities(child);
