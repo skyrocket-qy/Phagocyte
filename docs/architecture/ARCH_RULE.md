@@ -1,6 +1,6 @@
 # Architecture Rules (Phagocyte C#)
 
-Enforced by `python3 scripts/check_arch.py` (`make check-arch`).
+Enforced by `python3 tools/check_arch.py` (`make check-arch`).
 Ported from Vistrace-godot's 5-layer model, adapted to Phagocyte's
 `scripts/` feature-folder layout — no file moves required.
 
@@ -23,8 +23,8 @@ scripts/
 │     RunTelemetryManager.cs, UpgradeManager.cs
 ├── ui/ (except DamageNumberSpawner.cs)                             # [L4] UI
 ├── GameRoot.cs                                                     # [ROOT] composition root (unchecked)
-└── check_arch.py                                                   # enforcement
 tests/                                                              # [T] can import all (never checked)
+tools/check_arch.py                                                 # enforcement
 ```
 
 Engine rule (Phase 0): `Game.*` namespaces only. Heroes, enemies,
@@ -33,7 +33,7 @@ generic archetype executors (`PlayerActor`, `EnemyActor`, stage effects,
 salvo/beam/nova/zone/strike/aura, `StatPassive`) — never per-domain
 subclasses. A new behavior extends its archetype's schema.
 
-The full file→layer map lives in `scripts/check_arch.py`
+The full file→layer map lives in `tools/check_arch.py`
 (`DOMAIN_FILES`, `AUTOLOAD_FILES`, `GAMEPLAY_PREFIXES`, `GAMEPLAY_FILES`,
 `COMPOSITION_ROOT_FILES`). Update the map — not the prose — when files move.
 

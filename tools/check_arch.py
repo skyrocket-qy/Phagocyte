@@ -14,7 +14,7 @@ current scripts/ layout (no file moves required):
 
 Ported from Vistrace-godot scripts/check_arch.py (same strip + dynamic-UI-types
 approach), adapted to Game's feature-folder layout.
-Run: python3 scripts/check_arch.py  (or: make check-arch)
+Run: python3 tools/check_arch.py  (or: make check-arch)
 """
 
 import re

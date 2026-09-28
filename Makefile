@@ -4,7 +4,7 @@ build:
 	dotnet build Phagocyte.csproj --warnaserror
 
 check-arch:
-	python3 scripts/check_arch.py
+	python3 tools/check_arch.py
 
 check-assets:
 	python3 tools/asset_check/main.py
