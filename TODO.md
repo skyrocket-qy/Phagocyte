@@ -132,3 +132,16 @@ Holistic quality assurance system unifying tactile combat feel, build synergies,
   - Stress tests active horde tiers (100, 300, 500 entities) with weapon discharge and MultiMesh GPU batching.
   - Measures average FPS, 1% Low FPS, and maximum frame-time spikes across 180+ frames.
   - Headless execution verified: Tier 1 (147.6 FPS), Tier 2 (141.6 FPS), Tier 3 500-Pathogen Swarm (140.9 FPS, 1% Low 92.2 FPS, 203 batched entities).
+
+---
+
+## [TODO] Phase 7: Engine generalization (domain-decoupled renames + data-driven)
+
+Goal: `Game.*` engine knows only ids/stats/tags/timings; all phagocyte names live in data + locale + art. New hero/enemy/skill/stage = new JSON row, never a new `.cs`.
+
+- [ ] **7.0 Baseline + decisions**: record banned-token grep counts (`BaseCell|BaseEnemy|Pathogen|Fibrin|Opson|Macrophage|Phagocyte\.Hero|Phagocyte\.Map`); confirm root namespace `Game.*`, keep JSON `id` values stable for saves/achievements, approve 6-skill-archetype + trait-component approach.
+- [ ] **7.1 Mechanical namespace + folder rename**: `Phagocyte.*` → `Game.*`; `scripts/hero/` → `scripts/player/`, `scripts/map/` → `scripts/stages/`, `scripts/gear/` → `scripts/equipment/`, `endgame/` folded into `directors/`; `Main.cs` → `GameRoot.cs` shim; update `scripts/check_arch.py` prefixes, `.tscn` `ExtResource` paths, keep `.uid` sidecars. Verify: `dotnet build --warnaserror`, `check-arch`, smoke suites.
+- [ ] **7.2 Core type renames**: `BaseCell` → `PlayerActor`, `BaseEnemy` → `EnemyActor`, `CellStats` → `ActorStats`, `Morphology` → `BodyDeformation`, `BioHazardArea` → `HazardZone`, `CombatHelper` → `DamageService`, `PathogenSpawner` → `EnemySpawner`, `PathogenSwarmRenderer` → `SwarmRenderer`, `OrganEnvironmentSystem` → `StageSystem`, `NeutralMatterManager` → `NeutralPropManager`, `OverdriveDirector` → `EndlessDirector`, `AfflictionManager` → `RunMutatorService`, `EnemyPellet` → `EnemyProjectile`, groups `pathogens`/`neutral_matter` → `enemies`/`neutral_props`; `[Obsolete]` aliases first, then delete for zero-residual grep.
+- [ ] **7.3 Collapse subclasses into data**: 5 hero classes → `player_classes.json` + one `PlayerActor`; 20+ enemy species → `enemies.json` + `ThreatMode`/`SteeringBehaviors` + trait components (`EliteModifier`, `PhasedEnemyComponent`); 15 skills → 6 archetypes (`ProjectileSalvo/Beam/Aura/NovaBlast/DashStrike/Zone` + `StatPassive/ProcPassive`); 5 stage env classes → `stages.json` effects (`BuffZone/BlockerWall/DotZone/SlowZone`); domain literals (`opsonize`, `fibrin`, `atp`) become data ids + locale text only.
+- [ ] **7.4 Strings/assets decoupling**: translation keys `CLASS_/PATHOGEN_/MAP_WOUND` → `PLAYER_/ENEMY_/STAGE_` with compat lookup; audio `die_hero` → `die_player`; scenes `characters/macrophage.tscn` → `actors/player_base.tscn` + visual profiles; `GameManager` catalog split (`Catalog.GetStage/GetPlayerClass/GetEnemy`); UI binds to `PlayerActor.StatsChanged`, never concrete classes.
+- [ ] **7.5 Gates + docs**: `AGENTS.md`, `GUIDE.md`, `docs/architecture/ARCH_RULE.md` updated; per-phase `build --warnaserror` + `check-arch` + banned-token grep zero + affected suites green; final full 54-suite sweep + `check-assets`.

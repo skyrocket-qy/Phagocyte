@@ -3,6 +3,15 @@
 Read this before touching code, scenes, or assets. Conventions below were
 earned the hard way (red suites, broken builds, ghost diffs).
 
+## Engine generalization (Phase 0 rule — domain-decoupled, data-driven)
+
+- Root namespace is `Game.*`. Never `Phagocyte.*` in `scripts/`, never a domain literal in engine code (`macrophage/staph/fibrin/opsonize/acute_wound`-style tokens belong in JSON + locale + art only).
+- Engine sees only `id`, `StatBlock`, `tags[]`, `EffectSpec{effect_id, magnitude, duration, radius, tint}`. No `if (id == "<domain>")` branches.
+- New hero / enemy / skill / stage / equipment / mutator = new JSON row + composition of generic archetypes, never a new `.cs` class. Heroes: one `PlayerActor`; enemies: one `EnemyActor` + trait components; skills: `ProjectileSalvo/Beam/Aura/NovaBlast/DashStrike/Zone` + `StatPassive/ProcPassive`; stages: one `StageEnvironment` + `BuffZone/BlockerWall/DotZone/SlowZone`.
+- A "special" case extends its archetype schema (new field/component, all rows migrated) — no one-off classes, no per-domain subclasses.
+- No compat shims for renames: no `[Obsolete]` aliases, no old↔new key maps. Rename directly, fix call sites forward (extends "Code size" rule below).
+- Verify with zero-residual grep before declaring done: `BaseCell|BaseEnemy|Pathogen|Fibrin|Opson|Macrophage|Phagocyte\.` must return zero hits in `scripts/` (JSON/locale/art exempt).
+
 ## Session start (capability probe — never skip)
 
 Never assert a tool is missing without probing. Before claiming anything
