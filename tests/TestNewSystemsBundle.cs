@@ -144,7 +144,7 @@ public partial class TestNewSystemsBundle : SceneTree
         hazard._PhysicsProcess(0.12);
 
         AssertThat(player.Health).IsLess(hpBeforeHazard);
-        AssertThat(player.SlowTimer).IsGreater(0.0f);
+        AssertThat(player.Ailments != null && player.Ailments.IsAgglutinated).IsTrue();
         GD.Print("[PASS] Step 3: HazardZone periodic tick damage and biological slow application verified.");
 
         hazard.QueueFree();

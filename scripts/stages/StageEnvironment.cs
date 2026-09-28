@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using Game.Combat;
 using Game.Core;
 using Game.Directors;
 using Game.Player;
@@ -187,7 +188,7 @@ public sealed class StageEnvironment
             if (child is DotZone zone && GodotObject.IsInstanceValid(zone) && zone.Contains(player.GlobalPosition))
             {
                 player.TakeDamage(CatalogLoader.GetFloat(state.Def, "dps", 7.0f) * dt);
-                player.ApplySlow(CatalogLoader.GetFloat(state.Def, "slow_factor", 0.3f), CatalogLoader.GetFloat(state.Def, "slow_duration", 0.7f));
+                SlowService.ApplySlow(player, CatalogLoader.GetFloat(state.Def, "slow_factor", 0.3f), CatalogLoader.GetFloat(state.Def, "slow_duration", 0.7f));
                 break;
             }
         }

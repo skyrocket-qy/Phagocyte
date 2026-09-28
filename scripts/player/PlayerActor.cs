@@ -94,8 +94,6 @@ public partial class PlayerActor : CharacterBody2D, ISlowable
     public Vector2 NucleusVelocity { get; set; } = Vector2.Zero;
 
     // Status debuffs
-    public float SlowTimer { get; set; } = 0.0f;
-    public float SlowFactor { get; set; } = 1.0f;
     public float StunTimer { get; set; } = 0.0f;
     public float InvertControlsTimer { get; set; } = 0.0f;
 
@@ -111,6 +109,12 @@ public partial class PlayerActor : CharacterBody2D, ISlowable
     public EquipmentChamber? Equipment { get; set; }
 
     public ActorStats? Stats { get; set; }
+
+    /// <summary>Status/ailment state (slow, DoT, amp). Debuff timers and
+    /// stacking live in data (<see cref="AilmentController"/> over
+    /// assets/data/ailments.json); the actor only reads the aggregated
+    /// multipliers each frame.</summary>
+    public AilmentController? Ailments { get; private set; }
 
     /// <summary>Data-driven class id (assets/data/classes.json). Set before entering the tree.</summary>
     [Export] public string ClassId = "macrophage";
@@ -232,6 +236,15 @@ public partial class PlayerActor : CharacterBody2D, ISlowable
             AddChild(Stats);
         }
 
+        // Ensure ailment container exists (slow/DoT/amp state lives in data,
+        // mirroring the ActorStats pattern above).
+        Ailments = GetNodeOrNull<AilmentController>("AilmentController");
+        if (Ailments == null)
+        {
+            Ailments = new AilmentController { Name = "AilmentController" };
+            AddChild(Ailments);
+        }
+
         _classDef = GameManager.GetPlayerClass(ClassId);
         SetupCellIdentity();
 
@@ -287,13 +300,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable
 
         float dt = (float)delta;
 
-        // Process status debuffs
-        if (SlowTimer > 0.0f)
-        {
-            SlowTimer -= dt;
-            if (SlowTimer <= 0.0f)
-                SlowFactor = 1.0f;
-        }
+        // Process status debuffs (slow state lives in Ailments, not fields)
         if (StunTimer > 0.0f)
         {
             StunTimer -= dt;
@@ -512,10 +519,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable
         Vector2 inputVec = ReadMoveInput();
 
         float targetSpeed = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
-        if (SlowTimer > 0.0f)
-        {
-            targetSpeed *= SlowFactor;
-        }
+        targetSpeed *= Ailments?.SpeedMultiplier ?? 1.0f;
 
         CurrentSpeed = targetSpeed;
 
@@ -1051,8 +1055,10 @@ public partial class PlayerActor : CharacterBody2D, ISlowable
 
     public void ApplySlow(float duration, float factor)
     {
-        SlowTimer = duration;
-        SlowFactor = Mathf.Min(SlowFactor, factor);
+        // Factor is a 0-1 speed multiplier; the ailment channel takes a slow
+        // fraction (SpeedMultiplier = 1 - strongest). This stays only as the
+        // ISlowable dispatch endpoint; state lives in data.
+        Ailments?.ApplyAgglutination(duration, 1.0f - factor);
     }
 
     public void ApplyStun(float duration)

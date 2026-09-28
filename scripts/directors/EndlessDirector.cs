@@ -1,4 +1,5 @@
 using Godot;
+using Game.Combat;
 using Game.Core;
 using Game.Directors;
 using Game.Enemies;
@@ -201,7 +202,7 @@ public partial class EndlessDirector : Node
                     if (ctx.Player is PlayerActor burned)
                     {
                         burned.TakeDamage(6.0f);
-                        burned.ApplySlow(1.2f, 0.6f);
+                        SlowService.ApplySlow(ctx.Player, 1.2f, 0.6f);
                     }
                 }
             }

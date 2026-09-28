@@ -107,7 +107,7 @@ public partial class NovaSkill : BaseSkill
                 tween.TweenProperty(enemy, "global_position", enemy.GlobalPosition + push * kbDist, kbTime);
             }
             if (slowDur > 0.0f)
-                enemy.ApplySlow(slowDur, slowFactor);
+                SlowService.ApplySlow(enemy, slowDur, slowFactor);
         });
     }
 

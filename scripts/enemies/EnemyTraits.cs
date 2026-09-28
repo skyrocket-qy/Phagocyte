@@ -569,7 +569,7 @@ public partial class EnemyActor
         switch (kind)
         {
             case "slow":
-                player.ApplySlow(CatalogLoader.GetFloat(def, "duration", 2.5f), CatalogLoader.GetFloat(def, "factor", 0.65f));
+                SlowService.ApplySlow(player, CatalogLoader.GetFloat(def, "duration", 2.5f), CatalogLoader.GetFloat(def, "factor", 0.65f));
                 break;
             case "invert":
                 player.TakeDamage(ContactDamage);
@@ -605,7 +605,7 @@ public partial class EnemyActor
             }
             Rotation = state.Dir.Angle();
         }
-        Velocity = state.Dir * FloatSpeed * SlowFactor;
+        Velocity = state.Dir * FloatSpeed * (Ailments?.SpeedMultiplier ?? 1.0f);
         Position += Velocity * dt;
     }
 
@@ -629,9 +629,7 @@ public partial class EnemyActor
         if (heading == Vector2.Zero)
             heading = Vector2.Right;
 
-        float speed = FloatSpeed * SlowFactor;
-        if (Ailments != null && Ailments.IsAgglutinated)
-            speed *= Ailments.SpeedMultiplier;
+        float speed = FloatSpeed * (Ailments?.SpeedMultiplier ?? 1.0f);
         if (BossPhase != null)
             speed *= BossPhase.CurrentSpeedMult;
 
@@ -779,7 +777,7 @@ public partial class EnemyActor
             CatalogLoader.GetFloat(def, "radius_max", 760.0f),
             1.0f - hpRatio);
         if (GlobalPosition.DistanceTo(player.GlobalPosition) <= radius)
-            player.ApplySlow(CatalogLoader.GetFloat(def, "duration", 0.25f), CatalogLoader.GetFloat(def, "factor", 0.78f));
+            SlowService.ApplySlow(player, CatalogLoader.GetFloat(def, "duration", 0.25f), CatalogLoader.GetFloat(def, "factor", 0.78f));
     }
 
     private void TickTraction(Dictionary def, float dt)

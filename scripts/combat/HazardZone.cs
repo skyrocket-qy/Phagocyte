@@ -85,11 +85,14 @@ public partial class HazardZone : Node2D
 
     private void CheckHazardCollision()
     {
-        var player = (PlayerActor?)GetTree().GetFirstNodeInGroup("player");
-        if (player == null || !GodotObject.IsInstanceValid(player) || player.IsDead)
+        var node = GetTree().GetFirstNodeInGroup("player") as Node2D;
+        if (node == null || !GodotObject.IsInstanceValid(node))
+            return;
+        var player = node as PlayerActor;
+        if (player == null || player.IsDead)
             return;
 
-        if (GlobalPosition.DistanceTo(player.GlobalPosition) <= CurrentRadius)
+        if (GlobalPosition.DistanceTo(node.GlobalPosition) <= CurrentRadius)
         {
             if (DealsDamage && Damage > 0.0f)
             {
@@ -98,7 +101,7 @@ public partial class HazardZone : Node2D
 
             if (SlowsTarget)
             {
-                player.ApplySlow(TickInterval * 1.5f, SlowFactor);
+                SlowService.ApplySlow(node, TickInterval * 1.5f, SlowFactor);
             }
         }
     }

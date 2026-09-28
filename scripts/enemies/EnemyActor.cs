@@ -49,9 +49,7 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable
     public float SteeringPreferredRange { get; set; } = 260.0f;
     public float SteeringLatchRange { get; set; } = 40.0f;
 
-    // Status debuffs & Components
-    public float SlowTimer { get; set; } = 0.0f;
-    public float SlowFactor { get; set; } = 1.0f;
+    // Status debuffs & Components (slow state lives in Ailments, not fields)
     public float StunTimer { get; set; } = 0.0f;
     public AilmentController? Ailments { get; private set; }
     public BossPhaseComponent? BossPhase { get; private set; }
@@ -227,13 +225,6 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable
             return;
         }
 
-        if (SlowTimer > 0.0f)
-        {
-            SlowTimer -= dt;
-            if (SlowTimer <= 0.0f)
-                SlowFactor = 1.0f;
-        }
-
         PreDriftTraits();
         HandleBrownianDrift(dt);
         TickTraits(dt);
@@ -270,11 +261,7 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable
             WanderDir = (WanderDir + Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 0.7f).Normalized();
         }
 
-        float currentSpeed = FloatSpeed * SlowFactor;
-        if (Ailments != null && Ailments.IsAgglutinated)
-        {
-            currentSpeed *= Ailments.SpeedMultiplier;
-        }
+        float currentSpeed = FloatSpeed * (Ailments?.SpeedMultiplier ?? 1.0f);
         if (BossPhase != null)
         {
             currentSpeed *= BossPhase.CurrentSpeedMult;
@@ -491,8 +478,9 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable
 
     public void ApplySlow(float duration, float factor)
     {
-        SlowTimer = duration;
-        SlowFactor = Mathf.Min(SlowFactor, factor);
+        // Slow state lives in data (agglutination channel, strongest wins);
+        // this stays only as the ISlowable dispatch endpoint.
+        Ailments?.ApplyAgglutination(duration, 1.0f - factor);
     }
 
     public void ApplyStun(float duration)
