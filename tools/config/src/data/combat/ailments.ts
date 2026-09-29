@@ -63,6 +63,16 @@ export const Ailments: AilmentsFile = {
         AilmentChannel.Dot
       ],
       max_stacks: 0
+    },
+    {
+      id: AilmentId.Stun,
+      name: "Neural Arrest",
+      duration: 1,
+      magnitude: 0,
+      stack: AilmentStackRule.RefreshMax,
+      channels: [
+        AilmentChannel.Stun
+      ]
     }
   ]
 };

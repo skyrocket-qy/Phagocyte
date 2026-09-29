@@ -4,12 +4,14 @@ export enum AilmentId {
   Shock = "shock",
   Bleed = "bleed",
   Poison = "poison",
+  Stun = "stun",
 }
 
 export enum AilmentChannel {
   Dot = "dot",
   Slow = "slow",
   Amp = "amp",
+  Stun = "stun",
 }
 
 export enum AilmentStackRule {

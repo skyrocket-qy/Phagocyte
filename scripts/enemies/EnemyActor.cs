@@ -8,7 +8,7 @@ using Game.UI;
 
 namespace Game.Enemies;
 
-public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IStatusHost
+public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStatusHost
 {
     [Signal]
     public delegate void EnemyDiedEventHandler(EnemyActor enemy);
@@ -41,7 +41,8 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IS
     public float SteeringPreferredRange { get; set; } = 260.0f;
     public float SteeringLatchRange { get; set; } = 40.0f;
 
-    public float StunTimer { get; set; } = 0.0f;
+    public float StunTimer => Status?.GetTimer("stun") ?? 0.0f;
+    public bool IsStunned => Status?.IsStunned ?? false;
     public StatusController? Status { get; private set; }
     public BossPhaseComponent? BossPhase { get; private set; }
 
@@ -210,9 +211,8 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IS
 
         float dt = (float)delta;
 
-        if (StunTimer > 0.0f)
+        if (IsStunned)
         {
-            StunTimer -= dt;
             return;
         }
 
@@ -468,11 +468,6 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IS
         // Slow state lives in data (slow-channel carrier, strongest wins);
         // this stays only as the ISlowable dispatch endpoint.
         Status?.ApplySlow(duration, 1.0f - factor);
-    }
-
-    public void ApplyStun(float duration)
-    {
-        StunTimer = duration;
     }
 }
 

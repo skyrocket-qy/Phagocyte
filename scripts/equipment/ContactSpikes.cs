@@ -102,7 +102,7 @@ public partial class ContactSpikes : EquipmentPiece
 
         enemy.Velocity += impulse;
         if (StunOnIntercept > 0.0f)
-            enemy.ApplyStun(StunOnIntercept);
+            enemy.Status?.Apply("stun", 0.0f, StunOnIntercept);
 
         InterceptedCount++;
     }

@@ -94,7 +94,7 @@ export function runCrossValidation(data: {
   // 1. Ailments: channel + stack vocab
   for (const a of ailmentList) {
     for (const c of a.channels ?? []) {
-      if (c !== "dot" && c !== "slow" && c !== "amp") {
+      if (c !== "dot" && c !== "slow" && c !== "amp" && c !== "stun") {
         addError("Ailments", `Ailment '${a.id}' has unknown channel '${c}'.`);
       }
     }

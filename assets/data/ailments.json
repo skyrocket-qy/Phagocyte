@@ -59,6 +59,16 @@
         "dot"
       ],
       "max_stacks": 0
+    },
+    {
+      "id": "stun",
+      "name": "Neural Arrest",
+      "duration": 1,
+      "magnitude": 0,
+      "stack": "refresh_max",
+      "channels": [
+        "stun"
+      ]
     }
   ]
 }

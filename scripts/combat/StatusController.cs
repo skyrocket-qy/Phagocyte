@@ -143,6 +143,21 @@ public partial class StatusController : Node
         }
     }
 
+    /// <summary>True while any stun-channel ailment is active.</summary>
+    public bool IsStunned
+    {
+        get
+        {
+            EnsureConfigured();
+            foreach (var slot in _slots.Values)
+            {
+                if (HasChannel(slot, "stun") && slot.Timer > 0.0f)
+                    return true;
+            }
+            return false;
+        }
+    }
+
     /// <summary>Load defs (fail fast). Safe to call directly for custom/test setups.</summary>
     public void Configure(IEnumerable<StatusDef> defs, StatusOptions? options = null)
     {
@@ -479,7 +494,8 @@ public partial class StatusController : Node
         {
             if (!string.Equals(ch, "dot", StringComparison.OrdinalIgnoreCase)
                 && !string.Equals(ch, "slow", StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(ch, "amp", StringComparison.OrdinalIgnoreCase))
+                && !string.Equals(ch, "amp", StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(ch, "stun", StringComparison.OrdinalIgnoreCase))
                 throw new StatusDataException($"'{def.Id}': unknown channel '{ch}'.");
         }
         bool hasMin = !float.IsNaN(def.MinMagnitude);

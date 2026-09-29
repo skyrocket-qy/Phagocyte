@@ -16,7 +16,7 @@ namespace Game.Player;
 /// Encapsulates universal stats, physics movement, 32-vertex organic deformation,
 /// and experience progression.
 /// </summary>
-public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStunnable, IStatusHost
+public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStatusHost
 {
     [Signal]
     public delegate void StatsChangedEventHandler(float health, float maxHealth, float radiusRatio);
@@ -96,8 +96,9 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
     public Vector2 NucleusOffset { get => Visuals.NucleusOffset; set => Visuals.NucleusOffset = value; }
     public Vector2 NucleusVelocity { get => Visuals.NucleusVelocity; set => Visuals.NucleusVelocity = value; }
 
-    // Status debuffs
-    public float StunTimer { get; set; } = 0.0f;
+    // Status debuffs (stun state lives in Status, not fields)
+    public float StunTimer => Status?.GetTimer("stun") ?? 0.0f;
+    public bool IsStunned => Status?.IsStunned ?? false;
     public float InvertControlsTimer { get; set; } = 0.0f;
 
     // Visual Node references (delegated to Visuals)
@@ -210,11 +211,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
 
         float dt = (float)delta;
 
-        // Process status debuffs (slow state lives in Status, not fields)
-        if (StunTimer > 0.0f)
-        {
-            StunTimer -= dt;
-        }
+        // Process status debuffs (slow and stun state live in Status, not fields)
         if (InvertControlsTimer > 0.0f)
         {
             InvertControlsTimer -= dt;
@@ -576,11 +573,6 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
         // fraction (SpeedMultiplier = 1 - strongest). This stays only as the
         // ISlowable dispatch endpoint; state lives in data.
         Status?.ApplySlow(duration, 1.0f - factor);
-    }
-
-    public void ApplyStun(float duration)
-    {
-        StunTimer = duration;
     }
 
     public void ApplyInvertControls(float duration)

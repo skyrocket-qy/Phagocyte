@@ -15,12 +15,6 @@ public struct EffectSpec
     {
         if (target == null || !GodotObject.IsInstanceValid(target) || string.IsNullOrEmpty(EffectId))
             return;
-        if (EffectId == "stun")
-        {
-            if (target is IStunnable stunnable)
-                stunnable.ApplyStun(Duration);
-            return;
-        }
         if (target is IStatusHost host && host.Status != null)
             host.Status.Apply(EffectId, Magnitude, Duration);
     }
