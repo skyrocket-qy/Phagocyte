@@ -8,8 +8,6 @@ public struct EffectSpec
     public string EffectId;
     public float Magnitude;
     public float Duration;
-    public float Radius;
-    public Color Tint;
 
     public readonly void ApplyTo(Node? target)
     {
