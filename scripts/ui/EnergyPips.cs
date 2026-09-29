@@ -2,20 +2,13 @@ using Godot;
 
 namespace Game.UI;
 
-/// <summary>
-/// Circular energy pips (TODO Phase 1 revision): one disc per energy point.
-/// Filled discs are consumed energy, hollow discs are still free, and the
-/// trailing discs granted by generators (negative cost) render red so the
-/// capacity they add is instantly recognizable. Geometry is computed per
-/// draw from data, so the same node serves card badges and the chamber row.
-/// </summary>
+/// <summary>Circular energy pip indicators visualizing used and total energy capacity.</summary>
 public partial class EnergyPips : Control
 {
     public static readonly Color FillColor = new(0.20f, 0.78f, 0.95f);
     public static readonly Color GeneratorColor = new(1.0f, 0.38f, 0.38f);
     private static readonly Color RingColor = new(0.05f, 0.08f, 0.12f, 0.95f);
 
-    /// <summary>Total discs to draw.</summary>
     public int PipCount { get; private set; }
 
     /// <summary>Leading discs filled as consumed energy.</summary>

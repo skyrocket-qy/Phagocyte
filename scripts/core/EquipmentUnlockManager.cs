@@ -5,12 +5,7 @@ using System.Collections.Generic;
 
 namespace Game.Core;
 
-/// <summary>
-/// Meta-progression unlocks for gear chamber equipment (TODO Phase 1
-/// revision): the vault starts fully locked and gear are only obtained
-/// from enemy kills at a deliberately low drop chance. Unlocks are
-/// account-wide and persisted; a collected drop is the only way in.
-/// </summary>
+/// <summary>Account-wide persistence and unlock management for equipment drops.</summary>
 public static class EquipmentUnlockManager
 {
     /// <summary>Base chance per enemy kill. Deliberately low.</summary>

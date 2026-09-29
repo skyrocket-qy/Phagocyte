@@ -4,12 +4,7 @@ using System.Collections.Generic;
 
 namespace Game.Core;
 
-/// <summary>
-/// Allocation-conscious 2D quad tree for the 300-500 enemy concurrency budget
-/// (docs/spec.md §9 / TODO module 12). Supports O(log n) circle / rect queries and
-/// is designed to be rebuilt every physics frame with pooled nodes and pre-sized
-/// item lists, so steady-state rebuilds allocate nothing.
-/// </summary>
+/// <summary>Allocation-conscious 2D quad tree for high-density spatial queries.</summary>
 public sealed class QuadTree<T>
 {
     private struct Item

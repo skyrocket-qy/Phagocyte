@@ -2,15 +2,7 @@ using System;
 
 namespace Game.Core;
 
-/// <summary>
-/// Cross-manager command bus (Phase 3): achievement side effects (class / stage
-/// unlocks, talent points) travel as synchronous C# events instead of direct
-/// static calls, breaking the AchievementManager → GameManager /
-/// PassiveTreeManager compile-time edges. Queries (IsUnlocked, unlock text)
-/// intentionally stay direct reads — events carry commands, not answers.
-/// Subscriptions are installed once via <see cref="EnsureInitialized"/>,
-/// which every Raise path calls defensively (autoload order independent).
-/// </summary>
+/// <summary>Synchronous event bus decoupling meta-progression systems.</summary>
 public static class GameEvents
 {
     public static event Action<string>? ClassUnlockRequested;

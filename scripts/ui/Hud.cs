@@ -6,20 +6,11 @@ using Game.Player;
 
 namespace Game.UI;
 
-/// <summary>
-/// HUD coordinator (mediator). Owns view assembly, player fan-out and the
-/// per-frame dispatch; every readout lives in a sub-view below
-/// (<see cref="VitalsView"/>, <see cref="SkillBarView"/>,
-/// <see cref="WaveTimerView"/>, <see cref="PauseMenuView"/>,
-/// <see cref="TutorialCueView"/>, <see cref="ToastView"/>).
-/// The pre-split public surface is preserved as thin facades so the
-/// test harness keeps working unchanged.
-/// </summary>
+/// <summary>HUD coordinator assembling vitals, skill bar, wave timer, and toast views.</summary>
 public partial class Hud : CanvasLayer, IDirectorHud
 {
     public static PackedScene UpgradeModalScene => AssetLoader.Load<PackedScene>("res://scenes/ui/upgrade_modal.tscn");
 
-    // --- First-run micro-cues (docs/tutorial.md §2) ---
     public const float DodgeHintSeconds = 6.0f;
     public const int DodgeHintNearbyThreshold = 15;
     public const float DodgeHintNearbyRadius = 300.0f;
@@ -187,7 +178,6 @@ public partial class Hud : CanvasLayer, IDirectorHud
 
         UpdateLocalizedTexts();
 
-        // TODO Phase 5: click SFX on pause/upgrade buttons (idempotent).
         AudioManager.Instance?.WireClicks(this);
     }
 

@@ -7,16 +7,7 @@ using Game.Player;
 
 namespace Game.Combat;
 
-/// <summary>
-/// Extreme-density bullet-hell projectile manager for every faction.
-/// Uses MultiMeshInstance2D batch rendering and a QuadTree over the enemy
-/// registry for zero-GC, O(log n) collision queries capable of handling
-/// 4096+ projectiles at 60 FPS. Player-team shots query the enemy tree and
-/// route damage through <see cref="DamageService"/> with the host as source
-/// (preserves life-steal); enemy-team shots fly at the player cell.
-/// Per-node pellets are gone: steering (homing/chain/wobble) and on-hit
-/// effects ride in <see cref="ProjectileData"/> as data.
-/// </summary>
+/// <summary>Batch projectile manager using MultiMesh rendering and QuadTree queries.</summary>
 public partial class ProjectileManager : Node2D
 {
     public static ProjectileManager? Instance { get; private set; }
@@ -35,9 +26,7 @@ public partial class ProjectileManager : Node2D
     private readonly List<MultiMeshInstance2D> _typeMultiMeshes = new();
     private int[] _typeActiveCounts = Array.Empty<int>();
 
-    // 2D QuadTree over the active enemies: rebuilt once per physics frame and
-    // shared by every projectile, giving O(log n) neighborhood queries at the
-    // 300-500 enemy concurrency budget (docs/spec.md §9 / TODO module 12).
+    // QuadTree over active enemies: rebuilt once per physics frame for O(log n) queries.
     private const float ArenaQueryHalfExtent = 2600.0f;
     private readonly QuadTree<EnemyActor> _enemyTree = new(
         new Rect2(-ArenaQueryHalfExtent, -ArenaQueryHalfExtent, ArenaQueryHalfExtent * 2.0f, ArenaQueryHalfExtent * 2.0f),

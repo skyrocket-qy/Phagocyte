@@ -4,12 +4,7 @@ using Game.Core;
 
 namespace Game.Skills;
 
-/// <summary>
-/// Stat passive archetype (data: assets/data/skill/passive.json "mods").
-/// Each mod applies per_level as flat (×Level), mult (×Level) or
-/// flat_once (one-time bonus, e.g. kinesin pierce).
-/// Replaces every former per-passive subclass.
-/// </summary>
+/// <summary>Passive skill applying data-driven per-level stat modifiers.</summary>
 public partial class StatPassive : BaseSkill
 {
     public override void ApplyPassiveModifiers()

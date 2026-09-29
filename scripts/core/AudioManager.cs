@@ -328,10 +328,7 @@ public partial class AudioManager : Node
         }
     }
 
-    /// <summary>
-    /// Per-organ battle BGM (TODO Phase 5): each stage id resolves to its own
-    /// track; unknown ids fall back to the default battle theme.
-    /// </summary>
+    /// <summary>Maps stage ids to per-stage battle BGM tracks.</summary>
     private static readonly Dictionary<string, string> StageBgmTracks = new()
     {
         ["acute_wound"] = "battle_bgm",

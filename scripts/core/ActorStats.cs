@@ -76,19 +76,12 @@ public partial class ActorStats : Node, IStatHost
         EmitChanged(statName);
     }
 
-    /// <summary>
-    /// Registers a scaled modifier: contributes flat/pct multiplied by
-    /// (sourceStat / scalePer), recomputed live whenever any stat changes.
-    /// Unknown target/source is warned and ignored; scalePer &lt;= 0 falls
-    /// back to 1.0 (Vistrace guard).
-    /// </summary>
     public void AddScaledModifier(string target, float flat, float pct, string source, float scalePer)
     {
         _block.AddScaledModifier(target, flat, pct, source, scalePer);
         EmitChanged(target);
     }
 
-    /// <summary>Removes one matching scaled record (exact match); silent when absent.</summary>
     public bool RemoveScaledModifier(string target, float flat, float pct, string source, float scalePer)
     {
         if (!_block.RemoveScaledModifier(target, flat, pct, source, scalePer))
@@ -97,17 +90,12 @@ public partial class ActorStats : Node, IStatHost
         return true;
     }
 
-    /// <summary>
-    /// Registers a built-in cross-stat rule: flat += ratio * sourceStat,
-    /// recomputed live (Vistrace layer rules, flat channel only).
-    /// </summary>
     public void AddStatRule(string target, string source, float ratio)
     {
         _block.AddStatRule(target, source, ratio);
         EmitChanged(target);
     }
 
-    /// <summary>Removes one matching rule (exact match); silent when absent.</summary>
     public void RemoveStatRule(string target, string source, float ratio)
     {
         if (!_block.RemoveStatRule(target, source, ratio))
@@ -115,7 +103,6 @@ public partial class ActorStats : Node, IStatHost
         EmitChanged(target);
     }
 
-    /// <summary>Test/reset hook: drops every scaled record and rule.</summary>
     public void ClearScaled()
     {
         _block.ClearScaled();

@@ -4,12 +4,7 @@ using System.Collections.Generic;
 
 namespace Game.Core;
 
-/// <summary>
-/// Unified runtime asset pipeline (vistrace DataLoader-style): every Resource
-/// load in game and test code goes through here. Central case-insensitive
-/// cache, fail-fast <see cref="Load{T}"/>, nullable <see cref="TryLoad{T}"/>
-/// for legitimately-missing content, injectable provider for tests.
-/// </summary>
+/// <summary>Unified runtime asset cache and loader with injectable provider.</summary>
 public static class AssetLoader
 {
     private static IAssetProvider _provider = new GodotAssetProvider();

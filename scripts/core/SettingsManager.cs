@@ -57,15 +57,9 @@ public partial class SettingsManager : Node
         ApplySettings();
     }
 
-    /// <summary>
-    /// Apply runtime audio and display server settings.
-    /// Single source of truth for volumes (Phase 3): the Master bus is pushed
-    /// here; Sfx/Bgm channel levels are read from these statics by
-    /// AudioManager at play time (all players sit on the Master bus).
-    /// </summary>
+    /// <summary>Applies runtime audio bus and display settings.</summary>
     public static void ApplySettings()
     {
-        // Audio Bus volumes if buses exist
         if (AudioServer.GetBusCount() > 0)
         {
             int masterIdx = AudioServer.GetBusIndex("Master");

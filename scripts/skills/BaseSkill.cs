@@ -172,14 +172,12 @@ public partial class BaseSkill : Node2D
 
     // --- Stat Consumption Helpers for Active Skills ---
 
-    /// <summary>True when the skill has a live host to act through.</summary>
     [System.Diagnostics.CodeAnalysis.MemberNotNullWhen(true, nameof(Host))]
     protected bool HasValidHost()
     {
         return Host != null && GodotObject.IsInstanceValid(Host);
     }
 
-    /// <summary>Damage + crit flag in one call, zero-GC struct unpack.</summary>
     protected void GetDamage(float baseDmg, out float damage, out bool isCrit)
     {
         var data = GetCalculatedDamage(baseDmg);
@@ -187,10 +185,6 @@ public partial class BaseSkill : Node2D
         isCrit = data.IsCrit;
     }
 
-    /// <summary>
-    /// Registers one flat/percent stat modifier on the host, routing to the
-    /// typed ActorStats API and falling back to a GDScript add_modifier method.
-    /// </summary>
     protected void ApplyStat(string stat, float flat, float percent)
     {
         if (Stats is IStatHost host)
@@ -199,7 +193,6 @@ public partial class BaseSkill : Node2D
         }
     }
 
-    /// <summary>Removes a modifier previously registered by <see cref="ApplyStat"/>.</summary>
     protected void RemoveStat(string stat, float flat, float percent)
     {
         if (Stats is IStatHost host)

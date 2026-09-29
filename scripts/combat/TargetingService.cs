@@ -10,16 +10,11 @@ namespace Game.Combat;
 /// </summary>
 public static class TargetingService
 {
-    /// <summary>True when the node is a live, valid Node2D.</summary>
     public static bool IsValidTarget(Node? node)
     {
         return node is Node2D n && GodotObject.IsInstanceValid(n);
     }
 
-    /// <summary>
-    /// True when the node is a valid, living enemy that accepts damage.
-    /// Used by gear that scan for contact targets.
-    /// </summary>
     public static bool IsAttackable(Node? node)
     {
         if (node is not Node2D n || !GodotObject.IsInstanceValid(n))
@@ -29,10 +24,6 @@ public static class TargetingService
         return n is IDamageable;
     }
 
-    /// <summary>
-    /// Nearest enemy within <paramref name="maxRange"/> of
-    /// <paramref name="origin"/>, or null when none is in range.
-    /// </summary>
     public static EnemyActor? FindNearest(
         Node2D origin,
         float maxRange,
@@ -58,7 +49,6 @@ public static class TargetingService
         return best;
     }
 
-    /// <summary>Direction from origin to the nearest enemy, or fallback when none.</summary>
     public static Vector2 FindTargetDirection(Node2D origin, float maxRange, Vector2 fallbackDir)
     {
         var nearest = FindNearest(origin, maxRange);
@@ -68,10 +58,6 @@ public static class TargetingService
         return fallbackDir;
     }
 
-    /// <summary>
-    /// Appends every enemy within <paramref name="radius"/> of
-    /// <paramref name="center"/> into <paramref name="results"/> and returns the count.
-    /// </summary>
     public static int CollectInRadius(
         Vector2 center,
         float radius,
@@ -94,10 +80,6 @@ public static class TargetingService
         return added;
     }
 
-    /// <summary>
-    /// Invokes <paramref name="action"/> for every enemy within
-    /// <paramref name="radius"/> of <paramref name="center"/>.
-    /// </summary>
     public static void ForEachInRadius(
         Vector2 center,
         float radius,
@@ -114,10 +96,6 @@ public static class TargetingService
         }
     }
 
-    /// <summary>
-    /// True when at least one enemy lies within <paramref name="radius"/> of
-    /// <paramref name="center"/>.
-    /// </summary>
     public static bool AnyInRadius(Vector2 center, float radius)
     {
         float radiusSq = radius * radius;

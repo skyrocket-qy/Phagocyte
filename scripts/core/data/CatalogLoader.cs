@@ -3,14 +3,7 @@ using Godot.Collections;
 
 namespace Game.Core;
 
-/// <summary>
-/// Unified JSON catalog pipeline (Phase 3, vistrace-style): one tolerant
-/// loading path for every data file under res://assets/data/.
-/// JSON conventions: missing fields fall back to schema defaults; colors are
-/// "#rrggbbaa" hex strings; Vector2 are [x, y] arrays; scene/skill references
-/// are res:// paths / skill ids resolved at load time. Any failure throws
-/// <see cref="DataLoadException"/> (fail fast, no code fallback).
-/// </summary>
+/// <summary>Unified JSON catalog loader for data files under res://assets/data/.</summary>
 public static class CatalogLoader
 {
     /// <summary>Load a JSON array file into its raw entry dictionaries.</summary>

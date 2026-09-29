@@ -28,23 +28,10 @@ public static class StatProfiles
     public static readonly string[] Minion = { "max_health", "move_speed" };
 }
 
-/// <summary>
-/// Portable universal-stat container (Vistrace-style compute, dependency-free
-/// apart from the Godot SDK — no game namespaces, no SceneTree).
-/// Formula: Final = (Base + Flat) * (1 + Pct). Flat/Pct pool three sources:
-/// direct modifiers, scaled modifiers (value * sourceStat / scalePer,
-/// recomputed live) and built-in cross-stat rules (ratio * sourceStat,
-/// flat channel). A schema (see <see cref="StatProfiles"/>) selects the
-/// registered key subset; unregistered keys read 0 with a warning and
-/// writes are ignored, so partial hosts fail safe.
-/// <see cref="ActorStats"/> is the thin Node adapter (signals) over this.
-/// </summary>
+/// <summary>Stat container computing Final = (Base + Flat) * (1 + Pct) with live scaling.</summary>
 public sealed class StatBlock : IStatHost
 {
-    /// <summary>One scaled modifier contribution (Vistrace ScalingStat/ScalePer).</summary>
     public readonly record struct ScaledRecord(string Target, float Flat, float Pct, string Source, float ScalePer);
-
-    /// <summary>One built-in cross-stat rule: flat += Ratio * source (Vistrace layer rules).</summary>
     public readonly record struct StatRule(string Target, string Source, float Ratio);
 
     /// <summary>Fixed-point cap for the scaled/rules recompute (no-cycle contract).</summary>
@@ -160,12 +147,7 @@ public sealed class StatBlock : IStatHost
             s.SetBase(val);
     }
 
-    /// <summary>
-    /// Registers a scaled modifier: contributes flat/pct multiplied by
-    /// (sourceStat / scalePer), recomputed live whenever any stat changes.
-    /// Unknown target/source is warned and ignored; scalePer &lt;= 0 falls
-    /// back to 1.0 (Vistrace guard).
-    /// </summary>
+    /// <summary>Registers a modifier scaled by (sourceStat / scalePer).</summary>
     public void AddScaledModifier(string target, float flat, float pct, string source, float scalePer)
     {
         if (!_statsMap.ContainsKey(target))
@@ -186,7 +168,6 @@ public sealed class StatBlock : IStatHost
         _scaled.Add(new ScaledRecord(target, flat, pct, source, scalePer));
     }
 
-    /// <summary>Removes one matching scaled record (exact match); silent when absent.</summary>
     public bool RemoveScaledModifier(string target, float flat, float pct, string source, float scalePer)
     {
         for (int i = 0; i < _scaled.Count; i++)
@@ -201,10 +182,7 @@ public sealed class StatBlock : IStatHost
         return false;
     }
 
-    /// <summary>
-    /// Registers a built-in cross-stat rule: flat += ratio * sourceStat,
-    /// recomputed live (Vistrace layer rules, flat channel only).
-    /// </summary>
+    /// <summary>Registers a cross-stat rule: flat += ratio * sourceStat.</summary>
     public void AddStatRule(string target, string source, float ratio)
     {
         if (!_statsMap.ContainsKey(target) || string.IsNullOrEmpty(source) || !_statsMap.ContainsKey(source))

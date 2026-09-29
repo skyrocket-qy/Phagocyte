@@ -5,14 +5,7 @@ using Game.Player;
 
 namespace Game.Combat;
 
-/// <summary>
-/// Faction-agnostic stationary timed field: interval damage ticks plus generic
-/// <see cref="EffectSpec"/> hits. <see cref="Team.Player"/> zones strike the
-/// enemy registry with <see cref="Source"/> as the damage source (preserves
-/// life-steal); <see cref="Team.Enemy"/> zones strike the player cell.
-/// Mechanism extras ride as data: grow wavefront, enemy vortex pull, mine
-/// detonation on expiry, tint. Replaces the HazardZone/ZoneNode faction split.
-/// </summary>
+/// <summary>Stationary timed area hazard dealing interval damage and on-hit effects.</summary>
 public partial class Zone : Node2D
 {
     public Team SourceTeam { get; set; } = Team.Enemy;
@@ -22,7 +15,6 @@ public partial class Zone : Node2D
     public float TickInterval { get; set; } = 0.5f;
     public float Damage { get; set; } = 5.0f;
     public bool IsCrit { get; set; }
-    /// <summary>Inline on-hit effects (value types: zero heap allocation per spawn).</summary>
     public EffectSpec Effect0 { get; set; }
     public EffectSpec Effect1 { get; set; }
     public EffectSpec Effect2 { get; set; }

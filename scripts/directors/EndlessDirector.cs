@@ -7,20 +7,9 @@ using Game.Player;
 
 namespace Game.Directors;
 
-/// <summary>
-/// Endless overdrive environment ladder (docs/endgame.md §3.2) + pathological
-/// overload afflictions (§4). Effects are cumulative per 3-minute cycle:
-///   1) 15:00+ escalation;
-///   2) 18:00+ cross-organ boss incursion;
-///   3) 21:00+ bile-acid surge strips all armor for 3s periodically;
-///   4) 24:00+ gastric acid tide shrinks the safe zone;
-///   5) 27:00+ terminal composite: bile surge and acid tide coexist.
-/// Extracted verbatim from GameRoot; raid spawns delegate to
-/// <see cref="BossEncounterManager"/> so all boss lifecycle stays in one place.
-/// </summary>
+/// <summary>Endless mode director managing time-based environment escalations.</summary>
 public partial class EndlessDirector : Node
 {
-    /// <summary>Run context (GameRoot). Must be assigned before the first physics tick.</summary>
     public IRunContext? Context { get; set; }
 
     /// <summary>Cross-organ raid spawns are served by the boss manager.</summary>

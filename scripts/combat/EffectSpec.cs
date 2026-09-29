@@ -2,15 +2,7 @@ using Godot;
 
 namespace Game.Combat;
 
-/// <summary>
-/// Generic on-hit effect. The engine sees only effect_id + scalars, never
-/// domain types: "stun" dispatches via <see cref="IStunnable"/>, every ailment
-/// id routes straight into <see cref="StatusController.Apply"/> (channel
-/// behavior comes from the ailment def). Magnitude semantics per contract:
-/// DoT dps for dot-channel ailments, removed-fraction for slow, added-fraction
-/// for amp (-1 = def default). Radius reserves on-hit AoE; Tint reserves
-/// per-instance batch color.
-/// </summary>
+/// <summary>Generic on-hit status or damage effect payload.</summary>
 public struct EffectSpec
 {
     public string EffectId;

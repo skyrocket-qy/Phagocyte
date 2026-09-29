@@ -4,20 +4,11 @@ using Game.Enemies;
 
 namespace Game.Directors;
 
-/// <summary>
-/// 15:00 wave timeline + kill-driven dynamic backfill (docs/stages.md §4.2).
-/// Extracted from <c>GameRoot.ProcessWaveDirector / ProcessDynamicBackfill</c>:
-/// 03:00 elite raid, 06:00 swarm + elite pincer, 09:00 sub-boss (delegated to
-/// <see cref="BossEncounterManager"/>), 12:00 extreme swarm, 15:00 terminal
-/// lockdown (raised as <see cref="TerminalPhaseReached"/> so this component
-/// never touches boss state directly).
-/// </summary>
+/// <summary>Standard run wave timeline and dynamic backfill director.</summary>
 public partial class WaveDirectorComponent : Node
 {
-    /// <summary>Raised once when <see cref="IRunContext.RunGoalSeconds"/> is crossed.</summary>
     public event System.Action? TerminalPhaseReached;
 
-    /// <summary>Run context (GameRoot). Must be assigned before the first physics tick.</summary>
     public IRunContext? Context { get; set; }
 
     public bool EliteRaidTriggered { get; private set; } = false;

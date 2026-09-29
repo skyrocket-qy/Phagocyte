@@ -2,11 +2,7 @@ using Godot;
 
 namespace Game.Stages;
 
-/// <summary>
-/// Solid circular debris chunk dropped by death traits (granuloma wall).
-/// Static stage geometry on the environment layer; pure data (radius).
-/// Distinct from <see cref="BlockerWall"/> (gapped fenestra pore terrain).
-/// </summary>
+/// <summary>Static circular obstacle spawned in the environment.</summary>
 public partial class DebrisWall : StaticBody2D
 {
     public float Radius { get; set; } = 44.0f;

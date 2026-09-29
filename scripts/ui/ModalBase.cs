@@ -3,22 +3,13 @@ using Game.Core;
 
 namespace Game.UI;
 
-/// <summary>
-/// Shared scaffolding for the panel modals: hidden-on-ready state, the header
-/// ✕ button, the language-listener lifetime and the Closed signal.
-/// Subclasses resolve their own nodes, then call <see cref="InitModal"/> at the
-/// end of _Ready. Control (not PanelContainer) so both scene-rooted panel
-/// modals and code-built Control modals can extend it.
-/// </summary>
+/// <summary>Base class for panel modals with header close handling and localization.</summary>
 public partial class ModalBase : Control
 {
     [Signal]
     public delegate void ClosedEventHandler();
 
-    /// <summary>Header title node path; null when the modal builds its own title.</summary>
     protected virtual string? TitleLabelPath => "VBox/Header/Title";
-
-    /// <summary>Header close button node path; null when the modal has no ✕ button.</summary>
     protected virtual string? CloseButtonPath => "VBox/Header/CloseButton";
 
     public Label? TitleLabel { get; protected set; }
@@ -26,10 +17,6 @@ public partial class ModalBase : Control
 
     private Callable _langCallback;
 
-    /// <summary>
-    /// Applies the shared modal state, hooks the close button and language
-    /// listener, then refreshes the localized text. Call at the end of _Ready.
-    /// </summary>
     protected void InitModal()
     {
         ProcessMode = ProcessModeEnum.Always;

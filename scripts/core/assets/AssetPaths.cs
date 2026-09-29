@@ -2,11 +2,7 @@ using System.Collections.Generic;
 
 namespace Game.Core;
 
-/// <summary>
-/// Centralized runtime asset paths. Single source of truth — update here if
-/// folder structure changes. Ids equal gen/ file stems (no prefixes);
-/// paths are derived as res://assets/gen/&lt;category&gt;/{id}.png (Vistrace-style).
-/// </summary>
+/// <summary>Centralized runtime asset paths for generated sprites and icons.</summary>
 public static class AssetPaths
 {
     private const string GenRoot = "res://assets/gen";

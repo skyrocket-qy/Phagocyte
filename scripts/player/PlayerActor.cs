@@ -105,7 +105,6 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
     public Area2D? EngulfArea { get; set; }
     public SkillManager? CellSkillManager { get; set; }
 
-    /// <summary>2x2 gear equipment chamber (TODO Phase 0), parallel to SkillManager.</summary>
     public EquipmentChamber? Equipment { get; set; }
 
     public ActorStats? Stats { get; set; }
@@ -225,7 +224,6 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
         EngulfArea = GetNodeOrNull<Area2D>("EngulfArea");
         CellSkillManager = GetNodeOrNull<SkillManager>("SkillManager");
 
-        // Ensure ActorStats container node is initialized
         if (HasNode("ActorStats"))
         {
             Stats = GetNode<ActorStats>("ActorStats");
@@ -236,8 +234,6 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
             AddChild(Stats);
         }
 
-        // Ensure ailment container exists (slow/DoT/amp state lives in data,
-        // mirroring the ActorStats pattern above).
         Status = GetNodeOrNull<StatusController>("StatusController");
         if (Status == null)
         {

@@ -92,8 +92,6 @@ public partial class GameManager : Node
         }
     }
 
-    // Equipment chamber catalog (TODO Phase 0): 2x2 equipment definitions
-    // (data-owned: assets/data/equipment.json).
     private static Dictionary? _gearCatalog;
     public static Dictionary EquipmentCatalog
     {

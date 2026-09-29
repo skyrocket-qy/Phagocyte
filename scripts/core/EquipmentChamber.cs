@@ -5,15 +5,7 @@ using System.Collections.Generic;
 
 namespace Game.Core;
 
-/// <summary>
-/// Equipment Chamber — the 2x2 equipment system (TODO Phase 0).
-/// Four 1x1 slots under a base 6-point energy budget. Generators
-/// (<c>energy_cost == -1</c>, +1 energy each) raise the cap with no limit
-/// but must carry a drawback. Owned-but-unequipped
-/// gear live in the run-scoped backpack. Every effect is applied through
-/// the universal <see cref="ActorStats"/> pool (modifiers + drawback alike).
-/// Energy model (used/max): used = sum of positive costs, max = base + generators.
-/// </summary>
+/// <summary>2x2 equipment grid managing 4 slots under an energy budget.</summary>
 public partial class EquipmentChamber : Node2D
 {
     public const int MaxSlots = 4;
@@ -461,7 +453,6 @@ public partial class EquipmentChamber : Node2D
     // Stat application (mirrors the passive-trait modifier convention)
     // ------------------------------------------------------------------
 
-    /// <summary>One gear stat entry with optional Vistrace-style scaling.</summary>
     public readonly record struct EquipmentStatEntry(string Stat, float Flat, float Pct, string ScalingStat, float ScalePer)
     {
         public bool HasScaling => !string.IsNullOrEmpty(ScalingStat);

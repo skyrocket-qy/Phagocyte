@@ -5,35 +5,16 @@ using Game.Player;
 
 namespace Game.Enemies;
 
-/// <summary>
-/// Tactical threat intent driving enemy steering (docs/enemy.md steering model).
-/// Every enemy should exert pressure; pure idle wandering is reserved for
-/// environment-neutral matter only.
-/// </summary>
 public enum EnemyThreatMode
 {
-    /// <summary>Neutral drift / bosses with scripted pressure (Brownian wander).</summary>
     Drifter = 0,
-
-    /// <summary>Direct chemo-chaser: seeks the cell along the shortest vector (~80% tide).</summary>
     ChemoChaser = 1,
-
-    /// <summary>Flanker: aims 100-200px ahead of the player's travel vector to punish kiting.</summary>
     Interceptor = 2,
-
-    /// <summary>Standoff artillery: keeps distance, orbits and fires projectiles.</summary>
     Standoff = 3,
-
-    /// <summary>Tissue invader: ignores the player, latches onto host tissue and ulcerates it.</summary>
     Invader = 4
 }
 
-/// <summary>
-/// Shared threat-intent steering helpers. Every enemy uses one of four tactical
-/// modes (see <see cref="EnemyThreatMode"/>) so the horde applies real positioning
-/// pressure instead of aimless wandering. Pure drifting is reserved for neutral
-/// environment matter and scripted bosses.
-/// </summary>
+/// <summary>Calculates steering vectors for active enemies based on their threat mode.</summary>
 public static class EnemySteering
 {
     public const float ChaserJitter = 0.22f;

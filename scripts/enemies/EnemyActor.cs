@@ -24,15 +24,8 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IS
     [Export] public float FloatSpeed { get; set; } = 35.0f;
     [Export] public bool IsElite { get; set; } = false;
     [Export] public bool IsBoss { get; set; } = false;
-
-    /// <summary>Tactical threat intent driving steering (see docs/enemy.md).</summary>
     [Export] public EnemyThreatMode ThreatMode { get; set; } = EnemyThreatMode.Drifter;
 
-    /// <summary>
-    /// Instance tint used by the GPU swarm batch renderer (docs/spec.md §9).
-    /// Set from the enemy def; defaults to white so the baked batch texture
-    /// is drawn unmodified.
-    /// </summary>
     public Color SwarmBatchColor { get; set; } = Colors.White;
 
     public Vector2 Velocity { get; set; } = Vector2.Zero;
@@ -40,7 +33,6 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IS
     public Vector2 WanderDir { get; set; } = Vector2.Zero;
     public float BreatheTimer { get; set; } = 0.0f;
 
-    // Threat steering tuning
     public float SteeringPhase { get; set; } = 0.0f;
     public Vector2 SteeringAnchor { get; set; } = Vector2.Zero;
     public float SteeringOrbitSign { get; set; } = 1.0f;
@@ -49,7 +41,6 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IS
     public float SteeringPreferredRange { get; set; } = 260.0f;
     public float SteeringLatchRange { get; set; } = 40.0f;
 
-    // Status debuffs & Components (slow state lives in Status, not fields)
     public float StunTimer { get; set; } = 0.0f;
     public StatusController? Status { get; private set; }
     public BossPhaseComponent? BossPhase { get; private set; }
@@ -329,7 +320,6 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IS
         DamageNumberSpawner.ShowDamage(GlobalPosition, effectiveDmg, isCrit);
         RunTelemetryManager.Instance?.RecordDamageDealt(source?.Name ?? "direct", effectiveDmg);
 
-        // Life steal check on attacker
         if (source is PlayerActor playerCell && playerCell.Stats != null)
         {
             if (playerCell.Stats.RollLifeSteal())
@@ -346,7 +336,6 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IS
             VfxManager.Instance?.Play(VfxType.BarbImpact, GlobalPosition);
         }
 
-        // Flash modulate
         FlashModulate(new Color(1.8f, 0.4f, 0.4f, 1.0f), 0.15f);
 
         if (CurrentHealth <= 0.0f)
@@ -467,8 +456,6 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IS
         var player = PlayerRef;
         if (player != null && GodotObject.IsInstanceValid(player))
             player.AddExp(XpValue * EnemySpawner.ExpGainMultiplier);
-        // Equipment chamber equipment drops here too: one low-chance roll per
-        // kill, spawned as a collectable pickup (TODO Phase 1 revision).
         EquipmentUnlockManager.TrySpawnDrop(GlobalPosition, GetParent(), player);
         AchievementManager.RecordEvent("enemy_killed", EnemyId);
         RunTelemetryManager.Instance?.RecordKill(BaseScore);

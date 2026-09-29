@@ -1,9 +1,5 @@
 namespace Game.Core;
 
-/// <summary>
-/// Typed contract for universal-stat hosts (ActorStats).
-/// Replaces string duck-typing (<c>HasMethod("get_stat")</c>).
-/// </summary>
 public interface IStatHost
 {
     float GetStat(string statName);

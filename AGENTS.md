@@ -36,6 +36,14 @@ even when the session prompt doesn't advertise it.
   live runtime logs, test harness output, and current visual captures.
 - In visual / VFX validation, establish clean, identical current baselines (e.g. pre-cast
   vs peak-cast in the same scene) rather than digging through broken past revisions.
+- **No comment archaeology or roadmap tags:** Never write comments explaining historical
+  refactors, migrations, or past engine iterations (`Vistrace`, `TODO Phase X`, "Replaces duck typing",
+  "Extracted from X"). Zero roadmap tags in production code.
+- **Comments — less but clear:** If the class, method, or property name already clearly
+  represents what it does, do NOT add a comment. Eliminate redundant line comments
+  (`// Flash modulate`, `// Ensure container`). Doc summaries (`<summary>`) are reserved
+  strictly for non-obvious invariants, math formulas, or zero-GC contracts, capped at 1–2
+  lines max.
 
 ## AI collaboration (grill protocols)
 
@@ -168,7 +176,7 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
   separate change. Verify with the dangling-reference check
   (every used `ExtResource("id")` has a matching `id="..."` decl).
 
-## Code size (net-negative by default)
+## Code size and file organization (net-negative by default)
 
 - Prefer deleting to adding: remove dead branches, unused overloads/params,
   and one-use abstractions instead of switching them off (`if (false)`,
@@ -176,6 +184,12 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
 - No compatibility shims for removed mechanics: update the call sites,
   don't keep adapters (`DamageOrEngulf`-style fallbacks).
 - No speculative hooks: if nothing calls it, it doesn't ship.
+- **Co-locate small POCO types; avoid file fragmentation:** Do not create tiny standalone
+  files (< 20 lines) for plain C# interfaces, enums, or POCO structs that belong to a
+  single consumer subsystem (e.g. `DamageResult` in `DamageService.cs`, `ISlowable` in
+  `IDamageable.cs`, `Team` in `ProjectileData.cs`, `VfxType` in `VfxManager.cs`). Keep Godot
+  `Node`/`Resource` classes 1:1 with filenames (required by Godot's C# source generators),
+  but consolidate tightly-coupled plain C# types in their primary service or owner file.
 - Verify with a zero-residual grep: removed symbol names must return zero
   hits outside history/flavor text before declaring done.
 

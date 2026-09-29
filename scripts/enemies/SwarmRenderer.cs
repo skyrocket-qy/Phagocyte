@@ -4,12 +4,7 @@ using System.Collections.Generic;
 
 namespace Game.Enemies;
 
-/// <summary>
-/// GPU batch renderer for the microscopic swarm species (docs/spec.md §9 /
-/// TODO module 12). Every matching enemy is written into a per-species
-/// <see cref="MultiMeshInstance2D"/> and its own per-node drawing is suppressed,
-/// so 500 micro viruses cost one draw call per species instead of 500.
-/// </summary>
+/// <summary>GPU batch renderer using MultiMeshInstance2D for microscopic swarm enemies.</summary>
 public partial class SwarmRenderer : Node2D
 {
     private sealed class Species

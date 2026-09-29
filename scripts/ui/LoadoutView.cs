@@ -4,13 +4,7 @@ using Game.Core;
 
 namespace Game.UI;
 
-/// <summary>
-/// Pre-run loadout page (TODO Phase 1): the 6-category gear vault on the
-/// left and the 2x2 energy chamber on the right. A fresh cell deploys with no
-/// equipment — the default profile is four empty slots. All legality checks run
-/// through a scratch <see cref="EquipmentChamber"/>, so the page enforces
-/// exactly the same energy/slot contract as the run itself.
-/// </summary>
+/// <summary>Pre-run loadout view for selecting and configuring 2x2 equipment chamber loadouts.</summary>
 public partial class LoadoutView : Control
 {
     [Signal]

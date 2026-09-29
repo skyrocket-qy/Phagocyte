@@ -3,11 +3,7 @@ using Godot.Collections;
 
 namespace Game.Directors;
 
-/// <summary>
-/// Director-facing HUD surface. Implemented by <c>Game.UI.Hud</c>;
-/// lives here so directors never compile against concrete UI types
-/// (gameplay → UI is forbidden — see docs/architecture/ARCH_RULE.md).
-/// </summary>
+/// <summary>Director-facing HUD surface interface.</summary>
 public interface IDirectorHud
 {
     bool PauseInputSuppressed { get; set; }
@@ -15,25 +11,13 @@ public interface IDirectorHud
     void ShowOverdriveAlert(string title, string desc);
 }
 
-/// <summary>
-/// Director-facing settlement modal surface. Implemented by
-/// <c>Game.UI.RunRecordsModal</c>; same inversion as
-/// <see cref="IDirectorHud"/> — directors resolve it via
-/// <c>GetNodeOrNull&lt;IRunSettlementModal&gt;</c>, never the concrete type.
-/// </summary>
+/// <summary>Director-facing run settlement modal interface.</summary>
 public interface IRunSettlementModal
 {
     void OpenSettlement(Dictionary record);
 }
 
-/// <summary>
-/// Narrow run-scoped view of the orchestrator that director components are
-/// allowed to touch. Implemented by <see cref="GameRoot"/>; breaks the
-/// <c>StageEnvironment ↔ GameRoot</c> god-object cycle (suggestion 6) so directors
-/// and organ environments can be unit-tested against a mock context.
-/// Cap tunables stay on <see cref="GameRoot"/> — directors read them here so no
-/// spawn-cap state is ever duplicated.
-/// </summary>
+/// <summary>Run-scoped context interface for directors and stages.</summary>
 public interface IRunContext
 {
     Vector2 ArenaSize { get; }

@@ -5,16 +5,7 @@ using Game.Player;
 
 namespace Game.UI;
 
-/// <summary>
-/// Menu build preview (class → chamber → tree): assembles the exact final
-/// stats a deploy would produce, so the loadout and tree pages can show
-/// live totals while crafting. Rules are never duplicated here — class bases
-/// run through the real <c>PlayerActor.ApplyClassBaseStats</c>, chamber entries
-/// through a real <see cref="EquipmentChamber"/> (same skip + energy rules
-/// as <c>GameRoot.ApplyChamberLoadout</c>), tree entries through
-/// <see cref="PassiveTreeManager.ApplyModifier"/>. Nothing enters the tree;
-/// all scratch nodes are freed before return.
-/// </summary>
+/// <summary>Calculates aggregate player build stats across class, equipment, and passive tree.</summary>
 public static class BuildStatsPreview
 {
     public static readonly string[] CombatKeys =

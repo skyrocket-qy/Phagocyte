@@ -364,7 +364,6 @@ public partial class MainMenu : Control
 
         UpdateAllTexts();
 
-        // TODO Phase 5: click SFX on every menu/modal button (idempotent).
         AudioManager.Instance?.WireClicks(this);
     }
 

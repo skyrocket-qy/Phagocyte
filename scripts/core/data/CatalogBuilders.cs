@@ -49,12 +49,7 @@ public static class CatalogBuilders
         return table;
     }
 
-    /// <summary>
-    /// Equipment chamber catalog (TODO Phase 0): equipment definitions for the
-    /// 2x2 chamber. energy_cost in [-1, 4] (-1 = +1 generator, must carry a
-    /// drawback); modifiers/drawback share the passive-trait {stat, value, unit}
-    /// convention (flat / percent / percentagepoints).
-    /// </summary>
+    /// <summary>Categories for 2x2 equipment definitions.</summary>
     public static readonly System.Collections.Generic.HashSet<string> GearCategories = new()
     {
         "metabolism", "digestion", "cytoskeleton", "synthesis", "sensing", "symbiosis"
@@ -323,9 +318,7 @@ public static class CatalogBuilders
                 { "target_value", CatalogLoader.GetFloat(row, "target_value", 1.0f) },
                 { "stat_key", CatalogLoader.GetString(row, "stat_key") }
             };
-            // Achievement artwork is derived (Vistrace-style): no image_path in data.
-            // Path = res://assets/gen/achievement/{id}.png (+ _unachieved variant).
-            // Missing files fall back to the emoji icon at render time.
+            // Achievement artwork path is derived from id: no image_path in data.
             entry["image_path"] = AssetPaths.AchievementSprite(id);
             // Stage-clear chain extras (absent on generic achievements).
             foreach (string opt in new[] { "stage_id", "difficulty", "unlock_stage", "unlock_hard_stage" })

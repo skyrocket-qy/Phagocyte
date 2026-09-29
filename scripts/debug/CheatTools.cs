@@ -8,39 +8,17 @@ using Game.Skills;
 
 namespace Game.Debug;
 
-/// <summary>
-/// One-call full-unlock / full-build setup for test demand (headless suites
-/// and headed debug runs). Lives in scripts/debug/ (NOT tests/) so the
-/// headless sweep never tries to instantiate it as a suite AND production
-/// debug hooks (GameRoot, MainMenu) can use it without depending on tests/.
-/// The meta helpers compose the scattered per-suite unlock loops into a
-/// single entry point; <see cref="MaxOutPlayer"/> builds a max-level run
-/// loadout on top. Everything is additive — call
-/// <see cref="LockToBaseline"/> first when an exact state is required.
-/// The passive tree is intentionally left unallocated: suites spend the
-/// granted points explicitly.
-/// </summary>
+/// <summary>Debug tools for testing and unlocking progression states.</summary>
 public static class CheatTools
 {
-    /// <summary>Headed user arg (after `--`): unlock everything + max the run build.</summary>
     public const string CheatArgAll = "--cheats=all";
-
-    /// <summary>Headed user arg (after `--`): wipe meta progression back to a fresh profile.</summary>
     public const string CheatArgReset = "--cheats-reset";
-
-    /// <summary>Headed user arg (after `--`): invulnerable on top of <see cref="CheatArgAll"/>.</summary>
     public const string CheatArgGodmode = "--godmode";
 
     public const int DefaultMetaTreeLevel = 15;
     public const int DefaultRunLevel = 30;
     public const int DefaultSkillLevel = 5;
 
-    /// <summary>
-    /// Unlocks every achievement (cascades to all classes, stages + Hard modes
-    /// and Endless), every gear and max tree levels for every cell.
-    /// Talent points follow automatically: the earned bonus is derived from
-    /// unlocks, so no point grant is needed (or possible) here.
-    /// </summary>
     public static void UnlockAllMeta(int treeLevel = DefaultMetaTreeLevel)
     {
         var ids = new List<string>();

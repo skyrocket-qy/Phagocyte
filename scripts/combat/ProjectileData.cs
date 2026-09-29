@@ -2,26 +2,17 @@ using Godot;
 
 namespace Game.Combat;
 
-/// <summary>
-/// Projectile source faction. Selects the target set (enemy registry vs player
-/// cell), never the species: minions fire as <see cref="Enemy"/> regardless of
-/// summoner, hero-summoned allies would fire as <see cref="Player"/>.
-/// </summary>
 public enum Team
 {
     Player = 0,
     Enemy = 1,
 }
 
-/// <summary>
-/// Value-type data container for high-density projectile batch simulation.
-/// Avoids Godot Node allocation and Garbage Collection spikes.
-/// </summary>
+/// <summary>Stack-allocated data container for batched projectile simulation.</summary>
 public struct ProjectileData
 {
     public Vector2 Position;
     public Vector2 Direction;
-    /// <summary>Cached <see cref="Direction"/> angle (direction never changes post-spawn).</summary>
     public float Rotation;
     public float Speed;
     public float Radius;
@@ -33,18 +24,14 @@ public struct ProjectileData
     public int ProjectileTypeIndex;
     public bool IsActive;
 
-    /// <summary>Source faction: Player shots query the enemy tree, Enemy shots the player cell.</summary>
     public Team SourceTeam;
-    /// <summary>Steering mode: 0 linear, 1 homing, 2 chain.</summary>
     public byte Steering;
     public float TurnRate;
     public float WobbleFreq;
     public float WobbleAmp;
     public float ReacquireRadius;
     public float Phase;
-    /// <summary>Instance id of the assigned homing target (0 = steer to nearest).</summary>
     public ulong HomingTargetId;
-    /// <summary>Inline on-hit effects (value types: zero heap allocation per spawn).</summary>
     public EffectSpec Effect0;
     public EffectSpec Effect1;
     public EffectSpec Effect2;

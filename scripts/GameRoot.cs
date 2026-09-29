@@ -110,10 +110,7 @@ public partial class GameRoot : Node2D, IRunContext
     /// </summary>
     public bool IsEndlessRun { get; private set; } = GameManager.EndlessMode;
 
-    /// <summary>
-    /// GPU swarm batching for the microscopic species (docs/spec.md §9 / TODO module 12).
-    /// Enabled by default; disabling restores per-node drawing for every enemy.
-    /// </summary>
+    /// <summary>Enables GPU swarm batching for microscopic species.</summary>
     public bool SwarmBatchingEnabled { get; set; } = true;
 
     /// <summary>MultiMesh batch renderer for norovirus / influenza micro swarms.</summary>
@@ -336,11 +333,6 @@ public partial class GameRoot : Node2D, IRunContext
         }
     }
 
-    /// <summary>
-    /// Deploys the cell's active gear loadout (TODO Phase 1). A fresh cell
-    /// has no equipment: an empty profile simply equips nothing. Entries that
-    /// are stale, still locked or energy-illegal are skipped, never fatal.
-    /// </summary>
     private void ApplyChamberLoadout()
     {
         if (Player is not PlayerActor bc || bc.Equipment == null)
