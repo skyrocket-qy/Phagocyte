@@ -16,7 +16,7 @@ namespace Game.Player;
 /// Encapsulates universal stats, physics movement, 32-vertex organic deformation,
 /// and experience progression.
 /// </summary>
-public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStunnable, IAilmentHost
+public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStunnable, IStatusHost
 {
     [Signal]
     public delegate void StatsChangedEventHandler(float health, float maxHealth, float radiusRatio);
@@ -111,10 +111,10 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
     public ActorStats? Stats { get; set; }
 
     /// <summary>Status/ailment state (slow, DoT, amp). Debuff timers and
-    /// stacking live in data (<see cref="AilmentController"/> over
+    /// stacking live in data (<see cref="StatusController"/> over
     /// assets/data/ailments.json); the actor only reads the aggregated
     /// multipliers each frame.</summary>
-    public AilmentController? Ailments { get; private set; }
+    public StatusController? Status { get; private set; }
 
     /// <summary>Data-driven class id (assets/data/classes.json). Set before entering the tree.</summary>
     [Export] public string ClassId = "macrophage";
@@ -238,11 +238,11 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
 
         // Ensure ailment container exists (slow/DoT/amp state lives in data,
         // mirroring the ActorStats pattern above).
-        Ailments = GetNodeOrNull<AilmentController>("AilmentController");
-        if (Ailments == null)
+        Status = GetNodeOrNull<StatusController>("StatusController");
+        if (Status == null)
         {
-            Ailments = new AilmentController { Name = "AilmentController" };
-            AddChild(Ailments);
+            Status = new StatusController { Name = "StatusController" };
+            AddChild(Status);
         }
 
         _classDef = GameManager.GetPlayerClass(ClassId);
@@ -300,7 +300,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
 
         float dt = (float)delta;
 
-        // Process status debuffs (slow state lives in Ailments, not fields)
+        // Process status debuffs (slow state lives in Status, not fields)
         if (StunTimer > 0.0f)
         {
             StunTimer -= dt;
@@ -519,7 +519,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
         Vector2 inputVec = ReadMoveInput();
 
         float targetSpeed = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
-        targetSpeed *= Ailments?.SpeedMultiplier ?? 1.0f;
+        targetSpeed *= Status?.SpeedMultiplier ?? 1.0f;
 
         CurrentSpeed = targetSpeed;
 
@@ -1081,7 +1081,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
         // Factor is a 0-1 speed multiplier; the slow channel takes a removed
         // fraction (SpeedMultiplier = 1 - strongest). This stays only as the
         // ISlowable dispatch endpoint; state lives in data.
-        Ailments?.ApplySlow(duration, 1.0f - factor);
+        Status?.ApplySlow(duration, 1.0f - factor);
     }
 
     public void ApplyStun(float duration)

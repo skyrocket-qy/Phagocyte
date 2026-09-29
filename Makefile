@@ -7,10 +7,10 @@ check-arch:
 	python3 tools/check_arch.py
 
 check-config:
-	cd tools/config && npm run check
+	cd tools/config && pnpm run check
 
 config-export:
-	cd tools/config && npm run build
+	cd tools/config && pnpm run build
 
 check-assets:
 	python3 tools/asset_check/main.py

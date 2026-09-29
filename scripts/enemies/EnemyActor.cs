@@ -8,7 +8,7 @@ using Game.UI;
 
 namespace Game.Enemies;
 
-public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IAilmentHost
+public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IStatusHost
 {
     [Signal]
     public delegate void EnemyDiedEventHandler(EnemyActor enemy);
@@ -49,9 +49,9 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IA
     public float SteeringPreferredRange { get; set; } = 260.0f;
     public float SteeringLatchRange { get; set; } = 40.0f;
 
-    // Status debuffs & Components (slow state lives in Ailments, not fields)
+    // Status debuffs & Components (slow state lives in Status, not fields)
     public float StunTimer { get; set; } = 0.0f;
-    public AilmentController? Ailments { get; private set; }
+    public StatusController? Status { get; private set; }
     public BossPhaseComponent? BossPhase { get; private set; }
 
     public Area2D? HitArea { get; set; }
@@ -83,11 +83,11 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IA
         SteeringPhase = GD.Randf() * 10.0f;
         SteeringOrbitSign = GD.Randf() < 0.5f ? -1.0f : 1.0f;
 
-        Ailments = GetNodeOrNull<AilmentController>("AilmentController");
-        if (Ailments == null)
+        Status = GetNodeOrNull<StatusController>("StatusController");
+        if (Status == null)
         {
-            Ailments = new AilmentController { Name = "AilmentController" };
-            AddChild(Ailments);
+            Status = new StatusController { Name = "StatusController" };
+            AddChild(Status);
         }
 
         BossPhase = GetNodeOrNull<BossPhaseComponent>("BossPhaseComponent");
@@ -261,7 +261,7 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IA
             WanderDir = (WanderDir + Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 0.7f).Normalized();
         }
 
-        float currentSpeed = FloatSpeed * (Ailments?.SpeedMultiplier ?? 1.0f);
+        float currentSpeed = FloatSpeed * (Status?.SpeedMultiplier ?? 1.0f);
         if (BossPhase != null)
         {
             currentSpeed *= BossPhase.CurrentSpeedMult;
@@ -316,9 +316,9 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IA
             damage = BossPhase.ApplyDamageReduction(damage);
         }
 
-        if (Ailments != null)
+        if (Status != null)
         {
-            damage *= Ailments.DamageTakenMultiplier;
+            damage *= Status.DamageTakenMultiplier;
         }
 
         float effectiveDmg = Mathf.Max(1.0f, damage - Armor);
@@ -480,7 +480,7 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IA
     {
         // Slow state lives in data (slow-channel carrier, strongest wins);
         // this stays only as the ISlowable dispatch endpoint.
-        Ailments?.ApplySlow(duration, 1.0f - factor);
+        Status?.ApplySlow(duration, 1.0f - factor);
     }
 
     public void ApplyStun(float duration)

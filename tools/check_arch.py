@@ -134,7 +134,7 @@ STATIC_DOMAIN_FORBIDDEN = [
     (r"(?<!\.)\bBaseSkill\b", "Gameplay type 'BaseSkill' in domain"),
     (r"(?<!\.)\bSkillManager\b", "Gameplay type 'SkillManager' in domain"),
     (r"\bCombatComponent\b", "Gameplay component in domain"),
-    (r"\bAilmentController\b", "Gameplay component in domain"),
+    (r"\bStatusController\b", "Gameplay component in domain"),
     (r"\bEquipmentChamber\b", "Gameplay component 'EquipmentChamber' in domain"),
     (r"\bActorStats\b", "Gameplay component 'ActorStats' in domain"),
     # Autoload singletons (domain must not couple to globals).

@@ -143,8 +143,8 @@ public partial class TestEnemyEcosystem : SceneTree
         }
         AssertThat(biofilm).IsNotNull();
         player.ApplySlow(2.0f, 0.5f);
-        AssertThat(player.Ailments != null && player.Ailments.HasSlow).IsTrue();
-        AssertThat(player.Ailments!.SpeedMultiplier).IsEqualApprox(0.5f, 0.01f);
+        AssertThat(player.Status != null && player.Status.HasSlow).IsTrue();
+        AssertThat(player.Status!.SpeedMultiplier).IsEqualApprox(0.5f, 0.01f);
         GD.Print("[PASS] Test 5: Pseudomonas aeruginosa biofilm puddle & player slow effect verified.");
 
         // -------------------------------------------------------------

@@ -150,7 +150,7 @@
       {
         "stat": "amount",
         "unit": "flat",
-        "value": 1.0
+        "value": 1
       },
       {
         "stat": "projectile_speed",
@@ -196,7 +196,7 @@
       {
         "stat": "armor",
         "unit": "flat",
-        "value": 3.0
+        "value": 3
       },
       {
         "stat": "block",
@@ -414,7 +414,7 @@
       {
         "stat": "pierce",
         "unit": "flat",
-        "value": 1.0
+        "value": 1
       }
     ],
     "name_key": "ORGANELLE_CENTROSOME_ARRAY_NAME"
@@ -455,7 +455,7 @@
       {
         "stat": "amount",
         "unit": "flat",
-        "value": 1.0
+        "value": 1
       },
       {
         "stat": "crit_damage",
@@ -501,7 +501,7 @@
       {
         "stat": "armor",
         "unit": "flat",
-        "value": 5.0
+        "value": 5
       },
       {
         "stat": "block",
@@ -519,7 +519,7 @@
       {
         "stat": "armor",
         "unit": "flat",
-        "value": -3.0
+        "value": -3
       },
       {
         "stat": "evasion",

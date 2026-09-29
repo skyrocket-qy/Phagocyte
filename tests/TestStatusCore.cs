@@ -8,8 +8,8 @@ using Game.Combat;
 namespace Game.Tests;
 
 /// <summary>
-/// Verifies the portable StatusCore engine (stacking rules, aggregation, move
-/// mult, amp flag, validation) and the JSON loader behind AilmentController.
+/// Verifies the unified StatusController engine (stacking rules, aggregation, move
+/// mult, amp flag, validation) and the JSON loader.
 /// </summary>
 [TestSuite]
 public partial class TestStatusCore : TestHarness
@@ -200,32 +200,32 @@ public partial class TestStatusCore : TestHarness
 
     private void RunLoaderTests()
     {
-        // The real assets/data/ailments.json loads through the generic adapter.
-        var ailment = new AilmentController();
-        ailment.Apply("shock");
-        AssertThat(ailment.IsActive("shock")).IsTrue();
-        AssertThat(ailment.GetTimer("shock")).IsEqualApprox(4.0f, 0.01f);
-        AssertThat(ailment.DamageTakenMultiplier).IsEqualApprox(1.30f, 0.01f);
+        // The real assets/data/ailments.json loads through the StatusController.
+        var status = new StatusController();
+        status.Apply("shock");
+        AssertThat(status.IsActive("shock")).IsTrue();
+        AssertThat(status.GetTimer("shock")).IsEqualApprox(4.0f, 0.01f);
+        AssertThat(status.DamageTakenMultiplier).IsEqualApprox(1.30f, 0.01f);
 
-        ailment.ApplySlow();
-        AssertThat(ailment.HasSlow).IsTrue();
-        AssertThat(ailment.SpeedMultiplier).IsEqualApprox(0.60f, 0.01f);
+        status.ApplySlow();
+        AssertThat(status.HasSlow).IsTrue();
+        AssertThat(status.SpeedMultiplier).IsEqualApprox(0.60f, 0.01f);
 
-        ailment.Apply("ignite", 10.0f);
-        ailment.Apply("bleed", 5.0f);
-        ailment.Apply("poison", 2.0f, 2.0f);
-        AssertThat(ailment.IsActive("ignite")).IsTrue();
-        AssertThat(ailment.IsActive("bleed")).IsTrue();
-        AssertThat(ailment.IsActive("poison")).IsTrue();
-        AssertThat(ailment.GetStackCount("poison")).IsEqual(1);
+        status.Apply("ignite", 10.0f);
+        status.Apply("bleed", 5.0f);
+        status.Apply("poison", 2.0f, 2.0f);
+        AssertThat(status.IsActive("ignite")).IsTrue();
+        AssertThat(status.IsActive("bleed")).IsTrue();
+        AssertThat(status.IsActive("poison")).IsTrue();
+        AssertThat(status.GetStackCount("poison")).IsEqual(1);
 
-        ailment.ClearChannel("amp");
-        AssertThat(ailment.IsActive("shock")).IsFalse();
-        ailment.ClearAll();
-        AssertThat(ailment.IsActive("ignite")).IsFalse();
-        AssertThat(ailment.IsActive("poison")).IsFalse();
-        ailment.QueueFree();
+        status.ClearChannel("amp");
+        AssertThat(status.IsActive("shock")).IsFalse();
+        status.ClearAll();
+        AssertThat(status.IsActive("ignite")).IsFalse();
+        AssertThat(status.IsActive("poison")).IsFalse();
+        status.QueueFree();
 
-        GD.Print("[PASS] AilmentController JSON loader defaults and generic adapter surface.");
+        GD.Print("[PASS] StatusController JSON loader defaults and generic adapter surface.");
     }
 }

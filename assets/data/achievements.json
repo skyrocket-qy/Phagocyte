@@ -6,7 +6,7 @@
     "reward_cell": "",
     "reward_key": "",
     "stat_key": "kills",
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_FIRST_DIGESTION_TITLE"
   },
   {
@@ -16,7 +16,7 @@
     "reward_cell": "ctl",
     "reward_key": "ACH_ENGULF_20_REWARD",
     "stat_key": "kills",
-    "target_value": 200.0,
+    "target_value": 200,
     "title_key": "ACH_ENGULF_20_TITLE"
   },
   {
@@ -26,7 +26,7 @@
     "reward_cell": "neutrophil",
     "reward_key": "ACH_DEVOUR_50_REWARD",
     "stat_key": "kills",
-    "target_value": 500.0,
+    "target_value": 500,
     "title_key": "ACH_DEVOUR_50_TITLE"
   },
   {
@@ -36,7 +36,7 @@
     "reward_cell": "b_cell",
     "reward_key": "ACH_REACH_LEVEL_5_REWARD",
     "stat_key": "level",
-    "target_value": 15.0,
+    "target_value": 15,
     "title_key": "ACH_REACH_LEVEL_5_TITLE"
   },
   {
@@ -46,7 +46,7 @@
     "reward_cell": "dendritic",
     "reward_key": "ACH_SURVIVE_180S_REWARD",
     "stat_key": "survival_time",
-    "target_value": 480.0,
+    "target_value": 480,
     "title_key": "ACH_SURVIVE_180S_TITLE"
   },
   {
@@ -56,7 +56,7 @@
     "reward_cell": "",
     "reward_key": "",
     "stat_key": "radius_ratio",
-    "target_value": 2.0,
+    "target_value": 2,
     "title_key": "ACH_GIANT_VOLUME_TITLE"
   },
   {
@@ -66,7 +66,7 @@
     "reward_cell": "",
     "reward_key": "",
     "stat_key": "active_skills",
-    "target_value": 5.0,
+    "target_value": 5,
     "title_key": "ACH_FULL_ARSENAL_TITLE"
   },
   {
@@ -76,7 +76,7 @@
     "reward_cell": "",
     "reward_key": "",
     "stat_key": "first_evolution",
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_FIRST_EVOLUTION_TITLE"
   },
   {
@@ -86,7 +86,7 @@
     "reward_cell": "",
     "reward_key": "",
     "stat_key": "prion_cleared",
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_PRION_CLEARED_TITLE"
   },
   {
@@ -99,7 +99,7 @@
     "reward_key": "ACH_WOUND_CLEAR_REWARD",
     "stat_key": "map_clear_acute_wound",
     "talent_points": 1,
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_WOUND_CLEAR_TITLE",
     "unlock_hard_stage": "acute_wound",
     "unlock_stage": "alveolar_space"
@@ -114,7 +114,7 @@
     "reward_key": "ACH_ALVEOLAR_CLEAR_REWARD",
     "stat_key": "map_clear_alveolar_space",
     "talent_points": 1,
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_ALVEOLAR_CLEAR_TITLE",
     "unlock_hard_stage": "alveolar_space",
     "unlock_stage": "hepatic_sinusoid"
@@ -129,7 +129,7 @@
     "reward_key": "ACH_HEPATIC_CLEAR_REWARD",
     "stat_key": "map_clear_hepatic_sinusoid",
     "talent_points": 1,
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_HEPATIC_CLEAR_TITLE",
     "unlock_hard_stage": "hepatic_sinusoid",
     "unlock_stage": "gastric_lumen"
@@ -144,7 +144,7 @@
     "reward_key": "ACH_GASTRIC_CLEAR_REWARD",
     "stat_key": "map_clear_gastric_lumen",
     "talent_points": 1,
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_GASTRIC_CLEAR_TITLE",
     "unlock_hard_stage": "gastric_lumen",
     "unlock_stage": "blood_brain_barrier"
@@ -159,7 +159,7 @@
     "reward_key": "ACH_BBB_CLEAR_REWARD",
     "stat_key": "map_clear_blood_brain_barrier",
     "talent_points": 2,
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_BBB_CLEAR_TITLE",
     "unlock_hard_stage": "blood_brain_barrier"
   },
@@ -173,7 +173,7 @@
     "reward_key": "ACH_WOUND_HARD_CLEAR_REWARD",
     "stat_key": "map_clear_acute_wound_hard",
     "talent_points": 1,
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_WOUND_HARD_CLEAR_TITLE",
     "unlock_endless": true
   },
@@ -187,7 +187,7 @@
     "reward_key": "ACH_ALVEOLAR_HARD_CLEAR_REWARD",
     "stat_key": "map_clear_alveolar_space_hard",
     "talent_points": 1,
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_ALVEOLAR_HARD_CLEAR_TITLE"
   },
   {
@@ -200,7 +200,7 @@
     "reward_key": "ACH_HEPATIC_HARD_CLEAR_REWARD",
     "stat_key": "map_clear_hepatic_sinusoid_hard",
     "talent_points": 1,
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_HEPATIC_HARD_CLEAR_TITLE"
   },
   {
@@ -213,7 +213,7 @@
     "reward_key": "ACH_GASTRIC_HARD_CLEAR_REWARD",
     "stat_key": "map_clear_gastric_lumen_hard",
     "talent_points": 1,
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_GASTRIC_HARD_CLEAR_TITLE"
   },
   {
@@ -226,7 +226,7 @@
     "reward_key": "ACH_BBB_HARD_CLEAR_REWARD",
     "stat_key": "map_clear_blood_brain_barrier_hard",
     "talent_points": 1,
-    "target_value": 1.0,
+    "target_value": 1,
     "title_key": "ACH_BBB_HARD_CLEAR_TITLE"
   }
 ]

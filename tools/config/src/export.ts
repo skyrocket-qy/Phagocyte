@@ -4,20 +4,20 @@ import { fileURLToPath } from "node:url";
 import { runCrossValidation } from "./lib/cross-validator";
 import {
   configManifest,
-  HeroClasses,
-  MasteryClasses,
-  ClassStarters,
+  Ailments,
+  ActiveSkills,
+  PassiveSkills,
+  Classes,
   Enemies,
-  BossEncounters,
-  GearBases,
-  GearUniques,
-  GearAffixTiers,
-  Skills,
-  ActiveGems,
-  SurvivorMaps,
-  DefenseMaps,
-  Bgm,
-  Biomes,
+  EnemyCodex,
+  BossCodex,
+  Equipment,
+  Traits,
+  Tree,
+  Stages,
+  Achievements,
+  StatLabels,
+  UiElements,
 } from "./index";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -37,20 +37,20 @@ async function runExporter() {
 
   // 1. Cross-Dataset Referential Integrity & Balance Validation
   const crossResult = runCrossValidation({
-    heroClasses: HeroClasses,
-    masteryClasses: MasteryClasses,
-    starters: ClassStarters,
+    ailments: Ailments,
+    activeSkills: ActiveSkills,
+    passiveSkills: PassiveSkills,
+    classes: Classes,
     enemies: Enemies,
-    bossEncounters: BossEncounters,
-    gearBases: GearBases,
-    gearUniques: GearUniques,
-    gearAffixTiers: GearAffixTiers,
-    skills: Skills,
-    activeGems: ActiveGems,
-    survivorMaps: SurvivorMaps,
-    defenseMaps: DefenseMaps,
-    bgm: Bgm,
-    biomes: Biomes,
+    enemyCodex: EnemyCodex,
+    bossCodex: BossCodex,
+    equipment: Equipment,
+    traits: Traits,
+    tree: Tree,
+    stages: Stages,
+    achievements: Achievements,
+    statLabels: StatLabels,
+    uiElements: UiElements,
   });
 
   if (crossResult.warnings.length > 0) {

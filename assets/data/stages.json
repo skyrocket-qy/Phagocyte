@@ -38,13 +38,19 @@
       {
         "kind": "spawner",
         "prop": "buff_zone",
-        "interval": 6.0,
+        "interval": 6,
         "max_active": 3,
-        "initial_delay": 3.0,
-        "min_dist": 200.0,
-        "max_dist": 700.0,
+        "initial_delay": 3,
+        "min_dist": 200,
+        "max_dist": 700,
         "anchor": "player",
-        "overrides": { "stat_id": "cooldown_reduction", "bonus": 0.25, "duration": 6.0, "radius": 82.0, "lifetime": 22.0 }
+        "overrides": {
+          "stat_id": "cooldown_reduction",
+          "bonus": 0.25,
+          "duration": 6,
+          "radius": 82,
+          "lifetime": 22
+        }
       }
     ],
     "mech_key": "MAP_ALVEOLAR_MECH",
@@ -71,19 +77,28 @@
     "hard_unlocked": false,
     "id": "hepatic_sinusoid",
     "effects": [
-      { "kind": "stat_strip", "stat": "armor", "duration": 3.0, "interval": 18.0, "initial_delay": 10.0 },
+      {
+        "kind": "stat_strip",
+        "stat": "armor",
+        "duration": 3,
+        "interval": 18,
+        "initial_delay": 10
+      },
       {
         "kind": "spawner",
         "prop": "blocker_wall",
-        "interval": 24.0,
+        "interval": 24,
         "max_active": 3,
-        "initial_delay": 5.0,
-        "min_dist": 300.0,
-        "max_dist": 900.0,
+        "initial_delay": 5,
+        "min_dist": 300,
+        "max_dist": 900,
         "anchor": "arena",
         "arena_scale": 0.7,
         "orientation": "random",
-        "overrides": { "gap_half_width": 55.0, "length": 320.0 }
+        "overrides": {
+          "gap_half_width": 55,
+          "length": 320
+        }
       }
     ],
     "mech_key": "MAP_HEPATIC_MECH",
@@ -113,27 +128,39 @@
       {
         "kind": "spawner",
         "prop": "safe_zone",
-        "interval": 9.0,
+        "interval": 9,
         "max_active": 3,
-        "initial_delay": 3.0,
-        "min_dist": 200.0,
-        "max_dist": 900.0,
+        "initial_delay": 3,
+        "min_dist": 200,
+        "max_dist": 900,
         "anchor": "arena",
         "arena_scale": 0.8,
-        "overrides": { "radius": 120.0, "lifetime": 16.0 }
+        "overrides": {
+          "radius": 120,
+          "lifetime": 16
+        }
       },
       {
         "kind": "volley",
         "prop": "dot_zone",
         "count": 2,
-        "interval": 14.0,
-        "initial_delay": 6.0,
-        "min_dist": 120.0,
-        "max_dist": 760.0,
+        "interval": 14,
+        "initial_delay": 6,
+        "min_dist": 120,
+        "max_dist": 760,
         "anchor": "player",
-        "overrides": { "radius": 260.0, "lifetime": 6.0 }
+        "overrides": {
+          "radius": 260,
+          "lifetime": 6
+        }
       },
-      { "kind": "dot_scan", "dps": 7.0, "slow_factor": 0.3, "slow_duration": 0.7, "safe_zone": true }
+      {
+        "kind": "dot_scan",
+        "dps": 7,
+        "slow_factor": 0.3,
+        "slow_duration": 0.7,
+        "safe_zone": true
+      }
     ],
     "mech_key": "MAP_GASTRIC_MECH",
     "name_key": "MAP_GASTRIC_NAME",
@@ -163,12 +190,18 @@
         "kind": "scatter",
         "prop": "blocker_pillar",
         "count": 5,
-        "ring_radius": 620.0,
+        "ring_radius": 620,
         "angle_offset": 0.4,
-        "radius_base": 70.0,
-        "radius_step": 14.0
+        "radius_base": 70,
+        "radius_step": 14
       },
-      { "kind": "scramble", "duration": 1.6, "hard_mult": 1.5, "interval": 11.0, "initial_delay": 6.0 }
+      {
+        "kind": "scramble",
+        "duration": 1.6,
+        "hard_mult": 1.5,
+        "interval": 11,
+        "initial_delay": 6
+      }
     ],
     "mech_key": "MAP_BBB_MECH",
     "name_key": "MAP_BBB_NAME",

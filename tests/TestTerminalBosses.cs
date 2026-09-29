@@ -106,9 +106,9 @@ public partial class TestTerminalBosses : SceneTree
         capsid.GlobalPosition = _player!.GlobalPosition + new Vector2(120, 0);
         _container!.AddChild(capsid);
 
-        _player.Ailments?.ClearAll();
+        _player.Status?.ClearAll();
         capsid._PhysicsProcess(0.016);
-        AssertThat(_player.Ailments != null && _player.Ailments.HasSlow).IsTrue();
+        AssertThat(_player.Status != null && _player.Status.HasSlow).IsTrue();
 
         Vector2 velocityBefore = _player.Velocity;
         for (int i = 0; i < 366; i++)

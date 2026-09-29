@@ -295,14 +295,14 @@ public partial class BaseSkill : Node2D
     /// </summary>
     protected void ApplyOnHitEffects(Node? target, Dictionary p, float dmg)
     {
-        if (target is not IAilmentHost host || host.Ailments == null)
+        if (target is not IStatusHost host || host.Status == null)
             return;
         if (!p.TryGetValue("on_hit", out var v) || v.VariantType != Variant.Type.Array)
             return;
         foreach (var item in v.AsGodotArray())
         {
             if (TryParseOnHit(item, dmg, out string ailment, out float mag, out float dur))
-                host.Ailments.Apply(ailment, mag, dur);
+                host.Status.Apply(ailment, mag, dur);
         }
     }
 

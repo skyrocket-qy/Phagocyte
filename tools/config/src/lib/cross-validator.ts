@@ -2,6 +2,13 @@
  * Cross-dataset referential integrity and game balance validation.
  * Run during `pnpm check` and `pnpm build`.
  */
+import { SfxId } from "../ids/audio";
+import { StatId, ModType, PassiveModMode } from "../ids/stat";
+import { GearCategory } from "../ids/gear";
+import { TraitRarity, TraitBranch } from "../ids/trait";
+import { ThreatMode } from "../ids/enemy";
+import { SkillArchetype, SkillType } from "../ids/skill";
+import { StageEffectKind, StageProp } from "../ids/stage";
 
 export interface ValidationIssue {
   severity: "error" | "warning";
@@ -10,21 +17,20 @@ export interface ValidationIssue {
 }
 
 export function runCrossValidation(data: {
-  heroClasses?: any;
-  masteryClasses?: any;
-  starters?: any;
+  ailments?: any;
+  activeSkills?: any;
+  passiveSkills?: any;
+  classes?: any;
   enemies?: any;
-  bossEncounters?: any;
-  gearBases?: any;
-  gearUniques?: any;
-  gearAffixTiers?: any;
-  affixes?: Record<string, any>;
-  skills?: any;
-  activeGems?: any;
-  survivorMaps?: any;
-  defenseMaps?: any;
-  bgm?: any;
-  biomes?: any;
+  enemyCodex?: any;
+  bossCodex?: any;
+  equipment?: any;
+  traits?: any;
+  tree?: any;
+  stages?: any;
+  achievements?: any;
+  statLabels?: any;
+  uiElements?: any;
 }): { errors: ValidationIssue[]; warnings: ValidationIssue[] } {
   const issues: ValidationIssue[] = [];
 
@@ -41,160 +47,266 @@ export function runCrossValidation(data: {
     return [];
   };
 
-  const heroList = toList(data.heroClasses);
-  const masteryList = toList(data.masteryClasses);
+  const enumValues = (e: Record<string, string>): Set<string> => new Set(Object.values(e));
+  const statIds = enumValues(StatId as unknown as Record<string, string>);
+  const sfxIds = enumValues(SfxId as unknown as Record<string, string>);
+  const unitIds = enumValues(ModType as unknown as Record<string, string>);
+  const modModeIds = enumValues(PassiveModMode as unknown as Record<string, string>);
+  const gearCategories = enumValues(GearCategory as unknown as Record<string, string>);
+  const traitRarities = enumValues(TraitRarity as unknown as Record<string, string>);
+  const traitBranches = enumValues(TraitBranch as unknown as Record<string, string>);
+  const threatModes = enumValues(ThreatMode as unknown as Record<string, string>);
+  const archetypes = enumValues(SkillArchetype as unknown as Record<string, string>);
+  const skillTypes = enumValues(SkillType as unknown as Record<string, string>);
+  const effectKinds = enumValues(StageEffectKind as unknown as Record<string, string>);
+  const stageProps = enumValues(StageProp as unknown as Record<string, string>);
+
+  const ailmentList = toList((data.ailments as any)?.ailments ?? data.ailments);
+  const activeList = toList(data.activeSkills);
+  const passiveList = toList(data.passiveSkills);
+  const classList = toList(data.classes);
   const enemyList = toList(data.enemies);
-  const bossList = toList(data.bossEncounters);
-  const uniqueList = toList(data.gearUniques);
-  const baseList = toList(data.gearBases);
-  const skillList = toList(data.skills);
-  const survivorMapList = toList(data.survivorMaps);
-  const defenseMapList = toList(data.defenseMaps);
-  const bgmList = toList(data.bgm);
-  const starterList = toList(data.starters);
-  const activeGemList = toList(data.activeGems);
+  const enemyCodexList = toList(data.enemyCodex);
+  const bossCodexList = toList(data.bossCodex);
+  const equipmentList = toList(data.equipment);
+  const traitList = toList((data.traits as any)?.traits ?? data.traits);
+  const stageList = toList(data.stages);
+  const achievementList = toList(data.achievements);
+  const uiList = toList(data.uiElements);
+  const tree = (data.tree as any) ?? {};
+  const nodeList: any[] = Array.isArray(tree.nodes) ? tree.nodes : [];
+  const edgeList: any[] = Array.isArray(tree.edges) ? tree.edges : [];
+  const startNodes: Record<string, string> =
+    tree.start_nodes && typeof tree.start_nodes === "object" ? tree.start_nodes : {};
 
-  const heroIds = new Set(heroList.map((h) => h.id));
-  const masteryIds = new Set(masteryList.map((m) => m.id));
-  const enemyIds = new Set(enemyList.map((e) => e.id));
-  const uniqueIds = new Set(uniqueList.map((u) => u.id));
-  const baseIds = new Set(baseList.map((b) => b.id));
-  const skillIds = new Set(skillList.map((s) => s.id));
-  const activeGemIds = new Set(activeGemList.map((g) => g.id));
-  const bgmIds = new Set(bgmList.map((b) => b.id));
+  const checkDupes = (domain: string, kind: string, list: any[]) => {
+    const seen = new Set<string>();
+    for (const row of list) {
+      if (typeof row?.id !== "string" || row.id.length === 0) {
+        addError(domain, `A ${kind} row is missing its id.`);
+      } else if (seen.has(row.id)) {
+        addError(domain, `Duplicate ${kind} id '${row.id}'.`);
+      } else {
+        seen.add(row.id);
+      }
+    }
+    return seen;
+  };
 
-  // 1. Hero Classes -> Masteries Integrity
-  for (const hero of heroList) {
-    if (Array.isArray(hero.masteries)) {
-      for (const m of hero.masteries) {
-        if (!masteryIds.has(m)) {
-          addError("Class", `Hero class '${hero.id}' references unknown mastery '${m}'.`);
+  const ailmentIds = checkDupes("Ailments", "ailment", ailmentList);
+  const activeIds = checkDupes("Skills", "active skill", activeList);
+  const passiveIds = checkDupes("Skills", "passive skill", passiveList);
+  const classIds = checkDupes("Class", "player class", classList);
+  const enemyIds = checkDupes("Enemy", "enemy", enemyList);
+  const enemyCodexIds = checkDupes("Codex", "enemy codex row", enemyCodexList);
+  const bossCodexIds = checkDupes("Codex", "boss codex row", bossCodexList);
+  const equipmentIds = checkDupes("Gear", "equipment", equipmentList);
+  const traitIds = checkDupes("Passive", "trait", traitList);
+  const nodeIds = checkDupes("Passive", "tree node", nodeList);
+  const stageIds = checkDupes("Stage", "stage", stageList);
+  const achievementIds = checkDupes("Achievement", "achievement", achievementList);
+  const uiIds = checkDupes("Ui", "ui element", uiList);
+  void enemyCodexIds;
+  void bossCodexIds;
+  void uiIds;
+
+  const skillIds = new Set([...activeIds, ...passiveIds]);
+
+  // 1. Ailments: channel + stack vocab
+  for (const a of ailmentList) {
+    for (const c of a.channels ?? []) {
+      if (c !== "dot" && c !== "slow" && c !== "amp") {
+        addError("Ailments", `Ailment '${a.id}' has unknown channel '${c}'.`);
+      }
+    }
+    if (!["refresh_max", "strongest_wins", "independent"].includes(a.stack)) {
+      addError("Ailments", `Ailment '${a.id}' has unknown stack rule '${a.stack}'.`);
+    }
+  }
+
+  // 2. Skills -> classes / ailments / sfx / vocab
+  for (const s of [...activeList, ...passiveList]) {
+    if (s.class_id && !classIds.has(s.class_id)) {
+      addError("Skills", `Skill '${s.id}' references unknown class '${s.class_id}'.`);
+    }
+    if (s.archetype && !archetypes.has(s.archetype)) {
+      addError("Skills", `Skill '${s.id}' has unknown archetype '${s.archetype}'.`);
+    }
+    if (s.type && !skillTypes.has(s.type)) {
+      addError("Skills", `Skill '${s.id}' has unknown type '${s.type}'.`);
+    }
+    const onHit = (s.params as { on_hit?: Array<{ ailment?: unknown }> } | undefined)?.on_hit;
+    if (onHit !== undefined) {
+      for (const entry of onHit) {
+        const ref = typeof entry.ailment === "string" ? entry.ailment : "";
+        if (!ailmentIds.has(ref)) {
+          addError("Skills", `Skill '${s.id}' on_hit references unknown ailment '${ref}'.`);
         }
+      }
+    }
+    const params = (s.params ?? {}) as Record<string, unknown>;
+    for (const key of ["sfx", "nova_sfx"]) {
+      const v = params[key];
+      if (typeof v === "string" && !sfxIds.has(v)) {
+        addError("Skills", `Skill '${s.id}' param '${key}' references unknown sfx '${v}'.`);
+      }
+    }
+    for (const m of (s.mods ?? []) as Array<{ stat?: unknown; mode?: unknown }>) {
+      if (typeof m.stat !== "string" || !statIds.has(m.stat)) {
+        addError("Skills", `Passive skill '${s.id}' mod references unknown stat '${m.stat}'.`);
+      }
+      if (typeof m.mode !== "string" || !modModeIds.has(m.mode)) {
+        addError("Skills", `Passive skill '${s.id}' mod has unknown mode '${m.mode}'.`);
       }
     }
   }
 
-  // 2. Class Starters Integrity
-  for (const starter of starterList) {
-    if (starter.base_class && !heroIds.has(starter.base_class)) {
-      addError("Starters", `Starter config references unknown base_class '${starter.base_class}'.`);
+  // 3. Classes -> skills / achievements / stats
+  for (const c of classList) {
+    if (c.innate_skill && !skillIds.has(c.innate_skill)) {
+      addError("Class", `Class '${c.id}' innate_skill references unknown skill '${c.innate_skill}'.`);
     }
-    if (starter.starter_weapon && !baseIds.has(starter.starter_weapon)) {
-      addError("Starters", `Starter config for '${starter.base_class}' references unknown weapon base '${starter.starter_weapon}'.`);
+    if (c.unlock_achievement && !achievementIds.has(c.unlock_achievement)) {
+      addError("Class", `Class '${c.id}' references unknown achievement '${c.unlock_achievement}'.`);
     }
-    if (starter.starter_gem_id && !activeGemIds.has(starter.starter_gem_id)) {
-      addError("Starters", `Starter config for '${starter.base_class}' references unknown active gem '${starter.starter_gem_id}'.`);
+    if (c.trait_stat && !statIds.has(c.trait_stat)) {
+      addError("Class", `Class '${c.id}' trait_stat references unknown stat '${c.trait_stat}'.`);
     }
-  }
-
-  // 3. Active Gems -> Skills 1:1 Integrity
-  for (const gem of activeGemList) {
-    if (!gem.skill_id) {
-      addError("Gems", `Active gem '${gem.id}' has no skill_id configured (must map 1:1 to a skill).`);
-    } else if (!skillIds.has(gem.skill_id)) {
-      addError("Gems", `Active gem '${gem.id}' references unknown skill '${gem.skill_id}'.`);
+    for (const k of Object.keys(c.extra_stats ?? {})) {
+      if (!statIds.has(k)) {
+        addError("Class", `Class '${c.id}' extra_stats references unknown stat '${k}'.`);
+      }
     }
   }
 
-  // 4. Gear Uniques -> Bases Integrity
-  for (const unique of uniqueList) {
-    if (unique.base_type && !baseIds.has(unique.base_type)) {
-      addError("Gear", `Unique item '${unique.id}' references unknown base_type '${unique.base_type}'.`);
+  // 4. Achievements -> classes / stages
+  for (const a of achievementList) {
+    if (a.reward_cell && !classIds.has(a.reward_cell)) {
+      addError("Achievement", `Achievement '${a.id}' rewards unknown class '${a.reward_cell}'.`);
+    }
+    for (const key of ["stage_id", "unlock_stage", "unlock_hard_stage"]) {
+      if (a[key] && !stageIds.has(a[key])) {
+        addError("Achievement", `Achievement '${a.id}' references unknown stage '${a[key]}' (${key}).`);
+      }
     }
   }
 
-  // 4. Survivor Maps Integrity
-  for (const map of survivorMapList) {
-    if (map.bgm_id && !bgmIds.has(map.bgm_id)) {
-      addError("Map", `Survivor map '${map.name || map.id}' references unknown BGM '${map.bgm_id}'.`);
+  // 5. Enemies: threat mode, codex coverage, spawn refs
+  for (const e of enemyList) {
+    if (!threatModes.has(e.threat_mode)) {
+      addError("Enemy", `Enemy '${e.id}' has unknown threat_mode '${e.threat_mode}'.`);
     }
-    if (Array.isArray(map.general_enemies)) {
-      for (const enemyId of map.general_enemies) {
-        if (!enemyIds.has(enemyId)) {
-          addError("Map", `Survivor map '${map.name || map.id}' references unknown enemy '${enemyId}'.`);
+    const traits = (e.traits ?? {}) as Record<string, any>;
+    for (const [tname, tdef] of Object.entries(traits)) {
+      if (tdef && typeof tdef === "object") {
+        const spawn = (tdef as Record<string, unknown>).spawn;
+        if (typeof spawn === "string" && !enemyIds.has(spawn)) {
+          addError("Enemy", `Enemy '${e.id}' trait '${tname}' spawns unknown enemy '${spawn}'.`);
         }
       }
     }
-    if (Array.isArray(map.waves)) {
-      for (let i = 0; i < map.waves.length; i++) {
-        const wave = map.waves[i];
-        if (Array.isArray(wave?.enemy_ids)) {
-          for (const enemyId of wave.enemy_ids) {
-            if (!enemyIds.has(enemyId)) {
-              addError("Map", `Survivor map '${map.name || map.id}' wave ${i + 1} references unknown enemy '${enemyId}'.`);
-            }
+  }
+  for (const row of enemyCodexList) {
+    if (!enemyIds.has(row.id)) {
+      addError("Codex", `Enemy codex row '${row.id}' has no matching enemy in enemies.json.`);
+    }
+  }
+
+  // 6. Equipment: category / energy / stats / generator drawback
+  for (const g of equipmentList) {
+    if (!gearCategories.has(g.category)) {
+      addError("Gear", `Equipment '${g.id}' has unknown category '${g.category}'.`);
+    }
+    if (!Number.isInteger(g.energy_cost) || g.energy_cost < -1 || g.energy_cost > 4) {
+      addError("Gear", `Equipment '${g.id}' energy_cost ${g.energy_cost} outside [-1, 4].`);
+    }
+    if (g.energy_cost < 0 && ((g.drawback ?? []) as unknown[]).length === 0) {
+      addError("Gear", `Generator gear '${g.id}' must carry a drawback.`);
+    }
+    for (const key of ["modifiers", "drawback"]) {
+      for (const m of ((g[key] ?? []) as Array<Record<string, unknown>>)) {
+        if (typeof m.stat !== "string" || !statIds.has(m.stat)) {
+          addError("Gear", `Equipment '${g.id}' ${key} entry references unknown stat '${m.stat}'.`);
+        }
+        if (typeof m.unit !== "string" || !unitIds.has(m.unit)) {
+          addError("Gear", `Equipment '${g.id}' ${key} entry has unknown unit '${m.unit}'.`);
+        }
+        if (typeof m.scaling_stat === "string" && m.scaling_stat.length > 0) {
+          if (!statIds.has(m.scaling_stat)) {
+            addError("Gear", `Equipment '${g.id}' ${key} entry references unknown scaling_stat '${m.scaling_stat}'.`);
+          }
+          if (typeof m.scale_per !== "number" || m.scale_per <= 0) {
+            addError("Gear", `Equipment '${g.id}' ${key} entry has non-positive scale_per.`);
           }
         }
-        if (wave?.boss?.enemy_id && !enemyIds.has(wave.boss.enemy_id)) {
-          addError("Map", `Survivor map '${map.name || map.id}' wave ${i + 1} boss references unknown enemy '${wave.boss.enemy_id}'.`);
-        }
       }
     }
   }
 
-  // 5. Defense Maps Integrity
-  for (const map of defenseMapList) {
-    if (map.bgm_id && !bgmIds.has(map.bgm_id)) {
-      addError("Map", `Defense map '${map.name || map.id}' references unknown BGM '${map.bgm_id}'.`);
+  // 7. Passive traits + tree
+  for (const t of traitList) {
+    if (t.rarity && !traitRarities.has(t.rarity)) {
+      addError("Passive", `Trait '${t.id}' has unknown rarity '${t.rarity}'.`);
     }
-    if (Array.isArray(map.stages)) {
-      for (const stage of map.stages) {
-        if (Array.isArray(stage?.enemy_types)) {
-          for (const enemyId of stage.enemy_types) {
-            if (!enemyIds.has(enemyId)) {
-              addError("Map", `Defense map '${map.name || map.id}' stage '${stage.name || stage.stage_index}' references unknown enemy '${enemyId}'.`);
-            }
-          }
-        }
+    for (const m of ((t.modifiers ?? []) as Array<Record<string, unknown>>)) {
+      if (typeof m.stat !== "string" || !statIds.has(m.stat)) {
+        addError("Passive", `Trait '${t.id}' modifies unknown stat '${m.stat}'.`);
+      }
+      if (typeof m.unit !== "string" || !unitIds.has(m.unit)) {
+        addError("Passive", `Trait '${t.id}' modifier has unknown unit '${m.unit}'.`);
+      }
+    }
+  }
+  for (const n of nodeList) {
+    if (!traitIds.has(n.trait)) {
+      addError("Passive", `Tree node '${n.id}' references unknown trait '${n.trait}'.`);
+    }
+    if (n.branch && !traitBranches.has(n.branch)) {
+      addError("Passive", `Tree node '${n.id}' has unknown branch '${n.branch}'.`);
+    }
+  }
+  for (const e of edgeList) {
+    const [from, to] = Array.isArray(e) ? e : [undefined, undefined];
+    if (typeof from !== "string" || !nodeIds.has(from)) {
+      addError("Passive", `Tree edge references unknown node '${from}'.`);
+    }
+    if (typeof to !== "string" || !nodeIds.has(to)) {
+      addError("Passive", `Tree edge references unknown node '${to}'.`);
+    }
+  }
+  for (const [cls, start] of Object.entries(startNodes)) {
+    if (!classIds.has(cls)) {
+      addError("Passive", `Start node key '${cls}' is not a known class.`);
+    }
+    if (!nodeIds.has(start)) {
+      addError("Passive", `Start node for '${cls}' references unknown node '${start}'.`);
+    }
+  }
+
+  // 8. Stages: effect stat refs + kind/prop vocab
+  for (const s of stageList) {
+    for (const fx of ((s.effects ?? []) as Array<Record<string, any>>)) {
+      if (typeof fx.kind === "string" && !effectKinds.has(fx.kind)) {
+        addError("Stage", `Stage '${s.id}' effect has unknown kind '${fx.kind}'.`);
+      }
+      if (typeof fx.prop === "string" && !stageProps.has(fx.prop)) {
+        addError("Stage", `Stage '${s.id}' effect has unknown prop '${fx.prop}'.`);
+      }
+      if (typeof fx.stat === "string" && !statIds.has(fx.stat)) {
+        addError("Stage", `Stage '${s.id}' effect references unknown stat '${fx.stat}'.`);
+      }
+      const statId = (fx.overrides as Record<string, unknown> | undefined)?.stat_id;
+      if (typeof statId === "string" && !statIds.has(statId)) {
+        addError("Stage", `Stage '${s.id}' effect overrides unknown stat_id '${statId}'.`);
       }
     }
   }
 
-  // 6. Enemy Active Gems Integrity
-  for (const enemy of enemyList) {
-    if (!Array.isArray(enemy.gems) || enemy.gems.length === 0) {
-      addError("Enemy", `Enemy '${enemy.id}' must have at least one active gem configured.`);
-    } else {
-      for (const g of enemy.gems) {
-        if (!g.gem_id || typeof g.gem_id !== "string") {
-          addError("Enemy", `Enemy '${enemy.id}' contains invalid gem configuration.`);
-        }
-      }
-    }
-  }
-
-  // 7. Boss Encounters & Loot Weight Sanity
-  const referencedUniqueIds = new Set<string>();
-  for (const boss of bossList) {
-    if (boss.base_enemy_type && !enemyIds.has(boss.base_enemy_type)) {
-      addError("Enemy", `Boss encounter '${boss.id}' references unknown base_enemy_type '${boss.base_enemy_type}'.`);
-    }
-    if (Array.isArray(boss.loot_table)) {
-      let totalWeight = 0;
-      for (const item of boss.loot_table) {
-        if (item.weight !== undefined) {
-          if (item.weight <= 0) {
-            addError("Loot", `Boss encounter '${boss.id}' has non-positive loot weight: ${item.weight} for item '${item.item_id}'.`);
-          }
-          totalWeight += item.weight;
-        }
-        if (item.type === "unique" && item.item_id) {
-          referencedUniqueIds.add(item.item_id);
-          if (!uniqueIds.has(item.item_id)) {
-            addError("Loot", `Boss encounter '${boss.id}' drops unknown unique item '${item.item_id}'.`);
-          }
-        }
-      }
-      if (boss.loot_table.length > 0 && totalWeight <= 0) {
-        addError("Loot", `Boss encounter '${boss.id}' loot table total weight is not positive.`);
-      }
-    }
-  }
-
-  // 7. Unreferenced Master Items Check
-  for (const unique of uniqueList) {
-    if (!referencedUniqueIds.has(unique.id)) {
-      addWarning("Loot", `Master unique item '${unique.id}' is not referenced in any boss encounter loot table.`);
+  // 9. Unreferenced master rows (warnings, vistrace dead-asset pattern)
+  const placedTraits = new Set(nodeList.map((n) => n.trait));
+  for (const t of traitIds) {
+    if (!placedTraits.has(t)) {
+      addWarning("Passive", `Trait '${t}' is never placed on the passive tree.`);
     }
   }
 

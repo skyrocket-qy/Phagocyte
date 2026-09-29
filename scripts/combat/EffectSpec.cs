@@ -5,7 +5,7 @@ namespace Game.Combat;
 /// <summary>
 /// Generic on-hit effect. The engine sees only effect_id + scalars, never
 /// domain types: "stun" dispatches via <see cref="IStunnable"/>, every ailment
-/// id routes straight into <see cref="AilmentController.Apply"/> (channel
+/// id routes straight into <see cref="StatusController.Apply"/> (channel
 /// behavior comes from the ailment def). Magnitude semantics per contract:
 /// DoT dps for dot-channel ailments, removed-fraction for slow, added-fraction
 /// for amp (-1 = def default). Radius reserves on-hit AoE; Tint reserves
@@ -29,8 +29,8 @@ public struct EffectSpec
                 stunnable.ApplyStun(Duration);
             return;
         }
-        if (target is IAilmentHost host && host.Ailments != null)
-            host.Ailments.Apply(EffectId, Magnitude, Duration);
+        if (target is IStatusHost host && host.Status != null)
+            host.Status.Apply(EffectId, Magnitude, Duration);
     }
 
     public static void ApplyAll(Node? target, in EffectSpec e0, in EffectSpec e1, in EffectSpec e2, int count)

@@ -15,7 +15,7 @@ earned the hard way (red suites, broken builds, ghost diffs).
 ## Performance budget (1000+ entities — constraint, not aspiration)
 
 - Every design assumes 1000+ live entities. Current caps (300/450/500) are tuning, not architecture limits.
-- No per-entity Nodes for pure state: numbers/timers/status live in POCO containers, ticked inline in the owner's existing `_PhysicsProcess`. A `Node` wrapper is justified only by scene-tree membership (drawing, collision, grouping) — never by code organization. Precedent: `StatusController` (plain) + `AilmentController` (adapter); `StatBlock` (plain) + `ActorStats` (adapter).
+- No per-entity Nodes for pure state: numbers/timers/status live in POCO containers, ticked inline in the owner's existing `_PhysicsProcess`. A `Node` wrapper is justified only by scene-tree membership (drawing, collision, grouping) — never by code organization. Precedent: `StatBlock` (plain) + `ActorStats` (adapter); `StatusController`.
 - Hot paths (per-frame, per-projectile, per-query): no linear `ActiveEnemies` scans — QuadTree/spatial hash; no per-frame allocations (structs, pools, buffers); cache per-tick values in locals, never repeat dictionary/signal reads in a loop.
 - Scaling is validated through `benchmarks/`, never by assertion. A benchmark regression means the design is wrong, not the benchmark.
 
@@ -58,7 +58,7 @@ retained mental model. Route by domain familiarity:
 ```sh
 dotnet build Phagocyte.csproj --warnaserror   # or: make build
 python3 tools/check_arch.py                   # or: make check-arch (layer boundaries, docs/architecture/ARCH_RULE.md)
-make check-config                             # or: cd tools/config && npm run check (data schemas + ailment FKs)
+make check-config                             # or: cd tools/config && pnpm run check (data schemas + cross-dataset FKs)
 ```
 
 Zero warnings tolerated. Godot binary:

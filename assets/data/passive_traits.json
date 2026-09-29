@@ -38,7 +38,7 @@
         {
           "stat": "armor",
           "unit": "flat",
-          "value": 2.0
+          "value": 2
         }
       ],
       "name_key": "SKILL_BILAYER_NAME",
@@ -62,7 +62,7 @@
         {
           "stat": "armor",
           "unit": "flat",
-          "value": 3.0
+          "value": 3
         },
         {
           "stat": "block",
@@ -479,7 +479,7 @@
         {
           "stat": "health_regen",
           "unit": "flat",
-          "value": 2.0
+          "value": 2
         },
         {
           "stat": "life_steal",
@@ -498,7 +498,7 @@
         {
           "stat": "armor",
           "unit": "flat",
-          "value": 3.0
+          "value": 3
         }
       ],
       "name_key": "TREE_NODE_IRON_MEMBRANE_NAME",
@@ -630,7 +630,7 @@
         {
           "stat": "pierce",
           "unit": "flat",
-          "value": 1.0
+          "value": 1
         }
       ],
       "name_key": "TREE_NODE_PIERCING_FILAMENTS_NAME",
@@ -672,7 +672,7 @@
         {
           "stat": "armor",
           "unit": "flat",
-          "value": 2.0
+          "value": 2
         }
       ],
       "name_key": "TREE_NODE_RAPID_CLOTTING_NAME",
@@ -770,7 +770,7 @@
         {
           "stat": "amount",
           "unit": "flat",
-          "value": 1.0
+          "value": 1
         }
       ],
       "name_key": "TREE_NODE_SPLITTING_VOLLEY_NAME",

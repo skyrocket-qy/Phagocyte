@@ -149,7 +149,7 @@ public partial class Zone : Node2D
                 DamageService.DealDamage(player, Damage, null, false);
             EffectSpec.ApplyAll(player, in _fx0, in _fx1, in _fx2, EffectCount);
             if (SlowFactor >= 0.0f)
-                player.Ailments?.ApplySlow(slowDur, 1.0f - SlowFactor);
+                player.Status?.ApplySlow(slowDur, 1.0f - SlowFactor);
             return;
         }
 
@@ -162,8 +162,8 @@ public partial class Zone : Node2D
         {
             DamageService.DealDamage(enemy, damage, source, crit);
             EffectSpec.ApplyAll(enemy, in _fx0, in _fx1, in _fx2, EffectCount);
-            if (slowFactor >= 0.0f && enemy.Ailments != null)
-                enemy.Ailments.ApplySlow(slowDur, 1.0f - slowFactor);
+            if (slowFactor >= 0.0f && enemy.Status != null)
+                enemy.Status.ApplySlow(slowDur, 1.0f - slowFactor);
         });
     }
 

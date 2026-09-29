@@ -99,65 +99,65 @@ public partial class TestNewSystemsTriad : SceneTree
         GD.Print("[PASS] Test 2: VfxManager GPU particle pool & zero-GC recycling verified.");
 
         // ====================================================================
-        // Test 3: AilmentController biological effects & DoT pipeline
+        // Test 3: StatusController biological effects & DoT pipeline
         // ====================================================================
         var mockEnemy = new MockEnemyForAilment();
-        var ailment = new AilmentController();
-        mockEnemy.AddChild(ailment);
+        var status = new StatusController();
+        mockEnemy.AddChild(status);
         Root.AddChild(mockEnemy);
 
         // Initial state
-        AssertThat(ailment.IsActive("ignite")).IsFalse();
-        AssertThat(ailment.HasSlow).IsFalse();
-        AssertThat(ailment.IsActive("shock")).IsFalse();
-        AssertThat(ailment.IsActive("bleed")).IsFalse();
-        AssertThat(ailment.IsActive("poison")).IsFalse();
+        AssertThat(status.IsActive("ignite")).IsFalse();
+        AssertThat(status.HasSlow).IsFalse();
+        AssertThat(status.IsActive("shock")).IsFalse();
+        AssertThat(status.IsActive("bleed")).IsFalse();
+        AssertThat(status.IsActive("poison")).IsFalse();
 
         // 3a. Slow channel (data: chill row)
-        ailment.ApplySlow(duration: 2.0f, slowPct: 0.40f);
-        AssertThat(ailment.HasSlow).IsTrue();
-        AssertThat(ailment.SpeedMultiplier).IsEqualApprox(0.60f, 0.01f);
+        status.ApplySlow(duration: 2.0f, slowPct: 0.40f);
+        AssertThat(status.HasSlow).IsTrue();
+        AssertThat(status.SpeedMultiplier).IsEqualApprox(0.60f, 0.01f);
 
         // 3b. Amp channel (data: shock row)
-        ailment.Apply("shock", 0.30f, 3.0f);
-        AssertThat(ailment.IsActive("shock")).IsTrue();
-        AssertThat(ailment.DamageTakenMultiplier).IsEqualApprox(1.30f, 0.01f);
+        status.Apply("shock", 0.30f, 3.0f);
+        AssertThat(status.IsActive("shock")).IsTrue();
+        AssertThat(status.DamageTakenMultiplier).IsEqualApprox(1.30f, 0.01f);
 
         // 3c. DoT channel (data: ignite row)
-        ailment.Apply("ignite", 10.0f, 2.0f);
-        AssertThat(ailment.IsActive("ignite")).IsTrue();
+        status.Apply("ignite", 10.0f, 2.0f);
+        AssertThat(status.IsActive("ignite")).IsTrue();
 
         // Simulate 1 second physics process
         // Frame DoT = 10.0f * 1.0s = 10.0f
         // Amplified by amp (1.30x) = 13.0f
-        ailment._PhysicsProcess(1.0);
+        status._PhysicsProcess(1.0);
         AssertThat(mockEnemy.Health).IsEqualApprox(87.0f, 0.05f);
-        AssertThat(ailment.GetTimer("ignite")).IsEqualApprox(1.0f, 0.01f);
+        AssertThat(status.GetTimer("ignite")).IsEqualApprox(1.0f, 0.01f);
 
         // 3d. Move-scaled DoT (data: bleed row, 3x while moving)
         mockEnemy.Velocity = new Vector2(100.0f, 0.0f); // moving
-        ailment.Apply("bleed", 5.0f, 2.0f);
-        AssertThat(ailment.IsActive("bleed")).IsTrue();
+        status.Apply("bleed", 5.0f, 2.0f);
+        AssertThat(status.IsActive("bleed")).IsTrue();
 
         // Next 1 second:
         // Burn: 10.0 * 1.0 = 10.0
         // Leak: 5.0 * 3.0 (moving) * 1.0 = 15.0
         // Total unamplified = 25.0, amplified by 1.30 = 32.5
-        ailment._PhysicsProcess(1.0);
+        status._PhysicsProcess(1.0);
         AssertThat(mockEnemy.Health).IsEqualApprox(87.0f - 32.5f, 0.1f);
 
         // 3e. Independent stacks (data: poison row)
-        ailment.Apply("poison", 2.0f, 2.0f);
-        ailment.Apply("poison", 3.0f, 4.0f);
-        AssertThat(ailment.GetStackCount("poison")).IsEqual(2);
+        status.Apply("poison", 2.0f, 2.0f);
+        status.Apply("poison", 3.0f, 4.0f);
+        AssertThat(status.GetStackCount("poison")).IsEqual(2);
 
         // Process 2.0s: first stack should expire, second should remain
-        ailment._PhysicsProcess(2.01);
-        AssertThat(ailment.GetStackCount("poison")).IsEqual(1);
+        status._PhysicsProcess(2.01);
+        AssertThat(status.GetStackCount("poison")).IsEqual(1);
 
-        ailment.ClearAll();
-        AssertThat(ailment.IsActive("ignite")).IsFalse();
-        AssertThat(ailment.IsActive("poison")).IsFalse();
+        status.ClearAll();
+        AssertThat(status.IsActive("ignite")).IsFalse();
+        AssertThat(status.IsActive("poison")).IsFalse();
 
         mockEnemy.QueueFree();
         GD.Print("[PASS] Test 3: generic ailment effects (DoT, slow/amp channels, move scaling, stacks) verified.");

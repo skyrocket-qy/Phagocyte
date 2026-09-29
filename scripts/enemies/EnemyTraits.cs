@@ -608,7 +608,7 @@ public partial class EnemyActor
             }
             Rotation = state.Dir.Angle();
         }
-        Velocity = state.Dir * FloatSpeed * (Ailments?.SpeedMultiplier ?? 1.0f);
+        Velocity = state.Dir * FloatSpeed * (Status?.SpeedMultiplier ?? 1.0f);
         Position += Velocity * dt;
     }
 
@@ -632,7 +632,7 @@ public partial class EnemyActor
         if (heading == Vector2.Zero)
             heading = Vector2.Right;
 
-        float speed = FloatSpeed * (Ailments?.SpeedMultiplier ?? 1.0f);
+        float speed = FloatSpeed * (Status?.SpeedMultiplier ?? 1.0f);
         if (BossPhase != null)
             speed *= BossPhase.CurrentSpeedMult;
 
@@ -851,7 +851,7 @@ public partial class EnemyActor
                 {
                     if (other.HasMeta("mhc_marked"))
                         other.RemoveMeta("mhc_marked");
-                    other.Ailments?.ClearChannel("amp");
+                    other.Status?.ClearChannel("amp");
                 }
             }
         }
