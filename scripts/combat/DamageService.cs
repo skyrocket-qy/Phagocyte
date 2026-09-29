@@ -16,15 +16,4 @@ public static class DamageService
             damageable.TakeDamage(damage, source, isCrit);
         }
     }
-
-    public static void DealDamage(Node? target, float damage)
-    {
-        if (target == null || !GodotObject.IsInstanceValid(target))
-            return;
-
-        if (target is IDamageable damageable)
-        {
-            damageable.TakeDamage(damage);
-        }
-    }
 }
