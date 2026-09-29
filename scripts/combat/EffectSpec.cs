@@ -25,6 +25,7 @@ public struct EffectSpec
             host.Status.Apply(EffectId, Magnitude, Duration);
     }
 
+    /// <summary>Fixed 3 inline slots + count keeps per-hit apply zero-alloc.</summary>
     public static void ApplyAll(Node? target, in EffectSpec e0, in EffectSpec e1, in EffectSpec e2, int count)
     {
         if (count <= 0)
