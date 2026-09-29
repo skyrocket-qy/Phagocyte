@@ -1,0 +1,22 @@
+{
+  "name": "@games/config-framework",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "description": "Game-agnostic data-authoring framework: registries, shared types, validation harness, JSON export engine.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "check-purity": "./check-purity.sh"
+  },
+  "peerDependencies": {
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "zod": "^3.23.0"
+  }
+}

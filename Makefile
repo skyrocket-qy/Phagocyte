@@ -1,4 +1,4 @@
-.PHONY: build check-arch check-assets check-config config-export process-assets test-slice py-env bk
+.PHONY: build check-arch check-assets check-config check-framework config-export process-assets test-slice py-env bk
 
 build:
 	dotnet build Phagocyte.csproj --warnaserror
@@ -8,6 +8,9 @@ check-arch:
 
 check-config:
 	cd tools/config && pnpm run check
+
+check-framework:
+	cd tools/config-framework && pnpm run check && ./check-purity.sh
 
 config-export:
 	cd tools/config && pnpm run build

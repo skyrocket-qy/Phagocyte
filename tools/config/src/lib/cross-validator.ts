@@ -2,6 +2,14 @@
  * Cross-dataset referential integrity and game balance validation.
  * Run during `pnpm check` and `pnpm build`.
  */
+import {
+  toList,
+  enumValues,
+  checkDupes,
+  splitResult,
+  type ValidationIssue,
+  type ValidationResult,
+} from "@games/config-framework";
 import { SfxId } from "../ids/audio";
 import { StatId, ModType, PassiveModMode } from "../ids/stat";
 import { GearCategory } from "../ids/gear";
@@ -9,12 +17,6 @@ import { TraitRarity, TraitBranch } from "../ids/trait";
 import { ThreatMode } from "../ids/enemy";
 import { SkillArchetype, SkillType } from "../ids/skill";
 import { StageEffectKind, StageProp } from "../ids/stage";
-
-export interface ValidationIssue {
-  severity: "error" | "warning";
-  domain: string;
-  message: string;
-}
 
 export function runCrossValidation(data: {
   ailments?: any;
@@ -31,7 +33,7 @@ export function runCrossValidation(data: {
   achievements?: any;
   statLabels?: any;
   uiElements?: any;
-}): { errors: ValidationIssue[]; warnings: ValidationIssue[] } {
+}): ValidationResult {
   const issues: ValidationIssue[] = [];
 
   const addError = (domain: string, message: string) =>
@@ -39,15 +41,6 @@ export function runCrossValidation(data: {
   const addWarning = (domain: string, message: string) =>
     issues.push({ severity: "warning", domain, message });
 
-  const toList = (src: any): any[] => {
-    if (!src) return [];
-    if (Array.isArray(src)) return src;
-    if (typeof src.asArray === "function") return src.asArray();
-    if (typeof src === "object") return Object.values(src);
-    return [];
-  };
-
-  const enumValues = (e: Record<string, string>): Set<string> => new Set(Object.values(e));
   const statIds = enumValues(StatId as unknown as Record<string, string>);
   const sfxIds = enumValues(SfxId as unknown as Record<string, string>);
   const unitIds = enumValues(ModType as unknown as Record<string, string>);
@@ -79,33 +72,19 @@ export function runCrossValidation(data: {
   const startNodes: Record<string, string> =
     tree.start_nodes && typeof tree.start_nodes === "object" ? tree.start_nodes : {};
 
-  const checkDupes = (domain: string, kind: string, list: any[]) => {
-    const seen = new Set<string>();
-    for (const row of list) {
-      if (typeof row?.id !== "string" || row.id.length === 0) {
-        addError(domain, `A ${kind} row is missing its id.`);
-      } else if (seen.has(row.id)) {
-        addError(domain, `Duplicate ${kind} id '${row.id}'.`);
-      } else {
-        seen.add(row.id);
-      }
-    }
-    return seen;
-  };
-
-  const ailmentIds = checkDupes("Ailments", "ailment", ailmentList);
-  const activeIds = checkDupes("Skills", "active skill", activeList);
-  const passiveIds = checkDupes("Skills", "passive skill", passiveList);
-  const classIds = checkDupes("Class", "player class", classList);
-  const enemyIds = checkDupes("Enemy", "enemy", enemyList);
-  const enemyCodexIds = checkDupes("Codex", "enemy codex row", enemyCodexList);
-  const bossCodexIds = checkDupes("Codex", "boss codex row", bossCodexList);
-  const equipmentIds = checkDupes("Gear", "equipment", equipmentList);
-  const traitIds = checkDupes("Passive", "trait", traitList);
-  const nodeIds = checkDupes("Passive", "tree node", nodeList);
-  const stageIds = checkDupes("Stage", "stage", stageList);
-  const achievementIds = checkDupes("Achievement", "achievement", achievementList);
-  const uiIds = checkDupes("Ui", "ui element", uiList);
+  const ailmentIds = checkDupes(issues, "Ailments", "ailment", ailmentList);
+  const activeIds = checkDupes(issues, "Skills", "active skill", activeList);
+  const passiveIds = checkDupes(issues, "Skills", "passive skill", passiveList);
+  const classIds = checkDupes(issues, "Class", "player class", classList);
+  const enemyIds = checkDupes(issues, "Enemy", "enemy", enemyList);
+  const enemyCodexIds = checkDupes(issues, "Codex", "enemy codex row", enemyCodexList);
+  const bossCodexIds = checkDupes(issues, "Codex", "boss codex row", bossCodexList);
+  const equipmentIds = checkDupes(issues, "Gear", "equipment", equipmentList);
+  const traitIds = checkDupes(issues, "Passive", "trait", traitList);
+  const nodeIds = checkDupes(issues, "Passive", "tree node", nodeList);
+  const stageIds = checkDupes(issues, "Stage", "stage", stageList);
+  const achievementIds = checkDupes(issues, "Achievement", "achievement", achievementList);
+  const uiIds = checkDupes(issues, "Ui", "ui element", uiList);
   void enemyCodexIds;
   void bossCodexIds;
   void uiIds;
@@ -310,8 +289,5 @@ export function runCrossValidation(data: {
     }
   }
 
-  const errors = issues.filter((i) => i.severity === "error");
-  const warnings = issues.filter((i) => i.severity === "warning");
-
-  return { errors, warnings };
+  return splitResult(issues);
 }

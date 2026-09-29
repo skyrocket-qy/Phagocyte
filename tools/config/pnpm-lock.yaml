@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@games/config-framework':
+        specifier: file:../config-framework
+        version: file:../config-framework(zod@3.25.76)
     devDependencies:
       '@types/node':
         specifier: ^22.0.0
@@ -179,6 +183,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@games/config-framework@file:../config-framework':
+    resolution: {directory: ../config-framework, type: directory}
+    peerDependencies:
+      zod: ^3.23.0
+
   '@types/node@22.20.1':
     resolution: {integrity: sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q==}
 
@@ -287,6 +296,10 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
+
+  '@games/config-framework@file:../config-framework(zod@3.25.76)':
+    dependencies:
+      zod: 3.25.76
 
   '@types/node@22.20.1':
     dependencies:

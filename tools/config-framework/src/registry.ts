@@ -24,14 +24,14 @@ export type DataTable<R extends Record<string, any>> = {
  *
  * Example:
  * ```ts
- * export const Enemies = defineTable<EnemyDef>()({
- *   imp: { size: 44, life: 40, damage: 2 },
- *   bat: { size: 40, life: 30, damage: 1 },
+ * export const Items = defineTable<ItemDef>()({
+ *   sword: { damage: 10, speed: 1.2 },
+ *   axe: { damage: 14, speed: 0.9 },
  * });
  *
- * // Enemies.imp has type { readonly id: "imp", size: number, ... }
- * // Enemies.asArray() returns [{ id: "imp", ... }, { id: "bat", ... }]
- * // export type EnemyId = keyof typeof Enemies;
+ * // Items.sword has type { readonly id: "sword", damage: number, ... }
+ * // Items.asArray() returns [{ id: "sword", ... }, { id: "axe", ... }]
+ * // export type ItemId = keyof typeof Items;
  * ```
  */
 export function defineTable<TItem = any>() {

@@ -1,20 +1,16 @@
-import { StatId, ModType } from "../ids/stat";
-export * from "../ids/stat";
 import { z } from "zod";
 
 /**
- * Known stat identifiers across the game.
+ * Generic stat modifier row. The stat vocabulary is game-specific and
+ * supplied as a type parameter; at runtime any non-empty string is
+ * accepted (vocabulary membership is enforced by the game's own
+ * cross-validator, never here).
  */
-export type StatName = StatId | `${StatId}`;
-export const Stats = StatId;
-
-export type ModifierType = ModType | `${ModType}`;
-
-export interface StatModifier {
-  stat?: StatName ;
-  Stat?: StatName ;
-  type?: ModifierType;
-  Type?: ModifierType;
+export interface StatModifier<TStat extends string = string> {
+  stat?: TStat;
+  Stat?: TStat;
+  type?: string;
+  Type?: string;
   value?: number;
   Value?: number;
 }

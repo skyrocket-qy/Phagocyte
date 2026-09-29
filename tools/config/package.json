@@ -6,6 +6,9 @@
     "watch": "tsx watch src/export.ts",
     "check": "tsc --noEmit && tsx src/export.ts --check"
   },
+  "dependencies": {
+    "@games/config-framework": "file:../config-framework"
+  },
   "devDependencies": {
     "tsx": "^4.19.0",
     "typescript": "^5.6.0",
