@@ -4,6 +4,17 @@ using System.Collections.Generic;
 
 namespace Game.Combat;
 
+public enum VfxType
+{
+    CytoplasmSplatter,
+    AcidOxidationSparks,
+    BarbImpact,
+    BiofilmBurst,
+    MacRingBurst,
+    MarkBind,
+    PerforinPore
+}
+
 /// <summary>
 /// Pre-allocated GPU particle pool for combat impacts, cytoplasm bursts, and lysis reactions.
 /// Completely eliminates runtime GC allocation by recycling one-shot emitters.

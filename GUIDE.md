@@ -249,14 +249,14 @@ Read `BeamSkill.FirePierce` end-to-end: `FindTargetDirection` → `GetCalculated
 Trace any damage number from trigger to death.
 
 ### Files
-- `scripts/combat/DamageService.cs`
+- `scripts/combat/DamageService.cs` (contains `DamageResult`, `DamageService`)
 - `scripts/combat/SlowService.cs`
-- `scripts/combat/IDamageable.cs`, `ISlowable.cs`, `IStunnable.cs`, `IAilmentHost.cs`
-- `scripts/combat/Team.cs`, `EffectSpec.cs`, `ProjectileData.cs`
-- `scripts/combat/StatusCore.cs`, `AilmentController.cs` (+ `assets/data/ailments.json`)
+- `scripts/combat/IDamageable.cs` (contains `IDamageable`, `ISlowable`, `IStunnable`, `IStatusHost`)
+- `scripts/combat/ProjectileData.cs` (contains `Team`, `ProjectileData`)
+- `scripts/combat/StatusController.cs`
 - `scripts/combat/TargetingService.cs`
 - `scripts/combat/ProjectileManager.cs`
-- `scripts/combat/VfxManager.cs`, `VfxType.cs`
+- `scripts/combat/VfxManager.cs` (contains `VfxType`, `VfxManager`)
 - `scripts/ui/DamageNumberSpawner.cs`
 - `scripts/enemies/EnemyActor.cs` + `EnemyTraits.cs`
 
@@ -297,7 +297,7 @@ Know how 500 entities stay alive without melting CPU.
 ### Files
 - `scripts/enemies/EnemyActor.cs` + `EnemyTraits.cs` (def + trait engine)
 - `scripts/enemies/EnemySpawner.cs` (id pools, scaling, boss tables)
-- `scripts/enemies/EnemySteering.cs`, `EnemyThreatMode.cs`
+- `scripts/enemies/EnemySteering.cs` (contains `EnemyThreatMode`, `EnemySteering`)
 - `scripts/combat/` — `Zone.cs` (unified timed field, `Team` + `EffectSpec`), `ProximityMine.cs` lives in `scripts/directors/` (neutral matter), `DebrisWall.cs` in `scripts/stages/` (solid debris; distinct from `BlockerWall` pore terrain). No `hazards/` folder: things are classified by mechanism (zone / prop / wall), faction is data.
 - `scripts/enemies/BossPhaseComponent.cs`
 - `assets/data/enemies.json` — 35 defs (stats + steering + traits)
@@ -322,7 +322,7 @@ Special clustering in `SpawnSingle` is data (`spawn_cluster`: staph→3 with shi
 Bosses are def rows (`IsBoss`, score/contact, `telegraph_scale`): sub-bosses (score 600) + terminal (score 3000), `BossPhaseComponent` (phases, DR, speed mult incl. hard-enrage ×1.4). Terminal map table in `CreateTerminalBoss`: alveolar→syncytial, hepatic→macroschizont, gastric→biofilm_core, BBB→amyloid, default wound→mrsa. Boss-only mechanics (splits, shells, auras, chains) are traits in the same engine.
 
 ### Steering + layers
-Modes: `Drifter/ChemoChaser/Interceptor/Standoff/Invader` (`EnemyThreatMode.cs`).
+Modes: `Drifter/ChemoChaser/Interceptor/Standoff/Invader` (`EnemySteering.cs`).
 `ConfigureArena` → 6 anchors on 0.82-ring. `SeekPlayer` (jitter 0.22), `InterceptPlayer` (lead `clamp(vel*0.6,100,200)`), `Standoff` (approach >1.15×, retreat <0.6×, orbit), `InvadeTissue` (latch ≤max(8,40) → Zero for ulceration).
 Layers: enemies passive `Layer2/Mask0`; skills `Layer0/Mask2`; enemy shots `Layer0/Mask1`; player body `1|4`, sensor `1|2`.
 
