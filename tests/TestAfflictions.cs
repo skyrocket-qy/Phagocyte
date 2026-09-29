@@ -210,11 +210,11 @@ public partial class TestAfflictions : TestHarness
         AssertThat(enemy).IsNotNull();
         main.EnemyContainer!.AddChild(enemy!);
         AssertThat(enemy!.Ailments).IsNotNull();
-        enemy.Ailments!.Apply("opsonization");
-        AssertThat(enemy.Ailments.IsActive("opsonization")).IsTrue();
+        enemy.Ailments!.Apply("shock");
+        AssertThat(enemy.Ailments.IsActive("shock")).IsTrue();
 
         main._PhysicsProcess(RunMutatorService.AntigenicDriftInterval + 0.1f);
-        AssertThat(enemy.Ailments.IsActive("opsonization")).IsFalse();
+        AssertThat(enemy.Ailments.IsActive("shock")).IsFalse();
 
         GD.Print("[PASS] Endless integration: viscosity, febrile burn and antigenic drift verified.");
     }

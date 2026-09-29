@@ -107,37 +107,37 @@ public partial class TestNewSystemsTriad : SceneTree
         Root.AddChild(mockEnemy);
 
         // Initial state
-        AssertThat(ailment.IsActive("oxidative_burn")).IsFalse();
+        AssertThat(ailment.IsActive("ignite")).IsFalse();
         AssertThat(ailment.HasSlow).IsFalse();
-        AssertThat(ailment.IsActive("opsonization")).IsFalse();
-        AssertThat(ailment.IsActive("membrane_leak")).IsFalse();
-        AssertThat(ailment.IsActive("endotoxin")).IsFalse();
+        AssertThat(ailment.IsActive("shock")).IsFalse();
+        AssertThat(ailment.IsActive("bleed")).IsFalse();
+        AssertThat(ailment.IsActive("poison")).IsFalse();
 
-        // 3a. Slow channel (data: agglutination row)
+        // 3a. Slow channel (data: chill row)
         ailment.ApplySlow(duration: 2.0f, slowPct: 0.40f);
         AssertThat(ailment.HasSlow).IsTrue();
         AssertThat(ailment.SpeedMultiplier).IsEqualApprox(0.60f, 0.01f);
 
-        // 3b. Amp channel (data: opsonization row)
-        ailment.Apply("opsonization", 0.30f, 3.0f);
-        AssertThat(ailment.IsActive("opsonization")).IsTrue();
+        // 3b. Amp channel (data: shock row)
+        ailment.Apply("shock", 0.30f, 3.0f);
+        AssertThat(ailment.IsActive("shock")).IsTrue();
         AssertThat(ailment.DamageTakenMultiplier).IsEqualApprox(1.30f, 0.01f);
 
-        // 3c. DoT channel (data: oxidative_burn row)
-        ailment.Apply("oxidative_burn", 10.0f, 2.0f);
-        AssertThat(ailment.IsActive("oxidative_burn")).IsTrue();
+        // 3c. DoT channel (data: ignite row)
+        ailment.Apply("ignite", 10.0f, 2.0f);
+        AssertThat(ailment.IsActive("ignite")).IsTrue();
 
         // Simulate 1 second physics process
         // Frame DoT = 10.0f * 1.0s = 10.0f
         // Amplified by amp (1.30x) = 13.0f
         ailment._PhysicsProcess(1.0);
         AssertThat(mockEnemy.Health).IsEqualApprox(87.0f, 0.05f);
-        AssertThat(ailment.GetTimer("oxidative_burn")).IsEqualApprox(1.0f, 0.01f);
+        AssertThat(ailment.GetTimer("ignite")).IsEqualApprox(1.0f, 0.01f);
 
-        // 3d. Move-scaled DoT (data: membrane_leak row, 3x while moving)
+        // 3d. Move-scaled DoT (data: bleed row, 3x while moving)
         mockEnemy.Velocity = new Vector2(100.0f, 0.0f); // moving
-        ailment.Apply("membrane_leak", 5.0f, 2.0f);
-        AssertThat(ailment.IsActive("membrane_leak")).IsTrue();
+        ailment.Apply("bleed", 5.0f, 2.0f);
+        AssertThat(ailment.IsActive("bleed")).IsTrue();
 
         // Next 1 second:
         // Burn: 10.0 * 1.0 = 10.0
@@ -146,18 +146,18 @@ public partial class TestNewSystemsTriad : SceneTree
         ailment._PhysicsProcess(1.0);
         AssertThat(mockEnemy.Health).IsEqualApprox(87.0f - 32.5f, 0.1f);
 
-        // 3e. Independent stacks (data: endotoxin row)
-        ailment.Apply("endotoxin", 2.0f, 2.0f);
-        ailment.Apply("endotoxin", 3.0f, 4.0f);
-        AssertThat(ailment.GetStackCount("endotoxin")).IsEqual(2);
+        // 3e. Independent stacks (data: poison row)
+        ailment.Apply("poison", 2.0f, 2.0f);
+        ailment.Apply("poison", 3.0f, 4.0f);
+        AssertThat(ailment.GetStackCount("poison")).IsEqual(2);
 
         // Process 2.0s: first stack should expire, second should remain
         ailment._PhysicsProcess(2.01);
-        AssertThat(ailment.GetStackCount("endotoxin")).IsEqual(1);
+        AssertThat(ailment.GetStackCount("poison")).IsEqual(1);
 
         ailment.ClearAll();
-        AssertThat(ailment.IsActive("oxidative_burn")).IsFalse();
-        AssertThat(ailment.IsActive("endotoxin")).IsFalse();
+        AssertThat(ailment.IsActive("ignite")).IsFalse();
+        AssertThat(ailment.IsActive("poison")).IsFalse();
 
         mockEnemy.QueueFree();
         GD.Print("[PASS] Test 3: generic ailment effects (DoT, slow/amp channels, move scaling, stacks) verified.");

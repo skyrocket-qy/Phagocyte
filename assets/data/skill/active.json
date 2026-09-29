@@ -80,12 +80,12 @@
       "deploy_fallback": 100,
       "on_hit": [
         {
-          "ailment": "oxidative_burn",
+          "ailment": "ignite",
           "mult": 0.4,
           "duration": 1.5
         },
         {
-          "ailment": "membrane_leak",
+          "ailment": "bleed",
           "mult": 0.3,
           "duration": 2
         }
@@ -133,7 +133,7 @@
       "steering": "linear",
       "on_hit": [
         {
-          "ailment": "oxidative_burn",
+          "ailment": "ignite",
           "mult": 0.35,
           "duration": 2
         }
@@ -179,7 +179,7 @@
       "pierce": 3,
       "on_hit": [
         {
-          "ailment": "opsonization",
+          "ailment": "shock",
           "flat": 0.15,
           "duration": 2.5
         }
@@ -272,10 +272,10 @@
       "stagger_step": 0.05,
       "on_hit": [
         {
-          "ailment": "opsonization"
+          "ailment": "shock"
         },
         {
-          "ailment": "agglutination",
+          "ailment": "chill",
           "flat": 0.35,
           "duration": 1.5
         }
@@ -362,7 +362,7 @@
       "plus_host_radius": true,
       "on_hit": [
         {
-          "ailment": "membrane_leak",
+          "ailment": "bleed",
           "mult": 0.25,
           "duration": 1.5
         }

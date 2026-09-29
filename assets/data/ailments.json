@@ -4,7 +4,7 @@
   "amp_applies_to_own_dot": true,
   "ailments": [
     {
-      "id": "oxidative_burn",
+      "id": "ignite",
       "name": "ROS Oxidative Burn",
       "duration": 3,
       "magnitude": 0,
@@ -14,7 +14,7 @@
       ]
     },
     {
-      "id": "agglutination",
+      "id": "chill",
       "name": "Agglutination",
       "duration": 2.5,
       "magnitude": 0.4,
@@ -26,7 +26,7 @@
       "max_magnitude": 0.75
     },
     {
-      "id": "opsonization",
+      "id": "shock",
       "name": "Opsonization",
       "duration": 4,
       "magnitude": 0.3,
@@ -39,7 +39,7 @@
       "vfx": "MarkBind"
     },
     {
-      "id": "membrane_leak",
+      "id": "bleed",
       "name": "Membrane Leakage",
       "duration": 3,
       "magnitude": 0,
@@ -50,7 +50,7 @@
       "move_multiplier": 3
     },
     {
-      "id": "endotoxin",
+      "id": "poison",
       "name": "Endotoxin",
       "duration": 4,
       "magnitude": 0,

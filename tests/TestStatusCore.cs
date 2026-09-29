@@ -202,28 +202,28 @@ public partial class TestStatusCore : TestHarness
     {
         // The real assets/data/ailments.json loads through the generic adapter.
         var ailment = new AilmentController();
-        ailment.Apply("opsonization");
-        AssertThat(ailment.IsActive("opsonization")).IsTrue();
-        AssertThat(ailment.GetTimer("opsonization")).IsEqualApprox(4.0f, 0.01f);
+        ailment.Apply("shock");
+        AssertThat(ailment.IsActive("shock")).IsTrue();
+        AssertThat(ailment.GetTimer("shock")).IsEqualApprox(4.0f, 0.01f);
         AssertThat(ailment.DamageTakenMultiplier).IsEqualApprox(1.30f, 0.01f);
 
         ailment.ApplySlow();
         AssertThat(ailment.HasSlow).IsTrue();
         AssertThat(ailment.SpeedMultiplier).IsEqualApprox(0.60f, 0.01f);
 
-        ailment.Apply("oxidative_burn", 10.0f);
-        ailment.Apply("membrane_leak", 5.0f);
-        ailment.Apply("endotoxin", 2.0f, 2.0f);
-        AssertThat(ailment.IsActive("oxidative_burn")).IsTrue();
-        AssertThat(ailment.IsActive("membrane_leak")).IsTrue();
-        AssertThat(ailment.IsActive("endotoxin")).IsTrue();
-        AssertThat(ailment.GetStackCount("endotoxin")).IsEqual(1);
+        ailment.Apply("ignite", 10.0f);
+        ailment.Apply("bleed", 5.0f);
+        ailment.Apply("poison", 2.0f, 2.0f);
+        AssertThat(ailment.IsActive("ignite")).IsTrue();
+        AssertThat(ailment.IsActive("bleed")).IsTrue();
+        AssertThat(ailment.IsActive("poison")).IsTrue();
+        AssertThat(ailment.GetStackCount("poison")).IsEqual(1);
 
         ailment.ClearChannel("amp");
-        AssertThat(ailment.IsActive("opsonization")).IsFalse();
+        AssertThat(ailment.IsActive("shock")).IsFalse();
         ailment.ClearAll();
-        AssertThat(ailment.IsActive("oxidative_burn")).IsFalse();
-        AssertThat(ailment.IsActive("endotoxin")).IsFalse();
+        AssertThat(ailment.IsActive("ignite")).IsFalse();
+        AssertThat(ailment.IsActive("poison")).IsFalse();
         ailment.QueueFree();
 
         GD.Print("[PASS] AilmentController JSON loader defaults and generic adapter surface.");

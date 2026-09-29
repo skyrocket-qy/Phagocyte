@@ -11,7 +11,7 @@ namespace Game.Skills;
 /// Projectile-salvo archetype (data: assets/data/skill/active.json).
 /// Covers homing volleys, radial bursts, chaining shots and fan sprays:
 /// count projectiles fly with linear / homing / chain steering and apply
-/// generic <see cref="EffectSpec"/> hits (mark, agglutination, burn). All
+/// generic <see cref="EffectSpec"/> hits (mark, chill, burn). All
 /// shots route through the pooled <see cref="ProjectileManager"/> (batched
 /// structs, zero per-shot nodes); steering and effects ride as spawn data.
 /// </summary>
