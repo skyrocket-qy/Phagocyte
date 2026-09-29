@@ -281,7 +281,7 @@ public sealed class StatBlock : IStatHost
     }
 
     /// <summary>
-    /// Rolls for fluid deformation evasion (免傷)
+    /// Rolls for fluid deformation evasion
     /// </summary>
     public bool RollEvasion()
     {
@@ -290,7 +290,7 @@ public sealed class StatBlock : IStatHost
     }
 
     /// <summary>
-    /// Rolls for glycocalyx block (格擋)
+    /// Rolls for glycocalyx block
     /// </summary>
     public bool RollBlock()
     {
@@ -299,7 +299,7 @@ public sealed class StatBlock : IStatHost
     }
 
     /// <summary>
-    /// Rolls for receptor life steal on hit (吸血回復)
+    /// Rolls for receptor life steal on hit
     /// </summary>
     public bool RollLifeSteal()
     {

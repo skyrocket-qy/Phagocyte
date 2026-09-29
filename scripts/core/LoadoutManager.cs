@@ -132,7 +132,7 @@ public static class LoadoutManager
         return true;
     }
 
-    /// <summary>Display name for a profile slot (配置一/二/三), shared with the talent tree.</summary>
+    /// <summary>Display name for a profile slot, shared with the talent tree.</summary>
     public static string GetProfileName(int index)
     {
         return TranslationServer.Translate("TREE_PROFILE_" + (index + 1));

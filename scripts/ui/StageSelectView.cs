@@ -6,7 +6,7 @@ using Game.Core;
 namespace Game.UI;
 
 /// <summary>
-/// Holographic Host Body Scanner (全息透視人體掃描儀)
+/// Holographic Host Body Scanner
 /// High-precision 2D layered medical diagnostic interface for stage selection.
 /// Features high-fidelity transparent cybernetic human body, additive-blended
 /// anatomical organ overlays with breathing pulse tweens, laser scanline,

@@ -49,7 +49,7 @@ public partial class SettingsModal : ModalBase
     public Label? LangTitleLbl { get; set; }
     public OptionButton? LangOption { get; set; }
 
-    /// <summary>Dropdown order: English, 简体中文, 繁體中文, 日本語, Deutsch, Français, Русский, Español.</summary>
+    /// <summary>Dropdown order: English, Simplified Chinese, Traditional Chinese, Japanese, German, French, Russian, Spanish.</summary>
     private static readonly string[] LangLocales = { "en", "zh_CN", "zh_TW", "ja", "de", "fr", "ru", "es" };
     private static readonly string[] LangNames = { "English", "简体中文", "繁體中文", "日本語", "Deutsch", "Français", "Русский", "Español" };
 

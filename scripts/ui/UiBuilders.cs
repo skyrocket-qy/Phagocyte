@@ -247,7 +247,7 @@ public static class UiBuilders
         new(@"^\s*[^：:\n]{2,30}[：:]\s*", System.Text.RegularExpressions.RegexOptions.Compiled);
 
     /// <summary>
-    /// Strips a redundant leading "Biochem: / 生物机制：" style label from
+    /// Strips a redundant leading "Biochem:" style label from
     /// biochemistry body text. Call sites prepend their own section header,
     /// so without this the label renders twice (e.g. codex detail + tooltip).
     /// Only the first short "Label:" run is removed; body text is untouched.

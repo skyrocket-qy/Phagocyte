@@ -11,12 +11,12 @@ namespace Game.Directors;
 /// </summary>
 public static class RunMutatorService
 {
-    public const string FebrileConvulsion = "febrile_convulsion";   // 高熱驚厥
-    public const string Endotoxemia = "endotoxemia";                // 內毒素血症
-    public const string AutophagicFailure = "autophagic_failure";   // 自噬衰竭
-    public const string MicrotubuleSclerosis = "microtubule_sclerosis"; // 微管硬化
-    public const string AntigenicDrift = "antigenic_drift";         // 抗原全漂移
-    public const string ExtremeViscosity = "extreme_viscosity";     // 極限黏滯
+    public const string FebrileConvulsion = "febrile_convulsion";
+    public const string Endotoxemia = "endotoxemia";
+    public const string AutophagicFailure = "autophagic_failure";
+    public const string MicrotubuleSclerosis = "microtubule_sclerosis";
+    public const string AntigenicDrift = "antigenic_drift";
+    public const string ExtremeViscosity = "extreme_viscosity";
 
     /// <summary>Effect tuning (docs/endgame.md §4).</summary>
     public const float EndotoxemiaDamageMultiplier = 1.5f;
@@ -160,15 +160,15 @@ public static class RunMutatorService
 
     // --- Effect knobs consumed by the run systems (docs/endgame.md §4) ---
 
-    /// <summary>內毒素血症: all enemy damage taken +50%.</summary>
+    /// <summary>Endotoxemia: all enemy damage taken +50%.</summary>
     public static float IncomingDamageMultiplier => IsActive(Endotoxemia) ? EndotoxemiaDamageMultiplier : 1.0f;
 
-    /// <summary>自噬衰竭: global health_regen forced to zero.</summary>
+    /// <summary>Autophagic failure: global health_regen forced to zero.</summary>
     public static bool BlocksHealthRegen => IsActive(AutophagicFailure);
 
-    /// <summary>微管硬化: dodge roll (翻滾) disabled.</summary>
+    /// <summary>Microtubule sclerosis: dodge roll disabled.</summary>
     public static bool DodgeDisabled => IsActive(MicrotubuleSclerosis);
 
-    /// <summary>極限黏滯: base move speed -25% (applied as a percent modifier at run start).</summary>
+    /// <summary>Extreme viscosity: base move speed -25% (applied as a percent modifier at run start).</summary>
     public static float MoveSpeedPercentPenalty => IsActive(ExtremeViscosity) ? ViscosityMoveSpeedPenalty : 0.0f;
 }

@@ -90,10 +90,10 @@ public partial class TestGearBalance : TestHarness
         AssertThat(chamber.GeneratorCount).IsEqual(2);
         AssertThat(chamber.MaxEnergy).IsEqual(8);
 
-        // Cripple-flow (殘廢流): -30% move speed, -15% might.
+        // Cripple-flow: -30% move speed, -15% might.
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("move_speed"), 230.0f * 0.7f)).IsTrue();
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("might"), 1.0f - 0.15f)).IsTrue();
-        // Blood-for-power (血換電): -20% max HP for +0.05 CDR.
+        // Blood-for-power: -20% max HP for +0.05 CDR.
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("max_health"), 100.0f * 0.8f)).IsTrue();
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("cooldown_reduction"), 0.05f)).IsTrue();
 

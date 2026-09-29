@@ -11,7 +11,7 @@ using Game.Core;
 namespace Game.Tests;
 
 /// <summary>
-/// Behavioral tests for the Macrophage innate active (吞噬偽足):
+/// Behavioral tests for the Macrophage innate active:
 /// default double-grasp, Amount scaling, nearest-first targeting,
 /// and direct damage on all foes.
 /// Setup runs frame-gated inside _Process (house style: never touch

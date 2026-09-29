@@ -209,7 +209,7 @@ public partial class MainMenu : Control
             deployRow.MoveChild(EndlessBtn, DeployBtn.GetIndex() + 1);
         }
 
-        // Dual-track difficulty toggle (docs/stages.md §2): Normal vs Hard (急性危象),
+        // Dual-track difficulty toggle (docs/stages.md §2): Normal vs Hard,
         // unlocked per organ by clearing the prerequisite stage on Normal.
         if (DeployBtn != null && DeployBtn.GetParent() is Container difficultyRow)
         {

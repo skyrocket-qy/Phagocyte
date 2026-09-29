@@ -67,7 +67,7 @@ public partial class TestCodexAndTooltip : TestHarness
         var skillTooltip = hud.SkillTooltip;
         AssertThat(skillTooltip).IsNotNull();
 
-        // Macrophage starts with the innate active (吞噬偽足) in slot 0; draft a ranged weapon to test the active tooltip
+        // Macrophage starts with the innate active in slot 0; draft a ranged weapon to test the active tooltip
         var player = main.GetNodeOrNull<PlayerActor>("Player");
         AssertThat(player).IsNotNull();
         AssertThat(player!.CellSkillManager!.EquipActive(SkillFactory.CreateActive("ros_torrent")!, 1)).IsTrue();
@@ -76,7 +76,7 @@ public partial class TestCodexAndTooltip : TestHarness
         var slotsContainer = hud.SlotsContainer;
         AssertThat(slotsContainer != null && slotsContainer.GetChildCount() >= 6).IsTrue();
 
-        // Test Hover Slot 0 (Innate Active 吞噬偽足)
+        // Test Hover Slot 0 (Innate Active)
         var card0 = slotsContainer!.GetChild<Control>(0);
         hud.OnSlotMouseEntered(0, card0);
         AssertThat(skillTooltip!.Visible).IsTrue();

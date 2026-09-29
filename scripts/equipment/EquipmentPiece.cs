@@ -5,7 +5,7 @@ using Game.Player;
 namespace Game.Equipment;
 
 /// <summary>
-/// Base class for Modular Equipment (外掛式細胞器).
+/// Base class for Modular Equipment.
 /// Equipment are decoupled PackedScene attachments that live as child nodes of a
 /// PlayerActor and extend beyond its main polygon topology (IK limbs, receptor rings).
 /// Attached gear read the host's universal ActorStats pool at runtime.

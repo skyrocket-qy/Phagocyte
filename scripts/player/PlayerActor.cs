@@ -499,7 +499,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
         if (IsDead)
             return;
 
-        // Stage 0: Dodge invulnerability (翻滾無敵 takes precedence over
+        // Stage 0: Dodge invulnerability (takes precedence over
         // everything, including environmental damage).
         if (IsInvulnerable)
         {
@@ -507,7 +507,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
             return;
         }
 
-        // Stage 1: Fluid deformation evasion (閃避判定)
+        // Stage 1: Fluid deformation evasion
         if (Stats is ActorStats cs && cs.RollEvasion())
         {
             DamageNumberSpawner.ShowEvaded(GlobalPosition);
@@ -515,7 +515,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
             return;
         }
 
-        // Stage 2: Glycocalyx barrier block (格擋判定)
+        // Stage 2: Glycocalyx barrier block
         if (Stats is ActorStats csBlock && csBlock.RollBlock())
         {
             DamageNumberSpawner.ShowBlocked(GlobalPosition);
@@ -523,7 +523,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
             return;
         }
 
-        // Stage 3: Armor damage reduction (護甲減傷)
+        // Stage 3: Armor damage reduction
         float dr = Stats != null ? Stats.GetDamageReductionRatio() : 0.0f;
         float finalDmg = Mathf.Max(1.0f, amount * (1.0f - dr));
         DamageNumberSpawner.ShowPlayerDamage(GlobalPosition, finalDmg);

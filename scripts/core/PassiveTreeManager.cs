@@ -557,7 +557,7 @@ public static class PassiveTreeManager
         return true;
     }
 
-    /// <summary>Display name for a profile slot (配置一/二/三).</summary>
+    /// <summary>Display name for a profile slot.</summary>
     public static string GetProfileName(int index)
     {
         return TranslationServer.Translate("TREE_PROFILE_" + (index + 1));

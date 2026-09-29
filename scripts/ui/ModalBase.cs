@@ -53,7 +53,7 @@ public partial class ModalBase : Control
 
     /// <summary>Refreshes every translated label; subclasses extend this.</summary>
     /// <remarks>
-    /// The close affordance is a shared top-left "‹ 返回" text button
+    /// The close affordance is a shared top-left text button
     /// (NAV_BACK) on every modal header; subclasses must not override it.
     /// </remarks>
     public virtual void UpdateLocalizedTexts()

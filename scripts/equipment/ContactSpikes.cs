@@ -8,10 +8,10 @@ using Game.Player;
 namespace Game.Equipment;
 
 /// <summary>
-/// Modular Equipment: Receptor Spikes (受體棘刺陣列).
+/// Modular Equipment: Receptor Spikes.
 /// A ring of receptor stalks hovering just outside the cell membrane. The array
 /// rotates continuously; pathogens sweeping across a stalk take contact damage
-/// (反傷) and are shoved away by a rotational interception impulse (旋轉攔截).
+/// and are shoved away by a rotational interception impulse.
 /// </summary>
 public partial class ContactSpikes : EquipmentPiece
 {

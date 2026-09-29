@@ -28,8 +28,8 @@ public partial class RunRecordManager : Node
     public const float StandardClearSeconds = 900.0f;
 
     // Settlement causes (docs/record.md §3)
-    public const string CauseSpecificNeutralization = "specific_neutralization"; // 特異性中和成功
-    public const string CauseMembraneRupture = "membrane_rupture";               // SIRS / 敗血性休克陣亡
+    public const string CauseSpecificNeutralization = "specific_neutralization";
+    public const string CauseMembraneRupture = "membrane_rupture";               // SIRS / septic shock death
     public const string CauseSystemFailure = "system_failure";                   // Content/setup failure fallback
 
     // Difficulty tiers for scoring / ranking (docs/record.md §4.2)
@@ -44,8 +44,8 @@ public partial class RunRecordManager : Node
     public const string RankD = "D";
 
     // Endless overdrive grades (docs/endgame.md §5.1)
-    public const string RankSSS = "SSS"; // 超載神話
-    public const string RankEX = "EX";   // 破格存在
+    public const string RankSSS = "SSS";
+    public const string RankEX = "EX";
 
     /// <summary>Endless grade thresholds (docs/endgame.md §5.1).</summary>
     public const float SSSSurvivalSeconds = 1800.0f; // 30:00 triple-siege survival

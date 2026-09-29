@@ -176,7 +176,7 @@ public partial class TestStatAndSkills : TestHarness
         AssertThat(sm!.ActiveSlots.Count).IsEqual(5);
         AssertThat(sm.PassiveSlots.Count).IsEqual(5);
 
-        // Macrophage innate 吞噬偽足 occupies active slot 0; passive slots start empty
+        // Macrophage innate occupies active slot 0; passive slots start empty
         AssertThat(sm.GetActiveSlot(0) is StrikeSkill).IsTrue();
         AssertThat(sm.GetPassiveSlot(0)).IsNull();
 

@@ -56,7 +56,7 @@ public partial class TestSkillSystem : TestHarness
         AssertThat(sm.PassiveSlots.Count).IsEqual(5);
         GD.Print("[PASS] SkillManager contains exactly 5 Active slots and 5 Passive slots.");
 
-        // 2. Verify Active Slot 0: innate Phagocytic Grasp (吞噬偽足)
+        // 2. Verify Active Slot 0: innate Phagocytic Grasp
         var innateActive = sm.GetActiveSlot(0);
         AssertThat(innateActive is StrikeSkill).IsTrue();
         AssertThat(innateActive!.SkillId).IsEqual("phagocytic_grasp");
