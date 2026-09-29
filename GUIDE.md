@@ -251,7 +251,7 @@ Trace any damage number from trigger to death.
 ### Files
 - `scripts/combat/DamageService.cs` (contains `DamageResult`, `DamageService`)
 - `scripts/combat/SlowService.cs`
-- `scripts/combat/IDamageable.cs` (contains `IDamageable`, `ISlowable`, `IStunnable`, `IStatusHost`)
+- `scripts/combat/CombatInterfaces.cs` (contains `IDamageable`, `ISlowable`, `IStunnable`, `IStatusHost`)
 - `scripts/combat/ProjectileData.cs` (contains `Team`, `ProjectileData`)
 - `scripts/combat/StatusController.cs`
 - `scripts/combat/TargetingService.cs`

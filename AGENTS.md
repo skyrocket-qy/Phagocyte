@@ -187,7 +187,7 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
 - **Co-locate small POCO types; avoid file fragmentation:** Do not create tiny standalone
   files (< 20 lines) for plain C# interfaces, enums, or POCO structs that belong to a
   single consumer subsystem (e.g. `DamageResult` in `DamageService.cs`, `ISlowable` in
-  `IDamageable.cs`, `Team` in `ProjectileData.cs`, `VfxType` in `VfxManager.cs`). Keep Godot
+  `CombatInterfaces.cs`, `Team` in `ProjectileData.cs`, `VfxType` in `VfxManager.cs`). Keep Godot
   `Node`/`Resource` classes 1:1 with filenames (required by Godot's C# source generators),
   but consolidate tightly-coupled plain C# types in their primary service or owner file.
 - Verify with a zero-residual grep: removed symbol names must return zero
