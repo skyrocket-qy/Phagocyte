@@ -146,21 +146,14 @@ public partial class AuraSkill : BaseSkill
             if (skill.ParamString(p, "mode", "radial") == "orbital")
             {
                 float orbit = skill.GetCalculatedArea(skill.ParamFloat(p, "orbit", 115.0f));
-                foreach (float angle in skill.GetBladeAngles())
-                {
-                    Vector2 pos = Vector2.FromAngle(angle) * orbit;
-                    DrawLine(pos - Vector2.FromAngle(angle + 0.45f) * 20.0f, pos, new Color(accent, 0.7f), 6.0f);
-                    DrawCircle(pos, 5.0f, new Color(core, 0.9f));
-                }
+                SkillVisualPresenters.DrawAuraOrbital(this, orbit, skill.GetBladeAngles(), accent, core);
                 return;
             }
             float hostR = 48.0f;
             if (skill.Host is Game.Player.PlayerActor actor)
                 hostR = actor.CurrentRadius;
             float r = skill.GetCalculatedArea(skill.ParamFloat(p, "radius", 95.0f)) + hostR;
-            DrawCircle(Vector2.Zero, r * 0.9f, new Color(accent, 0.10f));
-            DrawArc(Vector2.Zero, r * 0.65f, 0.0f, Mathf.Tau, 40, new Color(accent, 0.5f), 2.0f);
-            DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 48, new Color(core, 0.6f), 2.0f);
+            SkillVisualPresenters.DrawAuraRadial(this, r, accent, core);
         }
     }
 }

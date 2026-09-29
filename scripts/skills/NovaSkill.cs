@@ -174,9 +174,7 @@ public partial class NovaSkill : BaseSkill
         {
             var skill = SkillRef;
             Color accent = skill != null ? SkillAssetPalette.Accent(skill.SkillId, new Color(1.0f, 0.6f, 0.2f)) : new Color(1.0f, 0.6f, 0.2f);
-            float pulse = 1.0f + 0.1f * Mathf.Sin(_age * 10.0f);
-            DrawArc(Vector2.Zero, 22.0f * pulse, 0.0f, Mathf.Tau, 32, new Color(accent, 0.8f), 2.0f);
-            DrawCircle(Vector2.Zero, 6.0f, new Color(accent, 0.6f));
+            SkillVisualPresenters.DrawNovaMarker(this, _age, accent);
         }
     }
 
@@ -208,18 +206,7 @@ public partial class NovaSkill : BaseSkill
             float prog = _age / VisualDuration;
             float alpha = Mathf.Clamp(1.0f - prog, 0.0f, 1.0f);
             float r = Radius * prog;
-            if (ConeHalfAngle < 0.0f)
-            {
-                DrawCircle(Vector2.Zero, r, new Color(accent, 0.10f * alpha));
-                DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 48, new Color(accent, 0.8f * alpha), 5.0f);
-                DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 48, new Color(core, 0.9f * alpha), 2.0f);
-            }
-            else
-            {
-                float c = Aim.Angle();
-                DrawArc(Vector2.Zero, r, c - ConeHalfAngle, c + ConeHalfAngle, 36, new Color(accent, 0.8f * alpha), 5.0f);
-                DrawArc(Vector2.Zero, r, c - ConeHalfAngle, c + ConeHalfAngle, 36, new Color(core, 0.9f * alpha), 2.0f);
-            }
+            SkillVisualPresenters.DrawNova(this, r, alpha, ConeHalfAngle, Aim, accent, core);
         }
     }
 }

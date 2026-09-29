@@ -235,11 +235,7 @@ public partial class BeamSkill : BaseSkill
             Color accent = skill != null ? SkillAssetPalette.Accent(skill.SkillId, new Color(0.4f, 1.0f, 0.6f)) : new Color(0.4f, 1.0f, 0.6f);
             Color core = skill != null ? SkillAssetPalette.Core(skill.SkillId, Colors.White) : Colors.White;
             float alpha = Lifetime > 0.0f ? Mathf.Clamp(1.0f - _age / Lifetime, 0.0f, 1.0f) : 1.0f;
-            DrawLine(From, To, new Color(accent, 0.35f * alpha), Width + 8.0f);
-            DrawLine(From, To, new Color(accent, 0.9f * alpha), Width * 0.5f);
-            DrawLine(From, To, new Color(core, 0.95f * alpha), Width * 0.22f);
-            DrawCircle(From, Width * 0.6f, new Color(core, 0.8f * alpha));
-            DrawCircle(To, Width * 0.6f, new Color(accent, 0.8f * alpha));
+            SkillVisualPresenters.DrawBeam(this, From, To, Width, alpha, accent, core);
         }
     }
 }

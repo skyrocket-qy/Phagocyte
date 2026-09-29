@@ -28,11 +28,11 @@ scripts/GameRoot.cs        # run orchestrator
 scripts/core/              # GameManager, Stats, save, audio, achievements, tree, chamber
 scripts/core/assets/       # AssetLoader, AssetPaths, GodotAssetProvider
 scripts/core/data/         # CatalogBuilders/Loader, DataPaths, DataValidator
-scripts/player/            # PlayerActor (ClassId + classes.json def)
-scripts/camera/         # CameraFollow (hero-agnostic follow + trauma shake)
-scripts/skills/            # BaseSkill, SkillManager, 7 archetypes + generic visuals
-scripts/combat/            # Damage/SlowService, StatusCore/Ailments, Targeting, Projectiles, Vfx, hazards/
-scripts/enemies/           # EnemyActor + traits, EnemySpawner, steering, BossPhaseComponent
+scripts/player/            # PlayerActor (ClassId + classes.json def) + PlayerVisuals
+scripts/camera/            # CameraFollow (hero-agnostic follow + trauma shake)
+scripts/skills/            # BaseSkill, SkillManager, 7 archetypes + SkillVisualPresenters
+scripts/combat/            # Damage/SlowService, StatusCore/Ailments, Targeting, Projectiles, Vfx, CombatVisualPresenters, hazards/
+scripts/enemies/           # EnemyActor + traits, SwarmRenderer + SwarmTextureFactory, EnemySpawner, steering, BossPhaseComponent
 scripts/directors/         # Wave, Boss, Endless, Stage, Settlement, Neutral, IRunContext
 scripts/stages/            # data-driven StageEnvironment + generic props + vfx/
 scripts/equipment/         # EquipmentPiece, ContactSpikes

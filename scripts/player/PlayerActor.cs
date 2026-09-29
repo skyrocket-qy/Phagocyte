@@ -45,14 +45,17 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
     public float CurrentSpeed { get; set; } = 230.0f;
     public bool IsDead { get; set; } = false;
 
-    // Deformation Parameters
-    [Export] public int VertexCount { get; set; } = 32;
-    [Export] public float DeformationSpeed { get; set; } = 3.6f;
-    [Export] public float BaseDeformationMag { get; set; } = 24.0f;
-    public float CurrentDeformationMag { get; set; } = 24.0f;
-    [Export] public int SmoothSubdivisions { get; set; } = 4; // 32 * 4 = 128 high-density smooth points
-    public FastNoiseLite? Noise { get; set; }
-    public float NoiseTime { get; set; } = 0.0f;
+    public PlayerVisuals Visuals { get; set; } = new() { Name = "PlayerVisuals" };
+    public Godot.Collections.Dictionary GetClassDef() => ClassDef();
+
+    // Deformation Parameters (Forwarded to Visuals for backward compatibility)
+    public int VertexCount { get => Visuals.VertexCount; set => Visuals.VertexCount = value; }
+    public float DeformationSpeed { get => Visuals.DeformationSpeed; set => Visuals.DeformationSpeed = value; }
+    public float BaseDeformationMag { get => Visuals.BaseDeformationMag; set => Visuals.BaseDeformationMag = value; }
+    public float CurrentDeformationMag { get => Visuals.CurrentDeformationMag; set => Visuals.CurrentDeformationMag = value; }
+    public int SmoothSubdivisions { get => Visuals.SmoothSubdivisions; set => Visuals.SmoothSubdivisions = value; }
+    public FastNoiseLite? Noise { get => Visuals.Noise; set => Visuals.Noise = value; }
+    public float NoiseTime { get => Visuals.NoiseTime; set => Visuals.NoiseTime = value; }
 
     // --- Dodge roll micro-control (docs/skill.md §6) ---
     /// <summary>Maximum dodge charges (one agile burst each).</summary>
@@ -89,19 +92,19 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
     /// <summary>Set on the first real HP loss — drives the dodge tutorial cue.</summary>
     public bool HasTakenDamage { get; private set; } = false;
 
-    // Inertial Nucleus offset
-    public Vector2 NucleusOffset { get; set; } = Vector2.Zero;
-    public Vector2 NucleusVelocity { get; set; } = Vector2.Zero;
+    // Inertial Nucleus offset (delegated to Visuals)
+    public Vector2 NucleusOffset { get => Visuals.NucleusOffset; set => Visuals.NucleusOffset = value; }
+    public Vector2 NucleusVelocity { get => Visuals.NucleusVelocity; set => Visuals.NucleusVelocity = value; }
 
     // Status debuffs
     public float StunTimer { get; set; } = 0.0f;
     public float InvertControlsTimer { get; set; } = 0.0f;
 
-    // Node references
-    public Polygon2D? Cytoplasm { get; set; }
-    public Line2D? Membrane { get; set; }
-    public Polygon2D? Nucleus { get; set; }
-    public CollisionPolygon2D? EngulfCollider { get; set; }
+    // Visual Node references (delegated to Visuals)
+    public Polygon2D? Cytoplasm { get => Visuals.Cytoplasm; set => Visuals.Cytoplasm = value; }
+    public Line2D? Membrane { get => Visuals.Membrane; set => Visuals.Membrane = value; }
+    public Polygon2D? Nucleus { get => Visuals.Nucleus; set => Visuals.Nucleus = value; }
+    public CollisionPolygon2D? EngulfCollider { get => Visuals.EngulfCollider; set => Visuals.EngulfCollider = value; }
     public Area2D? EngulfArea { get; set; }
     public SkillManager? CellSkillManager { get; set; }
 
@@ -128,99 +131,18 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
         return _classDef;
     }
 
-    public partial class GranuleCanvas : Node2D
-    {
-        public struct Granule
-        {
-            public Vector2 BasePos;
-            public Vector2 CurrentOffset;
-            public Vector2 Velocity;
-            public float Size;
-            public Color GranuleColor;
-            public float BrownianPhase;
-            public float LagSensitivity;
-        }
-
-        public readonly List<Granule> Granules = new();
-
-        public override void _Draw()
-        {
-            for (int i = 0; i < Granules.Count; i++)
-            {
-                var g = Granules[i];
-                Vector2 drawPos = g.BasePos + g.CurrentOffset;
-                DrawCircle(drawPos, g.Size, g.GranuleColor);
-                if (g.Size > 2.4f)
-                {
-                    DrawCircle(drawPos, g.Size * 0.45f, new Color(g.GranuleColor.R * 1.5f, g.GranuleColor.G * 1.5f, g.GranuleColor.B * 1.8f, g.GranuleColor.A * 0.75f));
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Dodge-roll burst ring around the membrane mid-dash
-    /// (docs/skill.md §6 / tutorial.md cue 3). The HP readout moved to the
-    /// top-left HUD bar (VitalsView.HpBar); this node draws no health arc.
-    /// </summary>
-    public partial class DodgeRing : Node2D
-    {
-        public PlayerActor? Host { get; set; }
-
-        public override void _Process(double delta)
-        {
-            if (Host == null || !GodotObject.IsInstanceValid(Host))
-            {
-                Visible = false;
-                return;
-            }
-            Visible = Host.IsDodging;
-            if (Visible)
-                QueueRedraw();
-        }
-
-        public override void _Draw()
-        {
-            if (Host == null || !GodotObject.IsInstanceValid(Host) || !Host.IsDodging)
-                return;
-            float dashRadius = Host.CurrentRadius + 9.0f;
-            DrawArc(Vector2.Zero, dashRadius, 0.0f, Mathf.Tau, 48,
-                new Color(0.55f, 1.0f, 0.95f, 0.9f), 3.2f, true);
-        }
-    }
-
-    private GranuleCanvas? _granuleCanvas;
-    private DodgeRing? _dodgeRing;
-    private Tween? _hitFlashTween;
-
-    /// <summary>
-    /// Membrane geometry refreshes at 30 Hz (FPS survey §3): the noise-driven
-    /// morphology moves slowly, so per-physics-tick Catmull-Rom rebuilds,
-    /// collision rebakes and granule redraws are pure overhead. Phase math
-    /// stays exact by integrating the accumulated step. Direct callers (tests,
-    /// _Ready) still get a synchronous full rebuild.
-    /// </summary>
     public const float DeformInterval = 1.0f / 30.0f;
     private float _deformAccum;
-
-    // Reused deformation buffers (steady state: zero allocations per rebuild).
-    // Polygon2D/Line2D/CollisionPolygon2D setters marshal-copy, so reuse is safe.
-    private float[] _rawRadii = Array.Empty<float>();
-    private float[] _relaxedRadii = Array.Empty<float>();
-    private Vector2[] _controlPoints = Array.Empty<Vector2>();
-    private Vector2[] _smoothPoints = Array.Empty<Vector2>();
-    private Vector2[] _uvPoints = Array.Empty<Vector2>();
-    private Vector2[] _linePoints = Array.Empty<Vector2>();
-    private float _lastRadiusParam = float.NaN;
 
     public override void _Ready()
     {
         AddToGroup("player");
 
-        Cytoplasm = GetNodeOrNull<Polygon2D>("Cytoplasm");
-        Membrane = GetNodeOrNull<Line2D>("Membrane");
-        Nucleus = GetNodeOrNull<Polygon2D>("Nucleus");
-        EngulfCollider = GetNodeOrNull<CollisionPolygon2D>("EngulfArea/EngulfCollider");
+        if (Visuals.GetParent() == null)
+        {
+            AddChild(Visuals);
+        }
+
         EngulfArea = GetNodeOrNull<Area2D>("EngulfArea");
         CellSkillManager = GetNodeOrNull<SkillManager>("SkillManager");
 
@@ -253,12 +175,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
 
         Stats.StatChanged += OnStatChanged;
 
-        // EngulfArea doubles as the contact-damage sensor: overlapping
-        // monsters are polled every physics tick (see ProcessContactDamage).
-
-        SetupGranuleCanvas();
-        SetupNucleusShape();
-        SetupCytoplasmShader();
+        Visuals.Setup(this);
 
         // Initialize Skill System (5 Active + 5 Passive)
         if (CellSkillManager != null)
@@ -279,9 +196,6 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
 
         // Initial deformation tick
         UpdateBodyDeformation(0.016f);
-
-        _dodgeRing = new DodgeRing { Name = "DodgeRing", Host = this, ZIndex = 3 };
-        AddChild(_dodgeRing);
 
         EmitStatsSignal();
     }
@@ -334,136 +248,14 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
         MaxHealth = CatalogLoader.GetFloat(ClassDef(), "base_hp", MaxHealth);
         BaseSpeed = CatalogLoader.GetFloat(ClassDef(), "base_speed", BaseSpeed);
         BaseRadius = BodyDeformation.RealSizeToRadius(CatalogLoader.GetFloat(ClassDef(), "body_microns", 20.0f));
-        BaseDeformationMag = CatalogLoader.GetFloat(ClassDef(), "deform_mag", BaseDeformationMag);
-        DeformationSpeed = CatalogLoader.GetFloat(ClassDef(), "deform_speed", DeformationSpeed);
-        Noise = new FastNoiseLite
-        {
-            NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex,
-            Seed = (int)GD.Randi(),
-            Frequency = CatalogLoader.GetFloat(ClassDef(), "noise_freq", 0.65f),
-            FractalOctaves = CatalogLoader.GetInt(ClassDef(), "noise_octaves", 2)
-        };
-        if (Cytoplasm != null)
-            Cytoplasm.Color = CatalogLoader.GetColor(ClassDef(), "cyto_color", Cytoplasm.Color);
-        if (Membrane != null)
-            Membrane.DefaultColor = CatalogLoader.GetColor(ClassDef(), "membrane_color", Membrane.DefaultColor);
+        if (Visuals.Host == null)
+            Visuals.Setup(this);
+        else
+            Visuals.SetupIdentityVisuals(ClassDef());
     }
 
-    private void SetupGranuleCanvas()
-    {
-        _granuleCanvas = new GranuleCanvas { Name = "Granules", ZIndex = 0 };
-        AddChild(_granuleCanvas);
-
-        int count = 24;
-        for (int i = 0; i < count; i++)
-        {
-            float angle = (float)GD.RandRange(0.0, Mathf.Tau);
-            float dist = (float)GD.RandRange(6.0, (BaseRadius > 0 ? BaseRadius : 48.0f) * 0.65f);
-            Vector2 basePos = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * dist;
-
-            Color col;
-            float size;
-            if (i < 12)
-            {
-                col = new Color(0.24f, 0.10f, 0.38f, 0.55f);
-                size = (float)GD.RandRange(2.0, 3.5);
-            }
-            else if (i < 19)
-            {
-                col = new Color(0.42f, 0.55f, 0.70f, 0.45f);
-                size = (float)GD.RandRange(1.6, 2.6);
-            }
-            else
-            {
-                col = new Color(0.80f, 0.90f, 1.0f, 0.40f);
-                size = (float)GD.RandRange(1.8, 3.0);
-            }
-
-            _granuleCanvas.Granules.Add(new GranuleCanvas.Granule
-            {
-                BasePos = basePos,
-                CurrentOffset = Vector2.Zero,
-                Velocity = Vector2.Zero,
-                Size = size,
-                GranuleColor = col,
-                BrownianPhase = (float)GD.RandRange(0.0, 100.0),
-                LagSensitivity = (float)GD.RandRange(0.04, 0.09)
-            });
-        }
-    }
-
-    /// <summary>
-    /// Parametric nucleus from the class definition. Kinds are generic shape
-    /// functions (circle / notched / spoked / lobed / oval), not cell types.
-    /// </summary>
-    public void SetupNucleusShape()
-    {
-        int n = Mathf.Max(8, CatalogLoader.GetInt(ClassDef(), "nucleus_points", 32));
-        float nRadius = CatalogLoader.GetFloat(ClassDef(), "nucleus_radius", 18.0f);
-        string kind = CatalogLoader.GetString(ClassDef(), "nucleus_kind", "circle");
-        float amp = CatalogLoader.GetFloat(ClassDef(), "nucleus_amp", 0.0f);
-        float freq = CatalogLoader.GetFloat(ClassDef(), "nucleus_freq", 1.0f);
-        var nPts = new Vector2[n];
-        for (int i = 0; i < n; i++)
-        {
-            float a = i * (Mathf.Tau / (float)n);
-            float r = kind switch
-            {
-                "notch" => nRadius * (1.0f - amp * Mathf.Max(0.0f, Mathf.Cos(a * freq))),
-                "spoked" or "lobed" => nRadius * (1.0f + amp * Mathf.Cos(a * freq)),
-                "oval" => nRadius * (1.0f + amp * Mathf.Sin(a * freq)),
-                _ => nRadius,
-            };
-            nPts[i] = new Vector2(Mathf.Cos(a) * r, Mathf.Sin(a) * r);
-        }
-        if (Nucleus != null)
-        {
-            Nucleus.Color = CatalogLoader.GetColor(ClassDef(), "nucleus_color", Nucleus.Color);
-            Nucleus.Polygon = nPts;
-            var uvs = new Vector2[n];
-            for (int i = 0; i < n; i++)
-            {
-                uvs[i] = (nPts[i] / (nRadius * 2.0f)) + new Vector2(0.5f, 0.5f);
-            }
-            Nucleus.UV = uvs;
-            Nucleus.ZIndex = 0;
-
-            var shader = AssetLoader.Load<Shader>("res://shaders/nucleus_sphere.gdshader");
-            var nMat = new ShaderMaterial { Shader = shader };
-            nMat.SetShaderParameter("radius", nRadius);
-            nMat.SetShaderParameter("core_color", Nucleus.Color);
-            Color edgeCol = new Color(Nucleus.Color.R * 0.28f, Nucleus.Color.G * 0.15f, Nucleus.Color.B * 0.32f, 1.0f);
-            nMat.SetShaderParameter("edge_color", edgeCol);
-            Color highlightCol = new Color(Mathf.Min(1.0f, Nucleus.Color.R * 1.45f), Mathf.Min(1.0f, Nucleus.Color.G * 1.45f), Mathf.Min(1.0f, Nucleus.Color.B * 1.45f), 1.0f);
-            nMat.SetShaderParameter("highlight_color", highlightCol);
-            Nucleus.Material = nMat;
-        }
-        if (Cytoplasm != null)
-        {
-            Cytoplasm.ZIndex = 1;
-        }
-        if (Membrane != null)
-        {
-            Membrane.ZIndex = 2;
-        }
-    }
-
-    public void SetupCytoplasmShader()
-    {
-        if (Cytoplasm == null)
-            return;
-        var shader = AssetLoader.Load<Shader>("res://shaders/cytoplasm_gel.gdshader");
-        var mat = new ShaderMaterial { Shader = shader };
-        Color baseCol = Cytoplasm.Color;
-        mat.SetShaderParameter("tint_color", baseCol);
-        Color rimCol = new Color(0.85f, 0.95f, 1.25f, 1.0f);
-        mat.SetShaderParameter("rim_color", rimCol);
-        mat.SetShaderParameter("rim_power", 3.2f);
-        mat.SetShaderParameter("inner_alpha", 0.22f);
-        mat.SetShaderParameter("flow_speed", 1.0f);
-        mat.SetShaderParameter("cell_radius", CurrentRadius > 0 ? CurrentRadius : BaseRadius);
-        Cytoplasm.Material = mat;
-    }
+    public void SetupNucleusShape() => Visuals.SetupNucleusShape(ClassDef());
+    public void SetupCytoplasmShader() => Visuals.SetupCytoplasmShader();
 
     /// <summary>Innate skill from the class definition, resolved by id.</summary>
     public void SetupInitialSkills()
@@ -615,304 +407,22 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
 
     public void UpdateBodyDeformation(float delta)
     {
-        if (CatalogLoader.GetString(ClassDef(), "deform_kind", "standard") == "star")
-        {
-            UpdateDeformStar(delta);
-            return;
-        }
-        NoiseTime += delta * DeformationSpeed;
-
-        float areaScale = Stats != null ? Stats.GetStat("area") : 1.0f;
-
-        float curR = BaseRadius * areaScale;
-        CurrentDeformationMag = BaseDeformationMag * areaScale;
-
-        CurrentRadius = curR;
-
-        EnsureDeformBuffers(VertexCount, VertexCount * SmoothSubdivisions);
-        var points = _controlPoints;
-        var rawRadii = _rawRadii;
-        float angleStep = Mathf.Tau / (float)VertexCount;
-        Vector2 vel = Velocity;
-        Vector2 moveDir = vel.Length() > 20.0f ? vel.Normalized() : Vector2.Zero;
-
-        for (int i = 0; i < VertexCount; i++)
-        {
-            float angle = i * angleStep;
-            var dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-
-            float nx1 = Mathf.Cos(angle) * 1.5f;
-            float ny1 = Mathf.Sin(angle) * 1.5f;
-            float nVal1 = Noise != null ? Noise.GetNoise3D(nx1, ny1, NoiseTime) : 0.0f;
-
-            float nx2 = Mathf.Cos(angle * 2.0f) * 2.4f;
-            float ny2 = Mathf.Sin(angle * 2.0f) * 2.4f;
-            float nVal2 = Noise != null ? Noise.GetNoise3D(nx2, ny2, NoiseTime * 1.35f) * 0.40f : 0.0f;
-
-            float forwardBias = 0.0f;
-            if (moveDir != Vector2.Zero)
-            {
-                float dot = Mathf.Max(0.0f, dir.Dot(moveDir));
-                forwardBias = dot * (CurrentDeformationMag * 0.85f);
-            }
-
-            // Dodge stretch: elongate along travel, pinch the flanks.
-            float dashStretch = 1.0f;
-            if (IsDodging && moveDir != Vector2.Zero)
-            {
-                float align = dir.Dot(moveDir);
-                dashStretch = 1.0f + 0.25f * align - 0.15f * (1.0f - Mathf.Abs(align));
-            }
-
-            float r = (curR + ((nVal1 + nVal2) * CurrentDeformationMag) + forwardBias) * dashStretch;
-            // Biological lipid bilayer clamp: never collapse into negative spikes
-            rawRadii[i] = Mathf.Max(curR * 0.65f, r);
-        }
-
-        // Biological Surface Tension Filter (Laplacian Relaxation)
-        // Lipid bilayer surface tension prevents acute inflections / sharp V-notches
-        var relaxedRadii = _relaxedRadii;
-        for (int pass = 0; pass < 2; pass++)
-        {
-            for (int i = 0; i < VertexCount; i++)
-            {
-                int prev = (i - 1 + VertexCount) % VertexCount;
-                int next = (i + 1) % VertexCount;
-                relaxedRadii[i] = 0.25f * rawRadii[prev] + 0.50f * rawRadii[i] + 0.25f * rawRadii[next];
-            }
-            Array.Copy(relaxedRadii, rawRadii, VertexCount);
-        }
-
-        for (int i = 0; i < VertexCount; i++)
-        {
-            float angle = i * angleStep;
-            var dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-            points[i] = dir * rawRadii[i];
-        }
-
-        SmoothClosedPolygonInto(points, SmoothSubdivisions, _smoothPoints);
-
-        AssignDeformationMeshes(points, _smoothPoints, curR, updateShaderParam: true);
-
-        UpdateNucleus(delta);
-        UpdateGranules(delta);
+        if (Visuals.Host == null)
+            Visuals.Setup(this);
+        Visuals.UpdateBodyDeformation(delta);
     }
 
-    /// <summary>
-    /// Star-arm deformation (data: deform_kind "star", deform_arms N).
-    /// Projection arms ride on a softer noise base with weaker forward bias;
-    /// per-tick shader params are skipped, as at setup time.
-    /// </summary>
-    private void UpdateDeformStar(float delta)
-    {
-        NoiseTime += delta * DeformationSpeed;
-
-        float areaScale = Stats != null ? Stats.GetStat("area") : 1.0f;
-
-        float curR = BaseRadius * areaScale;
-        CurrentDeformationMag = BaseDeformationMag * areaScale;
-
-        CurrentRadius = curR;
-
-        int arms = Mathf.Max(1, CatalogLoader.GetInt(ClassDef(), "deform_arms", 7));
-        var points = GetControlBuffer();
-        float angleStep = Mathf.Tau / (float)VertexCount;
-        Vector2 vel = Velocity;
-        Vector2 moveDir = vel.Length() > 20.0f ? vel.Normalized() : Vector2.Zero;
-
-        for (int i = 0; i < VertexCount; i++)
-        {
-            float angle = i * angleStep;
-            var dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-
-            float nx = Mathf.Cos(angle) * 1.5f;
-            float ny = Mathf.Sin(angle) * 1.5f;
-            float nVal = Noise != null ? Noise.GetNoise3D(nx, ny, NoiseTime) : 0.0f;
-
-            float armVal = Mathf.Pow(Mathf.Max(0.0f, Mathf.Cos(angle * (float)arms)), 2.0f) * (CurrentDeformationMag * 0.75f);
-
-            float forwardBias = 0.0f;
-            if (moveDir != Vector2.Zero)
-            {
-                float dot = Mathf.Max(0.0f, dir.Dot(moveDir));
-                forwardBias = dot * (CurrentDeformationMag * 0.5f);
-            }
-
-            float r = curR + (nVal * CurrentDeformationMag * 0.6f) + armVal + forwardBias;
-            points[i] = dir * Mathf.Max(14.0f, r);
-        }
-
-        var smoothPoints = GetSmoothBuffer(2);
-        SmoothClosedPolygonInto(points, 2, smoothPoints);
-
-        AssignDeformationMeshes(points, smoothPoints, curR, updateShaderParam: false);
-
-        UpdateNucleus(delta);
-    }
-
-    /// <summary>Sizes the reused deformation buffers; reallocates only when counts change.</summary>
-    protected void EnsureDeformBuffers(int controlCount, int smoothCount)
-    {
-        if (_controlPoints.Length != controlCount)
-        {
-            _controlPoints = new Vector2[controlCount];
-            _rawRadii = new float[controlCount];
-            _relaxedRadii = new float[controlCount];
-        }
-        if (_smoothPoints.Length != smoothCount)
-        {
-            _smoothPoints = new Vector2[smoothCount];
-            _uvPoints = new Vector2[smoothCount];
-            _linePoints = new Vector2[smoothCount + 1];
-        }
-    }
-
-    /// <summary>Reused control-point buffer sized to <see cref="VertexCount"/> (for overrides).</summary>
-    protected Vector2[] GetControlBuffer()
-    {
-        EnsureDeformBuffers(VertexCount, VertexCount * SmoothSubdivisions);
-        return _controlPoints;
-    }
-
-    /// <summary>Reused smooth-point buffer sized to VertexCount * subdiv (for overrides).</summary>
-    protected Vector2[] GetSmoothBuffer(int subdivisions)
-    {
-        EnsureDeformBuffers(VertexCount, VertexCount * subdivisions);
-        return _smoothPoints;
-    }
-
-    /// <summary>
-    /// Assigns rebuilt morphology to the visual mesh, membrane line and contact
-    /// sensor collider (shared by the base deformation and the dendritic override).
-    /// The cell_radius shader upload is dirty-checked: radius only moves with
-    /// the area stat, not with per-rebuild noise.
-    /// </summary>
-    protected void AssignDeformationMeshes(Vector2[] controlPoints, Vector2[] smoothPoints, float curR, bool updateShaderParam)
-    {
-        if (Cytoplasm != null)
-        {
-            Cytoplasm.Polygon = smoothPoints;
-            float uvDenom = Mathf.Max(24.0f, curR * 2.4f);
-            for (int i = 0; i < smoothPoints.Length; i++)
-            {
-                _uvPoints[i] = (smoothPoints[i] / uvDenom) + new Vector2(0.5f, 0.5f);
-            }
-            Cytoplasm.UV = _uvPoints;
-            if (updateShaderParam && Cytoplasm.Material is ShaderMaterial smat
-                && (float.IsNaN(_lastRadiusParam) || Mathf.Abs(_lastRadiusParam - curR) > 0.01f))
-            {
-                smat.SetShaderParameter("cell_radius", curR);
-                _lastRadiusParam = curR;
-            }
-        }
-
-        if (Membrane != null)
-        {
-            Array.Copy(smoothPoints, _linePoints, smoothPoints.Length);
-            _linePoints[^1] = smoothPoints[0];
-            Membrane.Points = _linePoints;
-        }
-
-        if (EngulfCollider != null)
-        {
-            EngulfCollider.Polygon = controlPoints;
-        }
-    }
-
-    private void UpdateGranules(float delta)
-    {
-        if (_granuleCanvas == null || _granuleCanvas.Granules.Count == 0)
-            return;
-
-        Vector2 vel = Velocity;
-        float maxOffset = CurrentRadius * 0.35f;
-        float expansion = CurrentRadius / BaseRadius;
-
-        for (int i = 0; i < _granuleCanvas.Granules.Count; i++)
-        {
-            var g = _granuleCanvas.Granules[i];
-            g.BrownianPhase += delta * 2.2f;
-
-            // Brownian wander inside the cytoplasm
-            Vector2 brownian = new Vector2(
-                Mathf.Sin(g.BrownianPhase + i * 1.7f),
-                Mathf.Cos(g.BrownianPhase * 1.4f + i * 2.3f)
-            ) * (2.8f * expansion);
-
-            // Flow lag behind cell velocity (protoplasmic cyclosis)
-            Vector2 targetLag = -vel * g.LagSensitivity + brownian;
-            if (targetLag.Length() > maxOffset)
-            {
-                targetLag = targetLag.Normalized() * maxOffset;
-            }
-
-            // Damped spring physics
-            Vector2 accel = (targetLag - g.CurrentOffset) * 24.0f - g.Velocity * 7.0f;
-            g.Velocity += accel * delta;
-            g.CurrentOffset += g.Velocity * delta;
-
-            _granuleCanvas.Granules[i] = g;
-        }
-
-        _granuleCanvas.QueueRedraw();
-    }
-
-    /// <summary>Allocation-free Catmull-Rom core (writes into a reused buffer).</summary>
     public static void SmoothClosedPolygonInto(Vector2[] pts, int subdivisions, Vector2[] dest)
-    {
-        int n = pts.Length;
-        if (n < 4 || subdivisions <= 1)
-        {
-            Array.Copy(pts, dest, Math.Min(pts.Length, dest.Length));
-            return;
-        }
-
-        float step = 1.0f / (float)subdivisions;
-        int idx = 0;
-
-        for (int i = 0; i < n; i++)
-        {
-            Vector2 p0 = pts[(i - 1 + n) % n];
-            Vector2 p1 = pts[i];
-            Vector2 p2 = pts[(i + 1) % n];
-            Vector2 p3 = pts[(i + 2) % n];
-
-            for (int s = 0; s < subdivisions; s++)
-            {
-                float t = s * step;
-                float t2 = t * t;
-                float t3 = t2 * t;
-                dest[idx++] = 0.5f * (
-                    (2.0f * p1) +
-                    (-p0 + p2) * t +
-                    (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
-                    (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3
-                );
-            }
-        }
-    }
+        => PlayerVisuals.SmoothClosedPolygonInto(pts, subdivisions, dest);
 
     public void UpdateNucleus(float delta)
     {
-        if (Nucleus == null)
-            return;
-
-        // Physical inertia lag: nucleus lags behind opposite to velocity vector
-        Vector2 targetLag = -Velocity * 0.08f;
-        float maxLag = CurrentRadius * 0.32f;
-        if (targetLag.Length() > maxLag)
-        {
-            targetLag = targetLag.Normalized() * maxLag;
-        }
-
-        // Damped harmonic oscillator
-        float springK = 48.0f;
-        float damping = 9.5f;
-        Vector2 accel = (targetLag - NucleusOffset) * springK - NucleusVelocity * damping;
-        NucleusVelocity += accel * delta;
-        NucleusOffset += NucleusVelocity * delta;
-        Nucleus.Position = NucleusOffset;
+        if (Visuals.Host == null)
+            Visuals.Setup(this);
+        Visuals.UpdateNucleus(delta);
     }
+
+    public void FlashModulate(Color flashColor, float duration) => Visuals.FlashModulate(flashColor, duration);
 
     /// <summary>
     /// Survivor-like contact damage (one-directional): overlapping monsters
@@ -1039,19 +549,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStu
         }
 
 
-        // Hit-flash coalescing: in a contact storm only one flash tween may
-        // exist at a time. Re-creating (kill + CreateTween + tree insert) on
-        // every hit dominated TakeDamage at 300 strikes/sec; a running flash
-        // already reads as constant impact glow, so reuse it.
-        if (Cytoplasm != null && finalDmg > 0.1f && Health > 0.0f)
-        {
-            if (_hitFlashTween == null || !_hitFlashTween.IsValid())
-            {
-                _hitFlashTween = CreateTween();
-                Cytoplasm.Modulate = new Color(2.2f, 0.6f, 0.6f, 1.0f);
-                _hitFlashTween.TweenProperty(Cytoplasm, "modulate", new Color(1.0f, 1.0f, 1.0f, 1.0f), 0.1);
-            }
-        }
+        Visuals.FlashHit(finalDmg);
 
         EmitStatsSignal();
     }

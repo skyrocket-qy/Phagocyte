@@ -96,6 +96,8 @@ public partial class TestTelegraphAndProjectiles : SceneTree
         var stats = new ActorStats { Name = "ActorStats" };
         cell.AddChild(stats);
         cell.Stats = stats;
+        stats.SetBase("block", 0);
+        stats.SetBase("evasion", 0);
         cell.AddToGroup("player");
         Root.AddChild(cell);
 

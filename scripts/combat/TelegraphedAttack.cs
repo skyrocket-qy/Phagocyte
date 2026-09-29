@@ -80,45 +80,7 @@ public partial class TelegraphedAttack : Node2D
     public override void _Draw()
     {
         float progress = Mathf.Clamp(_timer / Mathf.Max(0.01f, TelegraphDuration), 0.0f, 1.0f);
-
-        // Biohazard microscope colors
-        Color borderCol = new Color(1.0f, 0.22f, 0.28f, 0.85f + 0.15f * Mathf.Sin(_timer * 15.0f));
-        Color bgFaintCol = new Color(0.9f, 0.1f, 0.15f, 0.15f);
-        Color fillChargingCol = new Color(1.0f, 0.15f + 0.25f * progress, 0.1f, 0.25f + 0.45f * progress);
-
-        if (Shape == TelegraphAttackShape.Line)
-        {
-            Rect2 totalRect = new Rect2(0, -LineWidth / 2.0f, LineLength, LineWidth);
-            Rect2 chargeRect = new Rect2(0, -LineWidth / 2.0f, LineLength * progress, LineWidth);
-
-            DrawRect(totalRect, bgFaintCol);
-            DrawRect(chargeRect, fillChargingCol);
-            DrawRect(totalRect, borderCol, filled: false, width: 2.0f);
-
-            // Center charging laser tracer
-            DrawLine(new Vector2(0, 0), new Vector2(LineLength * progress, 0), borderCol, 1.5f);
-        }
-        else if (Shape == TelegraphAttackShape.MultiCircle)
-        {
-            float subRadius = Radius * 0.7f;
-            for (int i = 0; i < MultiCircleOffsets.Length; i++)
-            {
-                Vector2 center = MultiCircleOffsets[i] * Radius;
-                DrawCircle(center, subRadius, bgFaintCol);
-                DrawCircle(center, subRadius * progress, fillChargingCol);
-                DrawArc(center, subRadius, 0, Mathf.Tau, 28, borderCol, 2.0f);
-            }
-        }
-        else // Circle
-        {
-            DrawCircle(Vector2.Zero, Radius, bgFaintCol);
-            DrawCircle(Vector2.Zero, Radius * progress, fillChargingCol);
-            DrawArc(Vector2.Zero, Radius, 0, Mathf.Tau, 36, borderCol, 2.5f);
-
-            // Expanding inner ripple
-            float rippleProgress = Mathf.PosMod(progress * 2.0f, 1.0f);
-            DrawArc(Vector2.Zero, Radius * rippleProgress, 0, Mathf.Tau, 32, new Color(1f, 0.8f, 0.2f, (1.0f - rippleProgress) * 0.7f), 1.5f);
-        }
+        TelegraphVisualPresenter.Draw(this, new TelegraphVisualState(Shape, progress, _timer, Radius, LineLength, LineWidth, MultiCircleOffsets));
     }
 
     public void ExecuteImpact()

@@ -167,24 +167,6 @@ public partial class Zone : Node2D
 
     public override void _Draw()
     {
-        float alphaRatio = Mathf.Clamp(1.0f - (_lifeTimer / Mathf.Max(0.01f, Duration)), 0.0f, 1.0f);
-        Color core = new Color(CoreColor.R, CoreColor.G, CoreColor.B, CoreColor.A * alphaRatio);
-        Color rim = new Color(RimColor.R, RimColor.G, RimColor.B, RimColor.A * alphaRatio);
-
-        float pulse = 1.0f + 0.04f * Mathf.Sin(_phase);
-        float drawRadius = CurrentRadius;
-        DrawCircle(Vector2.Zero, drawRadius * pulse, core);
-        DrawArc(Vector2.Zero, drawRadius * pulse, 0, Mathf.Tau, 32, rim, 2.0f);
-
-        for (int i = 0; i < 4; i++)
-        {
-            float angle = (i * (Mathf.Tau / 4.0f)) + _phase * 0.2f;
-            float dist = drawRadius * 0.45f + 8.0f * Mathf.Sin(_phase + i);
-            Vector2 pos = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * dist;
-            float bubbleRadius = 5.0f + 2.0f * Mathf.Sin(_phase * 1.5f + i);
-
-            DrawCircle(pos, bubbleRadius, new Color(rim.R, rim.G, rim.B, 0.4f * alphaRatio));
-            DrawArc(pos, bubbleRadius, 0, Mathf.Tau, 12, rim, 1.0f);
-        }
+        ZoneVisualPresenter.Draw(this, new ZoneVisualState(_lifeTimer, Duration, CurrentRadius, _phase, CoreColor, RimColor));
     }
 }

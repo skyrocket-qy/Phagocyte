@@ -178,22 +178,8 @@ public partial class StrikeSkill : BaseSkill
             Vector2 origin = ToLocal(skill.Host!.GlobalPosition);
             Vector2 tip = ToLocal(_tip == Vector2.Zero ? skill.Host.GlobalPosition : _tip);
             float halfWidth = skill.ParamFloat(p, "chain_half_width", 16.0f) * skill.GetCalculatedArea(1.0f);
-            Vector2 dir = (tip - origin).Normalized();
-            if (dir == Vector2.Zero)
-                return;
-            Vector2 perp = dir.Orthogonal();
-            DrawLine(origin, tip, new Color(accent, 0.5f), halfWidth * 0.7f);
-            DrawLine(origin, tip, new Color(core, 0.8f), halfWidth * 0.25f);
             string kind = skill.ParamString(p, "chain_kind", "cup");
-            if (kind == "fist")
-            {
-                for (int k = -1; k <= 1; k++)
-                    DrawCircle(tip + perp * k * halfWidth * 0.5f + dir * 6.0f, halfWidth * 0.35f, new Color(accent, 0.8f));
-            }
-            else
-            {
-                DrawArc(tip, halfWidth * 0.8f, dir.Angle() - 1.1f, dir.Angle() + 1.1f, 16, new Color(accent, 0.9f), 3.0f);
-            }
+            SkillVisualPresenters.DrawStrike(this, origin, tip, halfWidth, kind, accent, core);
         }
     }
 }

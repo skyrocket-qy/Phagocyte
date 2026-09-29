@@ -33,6 +33,14 @@ generic archetype executors (`PlayerActor`, `EnemyActor`, stage effects,
 salvo/beam/nova/zone/strike/aura, `StatPassive`) — never per-domain
 subclasses. A new behavior extends its archetype's schema.
 
+Representation and logic decoupling:
+Simulation logic (physics, damage, status effects, targeting, collision geometry)
+is decoupled from visual presentation. Visual presenters and factories
+(`scripts/skills/SkillVisualPresenters.cs`, `scripts/combat/CombatVisualPresenters.cs`,
+`scripts/enemies/SwarmTextureFactory.cs`, `scripts/player/PlayerVisuals.cs`) isolate
+procedural drawing, shader uniforms, image baking, and tweens without polluting
+simulation entities.
+
 The full file→layer map lives in `tools/check_arch.py`
 (`DOMAIN_FILES`, `AUTOLOAD_FILES`, `GAMEPLAY_PREFIXES`, `GAMEPLAY_FILES`,
 `COMPOSITION_ROOT_FILES`). Update the map — not the prose — when files move.
