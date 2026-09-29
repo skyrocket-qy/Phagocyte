@@ -217,14 +217,6 @@ public partial class SkillBarView : Node
         {
             skillsData = csharpSm.GetAllUiData();
         }
-        else if (smNode != null && smNode.HasMethod("GetAllUiData"))
-        {
-            skillsData = smNode.Call("GetAllUiData").AsGodotArray<Dictionary>();
-        }
-        else if (smNode != null && smNode.HasMethod("get_all_ui_data"))
-        {
-            skillsData = smNode.Call("get_all_ui_data").AsGodotArray<Dictionary>();
-        }
         else
         {
             return false;

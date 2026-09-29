@@ -326,14 +326,6 @@ public partial class StatusController : Node
         {
             damageable.TakeDoTDamage(damage);
         }
-        else if (parent.HasMethod("TakeDoTDamage"))
-        {
-            parent.Call("TakeDoTDamage", damage);
-        }
-        else if (parent.HasMethod("take_dot_damage"))
-        {
-            parent.Call("take_dot_damage", damage);
-        }
     }
 
     public bool IsActive(string id)

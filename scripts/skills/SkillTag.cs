@@ -18,8 +18,6 @@ public static class SkillTag
     public const string Melee = "Melee";
     public const string Trap = "Trap";
 
-    public static readonly string[] AllTags = { AOE, Attack, Spell, Projectile, Duration, Melee, Trap };
-
     /// <summary>
     /// Fluorescent theme colors for UI badges matching bio-microscopic aesthetic.
     /// </summary>
@@ -33,20 +31,5 @@ public static class SkillTag
         Melee => new Color(0.95f, 0.60f, 0.25f),      // Warm Orange (Contact / Pseudopod Reach)
         Trap => new Color(0.32f, 0.90f, 0.90f),       // Teal Phosphor (Stationary Bio-Mine / Puddle)
         _ => Colors.White
-    };
-
-    /// <summary>
-    /// Returns the universal stat names that scale skills bearing the given tag.
-    /// </summary>
-    public static string[] GetInfluencingStats(string tag) => tag switch
-    {
-        Attack => new[] { "might", "crit_chance", "crit_damage" },
-        Spell => new[] { "might", "ailment_damage", "crit_chance", "crit_damage" },
-        AOE => new[] { "area" },
-        Projectile => new[] { "projectile_speed", "pierce", "amount" },
-        Duration => new[] { "duration" },
-        Melee => new[] { "area", "knockback" },
-        Trap => new[] { "area", "duration" },
-        _ => Array.Empty<string>()
     };
 }

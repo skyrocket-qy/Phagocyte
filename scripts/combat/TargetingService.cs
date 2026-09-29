@@ -26,9 +26,7 @@ public static class TargetingService
             return false;
         if (n is EnemyActor enemy && enemy.CurrentHealth <= 0.0f)
             return false;
-        if (n is IDamageable)
-            return true;
-        return n.HasMethod("take_damage");
+        return n is IDamageable;
     }
 
     /// <summary>
@@ -133,30 +131,5 @@ public static class TargetingService
         }
 
         return false;
-    }
-
-    /// <summary>
-    /// Counts enemies within <paramref name="radius"/> of <paramref name="center"/>,
-    /// optionally restricted by <paramref name="predicate"/>.
-    /// </summary>
-    public static int CountInRadius(
-        Vector2 center,
-        float radius,
-        System.Func<EnemyActor, bool>? predicate = null)
-    {
-        int count = 0;
-        float radiusSq = radius * radius;
-        foreach (var enemy in EnemyActor.ActiveEnemies)
-        {
-            if (!IsValidTarget(enemy))
-                continue;
-            if (predicate != null && !predicate(enemy))
-                continue;
-
-            if (center.DistanceSquaredTo(enemy.GlobalPosition) <= radiusSq)
-                count++;
-        }
-
-        return count;
     }
 }

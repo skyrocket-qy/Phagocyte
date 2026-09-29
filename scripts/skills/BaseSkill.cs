@@ -197,10 +197,6 @@ public partial class BaseSkill : Node2D
         {
             host.AddModifier(stat, flat, percent);
         }
-        else if (Stats != null && Stats.HasMethod("add_modifier"))
-        {
-            Stats.Call("add_modifier", stat, flat, percent);
-        }
     }
 
     /// <summary>Removes a modifier previously registered by <see cref="ApplyStat"/>.</summary>
@@ -209,10 +205,6 @@ public partial class BaseSkill : Node2D
         if (Stats is IStatHost host)
         {
             host.RemoveModifier(stat, flat, percent);
-        }
-        else if (Stats != null && Stats.HasMethod("remove_modifier"))
-        {
-            Stats.Call("remove_modifier", stat, flat, percent);
         }
     }
 
@@ -327,11 +319,6 @@ public partial class BaseSkill : Node2D
             float cdr = host.GetStat("cooldown_reduction");
             return baseCd * (1.0f - cdr);
         }
-        else if (Stats != null && Stats.HasMethod("get_stat"))
-        {
-            float cdr = (float)Stats.Call("get_stat", "cooldown_reduction");
-            return baseCd * (1.0f - cdr);
-        }
         return baseCd;
     }
 
@@ -352,17 +339,6 @@ public partial class BaseSkill : Node2D
             float might = host.GetStat("might");
             return new DamageResult(baseDmg * might, false);
         }
-        else if (Stats != null && Stats.HasMethod("get_stat"))
-        {
-            float might = (float)Stats.Call("get_stat", "might");
-            float dmg = baseDmg * might;
-            bool rollCrit = Stats.HasMethod("roll_critical") && (bool)Stats.Call("roll_critical");
-            if (rollCrit)
-            {
-                return new DamageResult(dmg * (float)Stats.Call("get_stat", "crit_damage"), true);
-            }
-            return new DamageResult(dmg, false);
-        }
 
         return new DamageResult(baseDmg, false);
     }
@@ -371,8 +347,6 @@ public partial class BaseSkill : Node2D
     {
         if (Stats is IStatHost host)
             return baseArea * host.GetStat("area");
-        if (Stats != null && Stats.HasMethod("get_stat"))
-            return baseArea * (float)Stats.Call("get_stat", "area");
         return baseArea;
     }
 
@@ -380,8 +354,6 @@ public partial class BaseSkill : Node2D
     {
         if (Stats is IStatHost host)
             return baseAmount + (int)host.GetStat("amount");
-        if (Stats != null && Stats.HasMethod("get_stat"))
-            return baseAmount + (int)(float)Stats.Call("get_stat", "amount");
         return baseAmount;
     }
 
@@ -389,8 +361,6 @@ public partial class BaseSkill : Node2D
     {
         if (Stats is IStatHost host)
             return basePierce + (int)host.GetStat("pierce");
-        if (Stats != null && Stats.HasMethod("get_stat"))
-            return basePierce + (int)(float)Stats.Call("get_stat", "pierce");
         return basePierce;
     }
 
@@ -398,8 +368,6 @@ public partial class BaseSkill : Node2D
     {
         if (Stats is IStatHost host)
             return baseSpeed * host.GetStat("projectile_speed");
-        if (Stats != null && Stats.HasMethod("get_stat"))
-            return baseSpeed * (float)Stats.Call("get_stat", "projectile_speed");
         return baseSpeed;
     }
 
@@ -407,8 +375,6 @@ public partial class BaseSkill : Node2D
     {
         if (Stats is IStatHost host)
             return baseDuration * host.GetStat("duration");
-        if (Stats != null && Stats.HasMethod("get_stat"))
-            return baseDuration * (float)Stats.Call("get_stat", "duration");
         return baseDuration;
     }
 

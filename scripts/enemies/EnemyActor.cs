@@ -487,14 +487,6 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStunnable, IS
     {
         StunTimer = duration;
     }
-
-    // Compatibility methods for duck-typing
-    public float GetXpValue() => XpValue;
-    public float get_atp_value() => XpValue;
-    public int GetBaseScore() => BaseScore;
-    public int get_base_score() => BaseScore;
-    public void take_damage(float damage, Node2D? source = null) => TakeDamage(damage, source, false);
-    public void take_damage(float damage, Node2D? source, bool isCrit) => TakeDamage(damage, source, isCrit);
 }
 
 

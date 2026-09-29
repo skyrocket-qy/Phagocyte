@@ -270,11 +270,6 @@ public partial class AudioManager : Node
         PlaySfx("item_pickup", 0.10f, -2.0f);
     }
 
-    public void PlayShoot()
-    {
-        PlaySfx("shoot", 0.08f, -1.0f);
-    }
-
     public void PlayDodge()
     {
         PlaySfx("flame_dash", 0.10f, -2.0f);

@@ -90,13 +90,12 @@ public partial class TestBaseScore : SceneTree
         AssertThat(Score("malignant_cell")).IsEqual(100);
         AssertThat(Score("prion")).IsEqual(100);
 
-        // Every standard pathogen exposes a positive score and compat accessor
+        // Every standard pathogen exposes a positive score
         foreach (string id in AllenemyIds)
         {
             var enemy = EnemySpawner.CreateEnemy(id);
             AssertThat(enemy).IsNotNull();
             AssertThat(enemy!.BaseScore).IsGreater(0);
-            AssertThat(enemy.GetBaseScore()).IsEqual(enemy.BaseScore);
             enemy.Free();
         }
         GD.Print("[PASS] 20 pathogen BaseScore tiers (5 / 15 / 35 / 100) verified.");

@@ -3,14 +3,12 @@ using Godot;
 namespace Game.Combat;
 
 /// <summary>
-/// Shared combat shims so skills, projectiles and hazards do not repeat the
-/// C# / GDScript damage-dispatch branch.
+/// Shared combat damage service: routes damage directly to typed <see cref="IDamageable"/> targets.
 /// </summary>
 public static class DamageService
 {
     /// <summary>
-    /// Applies skill damage to a enemy, routing to the typed C# API when
-    /// possible and falling back to a GDScript <c>take_damage</c> method.
+    /// Applies skill damage to an entity, routing to the typed <see cref="IDamageable"/> API.
     /// </summary>
     public static void DealDamage(Node? target, float damage, Node2D? source, bool isCrit)
     {
@@ -20,10 +18,6 @@ public static class DamageService
         if (target is IDamageable damageable)
         {
             damageable.TakeDamage(damage, source, isCrit);
-        }
-        else if (target.HasMethod("take_damage"))
-        {
-            target.Call("take_damage", damage, source!, isCrit);
         }
     }
 
@@ -36,10 +30,6 @@ public static class DamageService
         if (target is IDamageable damageable)
         {
             damageable.TakeDamage(damage);
-        }
-        else if (target.HasMethod("take_damage"))
-        {
-            target.Call("take_damage", damage);
         }
     }
 }
