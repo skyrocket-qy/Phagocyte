@@ -257,7 +257,7 @@ public partial class TestSurvivorHudUx : TestHarness
         AssertThat(hud.BuffTag!.Visible).IsFalse();
 
         // Apply a Slow debuff
-        player.ApplySlow(3.0f, 0.5f);
+        player.Status?.ApplySlow(3.0f, 0.5f);
         hud._Process(0.016);
         AssertThat(hud.BuffTag.Visible).IsTrue();
         AssertThat(hud.BuffTag.Text.Contains("\U0001F40C")).IsTrue();

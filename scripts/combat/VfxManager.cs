@@ -12,7 +12,8 @@ public enum VfxType
     BiofilmBurst,
     MacRingBurst,
     MarkBind,
-    PerforinPore
+    PerforinPore,
+    PelletFizzle
 }
 
 /// <summary>

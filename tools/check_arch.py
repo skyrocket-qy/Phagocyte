@@ -153,6 +153,18 @@ STATIC_AUTOLOAD_FORBIDDEN = [
     (r"\bSkillManager\b", "Gameplay 'SkillManager' in autoload"),
 ]
 
+# Phase 9 lockdown: deleted hit-dispatch interfaces. Any reference anywhere
+# in scripts/ (all layers) is a leftover from the DealDamage era.
+STATIC_PIPELINE_FORBIDDEN = [
+    (r"\bILeechable\b", "Deleted interface 'ILeechable' referenced (route leech via DamagePipeline attacker id)"),
+    (r"\bISlowable\b", "Deleted interface 'ISlowable' referenced (route slow via IStatusHost.Status)"),
+    (r"\bIStunnable\b", "Deleted interface 'IStunnable' referenced (route stun via IStatusHost.Status)"),
+]
+
+# ResolveHit may only be invoked from gameplay simulation code. Domain must
+# stay SceneTree-free, autoloads must not deal damage, UI must not resolve hits.
+RESOLVE_HIT_NON_GAMEPLAY_LAYERS = ("domain", "autoload", "ui")
+
 STATIC_GAMEPLAY_FORBIDDEN = [
     (r"use\s+Game\.UI\s*;", "Namespace 'Game.UI' imported in gameplay"),
     (r"\bRunRecordsModal\b", "Concrete UI 'RunRecordsModal' in gameplay"),
@@ -271,6 +283,11 @@ def check_file(
             continue
         if is_allowlisted(rel, line):
             continue
+        for pat, desc in STATIC_PIPELINE_FORBIDDEN:
+            if re.search(pat, line):
+                violations.append(
+                    f"  {rel}:{num} -> [VIOLATION] {desc}\n    Line: {line.strip()}"
+                )
         if layer == "domain":
             rules = list(STATIC_DOMAIN_FORBIDDEN)
             for t in sorted(ui_types):
@@ -315,6 +332,11 @@ def check_file(
                     )
         # 'ui' layer: imports allowed by design (UI may read gameplay intent
         # state). No static rules.
+        if layer in RESOLVE_HIT_NON_GAMEPLAY_LAYERS and re.search(r"\bResolveHit\s*\(", line):
+            violations.append(
+                f"  {rel}:{num} -> [VIOLATION] 'ResolveHit' called from {layer} layer (combat simulation only)\n"
+                f"    Line: {line.strip()}"
+            )
     if layer == "gameplay":
         # Post-filter: drop the 'using Game.UI' hit when the file only
         # touches the DamageNumberSpawner autoload (allowed exception).
@@ -330,6 +352,51 @@ def check_file(
             ]
             if not non_spawner_ui:
                 violations = [v for v in violations if "Game.UI" not in v]
+    return violations
+
+
+def check_projectile_tick() -> list[str]:
+    """Phase 9 lockdown: no dictionary lookups inside the projectile hot loop."""
+    rel = "scripts/combat/ProjectileManager.cs"
+    path = ROOT_DIR / rel
+    try:
+        content = path.read_text(encoding="utf-8")
+    except Exception as e:
+        return [f"{rel}: failed to read: {e}"]
+    cleaned = "\n".join(line for _, line in strip_code_decorations(content))
+    dict_fields = set(re.findall(r"Dictionary<[^;{}]*?>\s+(_\w+)", cleaned))
+    start = cleaned.find("void _PhysicsProcess")
+    if start == -1:
+        return [f"{rel}: _PhysicsProcess not found"]
+    depth = 0
+    body_start = -1
+    body_end = -1
+    for i in range(cleaned.find("{", start), len(cleaned)):
+        if cleaned[i] == "{":
+            if body_start == -1:
+                body_start = i
+            depth += 1
+        elif cleaned[i] == "}":
+            depth -= 1
+            if depth == 0:
+                body_end = i
+                break
+    if body_start == -1 or body_end == -1:
+        return [f"{rel}: _PhysicsProcess body not found"]
+    body = cleaned[body_start:body_end]
+    violations = []
+    for field in sorted(dict_fields):
+        for m in re.finditer(rf"{re.escape(field)}\b", body):
+            ln = body.count("\n", 0, m.start()) + 1
+            violations.append(
+                f"  {rel}:_PhysicsProcess~{ln} -> [VIOLATION] dictionary '{field}' read on the per-tick hot path"
+            )
+    for pat in (r"\.TryGetValue\s*\(", r"\.ContainsKey\s*\("):
+        for m in re.finditer(pat, body):
+            ln = body.count("\n", 0, m.start()) + 1
+            violations.append(
+                f"  {rel}:_PhysicsProcess~{ln} -> [VIOLATION] dictionary lookup '{m.group(0)}' on the per-tick hot path"
+            )
     return violations
 
 
@@ -350,6 +417,7 @@ def main() -> int:
     all_violations: list[str] = []
     for fp in cs_files:
         all_violations.extend(check_file(fp, ui_types))
+    all_violations.extend(check_projectile_tick())
     if all_violations:
         print("\n" + "=" * 70)
         print(f"ARCHITECTURE VIOLATIONS DETECTED ({len(all_violations)} total):")

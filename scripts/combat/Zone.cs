@@ -14,8 +14,6 @@ public partial class Zone : Node2D
     public float Duration { get; set; } = 8.0f;
     public float TickInterval { get; set; } = 0.5f;
     public float Damage { get; set; } = 5.0f;
-    public float CritChance { get; set; }
-    public float CritMultiplier { get; set; } = 1.0f;
     public EffectSpec Effect0 { get; set; }
     public EffectSpec Effect1 { get; set; }
     public EffectSpec Effect2 { get; set; }
@@ -131,6 +129,7 @@ public partial class Zone : Node2D
         _fx1 = Effect1;
         _fx2 = Effect2;
         float slowDur = SlowDuration < 0.0f ? TickInterval * 1.5f : SlowDuration;
+        ulong attackerId = Source != null && GodotObject.IsInstanceValid(Source) ? Source.GetInstanceId() : 0;
         if (SourceTeam == Team.Enemy)
         {
             var player = EnemySteering.GetPlayer(this);
@@ -139,8 +138,16 @@ public partial class Zone : Node2D
             if (GlobalPosition.DistanceTo(player.GlobalPosition) > CurrentRadius)
                 return;
             if (Damage > 0.0f)
-                DamageService.DealDamage(player, Damage, null, CritChance, CritMultiplier);
-            EffectSpec.ApplyAll(player, in _fx0, in _fx1, in _fx2, EffectCount);
+                DamagePipeline.ResolveHit(new HitPayload
+                {
+                    RawDamage = Damage,
+                    Faction = Team.Enemy,
+                    AttackerId = attackerId,
+                    Effect0 = _fx0,
+                    Effect1 = _fx1,
+                    Effect2 = _fx2,
+                    EffectCount = EffectCount,
+                }, player);
             if (SlowFactor >= 0.0f)
                 player.Status?.ApplySlow(slowDur, 1.0f - SlowFactor);
             return;
@@ -148,16 +155,19 @@ public partial class Zone : Node2D
 
         float radius = CurrentRadius;
         float damage = Damage;
-        Node2D? source = Source;
-        float critChance = CritChance;
-        float critMult = CritMultiplier;
-        float slowFactor = SlowFactor;
         TargetingService.ForEachInRadius(GlobalPosition, radius, enemy =>
         {
-            DamageService.DealDamage(enemy, damage, source, critChance, critMult);
-            EffectSpec.ApplyAll(enemy, in _fx0, in _fx1, in _fx2, EffectCount);
-            if (slowFactor >= 0.0f && enemy.Status != null)
-                enemy.Status.ApplySlow(slowDur, 1.0f - slowFactor);
+            DamagePipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = damage,
+                AttackerId = attackerId,
+                Effect0 = _fx0,
+                Effect1 = _fx1,
+                Effect2 = _fx2,
+                EffectCount = EffectCount,
+            }, enemy);
+            if (SlowFactor >= 0.0f && enemy.Status != null)
+                enemy.Status.ApplySlow(slowDur, 1.0f - SlowFactor);
         });
     }
 

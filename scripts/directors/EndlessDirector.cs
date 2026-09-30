@@ -191,7 +191,7 @@ public partial class EndlessDirector : Node
                     if (ctx.Player is PlayerActor burned)
                     {
                         burned.TakeDamage(6.0f);
-                        SlowService.ApplySlow(ctx.Player, 1.2f, 0.6f);
+                        burned.Status?.ApplySlow(1.2f, 1.0f - 0.6f);
                     }
                 }
             }

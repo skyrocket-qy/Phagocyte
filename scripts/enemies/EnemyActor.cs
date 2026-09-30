@@ -8,7 +8,7 @@ using Game.UI;
 
 namespace Game.Enemies;
 
-public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStatusHost
+public partial class EnemyActor : Node2D, IDamageable, IStatusHost
 {
     [Signal]
     public delegate void EnemyDiedEventHandler(EnemyActor enemy);
@@ -279,17 +279,17 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStatusHost
         Position += Velocity * dt;
     }
 
-    public virtual void TakeDamage(float damage, Node2D? source = null)
+    public virtual HitResult TakeDamage(float damage, Node2D? source = null)
     {
-        TakeDamageInternal(damage, source, false);
+        return TakeDamageInternal(damage, source, false);
     }
 
-    public virtual void TakeDamage(float damage, Node2D? source, bool isCrit)
+    public virtual HitResult TakeDamage(float damage, Node2D? source, bool isCrit)
     {
-        TakeDamageInternal(damage, source, isCrit);
+        return TakeDamageInternal(damage, source, isCrit);
     }
 
-    protected void TakeDamageInternal(float damage, Node2D? source, bool isCrit)
+    protected HitResult TakeDamageInternal(float damage, Node2D? source, bool isCrit)
     {
         PreDamageTraits(damage, source);
 
@@ -299,7 +299,7 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStatusHost
         {
             ShieldCharges--;
             RedrawIfVisible();
-            return;
+            return new HitResult();
         }
 
         if (BossPhase != null)
@@ -320,16 +320,6 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStatusHost
         DamageNumberSpawner.ShowDamage(GlobalPosition, effectiveDmg, isCrit);
         RunTelemetryManager.Instance?.RecordDamageDealt(source?.Name ?? "direct", effectiveDmg);
 
-        if (source is ILeechable leechable && source is Node2D leechNode)
-        {
-            if (leechable.RollLifeSteal())
-            {
-                leechable.Heal(1.0f);
-                DamageNumberSpawner.ShowHeal(leechNode.GlobalPosition, 1.0f);
-                RunTelemetryManager.Instance?.RecordLifeSteal(1.0f);
-            }
-        }
-
         AudioManager.Instance?.PlayHit(isCrit);
         if (isCrit)
         {
@@ -348,6 +338,7 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStatusHost
         }
 
         PostDamageTraits(damage, source);
+        return new HitResult { DamageDealt = effectiveDmg };
     }
 
     public virtual void TakeDoTDamage(float dotDamage)
@@ -441,6 +432,7 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStatusHost
     public override void _ExitTree()
     {
         _activeEnemies.Remove(this);
+        DeadEntityRegistry.Remove(GetInstanceId());
         base._ExitTree();
     }
 
@@ -448,6 +440,7 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStatusHost
     // suppresses death/exp. Production enemies never subclass.
     public virtual void Die(Node2D? killer)
     {
+        DeadEntityRegistry.Add(GetInstanceId());
         RunDeathTraits();
         AudioManager.Instance?.PlayEnemyDeath();
         // All progression EXP flows through death, regardless of what
@@ -461,13 +454,6 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStatusHost
         RunTelemetryManager.Instance?.RecordKill(BaseScore);
         EmitSignal(SignalName.EnemyDied, this);
         QueueFree();
-    }
-
-    public void ApplySlow(float duration, float factor)
-    {
-        // Slow state lives in data (slow-channel carrier, strongest wins);
-        // this stays only as the ISlowable dispatch endpoint.
-        Status?.ApplySlow(duration, 1.0f - factor);
     }
 }
 

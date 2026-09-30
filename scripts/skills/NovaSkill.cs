@@ -18,8 +18,6 @@ public partial class NovaSkill : BaseSkill
     private float _delayTimer;
     private bool _delayArmed;
     private float _delayDmg;
-    private float _delayCritChance;
-    private float _delayCritMult;
 
     public override void Trigger()
     {
@@ -40,14 +38,13 @@ public partial class NovaSkill : BaseSkill
             _delayTimer = delay;
             _delayArmed = true;
             float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 130.0f));
-            GetDamage(baseDmg, out _delayDmg, out _delayCritChance, out _delayCritMult);
+            _delayDmg = GetCalculatedDamage(baseDmg);
             SpawnMarker(_markedTarget);
             return;
         }
 
         float baseDmgNow = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 32.0f));
-        GetDamage(baseDmgNow, out float dmg, out float critChance, out float critMult);
-        Detonate(Host!.GlobalPosition, dmg, critChance, critMult);
+        Detonate(Host!.GlobalPosition, GetCalculatedDamage(baseDmgNow));
     }
 
     public override void _Process(double delta)
@@ -67,38 +64,38 @@ public partial class NovaSkill : BaseSkill
         if (_marker != null && GodotObject.IsInstanceValid(_marker))
             _marker.QueueFree();
         _marker = null;
-        Detonate(center, _delayDmg, _delayCritChance, _delayCritMult);
+        Detonate(center, _delayDmg);
     }
 
     /// <summary>Direct detonation with a fresh damage roll (previews, tests).</summary>
     public void DetonateAt(Vector2 center)
     {
-        GetDamage(GetBaseDamageForLevel(0.0f), out float dmg, out float critChance, out float critMult);
-        Detonate(center, dmg, critChance, critMult);
+        Detonate(center, GetCalculatedDamage(GetBaseDamageForLevel(0.0f)));
     }
 
     /// <summary>Immediate detonation used by triggers and zone expiries.</summary>
-    public void Detonate(Vector2 center, float dmg, float critChance, float critMult)
+    public void Detonate(Vector2 center, float dmg)
     {
         var p = SkillParams();
         string shape = ParamString(p, "shape", "sphere");
         if (shape == "cone")
-            DetonateCone(center, dmg, critChance, critMult, p);
+            DetonateCone(center, dmg, p);
         else
-            DetonateSphere(center, dmg, critChance, critMult, p);
+            DetonateSphere(center, dmg, p);
         SpawnNovaFx(center, p);
     }
 
-    private void DetonateSphere(Vector2 center, float dmg, float critChance, float critMult, Dictionary p)
+    private void DetonateSphere(Vector2 center, float dmg, Dictionary p)
     {
         float radius = GetCalculatedArea(ParamFloat(p, "radius", ParamFloat(p, "reach", 480.0f)));
         float kbDist = ParamFloat(p, "knockback_dist", 0.0f);
         float kbTime = ParamFloat(p, "knockback_time", 0.2f);
         float slowDur = ParamFloat(p, "slow_duration", 0.0f);
         float slowFactor = ParamFloat(p, "slow_factor", 0.5f);
+        ulong attackerId = Host!.GetInstanceId();
         TargetingService.ForEachInRadius(center, radius, enemy =>
         {
-            DamageService.DealDamage(enemy, dmg, Host, critChance, critMult);
+            DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, enemy);
             if (kbDist > 0.0f)
             {
                 Vector2 push = (enemy.GlobalPosition - center).Normalized();
@@ -107,18 +104,19 @@ public partial class NovaSkill : BaseSkill
                 var tween = enemy.CreateTween();
                 tween.TweenProperty(enemy, "global_position", enemy.GlobalPosition + push * kbDist, kbTime);
             }
-            if (slowDur > 0.0f)
-                SlowService.ApplySlow(enemy, slowDur, slowFactor);
+            if (slowDur > 0.0f && enemy.Status != null)
+                enemy.Status.ApplySlow(slowDur, 1.0f - slowFactor);
         });
     }
 
-    private void DetonateCone(Vector2 center, float dmg, float critChance, float critMult, Dictionary p)
+    private void DetonateCone(Vector2 center, float dmg, Dictionary p)
     {
         Vector2 aimDir = Host!.Velocity.Length() > 20.0f ? Host.Velocity.Normalized() : Vector2.Right;
         float reach = GetCalculatedArea(ParamFloat(p, "reach", 320.0f));
         float halfCone = Mathf.DegToRad(ParamFloat(p, "angle", 100.0f) * 0.5f);
         float kbDist = ParamFloat(p, "knockback_dist", 80.0f);
         float kbTime = ParamFloat(p, "knockback_time", 0.2f);
+        ulong attackerId = Host!.GetInstanceId();
         TargetingService.ForEachInRadius(center, reach, enemy =>
         {
             Vector2 toEnemy = enemy.GlobalPosition - center;
@@ -127,7 +125,7 @@ public partial class NovaSkill : BaseSkill
             Vector2 push = toEnemy.Normalized();
             var tween = Host!.CreateTween();
             tween.TweenProperty(enemy, "global_position", enemy.GlobalPosition + push * kbDist, kbTime);
-            DamageService.DealDamage(enemy, dmg, Host, critChance, critMult);
+            DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, enemy);
         });
     }
 

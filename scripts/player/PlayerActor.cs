@@ -16,7 +16,7 @@ namespace Game.Player;
 /// Encapsulates universal stats, physics movement, 32-vertex organic deformation,
 /// and experience progression.
 /// </summary>
-public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStatusHost, ILeechable
+public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
 {
     [Signal]
     public delegate void StatsChangedEventHandler(float health, float maxHealth, float radiusRatio);
@@ -44,6 +44,18 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
     public float Health { get; set; } = 100.0f;
     public float CurrentSpeed { get; set; } = 230.0f;
     public bool IsDead { get; set; } = false;
+
+    /// <summary>Grace window: dead but settlement delayed for mutual-kill trades.</summary>
+    public bool IsDowned { get; private set; } = false;
+
+    /// <summary>Remaining grace time in seconds (ticks in _PhysicsProcess).</summary>
+    public float DownedTimer { get; private set; } = 0.0f;
+
+    /// <summary>Lethal blows open a 1.0s grace window before the Died signal settles the run.</summary>
+    public const float GracePeriodSeconds = 1.0f;
+
+    /// <summary>Global slow-mo during grace; restored at settlement.</summary>
+    public const float GraceTimeScale = 0.35f;
 
     public PlayerVisuals Visuals { get; set; } = new() { Name = "PlayerVisuals" };
     public Godot.Collections.Dictionary GetClassDef() => ClassDef();
@@ -206,6 +218,8 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
         if (IsDead)
         {
             Velocity = Vector2.Zero;
+            if (IsDowned)
+                TickDowned((float)delta);
             return;
         }
 
@@ -460,8 +474,6 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
         EmitStatsSignal();
     }
 
-    public bool RollLifeSteal() => Stats != null && Stats.RollLifeSteal();
-
     /// <summary>
     /// Damage intake. Endotoxemia (docs/endgame.md §4) amplifies all damage taken.
     /// </summary>
@@ -471,7 +483,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
     }
 
     /// <summary>Generic damage entry (IDamageable): full pipeline, source/crit unused.</summary>
-    public void TakeDamage(float damage, Node2D? source, bool isCrit) => TakeDamage(damage);
+    public HitResult TakeDamage(float damage, Node2D? source, bool isCrit) => ApplyDamage(damage * RunMutatorService.IncomingDamageMultiplier);
 
     /// <summary>Generic DoT entry (IDamageable): direct HP loss, bypasses evasion/block.</summary>
     public void TakeDoTDamage(float dotDamage)
@@ -483,27 +495,21 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
         HasTakenDamage = true;
         RunTelemetryManager.Instance?.RecordDamageTaken(dotDamage);
         if (Health <= 0.0f)
-        {
-            Health = 0.0f;
-            IsDead = true;
-            AudioManager.Instance?.PlayPlayerDeath();
-            CameraFollow.Instance?.AddTrauma(0.65f);
-            EmitSignal(SignalName.Died);
-        }
+            EnterDowned();
         EmitStatsSignal();
     }
 
-    private void ApplyDamage(float amount)
+    private HitResult ApplyDamage(float amount)
     {
         if (IsDead)
-            return;
+            return new HitResult();
 
         // Stage 0: Dodge invulnerability (takes precedence over
         // everything, including environmental damage).
         if (IsInvulnerable)
         {
             DamageNumberSpawner.ShowEvaded(GlobalPosition);
-            return;
+            return new HitResult { IsEvaded = true };
         }
 
         // Stage 1: Fluid deformation evasion
@@ -511,7 +517,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
         {
             DamageNumberSpawner.ShowEvaded(GlobalPosition);
             RunTelemetryManager.Instance?.RecordEvaded();
-            return;
+            return new HitResult { IsEvaded = true };
         }
 
         // Stage 2: Glycocalyx barrier block
@@ -519,7 +525,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
         {
             DamageNumberSpawner.ShowBlocked(GlobalPosition);
             RunTelemetryManager.Instance?.RecordBlocked();
-            return;
+            return new HitResult { IsBlocked = true };
         }
 
         // Stage 3: Armor damage reduction
@@ -534,13 +540,7 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
         HasTakenDamage = true;
 
         if (Health <= 0.0f)
-        {
-            Health = 0.0f;
-            IsDead = true;
-            AudioManager.Instance?.PlayPlayerDeath();
-            CameraFollow.Instance?.AddTrauma(0.65f);
-            EmitSignal(SignalName.Died);
-        }
+            EnterDowned();
         else
         {
             AudioManager.Instance?.PlayPlayerHit();
@@ -551,6 +551,31 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
         Visuals.FlashHit(finalDmg);
 
         EmitStatsSignal();
+        return new HitResult { DamageDealt = finalDmg };
+    }
+
+    /// <summary>Lethal blows mark death at once but delay the Died signal through grace.</summary>
+    private void EnterDowned()
+    {
+        Health = 0.0f;
+        IsDead = true;
+        IsDowned = true;
+        DownedTimer = GracePeriodSeconds;
+        Engine.TimeScale = GraceTimeScale;
+        AudioManager.Instance?.PlayPlayerDeath();
+        CameraFollow.Instance?.AddTrauma(0.65f);
+    }
+
+    /// <summary>Grace countdown; expiry emits Died so settlement runs exactly once.</summary>
+    private void TickDowned(float dt)
+    {
+        DownedTimer -= dt;
+        if (DownedTimer > 0.0f)
+            return;
+        IsDowned = false;
+        DownedTimer = 0.0f;
+        Engine.TimeScale = 1.0f;
+        EmitSignal(SignalName.Died);
     }
 
     public void ApplyImpulse(Vector2 impulse)
@@ -567,14 +592,6 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
             Health = Mathf.Clamp(Health, 0.0f, maxHp);
         }
         EmitStatsSignal();
-    }
-
-    public void ApplySlow(float duration, float factor)
-    {
-        // Factor is a 0-1 speed multiplier; the slow channel takes a removed
-        // fraction (SpeedMultiplier = 1 - strongest). This stays only as the
-        // ISlowable dispatch endpoint; state lives in data.
-        Status?.ApplySlow(duration, 1.0f - factor);
     }
 
     public void ApplyInvertControls(float duration)

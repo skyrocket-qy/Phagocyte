@@ -96,10 +96,12 @@ public partial class TestTelegraphAndProjectiles : SceneTree
         var stats = new ActorStats { Name = "ActorStats" };
         cell.AddChild(stats);
         cell.Stats = stats;
-        stats.SetBase("block", 0);
-        stats.SetBase("evasion", 0);
         cell.AddToGroup("player");
         Root.AddChild(cell);
+        // Zero the RNG after _Ready: class trait_stat (macrophage block 0.08)
+        // is seeded on entering the tree and would overwrite earlier values.
+        stats.SetBase("block", 0);
+        stats.SetBase("evasion", 0);
 
         float startingHp = cell.Health;
 
@@ -134,9 +136,7 @@ public partial class TestTelegraphAndProjectiles : SceneTree
                 new Vector2(100, 100),
                 Vector2.Right,
                 speed: 400.0f,
-                baseDamage: 20.0f,
-                critChance: 0.0f,
-                critMultiplier: 1.0f,
+                payload: new HitPayload { RawDamage = 20.0f },
                 pierce: 1,
                 lifetime: 2.0f,
                 radius: 10.0f,
@@ -199,8 +199,15 @@ public partial class TestTelegraphAndProjectiles : SceneTree
         float cellHpBefore = barbHost.Health;
         freshProjMgr.Spawn(
             barbHost.GlobalPosition + new Vector2(30, 0), Vector2.Left,
-            400.0f, 10.0f, 0.0f, 1.0f, 0, 2.0f, 10.0f, "enemy_pellet", Team.Enemy,
-            new EffectSpec { EffectId = "stun", Duration = 0.5f }, default, default, 1);
+            400.0f,
+            new HitPayload
+            {
+                RawDamage = 10.0f,
+                Faction = Team.Enemy,
+                Effect0 = new EffectSpec { EffectId = "stun", Duration = 0.5f },
+                EffectCount = 1,
+            },
+            0, 2.0f, 10.0f, "enemy_pellet", Team.Enemy);
         freshProjMgr._PhysicsProcess(0.12);
         AssertThat(barbHost.Health).IsLess(cellHpBefore);
         AssertThat(barbHost.StunTimer).IsGreater(0.0f);

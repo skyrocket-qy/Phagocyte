@@ -40,15 +40,24 @@ public partial class AuraSkill : BaseSkill
             + ParamFloat(p, "radius_offset", 0.0f)
             + (ParamBool(p, "plus_host_radius", false) ? hostR : 0.0f);
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 8.0f));
-        GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
+        float dmg = GetCalculatedDamage(baseDmg);
+        ulong attackerId = Host!.GetInstanceId();
+        int fxCount = BuildOnHitEffects(p, dmg, out var fx0, out var fx1, out var fx2);
         string sfx = ParamString(p, "sfx");
         bool hitAny = false;
 
         TargetingService.ForEachInRadius(Host!.GlobalPosition, radius, enemy =>
         {
             hitAny = true;
-            DamageService.DealDamage(enemy, dmg, Host, critChance, critMult);
-            ApplyOnHitEffects(enemy, p, dmg);
+            DamagePipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = dmg,
+                AttackerId = attackerId,
+                Effect0 = fx0,
+                Effect1 = fx1,
+                Effect2 = fx2,
+                EffectCount = fxCount,
+            }, enemy);
         });
         if (sfx != "" && hitAny)
             AudioManager.Instance?.PlaySfx(sfx);
@@ -79,7 +88,8 @@ public partial class AuraSkill : BaseSkill
             return;
         _orbitTick = ParamFloat(p, "tick", 0.22f);
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 28.0f));
-        GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
+        float dmg = GetCalculatedDamage(baseDmg);
+        ulong attackerId = Host!.GetInstanceId();
         float bladeR = ParamFloat(p, "blade_radius", 28.0f);
         bool hitAny = false;
         foreach (float angle in _bladeAngles)
@@ -88,7 +98,7 @@ public partial class AuraSkill : BaseSkill
             TargetingService.ForEachInRadius(bladePos, bladeR, enemy =>
             {
                 hitAny = true;
-                DamageService.DealDamage(enemy, dmg, Host, critChance, critMult);
+                DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, enemy);
             });
         }
         string sfx = ParamString(p, "sfx");

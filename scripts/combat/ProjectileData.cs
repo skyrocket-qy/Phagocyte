@@ -6,6 +6,7 @@ public enum Team
 {
     Player = 0,
     Enemy = 1,
+    Neutral = 2,
 }
 
 /// <summary>Stack-allocated data container for batched projectile simulation.</summary>
@@ -18,9 +19,8 @@ public struct ProjectileData
     public float Radius;
     public float Lifetime;
     public float ElapsedTime;
-    public float BaseDamage;
-    public float CritChance;
-    public float CritMultiplier;
+    /// <summary>Cast-frozen hit snapshot; flight never mutates it.</summary>
+    public HitPayload Payload;
     public int PierceRemaining;
     // Index into ProjectileManager batch layers; selects rendering MultiMesh.
     public int ProjectileTypeIndex;
@@ -35,12 +35,6 @@ public struct ProjectileData
     public float ReacquireRadius;
     public float Phase;
     public ulong HomingTargetId;
-    // Emitter instance id for damage attribution; 0 means sourceless.
-    public ulong EmitterId;
-    public EffectSpec Effect0;
-    public EffectSpec Effect1;
-    public EffectSpec Effect2;
-    public int EffectCount;
 
     public const byte SteeringLinear = 0;
     public const byte SteeringHoming = 1;

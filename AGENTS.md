@@ -12,6 +12,12 @@ earned the hard way (red suites, broken builds, ghost diffs).
 - No compat shims for renames: no `[Obsolete]` aliases, no old↔new key maps. Rename directly, fix call sites forward (extends "Code size" rule below).
 - Verify with zero-residual grep before declaring done: `BaseCell|BaseEnemy|Pathogen|Fibrin|Opson|Macrophage|Phagocyte\.` must return zero hits in `scripts/` (JSON/locale/art exempt).
 
+### Damage payload vs pipeline rule
+
+- `HitPayload` (`scripts/combat/DamageService.cs`) carries only what is **frozen at cast time** (raw damage, type, force flags, faction, attacker id, knockback impulse, effect specs). `DamagePipeline` (`scripts/combat/DamagePipeline.cs`) reads only what is **live at hit time** (armor/resists/shields, evasion/block, HP thresholds, attacker stats for crit/leech). Test for a new field: *"could this change between fire and impact?"* No → payload; yes → pipeline.
+- Flight/render state (`Position`, `ProjectileTypeIndex`, lifetime) lives **beside** the payload in `ProjectileData`, never inside it. Payload is small value-types + shared effect refs — a new field must justify its bytes and migrate all spawner call sites.
+- Resolution (`InstanceFromId`, status slots, catalogs) happens **on hit only**, never per-tick. Enforced by `check_arch.py`: no deleted-interface refs (`ILeechable`/`ISlowable`/`IStunnable`), `ResolveHit` callers limited to combat simulation layers, no dictionary reads in `ProjectileManager._PhysicsProcess`.
+
 ## Performance budget (1000+ entities — constraint, not aspiration)
 
 - Every design assumes 1000+ live entities. Current caps (300/450/500) are tuning, not architecture limits.
@@ -88,6 +94,7 @@ Godot --headless --path . -s res://tests/<Suite>.cs
 - Known-red at HEAD (fix or explicitly re-baseline, never silently delete):
   TestPerformancePipeline species count
   (parked in benchmarks/, do not fix in passing).
+  TestNewSystemsTriad Phase 3 (mock was never `IDamageable`, DoT never lands).
   Fixed this pass: TestCheats (helper moved to scripts/testing/CheatTools.cs),
   TestDifficultyTracks (suite now opts into MapEffectsEnabled),
   TestGearBalance opener bound (phagolysosome_core might 0.15 → 0.12).
@@ -98,6 +105,8 @@ Godot --headless --path . -s res://tests/<Suite>.cs
 
 - Damage asserts: zero the RNG first —
   `Stats.SetBase("block", 0)`, `Stats.SetBase("evasion", 0)`.
+  Zero AFTER `AddChild`: class `trait_stat` (e.g. macrophage `block` 0.08)
+  is reseeded in `_Ready` and overwrites earlier values (8% flake).
 - HUD / exp / arena suites: freeze spawners + clear the arena + reset player
   baselines on frame 1, and reset HUD snapshots (`LastCurrentExp` etc. —
   setting `CurrentExp` directly does NOT fire `ExpChanged`).

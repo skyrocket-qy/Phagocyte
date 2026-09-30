@@ -89,7 +89,8 @@ public partial class ContactSpikes : EquipmentPiece
     private void Intercept(EnemyActor enemy, Vector2 outward)
     {
         float damage = ContactDamage * GetStat("might");
-        DamageService.DealDamage(enemy, damage, Host, GetStat("crit_chance"), GetStat("crit_damage"));
+        ulong attackerId = Host != null && GodotObject.IsInstanceValid(Host) ? Host.GetInstanceId() : 0;
+        DamagePipeline.ResolveHit(new HitPayload { RawDamage = damage, AttackerId = attackerId }, enemy);
 
         float knockback = InterceptKnockback * Mathf.Max(0.2f, GetStat("knockback"));
         float spinSign = Mathf.Sign(RotationSpeed == 0.0f ? 1.0f : RotationSpeed);

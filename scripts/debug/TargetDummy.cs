@@ -37,12 +37,13 @@ public partial class TargetDummy : EnemyActor
 
     public override float GetCollisionRadius() => 20.0f;
 
-    public override void TakeDamage(float damage, Node2D? source, bool isCrit)
+    public override HitResult TakeDamage(float damage, Node2D? source, bool isCrit)
     {
         HitsReceived++;
         DamageAccumulated += damage;
         CurrentHealth = MaxHealth; // Instant health reset so dummy never dies in tests
         VfxManager.Instance?.Play(VfxType.CytoplasmSplatter, GlobalPosition);
+        return new HitResult { DamageDealt = damage };
     }
 
     public override void TakeDoTDamage(float dotDamage)

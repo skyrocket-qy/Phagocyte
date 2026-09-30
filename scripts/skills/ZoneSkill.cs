@@ -26,7 +26,7 @@ public partial class ZoneSkill : BaseSkill
 
         Vector2 center = DeployPoint(p);
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 14.0f));
-        GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
+        float dmg = GetCalculatedDamage(baseDmg);
 
         int count = GetCalculatedAmount(ParamInt(p, "count", 1));
         bool mineRow = p.ContainsKey("nova_radius");
@@ -51,8 +51,6 @@ public partial class ZoneSkill : BaseSkill
                 Duration = GetCalculatedDuration(ParamFloat(p, "duration", ParamFloat(p, "fuse", 4.0f))),
                 TickInterval = ParamFloat(p, "tick", 0.35f),
                 Damage = dmg,
-                CritChance = critChance,
-                CritMultiplier = critMult,
                 Effect0 = fx0,
                 Effect1 = fx1,
                 EffectCount = fxCount,
@@ -62,7 +60,7 @@ public partial class ZoneSkill : BaseSkill
                 RimColor = SkillAssetPalette.Accent(SkillId, new Color(0.4f, 0.9f, 0.7f)),
                 NovaOnExpiry = mineRow,
                 NovaRadius = GetCalculatedArea(ParamFloat(p, "nova_radius", 80.0f)),
-                Expired = mineRow ? center => ExpireNova(center, p, dmg, critChance, critMult) : null
+                Expired = mineRow ? center => ExpireNova(center, p, dmg) : null
             });
         }
     }
@@ -80,7 +78,7 @@ public partial class ZoneSkill : BaseSkill
     }
 
     /// <summary>Deploys the zone nova on expiry (mine rows).</summary>
-    public void ExpireNova(Vector2 center, Dictionary p, float dmg, float critChance, float critMult)
+    public void ExpireNova(Vector2 center, Dictionary p, float dmg)
     {
         var nova = new NovaSkill
         {
@@ -94,9 +92,10 @@ public partial class ZoneSkill : BaseSkill
         if (novaSfx != "")
             AudioManager.Instance?.PlaySfx(novaSfx);
         float radius = GetCalculatedArea(ParamFloat(p, "nova_radius", 80.0f));
+        ulong attackerId = Host!.GetInstanceId();
         TargetingService.ForEachInRadius(center, radius, enemy =>
         {
-            DamageService.DealDamage(enemy, dmg, Host, critChance, critMult);
+            DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, enemy);
         });
         var parent = Host!.GetParent();
         if (parent != null)

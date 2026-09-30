@@ -237,6 +237,7 @@ public partial class TestEndlessMode : TestHarness
 
         // Only membrane rupture ends an endless overdrive
         player.TakeDamage(999999.0f);
+        player._PhysicsProcess(PlayerActor.GracePeriodSeconds + 0.1f);
         AssertThat(main.RunEnded).IsTrue();
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(1);
         AssertThat(RunRecordManager.Records[0]["result"].AsString()).IsEqual(RunRecordManager.ResultDefeat);

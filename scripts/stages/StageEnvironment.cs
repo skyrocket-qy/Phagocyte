@@ -188,7 +188,7 @@ public sealed class StageEnvironment
             if (child is DotZone zone && GodotObject.IsInstanceValid(zone) && zone.Contains(player.GlobalPosition))
             {
                 player.TakeDamage(CatalogLoader.GetFloat(state.Def, "dps", 7.0f) * dt);
-                SlowService.ApplySlow(player, CatalogLoader.GetFloat(state.Def, "slow_factor", 0.3f), CatalogLoader.GetFloat(state.Def, "slow_duration", 0.7f));
+                player.Status?.ApplySlow(CatalogLoader.GetFloat(state.Def, "slow_factor", 0.3f), 1.0f - CatalogLoader.GetFloat(state.Def, "slow_duration", 0.7f));
                 break;
             }
         }

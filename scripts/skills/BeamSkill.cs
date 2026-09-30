@@ -69,15 +69,24 @@ public partial class BeamSkill : BaseSkill
             }
             hits.Sort((a, b) => a.along.CompareTo(b.along));
 
-            GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
+            float dmg = GetCalculatedDamage(baseDmg);
+            ulong attackerId = Host!.GetInstanceId();
+            int fxCount = BuildOnHitEffects(p, dmg, out var fx0, out var fx1, out var fx2);
             int struck = 0;
             foreach (var (enemy, _) in hits)
             {
                 if (struck >= pierce)
                     break;
                 struck++;
-                DamageService.DealDamage(enemy, dmg, Host, critChance, critMult);
-                ApplyOnHitEffects(enemy, p, dmg);
+                DamagePipeline.ResolveHit(new HitPayload
+                {
+                    RawDamage = dmg,
+                    AttackerId = attackerId,
+                    Effect0 = fx0,
+                    Effect1 = fx1,
+                    Effect2 = fx2,
+                    EffectCount = fxCount,
+                }, enemy);
                 VfxManager.Instance?.Play(VfxType.PerforinPore, enemy.GlobalPosition);
             }
             SpawnBeamFx(start, end, width);
@@ -98,7 +107,8 @@ public partial class BeamSkill : BaseSkill
     {
         int count = GetCalculatedAmount(ParamInt(p, "count", 3));
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 35.0f));
-        GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
+        float dmg = GetCalculatedDamage(baseDmg);
+        ulong attackerId = Host!.GetInstanceId();
 
         var visited = new HashSet<EnemyActor>();
         EnemyActor? current = TargetingService.FindNearest(Host!, ParamFloat(p, "range", 480.0f));
@@ -107,7 +117,7 @@ public partial class BeamSkill : BaseSkill
         while (current != null && jumps < count)
         {
             visited.Add(current);
-            DamageService.DealDamage(current, dmg, Host, critChance, critMult);
+            DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, current);
             SpawnBeamFx(from, current.GlobalPosition, 9.0f);
             from = current.GlobalPosition;
             jumps++;
@@ -149,7 +159,11 @@ public partial class BeamSkill : BaseSkill
         }
 
         float dps = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 32.0f));
-        DamageService.DealDamage(_channelTarget, dps * (float)delta, Host);
+        DamagePipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = dps * (float)delta,
+            AttackerId = Host!.GetInstanceId(),
+        }, _channelTarget);
         string meta = ParamString(p, "meta");
         if (meta != "" && !_channelTarget.HasMeta(meta))
             _channelTarget.SetMeta(meta, true);

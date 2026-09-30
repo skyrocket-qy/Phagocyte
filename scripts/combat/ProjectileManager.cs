@@ -172,38 +172,23 @@ public partial class ProjectileManager : Node2D
         _slotToActiveIdx[slotIndex] = -1;
     }
 
-    private static Node2D? ResolveEmitter(ulong emitterId)
-    {
-        if (emitterId == 0) return null;
-        var obj = GodotObject.InstanceFromId(emitterId);
-        return obj is Node2D node && GodotObject.IsInstanceValid(node) ? node : null;
-    }
-
     public void Spawn(
         Vector2 pos,
         Vector2 dir,
         float speed,
-        float baseDamage,
-        float critChance = 0.0f,
-        float critMultiplier = 1.0f,
+        in HitPayload payload,
         int pierce = 0,
         float lifetime = 2.5f,
         float radius = 10.0f,
         string projType = "generic",
         Team team = Team.Player,
-        EffectSpec effect0 = default,
-        EffectSpec effect1 = default,
-        EffectSpec effect2 = default,
-        int effectCount = 0,
         int steering = 0,
         float turnRate = 6.0f,
         float wobbleFreq = 0.0f,
         float wobbleAmp = 0.0f,
         float reacquireRadius = 350.0f,
-        ulong homingTargetId = 0,
-        Node2D? emitter = null)
+        ulong homingTargetId = 0)
     {
-        ulong emitterId = emitter != null && GodotObject.IsInstanceValid(emitter) ? emitter.GetInstanceId() : 0;
         if (dir == Vector2.Zero) dir = Vector2.Right;
         else dir = dir.Normalized();
 
@@ -224,9 +209,7 @@ public partial class ProjectileManager : Node2D
                     Radius = radius,
                     Lifetime = lifetime,
                     ElapsedTime = 0.0f,
-                    BaseDamage = baseDamage,
-                    CritChance = critChance,
-                    CritMultiplier = critMultiplier,
+                    Payload = payload,
                     PierceRemaining = pierce,
                     ProjectileTypeIndex = typeIndex,
                     IsActive = true,
@@ -241,12 +224,7 @@ public partial class ProjectileManager : Node2D
                     WobbleAmp = wobbleAmp,
                     ReacquireRadius = reacquireRadius,
                     Phase = 0.0f,
-                    HomingTargetId = homingTargetId,
-                    EmitterId = emitterId,
-                    Effect0 = effect0,
-                    Effect1 = effect1,
-                    Effect2 = effect2,
-                    EffectCount = effectCount
+                    HomingTargetId = homingTargetId
                 };
                 MarkActive(slot);
                 _nextSpawnIndex = (slot + 1) % MaxTotalProjectiles;
@@ -265,9 +243,7 @@ public partial class ProjectileManager : Node2D
             Radius = radius,
             Lifetime = lifetime,
             ElapsedTime = 0.0f,
-            BaseDamage = baseDamage,
-            CritChance = critChance,
-            CritMultiplier = critMultiplier,
+            Payload = payload,
             PierceRemaining = pierce,
             ProjectileTypeIndex = typeIndex,
             IsActive = true,
@@ -282,12 +258,7 @@ public partial class ProjectileManager : Node2D
             WobbleAmp = wobbleAmp,
             ReacquireRadius = reacquireRadius,
             Phase = 0.0f,
-            HomingTargetId = homingTargetId,
-            EmitterId = emitterId,
-            Effect0 = effect0,
-            Effect1 = effect1,
-            Effect2 = effect2,
-            EffectCount = effectCount
+            HomingTargetId = homingTargetId
         };
         MarkActive(overwriteSlot);
         _nextSpawnIndex = (_nextSpawnIndex + 1) % MaxTotalProjectiles;
@@ -320,8 +291,8 @@ public partial class ProjectileManager : Node2D
         if (hasTargets)
             RebuildEnemyIndex();
 
-        // Enemy-team shots fly at the player cell. Damage attribution comes
-        // from each projectile's emitter id, resolved only on hit.
+        // Enemy-team shots fly at the player cell. Hits resolve from the
+        // carried payload; attribution needs no per-tick resolution.
         PlayerActor? player = _hostNode as PlayerActor ?? EnemySteering.GetPlayer(this);
         bool playerValid = player != null && GodotObject.IsInstanceValid(player) && !player.IsDead;
         Vector2 playerPos = playerValid ? player!.GlobalPosition : Vector2.Zero;
@@ -345,6 +316,13 @@ public partial class ProjectileManager : Node2D
                 continue;
             }
 
+            if (p.SourceTeam == Team.Enemy && DeadEntityRegistry.Count > 0 && DeadEntityRegistry.IsDead(p.Payload.AttackerId))
+            {
+                VfxManager.Instance?.Play(VfxType.PelletFizzle, p.Position);
+                MarkInactive(slot);
+                continue;
+            }
+
             bool projectileAlive;
             if (p.SourceTeam == Team.Enemy)
             {
@@ -357,8 +335,7 @@ public partial class ProjectileManager : Node2D
                     if (p.Position.DistanceSquaredTo(playerPos) <= reach * reach)
                     {
                         p.AddHitTarget(playerId);
-                        DamageService.DealDamage(player, p.BaseDamage, ResolveEmitter(p.EmitterId), p.CritChance, p.CritMultiplier);
-                        EffectSpec.ApplyAll(player, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
+                        DamagePipeline.ResolveHit(p.Payload, player);
                         if (p.PierceRemaining > 0)
                             p.PierceRemaining--;
                         else
@@ -401,8 +378,7 @@ public partial class ProjectileManager : Node2D
                         if (p.Position.DistanceSquaredTo(enemy.GlobalPosition) <= hitDistSq)
                         {
                             p.AddHitTarget(enemyId);
-                            DamageService.DealDamage(enemy, p.BaseDamage, ResolveEmitter(p.EmitterId), p.CritChance, p.CritMultiplier);
-                            EffectSpec.ApplyAll(enemy, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
+                            DamagePipeline.ResolveHit(p.Payload, enemy);
 
                             if (p.PierceRemaining > 0)
                             {
@@ -534,11 +510,11 @@ public partial class ProjectileManager : Node2D
         for (int i = 0; i < _activeCount; i++)
         {
             ref var p = ref _projectiles[_activeSlots[i]];
-            if (!p.IsActive || p.SourceTeam != team || p.EffectCount <= 0)
+            if (!p.IsActive || p.SourceTeam != team || p.Payload.EffectCount <= 0)
                 continue;
-            if (p.Effect0.EffectId == effectId) return true;
-            if (p.EffectCount > 1 && p.Effect1.EffectId == effectId) return true;
-            if (p.EffectCount > 2 && p.Effect2.EffectId == effectId) return true;
+            if (p.Payload.Effect0.EffectId == effectId) return true;
+            if (p.Payload.EffectCount > 1 && p.Payload.Effect1.EffectId == effectId) return true;
+            if (p.Payload.EffectCount > 2 && p.Payload.Effect2.EffectId == effectId) return true;
         }
         return false;
     }

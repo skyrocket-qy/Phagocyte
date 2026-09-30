@@ -348,6 +348,8 @@ public partial class TestRunRecords : TestHarness
         doomed.Died += () => died = true;
         doomed.TakeDamage(999999.0f);
         AssertThat(doomed.IsDead).IsTrue();
+        AssertThat(died).IsFalse();
+        doomed._PhysicsProcess(PlayerActor.GracePeriodSeconds + 0.1f);
         AssertThat(died).IsTrue();
         AssertThat(doomed.Health).IsEqual(0.0f);
         doomed.QueueFree();
@@ -430,6 +432,7 @@ public partial class TestRunRecords : TestHarness
         player.TakeDamage(999999.0f);
 
         AssertThat(player.IsDead).IsTrue();
+        player._PhysicsProcess(PlayerActor.GracePeriodSeconds + 0.1f);
         AssertThat(main2.RunEnded).IsTrue();
         AssertThat(RunRecordManager.GetRunCount()).IsEqual(before + 1);
         AssertThat(RunRecordManager.Records[0]["result"].AsString()).IsEqual(RunRecordManager.ResultDefeat);

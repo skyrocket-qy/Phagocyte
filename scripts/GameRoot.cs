@@ -424,6 +424,7 @@ public partial class GameRoot : Node2D, IRunContext
     /// </summary>
     public void EndRun(bool victory, string cause = "")
     {
+        Engine.TimeScale = 1.0f;
         if (RunEnded)
             return;
 

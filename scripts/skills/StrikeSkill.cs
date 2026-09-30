@@ -27,7 +27,7 @@ public partial class StrikeSkill : BaseSkill
         int count = GetCalculatedAmount(ParamInt(p, "count", 1));
         float reach = GetCalculatedArea(ParamFloat(p, "reach", 280.0f));
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 28.0f));
-        GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
+        float dmg = GetCalculatedDamage(baseDmg);
 
         var found = new List<EnemyActor>();
         TargetingService.CollectInRadius(Host!.GlobalPosition, reach, found);
@@ -49,9 +49,7 @@ public partial class StrikeSkill : BaseSkill
                 SkillRef = this,
                 GlobalPosition = Host.GlobalPosition,
                 Target = enemy,
-                Damage = dmg,
-                CritChance = critChance,
-                CritMultiplier = critMult
+                Damage = dmg
             });
         }
     }
@@ -62,12 +60,13 @@ public partial class StrikeSkill : BaseSkill
     }
 
     /// <summary>Target arrival hook for chain visuals.</summary>
-    public void OnChainArrived(EnemyActor target, Vector2 tipPos, float dmg, float critChance, float critMult)
+    public void OnChainArrived(EnemyActor target, Vector2 tipPos, float dmg)
     {
         if (!HasValidHost() || !GodotObject.IsInstanceValid(target))
             return;
         var p = SkillParams();
-        DamageService.DealDamage(target, dmg, Host, critChance, critMult);
+        ulong attackerId = Host!.GetInstanceId();
+        DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, target);
         VfxManager.Instance?.Play(VfxType.CytoplasmSplatter, tipPos);
 
         if (p.ContainsKey("splash_radius"))
@@ -77,7 +76,7 @@ public partial class StrikeSkill : BaseSkill
             TargetingService.ForEachInRadius(tipPos, splashR, enemy =>
             {
                 if (enemy != target)
-                    DamageService.DealDamage(enemy, splashDmg, Host, critChance, critMult);
+                    DamagePipeline.ResolveHit(new HitPayload { RawDamage = splashDmg, AttackerId = attackerId }, enemy);
             });
         }
 
@@ -94,8 +93,6 @@ public partial class StrikeSkill : BaseSkill
         public StrikeSkill? SkillRef { get; set; }
         public EnemyActor? Target { get; set; }
         public float Damage { get; set; }
-        public float CritChance { get; set; }
-        public float CritMultiplier { get; set; } = 1.0f;
 
         /// <summary>Chain tip kind (cup / fist) for tests and previews.</summary>
         public string VisualKind { get; private set; } = "";
@@ -145,7 +142,7 @@ public partial class StrikeSkill : BaseSkill
                     {
                         _arrivedFired = true;
                         if (Target != null && GodotObject.IsInstanceValid(Target))
-                            skill.OnChainArrived(Target, _tip, Damage, CritChance, CritMultiplier);
+                            skill.OnChainArrived(Target, _tip, Damage);
                     }
                 }
             }

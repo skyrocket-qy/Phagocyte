@@ -26,8 +26,6 @@ public partial class SalvoSkill : BaseSkill
         public Vector2 Dir;
         public EnemyActor? Target;
         public float Damage;
-        public float CritChance;
-        public float CritMultiplier;
     }
 
     public override void Trigger()
@@ -39,7 +37,7 @@ public partial class SalvoSkill : BaseSkill
         int count = GetCalculatedAmount(ParamInt(p, "count", 1));
         float speed = GetCalculatedSpeed(ParamFloat(p, "speed", 420.0f));
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 18.0f));
-        GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
+        float dmg = GetCalculatedDamage(baseDmg);
 
         string pattern = ParamString(p, "pattern", "fan");
         string sfx = ParamString(p, "sfx");
@@ -48,7 +46,7 @@ public partial class SalvoSkill : BaseSkill
 
         if (pattern == "radial")
         {
-            FireRadial(p, count, speed, dmg, critChance, critMult);
+            FireRadial(p, count, speed, dmg);
             return;
         }
 
@@ -69,7 +67,7 @@ public partial class SalvoSkill : BaseSkill
                     : baseDir.Rotated((i - (count - 1) * 0.5f) * spread);
                 if (dir == Vector2.Zero)
                     dir = Vector2.Right;
-                QueueShot(staggerBase + i * staggerStep, dir, target, dmg, critChance, critMult);
+                QueueShot(staggerBase + i * staggerStep, dir, target, dmg);
             }
             return;
         }
@@ -81,7 +79,7 @@ public partial class SalvoSkill : BaseSkill
                 : baseDir.Rotated((float)GD.RandRange(-spread, spread));
             if (dir == Vector2.Zero)
                 dir = Vector2.Right;
-            QueueShot(staggerBase + i * staggerStep, dir, null, dmg, critChance, critMult);
+            QueueShot(staggerBase + i * staggerStep, dir, null, dmg);
         }
     }
 
@@ -92,14 +90,14 @@ public partial class SalvoSkill : BaseSkill
         return Host!.Velocity.Length() > 20.0f ? Host.Velocity.Normalized() : Vector2.Right;
     }
 
-    private void QueueShot(float delay, Vector2 dir, EnemyActor? target, float dmg, float critChance, float critMult)
+    private void QueueShot(float delay, Vector2 dir, EnemyActor? target, float dmg)
     {
         if (delay <= 0.0f)
         {
-            FireOne(dir, target, dmg, critChance, critMult);
+            FireOne(dir, target, dmg);
             return;
         }
-        _pending.Add(new PendingShot { Delay = delay, Dir = dir, Target = target, Damage = dmg, CritChance = critChance, CritMultiplier = critMult });
+        _pending.Add(new PendingShot { Delay = delay, Dir = dir, Target = target, Damage = dmg });
     }
 
     public override void _Process(double delta)
@@ -117,11 +115,11 @@ public partial class SalvoSkill : BaseSkill
             _pending.RemoveAt(i);
             if (shot.Target != null && !GodotObject.IsInstanceValid(shot.Target))
                 shot.Target = null;
-            FireOne(shot.Dir, shot.Target, shot.Damage, shot.CritChance, shot.CritMultiplier);
+            FireOne(shot.Dir, shot.Target, shot.Damage);
         }
     }
 
-    private void FireRadial(Dictionary p, int count, float speed, float dmg, float critChance, float critMult)
+    private void FireRadial(Dictionary p, int count, float speed, float dmg)
     {
         var mgr = ProjectileManager.Instance;
         if (mgr == null || !HasValidHost())
@@ -132,14 +130,14 @@ public partial class SalvoSkill : BaseSkill
         for (int i = 0; i < count; i++)
         {
             Vector2 dir = Vector2.FromAngle(i * Mathf.Tau / count);
-            mgr.Spawn(Host!.GlobalPosition, dir, speed, dmg, critChance, critMult,
+            mgr.Spawn(Host!.GlobalPosition, dir, speed,
+                new HitPayload { RawDamage = dmg, AttackerId = Host.GetInstanceId() },
                 GetCalculatedPierce(ParamInt(p, "pierce", 2)),
-                ParamFloat(p, "lifetime", 1.6f), ParamFloat(p, "hit_radius", 20.0f), "defensin_barb",
-                emitter: Host);
+                ParamFloat(p, "lifetime", 1.6f), ParamFloat(p, "hit_radius", 20.0f), "defensin_barb");
         }
     }
 
-    private void FireOne(Vector2 dir, EnemyActor? target, float dmg, float critChance, float critMult)
+    private void FireOne(Vector2 dir, EnemyActor? target, float dmg)
     {
         if (!HasValidHost())
             return;
@@ -163,13 +161,21 @@ public partial class SalvoSkill : BaseSkill
         int fxCount = BuildOnHitEffects(p, dmg, out fx0, out fx1, out fx2);
         mgr.Spawn(
             Host!.GlobalPosition, dir,
-            GetCalculatedSpeed(ParamFloat(p, "speed", 420.0f)), dmg, critChance, critMult,
+            GetCalculatedSpeed(ParamFloat(p, "speed", 420.0f)),
+            new HitPayload
+            {
+                RawDamage = dmg,
+                AttackerId = Host.GetInstanceId(),
+                Effect0 = fx0,
+                Effect1 = fx1,
+                Effect2 = fx2,
+                EffectCount = fxCount,
+            },
             GetCalculatedPierce(ParamInt(p, "pierce", 0)),
             GetCalculatedDuration(ParamFloat(p, "lifetime", 2.0f)),
-            ParamFloat(p, "hit_radius", 20.0f), "generic", Team.Player,
-            fx0, fx1, fx2, fxCount, steering,
+            ParamFloat(p, "hit_radius", 20.0f), "generic", Team.Player, steering,
             ParamFloat(p, "turn", 6.0f), ParamFloat(p, "wobble_freq", 0.0f), ParamFloat(p, "wobble_amp", 0.0f),
-            ParamFloat(p, "reacquire", 350.0f), lockId, Host);
+            ParamFloat(p, "reacquire", 350.0f), lockId);
     }
 
 }

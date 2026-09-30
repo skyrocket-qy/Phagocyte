@@ -490,11 +490,17 @@ public partial class EnemyActor
             GlobalPosition + dir * CatalogLoader.GetFloat(def, "spawn_offset", 16.0f),
             dir,
             CatalogLoader.GetFloat(def, "speed", 300.0f),
-            CatalogLoader.GetFloat(def, "damage", 9.0f),
-            0.0f, 1.0f, 0,
+            new HitPayload
+            {
+                RawDamage = CatalogLoader.GetFloat(def, "damage", 9.0f),
+                Faction = Team.Enemy,
+                AttackerId = GetInstanceId(),
+                Effect0 = fx,
+                EffectCount = fxCount,
+            },
+            0,
             CatalogLoader.GetFloat(def, "lifetime", 5.0f),
-            8.0f, "enemy_pellet", Team.Enemy,
-            fx, default, default, fxCount, emitter: this);
+            8.0f, "enemy_pellet", Team.Enemy);
     }
 
     private void TickReplicate(Dictionary def, float dt)
@@ -572,7 +578,7 @@ public partial class EnemyActor
         switch (kind)
         {
             case "slow":
-                SlowService.ApplySlow(player, CatalogLoader.GetFloat(def, "duration", 2.5f), CatalogLoader.GetFloat(def, "factor", 0.65f));
+                player.Status?.ApplySlow(CatalogLoader.GetFloat(def, "duration", 2.5f), 1.0f - CatalogLoader.GetFloat(def, "factor", 0.65f));
                 break;
             case "invert":
                 player.TakeDamage(ContactDamage);
@@ -780,7 +786,7 @@ public partial class EnemyActor
             CatalogLoader.GetFloat(def, "radius_max", 760.0f),
             1.0f - hpRatio);
         if (GlobalPosition.DistanceTo(player.GlobalPosition) <= radius)
-            SlowService.ApplySlow(player, CatalogLoader.GetFloat(def, "duration", 0.25f), CatalogLoader.GetFloat(def, "factor", 0.78f));
+            player.Status?.ApplySlow(CatalogLoader.GetFloat(def, "duration", 0.25f), 1.0f - CatalogLoader.GetFloat(def, "factor", 0.78f));
     }
 
     private void TickTraction(Dictionary def, float dt)

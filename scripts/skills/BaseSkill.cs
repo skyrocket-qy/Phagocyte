@@ -178,13 +178,6 @@ public partial class BaseSkill : Node2D
         return Host != null && GodotObject.IsInstanceValid(Host);
     }
 
-    protected void GetDamage(float baseDmg, out float damage, out float critChance, out float critMultiplier)
-    {
-        damage = GetCalculatedDamage(baseDmg);
-        critChance = GetCritChance();
-        critMultiplier = GetCritMultiplier();
-    }
-
     protected void ApplyStat(string stat, float flat, float percent)
     {
         if (Stats is IStatHost host)
@@ -275,22 +268,6 @@ public partial class BaseSkill : Node2D
         return n;
     }
 
-    /// <summary>
-    /// Applies on_hit entries directly (beam/aura hit-time paths, zero alloc).
-    /// </summary>
-    protected void ApplyOnHitEffects(Node? target, Dictionary p, float dmg)
-    {
-        if (target is not IStatusHost host || host.Status == null)
-            return;
-        if (!p.TryGetValue("on_hit", out var v) || v.VariantType != Variant.Type.Array)
-            return;
-        foreach (var item in v.AsGodotArray())
-        {
-            if (TryParseOnHit(item, dmg, out string ailment, out float mag, out float dur))
-                host.Status.Apply(ailment, mag, dur);
-        }
-    }
-
     protected int ParamInt(Godot.Collections.Dictionary p, string key, int fallback)
     {
         return CatalogLoader.GetInt(p, key, fallback);
@@ -320,23 +297,6 @@ public partial class BaseSkill : Node2D
         if (Stats is IStatHost host)
             return baseDmg * host.GetStat("might");
         return baseDmg;
-    }
-
-    public float GetCritChance()
-    {
-        if (Stats is IStatHost host)
-            return host.GetStat("crit_chance");
-        return 0.0f;
-    }
-
-    public float GetCritMultiplier()
-    {
-        if (Stats is IStatHost host)
-        {
-            float cd = host.GetStat("crit_damage");
-            return cd > 0.0f ? cd : 1.0f;
-        }
-        return 1.0f;
     }
 
     public float GetCalculatedArea(float baseArea)
