@@ -141,7 +141,7 @@ public partial class Zone : Node2D
                 DamagePipeline.ResolveHit(new HitPayload
                 {
                     RawDamage = Damage,
-                    Faction = Team.Enemy,
+                    SourceFaction = Team.Enemy,
                     AttackerId = attackerId,
                     Effect0 = _fx0,
                     Effect1 = _fx1,

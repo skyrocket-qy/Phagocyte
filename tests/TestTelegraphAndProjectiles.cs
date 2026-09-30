@@ -203,11 +203,11 @@ public partial class TestTelegraphAndProjectiles : SceneTree
             new HitPayload
             {
                 RawDamage = 10.0f,
-                Faction = Team.Enemy,
+                SourceFaction = Team.Enemy,
                 Effect0 = new EffectSpec { EffectId = "stun", Duration = 0.5f },
                 EffectCount = 1,
             },
-            0, 2.0f, 10.0f, "enemy_pellet", Team.Enemy);
+            0, 2.0f, 10.0f, "enemy_pellet");
         freshProjMgr._PhysicsProcess(0.12);
         AssertThat(barbHost.Health).IsLess(cellHpBefore);
         AssertThat(barbHost.StunTimer).IsGreater(0.0f);

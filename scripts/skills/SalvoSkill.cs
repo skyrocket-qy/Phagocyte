@@ -173,7 +173,7 @@ public partial class SalvoSkill : BaseSkill
             },
             GetCalculatedPierce(ParamInt(p, "pierce", 0)),
             GetCalculatedDuration(ParamFloat(p, "lifetime", 2.0f)),
-            ParamFloat(p, "hit_radius", 20.0f), "generic", Team.Player, steering,
+            ParamFloat(p, "hit_radius", 20.0f), "generic", steering,
             ParamFloat(p, "turn", 6.0f), ParamFloat(p, "wobble_freq", 0.0f), ParamFloat(p, "wobble_amp", 0.0f),
             ParamFloat(p, "reacquire", 350.0f), lockId);
     }

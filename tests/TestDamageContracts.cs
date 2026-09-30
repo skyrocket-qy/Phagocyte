@@ -64,7 +64,7 @@ public partial class TestDamageContracts : TestHarness
         HitPayload plain = DamageService.Snapshot(10.0f);
         AssertThat(plain.RawDamage).IsEqual(10.0f);
         AssertThat(plain.Type).IsEqual(DamageType.Physical);
-        AssertThat(plain.Faction).IsEqual(Team.Player);
+        AssertThat(plain.SourceFaction).IsEqual(Team.Player);
         AssertThat(plain.Flags).IsEqual(HitFlags.None);
         AssertThat(plain.AttackerId).IsEqual(0);
         AssertThat(plain.EffectCount).IsEqual(0);
@@ -76,7 +76,7 @@ public partial class TestDamageContracts : TestHarness
             HitFlags.AlwaysCrit | HitFlags.CannotBeEvaded);
         AssertThat(full.RawDamage).IsEqual(8.0f);
         AssertThat(full.Type).IsEqual(DamageType.Fire);
-        AssertThat(full.Faction).IsEqual(Team.Enemy);
+        AssertThat(full.SourceFaction).IsEqual(Team.Enemy);
         AssertThat(full.Knockback).IsEqual(knock);
         AssertThat(full.EffectCount).IsEqual(1);
         AssertThat(full.Effect0.EffectId).IsEqual("burn");
@@ -244,8 +244,8 @@ public partial class TestDamageContracts : TestHarness
         ulong shooterId = shooter.GetInstanceId();
 
         mgr.Spawn(Vector2.Zero, Vector2.Left, 100.0f,
-            new HitPayload { RawDamage = 5.0f, Faction = Team.Enemy, AttackerId = shooterId },
-            0, 5.0f, 8.0f, "enemy_pellet", Team.Enemy);
+            new HitPayload { RawDamage = 5.0f, SourceFaction = Team.Enemy, AttackerId = shooterId },
+            0, 5.0f, 8.0f, "enemy_pellet");
         mgr._PhysicsProcess(0.016);
         AssertThat(mgr.ActiveCount).IsEqual(1);
 
@@ -258,11 +258,11 @@ public partial class TestDamageContracts : TestHarness
         GD.Print("[PASS] Enemy pellets fizzle when their owner dies.");
 
         mgr.Spawn(new Vector2(500, 500), Vector2.Right, 100.0f,
-            new HitPayload { RawDamage = 5.0f, Faction = Team.Enemy },
-            0, 5.0f, 8.0f, "enemy_pellet", Team.Enemy);
+            new HitPayload { RawDamage = 5.0f, SourceFaction = Team.Enemy },
+            0, 5.0f, 8.0f, "enemy_pellet");
         mgr.Spawn(new Vector2(500, 520), Vector2.Right, 100.0f,
             new HitPayload { RawDamage = 5.0f, AttackerId = shooterId },
-            0, 5.0f, 8.0f, "generic", Team.Player);
+            0, 5.0f, 8.0f, "generic");
         mgr._PhysicsProcess(0.016);
         AssertThat(mgr.ActiveCount).IsEqual(2);
         GD.Print("[PASS] Sourceless pellets and player-faction shots survive enemy death.");

@@ -493,14 +493,14 @@ public partial class EnemyActor
             new HitPayload
             {
                 RawDamage = CatalogLoader.GetFloat(def, "damage", 9.0f),
-                Faction = Team.Enemy,
+                SourceFaction = Team.Enemy,
                 AttackerId = GetInstanceId(),
                 Effect0 = fx,
                 EffectCount = fxCount,
             },
             0,
             CatalogLoader.GetFloat(def, "lifetime", 5.0f),
-            8.0f, "enemy_pellet", Team.Enemy);
+            8.0f, "enemy_pellet");
     }
 
     private void TickReplicate(Dictionary def, float dt)

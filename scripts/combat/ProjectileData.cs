@@ -27,7 +27,6 @@ public struct ProjectileData
     // True while pooled slot is live; false means free for reuse.
     public bool IsActive;
 
-    public Team SourceTeam;
     public byte Steering;
     public float TurnRate;
     public float WobbleFreq;

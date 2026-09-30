@@ -181,7 +181,6 @@ public partial class ProjectileManager : Node2D
         float lifetime = 2.5f,
         float radius = 10.0f,
         string projType = "generic",
-        Team team = Team.Player,
         int steering = 0,
         float turnRate = 6.0f,
         float wobbleFreq = 0.0f,
@@ -217,7 +216,6 @@ public partial class ProjectileManager : Node2D
                     HitTarget1 = 0,
                     HitTarget2 = 0,
                     HitTarget3 = 0,
-                    SourceTeam = team,
                     Steering = (byte)steering,
                     TurnRate = turnRate,
                     WobbleFreq = wobbleFreq,
@@ -251,7 +249,6 @@ public partial class ProjectileManager : Node2D
             HitTarget1 = 0,
             HitTarget2 = 0,
             HitTarget3 = 0,
-            SourceTeam = team,
             Steering = (byte)steering,
             TurnRate = turnRate,
             WobbleFreq = wobbleFreq,
@@ -316,7 +313,7 @@ public partial class ProjectileManager : Node2D
                 continue;
             }
 
-            if (p.SourceTeam == Team.Enemy && DeadEntityRegistry.Count > 0 && DeadEntityRegistry.IsDead(p.Payload.AttackerId))
+            if (p.Payload.SourceFaction == Team.Enemy && DeadEntityRegistry.Count > 0 && DeadEntityRegistry.IsDead(p.Payload.AttackerId))
             {
                 VfxManager.Instance?.Play(VfxType.PelletFizzle, p.Position);
                 MarkInactive(slot);
@@ -324,7 +321,7 @@ public partial class ProjectileManager : Node2D
             }
 
             bool projectileAlive;
-            if (p.SourceTeam == Team.Enemy)
+            if (p.Payload.SourceFaction == Team.Enemy)
             {
                 p.Position += p.Direction * p.Speed * dt;
                 p.Rotation = p.Direction.Angle();
@@ -498,7 +495,7 @@ public partial class ProjectileManager : Node2D
         for (int i = 0; i < _activeCount; i++)
         {
             ref var p = ref _projectiles[_activeSlots[i]];
-            if (p.IsActive && p.SourceTeam == team)
+            if (p.IsActive && p.Payload.SourceFaction == team)
                 n++;
         }
         return n;
@@ -510,7 +507,7 @@ public partial class ProjectileManager : Node2D
         for (int i = 0; i < _activeCount; i++)
         {
             ref var p = ref _projectiles[_activeSlots[i]];
-            if (!p.IsActive || p.SourceTeam != team || p.Payload.EffectCount <= 0)
+            if (!p.IsActive || p.Payload.SourceFaction != team || p.Payload.EffectCount <= 0)
                 continue;
             if (p.Payload.Effect0.EffectId == effectId) return true;
             if (p.Payload.EffectCount > 1 && p.Payload.Effect1.EffectId == effectId) return true;
