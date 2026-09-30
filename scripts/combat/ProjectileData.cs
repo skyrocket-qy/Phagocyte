@@ -22,6 +22,7 @@ public struct ProjectileData
     public float CritChance;
     public float CritMultiplier;
     public int PierceRemaining;
+    // Index into ProjectileManager batch layers; selects rendering MultiMesh.
     public int ProjectileTypeIndex;
     // True while pooled slot is live; false means free for reuse.
     public bool IsActive;
