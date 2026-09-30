@@ -32,14 +32,13 @@ public struct HitResult
     public bool IsBlocked;
 }
 
-/// <summary>Frozen at cast: raw damage (unbaked), type, force flags, source faction, attacker, knockback, effects.</summary>
+/// <summary>Frozen at cast: raw damage (unbaked), type, force flags, source faction, attacker, effects.</summary>
 public struct HitPayload
 {
     public float RawDamage;
     public DamageType Type;
     public HitFlags Flags;
     public Team SourceFaction;
-    public Vector2 Knockback;
     public EffectSpec Effect0;
     public EffectSpec Effect1;
     public EffectSpec Effect2;
@@ -54,7 +53,6 @@ public static class DamageService
         float baseDamage,
         DamageType type = DamageType.Physical,
         Team sourceFaction = Team.Player,
-        Vector2 knockback = default,
         EffectSpec effect0 = default,
         EffectSpec effect1 = default,
         EffectSpec effect2 = default,
@@ -68,7 +66,6 @@ public static class DamageService
             Type = type,
             Flags = flags,
             SourceFaction = sourceFaction,
-            Knockback = knockback,
             Effect0 = effect0,
             Effect1 = effect1,
             Effect2 = effect2,

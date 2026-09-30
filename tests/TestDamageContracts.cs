@@ -69,15 +69,13 @@ public partial class TestDamageContracts : TestHarness
         AssertThat(plain.AttackerId).IsEqual(0);
         AssertThat(plain.EffectCount).IsEqual(0);
 
-        var knock = new Vector2(3.0f, 4.0f);
         HitPayload full = DamageService.Snapshot(
-            8.0f, DamageType.Fire, Team.Enemy, knock,
+            8.0f, DamageType.Fire, Team.Enemy,
             new EffectSpec { EffectId = "burn", Magnitude = 2.0f, Duration = 3.0f }, default, default, 1, 42,
             HitFlags.AlwaysCrit | HitFlags.CannotBeEvaded);
         AssertThat(full.RawDamage).IsEqual(8.0f);
         AssertThat(full.Type).IsEqual(DamageType.Fire);
         AssertThat(full.SourceFaction).IsEqual(Team.Enemy);
-        AssertThat(full.Knockback).IsEqual(knock);
         AssertThat(full.EffectCount).IsEqual(1);
         AssertThat(full.Effect0.EffectId).IsEqual("burn");
         AssertThat(full.AttackerId).IsEqual(42);

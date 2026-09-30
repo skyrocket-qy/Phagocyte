@@ -31,7 +31,6 @@ public static class DamagePipeline
             return result;
 
         DispatchEffects(payload, target, result.DamageDealt);
-        ApplyKnockback(payload, target);
         ApplyLeech(attacker, result.DamageDealt);
         return result;
     }
@@ -106,21 +105,6 @@ public static class DamagePipeline
             EnemyActor ea => ea.MaxHealth,
             _ => 0.0f,
         };
-    }
-
-    private static void ApplyKnockback(in HitPayload payload, Node target)
-    {
-        if (payload.Knockback == Vector2.Zero)
-            return;
-        switch (target)
-        {
-            case PlayerActor pa:
-                pa.ApplyImpulse(payload.Knockback);
-                break;
-            case EnemyActor ea:
-                ea.Velocity += payload.Knockback;
-                break;
-        }
     }
 
     private static void ApplyLeech(Node2D? attacker, float dealt)
