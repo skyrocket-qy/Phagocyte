@@ -320,12 +320,12 @@ public partial class EnemyActor : Node2D, IDamageable, ISlowable, IStatusHost
         DamageNumberSpawner.ShowDamage(GlobalPosition, effectiveDmg, isCrit);
         RunTelemetryManager.Instance?.RecordDamageDealt(source?.Name ?? "direct", effectiveDmg);
 
-        if (source is PlayerActor playerCell && playerCell.Stats != null)
+        if (source is ILeechable leechable && source is Node2D leechNode)
         {
-            if (playerCell.Stats.RollLifeSteal())
+            if (leechable.RollLifeSteal())
             {
-                playerCell.Heal(1.0f);
-                DamageNumberSpawner.ShowHeal(playerCell.GlobalPosition, 1.0f);
+                leechable.Heal(1.0f);
+                DamageNumberSpawner.ShowHeal(leechNode.GlobalPosition, 1.0f);
                 RunTelemetryManager.Instance?.RecordLifeSteal(1.0f);
             }
         }

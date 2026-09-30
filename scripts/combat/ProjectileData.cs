@@ -35,6 +35,8 @@ public struct ProjectileData
     public float ReacquireRadius;
     public float Phase;
     public ulong HomingTargetId;
+    // Emitter instance id for damage attribution; 0 means sourceless.
+    public ulong EmitterId;
     public EffectSpec Effect0;
     public EffectSpec Effect1;
     public EffectSpec Effect2;

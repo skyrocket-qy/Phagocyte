@@ -16,7 +16,7 @@ namespace Game.Player;
 /// Encapsulates universal stats, physics movement, 32-vertex organic deformation,
 /// and experience progression.
 /// </summary>
-public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStatusHost
+public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, IStatusHost, ILeechable
 {
     [Signal]
     public delegate void StatsChangedEventHandler(float health, float maxHealth, float radiusRatio);
@@ -459,6 +459,8 @@ public partial class PlayerActor : CharacterBody2D, ISlowable, IDamageable, ISta
         Health = Mathf.Clamp(Health + amount, 0.0f, maxHp);
         EmitStatsSignal();
     }
+
+    public bool RollLifeSteal() => Stats != null && Stats.RollLifeSteal();
 
     /// <summary>
     /// Damage intake. Endotoxemia (docs/endgame.md §4) amplifies all damage taken.

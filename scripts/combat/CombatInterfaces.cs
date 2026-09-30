@@ -17,3 +17,9 @@ public interface IStatusHost
 {
     StatusController? Status { get; }
 }
+
+public interface ILeechable
+{
+    bool RollLifeSteal();
+    void Heal(float amount);
+}

@@ -134,7 +134,8 @@ public partial class SalvoSkill : BaseSkill
             Vector2 dir = Vector2.FromAngle(i * Mathf.Tau / count);
             mgr.Spawn(Host!.GlobalPosition, dir, speed, dmg, critChance, critMult,
                 GetCalculatedPierce(ParamInt(p, "pierce", 2)),
-                ParamFloat(p, "lifetime", 1.6f), ParamFloat(p, "hit_radius", 20.0f), "defensin_barb");
+                ParamFloat(p, "lifetime", 1.6f), ParamFloat(p, "hit_radius", 20.0f), "defensin_barb",
+                emitter: Host);
         }
     }
 
@@ -168,7 +169,7 @@ public partial class SalvoSkill : BaseSkill
             ParamFloat(p, "hit_radius", 20.0f), "generic", Team.Player,
             fx0, fx1, fx2, fxCount, steering,
             ParamFloat(p, "turn", 6.0f), ParamFloat(p, "wobble_freq", 0.0f), ParamFloat(p, "wobble_amp", 0.0f),
-            ParamFloat(p, "reacquire", 350.0f), lockId);
+            ParamFloat(p, "reacquire", 350.0f), lockId, Host);
     }
 
 }

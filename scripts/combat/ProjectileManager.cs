@@ -172,6 +172,13 @@ public partial class ProjectileManager : Node2D
         _slotToActiveIdx[slotIndex] = -1;
     }
 
+    private static Node2D? ResolveEmitter(ulong emitterId)
+    {
+        if (emitterId == 0) return null;
+        var obj = GodotObject.InstanceFromId(emitterId);
+        return obj is Node2D node && GodotObject.IsInstanceValid(node) ? node : null;
+    }
+
     public void Spawn(
         Vector2 pos,
         Vector2 dir,
@@ -193,8 +200,10 @@ public partial class ProjectileManager : Node2D
         float wobbleFreq = 0.0f,
         float wobbleAmp = 0.0f,
         float reacquireRadius = 350.0f,
-        ulong homingTargetId = 0)
+        ulong homingTargetId = 0,
+        Node2D? emitter = null)
     {
+        ulong emitterId = emitter != null && GodotObject.IsInstanceValid(emitter) ? emitter.GetInstanceId() : 0;
         if (dir == Vector2.Zero) dir = Vector2.Right;
         else dir = dir.Normalized();
 
@@ -233,6 +242,7 @@ public partial class ProjectileManager : Node2D
                     ReacquireRadius = reacquireRadius,
                     Phase = 0.0f,
                     HomingTargetId = homingTargetId,
+                    EmitterId = emitterId,
                     Effect0 = effect0,
                     Effect1 = effect1,
                     Effect2 = effect2,
@@ -273,6 +283,7 @@ public partial class ProjectileManager : Node2D
             ReacquireRadius = reacquireRadius,
             Phase = 0.0f,
             HomingTargetId = homingTargetId,
+            EmitterId = emitterId,
             Effect0 = effect0,
             Effect1 = effect1,
             Effect2 = effect2,
@@ -309,8 +320,8 @@ public partial class ProjectileManager : Node2D
         if (hasTargets)
             RebuildEnemyIndex();
 
-        // Enemy-team shots fly at the player cell (the host doubles as the
-        // damage source for player-team shots, preserving life-steal).
+        // Enemy-team shots fly at the player cell. Damage attribution comes
+        // from each projectile's emitter id, resolved only on hit.
         PlayerActor? player = _hostNode as PlayerActor ?? EnemySteering.GetPlayer(this);
         bool playerValid = player != null && GodotObject.IsInstanceValid(player) && !player.IsDead;
         Vector2 playerPos = playerValid ? player!.GlobalPosition : Vector2.Zero;
@@ -346,7 +357,7 @@ public partial class ProjectileManager : Node2D
                     if (p.Position.DistanceSquaredTo(playerPos) <= reach * reach)
                     {
                         p.AddHitTarget(playerId);
-                        DamageService.DealDamage(player, p.BaseDamage, null, p.CritChance, p.CritMultiplier);
+                        DamageService.DealDamage(player, p.BaseDamage, ResolveEmitter(p.EmitterId), p.CritChance, p.CritMultiplier);
                         EffectSpec.ApplyAll(player, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
                         if (p.PierceRemaining > 0)
                             p.PierceRemaining--;
@@ -390,7 +401,7 @@ public partial class ProjectileManager : Node2D
                         if (p.Position.DistanceSquaredTo(enemy.GlobalPosition) <= hitDistSq)
                         {
                             p.AddHitTarget(enemyId);
-                            DamageService.DealDamage(enemy, p.BaseDamage, _hostNode, p.CritChance, p.CritMultiplier);
+                            DamageService.DealDamage(enemy, p.BaseDamage, ResolveEmitter(p.EmitterId), p.CritChance, p.CritMultiplier);
                             EffectSpec.ApplyAll(enemy, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
 
                             if (p.PierceRemaining > 0)
