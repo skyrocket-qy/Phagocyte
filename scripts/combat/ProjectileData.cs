@@ -23,6 +23,7 @@ public struct ProjectileData
     public float CritMultiplier;
     public int PierceRemaining;
     public int ProjectileTypeIndex;
+    // True while pooled slot is live; false means free for reuse.
     public bool IsActive;
 
     public Team SourceTeam;
