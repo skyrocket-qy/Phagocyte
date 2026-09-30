@@ -163,6 +163,7 @@ Goal: stats work on any host (hero full set, enemy/minion subsets), 1000+ entity
 
 Goal: snapshot at cast (`HitPayload`), dumb flight (`ProjectileManager`), smart hit (`DamagePipeline`). Source: `PLAN.md` (5 phases).
 
+- [ ] **9**: survey https://github.com/PathOfBuildingCommunity/PathOfBuilding-PoE2 and https://github.com/PathOfBuildingCommunity/PathOfBuilding find the compute formula...etc
 - [ ] **9.0 Baselines (decided)**: capture `benchmarks/` numbers first. Locked: 3-slot `EffectSpec` stays (amend PLAN.md); `Team` gains `Neutral = 2`; `EmitterId` → `AttackerId` rename-direct during migration; zero-alloc via benchmark observation, not asserts; confirm `check-config` already FK-checks skill→ailment refs before adding boot validation.
 - [ ] **9.1 Contracts**: `HitPayload` (~40B: raw damage, damage type, hit flags incl. cast-rolled `IsCrit`, faction, armor pen, ailment mult, knockback impulse, effect specs, attacker id) + `HitResult` + `DamageType`/`HitFlags`, co-located in `DamageService.cs`. Crit moves from `DealDamage` RNG roll to cast-time snapshot.
 - [ ] **9.2 Pipeline**: new `DamagePipeline.ResolveHit(payload, target)` (mitigation → ailment derivation vs max-HP threshold → status dispatch → leech via attacker id). Migrate the 16 `DealDamage` call sites one archetype at a time (projectiles → beam/aura/nova/zone/strike → DoT/traits), deleting old paths per archetype. Actors keep HP/death/EXP/VFX. Deletes `ILeechable` (bridge from emitter work — zero-residual grep) and `ISlowable` (route via status dispatch).
