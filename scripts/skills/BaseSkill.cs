@@ -178,11 +178,11 @@ public partial class BaseSkill : Node2D
         return Host != null && GodotObject.IsInstanceValid(Host);
     }
 
-    protected void GetDamage(float baseDmg, out float damage, out bool isCrit)
+    protected void GetDamage(float baseDmg, out float damage, out float critChance, out float critMultiplier)
     {
-        var data = GetCalculatedDamage(baseDmg);
-        damage = data.Damage;
-        isCrit = data.IsCrit;
+        damage = GetCalculatedDamage(baseDmg);
+        critChance = GetCritChance();
+        critMultiplier = GetCritMultiplier();
     }
 
     protected void ApplyStat(string stat, float flat, float percent)
@@ -315,25 +315,28 @@ public partial class BaseSkill : Node2D
         return baseCd;
     }
 
-    public DamageResult GetCalculatedDamage(float baseDmg)
+    public float GetCalculatedDamage(float baseDmg)
     {
-        if (Stats is ActorStats cs)
-        {
-            float might = cs.GetStat("might");
-            float dmg = baseDmg * might;
-            if (cs.RollCritical())
-            {
-                return new DamageResult(dmg * cs.GetStat("crit_damage"), true);
-            }
-            return new DamageResult(dmg, false);
-        }
-        else if (Stats is IStatHost host)
-        {
-            float might = host.GetStat("might");
-            return new DamageResult(baseDmg * might, false);
-        }
+        if (Stats is IStatHost host)
+            return baseDmg * host.GetStat("might");
+        return baseDmg;
+    }
 
-        return new DamageResult(baseDmg, false);
+    public float GetCritChance()
+    {
+        if (Stats is IStatHost host)
+            return host.GetStat("crit_chance");
+        return 0.0f;
+    }
+
+    public float GetCritMultiplier()
+    {
+        if (Stats is IStatHost host)
+        {
+            float cd = host.GetStat("crit_damage");
+            return cd > 0.0f ? cd : 1.0f;
+        }
+        return 1.0f;
     }
 
     public float GetCalculatedArea(float baseArea)

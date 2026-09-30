@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using System;
 using System.Collections.Generic;
 using GdUnit4;
@@ -271,7 +271,7 @@ public partial class TestPerformancePipeline : TestHarness
         AssertThat(manager!.ActiveCount).IsEqual(0);
 
         float hpBefore = target.CurrentHealth;
-        manager.Spawn(new Vector2(0.0f, 0.0f), Vector2.Right, 600.0f, 5.0f, false, 0, 1.0f, 10.0f, "generic");
+        manager.Spawn(new Vector2(0.0f, 0.0f), Vector2.Right, 600.0f, 5.0f, 0.0f, 1.0f, 0, 1.0f, 10.0f, "generic");
 
         // One manual physics step carries the projectile 36px -> inside hit range
         manager._PhysicsProcess(0.06);

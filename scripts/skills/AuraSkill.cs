@@ -40,14 +40,14 @@ public partial class AuraSkill : BaseSkill
             + ParamFloat(p, "radius_offset", 0.0f)
             + (ParamBool(p, "plus_host_radius", false) ? hostR : 0.0f);
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 8.0f));
-        GetDamage(baseDmg, out float dmg, out bool crit);
+        GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
         string sfx = ParamString(p, "sfx");
         bool hitAny = false;
 
         TargetingService.ForEachInRadius(Host!.GlobalPosition, radius, enemy =>
         {
             hitAny = true;
-            DamageService.DealDamage(enemy, dmg, Host, crit);
+            DamageService.DealDamage(enemy, dmg, Host, critChance, critMult);
             ApplyOnHitEffects(enemy, p, dmg);
         });
         if (sfx != "" && hitAny)
@@ -79,7 +79,7 @@ public partial class AuraSkill : BaseSkill
             return;
         _orbitTick = ParamFloat(p, "tick", 0.22f);
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 28.0f));
-        GetDamage(baseDmg, out float dmg, out bool crit);
+        GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
         float bladeR = ParamFloat(p, "blade_radius", 28.0f);
         bool hitAny = false;
         foreach (float angle in _bladeAngles)
@@ -88,7 +88,7 @@ public partial class AuraSkill : BaseSkill
             TargetingService.ForEachInRadius(bladePos, bladeR, enemy =>
             {
                 hitAny = true;
-                DamageService.DealDamage(enemy, dmg, Host, crit);
+                DamageService.DealDamage(enemy, dmg, Host, critChance, critMult);
             });
         }
         string sfx = ParamString(p, "sfx");

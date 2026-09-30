@@ -491,7 +491,7 @@ public partial class EnemyActor
             dir,
             CatalogLoader.GetFloat(def, "speed", 300.0f),
             CatalogLoader.GetFloat(def, "damage", 9.0f),
-            false, 0,
+            0.0f, 1.0f, 0,
             CatalogLoader.GetFloat(def, "lifetime", 5.0f),
             8.0f, "enemy_pellet", Team.Enemy,
             fx, default, default, fxCount);

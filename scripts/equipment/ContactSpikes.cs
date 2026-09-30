@@ -89,11 +89,7 @@ public partial class ContactSpikes : EquipmentPiece
     private void Intercept(EnemyActor enemy, Vector2 outward)
     {
         float damage = ContactDamage * GetStat("might");
-        bool isCrit = Host!.Stats?.RollCritical() ?? false;
-        if (isCrit)
-            damage *= GetStat("crit_damage");
-
-        DamageService.DealDamage(enemy, damage, Host, isCrit);
+        DamageService.DealDamage(enemy, damage, Host, GetStat("crit_chance"), GetStat("crit_damage"));
 
         float knockback = InterceptKnockback * Mathf.Max(0.2f, GetStat("knockback"));
         float spinSign = Mathf.Sign(RotationSpeed == 0.0f ? 1.0f : RotationSpeed);

@@ -134,8 +134,9 @@ public partial class TestTelegraphAndProjectiles : SceneTree
                 new Vector2(100, 100),
                 Vector2.Right,
                 speed: 400.0f,
-                damage: 20.0f,
-                isCrit: false,
+                baseDamage: 20.0f,
+                critChance: 0.0f,
+                critMultiplier: 1.0f,
                 pierce: 1,
                 lifetime: 2.0f,
                 radius: 10.0f,
@@ -198,7 +199,7 @@ public partial class TestTelegraphAndProjectiles : SceneTree
         float cellHpBefore = barbHost.Health;
         freshProjMgr.Spawn(
             barbHost.GlobalPosition + new Vector2(30, 0), Vector2.Left,
-            400.0f, 10.0f, false, 0, 2.0f, 10.0f, "enemy_pellet", Team.Enemy,
+            400.0f, 10.0f, 0.0f, 1.0f, 0, 2.0f, 10.0f, "enemy_pellet", Team.Enemy,
             new EffectSpec { EffectId = "stun", Duration = 0.5f }, default, default, 1);
         freshProjMgr._PhysicsProcess(0.12);
         AssertThat(barbHost.Health).IsLess(cellHpBefore);

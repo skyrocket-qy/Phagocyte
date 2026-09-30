@@ -18,8 +18,9 @@ public struct ProjectileData
     public float Radius;
     public float Lifetime;
     public float ElapsedTime;
-    public float Damage;
-    public bool IsCrit;
+    public float BaseDamage;
+    public float CritChance;
+    public float CritMultiplier;
     public int PierceRemaining;
     public int ProjectileTypeIndex;
     public bool IsActive;

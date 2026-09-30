@@ -176,8 +176,9 @@ public partial class ProjectileManager : Node2D
         Vector2 pos,
         Vector2 dir,
         float speed,
-        float damage,
-        bool isCrit = false,
+        float baseDamage,
+        float critChance = 0.0f,
+        float critMultiplier = 1.0f,
         int pierce = 0,
         float lifetime = 2.5f,
         float radius = 10.0f,
@@ -214,8 +215,9 @@ public partial class ProjectileManager : Node2D
                     Radius = radius,
                     Lifetime = lifetime,
                     ElapsedTime = 0.0f,
-                    Damage = damage,
-                    IsCrit = isCrit,
+                    BaseDamage = baseDamage,
+                    CritChance = critChance,
+                    CritMultiplier = critMultiplier,
                     PierceRemaining = pierce,
                     ProjectileTypeIndex = typeIndex,
                     IsActive = true,
@@ -253,8 +255,9 @@ public partial class ProjectileManager : Node2D
             Radius = radius,
             Lifetime = lifetime,
             ElapsedTime = 0.0f,
-            Damage = damage,
-            IsCrit = isCrit,
+            BaseDamage = baseDamage,
+            CritChance = critChance,
+            CritMultiplier = critMultiplier,
             PierceRemaining = pierce,
             ProjectileTypeIndex = typeIndex,
             IsActive = true,
@@ -343,7 +346,7 @@ public partial class ProjectileManager : Node2D
                     if (p.Position.DistanceSquaredTo(playerPos) <= reach * reach)
                     {
                         p.AddHitTarget(playerId);
-                        DamageService.DealDamage(player, p.Damage, null, p.IsCrit);
+                        DamageService.DealDamage(player, p.BaseDamage, null, p.CritChance, p.CritMultiplier);
                         EffectSpec.ApplyAll(player, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
                         if (p.PierceRemaining > 0)
                             p.PierceRemaining--;
@@ -387,7 +390,7 @@ public partial class ProjectileManager : Node2D
                         if (p.Position.DistanceSquaredTo(enemy.GlobalPosition) <= hitDistSq)
                         {
                             p.AddHitTarget(enemyId);
-                            DamageService.DealDamage(enemy, p.Damage, _hostNode, p.IsCrit);
+                            DamageService.DealDamage(enemy, p.BaseDamage, _hostNode, p.CritChance, p.CritMultiplier);
                             EffectSpec.ApplyAll(enemy, in p.Effect0, in p.Effect1, in p.Effect2, p.EffectCount);
 
                             if (p.PierceRemaining > 0)

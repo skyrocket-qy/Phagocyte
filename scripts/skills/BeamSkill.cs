@@ -69,14 +69,14 @@ public partial class BeamSkill : BaseSkill
             }
             hits.Sort((a, b) => a.along.CompareTo(b.along));
 
-            GetDamage(baseDmg, out float dmg, out bool crit);
+            GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
             int struck = 0;
             foreach (var (enemy, _) in hits)
             {
                 if (struck >= pierce)
                     break;
                 struck++;
-                DamageService.DealDamage(enemy, dmg, Host, crit);
+                DamageService.DealDamage(enemy, dmg, Host, critChance, critMult);
                 ApplyOnHitEffects(enemy, p, dmg);
                 VfxManager.Instance?.Play(VfxType.PerforinPore, enemy.GlobalPosition);
             }
@@ -98,7 +98,7 @@ public partial class BeamSkill : BaseSkill
     {
         int count = GetCalculatedAmount(ParamInt(p, "count", 3));
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 35.0f));
-        GetDamage(baseDmg, out float dmg, out bool crit);
+        GetDamage(baseDmg, out float dmg, out float critChance, out float critMult);
 
         var visited = new HashSet<EnemyActor>();
         EnemyActor? current = TargetingService.FindNearest(Host!, ParamFloat(p, "range", 480.0f));
@@ -107,7 +107,7 @@ public partial class BeamSkill : BaseSkill
         while (current != null && jumps < count)
         {
             visited.Add(current);
-            DamageService.DealDamage(current, dmg, Host, crit);
+            DamageService.DealDamage(current, dmg, Host, critChance, critMult);
             SpawnBeamFx(from, current.GlobalPosition, 9.0f);
             from = current.GlobalPosition;
             jumps++;
@@ -149,7 +149,7 @@ public partial class BeamSkill : BaseSkill
         }
 
         float dps = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 32.0f));
-        DamageService.DealDamage(_channelTarget, dps * (float)delta, Host, false);
+        DamageService.DealDamage(_channelTarget, dps * (float)delta, Host);
         string meta = ParamString(p, "meta");
         if (meta != "" && !_channelTarget.HasMeta(meta))
             _channelTarget.SetMeta(meta, true);

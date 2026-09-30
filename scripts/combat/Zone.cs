@@ -14,7 +14,8 @@ public partial class Zone : Node2D
     public float Duration { get; set; } = 8.0f;
     public float TickInterval { get; set; } = 0.5f;
     public float Damage { get; set; } = 5.0f;
-    public bool IsCrit { get; set; }
+    public float CritChance { get; set; }
+    public float CritMultiplier { get; set; } = 1.0f;
     public EffectSpec Effect0 { get; set; }
     public EffectSpec Effect1 { get; set; }
     public EffectSpec Effect2 { get; set; }
@@ -138,7 +139,7 @@ public partial class Zone : Node2D
             if (GlobalPosition.DistanceTo(player.GlobalPosition) > CurrentRadius)
                 return;
             if (Damage > 0.0f)
-                DamageService.DealDamage(player, Damage, null, false);
+                DamageService.DealDamage(player, Damage, null, CritChance, CritMultiplier);
             EffectSpec.ApplyAll(player, in _fx0, in _fx1, in _fx2, EffectCount);
             if (SlowFactor >= 0.0f)
                 player.Status?.ApplySlow(slowDur, 1.0f - SlowFactor);
@@ -148,11 +149,12 @@ public partial class Zone : Node2D
         float radius = CurrentRadius;
         float damage = Damage;
         Node2D? source = Source;
-        bool crit = IsCrit;
+        float critChance = CritChance;
+        float critMult = CritMultiplier;
         float slowFactor = SlowFactor;
         TargetingService.ForEachInRadius(GlobalPosition, radius, enemy =>
         {
-            DamageService.DealDamage(enemy, damage, source, crit);
+            DamageService.DealDamage(enemy, damage, source, critChance, critMult);
             EffectSpec.ApplyAll(enemy, in _fx0, in _fx1, in _fx2, EffectCount);
             if (slowFactor >= 0.0f && enemy.Status != null)
                 enemy.Status.ApplySlow(slowDur, 1.0f - slowFactor);
