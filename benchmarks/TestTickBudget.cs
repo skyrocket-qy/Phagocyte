@@ -3,6 +3,7 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Game.Combat;
 using Game.Core;
 using Game.Enemies;
 using Game.Player;
@@ -183,7 +184,7 @@ public partial class TestTickBudget : TestHarness
                 sink += 1.0f;
             if (cell!.Stats is ActorStats csBlock && csBlock.RollBlock())
                 sink += 1.0f;
-            sink += cell!.Stats != null ? cell!.Stats.GetDamageReductionRatio() : 0.0f;
+            sink += cell!.Stats != null ? CombatMath.FromArmor(cell!.Stats.GetStat("armor"), CombatMath.ReferenceDamage) : 0.0f;
             sink += cell!.Stats != null ? cell!.Stats.GetStat("max_health") : 0.0f;
         }
         sw.Stop();

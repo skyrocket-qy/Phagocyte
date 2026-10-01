@@ -154,8 +154,7 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
             Evasion = Stats?.GetStat("evasion") ?? 0.0f,
             BlockChance = Stats?.GetStat("block") ?? 0.0f,
             BlockMitigation = 1.0f,
-            Armor = 0.0f,
-            DamageReduction = Stats?.GetDamageReductionRatio() ?? 0.0f,
+            Armor = Stats?.GetStat("armor") ?? 0.0f,
             DamageTakenMultiplier = RunMutatorService.IncomingDamageMultiplier,
         };
     }
@@ -575,7 +574,8 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
 
     public void ApplyImpulse(Vector2 impulse)
     {
-        float dr = Stats != null ? Stats.GetDamageReductionRatio() : 0.0f;
+        float armor = Stats != null ? Stats.GetStat("armor") : 0.0f;
+        float dr = CombatMath.FromArmor(armor, CombatMath.ReferenceDamage);
         Velocity += impulse * (1.0f - Mathf.Clamp(dr, 0.0f, 0.75f));
     }
 

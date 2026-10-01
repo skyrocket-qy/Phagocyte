@@ -286,8 +286,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
         get
         {
             float statusMult = Status?.DamageTakenMultiplier ?? 1.0f;
-            float bossDr = BossPhase?.CurrentDamageReduction ?? 0.0f;
-            if (statusMult != _cachedDefenses.DamageTakenMultiplier || bossDr != _cachedDefenses.DamageReduction || Armor != _cachedDefenses.Armor)
+            if (statusMult != _cachedDefenses.DamageTakenMultiplier || Armor != _cachedDefenses.Armor)
             {
                 InvalidateDefenses();
             }
@@ -304,7 +303,6 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
             BlockChance = 0.0f,
             BlockMitigation = 1.0f,
             Armor = Armor,
-            DamageReduction = BossPhase?.CurrentDamageReduction ?? 0.0f,
             DamageTakenMultiplier = Status?.DamageTakenMultiplier ?? 1.0f,
         };
     }
@@ -347,11 +345,6 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
     {
         if (CurrentHealth <= 0.0f)
             return;
-
-        if (BossPhase != null)
-        {
-            dotDamage = BossPhase.ApplyDamageReduction(dotDamage);
-        }
 
         CurrentHealth -= dotDamage;
         RunTelemetryManager.Instance?.RecordDamageDealt("ailment_dot", dotDamage);

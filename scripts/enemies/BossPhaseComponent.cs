@@ -11,7 +11,6 @@ public class BossPhaseDef
 {
     public float ThresholdPct { get; set; } = 1.0f; // HP percentage triggering this phase (e.g. 1.0, 0.6, 0.25)
     public float SpeedMult { get; set; } = 1.0f;
-    public float DamageReduction { get; set; } = 0.0f; // 0.0 ~ 0.8
     public float AttackTimer { get; set; } = 3.5f;
     public List<string> Attacks { get; set; } = new();
 }
@@ -40,15 +39,6 @@ public partial class BossPhaseComponent : Node
     private float _telegraphTimer = 3.5f;
     private int _attackIndex = 0;
     private Node2D? _parentEntity;
-
-    public float CurrentDamageReduction
-    {
-        get
-        {
-            var p = GetCurrentPhaseDef();
-            return p != null ? Math.Clamp(p.DamageReduction, 0.0f, 0.85f) : 0.0f;
-        }
-    }
 
     public float CurrentSpeedMult
     {
@@ -79,7 +69,6 @@ public partial class BossPhaseComponent : Node
         {
             ThresholdPct = 1.0f,
             SpeedMult = 1.0f,
-            DamageReduction = 0.0f,
             AttackTimer = 4.0f,
             Attacks = new List<string> { "circle" }
         });
@@ -87,7 +76,6 @@ public partial class BossPhaseComponent : Node
         {
             ThresholdPct = 0.60f,
             SpeedMult = 1.25f,
-            DamageReduction = 0.20f,
             AttackTimer = 3.0f,
             Attacks = new List<string> { "line", "circle" }
         });
@@ -95,7 +83,6 @@ public partial class BossPhaseComponent : Node
         {
             ThresholdPct = 0.25f,
             SpeedMult = 1.50f,
-            DamageReduction = 0.35f,
             AttackTimer = 2.0f,
             Attacks = new List<string> { "multi_circle", "line" }
         });
@@ -122,12 +109,6 @@ public partial class BossPhaseComponent : Node
             _telegraphTimer = phase != null ? phase.AttackTimer : 3.0f;
             TriggerTelegraphedAttack();
         }
-    }
-
-    public float ApplyDamageReduction(float rawDamage)
-    {
-        float dr = CurrentDamageReduction;
-        return Mathf.Max(1.0f, rawDamage * (1.0f - dr));
     }
 
     public void NotifyHealthChanged(float currentHp, float maxHp)

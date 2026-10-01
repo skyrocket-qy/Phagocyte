@@ -136,14 +136,6 @@ public partial class ActorStats : Node, IStatHost
     }
 
     /// <summary>
-    /// Returns percentage damage reduction from armor: Armor / (Armor + 50)
-    /// </summary>
-    public float GetDamageReductionRatio()
-    {
-        return _block.GetDamageReductionRatio();
-    }
-
-    /// <summary>
     /// Rolls for critical hit
     /// </summary>
     public bool RollCritical()

@@ -262,17 +262,6 @@ public sealed class StatBlock : IStatHost
     }
 
     /// <summary>
-    /// Returns percentage damage reduction from armor: Armor / (Armor + 50)
-    /// </summary>
-    public float GetDamageReductionRatio()
-    {
-        float a = GetStat("armor");
-        if (a <= 0.0f)
-            return 0.0f;
-        return a / (a + 50.0f);
-    }
-
-    /// <summary>
     /// Rolls for critical hit
     /// </summary>
     public bool RollCritical()

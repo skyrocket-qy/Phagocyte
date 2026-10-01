@@ -174,21 +174,15 @@ public partial class TestNewSystemsTriad : SceneTree
         bossPhase.NotifyHealthChanged(100.0f, 100.0f);
         AssertThat(bossPhase.CurrentPhaseIndex).IsEqual(1);
         AssertThat(bossPhase.IsEnraged).IsFalse();
-        AssertThat(bossPhase.CurrentDamageReduction).IsEqual(0.0f);
-        AssertThat(bossPhase.ApplyDamageReduction(50.0f)).IsEqual(50.0f);
 
         // Phase 2 check (50% HP <= 60% threshold)
         bossPhase.NotifyHealthChanged(50.0f, 100.0f);
         AssertThat(bossPhase.CurrentPhaseIndex).IsEqual(2);
         AssertThat(bossPhase.IsEnraged).IsTrue();
-        AssertThat(bossPhase.CurrentDamageReduction).IsEqual(0.20f);
-        AssertThat(bossPhase.ApplyDamageReduction(50.0f)).IsEqualApprox(40.0f, 0.01f); // 50 * (1 - 0.20) = 40
 
         // Phase 3 check (20% HP <= 25% threshold)
         bossPhase.NotifyHealthChanged(20.0f, 100.0f);
         AssertThat(bossPhase.CurrentPhaseIndex).IsEqual(3);
-        AssertThat(bossPhase.CurrentDamageReduction).IsEqual(0.35f);
-        AssertThat(bossPhase.ApplyDamageReduction(100.0f)).IsEqualApprox(65.0f, 0.01f); // 100 * (1 - 0.35) = 65
 
         // Hard Enrage test
         bossPhase.HardEnrageSeconds = 5.0f;
@@ -197,6 +191,6 @@ public partial class TestNewSystemsTriad : SceneTree
         AssertThat(bossPhase.CurrentSpeedMult).IsGreater(1.35f);
 
         bossNode.QueueFree();
-        GD.Print("[PASS] Test 4: BossPhaseComponent HP phase transitions, DR shields & hard enrage verified.");
+        GD.Print("[PASS] Test 4: BossPhaseComponent HP phase transitions & hard enrage verified.");
     }
 }

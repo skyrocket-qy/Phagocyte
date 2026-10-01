@@ -66,14 +66,12 @@ public static class HitPipeline
         if (isBlocked)
             rawDamage *= (1.0f - blockMitigation);
 
-        // Stage 4: Target Defense Mitigation (Armor & DR)
+        // Stage 4: Target Defense Mitigation (POE armour + vulnerability)
         float damage = rawDamage;
-        if (def.DamageReduction > 0.0f)
-            damage *= (1.0f - Mathf.Clamp(def.DamageReduction, 0.0f, 1.0f));
+        if ((payload.Flags & HitFlags.BypassesArmor) == 0 && def.Armor > 0.0f && damage > 0.0f)
+            damage *= 1.0f - CombatMath.FromArmor(def.Armor, damage);
         if (def.DamageTakenMultiplier > 0.0f)
             damage *= def.DamageTakenMultiplier;
-        if ((payload.Flags & HitFlags.BypassesArmor) == 0 && def.Armor > 0.0f)
-            damage = Mathf.Max(1.0f, damage - def.Armor);
 
         // Stage 5: Target Pure Intake
         float actualDamage = target.TakeDamage(damage, attacker, isCrit);

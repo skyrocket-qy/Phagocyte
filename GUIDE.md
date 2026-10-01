@@ -169,7 +169,7 @@ Defense: `max_health(100)`, `health_regen(0)`, `armor(0)`, `move_speed(230)`, `e
 Utility: `magnet(150)`
 
 Formula: `GetStat` (`:90-113`) with caps: CDR 75%, crit 100%, evasion 60%, block 75%, lifesteal 20%.
-Helpers: `GetDamageReductionRatio=armor/(armor+50)` (`:153`), `RollCritical/Evasion/Block/LifeSteal` (`:164-194`), `CalculateAilmentDamage/Duration` (`:199-210`).
+Helpers: `CombatMath.FromArmor=armor/(armor+5*damage)` (`CombatInterfaces.cs`), `RollCritical/Evasion/Block/LifeSteal` (`StatBlock.cs`), `CalculateAilmentDamage/Duration`.
 Signal: `StatChanged` (`:13-14`).
 
 `PlayerActor._Ready`: `AddToGroup("player")`, cache `Cytoplasm/Membrane/Nucleus/EngulfArea/SkillManager`, create `ActorStats`, load class def (`ClassId` → `GetPlayerClass`), seed `max_health/move_speed`, `ApplyClassBaseStats()` (armor + trait + extras), derive `Health/CurrentSpeed/CurrentRadius`, subscribe `StatChanged→OnStatChanged`, `CellSkillManager.Setup`, `SetupInitialSkills` (innate via `SkillFactory` id), `Equipment.Setup`.
@@ -268,7 +268,7 @@ Trace any damage number from trigger to death.
    - Stage 1 (Avoidance): Checks `def.IsInvulnerable` and rolls `def.Evasion`.
    - Stage 2 (Block): Rolls `def.BlockChance`.
    - Stage 3 (Crit): Evaluates crit from payload snapshot (`CritChance`, `CritMultiplier`).
-   - Stage 4 (Mitigation): Applies target `DamageReduction` and flat `Armor`.
+   - Stage 4 (Mitigation): POE armour `armor/(armor+5*damage)` plus `DamageTakenMultiplier`.
    - Stage 5 (Pure Intake): `target.TakeDamage(mitigatedDmg, attacker, isCrit)` deducts HP and triggers feedback.
    - Stage 6 (Post-Hit): Dispatches threshold-attenuated ailments and life leech.
 4. FX: `VfxManager.Play(...)` (pooled 16/type) + code-drawn transients.
