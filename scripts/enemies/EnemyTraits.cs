@@ -78,7 +78,6 @@ public partial class EnemyActor
         MaxHealth = CatalogLoader.GetFloat(def, "max_health", MaxHealth);
         CurrentHealth = MaxHealth;
         Armor = CatalogLoader.GetFloat(def, "armor", Armor);
-        ShieldCharges = CatalogLoader.GetInt(def, "shield_charges", ShieldCharges);
         XpValue = CatalogLoader.GetFloat(def, "xp", XpValue);
         BaseScore = CatalogLoader.GetInt(def, "score", BaseScore);
         FloatSpeed = CatalogLoader.GetFloat(def, "float_speed", FloatSpeed);
@@ -1153,7 +1152,5 @@ public partial class EnemyActor
         float r = BodyRadius;
         DrawCircle(Vector2.Zero, r, SwarmBatchColor);
         DrawArc(Vector2.Zero, r, 0.0f, Mathf.Tau, 24, new Color(1.0f, 1.0f, 1.0f, 0.5f), 1.5f);
-        if (ShieldCharges > 0)
-            DrawArc(Vector2.Zero, r + 5.0f, 0.0f, Mathf.Tau, 24, new Color(0.6f, 0.9f, 1.0f, 0.8f), 2.0f);
     }
 }

@@ -92,27 +92,19 @@ public partial class TestEnemyEcosystem : SceneTree
         GD.Print("[PASS] Test 2: Procedural 2D microscope rendering verified for all 20 pathogens.");
 
         // -------------------------------------------------------------
-        // TEST 3: Staph Fibrin Armor Shield
+        // TEST 3: Staph direct damage
         // -------------------------------------------------------------
         var playerScene = AssetLoader.Load<PackedScene>("res://scenes/actors/player_base.tscn");
         var player = playerScene.Instantiate<PlayerActor>();
         testContainer.AddChild(player);
 
         var staph = EnemySpawner.CreateEnemy("staph")!;
-        staph.ShieldCharges = 1;
         testContainer.AddChild(staph);
-        AssertThat(staph.ShieldCharges).IsEqual(1);
 
-        // First hit breaks the shield, health untouched
         float staphHp = staph.CurrentHealth;
         HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, staph);
-        AssertThat(staph.ShieldCharges).IsEqual(0);
-        AssertThat(staph.CurrentHealth).IsEqual(staphHp);
-
-        // Second hit lands: unarmored coccus takes full damage
-        HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, staph);
         AssertThat(staph.CurrentHealth).IsEqual(staphHp - 10.0f);
-        GD.Print("[PASS] Test 3: Staph fibrin microthrombi armor & shield breaking verified.");
+        GD.Print("[PASS] Test 3: Staph direct damage verified.");
 
         // -------------------------------------------------------------
         // TEST 4: E. coli Charge & Stagger

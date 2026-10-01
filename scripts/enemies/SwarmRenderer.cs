@@ -41,7 +41,6 @@ public partial class SwarmRenderer : Node2D
         RegisterSpecies("tb", 256, new Vector2(64.0f, 64.0f), SwarmTextureFactory.CreateTexture("tb"));
         RegisterSpecies("e_coli", 256, new Vector2(72.0f, 72.0f), SwarmTextureFactory.CreateTexture("e_coli"));
         RegisterSpecies("staph", 256, new Vector2(40.0f, 40.0f), SwarmTextureFactory.CreateTexture("staph"));
-        RegisterSpecies("staph_shielded", 64, new Vector2(48.0f, 48.0f), SwarmTextureFactory.CreateTexture("staph_shielded"));
         RegisterSpecies("pseudomonas", 192, new Vector2(48.0f, 48.0f), SwarmTextureFactory.CreateTexture("pseudomonas"));
         RegisterSpecies("anthrax_bacillus", 256, new Vector2(72.0f, 72.0f), SwarmTextureFactory.CreateTexture("anthrax_bacillus"));
         RegisterSpecies("plasmodium_merozoite", 192, new Vector2(48.0f, 48.0f), SwarmTextureFactory.CreateTexture("plasmodium_merozoite"));
@@ -100,14 +99,12 @@ public partial class SwarmRenderer : Node2D
         return _indexById.ContainsKey(speciesId);
     }
 
-    /// <summary>Batch species for an enemy (shielded staph gets its armor variant).</summary>
+    /// <summary>Batch species for an enemy.</summary>
     private static string ResolveSpeciesId(EnemyActor enemy)
     {
         string? variant = enemy.BatchSpeciesOverride;
         if (!string.IsNullOrEmpty(variant))
             return variant;
-        if (enemy.EnemyId == "staph" && enemy.ShieldCharges > 0)
-            return "staph_shielded";
         return enemy.EnemyId;
     }
 

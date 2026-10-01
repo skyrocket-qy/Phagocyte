@@ -409,7 +409,6 @@ public partial class GameRoot : Node2D, IRunContext
             if (guide == null)
                 return;
             guide.GlobalPosition = Player.GlobalPosition + new Vector2(150.0f, i == 0 ? -28.0f : 28.0f);
-            guide.ShieldCharges = 0;
             guide.MaxHealth = Mathf.Min(guide.MaxHealth, 8.0f);
             guide.Scale = new Vector2(0.8f, 0.8f);
             EnemyContainer.AddChild(guide);

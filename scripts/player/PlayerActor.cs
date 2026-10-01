@@ -154,7 +154,6 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
             Evasion = Stats?.GetStat("evasion") ?? 0.0f,
             BlockChance = Stats?.GetStat("block") ?? 0.0f,
             BlockMitigation = 1.0f,
-            ShieldCharges = 0,
             Armor = 0.0f,
             DamageReduction = Stats?.GetDamageReductionRatio() ?? 0.0f,
             DamageTakenMultiplier = RunMutatorService.IncomingDamageMultiplier,
@@ -535,8 +534,6 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         EmitStatsSignal();
         return finalDamage;
     }
-
-    public void ConsumeShieldCharge() { }
 
     /// <summary>Generic DoT entry (IDamageable): direct HP loss, bypasses avoidance and armor.</summary>
     public void TakeDoTDamage(float dotDamage)

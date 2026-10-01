@@ -266,7 +266,7 @@ Trace any damage number from trigger to death.
 2. Target: `TargetingService.FindTargetDirection/CollectInRadius/FindNearest` (iterates `EnemyActor.ActiveEnemies`) or segment test (`beamWidth=24*area`).
 3. Orchestration: `HitPipeline.ResolveHit(payload, target)` executes the 6-stage pipeline:
    - Stage 1 (Avoidance): Checks `def.IsInvulnerable` and rolls `def.Evasion`.
-   - Stage 2 (Interception): Consumes `def.ShieldCharges` or rolls `def.BlockChance`.
+   - Stage 2 (Block): Rolls `def.BlockChance`.
    - Stage 3 (Crit): Evaluates crit from payload snapshot (`CritChance`, `CritMultiplier`).
    - Stage 4 (Mitigation): Applies target `DamageReduction` and flat `Armor`.
    - Stage 5 (Pure Intake): `target.TakeDamage(mitigatedDmg, attacker, isCrit)` deducts HP and triggers feedback.
@@ -493,7 +493,6 @@ Run: `TestAssetLoader`, `TestAudioAssets`, `TestStatAndSkills`, `TestMenuFlow`, 
 - Might/Area/CDR/Amount/Pierce/Duration — universal damage scalers, never per-skill.
 - Innate — slot-0 un-overwritable starter weapon per cell.
 - Catalyst — L5 active + paired passive → epigenetic superweapon.
-- ShieldCharges — hit-absorbing shield (cluster spawns start with 1).
 - Marked — damage-taken multiplier from any amp-channel ailment (drift clears the channel).
 - Backfill — kill-driven refill up to `ActiveScreenCap`, max 7/tick.
 - Lockdown — 15:00 terminal-boss phase, backfill paused.

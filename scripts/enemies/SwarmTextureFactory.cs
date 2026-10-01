@@ -15,7 +15,6 @@ public static class SwarmTextureFactory
         "tb" => BuildTbTexture(),
         "e_coli" => BuildEColiTexture(),
         "staph" => BuildStaphTexture(),
-        "staph_shielded" => BuildStaphShieldedTexture(),
         "pseudomonas" => BuildPseudomonasTexture(),
         "anthrax_bacillus" => BuildAnthraxTexture(),
         "plasmodium_merozoite" => BuildMerozoiteTexture(),
@@ -173,21 +172,6 @@ public static class SwarmTextureFactory
         const int size = 40;
         var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
         BakeStaphCluster(image, new Vector2(size * 0.5f, size * 0.5f), new Color(0.95f, 0.78f, 0.18f, 0.95f));
-        return ImageTexture.CreateFromImage(image);
-    }
-
-    public static ImageTexture BuildStaphShieldedTexture()
-    {
-        const int size = 48;
-        var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
-        Vector2 center = new(size * 0.5f, size * 0.5f);
-        BakeStaphCluster(image, center, new Color(0.95f, 0.78f, 0.18f, 0.95f));
-        var ring = new Color(1.0f, 0.95f, 0.7f, 0.7f);
-        for (int i = 0; i < 24; i++)
-        {
-            float ang = i * (Mathf.Tau / 24.0f);
-            FillBakedCircle(image, center + Vector2.FromAngle(ang) * 18.0f, 1.5f, ring);
-        }
         return ImageTexture.CreateFromImage(image);
     }
 

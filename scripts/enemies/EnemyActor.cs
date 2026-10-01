@@ -18,7 +18,6 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
     [Export] public float MaxHealth { get; set; } = 20.0f;
     [Export] public float CurrentHealth { get; set; } = 20.0f;
     [Export] public float Armor { get; set; } = 0.0f;
-    [Export] public int ShieldCharges { get; set; } = 0;
     [Export] public float XpValue { get; set; } = 12.0f;
     [Export] public int BaseScore { get; set; } = 15;
     [Export] public float FloatSpeed { get; set; } = 35.0f;
@@ -288,7 +287,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
         {
             float statusMult = Status?.DamageTakenMultiplier ?? 1.0f;
             float bossDr = BossPhase?.CurrentDamageReduction ?? 0.0f;
-            if (statusMult != _cachedDefenses.DamageTakenMultiplier || bossDr != _cachedDefenses.DamageReduction || ShieldCharges != _cachedDefenses.ShieldCharges || Armor != _cachedDefenses.Armor)
+            if (statusMult != _cachedDefenses.DamageTakenMultiplier || bossDr != _cachedDefenses.DamageReduction || Armor != _cachedDefenses.Armor)
             {
                 InvalidateDefenses();
             }
@@ -304,21 +303,10 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
             Evasion = 0.0f,
             BlockChance = 0.0f,
             BlockMitigation = 1.0f,
-            ShieldCharges = ShieldCharges,
             Armor = Armor,
             DamageReduction = BossPhase?.CurrentDamageReduction ?? 0.0f,
             DamageTakenMultiplier = Status?.DamageTakenMultiplier ?? 1.0f,
         };
-    }
-
-    public virtual void ConsumeShieldCharge()
-    {
-        if (ShieldCharges > 0)
-        {
-            ShieldCharges--;
-            RedrawIfVisible();
-            InvalidateDefenses();
-        }
     }
 
     public virtual float TakeDamage(float finalDamage, Node2D? source = null, bool isCrit = false)

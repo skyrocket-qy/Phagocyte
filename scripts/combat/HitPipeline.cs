@@ -40,14 +40,7 @@ public static class HitPipeline
             }
         }
 
-        // Stage 2: Interception & Block
-        if (def.ShieldCharges > 0)
-        {
-            target.ConsumeShieldCharge();
-            result.IsBlocked = true;
-            return result;
-        }
-
+        // Stage 2: Block
         bool isBlocked = false;
         float blockMitigation = 0.0f;
         if ((payload.Flags & HitFlags.CannotBeBlocked) == 0 && def.BlockChance > 0.0f)

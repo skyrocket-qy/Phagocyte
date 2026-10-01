@@ -491,7 +491,6 @@ public static class EnemySpawner
             if (count > 1)
             {
                 float spread = Game.Core.CatalogLoader.GetFloat(cluster, "spread", 30.0f);
-                int shield = Game.Core.CatalogLoader.GetInt(cluster, "shield", 0);
                 Vector2 center = GetSpawnPoint(player.GlobalPosition, arenaSize, dist);
                 for (int s = 0; s < count; s++)
                 {
@@ -499,7 +498,6 @@ public static class EnemySpawner
                     if (member == null)
                         continue;
                     member.GlobalPosition = center + new Vector2((float)GD.RandRange(-spread, spread), (float)GD.RandRange(-spread, spread));
-                    member.ShieldCharges = shield;
                     ApplySpawnScaling(member, gameTime);
                     enemyContainer.AddChild(member);
                 }

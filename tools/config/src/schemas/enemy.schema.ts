@@ -5,20 +5,17 @@ import { z } from "zod";
 export interface SpawnClusterDef {
   count: number;
   spread: number;
-  shield: number;
 }
 
 export const SpawnClusterZodSchema = z.object({
   count: z.number().int().positive(),
   spread: z.number(),
-  shield: z.number().int().nonnegative(),
 });
 
 export interface EnemyDef {
   id: EnemyId;
   max_health: number;
   armor: number;
-  shield_charges: number;
   xp: number;
   score: number;
   float_speed: number;
@@ -42,7 +39,6 @@ export const EnemyZodSchema = z.object({
   id: z.string().min(1),
   max_health: z.number().positive(),
   armor: z.number(),
-  shield_charges: z.number().int().nonnegative(),
   xp: z.number(),
   score: z.number().int().nonnegative(),
   float_speed: z.number(),
