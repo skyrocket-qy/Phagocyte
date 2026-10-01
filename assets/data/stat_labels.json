@@ -6,7 +6,6 @@
   "duration": "STAT_DURATION",
   "amount": "STAT_AMOUNT",
   "pierce": "STAT_PIERCE",
-  "knockback": "STAT_KNOCKBACK",
   "crit_chance": "STAT_CRIT_CHANCE",
   "crit_damage": "STAT_CRIT_DAMAGE",
   "ailment_damage": "STAT_AILMENT_DAMAGE",

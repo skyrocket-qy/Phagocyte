@@ -115,7 +115,7 @@ flowchart TD
 ### 4.1 巨噬細胞起點中心 (Macrophage Starting Hub)
 - **色調**：暗紅褐與暖琥珀螢光。
 - **位置**：星盤左上方。
-- **專精純屬性**：`area`（體積/範圍）、`max_health`（生命上限）、`armor`（膜剛性減傷）、`block`（糖萼格擋率）、`knockback`（撞擊質量）。
+- **專精純屬性**：`area`（體積/範圍）、`max_health`（生命上限）、`armor`（膜剛性減傷）、`block`（糖萼格擋率）。
 
 ### 4.2 殺手 T 細胞起點中心 (CTL Starting Hub)
 - **色調**：冰藍色與銳利青綠螢光。
@@ -125,7 +125,7 @@ flowchart TD
 ### 4.3 嗜中性球起點中心 (Neutrophil Starting Hub)
 - **色調**：烈焰橙與酸性亮黃螢光。
 - **位置**：星盤左下方。
-- **專精純屬性**：`might`（傷害強度）、`knockback`（擊退力量）、`health_regen`（生命自癒）、`armor`（膜剛性護甲）。
+- **專精純屬性**：`might`（傷害強度）、`health_regen`（生命自癒）、`armor`（膜剛性護甲）。
 
 ### 4.4 B 淋巴細胞起點中心 (B-Cell Starting Hub)
 - **色調**：深靛藍與電離紫螢光。

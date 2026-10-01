@@ -61,9 +61,9 @@ public partial class TestStatAndSkills : TestHarness
         cs.AddModifier("life_steal", 0.50f, 0.0f);
         AssertThat(cs.GetStat("life_steal")).IsEqual(0.20f);
 
-        // Test POE armour formula (armor 50 vs 10 dmg = 50%)
+        // Test POE armour formula: small hits mitigated, big hits penetrate
         cs.AddModifier("armor", 50.0f, 0.0f);
-        AssertThat(CombatMath.FromArmor(cs.GetStat("armor"), 10.0f)).IsEqualApprox(0.50f, 0.001f);
+        AssertThat(CombatMath.FromArmor(cs.GetStat("armor"), 50.0f)).IsEqualApprox(50.0f / 300.0f, 0.001f);
         AssertThat(CombatMath.FromArmor(3.0f, 50.0f)).IsLess(0.02f);
         GD.Print("[PASS] Test 2: ActorStats 18 universal stats, clamps (CDR, evasion, block, life steal) & armor formula verified.");
 

@@ -230,11 +230,6 @@ export const PassiveSkills: readonly PassiveSkillDef[] = [
         stat: StatId.Duration,
         per_level: 0.15,
         mode: PassiveModMode.Mult
-      },
-      {
-        stat: StatId.Knockback,
-        per_level: 0.1,
-        mode: PassiveModMode.Mult
       }
     ]
   },

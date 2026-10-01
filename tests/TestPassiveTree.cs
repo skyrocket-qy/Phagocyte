@@ -101,7 +101,7 @@ public partial class TestPassiveTree : TestHarness
         string[] validStats =
         {
             "might", "area", "cooldown_reduction", "projectile_speed", "duration", "amount",
-            "pierce", "knockback", "crit_chance", "crit_damage", "max_health", "health_regen",
+            "pierce", "crit_chance", "crit_damage", "max_health", "health_regen",
             "armor", "move_speed", "evasion", "block", "life_steal", "magnet"
         };
         foreach (var node in PassiveTreeManager.Nodes)

@@ -132,11 +132,6 @@
           "stat": "duration",
           "unit": "percent",
           "value": 0.15
-        },
-        {
-          "stat": "knockback",
-          "unit": "percent",
-          "value": 0.1
         }
       ],
       "name_key": "SKILL_LONGEVITY_NAME",

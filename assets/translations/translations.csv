@@ -33,7 +33,6 @@ STAT_PROJECTILE_SPEED,Projectile Speed,投射物速度,投射物速度,投射速
 STAT_DURATION,Skill Duration,技能持续时间,技能持续时间,技能持続,Fertigkeitsdauer,Durée des compétences,Длительность навыков,Duración de habilidades
 STAT_AMOUNT,Projectile Count,投射物数量,投射物数量,投射数,Projektilanzahl,Nombre de projectiles,Число снарядов,N.º de proyectiles
 STAT_PIERCE,Pierce,穿透,穿透,貫通,Durchschlag,Perforation,Пробитие,Perforación
-STAT_KNOCKBACK,Knockback,击退,击退,撃退,Rückstoß,Recul,Отброс,Retroceso
 STAT_CRIT_CHANCE,Critical Chance,暴击几率,暴击几率,会心率,Krit-Chance,Chance de critique,Шанс крита,Prob. de crítico
 STAT_CRIT_DAMAGE,Critical Damage,暴击伤害,暴击伤害,会心ダメージ,Krit-Schaden,Dégâts critiques,Крит. урон,Daño crítico
 STAT_AILMENT_DAMAGE,Ailment Damage,异常伤害,异常伤害,状態異常ダメージ,Leidensschaden,Dégâts d’affliction,Урон недугами,Daño de aflicción

@@ -29,7 +29,7 @@ public partial class TestBuildStatsPreview : TestHarness
     private static readonly string[] AllStatKeys =
     {
         "might", "area", "cooldown_reduction", "projectile_speed", "duration",
-        "amount", "pierce", "knockback", "crit_chance", "crit_damage", "ailment_damage",
+        "amount", "pierce", "crit_chance", "crit_damage", "ailment_damage",
         "max_health", "health_regen", "armor", "move_speed", "evasion", "block", "life_steal",
         "magnet"
     };

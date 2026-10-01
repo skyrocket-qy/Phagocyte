@@ -109,11 +109,6 @@ export const Equipment: readonly EquipmentDef[] = [
         stat: StatId.MoveSpeed,
         unit: ModType.Percent,
         value: 0.12
-      },
-      {
-        stat: StatId.Knockback,
-        unit: ModType.Percent,
-        value: 0.2
       }
     ],
     name_key: "ORGANELLE_FLAGELLAR_BASE_NAME"
@@ -410,11 +405,6 @@ export const Equipment: readonly EquipmentDef[] = [
     id: GearId.CentrosomeArray,
     max_copies: 1,
     modifiers: [
-      {
-        stat: StatId.Knockback,
-        unit: ModType.Percent,
-        value: 0.3
-      },
       {
         stat: StatId.Pierce,
         unit: ModType.Flat,

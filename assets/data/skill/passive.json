@@ -226,11 +226,6 @@
         "stat": "duration",
         "per_level": 0.15,
         "mode": "mult"
-      },
-      {
-        "stat": "knockback",
-        "per_level": 0.1,
-        "mode": "mult"
       }
     ]
   },

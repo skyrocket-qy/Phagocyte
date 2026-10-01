@@ -16,7 +16,7 @@ public static class StatProfiles
     public static readonly string[] Full =
     {
         "might", "area", "cooldown_reduction", "projectile_speed", "duration",
-        "amount", "pierce", "knockback", "crit_chance", "crit_damage",
+        "amount", "pierce", "crit_chance", "crit_damage",
         "ailment_damage", "max_health", "health_regen", "armor", "move_speed",
         "evasion", "block", "life_steal", "magnet",
     };
@@ -46,7 +46,6 @@ public sealed class StatBlock : IStatHost
         ["duration"] = 1.0f,
         ["amount"] = 0.0f,
         ["pierce"] = 0.0f,
-        ["knockback"] = 1.0f,
         ["crit_chance"] = 0.05f,
         ["crit_damage"] = 2.0f,
         ["ailment_damage"] = 1.0f,

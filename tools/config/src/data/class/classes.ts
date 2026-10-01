@@ -90,7 +90,6 @@ export const Classes: readonly ClassDef[] = [
     trait_stat: StatId.Might,
     trait_stat_value: 1.2,
     extra_stats: {
-      knockback: 1.4,
       health_regen: 0.5
     },
     body_microns: 13.0,

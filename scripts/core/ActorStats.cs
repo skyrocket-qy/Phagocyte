@@ -24,7 +24,6 @@ public partial class ActorStats : Node, IStatHost
     public Stat Duration => _block.GetStatObj("duration")!;
     public Stat Amount => _block.GetStatObj("amount")!;
     public Stat Pierce => _block.GetStatObj("pierce")!;
-    public Stat Knockback => _block.GetStatObj("knockback")!;
     public Stat CritChance => _block.GetStatObj("crit_chance")!;
     public Stat CritDamage => _block.GetStatObj("crit_damage")!;
     public Stat AilmentDamage => _block.GetStatObj("ailment_damage")!;

@@ -6,7 +6,6 @@ export enum StatId {
   Duration = "duration",
   Amount = "amount",
   Pierce = "pierce",
-  Knockback = "knockback",
   CritChance = "crit_chance",
   CritDamage = "crit_damage",
   AilmentDamage = "ailment_damage",

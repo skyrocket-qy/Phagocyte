@@ -164,7 +164,7 @@ Understand the only numbers that matter: 19 universal stats, no skill-specific s
 - `scenes/actors/player_base.tscn` — body `layer1/mask4`, sensor `layer1/mask2`
 
 ### Stat matrix (`ActorStats.cs:17-39`)
-Combat: `might(1.0)`, `area(1.0)`, `cooldown_reduction(0)`, `projectile_speed(1.0)`, `duration(1.0)`, `amount(0)`, `pierce(0)`, `knockback(1.0)`, `crit_chance(.05)`, `crit_damage(2.0)`, `ailment_damage(1.0)`
+Combat: `might(1.0)`, `area(1.0)`, `cooldown_reduction(0)`, `projectile_speed(1.0)`, `duration(1.0)`, `amount(0)`, `pierce(0)`, `crit_chance(.05)`, `crit_damage(2.0)`, `ailment_damage(1.0)`
 Defense: `max_health(100)`, `health_regen(0)`, `armor(0)`, `move_speed(230)`, `evasion(0)`, `block(0)`, `life_steal(0)`
 Utility: `magnet(150)`
 
@@ -176,13 +176,13 @@ Signal: `StatChanged` (`:13-14`).
 
 Class deltas live in `assets/data/player_classes.json`, never subclasses:
 - `macrophage` — `armor 10, area 1.25, might 1.0, block .08` + innate `phagocytic_grasp`
-- `neutrophil` — `armor 5, might 1.2, knockback 1.4, regen .5` + innate `granzyme_detonation`
+- `neutrophil` — `armor 5, might 1.2, regen .5` + innate `granzyme_detonation`
 - `b_cell` — `proj_speed 1.3, CDR .10, amount 1.0` + innate `antibody_salvo`
 - `ctl` — `crit .15, evasion .10, pierce 1.0` + innate `perforin_lance`
 - `dendritic` — `armor 2, magnet 260, duration 1.2, CDR .10` + innate `mhc_tracer_beam`
 Each row also carries body/visual/nucleus/deform params; `PlayerActor` builds tints, nucleus shape and deform rig parametrically.
 
-Per-tick reads: `move_speed` in `HandleMovement`, `health_regen` in `HandleRegen`, `area` in `UpdateBodyDeformation`, `armor` in `ApplyImpulse/Defenses`.
+Per-tick reads: `move_speed` in `HandleMovement`, `health_regen` in `HandleRegen`, `area` in `UpdateBodyDeformation`, `armor` in `Defenses`.
 EXP: `ExpChanged(float,float,int)` + `LevelUp(int)`, `AddExp` (curve `ExpToNext*1.35+15`), `DrainAtp`.
 
 ### Hands-on

@@ -110,7 +110,6 @@ public partial class TestAllCells : TestHarness
                         case "neutrophil":
                             AssertThat(baseCell.Stats!.GetStat("armor")).IsEqualApprox(5.0f, 0.001f);
                             AssertThat(baseCell.Stats!.GetStat("might")).IsEqualApprox(1.2f, 0.001f);
-                            AssertThat(baseCell.Stats!.GetStat("knockback")).IsEqualApprox(1.4f, 0.001f);
                             AssertThat(baseCell.Stats!.GetStat("health_regen")).IsEqualApprox(0.5f, 0.001f);
                             break;
                         case "b_cell":

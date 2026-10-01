@@ -97,7 +97,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
                     └────────────┬────────────┘
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
-【通用戰鬥屬性 (Combat - 11項)】 【通用生存屬性 (Defense - 7項)】 【通用輔助與機制 (Utility - 1項)】
+【通用戰鬥屬性 (Combat - 10項)】 【通用生存屬性 (Defense - 7項)】 【通用輔助與機制 (Utility - 1項)】
 · Might (力量/傷害倍率)          · Max Health (最大生命)        · Magnet (拾取半徑)
 · Area (範圍/體積)              · Health Regen (生命自癒)
 · Cooldown Reduction (CDR)     · Armor (減傷/護甲)
@@ -105,7 +105,6 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 · Duration (持續時間)           · Evasion (流體閃避率)
 · Amount (額外數量)             · Block (糖萼格擋率)
 · Pierce (穿透次數)             · Life Steal (受體汲取/吸血)
-· Knockback (擊退力道)
 · Crit Chance (暴擊機率)
 · Crit Damage (暴擊倍率)
 · Ailment Damage (異常傷害倍率)
@@ -123,7 +122,6 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | `duration` | **持續時間** | `1.0` (100%) | 所有場上留存實體（酸霧 DoT 殘留、補體陣列地雷、黏網陷阱）的存活時間乘數。 |
 | `amount` | **額外數量** | `0` (發) | **固定增加所有技能的單次發射/生成個數**（如抗體 $+1$ 枚、穿孔素連發 $+1$ 束、偽足多出 $+1$ 爪）。 |
 | `pierce` | **穿透次數** | `0` (次) | 投射物貫穿敵人的額外次數（穿透後繼續向前飛行）。 |
-| `knockback` | **擊退力道** | `1.0` (100%) | 任何技能或碰撞命中敵人時施加的物理推擠衝量倍率。 |
 | `crit_chance` | **暴擊機率** | `0.05` (5%) | 任何傷害來源命中敵人弱點時觸發致命特異性暴擊的機率。 |
 | `crit_damage` | **暴擊倍率** | `2.0` (200%) | 觸發暴擊時的結算傷害倍率。 |
 | `ailment_damage` | **異常傷害倍率** | `1.0` (100%) | 全域 DoT／異常狀態傷害乘數，與 `might` 相乘結算。 |
@@ -173,10 +171,10 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | 主動技能名稱 | 醫學機制 | 消耗的通用 Stat | 戰鬥表現與機制 |
 | :--- | :--- | :--- | :--- |
 | **1. 穿孔素長矛<br>(Perforin Lance)** | 膜上穿孔素成孔 | `might`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近精英射出高初速螺旋光束。`amount` 增加連發數，`pierce` 增加貫穿人數。 |
-| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解反應 | `might`, `area`, `cooldown_reduction`, `duration`, `knockback` | 在隨機周遭地面生成生化光環，`area` 擴大地雷半徑，延遲 2 秒引發強烈擊退爆破。 |
+| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解反應 | `might`, `area`, `cooldown_reduction`, `duration` | 在隨機周遭地面生成生化光環，`area` 擴大地雷半徑，延遲 2 秒引發強烈擊退爆破。 |
 | **3. Y 型抗體齊射<br>(Antibody Salvo)** | 游離特異性抗體分泌 | `might`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發尋航 Y 型飛彈，`amount` 直接增加飛彈發射數量。 |
 | **4. 活性氧射流<br>(ROS Spray)** | NADPH 氧化酶釋放 $\text{H}_2\text{O}_2$ | `might`, `area`, `duration`, `cooldown_reduction` | 朝游動方向噴射高壓錐形酸霧，`area` 擴大噴射錐形面積，造成 DoT 溶解破甲。 |
-| **5. 偽足猛擊<br>(Pseudopod Lunge)** | 微絲聚合瞬間彈射 | `might`, `area`, `amount`, `knockback`, `cooldown_reduction` | 向外猛烈彈射阿米巴抓手，`area` 增加抓手伸長距離，`amount` 增加多向抓手數量。 |
+| **5. 偽足猛擊<br>(Pseudopod Lunge)** | 微絲聚合瞬間彈射 | `might`, `area`, `amount`, `cooldown_reduction` | 向外猛烈彈射阿米巴抓手，`area` 增加抓手伸長距離，`amount` 增加多向抓手數量。 |
 
 ---
 
@@ -236,7 +234,7 @@ graph LR
 - **五大獨立起點中心**：
   - 巨噬起點中心（左上）：側重 `area`（體積/範圍）、`max_health`（血上限）、`armor`（膜剛性減傷）、`block`（糖萼格擋率）。
   - 殺手 T 起點中心（右側）：側重 `move_speed`（移速）、`crit_chance`（暴擊率）、`pierce`（穿透）、`evasion`（流體閃避率）。
-  - 嗜中性球起點中心（左側）：側重 `might`（傷害強度）、`knockback`（擊退）、`health_regen`（生命自癒）。
+  - 嗜中性球起點中心（左側）：側重 `might`（傷害強度）、`health_regen`（生命自癒）。
   - B 細胞起點中心（右下）：側重 `amount`（彈道數）、`projectile_speed`（彈速）、`cooldown_reduction`（CDR）、`life_steal`（受體汲取/吸血）。
   - 樹突狀起點中心（正上）：側重 `magnet`（拾取半徑）、`duration`（狀態與光環持續時間）、`cooldown_reduction`（冷卻縮減）、`area`（感知與效果範圍）。
 - **細胞專屬曼哈頓環層**：以出戰細胞之起點中心為原點，$L_{\text{cell}} = |col - col_{\text{start}}| + |row - row_{\text{start}}|$。
@@ -342,7 +340,6 @@ var projectile_speed: Stat = Stat.new(1.0)
 var duration: Stat = Stat.new(1.0)
 var amount: Stat = Stat.new(0.0)
 var pierce: Stat = Stat.new(0.0)
-var knockback: Stat = Stat.new(1.0)
 var crit_chance: Stat = Stat.new(0.05)
 var crit_damage: Stat = Stat.new(2.0)
 

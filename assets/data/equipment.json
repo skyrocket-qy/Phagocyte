@@ -105,11 +105,6 @@
         "stat": "move_speed",
         "unit": "percent",
         "value": 0.12
-      },
-      {
-        "stat": "knockback",
-        "unit": "percent",
-        "value": 0.2
       }
     ],
     "name_key": "ORGANELLE_FLAGELLAR_BASE_NAME"
@@ -406,11 +401,6 @@
     "id": "centrosome_array",
     "max_copies": 1,
     "modifiers": [
-      {
-        "stat": "knockback",
-        "unit": "percent",
-        "value": 0.3
-      },
       {
         "stat": "pierce",
         "unit": "flat",

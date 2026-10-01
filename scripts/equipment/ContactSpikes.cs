@@ -92,7 +92,7 @@ public partial class ContactSpikes : EquipmentPiece
         ulong attackerId = Host != null && GodotObject.IsInstanceValid(Host) ? Host.GetInstanceId() : 0;
         HitPipeline.ResolveHit(new HitPayload { RawDamage = damage, AttackerId = attackerId }, enemy);
 
-        float knockback = InterceptKnockback * Mathf.Max(0.2f, GetStat("knockback"));
+        float knockback = InterceptKnockback;
         float spinSign = Mathf.Sign(RotationSpeed == 0.0f ? 1.0f : RotationSpeed);
         Vector2 tangent = new Vector2(-outward.Y, outward.X) * spinSign;
         Vector2 impulse = (outward * 0.7f + tangent * 0.3f).Normalized() * knockback;

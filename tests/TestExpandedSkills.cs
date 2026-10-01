@@ -121,11 +121,10 @@ public partial class TestExpandedSkills : SceneTree
         kinesin.RemovePassiveModifiers();
         AssertThat(cellStats.GetStat("pierce")).IsEqual(0.0f);
 
-        // 4.5 Cytokine Longevity: Duration +15%, Knockback +10% per level
+        // 4.5 Cytokine Longevity: Duration +15% per level
         var longevity = SkillFactory.CreatePassive("longevity")!;
         longevity.Setup(dummyHost);
         AssertThat(cellStats.GetStat("duration")).IsEqualApprox(1.15f, 0.01f);
-        AssertThat(cellStats.GetStat("knockback")).IsEqualApprox(1.10f, 0.01f);
         longevity.RemovePassiveModifiers();
 
         // 4.6 V(D)J Diversity: CritDamage +15%, CritChance +3% per level
@@ -151,7 +150,7 @@ public partial class TestExpandedSkills : SceneTree
 
         GD.Print("[PASS] Step 4: All 8 new Passive traits correctly inject, upgrade, and remove modifiers from ActorStats.");
 
-        // --- 5. Verify PlayerActor Integration (Exp, Impulse, Damage) ---
+        // --- 5. Verify PlayerActor Integration (Exp, Damage) ---
         var player = new PlayerActor();
         var playerStats = new ActorStats { Name = "ActorStats" };
         player.AddChild(playerStats);
@@ -163,13 +162,6 @@ public partial class TestExpandedSkills : SceneTree
         player.AddExp(15.0f);
         AssertThat(player.CurrentExp).IsEqualApprox(expBefore + 15.0f, 0.01f);
         GD.Print("[PASS] Step 5.1: PlayerActor AddExp works correctly.");
-
-        // 5.2 Armor damping in ApplyImpulse
-        playerStats.AddModifier("armor", 50.0f, 0.0f); // 50% DR
-        player.Velocity = Vector2.Zero;
-        player.ApplyImpulse(new Vector2(100.0f, 0.0f));
-        AssertThat(player.Velocity.X).IsEqualApprox(50.0f, 0.5f);
-        GD.Print("[PASS] Step 5.2: PlayerActor ApplyImpulse respects armor dampening.");
 
         // 5.3 Fatal damage
         player.Health = 20.0f;

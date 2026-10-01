@@ -10,7 +10,6 @@ export const StatLabels: StatLabelsFile = {
   [StatId.Duration]: "STAT_DURATION",
   [StatId.Amount]: "STAT_AMOUNT",
   [StatId.Pierce]: "STAT_PIERCE",
-  [StatId.Knockback]: "STAT_KNOCKBACK",
   [StatId.CritChance]: "STAT_CRIT_CHANCE",
   [StatId.CritDamage]: "STAT_CRIT_DAMAGE",
   [StatId.AilmentDamage]: "STAT_AILMENT_DAMAGE",

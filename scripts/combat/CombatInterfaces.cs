@@ -15,9 +15,6 @@ public readonly struct DefenseProfile
 /// <summary>POE armour curve shared by every damageable: big hits penetrate.</summary>
 public static class CombatMath
 {
-    /// <summary>Nominal hit size reproducing the legacy armor/(armor+50) ratio.</summary>
-    public const float ReferenceDamage = 10.0f;
-
     public static float FromArmor(float armor, float damage)
     {
         if (armor <= 0.0f || damage <= 0.0f)

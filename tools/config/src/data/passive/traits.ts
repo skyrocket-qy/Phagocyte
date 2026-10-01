@@ -136,11 +136,6 @@ export const Traits: TraitsFile = {
           stat: StatId.Duration,
           unit: ModType.Percent,
           value: 0.15
-        },
-        {
-          stat: StatId.Knockback,
-          unit: ModType.Percent,
-          value: 0.1
         }
       ],
       name_key: "SKILL_LONGEVITY_NAME",

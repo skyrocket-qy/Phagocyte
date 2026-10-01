@@ -572,13 +572,6 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         EmitSignal(SignalName.Died);
     }
 
-    public void ApplyImpulse(Vector2 impulse)
-    {
-        float armor = Stats != null ? Stats.GetStat("armor") : 0.0f;
-        float dr = CombatMath.FromArmor(armor, CombatMath.ReferenceDamage);
-        Velocity += impulse * (1.0f - Mathf.Clamp(dr, 0.0f, 0.75f));
-    }
-
     private void OnStatChanged(string statName, float val)
     {
         if (statName == "max_health" && Stats != null)
