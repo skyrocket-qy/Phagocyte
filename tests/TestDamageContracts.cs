@@ -4,6 +4,7 @@ using Game.Combat;
 using Game.Core;
 using Game.Enemies;
 using Game.Player;
+using Game.Skills;
 using GdUnit4;
 using static GdUnit4.Assertions;
 
@@ -36,6 +37,8 @@ public partial class TestDamageContracts : TestHarness
             RunPipelineTests();
             RunArmorPenetrationTests();
             RunAilmentChanceThresholdTests();
+            RunTypedDamageTests();
+            RunConditionalDamageTests();
             RunStaggerRecoupTests();
             RunDeadOwnerTests();
             RunGraceTests();
@@ -309,6 +312,11 @@ public partial class TestDamageContracts : TestHarness
         AssertThat(stats.GetStat("ailment_threshold")).IsEqual(0.0f);
         stats.RemoveModifier("ailment_threshold", -5.0f, 0.0f);
         AssertThat(stats.GetStat("ailment_threshold")).IsEqual(1.0f);
+        AssertThat(stats.GetStat("ailment_effect")).IsEqual(1.0f);
+        stats.AddModifier("damage_taken", -5.0f, 0.0f);
+        AssertThat(stats.GetStat("damage_taken")).IsEqual(0.0f);
+        stats.RemoveModifier("damage_taken", -5.0f, 0.0f);
+        AssertThat(stats.GetStat("damage_taken")).IsEqual(1.0f);
         GD.Print("[PASS] Ailment chance caps at 100%; threshold floors at zero.");
 
         var stun4 = new EffectSpec { EffectId = "stun", Magnitude = 0.0f, Duration = 4.0f };
@@ -384,6 +392,115 @@ public partial class TestDamageContracts : TestHarness
         critGated.QueueFree();
         thick.QueueFree();
         thin.QueueFree();
+        cell.QueueFree();
+    }
+
+    private void RunTypedDamageTests()
+    {
+        AssertThat(BaseSkill.TypeStatKey(DamageType.Physical)).IsEqual("physical_damage");
+        AssertThat(BaseSkill.TypeStatKey(DamageType.Fire)).IsEqual("fire_damage");
+        AssertThat(BaseSkill.TypeStatKey(DamageType.Cold)).IsEqual("cold_damage");
+        AssertThat(BaseSkill.TypeStatKey(DamageType.Lightning)).IsEqual("lightning_damage");
+        AssertThat(BaseSkill.TypeStatKey(DamageType.Chaos)).IsEqual("chaos_damage");
+
+        HitPayload untagged = DamageService.Snapshot(10.0f);
+        AssertThat(untagged.Type).IsEqual(DamageType.Physical);
+        GD.Print("[PASS] Damage type keys map 1:1; untagged payloads default to physical.");
+
+        var cell = new PlayerActor { GlobalPosition = new Vector2(300, 300) };
+        var stats = new ActorStats { Name = "ActorStats" };
+        cell.AddChild(stats);
+        cell.Stats = stats;
+        Root.AddChild(cell);
+        stats.SetBase("block", 0.0f);
+        stats.SetBase("evasion", 0.0f);
+        stats.SetBase("crit_chance", 0.0f);
+        stats.SetBase("life_steal", 0.0f);
+        stats.SetBase("armor", 0.0f);
+        ulong attackerId = cell.GetInstanceId();
+
+        var ros = SkillFactory.CreateActive("ros_torrent")!;
+        ros.Setup(cell);
+        AssertThat(ros.GetDamageType()).IsEqual(DamageType.Fire);
+        var grasp = SkillFactory.CreateActive("phagocytic_grasp")!;
+        grasp.Setup(cell);
+        AssertThat(grasp.GetDamageType()).IsEqual(DamageType.Physical);
+        var untyped = new BaseSkill { SkillId = "missing_id" };
+        AssertThat(untyped.GetDamageType()).IsEqual(DamageType.Physical);
+
+        stats.AddModifier("fire_damage", 0.0f, 0.5f);
+        AssertThat(ros.GetCalculatedDamage(16.0f)).IsEqualApprox(24.0f, 0.01f);
+        stats.AddModifier("physical_damage", 0.0f, 1.0f);
+        AssertThat(ros.GetCalculatedDamage(16.0f)).IsEqualApprox(24.0f, 0.01f);
+        AssertThat(grasp.GetCalculatedDamage(28.0f)).IsEqualApprox(56.0f, 0.01f);
+        stats.RemoveModifier("fire_damage", 0.0f, 0.5f);
+        stats.RemoveModifier("physical_damage", 0.0f, 1.0f);
+        GD.Print("[PASS] Typed multipliers scale only their own damage type.");
+
+        var armored = NewEnemy(1000.0f);
+        armored.Armor = 10.0f;
+        Root.AddChild(armored);
+        HitResult fireHit = HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = 20.0f,
+            Type = DamageType.Fire,
+            AttackerId = attackerId,
+        }, armored);
+        AssertThat(fireHit.DamageDealt).IsEqualApprox(20.0f * (1.0f - 10.0f / 110.0f), 0.01f);
+        GD.Print("[PASS] Armor still mitigates elemental hits (no physical-only split).");
+
+        ros.QueueFree();
+        grasp.QueueFree();
+        armored.QueueFree();
+        cell.QueueFree();
+    }
+
+    private void RunConditionalDamageTests()
+    {
+        var cell = new PlayerActor { GlobalPosition = new Vector2(300, 300) };
+        var stats = new ActorStats { Name = "ActorStats" };
+        cell.AddChild(stats);
+        cell.Stats = stats;
+        Root.AddChild(cell);
+        stats.SetBase("block", 0.0f);
+        stats.SetBase("evasion", 0.0f);
+        stats.SetBase("crit_chance", 0.0f);
+        stats.SetBase("life_steal", 0.0f);
+        stats.SetBase("armor", 0.0f);
+
+        var grasp = SkillFactory.CreateActive("phagocytic_grasp")!;
+        grasp.Setup(cell);
+        var ros = SkillFactory.CreateActive("ros_torrent")!;
+        ros.Setup(cell);
+        AssertThat(grasp.HasTag("Melee")).IsTrue();
+        AssertThat(ros.HasTag("Melee")).IsFalse();
+        AssertThat(ros.HasTag("Spell")).IsTrue();
+
+        stats.AddModifier("melee_damage", 0.0f, 0.5f);
+        AssertThat(grasp.GetCalculatedDamage(28.0f)).IsEqualApprox(42.0f, 0.01f);
+        AssertThat(ros.GetCalculatedDamage(16.0f)).IsEqualApprox(16.0f, 0.01f);
+        stats.RemoveModifier("melee_damage", 0.0f, 0.5f);
+        GD.Print("[PASS] Melee damage scales only Melee-tagged skills.");
+
+        stats.AddModifier("spell_damage", 0.0f, 0.5f);
+        stats.AddModifier("aoe_damage", 0.0f, 0.5f);
+        AssertThat(ros.GetCalculatedDamage(16.0f)).IsEqualApprox(36.0f, 0.01f);
+        AssertThat(grasp.GetCalculatedDamage(28.0f)).IsEqualApprox(42.0f, 0.01f);
+        stats.RemoveModifier("spell_damage", 0.0f, 0.5f);
+        stats.RemoveModifier("aoe_damage", 0.0f, 0.5f);
+        GD.Print("[PASS] Spell/AoE multipliers compound only on matching tags.");
+
+        stats.AddModifier("projectile_damage", 0.0f, 1.0f);
+        AssertThat(ros.GetCalculatedDamage(16.0f)).IsEqualApprox(16.0f, 0.01f);
+        stats.RemoveModifier("projectile_damage", 0.0f, 1.0f);
+
+        AssertThat(grasp.HasTag("Minion")).IsFalse();
+        AssertThat(ros.HasTag("Minion")).IsFalse();
+        AssertThat(stats.GetStat("minion_damage")).IsEqual(1.0f);
+        GD.Print("[PASS] Minion damage is wired but dormant (no skill carries the tag).");
+
+        grasp.QueueFree();
+        ros.QueueFree();
         cell.QueueFree();
     }
 

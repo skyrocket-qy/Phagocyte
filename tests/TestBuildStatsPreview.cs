@@ -30,7 +30,10 @@ public partial class TestBuildStatsPreview : TestHarness
     {
         "might", "area", "cooldown_reduction", "projectile_speed", "duration",
         "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration", "ailment_chance", "dot_damage",
-        "max_health", "health_regen", "armor", "ailment_threshold", "move_speed", "evasion", "block", "life_steal",
+        "physical_damage", "fire_damage", "cold_damage", "lightning_damage", "chaos_damage",
+        "melee_damage", "spell_damage", "aoe_damage", "projectile_damage", "minion_damage",
+        "ailment_effect",
+        "max_health", "health_regen", "armor", "damage_taken", "ailment_threshold", "move_speed", "evasion", "block", "life_steal",
         "magnet", "stagger", "recoup"
     };
 
@@ -152,7 +155,7 @@ public partial class TestBuildStatsPreview : TestHarness
         {
             AssertThat(player.Stats!.GetStat(key)).IsEqualApprox(preview[key], 0.001f);
         }
-        GD.Print("[PASS] Test 2: preview equals run-assembled stats on all 23 keys.");
+        GD.Print("[PASS] Test 2: preview equals run-assembled stats on all 35 keys.");
     }
 
     private void AssertMenuRefreshWiring()

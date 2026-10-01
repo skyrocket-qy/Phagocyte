@@ -82,6 +82,7 @@ public partial class BeamSkill : BaseSkill
                 float critMult = GetCalculatedCritDamage();
                 float pen = GetCalculatedArmorPenetration();
                 float ailChance = GetCalculatedAilmentChance();
+                DamageType dmgType = GetDamageType();
                 HitPipeline.ResolveHit(new HitPayload
                 {
                     RawDamage = dmg,
@@ -89,6 +90,7 @@ public partial class BeamSkill : BaseSkill
                     CritMultiplier = critMult,
                     ArmorPenetration = pen,
                     AilmentChance = ailChance,
+                    Type = dmgType,
                     AttackerId = attackerId,
                     Effect0 = fx0,
                     Effect1 = fx1,
@@ -121,6 +123,7 @@ public partial class BeamSkill : BaseSkill
         float chainMult = GetCalculatedCritDamage();
         float chainPen = GetCalculatedArmorPenetration();
         float chainAil = GetCalculatedAilmentChance();
+        DamageType chainType = GetDamageType();
 
         var visited = new HashSet<EnemyActor>();
         EnemyActor? current = TargetingService.FindNearest(Host!, ParamFloat(p, "range", 480.0f));
@@ -136,6 +139,7 @@ public partial class BeamSkill : BaseSkill
                 CritMultiplier = chainMult,
                 ArmorPenetration = chainPen,
                 AilmentChance = chainAil,
+                Type = chainType,
                 AttackerId = attackerId
             }, current);
             SpawnBeamFx(from, current.GlobalPosition, 9.0f);
@@ -183,6 +187,7 @@ public partial class BeamSkill : BaseSkill
         float chanMult = GetCalculatedCritDamage();
         float chanPen = GetCalculatedArmorPenetration();
         float chanAil = GetCalculatedAilmentChance();
+        DamageType chanType = GetDamageType();
         HitPipeline.ResolveHit(new HitPayload
         {
             RawDamage = dps * (float)delta,
@@ -190,6 +195,7 @@ public partial class BeamSkill : BaseSkill
             CritMultiplier = chanMult,
             ArmorPenetration = chanPen,
             AilmentChance = chanAil,
+            Type = chanType,
             AttackerId = Host!.GetInstanceId(),
         }, _channelTarget);
         string meta = ParamString(p, "meta");

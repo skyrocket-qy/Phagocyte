@@ -50,6 +50,7 @@ public partial class AuraSkill : BaseSkill
         float critMult = GetCalculatedCritDamage();
         float pen = GetCalculatedArmorPenetration();
         float ailChance = GetCalculatedAilmentChance();
+        DamageType dmgType = GetDamageType();
 
         TargetingService.ForEachInRadius(Host!.GlobalPosition, radius, enemy =>
         {
@@ -61,6 +62,7 @@ public partial class AuraSkill : BaseSkill
                 CritMultiplier = critMult,
                 ArmorPenetration = pen,
                 AilmentChance = ailChance,
+                Type = dmgType,
                 AttackerId = attackerId,
                 Effect0 = fx0,
                 Effect1 = fx1,
@@ -105,6 +107,7 @@ public partial class AuraSkill : BaseSkill
         float orbCritMult = GetCalculatedCritDamage();
         float orbPen = GetCalculatedArmorPenetration();
         float orbAil = GetCalculatedAilmentChance();
+        DamageType orbType = GetDamageType();
         foreach (float angle in _bladeAngles)
         {
             Vector2 bladePos = Host!.GlobalPosition + Vector2.FromAngle(angle) * orbit;
@@ -118,6 +121,7 @@ public partial class AuraSkill : BaseSkill
                     CritMultiplier = orbCritMult,
                     ArmorPenetration = orbPen,
                     AilmentChance = orbAil,
+                    Type = orbType,
                     AttackerId = attackerId
                 }, enemy);
             });

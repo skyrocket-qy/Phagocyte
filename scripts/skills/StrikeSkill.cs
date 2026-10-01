@@ -70,6 +70,7 @@ public partial class StrikeSkill : BaseSkill
         float strikeMult = GetCalculatedCritDamage();
         float strikePen = GetCalculatedArmorPenetration();
         float strikeAil = GetCalculatedAilmentChance();
+        DamageType strikeType = GetDamageType();
         HitPipeline.ResolveHit(new HitPayload
         {
             RawDamage = dmg,
@@ -77,6 +78,7 @@ public partial class StrikeSkill : BaseSkill
             CritMultiplier = strikeMult,
             ArmorPenetration = strikePen,
             AilmentChance = strikeAil,
+            Type = strikeType,
             AttackerId = attackerId
         }, target);
         VfxManager.Instance?.Play(VfxType.CytoplasmSplatter, tipPos);
@@ -95,6 +97,7 @@ public partial class StrikeSkill : BaseSkill
                         CritMultiplier = strikeMult,
                         ArmorPenetration = strikePen,
                         AilmentChance = strikeAil,
+                        Type = strikeType,
                         AttackerId = attackerId
                     }, enemy);
             });

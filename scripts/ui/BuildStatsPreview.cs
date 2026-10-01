@@ -12,12 +12,15 @@ public static class BuildStatsPreview
     {
         "might", "area", "cooldown_reduction", "projectile_speed", "duration",
         "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration",
-        "ailment_chance", "dot_damage"
+        "ailment_chance", "dot_damage",
+        "physical_damage", "fire_damage", "cold_damage", "lightning_damage", "chaos_damage",
+        "melee_damage", "spell_damage", "aoe_damage", "projectile_damage", "minion_damage",
+        "ailment_effect"
     };
 
     public static readonly string[] DefenseKeys =
     {
-        "max_health", "health_regen", "armor", "ailment_threshold", "move_speed", "evasion", "block", "life_steal",
+        "max_health", "health_regen", "armor", "damage_taken", "ailment_threshold", "move_speed", "evasion", "block", "life_steal",
         "stagger", "recoup"
     };
 
@@ -109,7 +112,7 @@ public static class BuildStatsPreview
             "max_health" or "health_regen" or "move_speed" or "magnet" => $"{value:F1}",
             "amount" or "pierce" or "armor" => $"{value:F0}",
             "cooldown_reduction" or "crit_chance" or "evasion" or "block" or "life_steal" or "stagger" or "recoup" or "armor_penetration" or "ailment_chance" => $"{value * 100.0f:F1}%",
-            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "dot_damage" or "ailment_threshold" => $"{value * 100.0f:F0}%",
+            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "dot_damage" or "ailment_threshold" or "ailment_effect" or "damage_taken" or "physical_damage" or "fire_damage" or "cold_damage" or "lightning_damage" or "chaos_damage" or "melee_damage" or "spell_damage" or "aoe_damage" or "projectile_damage" or "minion_damage" => $"{value * 100.0f:F0}%",
             _ => $"{value:F2}"
         };
     }

@@ -12,13 +12,15 @@ namespace Game.Core;
 /// </summary>
 public static class StatProfiles
 {
-    /// <summary>All 23 universal stats (heroes, UI previews, balance probes).</summary>
+    /// <summary>All 35 universal stats (heroes, UI previews, balance probes).</summary>
     public static readonly string[] Full =
     {
         "might", "area", "cooldown_reduction", "projectile_speed", "duration",
         "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration",
-        "ailment_chance", "dot_damage", "ailment_threshold",
-        "max_health", "health_regen", "armor", "move_speed",
+        "ailment_chance", "dot_damage", "ailment_threshold", "ailment_effect",
+        "physical_damage", "fire_damage", "cold_damage", "lightning_damage", "chaos_damage",
+        "melee_damage", "spell_damage", "aoe_damage", "projectile_damage", "minion_damage",
+        "max_health", "health_regen", "armor", "damage_taken", "move_speed",
         "evasion", "block", "life_steal", "magnet", "stagger", "recoup",
     };
 
@@ -52,10 +54,22 @@ public sealed class StatBlock : IStatHost
         ["armor_penetration"] = 0.0f,
         ["ailment_chance"] = 1.0f,
         ["ailment_threshold"] = 1.0f,
+        ["ailment_effect"] = 1.0f,
         ["dot_damage"] = 1.0f,
+        ["physical_damage"] = 1.0f,
+        ["fire_damage"] = 1.0f,
+        ["cold_damage"] = 1.0f,
+        ["lightning_damage"] = 1.0f,
+        ["chaos_damage"] = 1.0f,
+        ["melee_damage"] = 1.0f,
+        ["spell_damage"] = 1.0f,
+        ["aoe_damage"] = 1.0f,
+        ["projectile_damage"] = 1.0f,
+        ["minion_damage"] = 1.0f,
         ["max_health"] = 100.0f,
         ["health_regen"] = 0.0f,
         ["armor"] = 0.0f,
+        ["damage_taken"] = 1.0f,
         ["move_speed"] = 230.0f,
         ["evasion"] = 0.0f,
         ["block"] = 0.0f,
@@ -121,7 +135,7 @@ public sealed class StatBlock : IStatHost
             "life_steal" => Mathf.Clamp(val, 0.0f, 0.20f),          // Cap Life Steal at 20%
             "stagger" => Mathf.Clamp(val, 0.0f, 0.60f),               // Cap Stagger at 60%
             "recoup" => Mathf.Clamp(val, 0.0f, 0.30f),                // Cap Recoup at 30%
-            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "dot_damage" or "ailment_threshold" => Mathf.Max(0.0f, val),
+            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "dot_damage" or "ailment_threshold" or "ailment_effect" or "damage_taken" or "physical_damage" or "fire_damage" or "cold_damage" or "lightning_damage" or "chaos_damage" or "melee_damage" or "spell_damage" or "aoe_damage" or "projectile_damage" or "minion_damage" => Mathf.Max(0.0f, val),
             "amount" or "pierce" => Mathf.Max(0.0f, val),
             "move_speed" or "max_health" or "magnet" or "armor" => Mathf.Max(0.0f, val),
             _ => val

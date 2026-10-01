@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Game.Core;
 
 /// <summary>
-/// Centralized 23-Universal-Stat Manager for Cells in Game.
+/// Centralized 35-Universal-Stat Manager for Cells in Game.
 /// Thin Node adapter over <see cref="StatBlock"/> (full schema): owns the
 /// SceneTree membership and the <c>StatChanged</c> signal, delegates all
 /// math. Formula: Final = (Base + Flat) * (1 + Pct).
@@ -29,12 +29,24 @@ public partial class ActorStats : Node, IStatHost
     public Stat ArmorPenetration => _block.GetStatObj("armor_penetration")!;
     public Stat AilmentChance => _block.GetStatObj("ailment_chance")!;
     public Stat AilmentThreshold => _block.GetStatObj("ailment_threshold")!;
+    public Stat AilmentEffect => _block.GetStatObj("ailment_effect")!;
     public Stat DotDamage => _block.GetStatObj("dot_damage")!;
+    public Stat PhysicalDamage => _block.GetStatObj("physical_damage")!;
+    public Stat FireDamage => _block.GetStatObj("fire_damage")!;
+    public Stat ColdDamage => _block.GetStatObj("cold_damage")!;
+    public Stat LightningDamage => _block.GetStatObj("lightning_damage")!;
+    public Stat ChaosDamage => _block.GetStatObj("chaos_damage")!;
+    public Stat MeleeDamage => _block.GetStatObj("melee_damage")!;
+    public Stat SpellDamage => _block.GetStatObj("spell_damage")!;
+    public Stat AoEDamage => _block.GetStatObj("aoe_damage")!;
+    public Stat ProjectileDamage => _block.GetStatObj("projectile_damage")!;
+    public Stat MinionDamage => _block.GetStatObj("minion_damage")!;
 
     // Defense & Survival Stats (9)
     public Stat MaxHealth => _block.GetStatObj("max_health")!;
     public Stat HealthRegen => _block.GetStatObj("health_regen")!;
     public Stat Armor => _block.GetStatObj("armor")!;
+    public Stat DamageTaken => _block.GetStatObj("damage_taken")!;
     public Stat MoveSpeed => _block.GetStatObj("move_speed")!;
     public Stat Evasion => _block.GetStatObj("evasion")!;
     public Stat Block => _block.GetStatObj("block")!;

@@ -91,6 +91,7 @@ public partial class NovaSkill : BaseSkill
 
     private void DetonateSphere(Vector2 center, float dmg, float pen, float ailChance, Dictionary p)
     {
+        DamageType dmgType = GetDamageType();
         float radius = GetCalculatedArea(ParamFloat(p, "radius", ParamFloat(p, "reach", 480.0f)));
         float kbDist = ParamFloat(p, "knockback_dist", 0.0f);
         float kbTime = ParamFloat(p, "knockback_time", 0.2f);
@@ -108,6 +109,7 @@ public partial class NovaSkill : BaseSkill
                 CritMultiplier = novaMult,
                 ArmorPenetration = pen,
                 AilmentChance = ailChance,
+                Type = dmgType,
                 AttackerId = attackerId
             }, enemy);
             if (kbDist > 0.0f)
@@ -125,6 +127,7 @@ public partial class NovaSkill : BaseSkill
 
     private void DetonateCone(Vector2 center, float dmg, float pen, float ailChance, Dictionary p)
     {
+        DamageType dmgType = GetDamageType();
         Vector2 aimDir = Host!.Velocity.Length() > 20.0f ? Host.Velocity.Normalized() : Vector2.Right;
         float reach = GetCalculatedArea(ParamFloat(p, "reach", 320.0f));
         float halfCone = Mathf.DegToRad(ParamFloat(p, "angle", 100.0f) * 0.5f);
@@ -148,6 +151,7 @@ public partial class NovaSkill : BaseSkill
                 CritMultiplier = coneMult,
                 ArmorPenetration = pen,
                 AilmentChance = ailChance,
+                Type = dmgType,
                 AttackerId = attackerId
             }, enemy);
         });

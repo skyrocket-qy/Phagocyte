@@ -124,6 +124,10 @@ export function runCrossValidation(data: {
       }
     }
     const params = (s.params ?? {}) as Record<string, unknown>;
+    const dmgType = params.damage_type;
+    if (dmgType !== undefined && (typeof dmgType !== "string" || !["physical", "fire", "cold", "lightning", "chaos"].includes(dmgType))) {
+      addError("Skills", `Skill '${s.id}' param 'damage_type' is '${dmgType}' (expected physical/fire/cold/lightning/chaos).`);
+    }
     for (const key of ["sfx", "nova_sfx"]) {
       const v = params[key];
       if (typeof v === "string" && !sfxIds.has(v)) {

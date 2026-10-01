@@ -17,6 +17,7 @@ public static class SkillTag
     public const string Duration = "Duration";
     public const string Melee = "Melee";
     public const string Trap = "Trap";
+    public const string Minion = "Minion";
 
     /// <summary>
     /// Fluorescent theme colors for UI badges matching bio-microscopic aesthetic.
@@ -30,6 +31,7 @@ public static class SkillTag
         Duration => new Color(0.78f, 0.55f, 0.95f),   // Orchid Violet (Lingering / Persistent)
         Melee => new Color(0.95f, 0.60f, 0.25f),      // Warm Orange (Contact / Pseudopod Reach)
         Trap => new Color(0.32f, 0.90f, 0.90f),       // Teal Phosphor (Stationary Bio-Mine / Puddle)
+        Minion => new Color(0.65f, 0.95f, 0.35f),     // Lime Green (Summoned Entity)
         _ => Colors.White
     };
 }

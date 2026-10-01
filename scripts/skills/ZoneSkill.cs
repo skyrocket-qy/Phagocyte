@@ -29,6 +29,7 @@ public partial class ZoneSkill : BaseSkill
         float dmg = GetCalculatedDamage(baseDmg);
         float pen = GetCalculatedArmorPenetration();
         float ailChance = GetCalculatedAilmentChance();
+        DamageType dmgType = GetDamageType();
 
         int count = GetCalculatedAmount(ParamInt(p, "count", 1));
         bool mineRow = p.ContainsKey("nova_radius");
@@ -55,6 +56,7 @@ public partial class ZoneSkill : BaseSkill
                 Damage = dmg,
                 ArmorPenetration = pen,
                 AilmentChance = ailChance,
+                DamageType = dmgType,
                 Effect0 = fx0,
                 Effect1 = fx1,
                 EffectCount = fxCount,
@@ -84,6 +86,7 @@ public partial class ZoneSkill : BaseSkill
     /// <summary>Deploys the zone nova on expiry (mine rows).</summary>
     public void ExpireNova(Vector2 center, Dictionary p, float dmg, float pen, float ailChance)
     {
+        DamageType dmgType = GetDamageType();
         var nova = new NovaSkill
         {
             SkillId = SkillId,
@@ -108,6 +111,7 @@ public partial class ZoneSkill : BaseSkill
                 CritMultiplier = zoneMult,
                 ArmorPenetration = pen,
                 AilmentChance = ailChance,
+                Type = dmgType,
                 AttackerId = attackerId
             }, enemy);
         });

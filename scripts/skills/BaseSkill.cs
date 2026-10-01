@@ -295,8 +295,65 @@ public partial class BaseSkill : Node2D
     public float GetCalculatedDamage(float baseDmg)
     {
         if (Stats is IStatHost host)
-            return baseDmg * host.GetStat("might");
+        {
+            float mult = host.GetStat("might") * host.GetStat(TypeStatKey(GetDamageType()));
+            mult *= ConditionalMult(host, SkillTag.Melee, "melee_damage");
+            mult *= ConditionalMult(host, SkillTag.Spell, "spell_damage");
+            mult *= ConditionalMult(host, SkillTag.AOE, "aoe_damage");
+            mult *= ConditionalMult(host, SkillTag.Projectile, "projectile_damage");
+            mult *= ConditionalMult(host, SkillTag.Minion, "minion_damage");
+            return baseDmg * mult;
+        }
         return baseDmg;
+    }
+
+    /// <summary>Data-tag membership (case-insensitive); tags gate conditional stats.</summary>
+    public bool HasTag(string tag)
+    {
+        foreach (string t in Tags)
+        {
+            if (string.Equals(t, tag, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        return false;
+    }
+
+    private float ConditionalMult(IStatHost host, string tag, string stat)
+    {
+        return HasTag(tag) ? host.GetStat(stat) : 1.0f;
+    }
+
+    /// <summary>Hit damage type from skill data (params damage_type; physical default).</summary>
+    public DamageType GetDamageType()
+    {
+        string raw = ParamString(SkillParams(), "damage_type", "physical").Trim().ToLowerInvariant();
+        return raw switch
+        {
+            "fire" => DamageType.Fire,
+            "cold" => DamageType.Cold,
+            "lightning" => DamageType.Lightning,
+            "chaos" => DamageType.Chaos,
+            "physical" => DamageType.Physical,
+            _ => WarnUnknownDamageType(raw),
+        };
+    }
+
+    private DamageType WarnUnknownDamageType(string raw)
+    {
+        GD.PushWarning($"[BaseSkill] Unknown damage_type '{raw}' on '{SkillId}'; falling back to physical.");
+        return DamageType.Physical;
+    }
+
+    public static string TypeStatKey(DamageType type)
+    {
+        return type switch
+        {
+            DamageType.Fire => "fire_damage",
+            DamageType.Cold => "cold_damage",
+            DamageType.Lightning => "lightning_damage",
+            DamageType.Chaos => "chaos_damage",
+            _ => "physical_damage",
+        };
     }
 
     public float GetCalculatedArea(float baseArea)

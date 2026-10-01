@@ -164,8 +164,8 @@ Understand the only numbers that matter: 19 universal stats, no skill-specific s
 - `scenes/actors/player_base.tscn` — body `layer1/mask4`, sensor `layer1/mask2`
 
 ### Stat matrix (`ActorStats.cs:17-39`)
-Combat: `might(1.0)`, `area(1.0)`, `cooldown_reduction(0)`, `projectile_speed(1.0)`, `duration(1.0)`, `amount(0)`, `pierce(0)`, `crit_chance(.05)`, `crit_damage(2.0)`, `armor_penetration(0)`, `ailment_chance(1.0)`, `dot_damage(1.0)`, `ailment_threshold(1.0)`
-Defense: `max_health(100)`, `health_regen(0)`, `armor(0)`, `move_speed(230)`, `evasion(0)`, `block(0)`, `life_steal(0)`, `stagger(0)`, `recoup(0)`
+Combat: `might(1.0)`, `area(1.0)`, `cooldown_reduction(0)`, `projectile_speed(1.0)`, `duration(1.0)`, `amount(0)`, `pierce(0)`, `crit_chance(.05)`, `crit_damage(2.0)`, `armor_penetration(0)`, `ailment_chance(1.0)`, `dot_damage(1.0)`, `physical_damage(1.0)`, `fire_damage(1.0)`, `cold_damage(1.0)`, `lightning_damage(1.0)`, `chaos_damage(1.0)`, `melee_damage(1.0)`, `spell_damage(1.0)`, `aoe_damage(1.0)`, `projectile_damage(1.0)`, `minion_damage(1.0)`, `ailment_threshold(1.0)`, `ailment_effect(1.0)`
+Defense: `max_health(100)`, `health_regen(0)`, `armor(0)`, `damage_taken(1.0)`, `move_speed(230)`, `evasion(0)`, `block(0)`, `life_steal(0)`, `stagger(0)`, `recoup(0)`
 Utility: `magnet(150)`
 
 Formula: `GetStat` (`:90-113`) with caps: CDR 75%, crit 100%, evasion 60%, block 75%, lifesteal 20%.

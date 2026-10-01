@@ -38,10 +38,22 @@ STAT_CRIT_DAMAGE,Critical Damage,暴击伤害,暴击伤害,会心ダメージ,Kr
 STAT_ARMOR_PENETRATION,Armor Penetration,护甲穿透,护甲穿透,装甲貫通,Rüstungsdurchschlag,Pénétration d'armure,Пробитие брони,Penetración de armadura
 STAT_AILMENT_CHANCE,Ailment Chance,异常触发率,异常触发率,状態異常付与率,Zustandschance,Chance d'affliction,Шанс недуга,Prob. de aflicción
 STAT_AILMENT_THRESHOLD,Ailment Threshold,异常阈值,异常阈值,状態異常閾値,Zustandsschwelle,Seuil d'affliction,Порог недугов,Umbral de aflicción
+STAT_AILMENT_EFFECT,Ailment Effect,异常效果,異常效果,状態異常効果,Zustandswirkung,Effet d'affliction,Эффективность недугов,Efecto de aflicción
 STAT_DOT_DAMAGE,Dot Damage,持续伤害,持续伤害,持続ダメージ,DoT-Schaden,Dégâts sur la durée,Периодический урон,Daño en el tiempo
+STAT_PHYSICAL_DAMAGE,Physical Damage,物理伤害,物理伤害,物理ダメージ,Physischer Schaden,Dégâts physiques,Физический урон,Daño físico
+STAT_FIRE_DAMAGE,Fire Damage,火焰伤害,火焰伤害,火炎ダメージ,Feuerschaden,Dégâts de feu,Урон огнём,Daño de fuego
+STAT_COLD_DAMAGE,Cold Damage,冰霜伤害,冰霜伤害,冷気ダメージ,Kälteschaden,Dégâts de froid,Урон холодом,Daño de frío
+STAT_LIGHTNING_DAMAGE,Lightning Damage,闪电伤害,闪电伤害,雷撃ダメージ,Blitzschaden,Dégâts de foudre,Урон молнией,Daño de rayo
+STAT_CHAOS_DAMAGE,Chaos Damage,混沌伤害,混沌伤害,混沌ダメージ,Chaosschaden,Dégâts du chaos,Урон хаосом,Daño de caos
+STAT_MELEE_DAMAGE,Melee Damage,近战伤害,近战伤害,近接ダメージ,Nahkampfschaden,Dégâts de mêlée,Урон в ближнем бою,Daño cuerpo a cuerpo
+STAT_SPELL_DAMAGE,Spell Damage,法术伤害,法術傷害,呪文ダメージ,Zauberschaden,Dégâts de sort,Урон заклинаниями,Daño de hechizo
+STAT_AOE_DAMAGE,Area Damage,范围伤害,範圍傷害,範囲ダメージ,Flächenschaden,Dégâts de zone,Урон по площади,Daño de área
+STAT_PROJECTILE_DAMAGE,Projectile Damage,投射物伤害,投射物傷害,投射ダメージ,Projektilschaden,Dégâts de projectiles,Урон снарядами,Daño de proyectiles
+STAT_MINION_DAMAGE,Minion Damage,召唤物伤害,召喚物傷害,使役ダメージ,Diener-Schaden,Dégâts de serviteurs,Урон прислужников,Daño de esbirros
 STAT_MAX_HEALTH,Max Health,最大生命,最大生命,最大体力,Max. Gesundheit,Santé max,Макс. здоровье,Salud máx.
 STAT_HEALTH_REGEN,Health Regen,生命回复,生命回复,体力自然回復,Gesundheitsregen.,Régén. santé,Реген. здоровья,Regen. de salud
 STAT_ARMOR,Armor,护甲,护甲,装甲,Rüstung,Armure,Броня,Armadura
+STAT_DAMAGE_TAKEN,Damage Taken,承受伤害,承受傷害,被ダメージ,Erlittener Schaden,Dégâts subis,Получаемый урон,Daño recibido
 STAT_MOVE_SPEED,Move Speed,移动速度,移动速度,移動速度,Bewegungstempo,Vitesse de déplacement,Скорость движения,Velocidad de movimiento
 STAT_EVASION,Fluid Evasion,流体闪避,流体闪避,流体回避,Fluidausweichen,Esquive fluide,Жидкое уклонение,Evasión fluida
 STAT_BLOCK,Glycocalyx Block,糖萼格挡,糖萼格挡,糖衣ブロック,Glykokalyx-Block,Blocage glycocalyx,Блок гликокаликса,Bloqueo glucocáliz

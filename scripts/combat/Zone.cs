@@ -16,6 +16,7 @@ public partial class Zone : Node2D
     public float Damage { get; set; } = 5.0f;
     public float ArmorPenetration { get; set; }
     public float AilmentChance { get; set; }
+    public DamageType DamageType { get; set; } = DamageType.Physical;
     public EffectSpec Effect0 { get; set; }
     public EffectSpec Effect1 { get; set; }
     public EffectSpec Effect2 { get; set; }
@@ -159,6 +160,7 @@ public partial class Zone : Node2D
         float damage = Damage;
         float pen = ArmorPenetration;
         float ailChance = AilmentChance;
+        DamageType dmgType = DamageType;
         TargetingService.ForEachInRadius(GlobalPosition, radius, enemy =>
         {
             HitPipeline.ResolveHit(new HitPayload
@@ -166,6 +168,7 @@ public partial class Zone : Node2D
                 RawDamage = damage,
                 ArmorPenetration = pen,
                 AilmentChance = ailChance,
+                Type = dmgType,
                 AttackerId = attackerId,
                 Effect0 = _fx0,
                 Effect1 = _fx1,

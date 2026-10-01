@@ -97,7 +97,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
                     └────────────┬────────────┘
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
-【通用戰鬥屬性 (Combat - 10項)】 【通用生存屬性 (Defense - 9項)】 【通用輔助與機制 (Utility - 1項)】
+【通用戰鬥屬性 (Combat - 23項)】 【通用生存屬性 (Defense - 11項)】 【通用輔助與機制 (Utility - 1項)】
 · Might (力量/傷害倍率)          · Max Health (最大生命)        · Magnet (拾取半徑)
 · Area (範圍/體積)              · Health Regen (生命自癒)
 · Cooldown Reduction (CDR)     · Armor (減傷/護甲)
@@ -105,9 +105,14 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 · Duration (持續時間)           · Evasion (流體閃避率)
 · Amount (額外數量)             · Block (糖萼格擋率)
 · Pierce (穿透次數)             · Life Steal (受體汲取/吸血)
-· Crit Chance (暴擊機率)
-· Crit Damage (暴擊倍率)
+· Crit Chance (暴擊機率)        · Stagger (偏转/延傷)
+· Crit Damage (暴擊倍率)        · Recoup (回收/延補)
+· Armor Penetration (護甲穿透)  · Ailment Threshold (異常閾值)
+· Ailment Chance (異常觸發率)
 · Dot Damage (持續傷害倍率)
+· Physical／Fire／Cold／Lightning／Chaos Damage (五系傷害)
+· Melee／Spell／AoE／Projectile／Minion Damage (標籤條件傷害)
+· Ailment Effect (異常效果)
 ```
 
 ### 通用 Stat 詳細字典
@@ -124,7 +129,20 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | `pierce` | **穿透次數** | `0` (次) | 投射物貫穿敵人的額外次數（穿透後繼續向前飛行）。 |
 | `crit_chance` | **暴擊機率** | `0.05` (5%) | 任何傷害來源命中敵人弱點時觸發致命特異性暴擊的機率。 |
 | `crit_damage` | **暴擊倍率** | `2.0` (200%) | 觸發暴擊時的結算傷害倍率。 |
+| `armor_penetration` | **護甲穿透** | `0.0` (0%) | 開火時凍結的護甲穿透比例（硬上限 `1.0`）。 |
+| `ailment_chance` | **異常觸發率** | `1.0` (100%) | 命中時觸發 `on_hit` 異常的機率；暴擊必定觸發。 |
 | `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 全域 DoT 傷害乘數，與 `might` 相乘結算。 |
+| `physical_damage` | **物理傷害** | `1.0` (100%) | 物理系傷害乘數，與 `might` 相乘結算。 |
+| `fire_damage` | **火焰傷害** | `1.0` (100%) | 火焰系傷害乘數，與 `might` 相乘結算。 |
+| `cold_damage` | **冰霜傷害** | `1.0` (100%) | 冰霜系傷害乘數，與 `might` 相乘結算。 |
+| `lightning_damage` | **閃電傷害** | `1.0` (100%) | 閃電系傷害乘數，與 `might` 相乘結算。 |
+| `chaos_damage` | **混沌傷害** | `1.0` (100%) | 混沌系傷害乘數，與 `might` 相乘結算。 |
+| `melee_damage` | **近戰傷害** | `1.0` (100%) | 僅 `Melee` 標籤技能生效，與 `might` 相乘結算。 |
+| `spell_damage` | **法術傷害** | `1.0` (100%) | 僅 `Spell` 標籤技能生效，與 `might` 相乘結算。 |
+| `aoe_damage` | **範圍傷害** | `1.0` (100%) | 僅 `AOE` 標籤技能生效，與 `might` 相乘結算。 |
+| `projectile_damage` | **投射物傷害** | `1.0` (100%) | 僅 `Projectile` 標籤技能生效，與 `might` 相乘結算。 |
+| `minion_damage` | **召喚物傷害** | `1.0` (100%) | 僅 `Minion` 標籤技能生效（現無，待召喚技能）。 |
+| `ailment_effect` | **異常效果** | `1.0` (100%) | 異常狀態強度乘數（DoT 傷害除外）。 |
 
 #### 2. 通用生存與防禦屬性（Defense & Survival）
 | 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
@@ -132,12 +150,14 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | `max_health` | **最大生命值** | `100.0` | 細胞膜破裂前可承受的最大總耐久。 |
 | `health_regen` | **生命自癒率** | `0.0` (HP/s) | 胞膜每秒自動修復的固定生命值。 |
 | `armor` | **膜剛性 / 護甲** | `0.0` (點) | POE 護甲公式：$\text{減傷率} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$，大傷害穿透深。 |
+| `damage_taken` | **承受傷害** | `1.0` (100%) | 受到傷害乘數（與護甲曲線獨立）。 |
 | `move_speed` | **移動速度** | `230.0` (px/s) | 玩家細胞在常態巡航下的基礎遊動速度。 |
 | `evasion` | **流體閃避率** | `0.0` (0%) | 胞膜阿米巴流體變形完全免傷機率（硬上限 `0.60` 即 60%）。受擊第一順位判定。 |
 | `block` | **糖萼格擋率** | `0.0` (0%) | 細胞表面緻密糖萼屏障偏轉阻絕傷害機率（硬上限 `0.75` 即 75%）。受擊第二順位判定。 |
 | `life_steal` | **受體汲取 / 命中吸血** | `0.0` (0%) | 任何傷害來源命中敵人時觸發自體修復的機率（觸發時固定回復 1 點 HP，硬上限 `0.20` 即 20%）。 |
 | `stagger` | **偏转 / 延傷** | `0.0` (0%) | 命中傷害按比例轉入延傷池（4 秒指數衰減為無視護甲 DoT），僅玩家、僅直擊（硬上限 `0.60` 即 60%）。 |
 | `recoup` | **回收 / 延補** | `0.0` (0%) | 受到直擊後按比例在 4 秒內分期回復 HP（不受回血鎖定影響），僅玩家（硬上限 `0.30` 即 30%）。 |
+| `ailment_threshold` | **異常閾值** | `1.0` (100%) | 自身異常閾值乘數（僅下限 `0.0`，無上限）。 |
 
 #### 3. 通用輔助與機制屬性（Utility & Economy）
 | 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |

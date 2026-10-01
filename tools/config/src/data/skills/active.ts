@@ -34,6 +34,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Innate,
     archetype: SkillArchetype.Strike,
     params: {
+      damage_type: "physical",
       count: 2,
       reach: 280,
       splash_radius: 40,
@@ -77,6 +78,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Zone,
     params: {
+      damage_type: "fire",
       radius: 65,
       duration: 4,
       tick: 0.3,
@@ -128,6 +130,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Salvo,
     params: {
+      damage_type: "fire",
       count: 1,
       speed: 520,
       lifetime: 0.9,
@@ -175,6 +178,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Innate,
     archetype: SkillArchetype.Beam,
     params: {
+      damage_type: "physical",
       mode: "pierce",
       range: 700,
       width: 24,
@@ -223,6 +227,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Zone,
     params: {
+      damage_type: "cold",
       count: 1,
       fuse: 1.2,
       drop_min: 50,
@@ -262,6 +267,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Innate,
     archetype: SkillArchetype.Salvo,
     params: {
+      damage_type: "cold",
       count: 3,
       speed: 420,
       lifetime: 2,
@@ -318,6 +324,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Strike,
     params: {
+      damage_type: "physical",
       count: 1,
       reach: 260,
       sort_by_distance: false,
@@ -360,6 +367,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Aura,
     params: {
+      damage_type: "chaos",
       mode: "radial",
       radius: 95,
       radius_offset: -48,
@@ -405,6 +413,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Aura,
     params: {
+      damage_type: "physical",
       mode: "orbital",
       blades: 2,
       orbit: 115,
@@ -445,6 +454,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Innate,
     archetype: SkillArchetype.Nova,
     params: {
+      damage_type: "chaos",
       shape: "sphere",
       radius: 110,
       delay: 1.5,
@@ -484,6 +494,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Nova,
     params: {
+      damage_type: "cold",
       shape: "sphere",
       radius: 480,
       knockback_dist: 65,
@@ -523,6 +534,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Salvo,
     params: {
+      damage_type: "cold",
       count: 1,
       speed: 520,
       lifetime: 3,
@@ -567,6 +579,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Zone,
     params: {
+      damage_type: "chaos",
       radius: 42,
       duration: 3.5,
       tick: 0.35,
@@ -604,6 +617,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
       88
     ],
     params: {
+      damage_type: "lightning",
       mode: "chain",
       range: 480,
       chain_range: 240,
@@ -642,6 +656,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Zone,
     params: {
+      damage_type: "chaos",
       radius: 175,
       duration: 3,
       tick: 0.4,
@@ -683,6 +698,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Salvo,
     params: {
+      damage_type: "physical",
       count: 8,
       speed: 460,
       lifetime: 1.6,
@@ -723,6 +739,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Innate,
     archetype: SkillArchetype.Beam,
     params: {
+      damage_type: "fire",
       mode: "channel",
       range: 520,
       duration: 2,
@@ -760,6 +777,7 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
     type: SkillType.Active,
     archetype: SkillArchetype.Nova,
     params: {
+      damage_type: "fire",
       shape: "cone",
       reach: 320,
       angle: 100,
