@@ -93,9 +93,17 @@ public partial class NovaSkill : BaseSkill
         float slowDur = ParamFloat(p, "slow_duration", 0.0f);
         float slowFactor = ParamFloat(p, "slow_factor", 0.5f);
         ulong attackerId = Host!.GetInstanceId();
+        float novaCrit = GetCalculatedCritChance();
+        float novaMult = GetCalculatedCritDamage();
         TargetingService.ForEachInRadius(center, radius, enemy =>
         {
-            DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, enemy);
+            HitPipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = dmg,
+                CritChance = novaCrit,
+                CritMultiplier = novaMult,
+                AttackerId = attackerId
+            }, enemy);
             if (kbDist > 0.0f)
             {
                 Vector2 push = (enemy.GlobalPosition - center).Normalized();
@@ -117,6 +125,8 @@ public partial class NovaSkill : BaseSkill
         float kbDist = ParamFloat(p, "knockback_dist", 80.0f);
         float kbTime = ParamFloat(p, "knockback_time", 0.2f);
         ulong attackerId = Host!.GetInstanceId();
+        float coneCrit = GetCalculatedCritChance();
+        float coneMult = GetCalculatedCritDamage();
         TargetingService.ForEachInRadius(center, reach, enemy =>
         {
             Vector2 toEnemy = enemy.GlobalPosition - center;
@@ -125,7 +135,13 @@ public partial class NovaSkill : BaseSkill
             Vector2 push = toEnemy.Normalized();
             var tween = Host!.CreateTween();
             tween.TweenProperty(enemy, "global_position", enemy.GlobalPosition + push * kbDist, kbTime);
-            DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, enemy);
+            HitPipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = dmg,
+                CritChance = coneCrit,
+                CritMultiplier = coneMult,
+                AttackerId = attackerId
+            }, enemy);
         });
     }
 

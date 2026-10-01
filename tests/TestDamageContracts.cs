@@ -118,7 +118,7 @@ public partial class TestDamageContracts : TestHarness
 
         var foe = NewEnemy(100.0f);
         Root.AddChild(foe);
-        HitResult hit = DamagePipeline.ResolveHit(new HitPayload { RawDamage = 20.0f, AttackerId = attackerId }, foe);
+        HitResult hit = HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f, AttackerId = attackerId }, foe);
         AssertThat(hit.DamageDealt).IsEqual(20.0f);
         AssertThat(hit.IsCrit).IsFalse();
         AssertThat(hit.IsEvaded).IsFalse();
@@ -131,10 +131,10 @@ public partial class TestDamageContracts : TestHarness
         stats.SetBase("crit_damage", 2.0f);
         var critFoe = NewEnemy(100.0f);
         Root.AddChild(critFoe);
-        HitResult crit = DamagePipeline.ResolveHit(new HitPayload { RawDamage = 10.0f, AttackerId = attackerId }, critFoe);
+        HitResult crit = HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f, AttackerId = attackerId }, critFoe);
         AssertThat(crit.DamageDealt).IsEqual(20.0f);
         AssertThat(crit.IsCrit).IsTrue();
-        HitResult forced = DamagePipeline.ResolveHit(new HitPayload
+        HitResult forced = HitPipeline.ResolveHit(new HitPayload
         {
             RawDamage = 10.0f,
             AttackerId = attackerId,
@@ -148,7 +148,7 @@ public partial class TestDamageContracts : TestHarness
         var stunFx = new EffectSpec { EffectId = "stun", Magnitude = 0.0f, Duration = 1.0f };
         var fullFoe = NewEnemy(100.0f);
         Root.AddChild(fullFoe);
-        DamagePipeline.ResolveHit(new HitPayload
+        HitPipeline.ResolveHit(new HitPayload
         {
             RawDamage = 20.0f,
             AttackerId = attackerId,
@@ -158,7 +158,7 @@ public partial class TestDamageContracts : TestHarness
         AssertThat(fullFoe.StunTimer).IsEqualApprox(1.0f, 0.01f);
         var chipFoe = NewEnemy(1000.0f);
         Root.AddChild(chipFoe);
-        DamagePipeline.ResolveHit(new HitPayload
+        HitPipeline.ResolveHit(new HitPayload
         {
             RawDamage = 10.0f,
             AttackerId = attackerId,
@@ -173,14 +173,14 @@ public partial class TestDamageContracts : TestHarness
         var leechFoe = NewEnemy(100000.0f);
         Root.AddChild(leechFoe);
         for (int i = 0; i < 100 && cell.Health <= 50.0f; i++)
-            DamagePipeline.ResolveHit(new HitPayload { RawDamage = 10.0f, AttackerId = attackerId }, leechFoe);
+            HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f, AttackerId = attackerId }, leechFoe);
         AssertThat(cell.Health).IsEqual(51.0f);
         GD.Print("[PASS] Leech resolves via attacker id after the hit.");
         stats.SetBase("life_steal", 0.0f);
 
         var doomedFoe = NewEnemy(100.0f);
         Root.AddChild(doomedFoe);
-        HitResult lethal = DamagePipeline.ResolveHit(new HitPayload { RawDamage = 500.0f, AttackerId = attackerId }, doomedFoe);
+        HitResult lethal = HitPipeline.ResolveHit(new HitPayload { RawDamage = 500.0f, AttackerId = attackerId }, doomedFoe);
         AssertThat(lethal.TargetKilled).IsTrue();
         AssertThat(lethal.DamageDealt).IsEqual(500.0f);
         GD.Print("[PASS] Lethal hits report TargetKilled.");
@@ -190,7 +190,7 @@ public partial class TestDamageContracts : TestHarness
         for (int i = 0; i < 100 && dodged.DamageDealt != 0.0f; i++)
         {
             cell.Health = 100.0f;
-            dodged = DamagePipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, cell);
+            dodged = HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, cell);
         }
         AssertThat(dodged.DamageDealt).IsEqual(0.0f);
         AssertThat(dodged.IsEvaded).IsTrue();
@@ -201,7 +201,7 @@ public partial class TestDamageContracts : TestHarness
         for (int i = 0; i < 100 && stopped.DamageDealt != 0.0f; i++)
         {
             cell.Health = 100.0f;
-            stopped = DamagePipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, cell);
+            stopped = HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, cell);
         }
         AssertThat(stopped.DamageDealt).IsEqual(0.0f);
         AssertThat(stopped.IsBlocked).IsTrue();
@@ -247,7 +247,7 @@ public partial class TestDamageContracts : TestHarness
         mgr._PhysicsProcess(0.016);
         AssertThat(mgr.ActiveCount).IsEqual(1);
 
-        HitResult lethal = DamagePipeline.ResolveHit(new HitPayload { RawDamage = 500.0f, AttackerId = attackerId }, shooter);
+        HitResult lethal = HitPipeline.ResolveHit(new HitPayload { RawDamage = 500.0f, AttackerId = attackerId }, shooter);
         AssertThat(lethal.TargetKilled).IsTrue();
         AssertThat(DeadEntityRegistry.IsDead(shooterId)).IsTrue();
 
@@ -290,7 +290,7 @@ public partial class TestDamageContracts : TestHarness
         AssertThat(Engine.TimeScale).IsEqualApprox(0.35f, 0.001f);
         GD.Print("[PASS] Lethal blows open grace: dead, downed, settlement pending.");
 
-        AssertThat(cell.TakeDamage(10.0f, null, false).DamageDealt).IsEqual(0.0f);
+        AssertThat(cell.TakeDamage(10.0f, null, false)).IsEqual(0.0f);
         cell._PhysicsProcess(0.5);
         AssertThat(cell.IsDowned).IsTrue();
         AssertThat(diedEmitted).IsFalse();

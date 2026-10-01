@@ -279,36 +279,60 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
         Position += Velocity * dt;
     }
 
-    public virtual HitResult TakeDamage(float damage, Node2D? source = null, bool isCrit = false)
+    public bool IsDead => CurrentHealth <= 0.0f;
+
+    private DefenseProfile _cachedDefenses;
+    public virtual DefenseProfile Defenses
     {
-        PreDamageTraits(damage, source);
+        get
+        {
+            float statusMult = Status?.DamageTakenMultiplier ?? 1.0f;
+            float bossDr = BossPhase?.CurrentDamageReduction ?? 0.0f;
+            if (statusMult != _cachedDefenses.DamageTakenMultiplier || bossDr != _cachedDefenses.DamageReduction || ShieldCharges != _cachedDefenses.ShieldCharges || Armor != _cachedDefenses.Armor)
+            {
+                InvalidateDefenses();
+            }
+            return _cachedDefenses;
+        }
+    }
 
-        damage = ApplyShellAbsorb(damage, source, isCrit);
+    public void InvalidateDefenses()
+    {
+        _cachedDefenses = new DefenseProfile
+        {
+            IsInvulnerable = false,
+            Evasion = 0.0f,
+            BlockChance = 0.0f,
+            BlockMitigation = 1.0f,
+            ShieldCharges = ShieldCharges,
+            Armor = Armor,
+            DamageReduction = BossPhase?.CurrentDamageReduction ?? 0.0f,
+            DamageTakenMultiplier = Status?.DamageTakenMultiplier ?? 1.0f,
+        };
+    }
 
+    public virtual void ConsumeShieldCharge()
+    {
         if (ShieldCharges > 0)
         {
             ShieldCharges--;
             RedrawIfVisible();
-            return new HitResult();
+            InvalidateDefenses();
         }
+    }
 
-        if (BossPhase != null)
-        {
-            damage = BossPhase.ApplyDamageReduction(damage);
-        }
+    public virtual float TakeDamage(float finalDamage, Node2D? source = null, bool isCrit = false)
+    {
+        PreDamageTraits(finalDamage, source);
 
-        if (Status != null)
-        {
-            damage *= Status.DamageTakenMultiplier;
-        }
+        finalDamage = ApplyShellAbsorb(finalDamage, source, isCrit);
 
-        float effectiveDmg = Mathf.Max(1.0f, damage - Armor);
-        CurrentHealth -= effectiveDmg;
+        CurrentHealth -= finalDamage;
 
         BossPhase?.NotifyHealthChanged(CurrentHealth, MaxHealth);
 
-        DamageNumberSpawner.ShowDamage(GlobalPosition, effectiveDmg, isCrit);
-        RunTelemetryManager.Instance?.RecordDamageDealt(source?.Name ?? "direct", effectiveDmg);
+        DamageNumberSpawner.ShowDamage(GlobalPosition, finalDamage, isCrit);
+        RunTelemetryManager.Instance?.RecordDamageDealt(source?.Name ?? "direct", finalDamage);
 
         AudioManager.Instance?.PlayHit(isCrit);
         if (isCrit)
@@ -327,8 +351,8 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
             RedrawIfVisible();
         }
 
-        PostDamageTraits(damage, source);
-        return new HitResult { DamageDealt = effectiveDmg };
+        PostDamageTraits(finalDamage, source);
+        return finalDamage;
     }
 
     public virtual void TakeDoTDamage(float dotDamage)
@@ -379,7 +403,12 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
         if (now < NextContactTickMsec)
             return false;
         NextContactTickMsec = now + ContactTickInterval * 1000.0;
-        cell.TakeDamage(ContactDamage);
+        HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = ContactDamage,
+            SourceFaction = Team.Enemy,
+            AttackerId = GetInstanceId(),
+        }, cell);
         return true;
     }
 

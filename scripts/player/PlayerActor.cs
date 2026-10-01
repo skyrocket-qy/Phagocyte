@@ -123,7 +123,43 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
 
     public EquipmentChamber? Equipment { get; set; }
 
-    public ActorStats? Stats { get; set; }
+    private ActorStats? _stats;
+    public ActorStats? Stats
+    {
+        get => _stats;
+        set
+        {
+            if (_stats != null) _stats.StatChanged -= OnStatChanged;
+            _stats = value;
+            if (_stats != null) _stats.StatChanged += OnStatChanged;
+            InvalidateDefenses();
+        }
+    }
+
+    private DefenseProfile _cachedDefenses;
+    public DefenseProfile Defenses
+    {
+        get
+        {
+            var d = _cachedDefenses;
+            return InvulnTimer > 0.0f ? d with { IsInvulnerable = true } : d;
+        }
+    }
+
+    public void InvalidateDefenses()
+    {
+        _cachedDefenses = new DefenseProfile
+        {
+            IsInvulnerable = false,
+            Evasion = Stats?.GetStat("evasion") ?? 0.0f,
+            BlockChance = Stats?.GetStat("block") ?? 0.0f,
+            BlockMitigation = 1.0f,
+            ShieldCharges = 0,
+            Armor = 0.0f,
+            DamageReduction = Stats?.GetDamageReductionRatio() ?? 0.0f,
+            DamageTakenMultiplier = RunMutatorService.IncomingDamageMultiplier,
+        };
+    }
 
     /// <summary>Status/ailment state (slow, DoT, amp). Debuff timers and
     /// stacking live in data (<see cref="StatusController"/> over
@@ -474,11 +510,35 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         EmitStatsSignal();
     }
 
-    /// <summary>Damage intake (IDamageable). Endotoxemia amplifies all damage taken.</summary>
-    public HitResult TakeDamage(float damage, Node2D? source = null, bool isCrit = false) =>
-        ApplyDamage(damage * RunMutatorService.IncomingDamageMultiplier);
+    /// <summary>Pure damage intake (IDamageable): deducts final mitigated damage from HP, triggers feedback.</summary>
+    public float TakeDamage(float finalDamage, Node2D? source = null, bool isCrit = false)
+    {
+        if (IsDead || finalDamage <= 0.0f)
+            return 0.0f;
 
-    /// <summary>Generic DoT entry (IDamageable): direct HP loss, bypasses evasion/block.</summary>
+        DamageNumberSpawner.ShowPlayerDamage(GlobalPosition, finalDamage);
+        RunTelemetryManager.Instance?.RecordDamageTaken(finalDamage);
+
+        float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
+        Health = Mathf.Clamp(Health - finalDamage, 0.0f, maxHp);
+        HasTakenDamage = true;
+
+        if (Health <= 0.0f)
+            EnterDowned();
+        else
+        {
+            AudioManager.Instance?.PlayPlayerHit();
+            CameraFollow.Instance?.AddTrauma(finalDamage >= 15.0f ? 0.35f : 0.15f);
+        }
+
+        Visuals.FlashHit(finalDamage);
+        EmitStatsSignal();
+        return finalDamage;
+    }
+
+    public void ConsumeShieldCharge() { }
+
+    /// <summary>Generic DoT entry (IDamageable): direct HP loss, bypasses avoidance and armor.</summary>
     public void TakeDoTDamage(float dotDamage)
     {
         if (IsDead || dotDamage <= 0.0f)
@@ -490,61 +550,6 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         if (Health <= 0.0f)
             EnterDowned();
         EmitStatsSignal();
-    }
-
-    private HitResult ApplyDamage(float amount)
-    {
-        if (IsDead)
-            return new HitResult();
-
-        // Stage 0: Dodge invulnerability (takes precedence over
-        // everything, including environmental damage).
-        if (IsInvulnerable)
-        {
-            DamageNumberSpawner.ShowEvaded(GlobalPosition);
-            return new HitResult { IsEvaded = true };
-        }
-
-        // Stage 1: Fluid deformation evasion
-        if (Stats is ActorStats cs && cs.RollEvasion())
-        {
-            DamageNumberSpawner.ShowEvaded(GlobalPosition);
-            RunTelemetryManager.Instance?.RecordEvaded();
-            return new HitResult { IsEvaded = true };
-        }
-
-        // Stage 2: Glycocalyx barrier block
-        if (Stats is ActorStats csBlock && csBlock.RollBlock())
-        {
-            DamageNumberSpawner.ShowBlocked(GlobalPosition);
-            RunTelemetryManager.Instance?.RecordBlocked();
-            return new HitResult { IsBlocked = true };
-        }
-
-        // Stage 3: Armor damage reduction
-        float dr = Stats != null ? Stats.GetDamageReductionRatio() : 0.0f;
-        float finalDmg = Mathf.Max(1.0f, amount * (1.0f - dr));
-        DamageNumberSpawner.ShowPlayerDamage(GlobalPosition, finalDmg);
-        RunTelemetryManager.Instance?.RecordDamageTaken(finalDmg);
-
-        // Stage 4: HP Loss & Death check
-        float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
-        Health = Mathf.Clamp(Health - finalDmg, 0.0f, maxHp);
-        HasTakenDamage = true;
-
-        if (Health <= 0.0f)
-            EnterDowned();
-        else
-        {
-            AudioManager.Instance?.PlayPlayerHit();
-            CameraFollow.Instance?.AddTrauma(finalDmg >= 15.0f ? 0.35f : 0.15f);
-        }
-
-
-        Visuals.FlashHit(finalDmg);
-
-        EmitStatsSignal();
-        return new HitResult { DamageDealt = finalDmg };
     }
 
     /// <summary>Lethal blows mark death at once but delay the Died signal through grace.</summary>
@@ -584,6 +589,7 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
             float maxHp = Stats.GetStat("max_health");
             Health = Mathf.Clamp(Health, 0.0f, maxHp);
         }
+        InvalidateDefenses();
         EmitStatsSignal();
     }
 

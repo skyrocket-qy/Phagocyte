@@ -156,7 +156,7 @@ STATIC_AUTOLOAD_FORBIDDEN = [
 # Phase 9 lockdown: deleted hit-dispatch interfaces. Any reference anywhere
 # in scripts/ (all layers) is a leftover from the DealDamage era.
 STATIC_PIPELINE_FORBIDDEN = [
-    (r"\bILeechable\b", "Deleted interface 'ILeechable' referenced (route leech via DamagePipeline attacker id)"),
+    (r"\bILeechable\b", "Deleted interface 'ILeechable' referenced (route leech via HitPipeline attacker id)"),
     (r"\bISlowable\b", "Deleted interface 'ISlowable' referenced (route slow via IStatusHost.Status)"),
     (r"\bIStunnable\b", "Deleted interface 'IStunnable' referenced (route stun via IStatusHost.Status)"),
 ]

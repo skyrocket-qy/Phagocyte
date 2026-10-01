@@ -352,7 +352,12 @@ public partial class EnemyActor
                 && GlobalPosition.DistanceTo(player.GlobalPosition) < player.CurrentRadius + BodyRadius)
             {
                 player.Velocity += state.Dir * CatalogLoader.GetFloat(def, "knockback", 350.0f);
-                player.TakeDamage(CatalogLoader.GetFloat(def, "damage", 12.0f));
+                HitPipeline.ResolveHit(new HitPayload
+                {
+                    RawDamage = CatalogLoader.GetFloat(def, "damage", 12.0f),
+                    SourceFaction = Team.Enemy,
+                    AttackerId = GetInstanceId(),
+                }, player);
                 state.Phase = 3;
                 state.Timer = 0.0f;
                 Velocity = -state.Dir * CatalogLoader.GetFloat(def, "rebound", 50.0f);
@@ -581,17 +586,34 @@ public partial class EnemyActor
                 player.Status?.ApplySlow(CatalogLoader.GetFloat(def, "duration", 2.5f), 1.0f - CatalogLoader.GetFloat(def, "factor", 0.65f));
                 break;
             case "invert":
-                player.TakeDamage(ContactDamage);
+                HitPipeline.ResolveHit(new HitPayload
+                {
+                    RawDamage = ContactDamage,
+                    SourceFaction = Team.Enemy,
+                    AttackerId = GetInstanceId(),
+                }, player);
                 player.ApplyInvertControls(CatalogLoader.GetFloat(def, "duration", 2.0f));
                 break;
             case "drain":
                 player.DrainAtp(CatalogLoader.GetFloat(def, "amount", 15.0f));
                 FlashModulate(new Color(0.2f, 1.5f, 1.5f, 1.0f), 0.3f);
                 if (!CatalogLoader.GetBool(def, "no_damage", false))
-                    player.TakeDamage(ContactDamage);
+                {
+                    HitPipeline.ResolveHit(new HitPayload
+                    {
+                        RawDamage = ContactDamage,
+                        SourceFaction = Team.Enemy,
+                        AttackerId = GetInstanceId(),
+                    }, player);
+                }
                 break;
             default:
-                player.TakeDamage(CatalogLoader.GetFloat(def, "amount", ContactDamage));
+                HitPipeline.ResolveHit(new HitPayload
+                {
+                    RawDamage = CatalogLoader.GetFloat(def, "amount", ContactDamage),
+                    SourceFaction = Team.Enemy,
+                    AttackerId = GetInstanceId(),
+                }, player);
                 break;
         }
     }
@@ -671,8 +693,12 @@ public partial class EnemyActor
             if (state.Segs[i].DistanceTo(player.GlobalPosition) <= hitRange)
             {
                 state.Timer = CatalogLoader.GetFloat(def, "hit_cooldown", 0.45f);
-                player.TakeDamage(CatalogLoader.GetFloat(def, "damage", 14.0f)
-                    * (1.0f + CatalogLoader.GetFloat(def, "damage_per_segment", 0.05f) * i));
+                HitPipeline.ResolveHit(new HitPayload
+                {
+                    RawDamage = CatalogLoader.GetFloat(def, "damage", 14.0f) * (1.0f + CatalogLoader.GetFloat(def, "damage_per_segment", 0.05f) * i),
+                    SourceFaction = Team.Enemy,
+                    AttackerId = GetInstanceId(),
+                }, player);
                 Vector2 knock = player.GlobalPosition - state.Segs[i];
                 if (knock == Vector2.Zero)
                     knock = Vector2.Up;
@@ -768,7 +794,12 @@ public partial class EnemyActor
             + player.CurrentRadius * CatalogLoader.GetFloat(def, "radius_player_mult", 0.5f);
         if (GlobalPosition.DistanceTo(player.GlobalPosition) > reach)
             return;
-        player.TakeDamage(CatalogLoader.GetFloat(def, "damage", 10.0f));
+        HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = CatalogLoader.GetFloat(def, "damage", 10.0f),
+            SourceFaction = Team.Enemy,
+            AttackerId = GetInstanceId(),
+        }, player);
         Vector2 away = player.GlobalPosition - GlobalPosition;
         if (away == Vector2.Zero)
             away = Vector2.Up;
@@ -958,7 +989,12 @@ public partial class EnemyActor
         if (GlobalPosition.DistanceTo(player.GlobalPosition) <= reach)
         {
             state.Flag = true;
-            player.TakeDamage(CatalogLoader.GetFloat(def, "hit_damage", 9.0f));
+            HitPipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = CatalogLoader.GetFloat(def, "hit_damage", 9.0f),
+                SourceFaction = Team.Enemy,
+                AttackerId = GetInstanceId(),
+            }, player);
             Die(null);
         }
     }

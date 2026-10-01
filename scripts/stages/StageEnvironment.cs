@@ -187,7 +187,12 @@ public sealed class StageEnvironment
         {
             if (child is DotZone zone && GodotObject.IsInstanceValid(zone) && zone.Contains(player.GlobalPosition))
             {
-                player.TakeDamage(CatalogLoader.GetFloat(state.Def, "dps", 7.0f) * dt);
+                HitPipeline.ResolveHit(new HitPayload
+                {
+                    RawDamage = CatalogLoader.GetFloat(state.Def, "dps", 7.0f) * dt,
+                    SourceFaction = Team.Neutral,
+                    Flags = HitFlags.NeverCrit,
+                }, player);
                 player.Status?.ApplySlow(CatalogLoader.GetFloat(state.Def, "slow_factor", 0.3f), 1.0f - CatalogLoader.GetFloat(state.Def, "slow_duration", 0.7f));
                 break;
             }

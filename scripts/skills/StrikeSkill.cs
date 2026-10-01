@@ -66,7 +66,15 @@ public partial class StrikeSkill : BaseSkill
             return;
         var p = SkillParams();
         ulong attackerId = Host!.GetInstanceId();
-        DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, target);
+        float strikeCrit = GetCalculatedCritChance();
+        float strikeMult = GetCalculatedCritDamage();
+        HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = dmg,
+            CritChance = strikeCrit,
+            CritMultiplier = strikeMult,
+            AttackerId = attackerId
+        }, target);
         VfxManager.Instance?.Play(VfxType.CytoplasmSplatter, tipPos);
 
         if (p.ContainsKey("splash_radius"))
@@ -76,7 +84,13 @@ public partial class StrikeSkill : BaseSkill
             TargetingService.ForEachInRadius(tipPos, splashR, enemy =>
             {
                 if (enemy != target)
-                    DamagePipeline.ResolveHit(new HitPayload { RawDamage = splashDmg, AttackerId = attackerId }, enemy);
+                    HitPipeline.ResolveHit(new HitPayload
+                    {
+                        RawDamage = splashDmg,
+                        CritChance = strikeCrit,
+                        CritMultiplier = strikeMult,
+                        AttackerId = attackerId
+                    }, enemy);
             });
         }
 

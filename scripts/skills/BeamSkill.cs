@@ -78,9 +78,13 @@ public partial class BeamSkill : BaseSkill
                 if (struck >= pierce)
                     break;
                 struck++;
-                DamagePipeline.ResolveHit(new HitPayload
+                float critChance = GetCalculatedCritChance();
+                float critMult = GetCalculatedCritDamage();
+                HitPipeline.ResolveHit(new HitPayload
                 {
                     RawDamage = dmg,
+                    CritChance = critChance,
+                    CritMultiplier = critMult,
                     AttackerId = attackerId,
                     Effect0 = fx0,
                     Effect1 = fx1,
@@ -109,6 +113,8 @@ public partial class BeamSkill : BaseSkill
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 35.0f));
         float dmg = GetCalculatedDamage(baseDmg);
         ulong attackerId = Host!.GetInstanceId();
+        float chainCrit = GetCalculatedCritChance();
+        float chainMult = GetCalculatedCritDamage();
 
         var visited = new HashSet<EnemyActor>();
         EnemyActor? current = TargetingService.FindNearest(Host!, ParamFloat(p, "range", 480.0f));
@@ -117,7 +123,13 @@ public partial class BeamSkill : BaseSkill
         while (current != null && jumps < count)
         {
             visited.Add(current);
-            DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, current);
+            HitPipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = dmg,
+                CritChance = chainCrit,
+                CritMultiplier = chainMult,
+                AttackerId = attackerId
+            }, current);
             SpawnBeamFx(from, current.GlobalPosition, 9.0f);
             from = current.GlobalPosition;
             jumps++;
@@ -159,9 +171,13 @@ public partial class BeamSkill : BaseSkill
         }
 
         float dps = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 32.0f));
-        DamagePipeline.ResolveHit(new HitPayload
+        float chanCrit = GetCalculatedCritChance();
+        float chanMult = GetCalculatedCritDamage();
+        HitPipeline.ResolveHit(new HitPayload
         {
             RawDamage = dps * (float)delta,
+            CritChance = chanCrit,
+            CritMultiplier = chanMult,
             AttackerId = Host!.GetInstanceId(),
         }, _channelTarget);
         string meta = ParamString(p, "meta");

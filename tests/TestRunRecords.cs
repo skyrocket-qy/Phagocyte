@@ -3,6 +3,7 @@ using GdUnit4;
 using static GdUnit4.Assertions;
 using System;
 using Game.Core;
+using Game.Combat;
 using Game.Player;
 using Game.UI;
 
@@ -360,7 +361,7 @@ public partial class TestRunRecords : TestHarness
         survivor.Stats.SetBase("evasion", 0.0f);
         survivor.Stats.AddModifier("armor", 40.0f, 0.0f); // Macrophage base 10 + 40 = 50; 50 / (50 + 50) = 0.5 DR
         float hpBefore = survivor.Health;
-        survivor.TakeDamage(20.0f);
+        HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f }, survivor);
         float hpLost = hpBefore - survivor.Health;
         AssertThat(hpLost).IsEqualApprox(10.0f, 0.5f);
         survivor.QueueFree();

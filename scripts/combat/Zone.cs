@@ -138,7 +138,7 @@ public partial class Zone : Node2D
             if (GlobalPosition.DistanceTo(player.GlobalPosition) > CurrentRadius)
                 return;
             if (Damage > 0.0f)
-                DamagePipeline.ResolveHit(new HitPayload
+                HitPipeline.ResolveHit(new HitPayload
                 {
                     RawDamage = Damage,
                     SourceFaction = Team.Enemy,
@@ -157,7 +157,7 @@ public partial class Zone : Node2D
         float damage = Damage;
         TargetingService.ForEachInRadius(GlobalPosition, radius, enemy =>
         {
-            DamagePipeline.ResolveHit(new HitPayload
+            HitPipeline.ResolveHit(new HitPayload
             {
                 RawDamage = damage,
                 AttackerId = attackerId,

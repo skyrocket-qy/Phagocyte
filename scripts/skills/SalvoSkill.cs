@@ -127,11 +127,19 @@ public partial class SalvoSkill : BaseSkill
             GD.PushWarning("[SalvoSkill] No ProjectileManager: radial salvo dropped.");
             return;
         }
+        float critChance = GetCalculatedCritChance();
+        float critMult = GetCalculatedCritDamage();
         for (int i = 0; i < count; i++)
         {
             Vector2 dir = Vector2.FromAngle(i * Mathf.Tau / count);
             mgr.Spawn(Host!.GlobalPosition, dir, speed,
-                new HitPayload { RawDamage = dmg, AttackerId = Host.GetInstanceId() },
+                new HitPayload
+                {
+                    RawDamage = dmg,
+                    CritChance = critChance,
+                    CritMultiplier = critMult,
+                    AttackerId = Host.GetInstanceId(),
+                },
                 GetCalculatedPierce(ParamInt(p, "pierce", 2)),
                 ParamFloat(p, "lifetime", 1.6f), ParamFloat(p, "hit_radius", 20.0f), "defensin_barb");
         }
@@ -159,12 +167,16 @@ public partial class SalvoSkill : BaseSkill
         var fx1 = default(EffectSpec);
         var fx2 = default(EffectSpec);
         int fxCount = BuildOnHitEffects(p, dmg, out fx0, out fx1, out fx2);
+        float singleCrit = GetCalculatedCritChance();
+        float singleMult = GetCalculatedCritDamage();
         mgr.Spawn(
             Host!.GlobalPosition, dir,
             GetCalculatedSpeed(ParamFloat(p, "speed", 420.0f)),
             new HitPayload
             {
                 RawDamage = dmg,
+                CritChance = singleCrit,
+                CritMultiplier = singleMult,
                 AttackerId = Host.GetInstanceId(),
                 Effect0 = fx0,
                 Effect1 = fx1,

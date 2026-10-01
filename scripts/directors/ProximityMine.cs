@@ -129,13 +129,23 @@ public partial class ProximityMine : Node2D
             if (player != null && GodotObject.IsInstanceValid(player) && !player.IsDead
                 && GlobalPosition.DistanceTo(player.GlobalPosition) <= BlastRadius)
             {
-                player.TakeDamage(PlayerBlastDamage);
+                HitPipeline.ResolveHit(new HitPayload
+                {
+                    RawDamage = PlayerBlastDamage,
+                    SourceFaction = Team.Neutral,
+                    Flags = HitFlags.NeverCrit,
+                }, player);
             }
 
             TargetingService.ForEachInRadius(
                 GlobalPosition,
                 BlastRadius,
-                enemy => enemy.TakeDamage(EnemyBlastDamage, null));
+                enemy => HitPipeline.ResolveHit(new HitPayload
+                {
+                    RawDamage = EnemyBlastDamage,
+                    SourceFaction = Team.Neutral,
+                    Flags = HitFlags.NeverCrit,
+                }, enemy));
         }
 
         QueueFree();

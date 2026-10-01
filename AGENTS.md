@@ -14,7 +14,7 @@ earned the hard way (red suites, broken builds, ghost diffs).
 
 ### Damage payload vs pipeline rule
 
-- `HitPayload` (`scripts/combat/DamageService.cs`) carries only what is **frozen at cast time** (raw damage, type, force flags, source faction, attacker id, effect specs). `DamagePipeline` (`scripts/combat/DamagePipeline.cs`) reads only what is **live at hit time** (armor/resists/shields, evasion/block, HP thresholds, attacker stats for crit/leech). Test for a new field: *"could this change between fire and impact?"* No → payload; yes → pipeline.
+- `HitPayload` (`scripts/combat/DamageService.cs`) carries only what is **frozen at cast time** (raw damage, crit chance/multiplier, type, force flags, source faction, attacker id, effect specs). `HitPipeline` (`scripts/combat/HitPipeline.cs`) reads only what is **live at hit time** (armor/resists/shields, evasion/block, HP thresholds, attacker stats for leech). Test for a new field: *"could this change between fire and impact?"* No → payload; yes → pipeline.
 - Flight/render state (`Position`, `ProjectileTypeIndex`, lifetime) lives **beside** the payload in `ProjectileData`, never inside it. Payload is small value-types + shared effect refs — a new field must justify its bytes and migrate all spawner call sites.
 - Resolution (`InstanceFromId`, status slots, catalogs) happens **on hit only**, never per-tick. Enforced by `check_arch.py`: no deleted-interface refs (`ILeechable`/`ISlowable`/`IStunnable`), `ResolveHit` callers limited to combat simulation layers, no dictionary reads in `ProjectileManager._PhysicsProcess`.
 

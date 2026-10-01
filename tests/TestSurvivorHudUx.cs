@@ -176,7 +176,7 @@ public partial class TestSurvivorHudUx : TestHarness
         // Zero the innate block/evasion roll so the DR math below is deterministic.
         player.Stats!.SetBase("block", 0.0f);
         player.Stats.SetBase("evasion", 0.0f);
-        player.TakeDamage(20.0f);
+        HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f }, player);
         AssertThat(player.Health).IsEqualApprox(140.0f - 20.0f * (1.0f - 10.0f / 60.0f), 0.01f);
         AssertThat(hud.HpBar.Value).IsEqualApprox(player.Health, 0.01f);
         AssertThat(hud.HpBar.MaxValue).IsEqual(140.0f);

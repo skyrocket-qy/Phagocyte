@@ -92,8 +92,12 @@ public partial class TelegraphedAttack : Node2D
         bool isHit = CheckHit(player.GlobalPosition);
         if (isHit)
         {
-            // Trigger player 4-stage damage resolution pipeline (Evasion -> Block -> Armor -> HP)
-            player.TakeDamage(Damage);
+            HitPipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = Damage,
+                SourceFaction = Team.Enemy,
+                AttackerId = GetInstanceId(),
+            }, player);
 
             // Apply push recoil away from impact
             Vector2 pushDir = (player.GlobalPosition - GlobalPosition).Normalized();

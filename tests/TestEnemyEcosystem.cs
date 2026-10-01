@@ -105,12 +105,12 @@ public partial class TestEnemyEcosystem : SceneTree
 
         // First hit breaks the shield, health untouched
         float staphHp = staph.CurrentHealth;
-        staph.TakeDamage(10.0f);
+        HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, staph);
         AssertThat(staph.ShieldCharges).IsEqual(0);
         AssertThat(staph.CurrentHealth).IsEqual(staphHp);
 
         // Second hit lands: unarmored coccus takes full damage
-        staph.TakeDamage(10.0f);
+        HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, staph);
         AssertThat(staph.CurrentHealth).IsEqual(staphHp - 10.0f);
         GD.Print("[PASS] Test 3: Staph fibrin microthrombi armor & shield breaking verified.");
 
@@ -152,7 +152,7 @@ public partial class TestEnemyEcosystem : SceneTree
         // -------------------------------------------------------------
         var tb = EnemySpawner.CreateEnemy("tb")!;
         testContainer.AddChild(tb);
-        tb.TakeDamage(10.0f);
+        HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, tb);
         AssertThat(tb.CurrentHealth).IsEqual(35.0f - Mathf.Max(1.0f, 10.0f - tb.Armor));
         GD.Print("[PASS] Test 6: Mycobacterium tuberculosis mycolic wax armor verified.");
 

@@ -100,7 +100,7 @@ public partial class EndlessDirector : Node
                 if (ctx.Player is PlayerActor fevrile && fevrile.Stats != null)
                 {
                     float burn = fevrile.Stats.GetStat("max_health") * RunMutatorService.FebrileBurnHealthFraction;
-                    fevrile.TakeDamage(burn);
+                    fevrile.TakeDoTDamage(burn);
                 }
             }
         }
@@ -190,7 +190,7 @@ public partial class EndlessDirector : Node
                     _acidTickAccumulator -= 1.0f;
                     if (ctx.Player is PlayerActor burned)
                     {
-                        burned.TakeDamage(6.0f);
+                        burned.TakeDoTDamage(6.0f);
                         burned.Status?.ApplySlow(1.2f, 1.0f - 0.6f);
                     }
                 }

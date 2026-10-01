@@ -93,9 +93,17 @@ public partial class ZoneSkill : BaseSkill
             AudioManager.Instance?.PlaySfx(novaSfx);
         float radius = GetCalculatedArea(ParamFloat(p, "nova_radius", 80.0f));
         ulong attackerId = Host!.GetInstanceId();
+        float zoneCrit = GetCalculatedCritChance();
+        float zoneMult = GetCalculatedCritDamage();
         TargetingService.ForEachInRadius(center, radius, enemy =>
         {
-            DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, enemy);
+            HitPipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = dmg,
+                CritChance = zoneCrit,
+                CritMultiplier = zoneMult,
+                AttackerId = attackerId
+            }, enemy);
         });
         var parent = Host!.GetParent();
         if (parent != null)

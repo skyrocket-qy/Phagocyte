@@ -334,6 +334,23 @@ public partial class BaseSkill : Node2D
         return baseDuration;
     }
 
+    public float GetCalculatedCritChance(float baseChance = 0.05f)
+    {
+        if (Stats is IStatHost host)
+            return host.GetStat("crit_chance");
+        return baseChance;
+    }
+
+    public float GetCalculatedCritDamage(float baseMult = 2.0f)
+    {
+        if (Stats is IStatHost host)
+        {
+            float cd = host.GetStat("crit_damage");
+            return cd > 0.0f ? cd : baseMult;
+        }
+        return baseMult;
+    }
+
     // --- Virtual Hooks for Passive Traits to provide Stat Modifiers ---
 
     public virtual void ApplyPassiveModifiers()

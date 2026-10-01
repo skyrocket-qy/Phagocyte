@@ -36,6 +36,8 @@ public struct HitResult
 public struct HitPayload
 {
     public float RawDamage;
+    public float CritChance;
+    public float CritMultiplier;
     public DamageType Type;
     public HitFlags Flags;
     public Team SourceFaction;
@@ -48,7 +50,7 @@ public struct HitPayload
 
 public static class DamageService
 {
-    /// <summary>Pure cast-time packer: no RNG here. Crit is rolled per-impact by the pipeline.</summary>
+    /// <summary>Pure cast-time packer: no RNG here. Crit chance and multiplier are frozen at cast.</summary>
     public static HitPayload Snapshot(
         float baseDamage,
         DamageType type = DamageType.Physical,
@@ -58,11 +60,15 @@ public static class DamageService
         EffectSpec effect2 = default,
         int effectCount = 0,
         ulong attackerId = 0,
-        HitFlags flags = HitFlags.None)
+        HitFlags flags = HitFlags.None,
+        float critChance = 0.0f,
+        float critMultiplier = 2.0f)
     {
         return new HitPayload
         {
             RawDamage = baseDamage,
+            CritChance = critChance,
+            CritMultiplier = critMultiplier,
             Type = type,
             Flags = flags,
             SourceFaction = sourceFaction,

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using Game.Core;
+using Game.Combat;
 using Game.Enemies;
 using Game.Directors;
 using Game.Player;
@@ -146,11 +147,11 @@ public partial class TestAfflictions : TestHarness
         cell.Stats.SetBase("evasion", 0.0f);
 
         float hpBeforeFirst = cell.Health;
-        cell.TakeDamage(10.0f);
+        HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, cell);
         float firstLoss = hpBeforeFirst - cell.Health;
 
         float hpBeforeSecond = cell.Health;
-        cell.TakeDamage(10.0f);
+        HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, cell);
         float secondLoss = hpBeforeSecond - cell.Health;
 
         AssertThat(firstLoss).IsEqualApprox(secondLoss, 0.01f);

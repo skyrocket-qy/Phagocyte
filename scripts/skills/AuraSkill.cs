@@ -46,12 +46,17 @@ public partial class AuraSkill : BaseSkill
         string sfx = ParamString(p, "sfx");
         bool hitAny = false;
 
+        float critChance = GetCalculatedCritChance();
+        float critMult = GetCalculatedCritDamage();
+
         TargetingService.ForEachInRadius(Host!.GlobalPosition, radius, enemy =>
         {
             hitAny = true;
-            DamagePipeline.ResolveHit(new HitPayload
+            HitPipeline.ResolveHit(new HitPayload
             {
                 RawDamage = dmg,
+                CritChance = critChance,
+                CritMultiplier = critMult,
                 AttackerId = attackerId,
                 Effect0 = fx0,
                 Effect1 = fx1,
@@ -92,13 +97,21 @@ public partial class AuraSkill : BaseSkill
         ulong attackerId = Host!.GetInstanceId();
         float bladeR = ParamFloat(p, "blade_radius", 28.0f);
         bool hitAny = false;
+        float orbCritChance = GetCalculatedCritChance();
+        float orbCritMult = GetCalculatedCritDamage();
         foreach (float angle in _bladeAngles)
         {
             Vector2 bladePos = Host!.GlobalPosition + Vector2.FromAngle(angle) * orbit;
             TargetingService.ForEachInRadius(bladePos, bladeR, enemy =>
             {
                 hitAny = true;
-                DamagePipeline.ResolveHit(new HitPayload { RawDamage = dmg, AttackerId = attackerId }, enemy);
+                HitPipeline.ResolveHit(new HitPayload
+                {
+                    RawDamage = dmg,
+                    CritChance = orbCritChance,
+                    CritMultiplier = orbCritMult,
+                    AttackerId = attackerId
+                }, enemy);
             });
         }
         string sfx = ParamString(p, "sfx");

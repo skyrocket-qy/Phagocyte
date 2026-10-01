@@ -4,6 +4,7 @@ using System;
 using GdUnit4;
 using static GdUnit4.Assertions;
 using Game.Core;
+using Game.Combat;
 using Game.Enemies;
 using Game.Directors;
 using Game.Player;
@@ -101,7 +102,7 @@ public partial class TestTutorialCues : TestHarness
         AssertThat(cell.GlobalPosition.X).IsGreater(startPos.X);
 
         // Damage mid-dash is negated outright.
-        cell.TakeDamage(20.0f);
+        HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f }, cell);
         AssertThat(cell.Health).IsEqual(hpBefore);
         Input.ActionRelease("dodge");
 
@@ -113,7 +114,7 @@ public partial class TestTutorialCues : TestHarness
         AssertThat(cell.DodgeCharges).IsEqualApprox(1.0f, 0.001f);
 
         // Damage lands again once the window closes.
-        cell.TakeDamage(20.0f);
+        HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f }, cell);
         AssertThat(cell.Health).IsLess(hpBefore);
 
         // Dodge steers along the move input (holding left rolls left).
