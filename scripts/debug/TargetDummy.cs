@@ -37,7 +37,7 @@ public partial class TargetDummy : EnemyActor
 
     public override float GetCollisionRadius() => 20.0f;
 
-    public override HitResult TakeDamage(float damage, Node2D? source, bool isCrit)
+    public override HitResult TakeDamage(float damage, Node2D? source = null, bool isCrit = false)
     {
         HitsReceived++;
         DamageAccumulated += damage;

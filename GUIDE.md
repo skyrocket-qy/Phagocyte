@@ -264,7 +264,7 @@ Trace any damage number from trigger to death.
 1. `GetDamage(BaseDamage,out dmg,out crit)` — `might` + crit roll
 2. Target: `TargetingService.FindTargetDirection/CollectInRadius/FindNearest` (iterates `EnemyActor.ActiveEnemies`) or segment test (`beamWidth=24*area`)
 3. Dispatch: `DamageService.DealDamage(target,dmg,Host,isCrit)` → `IDamageable.TakeDamage` else duck-type `take_damage`
-4. Intake `EnemyActor.TakeDamageInternal`: shell absorb → `BossPhase.ApplyDamageReduction` → marked mult → `max(1,dmg-Armor)` → `NotifyHealthChanged` → numbers/telemetry/lifesteal/audio/VFX/flash → `Die` if ≤0 (death traits: splits, drops, obstacles)
+4. Intake `EnemyActor.TakeDamage`: shell absorb → `BossPhase.ApplyDamageReduction` → marked mult → `max(1,dmg-Armor)` → `NotifyHealthChanged` → numbers/telemetry/lifesteal/audio/VFX/flash → `Die` if ≤0 (death traits: splits, drops, obstacles)
 5. FX: `VfxManager.Play(...)` (pooled 16/type) + code-drawn transients
 6. Numbers: `ShowDamage` (yellow/13, gold crit/18), `ShowPlayerDamage` (red), `ShowHeal`, `ShowEvaded/Blocked`
 

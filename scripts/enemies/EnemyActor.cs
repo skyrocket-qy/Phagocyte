@@ -279,17 +279,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
         Position += Velocity * dt;
     }
 
-    public virtual HitResult TakeDamage(float damage, Node2D? source = null)
-    {
-        return TakeDamageInternal(damage, source, false);
-    }
-
-    public virtual HitResult TakeDamage(float damage, Node2D? source, bool isCrit)
-    {
-        return TakeDamageInternal(damage, source, isCrit);
-    }
-
-    protected HitResult TakeDamageInternal(float damage, Node2D? source, bool isCrit)
+    public virtual HitResult TakeDamage(float damage, Node2D? source = null, bool isCrit = false)
     {
         PreDamageTraits(damage, source);
 

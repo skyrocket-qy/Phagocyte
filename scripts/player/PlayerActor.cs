@@ -474,16 +474,9 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         EmitStatsSignal();
     }
 
-    /// <summary>
-    /// Damage intake. Endotoxemia (docs/endgame.md §4) amplifies all damage taken.
-    /// </summary>
-    public void TakeDamage(float amount)
-    {
-        ApplyDamage(amount * RunMutatorService.IncomingDamageMultiplier);
-    }
-
-    /// <summary>Generic damage entry (IDamageable): full pipeline, source/crit unused.</summary>
-    public HitResult TakeDamage(float damage, Node2D? source, bool isCrit) => ApplyDamage(damage * RunMutatorService.IncomingDamageMultiplier);
+    /// <summary>Damage intake (IDamageable). Endotoxemia amplifies all damage taken.</summary>
+    public HitResult TakeDamage(float damage, Node2D? source = null, bool isCrit = false) =>
+        ApplyDamage(damage * RunMutatorService.IncomingDamageMultiplier);
 
     /// <summary>Generic DoT entry (IDamageable): direct HP loss, bypasses evasion/block.</summary>
     public void TakeDoTDamage(float dotDamage)
