@@ -5,10 +5,9 @@ using Game.Core;
 namespace Game.Skills;
 
 /// <summary>
-/// Skill-icon palette table (Phase 4, TODO line 70: skill visuals must match
-/// their asset art). Accents are the most-saturated hues sampled from
-/// <c>gen/skill/&lt;id&gt;.png</c> (see commit message for the sampler); VFX
-/// keeps its shape language and tints core/halo from here. Unknown ids fall
+/// Skill-icon palette table: skill visuals match their asset art.
+/// Accents are the most-saturated hues sampled from <c>gen/skill/&lt;id&gt;.png</c>;
+/// VFX keeps its shape language and tints core/halo from here. Unknown ids fall
 /// back to the caller's previous hardcoded colors so new skills never break.
 /// </summary>
 public static class SkillAssetPalette

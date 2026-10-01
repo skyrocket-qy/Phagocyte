@@ -182,7 +182,7 @@ Class deltas live in `assets/data/player_classes.json`, never subclasses:
 - `dendritic` — `armor 2, magnet 260, duration 1.2, CDR .10` + innate `mhc_tracer_beam`
 Each row also carries body/visual/nucleus/deform params; `PlayerActor` builds tints, nucleus shape and deform rig parametrically.
 
-Per-tick reads: `move_speed` in `HandleMovement`, `health_regen` in `HandleRegen`, `area` in `UpdateBodyDeformation`, `armor` in `ApplyDamage/ApplyImpulse`.
+Per-tick reads: `move_speed` in `HandleMovement`, `health_regen` in `HandleRegen`, `area` in `UpdateBodyDeformation`, `armor` in `ApplyImpulse/Defenses`.
 EXP: `ExpChanged(float,float,int)` + `LevelUp(int)`, `AddExp` (curve `ExpToNext*1.35+15`), `DrainAtp`.
 
 ### Hands-on
@@ -249,10 +249,11 @@ Read `BeamSkill.FirePierce` end-to-end: `FindTargetDirection` → `GetCalculated
 Trace any damage number from trigger to death.
 
 ### Files
-- `scripts/combat/DamageService.cs` (contains `DamageResult`, `DamageService`)
-- `scripts/combat/SlowService.cs`
-- `scripts/combat/CombatInterfaces.cs` (contains `IDamageable`, `ISlowable`, `IStunnable`, `IStatusHost`)
+- `scripts/combat/HitPipeline.cs` (central 6-stage orchestrator)
+- `scripts/combat/DamageService.cs` (contains `HitPayload`, `HitResult`, `DamageType`, `HitFlags`, `DamageService`)
+- `scripts/combat/CombatInterfaces.cs` (contains `DefenseProfile`, `IDamageable`, `IStatusHost`)
 - `scripts/combat/ProjectileData.cs` (contains `Team`, `ProjectileData`)
+- `scripts/combat/EffectSpec.cs` (contains `EffectSpec`)
 - `scripts/combat/StatusController.cs`
 - `scripts/combat/TargetingService.cs`
 - `scripts/combat/ProjectileManager.cs`
@@ -261,25 +262,29 @@ Trace any damage number from trigger to death.
 - `scripts/enemies/EnemyActor.cs` + `EnemyTraits.cs`
 
 ### Standard path (perforin example)
-1. `GetDamage(BaseDamage,out dmg,out crit)` — `might` + crit roll
-2. Target: `TargetingService.FindTargetDirection/CollectInRadius/FindNearest` (iterates `EnemyActor.ActiveEnemies`) or segment test (`beamWidth=24*area`)
-3. Dispatch: `DamageService.DealDamage(target,dmg,Host,isCrit)` → `IDamageable.TakeDamage` else duck-type `take_damage`
-4. Intake `EnemyActor.TakeDamage`: shell absorb → `BossPhase.ApplyDamageReduction` → marked mult → `max(1,dmg-Armor)` → `NotifyHealthChanged` → numbers/telemetry/lifesteal/audio/VFX/flash → `Die` if ≤0 (death traits: splits, drops, obstacles)
-5. FX: `VfxManager.Play(...)` (pooled 16/type) + code-drawn transients
-6. Numbers: `ShowDamage` (yellow/13, gold crit/18), `ShowPlayerDamage` (red), `ShowHeal`, `ShowEvaded/Blocked`
+1. Spawner packs cast-frozen `HitPayload`: raw damage, crit chance/mult, element, flags, source faction, attacker id, effect specs.
+2. Target: `TargetingService.FindTargetDirection/CollectInRadius/FindNearest` (iterates `EnemyActor.ActiveEnemies`) or segment test (`beamWidth=24*area`).
+3. Orchestration: `HitPipeline.ResolveHit(payload, target)` executes the 6-stage pipeline:
+   - Stage 1 (Avoidance): Checks `def.IsInvulnerable` and rolls `def.Evasion`.
+   - Stage 2 (Interception): Consumes `def.ShieldCharges` or rolls `def.BlockChance`.
+   - Stage 3 (Crit): Evaluates crit from payload snapshot (`CritChance`, `CritMultiplier`).
+   - Stage 4 (Mitigation): Applies target `DamageReduction` and flat `Armor`.
+   - Stage 5 (Pure Intake): `target.TakeDamage(mitigatedDmg, attacker, isCrit)` deducts HP and triggers feedback.
+   - Stage 6 (Post-Hit): Dispatches threshold-attenuated ailments and life leech.
+4. FX: `VfxManager.Play(...)` (pooled 16/type) + code-drawn transients.
+5. Numbers: `ShowDamage` (yellow/13, gold crit/18), `ShowPlayerDamage` (red), `ShowHeal`, `ShowEvaded/Blocked`.
 
 Branch paths:
-- Projectiles (all batched): `SalvoSkill` / enemy `ranged` trait → `ProjectileManager.Spawn(...)` with `Team` + `EffectSpec` + steering data (circular buffer + `ProjectileData` + QuadTree query + multimesh sync). No per-shot nodes exist.
+- Projectiles (all batched): `SalvoSkill` / enemy `ranged` trait → `ProjectileManager.Spawn(...)` with `HitPayload` + steering data (circular buffer + `ProjectileData` + QuadTree query + multimesh sync). No per-shot nodes exist.
 - Homing: `ProjectileData.SteeringHoming` (locked-target id or nearest + mark) / chain: `SteeringChain` (reacquire + pierce redirect) / `BeamSkill` chain mode.
-- Contact/equipment: `PlayerActor.ProcessContactDamage` → `enemy.TryContactStrike` (1 hit/s); `ContactSpikes._PhysicsProcess` → `Intercept`.
-- Player intake (reverse): `PlayerActor.ApplyDamage`: invuln→evaded→`RollEvasion`→`RollBlock`→armor DR→`ShowPlayerDamage`→death/trauma/flash.
+- Contact/equipment: `PlayerActor.ProcessContactDamage` → `enemy.TryContactStrike` (routes through `HitPipeline.ResolveHit`); `ContactSpikes._PhysicsProcess` → `Intercept`.
+- Player intake: Pure intake via `PlayerActor.TakeDamage`: HP deduction, telemetry, flash, trauma, downed state.
 
 ### Status path (slow example)
-1. Sources (Zone ticks, NovaSkill, contact/slow-aura traits, stage dot-scan, acid tide) carry `EffectSpec` or call `SlowService.ApplySlow(node,dur,factor)` — never concrete types
-2. Dispatch: `ISlowable.ApplySlow` → `Ailments.ApplySlow(dur, 1−factor)` (slow-channel carrier from `assets/data/ailments.json` — authored in `tools/config/src/data/ailments.ts`, never named in code)
-3. State: `StatusController` (strongest-wins, `SpeedMultiplier = 1−strongest`, `IsActive(id)` for synergies); movement reads `Ailments.SpeedMultiplier` every frame
-4. No `SlowTimer/SlowFactor` fields exist — timed slow via `ActorStats` is unsupported (modifiers are permanent); HUD reads `Ailments.SlowTimer` (longest slow-channel timer)
-5. Spawner hit effects are `on_hit` rows (`tools/config/src/data/skills/active.ts`): `{ailment, mult/flat, duration}` → `EffectSpec`/`Apply`; unknown ids fail `make check-config`. VFX rides the ailment def (`vfx` field), played by the adapter.
+1. Sources (Zone ticks, NovaSkill, contact/slow-aura traits, stage dot-scan, acid tide) carry `EffectSpec` in `HitPayload` or call `target.Status?.Apply(id, mag, dur)`.
+2. State: `StatusController` (strongest-wins, `SpeedMultiplier = 1−strongest`, `IsActive(id)` for synergies); movement reads `Status.SpeedMultiplier` every frame.
+3. No `SlowTimer/SlowFactor` fields exist on actors — timed debuffs live in `StatusController`.
+4. Spawner hit effects are `on_hit` rows (`tools/config/src/data/skills/active.ts`): `{ailment, mult/flat, duration}` → `EffectSpec`/`Apply`; unknown ids fail `make check-config`. VFX rides the ailment def (`vfx` field).
 
 ### Hands-on
 Zero RNG per `AGENTS.md`: `Stats.SetBase("block",0)`, `Stats.SetBase("evasion",0)` before asserting damage in tests. Find one usage in `tests/TestContactDamage.cs:100`.

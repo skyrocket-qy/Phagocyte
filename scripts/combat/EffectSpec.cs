@@ -8,26 +8,4 @@ public struct EffectSpec
     public string EffectId;
     public float Magnitude;
     public float Duration;
-
-    public readonly void ApplyTo(Node? target)
-    {
-        if (target == null || !GodotObject.IsInstanceValid(target) || string.IsNullOrEmpty(EffectId))
-            return;
-        if (target is IStatusHost host && host.Status != null)
-            host.Status.Apply(EffectId, Magnitude, Duration);
-    }
-
-    /// <summary>Fixed 3 inline slots + count keeps per-hit apply zero-alloc.</summary>
-    public static void ApplyAll(Node? target, in EffectSpec e0, in EffectSpec e1, in EffectSpec e2, int count)
-    {
-        if (count <= 0)
-            return;
-        e0.ApplyTo(target);
-        if (count <= 1)
-            return;
-        e1.ApplyTo(target);
-        if (count <= 2)
-            return;
-        e2.ApplyTo(target);
-    }
 }
