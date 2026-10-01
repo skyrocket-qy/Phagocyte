@@ -44,6 +44,8 @@ STAT_EVASION,Fluid Evasion,流体闪避,流体闪避,流体回避,Fluidausweiche
 STAT_BLOCK,Glycocalyx Block,糖萼格挡,糖萼格挡,糖衣ブロック,Glykokalyx-Block,Blocage glycocalyx,Блок гликокаликса,Bloqueo glucocáliz
 STAT_LIFE_STEAL,Receptor Leech,受体汲取,受体汲取,受容体吸収,Rezeptor-Absaugung,Drain de récepteurs,Рецепторное поглощение,Drenaje de receptores
 STAT_MAGNET,Chemotaxis Magnet,趋化吸附,趋化吸附,走化性磁力,Chemotaxis-Magnet,Aimant chimiotactique,Магнит хемотаксиса,Imán quimiotáctico
+STAT_STAGGER,Stagger,偏转,偏轉,よろめき,Staffelung,Chancellement,Пошатывание,Tambaleo
+STAT_RECOUP,Recoup,回收,回收,取り戻し,Rückgewinnung,Récupération,Возврат,Recuperación
 TREE_NODE_PRECISE_EDGE_NAME,Precise Edge,精准刃口,精准刃口,精密刃,Präzise Klinge,Lame précise,Точное лезвие,Filo preciso
 TREE_NODE_MARKED_CORE_NAME,Marked Core,标记核心,标记核心,標識核,Markierter Kern,Noyau marqué,Меченое ядро,Núcleo marcado
 TREE_NODE_BLOOD_PRICE_NAME,Blood Price,血之代价,血之代价,血の代償,Blutpreis,Prix du sang,Цена крови,Precio de sangre

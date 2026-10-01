@@ -12,13 +12,13 @@ namespace Game.Core;
 /// </summary>
 public static class StatProfiles
 {
-    /// <summary>All 18 universal stats (heroes, UI previews, balance probes).</summary>
+    /// <summary>All 20 universal stats (heroes, UI previews, balance probes).</summary>
     public static readonly string[] Full =
     {
         "might", "area", "cooldown_reduction", "projectile_speed", "duration",
         "amount", "pierce", "crit_chance", "crit_damage",
         "ailment_damage", "max_health", "health_regen", "armor", "move_speed",
-        "evasion", "block", "life_steal", "magnet",
+        "evasion", "block", "life_steal", "magnet", "stagger", "recoup",
     };
 
     /// <summary>Enemy combat stats (heroes' build stats excluded).</summary>
@@ -57,6 +57,8 @@ public sealed class StatBlock : IStatHost
         ["block"] = 0.0f,
         ["life_steal"] = 0.0f,
         ["magnet"] = 150.0f,
+        ["stagger"] = 0.0f,
+        ["recoup"] = 0.0f,
     };
 
     private readonly Dictionary<string, Stat> _statsMap = new();
@@ -111,6 +113,8 @@ public sealed class StatBlock : IStatHost
             "evasion" => Mathf.Clamp(val, 0.0f, 0.60f),             // Cap Evasion at 60%
             "block" => Mathf.Clamp(val, 0.0f, 0.75f),               // Cap Block at 75%
             "life_steal" => Mathf.Clamp(val, 0.0f, 0.20f),          // Cap Life Steal at 20%
+            "stagger" => Mathf.Clamp(val, 0.0f, 0.60f),               // Cap Stagger at 60%
+            "recoup" => Mathf.Clamp(val, 0.0f, 0.30f),                // Cap Recoup at 30%
             "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "ailment_damage" => Mathf.Max(0.0f, val),
             "amount" or "pierce" => Mathf.Max(0.0f, val),
             "move_speed" or "max_health" or "magnet" or "armor" => Mathf.Max(0.0f, val),

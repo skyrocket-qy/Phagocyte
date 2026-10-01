@@ -28,7 +28,7 @@ public partial class ActorStats : Node, IStatHost
     public Stat CritDamage => _block.GetStatObj("crit_damage")!;
     public Stat AilmentDamage => _block.GetStatObj("ailment_damage")!;
 
-    // Defense & Survival Stats (7)
+    // Defense & Survival Stats (9)
     public Stat MaxHealth => _block.GetStatObj("max_health")!;
     public Stat HealthRegen => _block.GetStatObj("health_regen")!;
     public Stat Armor => _block.GetStatObj("armor")!;
@@ -36,6 +36,8 @@ public partial class ActorStats : Node, IStatHost
     public Stat Evasion => _block.GetStatObj("evasion")!;
     public Stat Block => _block.GetStatObj("block")!;
     public Stat LifeSteal => _block.GetStatObj("life_steal")!;
+    public Stat Stagger => _block.GetStatObj("stagger")!;
+    public Stat Recoup => _block.GetStatObj("recoup")!;
 
     // Utility & Meta Stats (1)
     public Stat Magnet => _block.GetStatObj("magnet")!;

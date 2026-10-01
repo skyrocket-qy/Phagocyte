@@ -33,7 +33,7 @@ public partial class TestStatAndSkills : TestHarness
         AssertThat(s.GetValue()).IsEqualApprox(20.0f, 0.001f);
         GD.Print("[PASS] Test 1: Stat math calculation (base + flat) * (1 + pct) verified.");
 
-        // --- Test 2: ActorStats 18 universal stats & caps ---
+        // --- Test 2: ActorStats 20 universal stats & caps ---
         var cs = new ActorStats();
         AssertThat(cs.GetStat("might")).IsEqual(1.0f);
         AssertThat(cs.GetStat("area")).IsEqual(1.0f);
@@ -61,11 +61,19 @@ public partial class TestStatAndSkills : TestHarness
         cs.AddModifier("life_steal", 0.50f, 0.0f);
         AssertThat(cs.GetStat("life_steal")).IsEqual(0.20f);
 
+        // Test Stagger clamp at 60% and Recoup clamp at 30%
+        AssertThat(cs.GetStat("stagger")).IsEqual(0.0f);
+        AssertThat(cs.GetStat("recoup")).IsEqual(0.0f);
+        cs.AddModifier("stagger", 0.90f, 0.0f);
+        cs.AddModifier("recoup", 0.90f, 0.0f);
+        AssertThat(cs.GetStat("stagger")).IsEqual(0.60f);
+        AssertThat(cs.GetStat("recoup")).IsEqual(0.30f);
+
         // Test POE armour formula: small hits mitigated, big hits penetrate
         cs.AddModifier("armor", 50.0f, 0.0f);
         AssertThat(CombatMath.FromArmor(cs.GetStat("armor"), 50.0f)).IsEqualApprox(50.0f / 300.0f, 0.001f);
         AssertThat(CombatMath.FromArmor(3.0f, 50.0f)).IsLess(0.02f);
-        GD.Print("[PASS] Test 2: ActorStats 18 universal stats, clamps (CDR, evasion, block, life steal) & armor formula verified.");
+        GD.Print("[PASS] Test 2: ActorStats 20 universal stats, clamps (CDR, evasion, block, life steal, stagger, recoup) & armor formula verified.");
 
         // --- Test 3: SkillManager 5 Active + 5 Passive Routing ---
         var sm = new SkillManager();

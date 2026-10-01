@@ -34,6 +34,7 @@ public partial class TestDamageContracts : TestHarness
             RunSnapshotTests();
             RunResultTests();
             RunPipelineTests();
+            RunStaggerRecoupTests();
             RunDeadOwnerTests();
             RunGraceTests();
             Finish(true, "ALL DAMAGE CONTRACTS TESTS");
@@ -215,6 +216,80 @@ public partial class TestDamageContracts : TestHarness
         chipFoe.QueueFree();
         leechFoe.QueueFree();
         cell.QueueFree();
+    }
+
+    private void RunStaggerRecoupTests()
+    {
+        var cell = new PlayerActor { GlobalPosition = new Vector2(300, 300) };
+        var stats = new ActorStats { Name = "ActorStats" };
+        cell.AddChild(stats);
+        cell.Stats = stats;
+        Root.AddChild(cell);
+        stats.SetBase("max_health", 100.0f);
+        stats.SetBase("block", 0.0f);
+        stats.SetBase("evasion", 0.0f);
+        cell.Health = 100.0f;
+
+        // Caps: stagger 60%, recoup 30%.
+        stats.AddModifier("stagger", 0.9f, 0.0f);
+        stats.AddModifier("recoup", 0.9f, 0.0f);
+        AssertThat(stats.GetStat("stagger")).IsEqual(0.60f);
+        AssertThat(stats.GetStat("recoup")).IsEqual(0.30f);
+        stats.RemoveModifier("stagger", 0.9f, 0.0f);
+        stats.RemoveModifier("recoup", 0.9f, 0.0f);
+
+        // Stagger defers half the hit; instant lands now, DoTs feed neither pool.
+        stats.AddModifier("stagger", 0.5f, 0.0f);
+        float dealt = cell.TakeDamage(40.0f);
+        AssertThat(dealt).IsEqual(40.0f);
+        AssertThat(cell.Health).IsEqual(80.0f);
+        AssertThat(cell.StaggerPool).IsEqual(20.0f);
+        AssertThat(cell.RecoupPool).IsEqual(0.0f);
+        cell.TakeDoTDamage(10.0f);
+        AssertThat(cell.StaggerPool).IsEqual(20.0f);
+        AssertThat(cell.RecoupPool).IsEqual(0.0f);
+        GD.Print("[PASS] Stagger defers half the hit; DoTs bypass both pools.");
+
+        // Pool drains as unmitigated DoT over the 4s window.
+        cell.Health = 80.0f;
+        cell._PhysicsProcess(2.0);
+        AssertThat(cell.StaggerPool).IsEqualApprox(10.0f, 0.01f);
+        AssertThat(cell.Health).IsEqualApprox(70.0f, 0.01f);
+        GD.Print("[PASS] Stagger pool ticks down as DoT.");
+
+        // Stagger ticks can kill.
+        cell.Health = 12.0f;
+        cell.TakeDamage(20.0f);
+        AssertThat(cell.Health).IsEqual(2.0f);
+        cell._PhysicsProcess(4.0);
+        AssertThat(cell.StaggerPool).IsEqual(0.0f);
+        AssertThat(cell.IsDead).IsTrue();
+        GD.Print("[PASS] Pending stagger damage settles the kill.");
+        stats.RemoveModifier("stagger", 0.5f, 0.0f);
+        cell.QueueFree();
+
+        // Recoup schedules 25% of the taken hit, paid over 4s.
+        var cell2 = new PlayerActor { GlobalPosition = new Vector2(300, 300) };
+        var stats2 = new ActorStats { Name = "ActorStats" };
+        cell2.AddChild(stats2);
+        cell2.Stats = stats2;
+        Root.AddChild(cell2);
+        stats2.SetBase("max_health", 100.0f);
+        stats2.SetBase("block", 0.0f);
+        stats2.SetBase("evasion", 0.0f);
+        stats2.AddModifier("recoup", 0.25f, 0.0f);
+        cell2.Health = 50.0f;
+        cell2.TakeDamage(40.0f);
+        AssertThat(cell2.Health).IsEqual(10.0f);
+        AssertThat(cell2.RecoupPool).IsEqual(10.0f);
+        cell2._PhysicsProcess(2.0);
+        AssertThat(cell2.RecoupPool).IsEqualApprox(5.0f, 0.01f);
+        AssertThat(cell2.Health).IsEqualApprox(15.0f, 0.01f);
+        cell2._PhysicsProcess(4.0);
+        AssertThat(cell2.RecoupPool).IsEqual(0.0f);
+        AssertThat(cell2.Health).IsEqualApprox(20.0f, 0.01f);
+        GD.Print("[PASS] Recoup repays a quarter of the hit over its window.");
+        cell2.QueueFree();
     }
 
     private void RunDeadOwnerTests()

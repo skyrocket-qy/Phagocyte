@@ -16,7 +16,8 @@ public static class BuildStatsPreview
 
     public static readonly string[] DefenseKeys =
     {
-        "max_health", "health_regen", "armor", "move_speed", "evasion", "block", "life_steal"
+        "max_health", "health_regen", "armor", "move_speed", "evasion", "block", "life_steal",
+        "stagger", "recoup"
     };
 
     public static readonly string[] UtilityKeys = { "magnet" };
@@ -106,7 +107,7 @@ public static class BuildStatsPreview
         {
             "max_health" or "health_regen" or "move_speed" or "magnet" => $"{value:F1}",
             "amount" or "pierce" or "armor" => $"{value:F0}",
-            "cooldown_reduction" or "crit_chance" or "evasion" or "block" or "life_steal" => $"{value * 100.0f:F1}%",
+            "cooldown_reduction" or "crit_chance" or "evasion" or "block" or "life_steal" or "stagger" or "recoup" => $"{value * 100.0f:F1}%",
             "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "ailment_damage" => $"{value * 100.0f:F0}%",
             _ => $"{value:F2}"
         };

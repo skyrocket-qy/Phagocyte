@@ -45,6 +45,20 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
     public float CurrentSpeed { get; set; } = 230.0f;
     public bool IsDead { get; set; } = false;
 
+    /// <summary>Deferred Brewmaster-stagger damage awaiting its DoT ticks (hits-only).</summary>
+    public float StaggerPool { get; private set; } = 0.0f;
+
+    /// <summary>Scheduled POE-recoup healing awaiting its ticks (hits-only).</summary>
+    public float RecoupPool { get; private set; } = 0.0f;
+
+    /// <summary>Stagger pool drains fully over this window (exponential decay).</summary>
+    public const float StaggerDurationSeconds = 4.0f;
+
+    /// <summary>Recoup pool heals fully over this window (exponential decay).</summary>
+    public const float RecoupDurationSeconds = 4.0f;
+
+    private const float PoolEpsilon = 0.05f;
+
     /// <summary>Grace window: dead but settlement delayed for mutual-kill trades.</summary>
     public bool IsDowned { get; private set; } = false;
 
@@ -278,6 +292,7 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         }
 
         HandleRegen(dt);
+        TickStaggerRecoup(dt);
         UpdateDodgeState(dt);
         HandleMovement(dt);
         ProcessContactDamage();
@@ -356,6 +371,29 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
             {
                 Heal(regen * delta);
             }
+        }
+    }
+
+    /// <summary>Drains the stagger pool as unmitigated DoT and pays the recoup pool as healing.</summary>
+    private void TickStaggerRecoup(float dt)
+    {
+        if (StaggerPool > 0.0f)
+        {
+            float tick = StaggerPool * dt / StaggerDurationSeconds;
+            if (StaggerPool < PoolEpsilon)
+                tick = StaggerPool;
+            StaggerPool -= tick;
+            if (tick > 0.0f)
+                TakeDoTDamage(tick);
+        }
+        if (!IsDead && RecoupPool > 0.0f)
+        {
+            float heal = RecoupPool * dt / RecoupDurationSeconds;
+            if (RecoupPool < PoolEpsilon)
+                heal = RecoupPool;
+            RecoupPool -= heal;
+            if (heal > 0.0f)
+                Heal(heal);
         }
     }
 
@@ -520,17 +558,24 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         EmitStatsSignal();
     }
 
-    /// <summary>Pure damage intake (IDamageable): deducts final mitigated damage from HP, triggers feedback.</summary>
+    /// <summary>Pure damage intake (IDamageable): staggers part of the hit into a
+    /// DoT pool, schedules recoup healing, deducts the instant remainder from HP.</summary>
     public float TakeDamage(float finalDamage, Node2D? source = null, bool isCrit = false)
     {
         if (IsDead || finalDamage <= 0.0f)
             return 0.0f;
 
-        DamageNumberSpawner.ShowPlayerDamage(GlobalPosition, finalDamage);
-        RunTelemetryManager.Instance?.RecordDamageTaken(finalDamage);
+        float staggerPct = Stats != null ? Stats.GetStat("stagger") : 0.0f;
+        float instant = finalDamage * (1.0f - staggerPct);
+        StaggerPool += finalDamage - instant;
+        float recoupPct = Stats != null ? Stats.GetStat("recoup") : 0.0f;
+        RecoupPool += finalDamage * recoupPct;
+
+        DamageNumberSpawner.ShowPlayerDamage(GlobalPosition, instant);
+        RunTelemetryManager.Instance?.RecordDamageTaken(instant);
 
         float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
-        Health = Mathf.Clamp(Health - finalDamage, 0.0f, maxHp);
+        Health = Mathf.Clamp(Health - instant, 0.0f, maxHp);
         HasTakenDamage = true;
 
         if (Health <= 0.0f)

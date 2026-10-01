@@ -217,7 +217,7 @@ public static class UiBuilders
 
     public static string FormatSignatureStat(string stat, float value) => stat switch
     {
-        "crit_chance" or "evasion" or "block" or "life_steal" or "cooldown_reduction" => $"{value * 100.0f:F0}%",
+        "crit_chance" or "evasion" or "block" or "life_steal" or "cooldown_reduction" or "stagger" or "recoup" => $"{value * 100.0f:F0}%",
         "might" or "area" or "projectile_speed" or "duration" or "amount" or "crit_damage" => $"×{value:F1}".TrimEnd('0').TrimEnd('.'),
         _ => value % 1.0f == 0.0f ? $"{value:F0}" : $"{value:F1}"
     };

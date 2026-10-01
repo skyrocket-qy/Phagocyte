@@ -97,7 +97,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
                     └────────────┬────────────┘
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
-【通用戰鬥屬性 (Combat - 10項)】 【通用生存屬性 (Defense - 7項)】 【通用輔助與機制 (Utility - 1項)】
+【通用戰鬥屬性 (Combat - 10項)】 【通用生存屬性 (Defense - 9項)】 【通用輔助與機制 (Utility - 1項)】
 · Might (力量/傷害倍率)          · Max Health (最大生命)        · Magnet (拾取半徑)
 · Area (範圍/體積)              · Health Regen (生命自癒)
 · Cooldown Reduction (CDR)     · Armor (減傷/護甲)
@@ -131,11 +131,13 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | :--- | :--- | :--- | :--- |
 | `max_health` | **最大生命值** | `100.0` | 細胞膜破裂前可承受的最大總耐久。 |
 | `health_regen` | **生命自癒率** | `0.0` (HP/s) | 胞膜每秒自動修復的固定生命值。 |
-| `armor` | **膜剛性 / 護甲** | `0.0` (點) | 通用護甲公式：$\text{減傷率} = \frac{\text{Armor}}{\text{Armor} + 50}$，提供平滑邊際減傷。 |
+| `armor` | **膜剛性 / 護甲** | `0.0` (點) | POE 護甲公式：$\text{減傷率} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$，大傷害穿透深。 |
 | `move_speed` | **移動速度** | `230.0` (px/s) | 玩家細胞在常態巡航下的基礎遊動速度。 |
 | `evasion` | **流體閃避率** | `0.0` (0%) | 胞膜阿米巴流體變形完全免傷機率（硬上限 `0.60` 即 60%）。受擊第一順位判定。 |
 | `block` | **糖萼格擋率** | `0.0` (0%) | 細胞表面緻密糖萼屏障偏轉阻絕傷害機率（硬上限 `0.75` 即 75%）。受擊第二順位判定。 |
 | `life_steal` | **受體汲取 / 命中吸血** | `0.0` (0%) | 任何傷害來源命中敵人時觸發自體修復的機率（觸發時固定回復 1 點 HP，硬上限 `0.20` 即 20%）。 |
+| `stagger` | **偏转 / 延傷** | `0.0` (0%) | 命中傷害按比例轉入延傷池（4 秒指數衰減為無視護甲 DoT），僅玩家、僅直擊（硬上限 `0.60` 即 60%）。 |
+| `recoup` | **回收 / 延補** | `0.0` (0%) | 受到直擊後按比例在 4 秒內分期回復 HP（不受回血鎖定影響），僅玩家（硬上限 `0.30` 即 30%）。 |
 
 #### 3. 通用輔助與機制屬性（Utility & Economy）
 | 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
@@ -350,6 +352,8 @@ var move_speed: Stat = Stat.new(230.0)
 var evasion: Stat = Stat.new(0.0)
 var block: Stat = Stat.new(0.0)
 var life_steal: Stat = Stat.new(0.0)
+var stagger: Stat = Stat.new(0.0)
+var recoup: Stat = Stat.new(0.0)
 
 var magnet: Stat = Stat.new(150.0)
 ```

@@ -17,6 +17,8 @@ export enum StatId {
   Block = "block",
   LifeSteal = "life_steal",
   Magnet = "magnet",
+  Stagger = "stagger",
+  Recoup = "recoup",
 }
 
 export enum ModType {

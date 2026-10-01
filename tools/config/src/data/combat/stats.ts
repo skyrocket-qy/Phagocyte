@@ -21,4 +21,6 @@ export const StatLabels: StatLabelsFile = {
   [StatId.Block]: "STAT_BLOCK",
   [StatId.LifeSteal]: "STAT_LIFE_STEAL",
   [StatId.Magnet]: "STAT_MAGNET",
+  [StatId.Stagger]: "STAT_STAGGER",
+  [StatId.Recoup]: "STAT_RECOUP",
 };

@@ -16,5 +16,7 @@
   "evasion": "STAT_EVASION",
   "block": "STAT_BLOCK",
   "life_steal": "STAT_LIFE_STEAL",
-  "magnet": "STAT_MAGNET"
+  "magnet": "STAT_MAGNET",
+  "stagger": "STAT_STAGGER",
+  "recoup": "STAT_RECOUP"
 }
