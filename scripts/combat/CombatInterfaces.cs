@@ -25,19 +25,9 @@ public static class CombatMath
 
 public interface IDamageable
 {
-    /// <summary>Returns cached defense profile (zero-GC read).</summary>
     DefenseProfile Defenses { get; }
-
-    /// <summary>Reports whether target is currently dead.</summary>
     bool IsDead { get; }
-
-    /// <summary>
-    /// Pure intake: deducts final pre-mitigated damage from HP,
-    /// triggers sensory feedback, and returns actual damage taken.
-    /// </summary>
     float TakeDamage(float finalDamage, Node2D? source = null, bool isCrit = false);
-
-    /// <summary>Direct unmitigated DoT application (bypasses avoidance and armor).</summary>
     void TakeDoTDamage(float dotDamage);
 }
 
