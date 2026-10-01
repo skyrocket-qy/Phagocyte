@@ -33,5 +33,5 @@ public interface IDamageable
 
 public interface IStatusHost
 {
-    StatusController? Status { get; }
+    StatusController Status { get; }
 }

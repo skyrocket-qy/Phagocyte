@@ -264,7 +264,7 @@ public partial class VitalsView : Node
         else if (kind == 3 && PlayerRef is PlayerActor bcSlow)
         {
             BuffTag.Visible = true;
-            BuffTag.Text = $"🐌 {Tr("STATUS_SLOW")}: {(bcSlow.Status?.SlowTimer ?? 0.0f):F1}s";
+            BuffTag.Text = $"🐌 {Tr("STATUS_SLOW")}: {bcSlow.Status.SlowTimer:F1}s";
             BuffTag.Modulate = new Color(0.4f, 0.8f, 0.5f, 0.95f);
         }
         else

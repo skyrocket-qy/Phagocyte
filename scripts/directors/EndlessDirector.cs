@@ -114,7 +114,7 @@ public partial class EndlessDirector : Node
                 foreach (var enemy in EnemyActor.ActiveEnemies)
                 {
                     if (GodotObject.IsInstanceValid(enemy))
-                        enemy.Status?.ClearChannel("amp");
+                        enemy.Status.ClearChannel("amp");
                 }
                 GD.Print("[Affliction] Antigenic drift: vulnerability marks reset.");
             }
@@ -191,7 +191,7 @@ public partial class EndlessDirector : Node
                     if (ctx.Player is PlayerActor burned)
                     {
                         burned.TakeDoTDamage(6.0f);
-                        burned.Status?.ApplySlow(1.2f, 1.0f - 0.6f);
+                        burned.Status.ApplySlow(1.2f, 1.0f - 0.6f);
                     }
                 }
             }

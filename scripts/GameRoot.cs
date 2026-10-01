@@ -412,7 +412,7 @@ public partial class GameRoot : Node2D, IRunContext
             guide.MaxHealth = Mathf.Min(guide.MaxHealth, 8.0f);
             guide.Scale = new Vector2(0.8f, 0.8f);
             EnemyContainer.AddChild(guide);
-            guide.Status?.Apply("stun", 0.0f, 9999.0f); // dormant teaching target
+            guide.Status.Apply("stun", 0.0f, 9999.0f); // dormant teaching target
         }
     }
 

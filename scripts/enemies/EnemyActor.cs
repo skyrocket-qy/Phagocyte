@@ -40,9 +40,32 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
     public float SteeringPreferredRange { get; set; } = 260.0f;
     public float SteeringLatchRange { get; set; } = 40.0f;
 
-    public float StunTimer => Status?.GetTimer("stun") ?? 0.0f;
-    public bool IsStunned => Status?.IsStunned ?? false;
-    public StatusController? Status { get; private set; }
+    public float StunTimer => Status.GetTimer("stun");
+    public bool IsStunned => Status.IsStunned;
+    private StatusController? _status;
+
+    /// <summary>Status/ailment state (slow, DoT, amp). Debuff timers and
+    /// stacking live in data (<see cref="StatusController"/> over
+    /// assets/data/ailments.json); the actor only reads the aggregated
+    /// multipliers each frame. Lazy-created so the contract never returns null,
+    /// even off-tree.</summary>
+    public StatusController Status
+    {
+        get
+        {
+            if (_status == null)
+            {
+                _status = GetNodeOrNull<StatusController>("StatusController");
+                if (_status == null)
+                {
+                    _status = new StatusController { Name = "StatusController" };
+                    if (IsInsideTree())
+                        AddChild(_status);
+                }
+            }
+            return _status;
+        }
+    }
     public BossPhaseComponent? BossPhase { get; private set; }
 
     public Area2D? HitArea { get; set; }
@@ -73,13 +96,6 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
         WanderDir = Vector2.FromAngle(GD.Randf() * Mathf.Tau);
         SteeringPhase = GD.Randf() * 10.0f;
         SteeringOrbitSign = GD.Randf() < 0.5f ? -1.0f : 1.0f;
-
-        Status = GetNodeOrNull<StatusController>("StatusController");
-        if (Status == null)
-        {
-            Status = new StatusController { Name = "StatusController" };
-            AddChild(Status);
-        }
 
         BossPhase = GetNodeOrNull<BossPhaseComponent>("BossPhaseComponent");
 
@@ -251,7 +267,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
             WanderDir = (WanderDir + Vector2.FromAngle(GD.Randf() * Mathf.Tau) * 0.7f).Normalized();
         }
 
-        float currentSpeed = FloatSpeed * (Status?.SpeedMultiplier ?? 1.0f);
+        float currentSpeed = FloatSpeed * Status.SpeedMultiplier;
         if (BossPhase != null)
         {
             currentSpeed *= BossPhase.CurrentSpeedMult;
@@ -285,7 +301,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
     {
         get
         {
-            float statusMult = Status?.DamageTakenMultiplier ?? 1.0f;
+            float statusMult = Status.DamageTakenMultiplier;
             if (statusMult != _cachedDefenses.DamageTakenMultiplier || Armor != _cachedDefenses.Armor)
             {
                 InvalidateDefenses();
@@ -303,7 +319,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
             BlockChance = 0.0f,
             BlockMitigation = 1.0f,
             Armor = Armor,
-            DamageTakenMultiplier = Status?.DamageTakenMultiplier ?? 1.0f,
+            DamageTakenMultiplier = Status.DamageTakenMultiplier,
         };
     }
 

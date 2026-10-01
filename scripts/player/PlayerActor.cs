@@ -109,8 +109,8 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
     public Vector2 NucleusVelocity { get => Visuals.NucleusVelocity; set => Visuals.NucleusVelocity = value; }
 
     // Status debuffs (stun state lives in Status, not fields)
-    public float StunTimer => Status?.GetTimer("stun") ?? 0.0f;
-    public bool IsStunned => Status?.IsStunned ?? false;
+    public float StunTimer => Status.GetTimer("stun");
+    public bool IsStunned => Status.IsStunned;
     public float InvertControlsTimer { get; set; } = 0.0f;
 
     // Visual Node references (delegated to Visuals)
@@ -159,11 +159,30 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         };
     }
 
+    private StatusController? _status;
+
     /// <summary>Status/ailment state (slow, DoT, amp). Debuff timers and
     /// stacking live in data (<see cref="StatusController"/> over
     /// assets/data/ailments.json); the actor only reads the aggregated
-    /// multipliers each frame.</summary>
-    public StatusController? Status { get; private set; }
+    /// multipliers each frame. Lazy-created so the contract never returns null,
+    /// even off-tree.</summary>
+    public StatusController Status
+    {
+        get
+        {
+            if (_status == null)
+            {
+                _status = GetNodeOrNull<StatusController>("StatusController");
+                if (_status == null)
+                {
+                    _status = new StatusController { Name = "StatusController" };
+                    if (IsInsideTree())
+                        AddChild(_status);
+                }
+            }
+            return _status;
+        }
+    }
 
     /// <summary>Data-driven class id (assets/data/classes.json). Set before entering the tree.</summary>
     [Export] public string ClassId = "macrophage";
@@ -201,13 +220,6 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         {
             Stats = new ActorStats { Name = "ActorStats" };
             AddChild(Stats);
-        }
-
-        Status = GetNodeOrNull<StatusController>("StatusController");
-        if (Status == null)
-        {
-            Status = new StatusController { Name = "StatusController" };
-            AddChild(Status);
         }
 
         _classDef = GameManager.GetPlayerClass(ClassId);
@@ -352,7 +364,7 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         Vector2 inputVec = ReadMoveInput();
 
         float targetSpeed = Stats != null ? Stats.GetStat("move_speed") : BaseSpeed;
-        targetSpeed *= Status?.SpeedMultiplier ?? 1.0f;
+        targetSpeed *= Status.SpeedMultiplier;
 
         CurrentSpeed = targetSpeed;
 

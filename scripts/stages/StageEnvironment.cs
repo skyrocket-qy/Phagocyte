@@ -193,7 +193,7 @@ public sealed class StageEnvironment
                     SourceFaction = Team.Neutral,
                     Flags = HitFlags.NeverCrit,
                 }, player);
-                player.Status?.ApplySlow(CatalogLoader.GetFloat(state.Def, "slow_factor", 0.3f), 1.0f - CatalogLoader.GetFloat(state.Def, "slow_duration", 0.7f));
+                player.Status.ApplySlow(CatalogLoader.GetFloat(state.Def, "slow_factor", 0.3f), 1.0f - CatalogLoader.GetFloat(state.Def, "slow_duration", 0.7f));
                 break;
             }
         }

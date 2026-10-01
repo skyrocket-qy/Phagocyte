@@ -126,7 +126,7 @@ public static class HitPipeline
     {
         if (payload.EffectCount <= 0)
             return;
-        if (target is not IStatusHost host || host.Status == null)
+        if (target is not IStatusHost host)
             return;
         float threshold = MaxHpOf(target) * AilmentThresholdFraction;
         float scale = threshold > 0.0f ? Mathf.Clamp(dealt / threshold, 0.0f, 1.0f) : 1.0f;

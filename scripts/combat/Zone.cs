@@ -149,7 +149,7 @@ public partial class Zone : Node2D
                     EffectCount = EffectCount,
                 }, player);
             if (SlowFactor >= 0.0f)
-                player.Status?.ApplySlow(slowDur, 1.0f - SlowFactor);
+                player.Status.ApplySlow(slowDur, 1.0f - SlowFactor);
             return;
         }
 

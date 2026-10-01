@@ -582,7 +582,7 @@ public partial class EnemyActor
         switch (kind)
         {
             case "slow":
-                player.Status?.ApplySlow(CatalogLoader.GetFloat(def, "duration", 2.5f), 1.0f - CatalogLoader.GetFloat(def, "factor", 0.65f));
+                player.Status.ApplySlow(CatalogLoader.GetFloat(def, "duration", 2.5f), 1.0f - CatalogLoader.GetFloat(def, "factor", 0.65f));
                 break;
             case "invert":
                 HitPipeline.ResolveHit(new HitPayload
@@ -635,7 +635,7 @@ public partial class EnemyActor
             }
             Rotation = state.Dir.Angle();
         }
-        Velocity = state.Dir * FloatSpeed * (Status?.SpeedMultiplier ?? 1.0f);
+        Velocity = state.Dir * FloatSpeed * (Status.SpeedMultiplier);
         Position += Velocity * dt;
     }
 
@@ -659,7 +659,7 @@ public partial class EnemyActor
         if (heading == Vector2.Zero)
             heading = Vector2.Right;
 
-        float speed = FloatSpeed * (Status?.SpeedMultiplier ?? 1.0f);
+        float speed = FloatSpeed * (Status.SpeedMultiplier);
         if (BossPhase != null)
             speed *= BossPhase.CurrentSpeedMult;
 
@@ -816,7 +816,7 @@ public partial class EnemyActor
             CatalogLoader.GetFloat(def, "radius_max", 760.0f),
             1.0f - hpRatio);
         if (GlobalPosition.DistanceTo(player.GlobalPosition) <= radius)
-            player.Status?.ApplySlow(CatalogLoader.GetFloat(def, "duration", 0.25f), 1.0f - CatalogLoader.GetFloat(def, "factor", 0.78f));
+            player.Status.ApplySlow(CatalogLoader.GetFloat(def, "duration", 0.25f), 1.0f - CatalogLoader.GetFloat(def, "factor", 0.78f));
     }
 
     private void TickTraction(Dictionary def, float dt)
@@ -887,7 +887,7 @@ public partial class EnemyActor
                 {
                     if (other.HasMeta("mhc_marked"))
                         other.RemoveMeta("mhc_marked");
-                    other.Status?.ClearChannel("amp");
+                    other.Status.ClearChannel("amp");
                 }
             }
         }
