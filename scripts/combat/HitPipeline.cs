@@ -69,7 +69,7 @@ public static class HitPipeline
         // Stage 4: Target Defense Mitigation (POE armour + vulnerability)
         float damage = rawDamage;
         if ((payload.Flags & HitFlags.BypassesArmor) == 0 && def.Armor > 0.0f && damage > 0.0f)
-            damage *= 1.0f - CombatMath.FromArmor(def.Armor, damage);
+            damage *= 1.0f - CombatMath.FromArmorPenetrated(def.Armor, damage, payload.ArmorPenetration);
         if (def.DamageTakenMultiplier > 0.0f)
             damage *= def.DamageTakenMultiplier;
 

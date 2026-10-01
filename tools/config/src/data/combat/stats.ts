@@ -12,6 +12,7 @@ export const StatLabels: StatLabelsFile = {
   [StatId.Pierce]: "STAT_PIERCE",
   [StatId.CritChance]: "STAT_CRIT_CHANCE",
   [StatId.CritDamage]: "STAT_CRIT_DAMAGE",
+  [StatId.ArmorPenetration]: "STAT_ARMOR_PENETRATION",
   [StatId.AilmentDamage]: "STAT_AILMENT_DAMAGE",
   [StatId.MaxHealth]: "STAT_MAX_HEALTH",
   [StatId.HealthRegen]: "STAT_HEALTH_REGEN",

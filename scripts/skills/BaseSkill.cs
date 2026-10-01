@@ -351,6 +351,13 @@ public partial class BaseSkill : Node2D
         return baseMult;
     }
 
+    public float GetCalculatedArmorPenetration()
+    {
+        if (Stats is IStatHost host)
+            return Mathf.Clamp(host.GetStat("armor_penetration"), 0.0f, 1.0f);
+        return 0.0f;
+    }
+
     // --- Virtual Hooks for Passive Traits to provide Stat Modifiers ---
 
     public virtual void ApplyPassiveModifiers()

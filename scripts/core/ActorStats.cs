@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Game.Core;
 
 /// <summary>
-/// Centralized 18-Universal-Stat Manager for Cells in Game.
+/// Centralized 21-Universal-Stat Manager for Cells in Game.
 /// Thin Node adapter over <see cref="StatBlock"/> (full schema): owns the
 /// SceneTree membership and the <c>StatChanged</c> signal, delegates all
 /// math. Formula: Final = (Base + Flat) * (1 + Pct).
@@ -26,6 +26,7 @@ public partial class ActorStats : Node, IStatHost
     public Stat Pierce => _block.GetStatObj("pierce")!;
     public Stat CritChance => _block.GetStatObj("crit_chance")!;
     public Stat CritDamage => _block.GetStatObj("crit_damage")!;
+    public Stat ArmorPenetration => _block.GetStatObj("armor_penetration")!;
     public Stat AilmentDamage => _block.GetStatObj("ailment_damage")!;
 
     // Defense & Survival Stats (9)

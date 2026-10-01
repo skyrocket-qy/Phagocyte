@@ -8,6 +8,7 @@ export enum StatId {
   Pierce = "pierce",
   CritChance = "crit_chance",
   CritDamage = "crit_damage",
+  ArmorPenetration = "armor_penetration",
   AilmentDamage = "ailment_damage",
   MaxHealth = "max_health",
   HealthRegen = "health_regen",

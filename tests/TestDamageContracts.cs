@@ -34,6 +34,7 @@ public partial class TestDamageContracts : TestHarness
             RunSnapshotTests();
             RunResultTests();
             RunPipelineTests();
+            RunArmorPenetrationTests();
             RunStaggerRecoupTests();
             RunDeadOwnerTests();
             RunGraceTests();
@@ -64,6 +65,7 @@ public partial class TestDamageContracts : TestHarness
     {
         HitPayload plain = DamageService.Snapshot(10.0f);
         AssertThat(plain.RawDamage).IsEqual(10.0f);
+        AssertThat(plain.ArmorPenetration).IsEqual(0.0f);
         AssertThat(plain.Type).IsEqual(DamageType.Physical);
         AssertThat(plain.SourceFaction).IsEqual(Team.Player);
         AssertThat(plain.Flags).IsEqual(HitFlags.None);
@@ -81,6 +83,8 @@ public partial class TestDamageContracts : TestHarness
         AssertThat(full.Effect0.EffectId).IsEqual("burn");
         AssertThat(full.AttackerId).IsEqual(42);
         AssertThat(full.Flags).IsEqual(HitFlags.AlwaysCrit | HitFlags.CannotBeEvaded);
+        HitPayload pen = DamageService.Snapshot(10.0f, armorPenetration: 0.5f);
+        AssertThat(pen.ArmorPenetration).IsEqual(0.5f);
         GD.Print("[PASS] Snapshot packs the payload with no RNG; force flags survive.");
     }
 
@@ -215,6 +219,67 @@ public partial class TestDamageContracts : TestHarness
         fullFoe.QueueFree();
         chipFoe.QueueFree();
         leechFoe.QueueFree();
+        cell.QueueFree();
+    }
+
+    private void RunArmorPenetrationTests()
+    {
+        AssertThat(CombatMath.FromArmorPenetrated(20.0f, 20.0f, 0.0f)).IsEqualApprox(20.0f / 120.0f, 0.0001f);
+        AssertThat(CombatMath.FromArmorPenetrated(20.0f, 20.0f, 0.5f)).IsEqualApprox(10.0f / 110.0f, 0.0001f);
+        AssertThat(CombatMath.FromArmorPenetrated(20.0f, 20.0f, 1.0f)).IsEqual(0.0f);
+        AssertThat(CombatMath.FromArmorPenetrated(20.0f, 20.0f, 2.0f)).IsEqual(0.0f);
+        AssertThat(CombatMath.FromArmorPenetrated(20.0f, 20.0f, -1.0f)).IsEqualApprox(20.0f / 120.0f, 0.0001f);
+        AssertThat(CombatMath.FromArmorPenetrated(0.0f, 20.0f, 0.5f)).IsEqual(0.0f);
+        AssertThat(CombatMath.FromArmor(20.0f, 20.0f)).IsEqualApprox(CombatMath.FromArmorPenetrated(20.0f, 20.0f, 0.0f), 0.0001f);
+        GD.Print("[PASS] Armor penetration scales effective armor per the POE curve.");
+
+        var cell = new PlayerActor { GlobalPosition = new Vector2(300, 300) };
+        var stats = new ActorStats { Name = "ActorStats" };
+        cell.AddChild(stats);
+        cell.Stats = stats;
+        Root.AddChild(cell);
+        stats.SetBase("block", 0.0f);
+        stats.SetBase("evasion", 0.0f);
+        stats.SetBase("crit_chance", 0.0f);
+        stats.SetBase("life_steal", 0.0f);
+        ulong attackerId = cell.GetInstanceId();
+
+        stats.AddModifier("armor_penetration", 2.0f, 0.0f);
+        AssertThat(stats.GetStat("armor_penetration")).IsEqual(1.0f);
+        stats.RemoveModifier("armor_penetration", 2.0f, 0.0f);
+        AssertThat(stats.GetStat("armor_penetration")).IsEqual(0.0f);
+
+        var armored = NewEnemy(1000.0f);
+        armored.Armor = 10.0f;
+        Root.AddChild(armored);
+        HitResult noPen = HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f, AttackerId = attackerId }, armored);
+        float expectedNoPen = 20.0f * (1.0f - 10.0f / (10.0f + 5.0f * 20.0f));
+        AssertThat(noPen.DamageDealt).IsEqualApprox(expectedNoPen, 0.01f);
+
+        var pierced = NewEnemy(1000.0f);
+        pierced.Armor = 10.0f;
+        Root.AddChild(pierced);
+        HitResult fullPen = HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f, ArmorPenetration = 1.0f, AttackerId = attackerId }, pierced);
+        AssertThat(fullPen.DamageDealt).IsEqualApprox(20.0f, 0.01f);
+
+        var half = NewEnemy(1000.0f);
+        half.Armor = 10.0f;
+        Root.AddChild(half);
+        HitResult halfPen = HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f, ArmorPenetration = 0.5f, AttackerId = attackerId }, half);
+        AssertThat(halfPen.DamageDealt).IsEqualApprox(20.0f * (1.0f - 5.0f / (5.0f + 100.0f)), 0.01f);
+        AssertThat(halfPen.DamageDealt > noPen.DamageDealt).IsTrue();
+
+        var bypassed = NewEnemy(1000.0f);
+        bypassed.Armor = 10.0f;
+        Root.AddChild(bypassed);
+        HitResult bypass = HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f, Flags = HitFlags.BypassesArmor, AttackerId = attackerId }, bypassed);
+        AssertThat(bypass.DamageDealt).IsEqualApprox(20.0f, 0.01f);
+        GD.Print("[PASS] Penetrated hits ignore a fraction of armor; full pen matches bypass.");
+
+        armored.QueueFree();
+        pierced.QueueFree();
+        half.QueueFree();
+        bypassed.QueueFree();
         cell.QueueFree();
     }
 

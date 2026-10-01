@@ -68,11 +68,13 @@ public partial class StrikeSkill : BaseSkill
         ulong attackerId = Host!.GetInstanceId();
         float strikeCrit = GetCalculatedCritChance();
         float strikeMult = GetCalculatedCritDamage();
+        float strikePen = GetCalculatedArmorPenetration();
         HitPipeline.ResolveHit(new HitPayload
         {
             RawDamage = dmg,
             CritChance = strikeCrit,
             CritMultiplier = strikeMult,
+            ArmorPenetration = strikePen,
             AttackerId = attackerId
         }, target);
         VfxManager.Instance?.Play(VfxType.CytoplasmSplatter, tipPos);
@@ -89,6 +91,7 @@ public partial class StrikeSkill : BaseSkill
                         RawDamage = splashDmg,
                         CritChance = strikeCrit,
                         CritMultiplier = strikeMult,
+                        ArmorPenetration = strikePen,
                         AttackerId = attackerId
                     }, enemy);
             });

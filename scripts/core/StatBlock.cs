@@ -12,11 +12,11 @@ namespace Game.Core;
 /// </summary>
 public static class StatProfiles
 {
-    /// <summary>All 20 universal stats (heroes, UI previews, balance probes).</summary>
+    /// <summary>All 21 universal stats (heroes, UI previews, balance probes).</summary>
     public static readonly string[] Full =
     {
         "might", "area", "cooldown_reduction", "projectile_speed", "duration",
-        "amount", "pierce", "crit_chance", "crit_damage",
+        "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration",
         "ailment_damage", "max_health", "health_regen", "armor", "move_speed",
         "evasion", "block", "life_steal", "magnet", "stagger", "recoup",
     };
@@ -48,6 +48,7 @@ public sealed class StatBlock : IStatHost
         ["pierce"] = 0.0f,
         ["crit_chance"] = 0.05f,
         ["crit_damage"] = 2.0f,
+        ["armor_penetration"] = 0.0f,
         ["ailment_damage"] = 1.0f,
         ["max_health"] = 100.0f,
         ["health_regen"] = 0.0f,
@@ -110,6 +111,7 @@ public sealed class StatBlock : IStatHost
         {
             "cooldown_reduction" => Mathf.Clamp(val, 0.0f, 0.75f), // Cap CDR at 75%
             "crit_chance" => Mathf.Clamp(val, 0.0f, 1.0f),         // Cap Crit Chance at 100%
+            "armor_penetration" => Mathf.Clamp(val, 0.0f, 1.0f),
             "evasion" => Mathf.Clamp(val, 0.0f, 0.60f),             // Cap Evasion at 60%
             "block" => Mathf.Clamp(val, 0.0f, 0.75f),               // Cap Block at 75%
             "life_steal" => Mathf.Clamp(val, 0.0f, 0.20f),          // Cap Life Steal at 20%

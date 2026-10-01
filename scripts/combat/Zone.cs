@@ -14,6 +14,7 @@ public partial class Zone : Node2D
     public float Duration { get; set; } = 8.0f;
     public float TickInterval { get; set; } = 0.5f;
     public float Damage { get; set; } = 5.0f;
+    public float ArmorPenetration { get; set; }
     public EffectSpec Effect0 { get; set; }
     public EffectSpec Effect1 { get; set; }
     public EffectSpec Effect2 { get; set; }
@@ -155,11 +156,13 @@ public partial class Zone : Node2D
 
         float radius = CurrentRadius;
         float damage = Damage;
+        float pen = ArmorPenetration;
         TargetingService.ForEachInRadius(GlobalPosition, radius, enemy =>
         {
             HitPipeline.ResolveHit(new HitPayload
             {
                 RawDamage = damage,
+                ArmorPenetration = pen,
                 AttackerId = attackerId,
                 Effect0 = _fx0,
                 Effect1 = _fx1,

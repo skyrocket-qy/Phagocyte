@@ -80,11 +80,13 @@ public partial class BeamSkill : BaseSkill
                 struck++;
                 float critChance = GetCalculatedCritChance();
                 float critMult = GetCalculatedCritDamage();
+                float pen = GetCalculatedArmorPenetration();
                 HitPipeline.ResolveHit(new HitPayload
                 {
                     RawDamage = dmg,
                     CritChance = critChance,
                     CritMultiplier = critMult,
+                    ArmorPenetration = pen,
                     AttackerId = attackerId,
                     Effect0 = fx0,
                     Effect1 = fx1,
@@ -115,6 +117,7 @@ public partial class BeamSkill : BaseSkill
         ulong attackerId = Host!.GetInstanceId();
         float chainCrit = GetCalculatedCritChance();
         float chainMult = GetCalculatedCritDamage();
+        float chainPen = GetCalculatedArmorPenetration();
 
         var visited = new HashSet<EnemyActor>();
         EnemyActor? current = TargetingService.FindNearest(Host!, ParamFloat(p, "range", 480.0f));
@@ -128,6 +131,7 @@ public partial class BeamSkill : BaseSkill
                 RawDamage = dmg,
                 CritChance = chainCrit,
                 CritMultiplier = chainMult,
+                ArmorPenetration = chainPen,
                 AttackerId = attackerId
             }, current);
             SpawnBeamFx(from, current.GlobalPosition, 9.0f);
@@ -173,11 +177,13 @@ public partial class BeamSkill : BaseSkill
         float dps = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 32.0f));
         float chanCrit = GetCalculatedCritChance();
         float chanMult = GetCalculatedCritDamage();
+        float chanPen = GetCalculatedArmorPenetration();
         HitPipeline.ResolveHit(new HitPayload
         {
             RawDamage = dps * (float)delta,
             CritChance = chanCrit,
             CritMultiplier = chanMult,
+            ArmorPenetration = chanPen,
             AttackerId = Host!.GetInstanceId(),
         }, _channelTarget);
         string meta = ParamString(p, "meta");

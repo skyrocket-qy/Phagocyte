@@ -38,6 +38,7 @@ public struct HitPayload
     public float RawDamage;
     public float CritChance;
     public float CritMultiplier;
+    public float ArmorPenetration;
     public DamageType Type;
     public HitFlags Flags;
     public Team SourceFaction;
@@ -62,13 +63,15 @@ public static class DamageService
         ulong attackerId = 0,
         HitFlags flags = HitFlags.None,
         float critChance = 0.0f,
-        float critMultiplier = 2.0f)
+        float critMultiplier = 2.0f,
+        float armorPenetration = 0.0f)
     {
         return new HitPayload
         {
             RawDamage = baseDamage,
             CritChance = critChance,
             CritMultiplier = critMultiplier,
+            ArmorPenetration = armorPenetration,
             Type = type,
             Flags = flags,
             SourceFaction = sourceFaction,

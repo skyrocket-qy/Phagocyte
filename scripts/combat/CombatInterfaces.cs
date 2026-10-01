@@ -17,9 +17,18 @@ public static class CombatMath
 {
     public static float FromArmor(float armor, float damage)
     {
+        return FromArmorPenetrated(armor, damage, 0.0f);
+    }
+
+    public static float FromArmorPenetrated(float armor, float damage, float penetration)
+    {
         if (armor <= 0.0f || damage <= 0.0f)
             return 0.0f;
-        return Mathf.Clamp(armor / (armor + 5.0f * damage), 0.0f, 0.85f);
+        float pen = Mathf.Clamp(penetration, 0.0f, 1.0f);
+        float effective = armor * (1.0f - pen);
+        if (effective <= 0.0f)
+            return 0.0f;
+        return Mathf.Clamp(effective / (effective + 5.0f * damage), 0.0f, 0.85f);
     }
 }
 
