@@ -35,6 +35,7 @@ public partial class TestDamageContracts : TestHarness
             RunResultTests();
             RunPipelineTests();
             RunArmorPenetrationTests();
+            RunAilmentChanceThresholdTests();
             RunStaggerRecoupTests();
             RunDeadOwnerTests();
             RunGraceTests();
@@ -66,6 +67,7 @@ public partial class TestDamageContracts : TestHarness
         HitPayload plain = DamageService.Snapshot(10.0f);
         AssertThat(plain.RawDamage).IsEqual(10.0f);
         AssertThat(plain.ArmorPenetration).IsEqual(0.0f);
+        AssertThat(plain.AilmentChance).IsEqual(0.0f);
         AssertThat(plain.Type).IsEqual(DamageType.Physical);
         AssertThat(plain.SourceFaction).IsEqual(Team.Player);
         AssertThat(plain.Flags).IsEqual(HitFlags.None);
@@ -157,6 +159,7 @@ public partial class TestDamageContracts : TestHarness
         {
             RawDamage = 20.0f,
             AttackerId = attackerId,
+            AilmentChance = 1.0f,
             Effect0 = stunFx,
             EffectCount = 1,
         }, fullFoe);
@@ -167,6 +170,7 @@ public partial class TestDamageContracts : TestHarness
         {
             RawDamage = 10.0f,
             AttackerId = attackerId,
+            AilmentChance = 1.0f,
             Effect0 = stunFx,
             EffectCount = 1,
         }, chipFoe);
@@ -280,6 +284,106 @@ public partial class TestDamageContracts : TestHarness
         pierced.QueueFree();
         half.QueueFree();
         bypassed.QueueFree();
+        cell.QueueFree();
+    }
+
+    private void RunAilmentChanceThresholdTests()
+    {
+        var cell = new PlayerActor { GlobalPosition = new Vector2(300, 300) };
+        var stats = new ActorStats { Name = "ActorStats" };
+        cell.AddChild(stats);
+        cell.Stats = stats;
+        Root.AddChild(cell);
+        stats.SetBase("block", 0.0f);
+        stats.SetBase("evasion", 0.0f);
+        stats.SetBase("crit_chance", 0.0f);
+        stats.SetBase("life_steal", 0.0f);
+        stats.SetBase("armor", 0.0f);
+        ulong attackerId = cell.GetInstanceId();
+
+        stats.AddModifier("ailment_chance", 2.0f, 0.0f);
+        AssertThat(stats.GetStat("ailment_chance")).IsEqual(1.0f);
+        stats.RemoveModifier("ailment_chance", 2.0f, 0.0f);
+        AssertThat(stats.GetStat("ailment_chance")).IsEqual(1.0f);
+        stats.AddModifier("ailment_threshold", -5.0f, 0.0f);
+        AssertThat(stats.GetStat("ailment_threshold")).IsEqual(0.0f);
+        stats.RemoveModifier("ailment_threshold", -5.0f, 0.0f);
+        AssertThat(stats.GetStat("ailment_threshold")).IsEqual(1.0f);
+        GD.Print("[PASS] Ailment chance caps at 100%; threshold floors at zero.");
+
+        var stun4 = new EffectSpec { EffectId = "stun", Magnitude = 0.0f, Duration = 4.0f };
+        var gated = NewEnemy(1000.0f);
+        Root.AddChild(gated);
+        HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = 500.0f,
+            AttackerId = attackerId,
+            AilmentChance = 0.0f,
+            Effect0 = stun4,
+            EffectCount = 1,
+        }, gated);
+        AssertThat(gated.StunTimer).IsEqual(0.0f);
+        GD.Print("[PASS] Zero ailment chance blocks non-crit procs.");
+
+        stats.SetBase("crit_chance", 1.0f);
+        var critGated = NewEnemy(1000.0f);
+        Root.AddChild(critGated);
+        HitResult critHit = HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = 500.0f,
+            AttackerId = attackerId,
+            AilmentChance = 0.0f,
+            Effect0 = stun4,
+            EffectCount = 1,
+        }, critGated);
+        AssertThat(critHit.IsCrit).IsTrue();
+        AssertThat(critGated.StunTimer).IsEqualApprox(4.0f, 0.01f);
+        stats.SetBase("crit_chance", 0.0f);
+        GD.Print("[PASS] Crits guarantee ailment application regardless of chance.");
+
+        var thick = NewEnemy(1000.0f);
+        thick.AilmentThresholdMult = 4.0f;
+        Root.AddChild(thick);
+        var thin = NewEnemy(1000.0f);
+        Root.AddChild(thin);
+        HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = 25.0f,
+            AttackerId = attackerId,
+            AilmentChance = 1.0f,
+            Effect0 = stun4,
+            EffectCount = 1,
+        }, thin);
+        HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = 25.0f,
+            AttackerId = attackerId,
+            AilmentChance = 1.0f,
+            Effect0 = stun4,
+            EffectCount = 1,
+        }, thick);
+        AssertThat(thin.StunTimer).IsEqualApprox(2.0f, 0.01f);
+        AssertThat(thick.StunTimer).IsEqualApprox(0.5f, 0.01f);
+        GD.Print("[PASS] Enemy threshold mult attenuates weak-hit ailments.");
+
+        stats.SetBase("max_health", 400.0f);
+        stats.SetBase("ailment_threshold", 4.0f);
+        cell.Health = 400.0f;
+        HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = 10.0f,
+            AilmentChance = 1.0f,
+            Effect0 = stun4,
+            EffectCount = 1,
+        }, cell);
+        AssertThat(cell.StunTimer).IsEqualApprox(0.5f, 0.01f);
+        stats.SetBase("ailment_threshold", 1.0f);
+        GD.Print("[PASS] Player threshold stat scales incoming ailment strength.");
+
+        gated.QueueFree();
+        critGated.QueueFree();
+        thick.QueueFree();
+        thin.QueueFree();
         cell.QueueFree();
     }
 

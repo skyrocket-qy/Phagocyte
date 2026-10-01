@@ -65,7 +65,7 @@ export const Equipment: readonly EquipmentDef[] = [
         value: 0.12
       },
       {
-        stat: StatId.AilmentDamage,
+        stat: StatId.DotDamage,
         unit: ModType.Percent,
         value: 0.15
       }
@@ -83,7 +83,7 @@ export const Equipment: readonly EquipmentDef[] = [
     max_copies: 1,
     modifiers: [
       {
-        stat: StatId.AilmentDamage,
+        stat: StatId.DotDamage,
         unit: ModType.Percent,
         value: 0.08
       },
@@ -337,7 +337,7 @@ export const Equipment: readonly EquipmentDef[] = [
     max_copies: 1,
     modifiers: [
       {
-        stat: StatId.AilmentDamage,
+        stat: StatId.DotDamage,
         unit: ModType.Percent,
         value: 0.1
       },

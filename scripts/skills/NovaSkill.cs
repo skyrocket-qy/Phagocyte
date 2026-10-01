@@ -19,6 +19,7 @@ public partial class NovaSkill : BaseSkill
     private bool _delayArmed;
     private float _delayDmg;
     private float _delayPen;
+    private float _delayAil;
 
     public override void Trigger()
     {
@@ -41,12 +42,13 @@ public partial class NovaSkill : BaseSkill
             float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 130.0f));
             _delayDmg = GetCalculatedDamage(baseDmg);
             _delayPen = GetCalculatedArmorPenetration();
+            _delayAil = GetCalculatedAilmentChance();
             SpawnMarker(_markedTarget);
             return;
         }
 
         float baseDmgNow = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 32.0f));
-        Detonate(Host!.GlobalPosition, GetCalculatedDamage(baseDmgNow), GetCalculatedArmorPenetration());
+        Detonate(Host!.GlobalPosition, GetCalculatedDamage(baseDmgNow), GetCalculatedArmorPenetration(), GetCalculatedAilmentChance());
     }
 
     public override void _Process(double delta)
@@ -66,28 +68,28 @@ public partial class NovaSkill : BaseSkill
         if (_marker != null && GodotObject.IsInstanceValid(_marker))
             _marker.QueueFree();
         _marker = null;
-        Detonate(center, _delayDmg, _delayPen);
+        Detonate(center, _delayDmg, _delayPen, _delayAil);
     }
 
     /// <summary>Direct detonation with a fresh damage roll (previews, tests).</summary>
     public void DetonateAt(Vector2 center)
     {
-        Detonate(center, GetCalculatedDamage(GetBaseDamageForLevel(0.0f)), GetCalculatedArmorPenetration());
+        Detonate(center, GetCalculatedDamage(GetBaseDamageForLevel(0.0f)), GetCalculatedArmorPenetration(), GetCalculatedAilmentChance());
     }
 
     /// <summary>Immediate detonation used by triggers and zone expiries.</summary>
-    public void Detonate(Vector2 center, float dmg, float pen)
+    public void Detonate(Vector2 center, float dmg, float pen, float ailChance)
     {
         var p = SkillParams();
         string shape = ParamString(p, "shape", "sphere");
         if (shape == "cone")
-            DetonateCone(center, dmg, pen, p);
+            DetonateCone(center, dmg, pen, ailChance, p);
         else
-            DetonateSphere(center, dmg, pen, p);
+            DetonateSphere(center, dmg, pen, ailChance, p);
         SpawnNovaFx(center, p);
     }
 
-    private void DetonateSphere(Vector2 center, float dmg, float pen, Dictionary p)
+    private void DetonateSphere(Vector2 center, float dmg, float pen, float ailChance, Dictionary p)
     {
         float radius = GetCalculatedArea(ParamFloat(p, "radius", ParamFloat(p, "reach", 480.0f)));
         float kbDist = ParamFloat(p, "knockback_dist", 0.0f);
@@ -105,6 +107,7 @@ public partial class NovaSkill : BaseSkill
                 CritChance = novaCrit,
                 CritMultiplier = novaMult,
                 ArmorPenetration = pen,
+                AilmentChance = ailChance,
                 AttackerId = attackerId
             }, enemy);
             if (kbDist > 0.0f)
@@ -120,7 +123,7 @@ public partial class NovaSkill : BaseSkill
         });
     }
 
-    private void DetonateCone(Vector2 center, float dmg, float pen, Dictionary p)
+    private void DetonateCone(Vector2 center, float dmg, float pen, float ailChance, Dictionary p)
     {
         Vector2 aimDir = Host!.Velocity.Length() > 20.0f ? Host.Velocity.Normalized() : Vector2.Right;
         float reach = GetCalculatedArea(ParamFloat(p, "reach", 320.0f));
@@ -144,6 +147,7 @@ public partial class NovaSkill : BaseSkill
                 CritChance = coneCrit,
                 CritMultiplier = coneMult,
                 ArmorPenetration = pen,
+                AilmentChance = ailChance,
                 AttackerId = attackerId
             }, enemy);
         });

@@ -164,12 +164,12 @@ Understand the only numbers that matter: 19 universal stats, no skill-specific s
 - `scenes/actors/player_base.tscn` — body `layer1/mask4`, sensor `layer1/mask2`
 
 ### Stat matrix (`ActorStats.cs:17-39`)
-Combat: `might(1.0)`, `area(1.0)`, `cooldown_reduction(0)`, `projectile_speed(1.0)`, `duration(1.0)`, `amount(0)`, `pierce(0)`, `crit_chance(.05)`, `crit_damage(2.0)`, `ailment_damage(1.0)`
+Combat: `might(1.0)`, `area(1.0)`, `cooldown_reduction(0)`, `projectile_speed(1.0)`, `duration(1.0)`, `amount(0)`, `pierce(0)`, `crit_chance(.05)`, `crit_damage(2.0)`, `armor_penetration(0)`, `ailment_chance(1.0)`, `dot_damage(1.0)`, `ailment_threshold(1.0)`
 Defense: `max_health(100)`, `health_regen(0)`, `armor(0)`, `move_speed(230)`, `evasion(0)`, `block(0)`, `life_steal(0)`, `stagger(0)`, `recoup(0)`
 Utility: `magnet(150)`
 
 Formula: `GetStat` (`:90-113`) with caps: CDR 75%, crit 100%, evasion 60%, block 75%, lifesteal 20%.
-Helpers: `CombatMath.FromArmor=armor/(armor+5*damage)` (`CombatInterfaces.cs`), `RollCritical/Evasion/Block/LifeSteal` (`StatBlock.cs`), `CalculateAilmentDamage/Duration`.
+Helpers: `CombatMath.FromArmor=armor/(armor+5*damage)` (`CombatInterfaces.cs`), `RollCritical/Evasion/Block/LifeSteal` (`StatBlock.cs`), `CalculateDotDamage/Duration`.
 Signal: `StatChanged` (`:13-14`).
 
 `PlayerActor._Ready`: `AddToGroup("player")`, cache `Cytoplasm/Membrane/Nucleus/EngulfArea/SkillManager`, create `ActorStats`, load class def (`ClassId` → `GetPlayerClass`), seed `max_health/move_speed`, `ApplyClassBaseStats()` (armor + trait + extras), derive `Health/CurrentSpeed/CurrentRadius`, subscribe `StatChanged→OnStatChanged`, `CellSkillManager.Setup`, `SetupInitialSkills` (innate via `SkillFactory` id), `Equipment.Setup`.

@@ -85,7 +85,8 @@ public static class HitPipeline
             return result;
 
         // Stage 6: Post-Hit Procs
-        DispatchEffects(payload, targetNode, actualDamage);
+        if (payload.EffectCount > 0 && (isCrit || RollAilment(payload.AilmentChance)))
+            DispatchEffects(payload, targetNode, actualDamage);
         ApplyLeech(attacker, actualDamage);
         return result;
     }
@@ -122,19 +123,46 @@ public static class HitPipeline
         return 2.0f;
     }
 
+    private static bool RollAilment(float chance)
+    {
+        if (chance >= 1.0f)
+            return true;
+        if (chance <= 0.0f)
+            return false;
+        return GD.Randf() < chance;
+    }
+
     private static void DispatchEffects(in HitPayload payload, Node target, float dealt)
     {
         if (payload.EffectCount <= 0)
             return;
         if (target is not IStatusHost host)
             return;
-        float threshold = MaxHpOf(target) * AilmentThresholdFraction;
+        float threshold = AilmentThresholdOf(target);
         float scale = threshold > 0.0f ? Mathf.Clamp(dealt / threshold, 0.0f, 1.0f) : 1.0f;
         ApplyEffect(host.Status, payload.Effect0, scale);
         if (payload.EffectCount > 1)
             ApplyEffect(host.Status, payload.Effect1, scale);
         if (payload.EffectCount > 2)
             ApplyEffect(host.Status, payload.Effect2, scale);
+    }
+
+    internal static float AilmentThresholdOf(Node target)
+    {
+        float maxHp = 0.0f;
+        float mult = 1.0f;
+        switch (target)
+        {
+            case PlayerActor pa:
+                maxHp = pa.Stats?.GetStat("max_health") ?? 100.0f;
+                mult = pa.Stats?.GetStat("ailment_threshold") ?? 1.0f;
+                break;
+            case EnemyActor ea:
+                maxHp = ea.MaxHealth;
+                mult = ea.AilmentThresholdMult;
+                break;
+        }
+        return Mathf.Max(0.0f, maxHp * AilmentThresholdFraction * Mathf.Max(0.0f, mult));
     }
 
     private static void ApplyEffect(StatusController status, in EffectSpec e, float scale)
@@ -144,16 +172,6 @@ public static class HitPipeline
         float mag = e.Magnitude >= 0.0f ? e.Magnitude * scale : e.Magnitude;
         float dur = e.Duration >= 0.0f ? Mathf.Max(0.1f, e.Duration * scale) : e.Duration;
         status.Apply(e.EffectId, mag, dur);
-    }
-
-    private static float MaxHpOf(Node target)
-    {
-        return target switch
-        {
-            PlayerActor pa => pa.Stats?.GetStat("max_health") ?? 100.0f,
-            EnemyActor ea => ea.MaxHealth,
-            _ => 0.0f,
-        };
     }
 
     private static void ApplyLeech(Node2D? attacker, float dealt)

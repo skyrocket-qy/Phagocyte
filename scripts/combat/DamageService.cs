@@ -39,6 +39,7 @@ public struct HitPayload
     public float CritChance;
     public float CritMultiplier;
     public float ArmorPenetration;
+    public float AilmentChance;
     public DamageType Type;
     public HitFlags Flags;
     public Team SourceFaction;

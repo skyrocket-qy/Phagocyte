@@ -66,22 +66,22 @@ public partial class TestNewSystemsTriad : SceneTree
     private void RunAllTests()
     {
         // ====================================================================
-        // Test 1: ActorStats AilmentDamage stat & calculation formulas
+        // Test 1: ActorStats DotDamage stat & calculation formulas
         // ====================================================================
         var stats = new ActorStats();
-        AssertThat(stats.GetStat("ailment_damage")).IsEqual(1.0f);
+        AssertThat(stats.GetStat("dot_damage")).IsEqual(1.0f);
 
-        stats.AddModifier("ailment_damage", 0.0f, 0.40f); // +40%
-        AssertThat(stats.GetStat("ailment_damage")).IsEqualApprox(1.40f, 0.001f);
+        stats.AddModifier("dot_damage", 0.0f, 0.40f); // +40%
+        AssertThat(stats.GetStat("dot_damage")).IsEqualApprox(1.40f, 0.001f);
 
         stats.AddModifier("might", 0.0f, 0.20f); // +20% Might -> 1.20f
         float expectedDps = 20.0f * 1.20f * 1.40f; // 33.6f
-        AssertThat(stats.CalculateAilmentDamage(20.0f)).IsEqualApprox(expectedDps, 0.01f);
+        AssertThat(stats.CalculateDotDamage(20.0f)).IsEqualApprox(expectedDps, 0.01f);
 
         stats.AddModifier("duration", 0.0f, 0.50f); // +50% Duration -> 1.50f
         AssertThat(stats.CalculateAilmentDuration(4.0f)).IsEqualApprox(6.0f, 0.01f);
 
-        GD.Print("[PASS] Test 1: ActorStats AilmentDamage, calculations & Duration scaling verified.");
+        GD.Print("[PASS] Test 1: ActorStats DotDamage, calculations & Duration scaling verified.");
 
         // ====================================================================
         // Test 2: VfxManager GPU particle pool & dispatch

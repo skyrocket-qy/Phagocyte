@@ -78,6 +78,7 @@ public partial class EnemyActor
         MaxHealth = CatalogLoader.GetFloat(def, "max_health", MaxHealth);
         CurrentHealth = MaxHealth;
         Armor = CatalogLoader.GetFloat(def, "armor", Armor);
+        AilmentThresholdMult = CatalogLoader.GetFloat(def, "ailment_threshold_mult", AilmentThresholdMult);
         XpValue = CatalogLoader.GetFloat(def, "xp", XpValue);
         BaseScore = CatalogLoader.GetInt(def, "score", BaseScore);
         FloatSpeed = CatalogLoader.GetFloat(def, "float_speed", FloatSpeed);

@@ -63,7 +63,7 @@
 | 類別 | 高費核心 | 低費／發電對照 | 能量 |
 | :--- | :--- | :--- | :--- |
 | **代謝 (metabolism)** | 線粒體 MkII：`CDR +0.16`／`duration +10%` | 糖酵解旁路：`CDR +0.05`／`move_speed +3%` | 4／1 |
-| **消化 (digestion)** | 強酸溶酶體：`might +12%`／`ailment_damage +15%` | 蛋白酶體篩：`ailment_damage +8%`／`health_regen +0.3` | 3／1 |
+| **消化 (digestion)** | 強酸溶酶體：`might +12%`／`dot_damage +15%` | 蛋白酶體篩：`dot_damage +8%`／`health_regen +0.3` | 3／1 |
 | **骨架 (cytoskeleton)** | 鞭毛基座：`move_speed +12%` | 微管錨點：`move_speed +4%`／`area +4%` | 3／1 |
 | **合成 (synthesis)** | 粗面內質網：`amount +1`／`projectile_speed +8%`（唯一 `amount+1`，鎖 4 費） | 核糖體簇：`projectile_speed +8%`／`duration +8%` | 4／2 |
 | **感知 (sensing)** | 離子通道陣列：`armor +3`／`block +0.04`／`magnet +15%` | 趨化貼片：`magnet +20%`／`evasion +0.02` | 3／1 |

@@ -12,12 +12,13 @@ namespace Game.Core;
 /// </summary>
 public static class StatProfiles
 {
-    /// <summary>All 21 universal stats (heroes, UI previews, balance probes).</summary>
+    /// <summary>All 23 universal stats (heroes, UI previews, balance probes).</summary>
     public static readonly string[] Full =
     {
         "might", "area", "cooldown_reduction", "projectile_speed", "duration",
         "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration",
-        "ailment_damage", "max_health", "health_regen", "armor", "move_speed",
+        "ailment_chance", "dot_damage", "ailment_threshold",
+        "max_health", "health_regen", "armor", "move_speed",
         "evasion", "block", "life_steal", "magnet", "stagger", "recoup",
     };
 
@@ -49,7 +50,9 @@ public sealed class StatBlock : IStatHost
         ["crit_chance"] = 0.05f,
         ["crit_damage"] = 2.0f,
         ["armor_penetration"] = 0.0f,
-        ["ailment_damage"] = 1.0f,
+        ["ailment_chance"] = 1.0f,
+        ["ailment_threshold"] = 1.0f,
+        ["dot_damage"] = 1.0f,
         ["max_health"] = 100.0f,
         ["health_regen"] = 0.0f,
         ["armor"] = 0.0f,
@@ -112,12 +115,13 @@ public sealed class StatBlock : IStatHost
             "cooldown_reduction" => Mathf.Clamp(val, 0.0f, 0.75f), // Cap CDR at 75%
             "crit_chance" => Mathf.Clamp(val, 0.0f, 1.0f),         // Cap Crit Chance at 100%
             "armor_penetration" => Mathf.Clamp(val, 0.0f, 1.0f),
+            "ailment_chance" => Mathf.Clamp(val, 0.0f, 1.0f),
             "evasion" => Mathf.Clamp(val, 0.0f, 0.60f),             // Cap Evasion at 60%
             "block" => Mathf.Clamp(val, 0.0f, 0.75f),               // Cap Block at 75%
             "life_steal" => Mathf.Clamp(val, 0.0f, 0.20f),          // Cap Life Steal at 20%
             "stagger" => Mathf.Clamp(val, 0.0f, 0.60f),               // Cap Stagger at 60%
             "recoup" => Mathf.Clamp(val, 0.0f, 0.30f),                // Cap Recoup at 30%
-            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "ailment_damage" => Mathf.Max(0.0f, val),
+            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "dot_damage" or "ailment_threshold" => Mathf.Max(0.0f, val),
             "amount" or "pierce" => Mathf.Max(0.0f, val),
             "move_speed" or "max_health" or "magnet" or "armor" => Mathf.Max(0.0f, val),
             _ => val
@@ -302,11 +306,11 @@ public sealed class StatBlock : IStatHost
     }
 
     /// <summary>
-    /// Computes effective ailment damage (DoT) based on Might and AilmentDamage multipliers
+    /// Computes effective DoT damage based on Might and DotDamage multipliers
     /// </summary>
-    public float CalculateAilmentDamage(float baseDps)
+    public float CalculateDotDamage(float baseDps)
     {
-        return Mathf.Max(0.0f, baseDps * GetStat("might") * GetStat("ailment_damage"));
+        return Mathf.Max(0.0f, baseDps * GetStat("might") * GetStat("dot_damage"));
     }
 
     /// <summary>

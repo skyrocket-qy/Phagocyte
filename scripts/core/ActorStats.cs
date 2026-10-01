@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Game.Core;
 
 /// <summary>
-/// Centralized 21-Universal-Stat Manager for Cells in Game.
+/// Centralized 23-Universal-Stat Manager for Cells in Game.
 /// Thin Node adapter over <see cref="StatBlock"/> (full schema): owns the
 /// SceneTree membership and the <c>StatChanged</c> signal, delegates all
 /// math. Formula: Final = (Base + Flat) * (1 + Pct).
@@ -27,7 +27,9 @@ public partial class ActorStats : Node, IStatHost
     public Stat CritChance => _block.GetStatObj("crit_chance")!;
     public Stat CritDamage => _block.GetStatObj("crit_damage")!;
     public Stat ArmorPenetration => _block.GetStatObj("armor_penetration")!;
-    public Stat AilmentDamage => _block.GetStatObj("ailment_damage")!;
+    public Stat AilmentChance => _block.GetStatObj("ailment_chance")!;
+    public Stat AilmentThreshold => _block.GetStatObj("ailment_threshold")!;
+    public Stat DotDamage => _block.GetStatObj("dot_damage")!;
 
     // Defense & Survival Stats (9)
     public Stat MaxHealth => _block.GetStatObj("max_health")!;
@@ -170,11 +172,11 @@ public partial class ActorStats : Node, IStatHost
     }
 
     /// <summary>
-    /// Computes effective ailment damage (DoT) based on Might and AilmentDamage multipliers
+    /// Computes effective DoT damage based on Might and DotDamage multipliers
     /// </summary>
-    public float CalculateAilmentDamage(float baseDps)
+    public float CalculateDotDamage(float baseDps)
     {
-        return _block.CalculateAilmentDamage(baseDps);
+        return _block.CalculateDotDamage(baseDps);
     }
 
     /// <summary>

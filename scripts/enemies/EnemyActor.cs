@@ -18,6 +18,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
     [Export] public float MaxHealth { get; set; } = 20.0f;
     [Export] public float CurrentHealth { get; set; } = 20.0f;
     [Export] public float Armor { get; set; } = 0.0f;
+    [Export] public float AilmentThresholdMult { get; set; } = 1.0f;
     [Export] public float XpValue { get; set; } = 12.0f;
     [Export] public int BaseScore { get; set; } = 15;
     [Export] public float FloatSpeed { get; set; } = 35.0f;

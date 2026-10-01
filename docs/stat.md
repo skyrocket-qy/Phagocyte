@@ -14,7 +14,7 @@
                     └────────────┬────────────┘
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
-【通用戰鬥屬性 (Combat - 11項)】     【通用生存屬性 (Defense - 9項)】   【通用機制屬性 (Utility - 1項)】
+【通用戰鬥屬性 (Combat - 12項)】     【通用生存屬性 (Defense - 10項)】   【通用機制屬性 (Utility - 1項)】
 · Might (傷害倍率)                  · Max Health (最大生命)          · Magnet (趨化拾取半徑)
 · Area (範圍/體積)                  · Health Regen (自癒率)
 · CDR (冷卻縮減)                    · Armor (膜剛性/減傷)
@@ -24,8 +24,9 @@
 · Pierce (穿透次數)                 · Life Steal (受體汲取/吸血)
 · Crit Chance (特異性暴擊率)         · Stagger (偏转/延傷)
 · Crit Damage (暴擊傷害倍率)         · Recoup (回收/延補)
-· Armor Penetration (護甲穿透)
-· Ailment Damage (異常傷害倍率)
+· Armor Penetration (護甲穿透)       · Ailment Threshold (異常閾值)
+· Ailment Chance (異常觸發率)
+· Dot Damage (持續傷害倍率)
 ```
 
 ```mermaid
@@ -96,7 +97,7 @@ public class Stat
 
 ## 3. 全域通用屬性字典規範表 (Universal Stat Dictionary)
 
-所有屬性鍵名統一使用蛇形命名法（Snake_case），並在 `scripts/core/StatBlock.cs` 中註冊（共 21 項）：
+所有屬性鍵名統一使用蛇形命名法（Snake_case），並在 `scripts/core/StatBlock.cs` 中註冊（共 23 項）：
 
 | 屬性標識 (Key) | 顯示名稱 | 基準預設值 | 類別 | 影響範圍與通用運算規則 |
 | :--- | :--- | :--- | :--- | :--- |
@@ -110,7 +111,9 @@ public class Stat
 | `crit_chance` | **特異性暴擊率** | `0.05` (5%) | 戰鬥 | 命中敵人時觸發致命特異性暴擊的機率。 |
 | `crit_damage` | **暴擊傷害倍率** | `2.0` (200%) | 戰鬥 | 觸發暴擊時的結算傷害乘數。 |
 | `armor_penetration` | **護甲穿透** | `0.0` (0%) | 戰鬥 | 開火時凍結的護甲穿透比例：$\text{Armor}_{\text{eff}} = \text{Armor} \times (1.0 - \text{Pen})$，硬上限 `1.0` (100%)。 |
-| `ailment_damage` | **異常傷害倍率** | `1.0` (100%) | 戰鬥 | 全域 DoT／異常狀態傷害乘數，與 `might` 相乘結算。 |
+| `ailment_chance` | **異常觸發率** | `1.0` (100%) | 戰鬥 | 命中時觸發 `on_hit` 異常的機率（開火時凍結）；暴擊必定觸發。硬上限 `1.0` (100%)。 |
+| `ailment_threshold` | **異常閾值** | `1.0` (100%) | 生存 | 自身異常閾值乘數：$\text{Threshold} = \text{MaxHP} \times 0.05 \times \text{Mult}$，僅下限 `0.0`，無上限。 |
+| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 戰鬥 | 全域 DoT 傷害乘數，與 `might` 相乘結算。 |
 | `max_health` | **最大生命值** | `100.0` | 生存 | 細胞膜破裂前可承受的最大耐久上限。 |
 | `health_regen` | **生命自癒率** | `0.0` (HP/s) | 生存 | 每秒自動修復的細胞膜生命值。 |
 | `armor` | **膜剛性 / 護甲** | `0.0` (點) | 生存 | POE 邊際減傷公式：$\text{DR} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$，大傷害穿透深。 |
@@ -122,7 +125,7 @@ public class Stat
 | `recoup` | **回收 / 延補** | `0.0` (0%) | 生存/續航 | 受到直擊後按比例在 4 秒內分期回復 HP（不受回血鎖定影響），僅玩家。硬上限設為 `0.30` (30%)。 |
 | `magnet` | **趨化引力 (拾取)** | `150.0` (px) | 機制 | 自動吸附周邊 ATP 經驗滴與抗原碎片的有效半徑。 |
 
-### 3.1 能量約束層（非第 22 屬性）
+### 3.1 能量約束層（非第 24 屬性）
 
 胞器腔室的能量是**約束層，而非通用 Stat**：`CellStats` 內無 `energy` 槽位，所有胞器 `modifiers`／`drawback` 亦不得引用 `energy`。能量模型（已用-上限）：已用＝Σ正成本，上限＝6＋Σ發電量（`energy_cost == -1` 即 `+1` 發電，必帶重度負面），合法⇔已用≤上限且件數≤4。背包（run-scoped，上限 12）永不計入能量。硬上限複查（Phase 4）：腔室 CDR 合計 `+0.26`＋被動滿級 `+0.40`＋底盤 `0.10` 仍被 `0.75` 鉗制；腔室 `evasion +0.02`／`block +0.04` 僅為微調，遠低於 `0.60`／`0.75` 上限；`amount +1` 唯一來源鎖 4 費（佔基礎預算 2/3），`4+3` 超載、`4+1+1` 滿配。
 
@@ -150,6 +153,8 @@ flowchart TD
     EvCheck -- 成功 --> Evaded["【完全閃避 (EVADED)】<br>受到 0 傷害 · 胞膜流體變形水波紋"]
     EvCheck -- 失敗 --> BlkCheck{"2. 格擋判定 (Block Roll)<br>randf() < stats.block"}
     BlkCheck -- 成功 --> Blocked["【完全格擋 (BLOCKED)】<br>受到 0 傷害 · 糖萼屏障晶體偏轉"]
-    BlkCheck -- 失敗 --> ArmorDR["3. 護甲減傷 (Armor DR)<br>Damage * (1 - Armor / (Armor + 50))"]
+    BlkCheck -- 失敗 --> ArmorDR["3. 護甲減傷 (Armor DR)<br>Damage * (1 - ArmorEff / (ArmorEff + 5*Damage))<br>ArmorEff = Armor * (1 - pen)"]
     ArmorDR --> HPLoss["4. 扣減生命 (HP Loss)<br>扣除生命耐久 · 若 HP <= 0 胞膜破裂陣亡"]
+    HPLoss --> AilRoll{"5. 異常判定 (Ailment Roll)<br>暴擊必定觸發 · 否則 randf() < ailment_chance"}
+    AilRoll -- 觸發 --> AilScale["異常強度按閾值縮放<br>scale = dealt / (MaxHP * 0.05 * 閾值乘數)"]
 ```

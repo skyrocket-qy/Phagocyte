@@ -107,7 +107,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 · Pierce (穿透次數)             · Life Steal (受體汲取/吸血)
 · Crit Chance (暴擊機率)
 · Crit Damage (暴擊倍率)
-· Ailment Damage (異常傷害倍率)
+· Dot Damage (持續傷害倍率)
 ```
 
 ### 通用 Stat 詳細字典
@@ -124,7 +124,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | `pierce` | **穿透次數** | `0` (次) | 投射物貫穿敵人的額外次數（穿透後繼續向前飛行）。 |
 | `crit_chance` | **暴擊機率** | `0.05` (5%) | 任何傷害來源命中敵人弱點時觸發致命特異性暴擊的機率。 |
 | `crit_damage` | **暴擊倍率** | `2.0` (200%) | 觸發暴擊時的結算傷害倍率。 |
-| `ailment_damage` | **異常傷害倍率** | `1.0` (100%) | 全域 DoT／異常狀態傷害乘數，與 `might` 相乘結算。 |
+| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 全域 DoT 傷害乘數，與 `might` 相乘結算。 |
 
 #### 2. 通用生存與防禦屬性（Defense & Survival）
 | 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |

@@ -61,7 +61,7 @@
         "value": 0.12
       },
       {
-        "stat": "ailment_damage",
+        "stat": "dot_damage",
         "unit": "percent",
         "value": 0.15
       }
@@ -79,7 +79,7 @@
     "max_copies": 1,
     "modifiers": [
       {
-        "stat": "ailment_damage",
+        "stat": "dot_damage",
         "unit": "percent",
         "value": 0.08
       },
@@ -333,7 +333,7 @@
     "max_copies": 1,
     "modifiers": [
       {
-        "stat": "ailment_damage",
+        "stat": "dot_damage",
         "unit": "percent",
         "value": 0.1
       },

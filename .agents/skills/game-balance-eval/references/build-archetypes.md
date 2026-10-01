@@ -21,7 +21,7 @@ This document defines the **5 Canonical Immunological Archetypes**, detailing th
   - `acidic_lysosome` (+Might, +Digestion)
   - `v_atpase_pump` (+Ailment tick rate)
   - `catalase_quenched` (+Duration, -Drawback self-damage)
-* **Primary Scaling Stats**: `might`, `duration`, `area`, `ailment_damage`
+* **Primary Scaling Stats**: `might`, `duration`, `area`, `dot_damage`
 * **Target Combat Feel**: Incinerating wave clear; satisfying chemical sizzle audio and rapid cyan/lime tick numbers.
 * **Benchmark DPS**: High AoE sustained DPS ($120\text{--}240\text{ DPS}$ across 30+ enemies), moderate single-target damage.
 

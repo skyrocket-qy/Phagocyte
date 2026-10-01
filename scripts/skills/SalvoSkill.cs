@@ -130,6 +130,7 @@ public partial class SalvoSkill : BaseSkill
         float critChance = GetCalculatedCritChance();
         float critMult = GetCalculatedCritDamage();
         float pen = GetCalculatedArmorPenetration();
+        float ailChance = GetCalculatedAilmentChance();
         for (int i = 0; i < count; i++)
         {
             Vector2 dir = Vector2.FromAngle(i * Mathf.Tau / count);
@@ -140,6 +141,7 @@ public partial class SalvoSkill : BaseSkill
                     CritChance = critChance,
                     CritMultiplier = critMult,
                     ArmorPenetration = pen,
+                    AilmentChance = ailChance,
                     AttackerId = Host.GetInstanceId(),
                 },
                 GetCalculatedPierce(ParamInt(p, "pierce", 2)),
@@ -172,6 +174,7 @@ public partial class SalvoSkill : BaseSkill
         float singleCrit = GetCalculatedCritChance();
         float singleMult = GetCalculatedCritDamage();
         float singlePen = GetCalculatedArmorPenetration();
+        float singleAil = GetCalculatedAilmentChance();
         mgr.Spawn(
             Host!.GlobalPosition, dir,
             GetCalculatedSpeed(ParamFloat(p, "speed", 420.0f)),
@@ -181,6 +184,7 @@ public partial class SalvoSkill : BaseSkill
                 CritChance = singleCrit,
                 CritMultiplier = singleMult,
                 ArmorPenetration = singlePen,
+                AilmentChance = singleAil,
                 AttackerId = Host.GetInstanceId(),
                 Effect0 = fx0,
                 Effect1 = fx1,

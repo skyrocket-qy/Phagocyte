@@ -29,8 +29,8 @@ public partial class TestBuildStatsPreview : TestHarness
     private static readonly string[] AllStatKeys =
     {
         "might", "area", "cooldown_reduction", "projectile_speed", "duration",
-        "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration", "ailment_damage",
-        "max_health", "health_regen", "armor", "move_speed", "evasion", "block", "life_steal",
+        "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration", "ailment_chance", "dot_damage",
+        "max_health", "health_regen", "armor", "ailment_threshold", "move_speed", "evasion", "block", "life_steal",
         "magnet", "stagger", "recoup"
     };
 
@@ -152,7 +152,7 @@ public partial class TestBuildStatsPreview : TestHarness
         {
             AssertThat(player.Stats!.GetStat(key)).IsEqualApprox(preview[key], 0.001f);
         }
-        GD.Print("[PASS] Test 2: preview equals run-assembled stats on all 21 keys.");
+        GD.Print("[PASS] Test 2: preview equals run-assembled stats on all 23 keys.");
     }
 
     private void AssertMenuRefreshWiring()

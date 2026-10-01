@@ -192,7 +192,7 @@ class EducationalAuditor:
         # Expected mappings
         category_expected_stats = {
             "metabolism": {"cooldown_reduction", "duration", "move_speed", "might"},
-            "digestion": {"might", "ailment_damage", "health_regen", "life_steal"},
+            "digestion": {"might", "dot_damage", "health_regen", "life_steal"},
             "cytoskeleton": {"move_speed", "knockback", "area", "pierce", "evasion"},
             "synthesis": {"amount", "projectile_speed", "duration", "crit_damage", "area"},
             "sensing": {"armor", "block", "magnet", "evasion"},

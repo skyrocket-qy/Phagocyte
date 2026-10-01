@@ -16,6 +16,7 @@ export interface EnemyDef {
   id: EnemyId;
   max_health: number;
   armor: number;
+  ailment_threshold_mult?: number;
   xp: number;
   score: number;
   float_speed: number;
@@ -39,6 +40,7 @@ export const EnemyZodSchema = z.object({
   id: z.string().min(1),
   max_health: z.number().positive(),
   armor: z.number(),
+  ailment_threshold_mult: z.number().nonnegative().optional(),
   xp: z.number(),
   score: z.number().int().nonnegative(),
   float_speed: z.number(),

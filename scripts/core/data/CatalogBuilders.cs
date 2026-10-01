@@ -171,6 +171,7 @@ public static class CatalogBuilders
                 { "id", id },
                 { "max_health", CatalogLoader.GetFloat(row, "max_health", 20.0f) },
                 { "armor", CatalogLoader.GetFloat(row, "armor", 0.0f) },
+                { "ailment_threshold_mult", CatalogLoader.GetFloat(row, "ailment_threshold_mult", 1.0f) },
                 { "xp", CatalogLoader.GetFloat(row, "xp", 12.0f) },
                 { "score", CatalogLoader.GetInt(row, "score", 15) },
                 { "float_speed", CatalogLoader.GetFloat(row, "float_speed", 35.0f) },

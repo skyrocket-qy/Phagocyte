@@ -11,12 +11,13 @@ public static class BuildStatsPreview
     public static readonly string[] CombatKeys =
     {
         "might", "area", "cooldown_reduction", "projectile_speed", "duration",
-        "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration", "ailment_damage"
+        "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration",
+        "ailment_chance", "dot_damage"
     };
 
     public static readonly string[] DefenseKeys =
     {
-        "max_health", "health_regen", "armor", "move_speed", "evasion", "block", "life_steal",
+        "max_health", "health_regen", "armor", "ailment_threshold", "move_speed", "evasion", "block", "life_steal",
         "stagger", "recoup"
     };
 
@@ -107,8 +108,8 @@ public static class BuildStatsPreview
         {
             "max_health" or "health_regen" or "move_speed" or "magnet" => $"{value:F1}",
             "amount" or "pierce" or "armor" => $"{value:F0}",
-            "cooldown_reduction" or "crit_chance" or "evasion" or "block" or "life_steal" or "stagger" or "recoup" or "armor_penetration" => $"{value * 100.0f:F1}%",
-            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "ailment_damage" => $"{value * 100.0f:F0}%",
+            "cooldown_reduction" or "crit_chance" or "evasion" or "block" or "life_steal" or "stagger" or "recoup" or "armor_penetration" or "ailment_chance" => $"{value * 100.0f:F1}%",
+            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "dot_damage" or "ailment_threshold" => $"{value * 100.0f:F0}%",
             _ => $"{value:F2}"
         };
     }

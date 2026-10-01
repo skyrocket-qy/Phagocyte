@@ -204,6 +204,7 @@ public partial class TestTelegraphAndProjectiles : SceneTree
             {
                 RawDamage = 10.0f,
                 SourceFaction = Team.Enemy,
+                AilmentChance = 1.0f,
                 Effect0 = new EffectSpec { EffectId = "stun", Duration = 0.5f },
                 EffectCount = 1,
             },
