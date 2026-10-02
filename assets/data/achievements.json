@@ -81,6 +81,7 @@
   },
   {
     "desc_key": "ACH_PRION_CLEARED_DESC",
+    "enemy_ids": ["prion", "prpsc_amyloid_aggregate"],
     "icon": "💎",
     "id": "prion_cleared",
     "reward_cell": "",

@@ -96,7 +96,4 @@ public partial class EquipmentDrop : Node2D
         AudioManager.Instance?.PlayPickup();
         QueueFree();
     }
-
-    /// <summary>Test/scripted hook: collect without a live player target.</summary>
-    public void CollectForTest() => Collect();
 }

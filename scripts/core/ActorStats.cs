@@ -182,20 +182,4 @@ public partial class ActorStats : Node, IStatHost
     {
         return _block.RollLifeSteal();
     }
-
-    /// <summary>
-    /// Computes effective DoT damage based on Damage and DotDamage multipliers
-    /// </summary>
-    public float CalculateDotDamage(float baseDps)
-    {
-        return _block.CalculateDotDamage(baseDps);
-    }
-
-    /// <summary>
-    /// Computes effective ailment duration based on the universal Duration stat
-    /// </summary>
-    public float CalculateAilmentDuration(float baseDuration)
-    {
-        return _block.CalculateAilmentDuration(baseDuration);
-    }
 }

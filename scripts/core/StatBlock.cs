@@ -318,20 +318,4 @@ public sealed class StatBlock : IStatHost
         float ls = GetStat("life_steal");
         return ls > 0.0f && GD.Randf() < ls;
     }
-
-    /// <summary>
-    /// Computes effective DoT damage based on Damage and DotDamage multipliers
-    /// </summary>
-    public float CalculateDotDamage(float baseDps)
-    {
-        return Mathf.Max(0.0f, baseDps * GetStat("damage") * GetStat("dot_damage"));
-    }
-
-    /// <summary>
-    /// Computes effective ailment duration based on the universal Duration stat
-    /// </summary>
-    public float CalculateAilmentDuration(float baseDuration)
-    {
-        return Mathf.Max(0.1f, baseDuration * GetStat("duration"));
-    }
 }

@@ -331,6 +331,9 @@ public static class CatalogBuilders
                 entry["talent_points"] = CatalogLoader.GetInt(row, "talent_points");
             if (row.ContainsKey("unlock_endless"))
                 entry["unlock_endless"] = CatalogLoader.GetBool(row, "unlock_endless");
+            // Enemy-specific clear extras (absent on generic achievements).
+            if (row.TryGetValue("enemy_ids", out var enemyIds) && enemyIds.VariantType == Variant.Type.Array)
+                entry["enemy_ids"] = enemyIds.AsGodotArray();
             table[id] = entry;
         }
         GD.Print($"[Catalog] Loaded {table.Count} achievements.");

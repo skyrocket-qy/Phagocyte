@@ -6,7 +6,7 @@ namespace Game.Directors;
 
 /// <summary>
 /// Drifting neutral matter (dormant toxin mines) plus host ulceration ambient
-/// acid mist (docs/stages.md §4.3). Extracted from GameRoot.
+/// acid mist (docs/stages.md §4.3).
 /// Neutrals are not <see cref="EnemyActor"/> nodes, so they never consume
 /// screen-cap slots.
 /// </summary>

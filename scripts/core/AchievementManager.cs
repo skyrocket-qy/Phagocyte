@@ -143,19 +143,30 @@ public partial class AchievementManager : Node
         {
             case "enemy_killed":
                 // Kill counter drives the digestion-line achievements (re-keyed
-                // to kills) plus the PrPsc amyloid clear.
+                // to kills). Enemy-specific clears match catalog enemy_ids.
                 float kills = ProgressData.GetValueOrDefault("kills", 0.0f).AsSingle() + 1.0f;
                 ProgressData["kills"] = kills;
                 EvaluateThreshold("first_digestion");
                 EvaluateThreshold("engulf_20");
                 EvaluateThreshold("devour_50");
 
-                // PrPsc amyloid crystals (regular prion aggregate or the stage-5 terminal boss)
                 string enemyId = value.Obj != null ? value.AsString() : "";
-                if (enemyId == "prion" || enemyId == "prpsc_amyloid_aggregate")
+                if (!string.IsNullOrEmpty(enemyId))
                 {
-                    ProgressData["prion_cleared"] = 1.0f;
-                    Unlock("prion_cleared");
+                    foreach (string achId in Achievements.Keys)
+                    {
+                        var ach = Achievements[achId].AsGodotDictionary();
+                        foreach (string id in CatalogLoader.GetStringArray(ach, "enemy_ids"))
+                        {
+                            if (id == enemyId)
+                            {
+                                string statKey = ach.GetValueOrDefault("stat_key", achId).AsString();
+                                ProgressData[statKey] = 1.0f;
+                                Unlock(achId);
+                                break;
+                            }
+                        }
+                    }
                 }
                 break;
 

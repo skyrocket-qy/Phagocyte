@@ -416,7 +416,7 @@ public partial class TestEquipmentChamber : TestHarness
         string droppedId = drop!.EquipmentId;
         AssertThat(droppedId).IsNotEmpty();
         AssertThat(EquipmentUnlockManager.IsUnlocked(droppedId)).IsFalse();
-        drop.CollectForTest();
+        drop.Collect();
         AssertThat(EquipmentUnlockManager.IsUnlocked(droppedId)).IsTrue();
         AssertThat(drop.IsQueuedForDeletion()).IsTrue();
         GD.Print("[PASS] A rolled drop spawns as a pickup and unlocks on collect.");

@@ -8,8 +8,7 @@ namespace Game.Directors;
 
 /// <summary>
 /// Sub-lord + terminal-boss lifecycle (09:00 sub-boss showdown, 15:00 terminal
-/// lockdown) plus endless multi-boss incursions. Extracted from GameRoot; the 09:00
-/// trigger is evaluated here so <see cref="WaveDirectorComponent"/> never
+/// lockdown) plus endless multi-boss incursions. The 09:00 trigger is evaluated here so <see cref="WaveDirectorComponent"/> never
 /// touches boss state — the 15:00 lockdown arrives via
 /// <see cref="WaveDirectorComponent.TerminalPhaseReached"/>.
 /// Victory/defeat settlement is requested through <see cref="IRunContext.EndRun"/>

@@ -9,11 +9,20 @@ using Game.Enemies;
 
 namespace Game.Tests;
 
-public partial class MockEnemyForAilment : Node2D
+public partial class MockEnemyForAilment : Node2D, IDamageable
 {
     public float Health = 100.0f;
     public float LastDoTReceived = 0.0f;
     public Vector2 Velocity = Vector2.Zero;
+
+    public DefenseProfile Defenses => new();
+    public bool IsDead => Health <= 0.0f;
+
+    public float TakeDamage(float finalDamage, Node2D? source = null, bool isCrit = false)
+    {
+        Health -= finalDamage;
+        return finalDamage;
+    }
 
     public void TakeDoTDamage(float dotDamage)
     {
@@ -76,10 +85,10 @@ public partial class TestNewSystemsTriad : SceneTree
 
         stats.AddModifier("damage", 0.0f, 0.20f); // +20% Damage -> 1.20f
         float expectedDps = 20.0f * 1.20f * 1.40f; // 33.6f
-        AssertThat(stats.CalculateDotDamage(20.0f)).IsEqualApprox(expectedDps, 0.01f);
+        AssertThat(20.0f * stats.GetStat("damage") * stats.GetStat("dot_damage")).IsEqualApprox(expectedDps, 0.01f);
 
         stats.AddModifier("duration", 0.0f, 0.50f); // +50% Duration -> 1.50f
-        AssertThat(stats.CalculateAilmentDuration(4.0f)).IsEqualApprox(6.0f, 0.01f);
+        AssertThat(4.0f * stats.GetStat("duration")).IsEqualApprox(6.0f, 0.01f);
 
         GD.Print("[PASS] Test 1: ActorStats DotDamage, calculations & Duration scaling verified.");
 

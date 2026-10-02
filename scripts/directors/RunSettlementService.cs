@@ -12,7 +12,6 @@ namespace Game.Directors;
 /// <summary>
 /// Run lifecycle owner: achievement event wiring plus combat settlement
 /// (victory/defeat validation, telemetry, records, leaderboards, modal).
-/// Extracted from <c>GameRoot.EndRun / ConnectAchievementEvents / RecordTreeLevel</c>.
 /// Settlement is requested through <see cref="IRunContext.EndRun"/>; the
 /// <c>RunEnded</c> flag itself stays on <see cref="GameRoot"/>.
 /// </summary>
