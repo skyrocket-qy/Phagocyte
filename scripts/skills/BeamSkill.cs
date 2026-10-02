@@ -83,7 +83,7 @@ public partial class BeamSkill : BaseSkill
                 float pen = GetCalculatedArmorPenetration();
                 float ailChance = GetCalculatedAilmentChance();
                 DamageType dmgType = GetDamageType();
-                HitPipeline.ResolveHit(new HitPayload
+                HitPresenter.ResolveAndPresent(new HitPayload
                 {
                     RawDamage = dmg,
                     CritChance = critChance,
@@ -132,7 +132,7 @@ public partial class BeamSkill : BaseSkill
         while (current != null && jumps < count)
         {
             visited.Add(current);
-            HitPipeline.ResolveHit(new HitPayload
+            HitPresenter.ResolveAndPresent(new HitPayload
             {
                 RawDamage = dmg,
                 CritChance = chainCrit,
@@ -188,7 +188,7 @@ public partial class BeamSkill : BaseSkill
         float chanPen = GetCalculatedArmorPenetration();
         float chanAil = GetCalculatedAilmentChance();
         DamageType chanType = GetDamageType();
-        HitPipeline.ResolveHit(new HitPayload
+        HitPresenter.ResolveAndPresent(new HitPayload
         {
             RawDamage = dps * (float)delta,
             CritChance = chanCrit,

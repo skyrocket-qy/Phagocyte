@@ -2,7 +2,6 @@ using Godot;
 using Game.Core;
 using Game.Enemies;
 using Game.Player;
-using Game.UI;
 
 namespace Game.Combat;
 
@@ -20,12 +19,10 @@ public static class HitPipeline
             return result;
 
         DefenseProfile def = target.Defenses;
-        Vector2 targetPos = targetNode is Node2D n2d ? n2d.GlobalPosition : Vector2.Zero;
 
         // Stage 1: Avoidance (Invulnerability & Evasion)
         if (def.IsInvulnerable)
         {
-            DamageNumberSpawner.ShowEvaded(targetPos);
             result.IsEvaded = true;
             return result;
         }
@@ -34,7 +31,6 @@ public static class HitPipeline
         {
             if (GD.Randf() < def.Evasion)
             {
-                DamageNumberSpawner.ShowEvaded(targetPos);
                 result.IsEvaded = true;
                 return result;
             }
@@ -51,7 +47,6 @@ public static class HitPipeline
                 blockMitigation = def.BlockMitigation > 0.0f ? def.BlockMitigation : 1.0f;
                 if (blockMitigation >= 1.0f)
                 {
-                    DamageNumberSpawner.ShowBlocked(targetPos);
                     result.IsBlocked = true;
                     return result;
                 }
@@ -87,7 +82,7 @@ public static class HitPipeline
         // Stage 6: Post-Hit Procs
         if (payload.EffectCount > 0 && (isCrit || RollAilment(payload.AilmentChance)))
             DispatchEffects(payload, targetNode, actualDamage);
-        ApplyLeech(attacker, actualDamage);
+        result.LifeStolen = ApplyLeech(attacker, actualDamage);
         return result;
     }
 
@@ -204,13 +199,14 @@ public static class HitPipeline
         return 1.0f;
     }
 
-    private static void ApplyLeech(Node2D? attacker, float dealt)
+    private static float ApplyLeech(Node2D? attacker, float dealt)
     {
         if (attacker is PlayerActor pa && pa.Stats is ActorStats st && st.RollLifeSteal())
         {
             pa.Heal(1.0f);
-            DamageNumberSpawner.ShowHeal(pa.GlobalPosition, 1.0f);
             RunTelemetryManager.Instance?.RecordLifeSteal(1.0f);
+            return 1.0f;
         }
+        return 0.0f;
     }
 }

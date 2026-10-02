@@ -55,7 +55,7 @@ public partial class AuraSkill : BaseSkill
         TargetingService.ForEachInRadius(Host!.GlobalPosition, radius, enemy =>
         {
             hitAny = true;
-            HitPipeline.ResolveHit(new HitPayload
+            HitPresenter.ResolveAndPresent(new HitPayload
             {
                 RawDamage = dmg,
                 CritChance = critChance,
@@ -114,7 +114,7 @@ public partial class AuraSkill : BaseSkill
             TargetingService.ForEachInRadius(bladePos, bladeR, enemy =>
             {
                 hitAny = true;
-                HitPipeline.ResolveHit(new HitPayload
+                HitPresenter.ResolveAndPresent(new HitPayload
                 {
                     RawDamage = dmg,
                     CritChance = orbCritChance,

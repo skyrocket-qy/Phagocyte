@@ -92,7 +92,7 @@ public partial class TelegraphedAttack : Node2D
         bool isHit = CheckHit(player.GlobalPosition);
         if (isHit)
         {
-            HitPipeline.ResolveHit(new HitPayload
+            HitPresenter.ResolveAndPresent(new HitPayload
             {
                 RawDamage = Damage,
                 SourceFaction = Team.Enemy,

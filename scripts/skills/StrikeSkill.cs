@@ -71,7 +71,7 @@ public partial class StrikeSkill : BaseSkill
         float strikePen = GetCalculatedArmorPenetration();
         float strikeAil = GetCalculatedAilmentChance();
         DamageType strikeType = GetDamageType();
-        HitPipeline.ResolveHit(new HitPayload
+        HitPresenter.ResolveAndPresent(new HitPayload
         {
             RawDamage = dmg,
             CritChance = strikeCrit,
@@ -90,7 +90,7 @@ public partial class StrikeSkill : BaseSkill
             TargetingService.ForEachInRadius(tipPos, splashR, enemy =>
             {
                 if (enemy != target)
-                    HitPipeline.ResolveHit(new HitPayload
+                    HitPresenter.ResolveAndPresent(new HitPayload
                     {
                         RawDamage = splashDmg,
                         CritChance = strikeCrit,

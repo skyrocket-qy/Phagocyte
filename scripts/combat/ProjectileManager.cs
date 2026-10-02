@@ -332,7 +332,7 @@ public partial class ProjectileManager : Node2D
                     if (p.Position.DistanceSquaredTo(playerPos) <= reach * reach)
                     {
                         p.AddHitTarget(playerId);
-                        HitPipeline.ResolveHit(p.Payload, player);
+                        HitPresenter.ResolveAndPresent(p.Payload, player);
                         if (p.PierceRemaining > 0)
                             p.PierceRemaining--;
                         else
@@ -375,7 +375,7 @@ public partial class ProjectileManager : Node2D
                         if (p.Position.DistanceSquaredTo(enemy.GlobalPosition) <= hitDistSq)
                         {
                             p.AddHitTarget(enemyId);
-                            HitPipeline.ResolveHit(p.Payload, enemy);
+                            HitPresenter.ResolveAndPresent(p.Payload, enemy);
 
                             if (p.PierceRemaining > 0)
                             {

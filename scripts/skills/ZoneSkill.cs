@@ -104,7 +104,7 @@ public partial class ZoneSkill : BaseSkill
         float zoneMult = GetCalculatedCritDamage();
         TargetingService.ForEachInRadius(center, radius, enemy =>
         {
-            HitPipeline.ResolveHit(new HitPayload
+            HitPresenter.ResolveAndPresent(new HitPayload
             {
                 RawDamage = dmg,
                 CritChance = zoneCrit,

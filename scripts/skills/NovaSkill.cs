@@ -102,7 +102,7 @@ public partial class NovaSkill : BaseSkill
         float novaMult = GetCalculatedCritDamage();
         TargetingService.ForEachInRadius(center, radius, enemy =>
         {
-            HitPipeline.ResolveHit(new HitPayload
+            HitPresenter.ResolveAndPresent(new HitPayload
             {
                 RawDamage = dmg,
                 CritChance = novaCrit,
@@ -144,7 +144,7 @@ public partial class NovaSkill : BaseSkill
             Vector2 push = toEnemy.Normalized();
             var tween = Host!.CreateTween();
             tween.TweenProperty(enemy, "global_position", enemy.GlobalPosition + push * kbDist, kbTime);
-            HitPipeline.ResolveHit(new HitPayload
+            HitPresenter.ResolveAndPresent(new HitPayload
             {
                 RawDamage = dmg,
                 CritChance = coneCrit,

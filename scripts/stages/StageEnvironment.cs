@@ -187,7 +187,7 @@ public sealed class StageEnvironment
         {
             if (child is DotZone zone && GodotObject.IsInstanceValid(zone) && zone.Contains(player.GlobalPosition))
             {
-                HitPipeline.ResolveHit(new HitPayload
+                HitPresenter.ResolveAndPresent(new HitPayload
                 {
                     RawDamage = CatalogLoader.GetFloat(state.Def, "dps", 7.0f) * dt,
                     SourceFaction = Team.Neutral,

@@ -401,7 +401,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
         if (now < NextContactTickMsec)
             return false;
         NextContactTickMsec = now + ContactTickInterval * 1000.0;
-        HitPipeline.ResolveHit(new HitPayload
+        HitPresenter.ResolveAndPresent(new HitPayload
         {
             RawDamage = ContactDamage,
             SourceFaction = Team.Enemy,

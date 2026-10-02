@@ -26,6 +26,7 @@ public enum HitFlags : byte
 public struct HitResult
 {
     public float DamageDealt;
+    public float LifeStolen;
     public bool TargetKilled;
     public bool IsCrit;
     public bool IsEvaded;
