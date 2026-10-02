@@ -142,11 +142,12 @@ public static class HitPipeline
         float scale = threshold > 0.0f ? Mathf.Clamp(dealt / threshold, 0.0f, 1.0f) : 1.0f;
         float ailEffect = AilmentEffectOf(payload.AttackerId);
         float dotMult = DotDamageOf(payload.AttackerId);
-        ApplyEffect(host.Status, payload.Effect0, scale, ailEffect, dotMult);
+        float armor = target is IDamageable damageable ? damageable.Defenses.Armor : 0.0f;
+        ApplyEffect(host.Status, payload.Effect0, scale, ailEffect, dotMult, armor, payload.ArmorPenetration);
         if (payload.EffectCount > 1)
-            ApplyEffect(host.Status, payload.Effect1, scale, ailEffect, dotMult);
+            ApplyEffect(host.Status, payload.Effect1, scale, ailEffect, dotMult, armor, payload.ArmorPenetration);
         if (payload.EffectCount > 2)
-            ApplyEffect(host.Status, payload.Effect2, scale, ailEffect, dotMult);
+            ApplyEffect(host.Status, payload.Effect2, scale, ailEffect, dotMult, armor, payload.ArmorPenetration);
     }
 
     internal static float AilmentThresholdOf(Node target)
@@ -167,7 +168,7 @@ public static class HitPipeline
         return Mathf.Max(0.0f, maxHp * AilmentThresholdFraction * Mathf.Max(0.0f, mult));
     }
 
-    private static void ApplyEffect(StatusController status, in EffectSpec e, float scale, float ailEffect, float dotMult)
+    private static void ApplyEffect(StatusController status, in EffectSpec e, float scale, float ailEffect, float dotMult, float armor, float penetration)
     {
         if (string.IsNullOrEmpty(e.EffectId))
             return;
@@ -176,7 +177,10 @@ public static class HitPipeline
         {
             mag *= scale;
             if (status.IsDotChannel(e.EffectId))
+            {
                 mag *= dotMult;
+                mag *= 1.0f - CombatMath.FromArmorDot(armor, mag, penetration);
+            }
             else
                 mag *= ailEffect;
         }

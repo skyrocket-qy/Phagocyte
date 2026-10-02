@@ -169,7 +169,7 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
             BlockChance = Stats?.GetStat("block") ?? 0.0f,
             BlockMitigation = 1.0f,
             Armor = Stats?.GetStat("armor") ?? 0.0f,
-            DamageTakenMultiplier = RunMutatorService.IncomingDamageMultiplier,
+            DamageTakenMultiplier = RunMutatorService.IncomingDamageMultiplier * (Stats?.GetStat("damage_taken") ?? 1.0f),
         };
     }
 
@@ -384,7 +384,7 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
                 tick = StaggerPool;
             StaggerPool -= tick;
             if (tick > 0.0f)
-                TakeDoTDamage(tick);
+                TakeDoTDamageMitigated(tick, false);
         }
         if (!IsDead && RecoupPool > 0.0f)
         {
@@ -591,11 +591,22 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
         return finalDamage;
     }
 
-    /// <summary>Generic DoT entry (IDamageable): direct HP loss, bypasses avoidance and armor.</summary>
+    /// <summary>Generic DoT entry (IDamageable): damage_taken mitigates at intake; armor was applied at status-application.</summary>
     public void TakeDoTDamage(float dotDamage)
+    {
+        TakeDoTDamageMitigated(dotDamage, true);
+    }
+
+    private void TakeDoTDamageMitigated(float dotDamage, bool mitigate)
     {
         if (IsDead || dotDamage <= 0.0f)
             return;
+        if (mitigate)
+        {
+            float mult = RunMutatorService.IncomingDamageMultiplier * (Stats?.GetStat("damage_taken") ?? 1.0f);
+            if (mult > 0.0f)
+                dotDamage *= mult;
+        }
         float maxHp = Stats != null ? Stats.GetStat("max_health") : 100.0f;
         Health = Mathf.Clamp(Health - dotDamage, 0.0f, maxHp);
         HasTakenDamage = true;

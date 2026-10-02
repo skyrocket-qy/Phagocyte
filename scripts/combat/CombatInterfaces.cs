@@ -15,6 +15,9 @@ public readonly struct DefenseProfile
 /// <summary>POE armour curve shared by every damageable: big hits penetrate.</summary>
 public static class CombatMath
 {
+    /// <summary>DoT curve factor over per-second dps (parity with hits; raise to soften).</summary>
+    public const float DotArmorFactor = 5.0f;
+
     public static float FromArmor(float armor, float damage)
     {
         return FromArmorPenetrated(armor, damage, 0.0f);
@@ -29,6 +32,17 @@ public static class CombatMath
         if (effective <= 0.0f)
             return 0.0f;
         return Mathf.Clamp(effective / (effective + 5.0f * damage), 0.0f, 0.85f);
+    }
+
+    public static float FromArmorDot(float armor, float dps, float penetration)
+    {
+        if (armor <= 0.0f || dps <= 0.0f)
+            return 0.0f;
+        float pen = Mathf.Clamp(penetration, 0.0f, 1.0f);
+        float effective = armor * (1.0f - pen);
+        if (effective <= 0.0f)
+            return 0.0f;
+        return Mathf.Clamp(effective / (effective + DotArmorFactor * dps), 0.0f, 0.85f);
     }
 }
 
