@@ -484,11 +484,11 @@ public partial class TestDamageContracts : TestHarness
 
         stats.AddModifier("spell_damage", 0.0f, 0.5f);
         stats.AddModifier("aoe_damage", 0.0f, 0.5f);
-        AssertThat(ros.GetCalculatedDamage(16.0f)).IsEqualApprox(36.0f, 0.01f);
+        AssertThat(ros.GetCalculatedDamage(16.0f)).IsEqualApprox(32.0f, 0.01f);
         AssertThat(grasp.GetCalculatedDamage(28.0f)).IsEqualApprox(42.0f, 0.01f);
         stats.RemoveModifier("spell_damage", 0.0f, 0.5f);
         stats.RemoveModifier("aoe_damage", 0.0f, 0.5f);
-        GD.Print("[PASS] Spell/AoE multipliers compound only on matching tags.");
+        GD.Print("[PASS] Spell/AoE multipliers add into the increased damage pool on matching tags.");
 
         stats.AddModifier("projectile_damage", 0.0f, 1.0f);
         AssertThat(ros.GetCalculatedDamage(16.0f)).IsEqualApprox(16.0f, 0.01f);

@@ -15,7 +15,7 @@ public static class StatProfiles
     /// <summary>All 35 universal stats (heroes, UI previews, balance probes).</summary>
     public static readonly string[] Full =
     {
-        "might", "area", "cooldown_reduction", "projectile_speed", "duration",
+        "damage", "area", "cooldown_reduction", "projectile_speed", "duration",
         "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration",
         "ailment_chance", "dot_damage", "ailment_threshold", "ailment_effect",
         "physical_damage", "fire_damage", "cold_damage", "lightning_damage", "chaos_damage",
@@ -42,7 +42,7 @@ public sealed class StatBlock : IStatHost
 
     private static readonly Dictionary<string, float> CanonicalBases = new()
     {
-        ["might"] = 1.0f,
+        ["damage"] = 1.0f,
         ["area"] = 1.0f,
         ["cooldown_reduction"] = 0.0f,
         ["projectile_speed"] = 1.0f,
@@ -135,7 +135,7 @@ public sealed class StatBlock : IStatHost
             "life_steal" => Mathf.Clamp(val, 0.0f, 0.20f),          // Cap Life Steal at 20%
             "stagger" => Mathf.Clamp(val, 0.0f, 0.60f),               // Cap Stagger at 60%
             "recoup" => Mathf.Clamp(val, 0.0f, 0.30f),                // Cap Recoup at 30%
-            "might" or "area" or "projectile_speed" or "duration" or "crit_damage" or "dot_damage" or "ailment_threshold" or "ailment_effect" or "damage_taken" or "physical_damage" or "fire_damage" or "cold_damage" or "lightning_damage" or "chaos_damage" or "melee_damage" or "spell_damage" or "aoe_damage" or "projectile_damage" or "minion_damage" => Mathf.Max(0.0f, val),
+            "damage" or "area" or "projectile_speed" or "duration" or "crit_damage" or "dot_damage" or "ailment_threshold" or "ailment_effect" or "damage_taken" or "physical_damage" or "fire_damage" or "cold_damage" or "lightning_damage" or "chaos_damage" or "melee_damage" or "spell_damage" or "aoe_damage" or "projectile_damage" or "minion_damage" => Mathf.Max(0.0f, val),
             "amount" or "pierce" => Mathf.Max(0.0f, val),
             "move_speed" or "max_health" or "magnet" or "armor" => Mathf.Max(0.0f, val),
             _ => val
@@ -320,11 +320,11 @@ public sealed class StatBlock : IStatHost
     }
 
     /// <summary>
-    /// Computes effective DoT damage based on Might and DotDamage multipliers
+    /// Computes effective DoT damage based on Damage and DotDamage multipliers
     /// </summary>
     public float CalculateDotDamage(float baseDps)
     {
-        return Mathf.Max(0.0f, baseDps * GetStat("might") * GetStat("dot_damage"));
+        return Mathf.Max(0.0f, baseDps * GetStat("damage") * GetStat("dot_damage"));
     }
 
     /// <summary>

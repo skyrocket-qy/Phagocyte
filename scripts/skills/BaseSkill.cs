@@ -296,12 +296,14 @@ public partial class BaseSkill : Node2D
     {
         if (Stats is IStatHost host)
         {
-            float mult = host.GetStat("might") * host.GetStat(TypeStatKey(GetDamageType()));
-            mult *= ConditionalMult(host, SkillTag.Melee, "melee_damage");
-            mult *= ConditionalMult(host, SkillTag.Spell, "spell_damage");
-            mult *= ConditionalMult(host, SkillTag.AOE, "aoe_damage");
-            mult *= ConditionalMult(host, SkillTag.Projectile, "projectile_damage");
-            mult *= ConditionalMult(host, SkillTag.Minion, "minion_damage");
+            float inc = host.GetStat("damage") - 1.0f;
+            inc += host.GetStat(TypeStatKey(GetDamageType())) - 1.0f;
+            inc += ConditionalInc(host, SkillTag.Melee, "melee_damage");
+            inc += ConditionalInc(host, SkillTag.Spell, "spell_damage");
+            inc += ConditionalInc(host, SkillTag.AOE, "aoe_damage");
+            inc += ConditionalInc(host, SkillTag.Projectile, "projectile_damage");
+            inc += ConditionalInc(host, SkillTag.Minion, "minion_damage");
+            float mult = Mathf.Max(0.0f, 1.0f + inc);
             return baseDmg * mult;
         }
         return baseDmg;
@@ -318,9 +320,9 @@ public partial class BaseSkill : Node2D
         return false;
     }
 
-    private float ConditionalMult(IStatHost host, string tag, string stat)
+    private float ConditionalInc(IStatHost host, string tag, string stat)
     {
-        return HasTag(tag) ? host.GetStat(stat) : 1.0f;
+        return HasTag(tag) ? host.GetStat(stat) - 1.0f : 0.0f;
     }
 
     /// <summary>Hit damage type from skill data (params damage_type; physical default).</summary>

@@ -28,7 +28,7 @@ public partial class TestBuildStatsPreview : TestHarness
 
     private static readonly string[] AllStatKeys =
     {
-        "might", "area", "cooldown_reduction", "projectile_speed", "duration",
+        "damage", "area", "cooldown_reduction", "projectile_speed", "duration",
         "amount", "pierce", "crit_chance", "crit_damage", "armor_penetration", "ailment_chance", "dot_damage",
         "physical_damage", "fire_damage", "cold_damage", "lightning_damage", "chaos_damage",
         "melee_damage", "spell_damage", "aoe_damage", "projectile_damage", "minion_damage",
@@ -121,8 +121,8 @@ public partial class TestBuildStatsPreview : TestHarness
     {
         var preview = BuildStatsPreview.PreviewStats("macrophage");
         AssertThat(preview.Count).IsEqual(AllStatKeys.Length);
-        AssertThat(preview["might"]).IsGreater(1.0f);
-        GD.Print($"[PASS] Test 1: preview totals computed (might={preview["might"]:F3}).");
+        AssertThat(preview["damage"]).IsGreater(1.0f);
+        GD.Print($"[PASS] Test 1: preview totals computed (damage={preview["damage"]:F3}).");
 
         AssertThat(_player).IsNotNull();
         AssertThat(GodotObject.IsInstanceValid(_player)).IsTrue();
@@ -168,13 +168,13 @@ public partial class TestBuildStatsPreview : TestHarness
         AssertThat(loadout).IsNotNull();
         AssertThat(loadout!.StatPanel).IsNotNull();
 
-        string before = StatValue(loadout.StatPanel!, "might");
+        string before = StatValue(loadout.StatPanel!, "damage");
         AssertThat(loadout.ToggleGear("redox_symbiont")).IsTrue();
-        string unequipped = StatValue(loadout.StatPanel!, "might");
+        string unequipped = StatValue(loadout.StatPanel!, "damage");
         AssertThat(unequipped).IsNotEqual(before);
         AssertThat(loadout.ToggleGear("redox_symbiont")).IsTrue();
-        AssertThat(StatValue(loadout.StatPanel!, "might")).IsEqual(before);
-        GD.Print($"[PASS] Test 3: loadout panel refreshes on equip/unequip (might {unequipped} <-> {before}).");
+        AssertThat(StatValue(loadout.StatPanel!, "damage")).IsEqual(before);
+        GD.Print($"[PASS] Test 3: loadout panel refreshes on equip/unequip (damage {unequipped} <-> {before}).");
 
         _menu.OnLoadoutConfirmPressed();
         AssertThat(_menu.TreeStatPanel).IsNotNull();

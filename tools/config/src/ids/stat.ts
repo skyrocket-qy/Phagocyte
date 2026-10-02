@@ -1,5 +1,5 @@
 export enum StatId {
-  Might = "might",
+  Damage = "damage",
   Area = "area",
   CooldownReduction = "cooldown_reduction",
   ProjectileSpeed = "projectile_speed",

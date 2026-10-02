@@ -3,7 +3,7 @@ import { StatId, type StatLabelsFile } from "../../schemas/ui.schema";
 export { StatId };
 
 export const StatLabels: StatLabelsFile = {
-  [StatId.Might]: "STAT_MIGHT",
+  [StatId.Damage]: "STAT_DAMAGE",
   [StatId.Area]: "STAT_AREA",
   [StatId.CooldownReduction]: "STAT_COOLDOWN_REDUCTION",
   [StatId.ProjectileSpeed]: "STAT_PROJECTILE_SPEED",

@@ -108,7 +108,7 @@ public partial class TestExpandedSkills : SceneTree
         var glycolysis = SkillFactory.CreatePassive("glycolysis")!;
         glycolysis.Setup(dummyHost);
         AssertThat(cellStats.GetStat("move_speed")).IsEqualApprox(230.0f * 1.06f, 0.5f);
-        AssertThat(cellStats.GetStat("might")).IsEqualApprox(1.05f, 0.01f);
+        AssertThat(cellStats.GetStat("damage")).IsEqualApprox(1.05f, 0.01f);
         glycolysis.RemovePassiveModifiers();
 
         // 4.4 Kinesin Transit: Speed +15%, Pierce +1

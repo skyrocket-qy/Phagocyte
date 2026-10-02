@@ -358,8 +358,7 @@ public partial class TestRunRecords : TestHarness
         var survivor = cellScene.Instantiate<PlayerActor>();
         Root.AddChild(survivor);
         survivor.Stats!.SetBase("block", 0.0f);
-        survivor.Stats.SetBase("evasion", 0.0f);
-        survivor.Stats.AddModifier("armor", 40.0f, 0.0f); // Macrophage base 10 + 40 = 50; 50 / (50 + 50) = 0.5 DR
+        survivor.Stats.AddModifier("armor", 90.0f, 0.0f); // Macrophage base 10 + 90 = 100; 100 / (100 + 5*20) = 0.5 DR
         float hpBefore = survivor.Health;
         HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f }, survivor);
         float hpLost = hpBefore - survivor.Health;

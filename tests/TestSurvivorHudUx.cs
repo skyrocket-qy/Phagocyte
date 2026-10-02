@@ -172,12 +172,13 @@ public partial class TestSurvivorHudUx : TestHarness
         AssertThat(hud.HpBar!.MaxValue).IsEqual(140.0f);
         AssertThat(hud.HpBar.Value).IsEqual(140.0f);
 
-        // Take damage -> HUD bar drops & hit flash (Armor 10 => 10/60 DR)
+        // Take damage -> HUD bar drops & hit flash (Armor 10 against 20 damage => 10/110 DR)
         // Zero the innate block/evasion roll so the DR math below is deterministic.
         player.Stats!.SetBase("block", 0.0f);
         player.Stats.SetBase("evasion", 0.0f);
         HitPipeline.ResolveHit(new HitPayload { RawDamage = 20.0f }, player);
-        AssertThat(player.Health).IsEqualApprox(140.0f - 20.0f * (1.0f - 10.0f / 60.0f), 0.01f);
+        float expectedDr = 10.0f / (10.0f + 5.0f * 20.0f);
+        AssertThat(player.Health).IsEqualApprox(140.0f - 20.0f * (1.0f - expectedDr), 0.01f);
         AssertThat(hud.HpBar.Value).IsEqualApprox(player.Health, 0.01f);
         AssertThat(hud.HpBar.MaxValue).IsEqual(140.0f);
         GD.Print("[PASS] 3. Top-left HUD health bar tracks damage; dodge ring kept, follower arc removed.");

@@ -1,5 +1,5 @@
 {
-  "might": "STAT_MIGHT",
+  "damage": "STAT_DAMAGE",
   "area": "STAT_AREA",
   "cooldown_reduction": "STAT_COOLDOWN_REDUCTION",
   "projectile_speed": "STAT_PROJECTILE_SPEED",

@@ -19,7 +19,7 @@ export const Classes: readonly ClassDef[] = [
     trait_stat_value: 0.08,
     extra_stats: {
       area: 1.25,
-      might: 1.0
+      damage: 1.0
     },
     body_microns: 20.0,
     deform_mag: 23.3,
@@ -87,7 +87,7 @@ export const Classes: readonly ClassDef[] = [
     base_hp: 100.0,
     base_speed: 230.0,
     base_armor: 5.0,
-    trait_stat: StatId.Might,
+    trait_stat: StatId.Damage,
     trait_stat_value: 1.2,
     extra_stats: {
       health_regen: 0.5

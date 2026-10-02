@@ -88,7 +88,7 @@ public partial class ContactSpikes : EquipmentPiece
 
     private void Intercept(EnemyActor enemy, Vector2 outward)
     {
-        float damage = ContactDamage * GetStat("might");
+        float damage = ContactDamage * GetStat("damage");
         ulong attackerId = Host != null && GodotObject.IsInstanceValid(Host) ? Host.GetInstanceId() : 0;
         HitPipeline.ResolveHit(new HitPayload { RawDamage = damage, AttackerId = attackerId }, enemy);
 

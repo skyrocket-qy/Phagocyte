@@ -40,7 +40,7 @@ export const PassiveSkills: readonly PassiveSkillDef[] = [
     archetype: "passive",
     mods: [
       {
-        stat: StatId.Might,
+        stat: StatId.Damage,
         per_level: 0.1,
         mode: PassiveModMode.Mult
       },
@@ -184,7 +184,7 @@ export const PassiveSkills: readonly PassiveSkillDef[] = [
         mode: PassiveModMode.Mult
       },
       {
-        stat: StatId.Might,
+        stat: StatId.Damage,
         per_level: 0.05,
         mode: PassiveModMode.Mult
       }

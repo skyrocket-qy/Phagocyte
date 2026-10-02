@@ -15,7 +15,7 @@ flowchart TD
     subgraph StartingHubs [五大細胞獨立起點中心 (5 Distinct Starting Hubs)]
         HUB_MAC["【巨噬起點中心】<br>(Macrophage Hub · 左上方)<br>體積 Area / 生命 HP / 護甲 Armor / 格擋 Block"]
         HUB_CTL["【殺手 T 起點中心】<br>(CTL Hub · 右上方)<br>移速 Speed / 暴擊 Crit / 穿透 Pierce / 閃避 Evasion"]
-        HUB_NEU["【嗜中性球起點中心】<br>(Neutrophil Hub · 左下方)<br>傷害 Might / 擊退 Knock / 自癒 Regen"]
+        HUB_NEU["【嗜中性球起點中心】<br>(Neutrophil Hub · 左下方)<br>傷害 Damage / 擊退 Knock / 自癒 Regen"]
         HUB_B["【B 細胞起點中心】<br>(B-Cell Hub · 右下方)<br>彈道數 Amount / 彈速 ProjSpd / CDR / 汲取 LifeSteal"]
         HUB_DC["【樹突狀起點中心】<br>(Dendritic Hub · 左中段)<br>拾取 Magnet / 持續 Duration / 冷卻 CDR"]
     end
@@ -88,7 +88,7 @@ flowchart TD
 > - 🚫 **嚴禁屬性聯動轉化**（例如：「每 100 點生命增加 5% 傷害」、「將護甲折算為暴擊率」等一律不採用）。
 > - ✅ **嚴格採用標準雙軌基礎加成**：
 >   - **純固定值 (Flat)**：如 `max_health +15`、`armor +2`、`amount +1`、`pierce +1`。
->   - **純百分比 (Simple Percent)**：如 `might +5%`、`move_speed +5%`、`area +6%`、`cooldown_reduction +4%`、`evasion +3%`、`block +4%`、`life_steal +1%`。
+>   - **純百分比 (Simple Percent)**：如 `damage +5%`、`move_speed +5%`、`area +6%`、`cooldown_reduction +4%`、`evasion +3%`、`block +4%`、`life_steal +1%`。
 > - 最終通用公式純粹透明：$\text{FinalStat} = (\text{Base} + \text{FlatBonus}) \times (1.0 + \text{PercentBonus})$。
 
 ### 節點稀有度分級表
@@ -100,7 +100,7 @@ flowchart TD
 
 | 稀有度等級 | 外觀圖元 | 數值加成結構 (純粹直觀加成) | 生物代謝代價 (Trade-off) | 當前版本狀態 |
 | :--- | :--- | :--- | :--- | :--- |
-| **普通 (Normal)** | 白色正圓形小囊泡 | 提供單一基礎通用屬性（如 `might +4%` 或 `health_regen +0.3`）。 | 無代價。 | **正式實裝（33 個）** |
+| **普通 (Normal)** | 白色正圓形小囊泡 | 提供單一基礎通用屬性（如 `damage +4%` 或 `health_regen +0.3`）。 | 無代價。 | **正式實裝（33 個）** |
 | **魔法 (Magic)** | 藍色正圓形囊泡（較大） | 提供單一加強或兩個相輔相成的通用屬性（如 `duration +14%`、`magnet +40%`）。 | 無代價。 | **正式實裝（10 個）** |
 | **稀有 (Rare)** | 金色菱形生化複合體圖騰 | 提供兩項大幅度純屬性加成（如 `armor +3` ＋ `block +4%`、`crit_damage +15%` ＋ `crit_chance +3%`）。 | 無代價。 | **正式實裝（4 個）** |
 | **獨特/傳奇 (Unique)** | 橙色六邊形圖騰 | 頂級多重屬性圖騰（如 `max_health +15%` ＋ `armor +2`、`area +30%` 等多達五項）。 | 顯著固定代價（如 `max_health -25%`）。 | **正式實裝（2 個）** |
@@ -125,7 +125,7 @@ flowchart TD
 ### 4.3 嗜中性球起點中心 (Neutrophil Starting Hub)
 - **色調**：烈焰橙與酸性亮黃螢光。
 - **位置**：星盤左下方。
-- **專精純屬性**：`might`（傷害強度）、`health_regen`（生命自癒）、`armor`（膜剛性護甲）。
+- **專精純屬性**：`damage`（傷害強度）、`health_regen`（生命自癒）、`armor`（膜剛性護甲）。
 
 ### 4.4 B 淋巴細胞起點中心 (B-Cell Starting Hub)
 - **色調**：深靛藍與電離紫螢光。

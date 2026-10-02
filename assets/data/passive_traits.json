@@ -85,7 +85,7 @@
           "value": 0.06
         },
         {
-          "stat": "might",
+          "stat": "damage",
           "unit": "percent",
           "value": 0.05
         }
@@ -229,7 +229,7 @@
       "id": "small_might",
       "modifiers": [
         {
-          "stat": "might",
+          "stat": "damage",
           "unit": "percent",
           "value": 0.04
         }
@@ -271,7 +271,7 @@
       "id": "adaptive_overdrive",
       "modifiers": [
         {
-          "stat": "might",
+          "stat": "damage",
           "unit": "percent",
           "value": 0.2
         },
@@ -346,7 +346,7 @@
       "id": "blood_price",
       "modifiers": [
         {
-          "stat": "might",
+          "stat": "damage",
           "unit": "percent",
           "value": 0.08
         }
@@ -360,7 +360,7 @@
       "id": "contained_fury",
       "modifiers": [
         {
-          "stat": "might",
+          "stat": "damage",
           "unit": "percent",
           "value": 0.09
         }
@@ -581,7 +581,7 @@
       "id": "overdrawn_strings",
       "modifiers": [
         {
-          "stat": "might",
+          "stat": "damage",
           "unit": "percent",
           "value": 0.07
         }

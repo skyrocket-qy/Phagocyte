@@ -98,7 +98,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
 【通用戰鬥屬性 (Combat - 23項)】 【通用生存屬性 (Defense - 11項)】 【通用輔助與機制 (Utility - 1項)】
-· Might (力量/傷害倍率)          · Max Health (最大生命)        · Magnet (拾取半徑)
+· Damage (傷害倍率)             · Max Health (最大生命)        · Magnet (拾取半徑)
 · Area (範圍/體積)              · Health Regen (生命自癒)
 · Cooldown Reduction (CDR)     · Armor (減傷/護甲)
 · Projectile Speed (彈道速度)   · Move Speed (移動速度)
@@ -120,7 +120,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 #### 1. 通用戰鬥屬性（Combat Stats）—— 所有 5 大主動技能共通消費
 | 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
 | :--- | :--- | :--- | :--- |
-| `might` | **力量 / 傷害倍率** | `1.0` (100%) | 全域傷害百分比乘數。無論是直擊、DoT 腐蝕或地雷爆破，通通乘以此係數。 |
+| `damage` | **傷害倍率** | `1.0` (100%) | 全域傷害基礎百分比池。無論是直擊、DoT 腐蝕或地雷爆破，均參與結算。與屬性/標籤傷害採 PoE 式加法合併為 Increased Pool：`inc = (damage - 1) + (type - 1) + sum(tag - 1)`，總倍率為 `max(0, 1 + inc)`。 |
 | `area` | **範圍 / 體積** | `1.0` (100%) | 全域尺寸乘數。等比放大投射物尺寸、AoE 爆炸半徑、噴霧角度以及**細胞本體接觸判定面**。 |
 | `cooldown_reduction` | **冷卻縮減 (CDR)** | `0.0` (0%) | 百分比縮短所有主動技能的循環冷卻時間（上限設為 `0.75` 即 75%）。 |
 | `projectile_speed` | **彈道速度** | `1.0` (100%) | 所有投射物（抗體、射線、酸液水滴、彈出的偽足抓手）的飛行速度乘數。 |
@@ -131,17 +131,17 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | `crit_damage` | **暴擊倍率** | `2.0` (200%) | 觸發暴擊時的結算傷害倍率。 |
 | `armor_penetration` | **護甲穿透** | `0.0` (0%) | 開火時凍結的護甲穿透比例（硬上限 `1.0`）。 |
 | `ailment_chance` | **異常觸發率** | `1.0` (100%) | 命中時觸發 `on_hit` 異常的機率；暴擊必定觸發。 |
-| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 全域 DoT 傷害乘數，與 `might` 相乘結算。 |
-| `physical_damage` | **物理傷害** | `1.0` (100%) | 物理系傷害乘數，與 `might` 相乘結算。 |
-| `fire_damage` | **火焰傷害** | `1.0` (100%) | 火焰系傷害乘數，與 `might` 相乘結算。 |
-| `cold_damage` | **冰霜傷害** | `1.0` (100%) | 冰霜系傷害乘數，與 `might` 相乘結算。 |
-| `lightning_damage` | **閃電傷害** | `1.0` (100%) | 閃電系傷害乘數，與 `might` 相乘結算。 |
-| `chaos_damage` | **混沌傷害** | `1.0` (100%) | 混沌系傷害乘數，與 `might` 相乘結算。 |
-| `melee_damage` | **近戰傷害** | `1.0` (100%) | 僅 `Melee` 標籤技能生效，與 `might` 相乘結算。 |
-| `spell_damage` | **法術傷害** | `1.0` (100%) | 僅 `Spell` 標籤技能生效，與 `might` 相乘結算。 |
-| `aoe_damage` | **範圍傷害** | `1.0` (100%) | 僅 `AOE` 標籤技能生效，與 `might` 相乘結算。 |
-| `projectile_damage` | **投射物傷害** | `1.0` (100%) | 僅 `Projectile` 標籤技能生效，與 `might` 相乘結算。 |
-| `minion_damage` | **召喚物傷害** | `1.0` (100%) | 僅 `Minion` 標籤技能生效（現無，待召喚技能）。 |
+| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 全域 DoT 傷害乘數，與 `damage` 結算。 |
+| `physical_damage` | **物理傷害** | `1.0` (100%) | 物理系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
+| `fire_damage` | **火焰傷害** | `1.0` (100%) | 火焰系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
+| `cold_damage` | **冰霜傷害** | `1.0` (100%) | 冰霜系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
+| `lightning_damage` | **閃電傷害** | `1.0` (100%) | 閃電系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
+| `chaos_damage` | **混沌傷害** | `1.0` (100%) | 混沌系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
+| `melee_damage` | **近戰傷害** | `1.0` (100%) | 僅 `Melee` 標籤技能生效，與 `damage` 在通用加成池中加法累計 (`increased`)。 |
+| `spell_damage` | **法術傷害** | `1.0` (100%) | 僅 `Spell` 標籤技能生效，與 `damage` 在通用加成池中加法累計 (`increased`)。 |
+| `aoe_damage` | **範圍傷害** | `1.0` (100%) | 僅 `AOE` 標籤技能生效，與 `damage` 在通用加成池中加法累計 (`increased`)。 |
+| `projectile_damage` | **投射物傷害** | `1.0` (100%) | 僅 `Projectile` 標籤技能生效，與 `damage` 在通用加成池中加法累計 (`increased`)。 |
+| `minion_damage` | **召喚物傷害** | `1.0` (100%) | 僅 `Minion` 標籤技能生效（現無，待召喚技能），與 `damage` 在通用加成池中加法累計 (`increased`)。 |
 | `ailment_effect` | **異常效果** | `1.0` (100%) | 異常狀態強度乘數（DoT 傷害除外）。 |
 
 #### 2. 通用生存與防禦屬性（Defense & Survival）
@@ -177,7 +177,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 ├────────────────────────────────────────────────────────┤
 │ 被動特質槽位 (Passive Organelles x5) - 提供純通用 Stat 加成│
 │ [1: 溶酶體酵素] [2: 肌動蛋白] [3: 調理素]   [4: 線粒體]   [5: 趨化受體] │
-│   (Might+Regen)  (Area+Speed)  (Crit+Dmg)     (CDR+Dur)   (Magnet+Speed)│
+│   (Damage+Regen) (Area+Speed)  (Crit+Dmg)     (CDR+Dur)   (Magnet+Speed)│
 ├────────────────────────────────────────────────────────┤
 │ 胞器腔室 (Organelle Chamber 2x2) - 高費極端件＋發電拼圖    │
 │ [槽1] [槽2]                                            │
@@ -192,11 +192,11 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 
 | 主動技能名稱 | 醫學機制 | 消耗的通用 Stat | 戰鬥表現與機制 |
 | :--- | :--- | :--- | :--- |
-| **1. 穿孔素長矛<br>(Perforin Lance)** | 膜上穿孔素成孔 | `might`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近精英射出高初速螺旋光束。`amount` 增加連發數，`pierce` 增加貫穿人數。 |
-| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解反應 | `might`, `area`, `cooldown_reduction`, `duration` | 在隨機周遭地面生成生化光環，`area` 擴大地雷半徑，延遲 2 秒引發強烈擊退爆破。 |
-| **3. Y 型抗體齊射<br>(Antibody Salvo)** | 游離特異性抗體分泌 | `might`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發尋航 Y 型飛彈，`amount` 直接增加飛彈發射數量。 |
-| **4. 活性氧射流<br>(ROS Spray)** | NADPH 氧化酶釋放 $\text{H}_2\text{O}_2$ | `might`, `area`, `duration`, `cooldown_reduction` | 朝游動方向噴射高壓錐形酸霧，`area` 擴大噴射錐形面積，造成 DoT 溶解破甲。 |
-| **5. 偽足猛擊<br>(Pseudopod Lunge)** | 微絲聚合瞬間彈射 | `might`, `area`, `amount`, `cooldown_reduction` | 向外猛烈彈射阿米巴抓手，`area` 增加抓手伸長距離，`amount` 增加多向抓手數量。 |
+| **1. 穿孔素長矛<br>(Perforin Lance)** | 膜上穿孔素成孔 | `damage`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近精英射出高初速螺旋光束。`amount` 增加連發數，`pierce` 增加貫穿人數。 |
+| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解反應 | `damage`, `area`, `cooldown_reduction`, `duration` | 在隨機周遭地面生成生化光環，`area` 擴大地雷半徑，延遲 2 秒引發強烈擊退爆破。 |
+| **3. Y 型抗體齊射<br>(Antibody Salvo)** | 游離特異性抗體分泌 | `damage`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發尋航 Y 型飛彈，`amount` 直接增加飛彈發射數量。 |
+| **4. 活性氧射流<br>(ROS Spray)** | NADPH 氧化酶釋放 $\text{H}_2\text{O}_2$ | `damage`, `area`, `duration`, `cooldown_reduction` | 朝游動方向噴射高壓錐形酸霧，`area` 擴大噴射錐形面積，造成 DoT 溶解破甲。 |
+| **5. 偽足猛擊<br>(Pseudopod Lunge)** | 微絲聚合瞬間彈射 | `damage`, `area`, `amount`, `cooldown_reduction` | 向外猛烈彈射阿米巴抓手，`area` 增加抓手伸長距離，`amount` 增加多向抓手數量。 |
 
 ---
 
@@ -205,7 +205,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 
 | 被動特質名稱 | 生物學包裝 | 提供的純通用 Stat 加成（每級遞增） |
 | :--- | :--- | :--- |
-| **1. 溶酶體酵素 (Lysosome Priming)** | 胞內水解酶活化 | `might +10%` / `health_regen +0.6 HP/s`（全傷害強化與自噬修復） |
+| **1. 溶酶體酵素 (Lysosome Priming)** | 胞內水解酶活化 | `damage +10%` / `health_regen +0.6 HP/s`（全傷害強化與自噬修復） |
 | **2. 肌動蛋白微絲 (Actin Polymerization)** | 骨架微絲定向聚合 | `area +12%` / `move_speed +6%`（全技能範圍放大與走位加速） |
 | **3. 調理素親和 (Opsonin Affinity)** | 特異性識別受體增生 | `crit_chance +5%` / `crit_damage +25%`（全傷害暴擊率與暴擊倍率飆升） |
 | **4. 線粒體超頻 (Mitochondrial Overclock)**| 三羧酸循環產能倍增 | `cooldown_reduction +8%` / `duration +10%`（全技能開火加速與留場延長） |
@@ -256,7 +256,7 @@ graph LR
 - **五大獨立起點中心**：
   - 巨噬起點中心（左上）：側重 `area`（體積/範圍）、`max_health`（血上限）、`armor`（膜剛性減傷）、`block`（糖萼格擋率）。
   - 殺手 T 起點中心（右側）：側重 `move_speed`（移速）、`crit_chance`（暴擊率）、`pierce`（穿透）、`evasion`（流體閃避率）。
-  - 嗜中性球起點中心（左側）：側重 `might`（傷害強度）、`health_regen`（生命自癒）。
+  - 嗜中性球起點中心（左側）：側重 `damage`（傷害強度）、`health_regen`（生命自癒）。
   - B 細胞起點中心（右下）：側重 `amount`（彈道數）、`projectile_speed`（彈速）、`cooldown_reduction`（CDR）、`life_steal`（受體汲取/吸血）。
   - 樹突狀起點中心（正上）：側重 `magnet`（拾取半徑）、`duration`（狀態與光環持續時間）、`cooldown_reduction`（冷卻縮減）、`area`（感知與效果範圍）。
 - **細胞專屬曼哈頓環層**：以出戰細胞之起點中心為原點，$L_{\text{cell}} = |col - col_{\text{start}}| + |row - row_{\text{start}}|$。
@@ -273,9 +273,9 @@ graph LR
   - 所有節點僅提供透明直觀的純固定值（Flat）或純百分比（Percent）：
     $$\text{FinalStat} = (\text{Base} + \text{FlatBonus}) \times (1.0 + \text{PercentBonus})$$
 - **稀有度分級狀態**：
-  - **普通 (Normal)**：單項小額基礎屬性（如 `might +5%`、`max_health +10`）。
+  - **普通 (Normal)**：單項小額基礎屬性（如 `damage +5%`、`max_health +10`）。
   - **魔法 (Magic)**：較高額屬性或雙項互補屬性（如 `area +8%` ＋ `armor +2`）。
-  - **稀有 (Rare)**：高額純屬性加成（如 `might +15%`、`move_speed +10%`）。
+  - **稀有 (Rare)**：高額純屬性加成（如 `damage +15%`、`move_speed +10%`）。
   - **獨特/傳奇 (Unique / Keystones)**：**[TODO in the future / 未來擴展]** 當前版本暫不實裝機制顛覆型 Keystone，優先保障早期版本數值穩定與調試簡潔性。
 
 ### 渲染語言（Confocal Fluorescence）
@@ -355,7 +355,7 @@ func add_modifier(flat: float, pct: float) -> void:
 class_name CellStats
 extends Node
 
-var might: Stat = Stat.new(1.0)
+var damage: Stat = Stat.new(1.0)
 var area: Stat = Stat.new(1.0)
 var cooldown_reduction: Stat = Stat.new(0.0)
 var projectile_speed: Stat = Stat.new(1.0)
@@ -383,7 +383,7 @@ var magnet: Stat = Stat.new(150.0)
 ```gdscript
 # 所有 ActiveSkill 在計算彈道或傷害時的統一寫法
 func get_calculated_damage() -> float:
-	var base = base_damage * stats.might.get_value()
+	var base = base_damage * stats.damage.get_value()
 	if randf() < stats.crit_chance.get_value():
 		return base * stats.crit_damage.get_value()
 	return base

@@ -36,7 +36,7 @@
     "archetype": "passive",
     "mods": [
       {
-        "stat": "might",
+        "stat": "damage",
         "per_level": 0.1,
         "mode": "mult"
       },
@@ -180,7 +180,7 @@
         "mode": "mult"
       },
       {
-        "stat": "might",
+        "stat": "damage",
         "per_level": 0.05,
         "mode": "mult"
       }

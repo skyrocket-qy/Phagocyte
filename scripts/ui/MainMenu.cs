@@ -648,7 +648,7 @@ public partial class MainMenu : Control
             {
                 "block" => Mathf.Clamp(sigNum / 0.10f, 0.25f, 1.0f),
                 "crit_chance" => Mathf.Clamp(sigNum / 0.15f, 0.25f, 1.0f),
-                "might" => Mathf.Clamp((sigNum - 1.0f) / 0.5f, 0.25f, 1.0f),
+                "damage" => Mathf.Clamp((sigNum - 1.0f) / 0.5f, 0.25f, 1.0f),
                 "projectile_speed" => Mathf.Clamp((sigNum - 1.0f) / 0.5f, 0.25f, 1.0f),
                 "magnet" => Mathf.Clamp((sigNum - 1.0f) / 0.5f, 0.25f, 1.0f),
                 _ => 0.45f

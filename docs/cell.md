@@ -59,9 +59,9 @@ $$R(\theta, t) = R_{\text{base}} \times \left(1.0 + \text{Amplitude} \times \tex
 依據各細胞的生物機能，在通用屬性矩陣中設定差異化起始基準：
 
 ```
-[巨噬細胞]   HP: 140 | Armor: 10 | Speed: 210 | Area: 1.25 | Might: 1.0  | Block:   8%
+[巨噬細胞]   HP: 140 | Armor: 10 | Speed: 210 | Area: 1.25 | Damage: 1.0 | Block:   8%
 [殺手 T]     HP:  90 | Armor:  0 | Speed: 260 | Crit: 15%  | Evasion: 10%| Pierce: +1
-[嗜中性球]   HP: 100 | Armor:  5 | Speed: 230 | Might: 1.2  | Knock: 1.4  | Regen: 0.5
+[嗜中性球]   HP: 100 | Armor:  5 | Speed: 230 | Damage: 1.2 | Knock: 1.4  | Regen: 0.5
 [B 細胞]     HP:  95 | Armor:  0 | Speed: 220 | ProjSpd: 1.3| CDR:  10%   | Amount: +1
 [樹突細胞]   HP: 110 | Armor:  2 | Speed: 225 | Magnet: 260 | Duration: 1.2| CDR: 10%
 ```

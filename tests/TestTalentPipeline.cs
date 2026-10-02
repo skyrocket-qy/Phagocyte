@@ -194,7 +194,7 @@ public partial class TestTalentPipeline : TestHarness
         // The innate hub is instantiated for free but carries no stat effects.
         AssertThat(player!.GetNodeOrNull<Node>("TreeLoadout_lysosome")).IsNotNull();
         AssertThat(player.Stats).IsNotNull();
-        AssertThat(player.Stats!.GetStat("might")).IsEqualApprox(1.0f, 0.001f);
+        AssertThat(player.Stats!.GetStat("damage")).IsEqualApprox(1.0f, 0.001f);
         AssertThat(PassiveTreeManager.GetSpentPoints("macrophage")).IsEqual(0);
 
         GD.Print("[PASS] The innate start hub is present in the run at zero point cost with no stat effects.");

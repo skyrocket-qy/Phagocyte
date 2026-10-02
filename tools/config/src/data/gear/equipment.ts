@@ -60,7 +60,7 @@ export const Equipment: readonly EquipmentDef[] = [
     max_copies: 1,
     modifiers: [
       {
-        stat: StatId.Might,
+        stat: StatId.Damage,
         unit: ModType.Percent,
         value: 0.12
       },
@@ -244,7 +244,7 @@ export const Equipment: readonly EquipmentDef[] = [
         value: -0.3
       },
       {
-        stat: StatId.Might,
+        stat: StatId.Damage,
         unit: ModType.Percent,
         value: -0.15
       }
@@ -319,7 +319,7 @@ export const Equipment: readonly EquipmentDef[] = [
         value: 0.1
       },
       {
-        stat: StatId.Might,
+        stat: StatId.Damage,
         unit: ModType.Percent,
         value: 0.1
       }
@@ -360,7 +360,7 @@ export const Equipment: readonly EquipmentDef[] = [
     max_copies: 1,
     modifiers: [
       {
-        stat: StatId.Might,
+        stat: StatId.Damage,
         unit: ModType.Percent,
         value: 0.12
       },
@@ -527,7 +527,7 @@ export const Equipment: readonly EquipmentDef[] = [
     max_copies: 1,
     modifiers: [
       {
-        stat: StatId.Might,
+        stat: StatId.Damage,
         unit: ModType.Percent,
         value: 0.1
       }

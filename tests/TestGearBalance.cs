@@ -92,7 +92,7 @@ public partial class TestGearBalance : TestHarness
 
         // Cripple-flow: -30% move speed, -15% might.
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("move_speed"), 230.0f * 0.7f)).IsTrue();
-        AssertThat(Mathf.IsEqualApprox(stats.GetStat("might"), 1.0f - 0.15f)).IsTrue();
+        AssertThat(Mathf.IsEqualApprox(stats.GetStat("damage"), 1.0f - 0.15f)).IsTrue();
         // Blood-for-power: -20% max HP for +0.05 CDR.
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("max_health"), 100.0f * 0.8f)).IsTrue();
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("cooldown_reduction"), 0.05f)).IsTrue();
@@ -179,7 +179,7 @@ public partial class TestGearBalance : TestHarness
                 continue;
             foreach (var mod in entry["modifiers"].AsGodotArray<Dictionary>())
             {
-                if (mod["stat"].AsString() == "might" && mod["unit"].AsString() == "percent")
+                if (mod["stat"].AsString() == "damage" && mod["unit"].AsString() == "percent")
                     maxMight = Mathf.Max(maxMight, mod["value"].AsSingle());
             }
         }

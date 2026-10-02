@@ -125,8 +125,8 @@ public partial class TestEquipmentChamber : TestHarness
 
         // --- Generator drawback applies immediately (acidic lysosome adds Might +12%) ---
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("move_speed"), 230.0f * 0.7f)).IsTrue();
-        AssertThat(Mathf.IsEqualApprox(stats.GetStat("might"), 1.0f + 0.12f - 0.15f)).IsTrue();
-        GD.Print("[PASS] Generator drawback active: Move Speed -30%, Might -15% (stacked with lysosome +12%).");
+        AssertThat(Mathf.IsEqualApprox(stats.GetStat("damage"), 1.0f + 0.12f - 0.15f)).IsTrue();
+        GD.Print("[PASS] Generator drawback active: Move Speed -30%, Damage -15% (stacked with lysosome +12%).");
 
         // --- Replace semantics: 4-cost out, 1-cost in; stats roll back exactly ---
         AssertThat(chamber.Equip("glycolytic_bypass", 0)).IsTrue();
@@ -142,7 +142,7 @@ public partial class TestEquipmentChamber : TestHarness
         AssertThat(chamber.MaxEnergy).IsEqual(6);
         AssertThat(BagHas(chamber, "symbiotic_flora")).IsTrue();
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("move_speed"), 230.0f * 1.03f)).IsTrue();
-        AssertThat(Mathf.IsEqualApprox(stats.GetStat("might"), 1.0f + 0.12f)).IsTrue();
+        AssertThat(Mathf.IsEqualApprox(stats.GetStat("damage"), 1.0f + 0.12f)).IsTrue();
         GD.Print("[PASS] Unequip rolls the -30% back (glycolytic +3% and lysosome Might remain).");
 
         // --- Backpack never counts toward energy ---
@@ -212,7 +212,7 @@ public partial class TestEquipmentChamber : TestHarness
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("max_health"), 100.0f)).IsTrue();
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("cooldown_reduction"), 0.0f)).IsTrue();
         AssertThat(Mathf.IsEqualApprox(stats.GetStat("move_speed"), 230.0f)).IsTrue();
-        AssertThat(Mathf.IsEqualApprox(stats.GetStat("might"), 1.0f)).IsTrue();
+        AssertThat(Mathf.IsEqualApprox(stats.GetStat("damage"), 1.0f)).IsTrue();
         mock.Free();
         GD.Print("[PASS] _ExitTree cleanup removes all equipped modifiers (no stat drift).");
     }

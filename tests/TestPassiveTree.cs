@@ -100,7 +100,7 @@ public partial class TestPassiveTree : TestHarness
         var rarities = new List<PassiveTreeManager.TreeRarity>();
         string[] validStats =
         {
-            "might", "area", "cooldown_reduction", "projectile_speed", "duration", "amount",
+            "damage", "area", "cooldown_reduction", "projectile_speed", "duration", "amount",
             "pierce", "crit_chance", "crit_damage", "max_health", "health_regen",
             "armor", "move_speed", "evasion", "block", "life_steal", "magnet"
         };
@@ -460,7 +460,7 @@ public partial class TestPassiveTree : TestHarness
         AssertThat(bundle is TreeStatBundleSkill).IsTrue();
         bundleHost.AddChild(bundle!);
         bundle!.Setup(bundleHost);
-        AssertThat(bundleStats.GetStat("might")).IsEqualApprox(1.08f, 0.001f);
+        AssertThat(bundleStats.GetStat("damage")).IsEqualApprox(1.08f, 0.001f);
         AssertThat(bundleStats.GetStat("max_health")).IsEqualApprox(100.0f, 0.01f);
         bundleHost.QueueFree();
         GD.Print("[PASS] A normal node bundle applies its single stat modifier.");
@@ -633,7 +633,7 @@ public partial class TestPassiveTree : TestHarness
 
         string tooltip = PassiveTreeManager.GetNodeTooltipText("macrophage", "blood_price");
         AssertThat(tooltip.Contains("Blood Price")).IsTrue();
-        AssertThat(tooltip.Contains("+8% Might")).IsTrue();
+        AssertThat(tooltip.Contains("+8% Damage")).IsTrue();
         AssertThat(tooltip.Contains("Max Health")).IsFalse();
         GD.Print("[PASS] Hover tooltips expose the node's single stat modifier.");
 

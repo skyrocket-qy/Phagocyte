@@ -56,7 +56,7 @@
     "max_copies": 1,
     "modifiers": [
       {
-        "stat": "might",
+        "stat": "damage",
         "unit": "percent",
         "value": 0.12
       },
@@ -240,7 +240,7 @@
         "value": -0.3
       },
       {
-        "stat": "might",
+        "stat": "damage",
         "unit": "percent",
         "value": -0.15
       }
@@ -315,7 +315,7 @@
         "value": 0.1
       },
       {
-        "stat": "might",
+        "stat": "damage",
         "unit": "percent",
         "value": 0.1
       }
@@ -356,7 +356,7 @@
     "max_copies": 1,
     "modifiers": [
       {
-        "stat": "might",
+        "stat": "damage",
         "unit": "percent",
         "value": 0.12
       },
@@ -523,7 +523,7 @@
     "max_copies": 1,
     "modifiers": [
       {
-        "stat": "might",
+        "stat": "damage",
         "unit": "percent",
         "value": 0.1
       }

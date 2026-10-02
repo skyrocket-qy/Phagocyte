@@ -17,7 +17,7 @@ public partial class ActorStats : Node, IStatHost
     private readonly StatBlock _block = new();
 
     // Full-schema convenience surface (prefer GetStat(string) for profiled blocks).
-    public Stat Might => _block.GetStatObj("might")!;
+    public Stat Damage => _block.GetStatObj("damage")!;
     public Stat Area => _block.GetStatObj("area")!;
     public Stat CooldownReduction => _block.GetStatObj("cooldown_reduction")!;
     public Stat ProjectileSpeed => _block.GetStatObj("projectile_speed")!;
@@ -184,7 +184,7 @@ public partial class ActorStats : Node, IStatHost
     }
 
     /// <summary>
-    /// Computes effective DoT damage based on Might and DotDamage multipliers
+    /// Computes effective DoT damage based on Damage and DotDamage multipliers
     /// </summary>
     public float CalculateDotDamage(float baseDps)
     {

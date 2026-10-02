@@ -15,7 +15,7 @@
          ┌───────────────────────┼───────────────────────┐
          ▼                       ▼                       ▼
 【通用戰鬥屬性 (Combat - 23項)】     【通用生存屬性 (Defense - 11項)】   【通用機制屬性 (Utility - 1項)】
-· Might (傷害倍率)                  · Max Health (最大生命)          · Magnet (趨化拾取半徑)
+· Damage (通用傷害)                 · Max Health (最大生命)          · Magnet (趨化拾取半徑)
 · Area (範圍/體積)                  · Health Regen (自癒率)
 · CDR (冷卻縮減)                    · Armor (膜剛性/減傷)
 · Projectile Speed (彈道速度)       · Move Speed (移動速度)
@@ -27,8 +27,8 @@
 · Armor Penetration (護甲穿透)       · Ailment Threshold (異常閾值)
 · Ailment Chance (異常觸發率)
 · Dot Damage (持續傷害倍率)
-· Physical／Fire／Cold／Lightning／Chaos Damage (五系傷害乘數，與 `might` 相乘；技能 `damage_type` 決定吃哪一系)
-· Melee／Spell／AoE／Projectile／Minion Damage (標籤條件乘數，僅帶對應標籤的技能生效；與 `might` 相乘)
+· Physical／Fire／Cold／Lightning／Chaos Damage (五系傷害加成，與 `damage` 同屬 Increased 加法池；技能 `damage_type` 決定吃哪一系)
+· Melee／Spell／AoE／Projectile／Minion Damage (標籤條件加成，僅帶對應標籤的技能生效；與 `damage` 同屬 Increased 加法池)
 · Ailment Effect (異常效果，異常狀態強度乘數；DoT 傷害除外)
 ```
 
@@ -104,7 +104,7 @@ public class Stat
 
 | 屬性標識 (Key) | 顯示名稱 | 基準預設值 | 類別 | 影響範圍與通用運算規則 |
 | :--- | :--- | :--- | :--- | :--- |
-| `might` | **力量 / 傷害倍率** | `1.0` (100%) | 戰鬥 | 全域傷害乘數。影響所有直擊、DoT 酸蝕、地雷引信爆破傷害。 |
+| `damage` | **通用傷害** | `1.0` (100%) | 戰鬥 | 通用基礎傷害加成。與五系傷害及標籤傷害共同構成 Increased 加法池。 |
 | `area` | **範圍 / 體積** | `1.0` (100%) | 戰鬥/形態 | 幾何尺寸乘數。等比縮放投射物尺寸、爆炸半徑、噴霧角度以及**玩家細胞本體碰撞受擊面**。 |
 | `cooldown_reduction` | **冷卻縮減 (CDR)** | `0.0` (0%) | 戰鬥 | 縮短所有主動技能循環週期。計算公式：$T_{\text{actual}} = T_{\text{base}} \times (1.0 - \text{CDR})$，硬上限 `0.75` (75%)。 |
 | `projectile_speed` | **彈道速度** | `1.0` (100%) | 戰鬥 | 所有飛行實體（抗體、穿孔射線、飛濺酸液、彈射抓手）的飛行速度乘數。 |
@@ -116,17 +116,17 @@ public class Stat
 | `armor_penetration` | **護甲穿透** | `0.0` (0%) | 戰鬥 | 開火時凍結的護甲穿透比例：$\text{Armor}_{\text{eff}} = \text{Armor} \times (1.0 - \text{Pen})$，硬上限 `1.0` (100%)。 |
 | `ailment_chance` | **異常觸發率** | `1.0` (100%) | 戰鬥 | 命中時觸發 `on_hit` 異常的機率（開火時凍結）；暴擊必定觸發。硬上限 `1.0` (100%)。 |
 | `ailment_threshold` | **異常閾值** | `1.0` (100%) | 生存 | 自身異常閾值乘數：$\text{Threshold} = \text{MaxHP} \times 0.05 \times \text{Mult}$，僅下限 `0.0`，無上限。 |
-| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 戰鬥 | 全域 DoT 傷害乘數，與 `might` 相乘結算。 |
-| `physical_damage` | **物理傷害** | `1.0` (100%) | 戰鬥 | 物理系傷害乘數，與 `might` 相乘結算（`damage_type: physical` 技能）。 |
-| `fire_damage` | **火焰傷害** | `1.0` (100%) | 戰鬥 | 火焰系傷害乘數，與 `might` 相乘結算。 |
-| `cold_damage` | **冰霜傷害** | `1.0` (100%) | 戰鬥 | 冰霜系傷害乘數，與 `might` 相乘結算。 |
-| `lightning_damage` | **閃電傷害** | `1.0` (100%) | 戰鬥 | 閃電系傷害乘數，與 `might` 相乘結算。 |
-| `chaos_damage` | **混沌傷害** | `1.0` (100%) | 戰鬥 | 混沌系傷害乘數，與 `might` 相乘結算。 |
-| `melee_damage` | **近戰傷害** | `1.0` (100%) | 戰鬥 | 標籤條件乘數：僅 `Melee` 標籤技能生效，與 `might` 相乘結算。 |
-| `spell_damage` | **法術傷害** | `1.0` (100%) | 戰鬥 | 標籤條件乘數：僅 `Spell` 標籤技能生效，與 `might` 相乘結算。 |
-| `aoe_damage` | **範圍傷害** | `1.0` (100%) | 戰鬥 | 標籤條件乘數：僅 `AOE` 標籤技能生效，與 `might` 相乘結算。 |
-| `projectile_damage` | **投射物傷害** | `1.0` (100%) | 戰鬥 | 標籤條件乘數：僅 `Projectile` 標籤技能生效，與 `might` 相乘結算。 |
-| `minion_damage` | **召喚物傷害** | `1.0` (100%) | 戰鬥 | 標籤條件乘數：僅 `Minion` 標籤技能生效（現無技能攜帶，待召喚技能）。 |
+| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 戰鬥 | 全域 DoT 傷害乘數，與 `damage` 相乘結算。 |
+| `physical_damage` | **物理傷害** | `1.0` (100%) | 戰鬥 | 物理系傷害加成，與 `damage` 加算進 Increased 池（`damage_type: physical` 技能）。 |
+| `fire_damage` | **火焰傷害** | `1.0` (100%) | 戰鬥 | 火焰系傷害加成，與 `damage` 加算進 Increased 池。 |
+| `cold_damage` | **冰霜傷害** | `1.0` (100%) | 戰鬥 | 冰霜系傷害加成，與 `damage` 加算進 Increased 池。 |
+| `lightning_damage` | **閃電傷害** | `1.0` (100%) | 戰鬥 | 閃電系傷害加成，與 `damage` 加算進 Increased 池。 |
+| `chaos_damage` | **混沌傷害** | `1.0` (100%) | 戰鬥 | 混沌系傷害加成，與 `damage` 加算進 Increased 池。 |
+| `melee_damage` | **近戰傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `Melee` 標籤技能生效，加算進 Increased 池。 |
+| `spell_damage` | **法術傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `Spell` 標籤技能生效，加算進 Increased 池。 |
+| `aoe_damage` | **範圍傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `AOE` 標籤技能生效，加算進 Increased 池。 |
+| `projectile_damage` | **投射物傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `Projectile` 標籤技能生效，加算進 Increased 池。 |
+| `minion_damage` | **召喚物傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `Minion` 標籤技能生效，加算進 Increased 池。 |
 | `ailment_effect` | **異常效果** | `1.0` (100%) | 戰鬥 | 異常狀態強度乘數（DoT 傷害除外，由 `dot_damage` 負責）。 |
 | `max_health` | **最大生命值** | `100.0` | 生存 | 細胞膜破裂前可承受的最大耐久上限。 |
 | `health_regen` | **生命自癒率** | `0.0` (HP/s) | 生存 | 每秒自動修復的細胞膜生命值。 |

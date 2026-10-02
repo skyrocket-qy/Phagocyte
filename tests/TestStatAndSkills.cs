@@ -35,7 +35,7 @@ public partial class TestStatAndSkills : TestHarness
 
         // --- Test 2: ActorStats 20 universal stats & caps ---
         var cs = new ActorStats();
-        AssertThat(cs.GetStat("might")).IsEqual(1.0f);
+        AssertThat(cs.GetStat("damage")).IsEqual(1.0f);
         AssertThat(cs.GetStat("area")).IsEqual(1.0f);
         AssertThat(cs.GetStat("cooldown_reduction")).IsEqual(0.0f);
         AssertThat(cs.GetStat("move_speed")).IsEqual(230.0f);
@@ -122,10 +122,10 @@ public partial class TestStatAndSkills : TestHarness
         AssertThat(mockStats.GetStat("area")).IsEqualApprox(1.24f, 0.001f);
         AssertThat(mockStats.GetStat("move_speed")).IsEqualApprox(230.0f * 1.12f, 0.01f);
 
-        // Equip Lysosome: might +10%, health_regen +0.6
+        // Equip Lysosome: damage +10%, health_regen +0.6
         var lyso = SkillFactory.CreatePassive("lysosome")!;
         mockSm.EquipPassive(lyso, 1);
-        AssertThat(mockStats.GetStat("might")).IsEqualApprox(1.10f, 0.001f);
+        AssertThat(mockStats.GetStat("damage")).IsEqualApprox(1.10f, 0.001f);
         AssertThat(mockStats.GetStat("health_regen")).IsEqualApprox(0.60f, 0.001f);
 
         GD.Print("[PASS] Test 4: Passive traits universal stat injection, leveling and stacking verified.");
@@ -149,9 +149,15 @@ public partial class TestStatAndSkills : TestHarness
         // Area with current 1.24 area
         AssertThat(activeWeapon.GetCalculatedArea(1.0f)).IsEqualApprox(1.24f, 0.001f);
 
-        // Damage with might 1.10
+        // Damage with damage 1.10
         var dmgCalc = activeWeapon.GetCalculatedDamage(20.0f);
         AssertThat(Mathf.IsEqualApprox(dmgCalc, 22.0f)).IsTrue();
+
+        // Increased pool test: +20% fire_damage on ros_torrent (fire type) adds to damage (+10%), total +30% -> 26.0f
+        mockStats.AddModifier("fire_damage", 0.0f, 0.20f);
+        var dmgWithFire = activeWeapon.GetCalculatedDamage(20.0f);
+        AssertThat(Mathf.IsEqualApprox(dmgWithFire, 26.0f)).IsTrue();
+        mockStats.RemoveModifier("fire_damage", 0.0f, 0.20f);
 
         GD.Print("[PASS] Test 5: Active weapon stat consumption (CDR, Area, Amount, Damage) verified.");
 

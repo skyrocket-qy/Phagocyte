@@ -65,11 +65,11 @@ public partial class TestStatScaling : TestHarness
     private void RunBaselineTests()
     {
         var stats = NewStats();
-        AssertThat(stats.GetStat("might")).IsEqual(1.0f);
-        stats.AddModifier("might", 0.5f, 0.25f);
-        AssertThat(stats.GetStat("might")).IsEqual(1.875f);
-        stats.RemoveModifier("might", 0.5f, 0.25f);
-        AssertThat(stats.GetStat("might")).IsEqual(1.0f);
+        AssertThat(stats.GetStat("damage")).IsEqual(1.0f);
+        stats.AddModifier("damage", 0.5f, 0.25f);
+        AssertThat(stats.GetStat("damage")).IsEqual(1.875f);
+        stats.RemoveModifier("damage", 0.5f, 0.25f);
+        AssertThat(stats.GetStat("damage")).IsEqual(1.0f);
         GD.Print("[PASS] Unscaled add/remove round-trips exactly.");
         stats.Free();
     }
@@ -82,11 +82,11 @@ public partial class TestStatScaling : TestHarness
         stats.AddScaledModifier("armor", 1.0f, 0.0f, "max_health", 50.0f);
         AssertThat(stats.GetStat("armor")).IsEqual(2.0f);
         // Pct channel: drop the armor record first for isolation, set armor
-        // base 20, might = 1 * (1 + 0.25 * (20 / 10)) = 1.5.
+        // base 20, damage = 1 * (1 + 0.25 * (20 / 10)) = 1.5.
         stats.RemoveScaledModifier("armor", 1.0f, 0.0f, "max_health", 50.0f);
         stats.SetBase("armor", 20.0f);
-        stats.AddScaledModifier("might", 0.0f, 0.25f, "armor", 10.0f);
-        AssertThat(stats.GetStat("might")).IsEqual(1.5f);
+        stats.AddScaledModifier("damage", 0.0f, 0.25f, "armor", 10.0f);
+        AssertThat(stats.GetStat("damage")).IsEqual(1.5f);
         GD.Print("[PASS] Scaled flat + pct channels resolve against the source stat.");
         stats.Free();
     }
@@ -267,10 +267,10 @@ public partial class TestStatScaling : TestHarness
         AssertThat(enemy.HasStat("max_health")).IsTrue();
         AssertThat(enemy.HasStat("armor")).IsTrue();
         AssertThat(enemy.HasStat("move_speed")).IsTrue();
-        AssertThat(enemy.HasStat("might")).IsFalse();
-        AssertThat(enemy.GetStat("might")).IsEqual(0.0f);
-        enemy.AddModifier("might", 1.0f, 0.0f);
-        AssertThat(enemy.GetStat("might")).IsEqual(0.0f);
+        AssertThat(enemy.HasStat("damage")).IsFalse();
+        AssertThat(enemy.GetStat("damage")).IsEqual(0.0f);
+        enemy.AddModifier("damage", 1.0f, 0.0f);
+        AssertThat(enemy.GetStat("damage")).IsEqual(0.0f);
         AssertThat(enemy.GetStat("max_health")).IsEqual(100.0f);
 
         var minion = new StatBlock(StatProfiles.Minion);
@@ -289,8 +289,8 @@ public partial class TestStatScaling : TestHarness
         var node = NewStats();
         try
         {
-            block.AddModifier("might", 0.5f, 0.25f);
-            node.AddModifier("might", 0.5f, 0.25f);
+            block.AddModifier("damage", 0.5f, 0.25f);
+            node.AddModifier("damage", 0.5f, 0.25f);
             block.AddScaledModifier("armor", 1.0f, 0.0f, "max_health", 50.0f);
             node.AddScaledModifier("armor", 1.0f, 0.0f, "max_health", 50.0f);
             block.AddStatRule("health_regen", "max_health", 0.5f);

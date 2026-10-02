@@ -74,7 +74,7 @@ public partial class TestNewSystemsTriad : SceneTree
         stats.AddModifier("dot_damage", 0.0f, 0.40f); // +40%
         AssertThat(stats.GetStat("dot_damage")).IsEqualApprox(1.40f, 0.001f);
 
-        stats.AddModifier("might", 0.0f, 0.20f); // +20% Might -> 1.20f
+        stats.AddModifier("damage", 0.0f, 0.20f); // +20% Damage -> 1.20f
         float expectedDps = 20.0f * 1.20f * 1.40f; // 33.6f
         AssertThat(stats.CalculateDotDamage(20.0f)).IsEqualApprox(expectedDps, 0.01f);
 

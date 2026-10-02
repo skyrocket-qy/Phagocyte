@@ -130,14 +130,14 @@ public partial class TestI18n : TestHarness
         Root.AddChild(panel);
         GameManager.SetLanguage("zh_CN");
         panel.Refresh("macrophage");
-        var mightNameZh = panel.GetNodeOrNull<Label>("Margin/VBox/StatScroll/GroupsBox/Row_might/Name");
-        AssertThat(mightNameZh).IsNotNull();
-        AssertThat(mightNameZh!.Text.Contains("伤害")).IsTrue();
+        var damageNameZh = panel.GetNodeOrNull<Label>("Margin/VBox/StatScroll/GroupsBox/Row_damage/Name");
+        AssertThat(damageNameZh).IsNotNull();
+        AssertThat(damageNameZh!.Text.Contains("伤害")).IsTrue();
         GameManager.SetLanguage("en");
         panel.UpdateLocalizedTexts();
-        var mightNameEn = panel.GetNodeOrNull<Label>("Margin/VBox/StatScroll/GroupsBox/Row_might/Name");
-        AssertThat(mightNameEn).IsNotNull();
-        AssertThat(mightNameEn!.Text.Contains("Might")).IsTrue();
+        var damageNameEn = panel.GetNodeOrNull<Label>("Margin/VBox/StatScroll/GroupsBox/Row_damage/Name");
+        AssertThat(damageNameEn).IsNotNull();
+        AssertThat(damageNameEn!.Text.Contains("Damage")).IsTrue();
         panel.QueueFree();
         GD.Print("[PASS] Stat preview rows re-translate on language switch.");
 

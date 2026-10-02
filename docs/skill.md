@@ -6,7 +6,7 @@
 
 在《Project: Phagocyte》中，技能系統是玩家戰鬥構築（Build）的核心載體。所有技能嚴格遵守「高內聚、低耦合」的模組化原則：
 
-- **全域通用 Stat 注入**：所有主動技能的冷卻（`cooldown_reduction`）、傷害（`might`）、範圍（`area`）、彈道速度（`projectile_speed`）、發射數量（`amount`）與穿透次數（`pierce`），**100% 動態讀取自全域通用屬性池**，絕不定義私有變數。
+- **全域通用 Stat 注入**：所有主動技能的冷卻（`cooldown_reduction`）、傷害（`damage`）、範圍（`area`）、彈道速度（`projectile_speed`）、發射數量（`amount`）與穿透次數（`pierce`），**100% 動態讀取自全域通用屬性池**，絕不定義私有變數。
 - **全域數值模型專題文檔**：全域 19 項通用屬性定義、標準計算公式與邊界約束，請直接參閱專題文檔 👉 **[`docs/stat.md`](file:///Users/zelin/project/Phagocyte/docs/stat.md)**。
 - **全自動獨立開火迴圈**：每個主動技能掛載於細胞實體下方，具備獨立的冷卻計時器與索敵邏輯，冷卻就緒時自動觸發，讓玩家專注於走位拉扯與微觀物理微操。
 
@@ -23,7 +23,7 @@
 ├────────────────────────────────────────────────────────────────────────┤
 │ 被動特質槽位 (Passive Organelles x5) - 提供純通用 Stat 加成              │
 │ [1: 溶酶體酵素]  [2: 肌動蛋白]  [3: 調理素]    [4: 線粒體]    [5: 趨化受體]    │
-│   (Might+Regen)  (Area+Speed)  (Crit+Dmg)     (CDR+Dur)     (Magnet+Speed)  │
+│   (Damage+Regen) (Area+Speed)  (Crit+Dmg)     (CDR+Dur)     (Magnet+Speed)  │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -35,12 +35,12 @@
 
 | 主動技能名稱 | 醫學原型機制 | 消耗的通用 Stat | 戰鬥表現與機制細節 |
 | :--- | :--- | :--- | :--- |
-| **0. 吞噬偽足<br>(Phagocytic Grasp，巨噬固有)** | 巨噬細胞偽足快速伸出打擊 | `might`, `area`, `amount`, `cooldown_reduction` | 由近到遠伸出 2 根偽足抓取，`amount` 增加抓取隻數；鏈射命中造成接觸傷害。阿米巴變形本身為全細胞共用底盤視覺。 |
-| **1. 穿孔素長矛<br>(Perforin Lance)** | 殺手 T 細胞在靶膜成孔 | `might`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近高危病原體射出高初速螺旋光束。`amount` 增加連發射線束數，`pierce` 增加貫穿人數。 |
-| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解沉積引發爆破 | `might`, `area`, `cooldown_reduction`, `duration` | 在玩家周圍隨機生成生化光環地雷，`area` 擴大地雷半徑，延遲引發強烈衝擊波造成範圍傷害。 |
-| **3. Y 型抗體齊射<br>(Antibody Salvo)** | B 細胞分泌游離抗體中和病原體 | `might`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發巡航尋的 Y 型抗體飛彈，`amount` 直接增加單輪發射彈道數。 |
-| **4. 活性氧射流<br>(ROS Torrent / Spray)** | 吞噬細胞呼吸爆發釋放 $\text{H}_2\text{O}_2$ | `might`, `area`, `duration`, `cooldown_reduction` | 朝游動前方噴射高壓錐形酸霧，`area` 放大錐形覆蓋角度與射程，造成持續溶解破甲 DoT。 |
-| **5. 偽足猛擊<br>(Pseudopod Lunge)** | 肌動蛋白微絲瞬間定向爆發彈射 | `might`, `area`, `amount`, `cooldown_reduction` | 向外猛烈彈出阿米巴肉質抓手，`area` 延長彈射距離，命中時將敵人擊暈並強制向內拖曳。 |
+| **0. 吞噬偽足<br>(Phagocytic Grasp，巨噬固有)** | 巨噬細胞偽足快速伸出打擊 | `damage`, `area`, `amount`, `cooldown_reduction` | 由近到遠伸出 2 根偽足抓取，`amount` 增加抓取隻數；鏈射命中造成接觸傷害。阿米巴變形本身為全細胞共用底盤視覺。 |
+| **1. 穿孔素長矛<br>(Perforin Lance)** | 殺手 T 細胞在靶膜成孔 | `damage`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近高危病原體射出高初速螺旋光束。`amount` 增加連發射線束數，`pierce` 增加貫穿人數。 |
+| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解沉積引發爆破 | `damage`, `area`, `cooldown_reduction`, `duration` | 在玩家周圍隨機生成生化光環地雷，`area` 擴大地雷半徑，延遲引發強烈衝擊波造成範圍傷害。 |
+| **3. Y 型抗體齊射<br>(Antibody Salvo)** | B 細胞分泌游離抗體中和病原體 | `damage`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發巡航尋的 Y 型抗體飛彈，`amount` 直接增加單輪發射彈道數。 |
+| **4. 活性氧射流<br>(ROS Torrent / Spray)** | 吞噬細胞呼吸爆發釋放 $\text{H}_2\text{O}_2$ | `damage`, `area`, `duration`, `cooldown_reduction` | 朝游動前方噴射高壓錐形酸霧，`area` 放大錐形覆蓋角度與射程，造成持續溶解破甲 DoT。 |
+| **5. 偽足猛擊<br>(Pseudopod Lunge)** | 肌動蛋白微絲瞬間定向爆發彈射 | `damage`, `area`, `amount`, `cooldown_reduction` | 向外猛烈彈出阿米巴肉質抓手，`area` 延長彈射距離，命中時將敵人擊暈並強制向內拖曳。 |
 
 ---
 
@@ -50,7 +50,7 @@
 
 | 被動特質名稱 | 生物學包裝 | 提供的純通用 Stat 加成 (每級遞增) | 戰術定位 |
 | :--- | :--- | :--- | :--- |
-| **1. 溶酶體酵素<br>(Lysosome Priming)** | 胞內水解酶儲備與活化 | `might +10%` / `health_regen +0.6 HP/s` | 全傷害強化與自噬持續修復 |
+| **1. 溶酶體酵素<br>(Lysosome Priming)** | 胞內水解酶儲備與活化 | `damage +10%` / `health_regen +0.6 HP/s` | 全傷害強化與自噬持續修復 |
 | **2. 肌動蛋白微絲<br>(Actin Polymerization)** | 細胞骨架微絲定向聚合 | `area +12%` / `move_speed +6%` | 全技能範圍放大與機動走位 |
 | **3. 調理素親和<br>(Opsonin Affinity)** | 表面特異性受體增生 | `crit_chance +5%` / `crit_damage +25%` | 致命弱點暴擊與超額處決 |
 | **4. 線粒體超頻<br>(Mitochondrial Overclock)**| 三羧酸循環 ATP 產能倍增 | `cooldown_reduction +8%` / `duration +10%` | 全技能循環開火加速與留場延長 |
@@ -58,16 +58,16 @@
 
 ### 4.1 胞器腔室六類（Organelle Chamber 2x2，第三系統）
 
-與主動 5＋被動 5 並存的獨立裝備系統：被動＝通用底盤加成，腔室＝高費極端件＋發電拼圖。2x2＝最多 4 件（全 1x1 無拼接），基礎能量 6，`energy_cost ∈ [-1, 4]`（`-1`＝`+1` 發電且必帶重度負面）。已用＝Σ正成本，上限＝6＋Σ發電量，合法⇔已用≤上限且件數≤4。取得走打怪掉落解鎖（基礎機率 2%）→升級三選一（每輪最多 1 張胞器卡，滿槽進換裝）→出戰前配裝頁預配（裸裝開局，預設 4 空槽）。
+與主動 5＋被動 5 並存的獨立裝備系統：被動＝通用底盤加成，腔室＝高費極端件＋發電拼圖。2x2＝最多 4 件（全 1x1 無拼接），基礎能量 6，`energy_cost ∈ [-1, 4]`（`-1`＝`+1` 發電且必帶重度負面）。已用＝Σ正成本，上限＝6＋Σ發電量，合法⇔已用≤上限且件數≤4。取得走打怪掉落解鎖（基礎機率 2%）→升級三選一（每輪最多 1張胞器卡，滿槽進換裝）→出戰前配裝頁預配（裸裝開局，預設 4 空槽）。
 
 | 類別 | 高費核心 | 低費／發電對照 | 能量 |
 | :--- | :--- | :--- | :--- |
 | **代謝 (metabolism)** | 線粒體 MkII：`CDR +0.16`／`duration +10%` | 糖酵解旁路：`CDR +0.05`／`move_speed +3%` | 4／1 |
-| **消化 (digestion)** | 強酸溶酶體：`might +12%`／`dot_damage +15%` | 蛋白酶體篩：`dot_damage +8%`／`health_regen +0.3` | 3／1 |
+| **消化 (digestion)** | 強酸溶酶體：`damage +12%`／`dot_damage +15%` | 蛋白酶體篩：`dot_damage +8%`／`health_regen +0.3` | 3／1 |
 | **骨架 (cytoskeleton)** | 鞭毛基座：`move_speed +12%` | 微管錨點：`move_speed +4%`／`area +4%` | 3／1 |
 | **合成 (synthesis)** | 粗面內質網：`amount +1`／`projectile_speed +8%`（唯一 `amount+1`，鎖 4 費） | 核糖體簇：`projectile_speed +8%`／`duration +8%` | 4／2 |
 | **感知 (sensing)** | 離子通道陣列：`armor +3`／`block +0.04`／`magnet +15%` | 趨化貼片：`magnet +20%`／`evasion +0.02` | 3／1 |
-| **共生 (symbiosis，發電件)** | 共生菌群：`+1` 發電，代價 `move_speed -30%`／`might -15%`（殘廢流） | 噬菌體碎片：`+1` 發電／`CDR +0.05`，代價 `max_health -20%`（血換電） | -1／-1 |
+| **共生 (symbiosis，發電件)** | 共生菌群：`+1` 發電，代價 `move_speed -30%`／`damage -15%`（殘廢流） | 噬菌體碎片：`+1` 發電／`CDR +0.05`，代價 `max_health -20%`（血換電） | -1／-1 |
 
 ---
 

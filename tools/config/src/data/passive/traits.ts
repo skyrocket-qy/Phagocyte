@@ -89,7 +89,7 @@ export const Traits: TraitsFile = {
           value: 0.06
         },
         {
-          stat: StatId.Might,
+          stat: StatId.Damage,
           unit: ModType.Percent,
           value: 0.05
         }
@@ -233,7 +233,7 @@ export const Traits: TraitsFile = {
       id: TraitId.SmallMight,
       modifiers: [
         {
-          stat: StatId.Might,
+          stat: StatId.Damage,
           unit: ModType.Percent,
           value: 0.04
         }
@@ -275,7 +275,7 @@ export const Traits: TraitsFile = {
       id: TraitId.AdaptiveOverdrive,
       modifiers: [
         {
-          stat: StatId.Might,
+          stat: StatId.Damage,
           unit: ModType.Percent,
           value: 0.2
         },
@@ -350,7 +350,7 @@ export const Traits: TraitsFile = {
       id: TraitId.BloodPrice,
       modifiers: [
         {
-          stat: StatId.Might,
+          stat: StatId.Damage,
           unit: ModType.Percent,
           value: 0.08
         }
@@ -364,7 +364,7 @@ export const Traits: TraitsFile = {
       id: TraitId.ContainedFury,
       modifiers: [
         {
-          stat: StatId.Might,
+          stat: StatId.Damage,
           unit: ModType.Percent,
           value: 0.09
         }
@@ -585,7 +585,7 @@ export const Traits: TraitsFile = {
       id: TraitId.OverdrawnStrings,
       modifiers: [
         {
-          stat: StatId.Might,
+          stat: StatId.Damage,
           unit: ModType.Percent,
           value: 0.07
         }

@@ -98,7 +98,7 @@ public partial class TestAllCells : TestHarness
                         case "macrophage":
                             AssertThat(baseCell.Stats!.GetStat("armor")).IsEqualApprox(10.0f, 0.001f);
                             AssertThat(baseCell.Stats!.GetStat("area")).IsEqualApprox(1.25f, 0.001f);
-                            AssertThat(baseCell.Stats!.GetStat("might")).IsEqualApprox(1.0f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("damage")).IsEqualApprox(1.0f, 0.001f);
                             AssertThat(baseCell.Stats!.GetStat("block")).IsEqualApprox(0.08f, 0.001f);
                             break;
                         case "ctl":
@@ -109,7 +109,7 @@ public partial class TestAllCells : TestHarness
                             break;
                         case "neutrophil":
                             AssertThat(baseCell.Stats!.GetStat("armor")).IsEqualApprox(5.0f, 0.001f);
-                            AssertThat(baseCell.Stats!.GetStat("might")).IsEqualApprox(1.2f, 0.001f);
+                            AssertThat(baseCell.Stats!.GetStat("damage")).IsEqualApprox(1.2f, 0.001f);
                             AssertThat(baseCell.Stats!.GetStat("health_regen")).IsEqualApprox(0.5f, 0.001f);
                             break;
                         case "b_cell":
