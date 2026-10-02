@@ -140,11 +140,12 @@ public static class HitPipeline
             return;
         float threshold = AilmentThresholdOf(target);
         float scale = threshold > 0.0f ? Mathf.Clamp(dealt / threshold, 0.0f, 1.0f) : 1.0f;
-        ApplyEffect(host.Status, payload.Effect0, scale);
+        float ailEffect = AilmentEffectOf(payload.AttackerId);
+        ApplyEffect(host.Status, payload.Effect0, scale, ailEffect);
         if (payload.EffectCount > 1)
-            ApplyEffect(host.Status, payload.Effect1, scale);
+            ApplyEffect(host.Status, payload.Effect1, scale, ailEffect);
         if (payload.EffectCount > 2)
-            ApplyEffect(host.Status, payload.Effect2, scale);
+            ApplyEffect(host.Status, payload.Effect2, scale, ailEffect);
     }
 
     internal static float AilmentThresholdOf(Node target)
@@ -165,13 +166,27 @@ public static class HitPipeline
         return Mathf.Max(0.0f, maxHp * AilmentThresholdFraction * Mathf.Max(0.0f, mult));
     }
 
-    private static void ApplyEffect(StatusController status, in EffectSpec e, float scale)
+    private static void ApplyEffect(StatusController status, in EffectSpec e, float scale, float ailEffect)
     {
         if (string.IsNullOrEmpty(e.EffectId))
             return;
-        float mag = e.Magnitude >= 0.0f ? e.Magnitude * scale : e.Magnitude;
+        float mag = e.Magnitude;
+        if (mag >= 0.0f)
+        {
+            mag *= scale;
+            if (!status.IsDotChannel(e.EffectId))
+                mag *= ailEffect;
+        }
         float dur = e.Duration >= 0.0f ? Mathf.Max(0.1f, e.Duration * scale) : e.Duration;
         status.Apply(e.EffectId, mag, dur);
+    }
+
+    private static float AilmentEffectOf(ulong attackerId)
+    {
+        Node2D? attacker = ResolveAttacker(attackerId);
+        if (attacker is PlayerActor pa && pa.Stats is ActorStats st)
+            return Mathf.Max(0.0f, st.GetStat("ailment_effect"));
+        return 1.0f;
     }
 
     private static void ApplyLeech(Node2D? attacker, float dealt)

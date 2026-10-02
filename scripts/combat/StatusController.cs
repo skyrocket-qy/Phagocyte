@@ -390,6 +390,14 @@ public partial class StatusController : Node
         }
     }
 
+    public bool IsDotChannel(string id)
+    {
+        EnsureConfigured();
+        if (!_slots.TryGetValue(id, out var slot))
+            return false;
+        return HasChannel(slot, "dot");
+    }
+
     public void ClearAll()
     {
         EnsureConfigured();
