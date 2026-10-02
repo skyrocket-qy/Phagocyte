@@ -19,7 +19,7 @@ public static class HitPresenter
             if (targetNode is Node2D evaded)
                 DamageNumberSpawner.ShowEvaded(evaded.GlobalPosition);
         }
-        else if (result.IsBlocked && result.DamageDealt <= 0.0f)
+        else if (result.IsBlocked)
         {
             if (targetNode is Node2D blocked)
                 DamageNumberSpawner.ShowBlocked(blocked.GlobalPosition);

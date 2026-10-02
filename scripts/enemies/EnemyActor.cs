@@ -318,7 +318,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
             IsInvulnerable = false,
             Evasion = 0.0f,
             BlockChance = 0.0f,
-            BlockMitigation = 1.0f,
+            BlockMitigation = DefenseProfile.DefaultBlockMitigation,
             Armor = Armor,
             DamageTakenMultiplier = Status.DamageTakenMultiplier,
         };

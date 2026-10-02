@@ -167,7 +167,7 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
             IsInvulnerable = false,
             Evasion = Stats?.GetStat("evasion") ?? 0.0f,
             BlockChance = Stats?.GetStat("block") ?? 0.0f,
-            BlockMitigation = 1.0f,
+            BlockMitigation = DefenseProfile.DefaultBlockMitigation,
             Armor = Stats?.GetStat("armor") ?? 0.0f,
             DamageTakenMultiplier = RunMutatorService.IncomingDamageMultiplier * (Stats?.GetStat("damage_taken") ?? 1.0f),
         };

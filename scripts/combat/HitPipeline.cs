@@ -44,7 +44,7 @@ public static class HitPipeline
             if (GD.Randf() < def.BlockChance)
             {
                 isBlocked = true;
-                blockMitigation = def.BlockMitigation > 0.0f ? def.BlockMitigation : 1.0f;
+                blockMitigation = def.BlockMitigation > 0.0f ? def.BlockMitigation : DefenseProfile.DefaultBlockMitigation;
                 if (blockMitigation >= 1.0f)
                 {
                     result.IsBlocked = true;

@@ -153,7 +153,7 @@ For modularity and high reusability, this game's numeric system **completely eli
 | `damage_taken` | **Damage Taken** | `1.0` (100%) | Damage-taken multiplier (independent of the armor curve). Player defense is the mutation multiplier times this attribute; direct hits and DoT entries each multiply once, while stagger-pool drains are not double-counted. |
 | `move_speed` | **Move Speed** | `230.0` (px/s) | Baseline cruising swim speed of the player cell. |
 | `evasion` | **Fluid Evasion Rate** | `0.0` (0%) | Chance for amoebic membrane fluid deformation to fully avoid damage (hard cap `0.60`, i.e. 60%). First check on being hit. |
-| `block` | **Glycocalyx Block Rate** | `0.0` (0%) | Chance for the dense surface glycocalyx barrier to deflect and negate damage (hard cap `0.75`, i.e. 75%). Second check on being hit. |
+| `block` | **Glycocalyx Block Rate** | `0.0` (0%) | Chance for the dense surface glycocalyx barrier to deflect and mitigate 50% of damage (hard cap `0.75`, i.e. 75%). Second check on being hit. |
 | `life_steal` | **Receptor Drain / Life on Hit** | `0.0` (0%) | Chance for any damage source to trigger self-repair on hitting an enemy (restores a flat 1 HP on proc, hard cap `0.20`, i.e. 20%). |
 | `stagger` | **Deflect / Delayed Damage** | `0.0` (0%) | Fraction of hit damage diverted into a stagger pool (decays exponentially over 4 seconds as armor-ignoring DoT), players only, direct hits only (hard cap `0.60`, i.e. 60%). |
 | `recoup` | **Recovery / Delayed Heal** | `0.0` (0%) | Fraction of a direct hit recovered in installments over 4 seconds (ignores heal suppression), players only (hard cap `0.30`, i.e. 30%). |

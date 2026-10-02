@@ -4,10 +4,11 @@ namespace Game.Combat;
 
 public readonly struct DefenseProfile
 {
+    public const float DefaultBlockMitigation = 0.5f;
     public bool IsInvulnerable { get; init; }
     public float Evasion { get; init; }            // 0.0 to 1.0 chance
     public float BlockChance { get; init; }        // 0.0 to 1.0 chance
-    public float BlockMitigation { get; init; }    // 1.0 = 100% full block
+    public float BlockMitigation { get; init; }    // 0.5 = 50% partial default, 1.0 = full negate
     public float Armor { get; init; }              // POE-curved in HitPipeline
     public float DamageTakenMultiplier { get; init; } // Vulnerability (default 1.0)
 }

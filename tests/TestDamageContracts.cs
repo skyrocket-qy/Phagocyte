@@ -212,17 +212,17 @@ public partial class TestDamageContracts : TestHarness
         stats.SetBase("evasion", 0.0f);
         stats.SetBase("block", 0.75f);
         HitResult stopped = new HitResult { DamageDealt = -1.0f };
-        for (int i = 0; i < 100 && stopped.DamageDealt != 0.0f; i++)
+        for (int i = 0; i < 100 && !stopped.IsBlocked; i++)
         {
             cell.Health = 100.0f;
             stopped = HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, cell);
         }
-        AssertThat(stopped.DamageDealt).IsEqual(0.0f);
+        AssertThat(stopped.DamageDealt).IsEqual(5.0f);
         AssertThat(stopped.IsBlocked).IsTrue();
         AssertThat(stopped.IsEvaded).IsFalse();
         AssertThat(stopped.IsInvulnerable).IsFalse();
         stats.SetBase("block", 0.0f);
-        GD.Print("[PASS] Avoided hits report IsEvaded / IsBlocked.");
+        GD.Print("[PASS] Blocked hits mitigate 50% and report IsBlocked.");
 
         foe.QueueFree();
         critFoe.QueueFree();
