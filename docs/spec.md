@@ -131,7 +131,7 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | `crit_damage` | **暴擊倍率** | `2.0` (200%) | 觸發暴擊時的結算傷害倍率。 |
 | `armor_penetration` | **護甲穿透** | `0.0` (0%) | 開火時凍結的護甲穿透比例（硬上限 `1.0`）。 |
 | `ailment_chance` | **異常觸發率** | `1.0` (100%) | 命中時觸發 `on_hit` 異常的機率；暴擊必定觸發。 |
-| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 全域 DoT 傷害乘數，與 `damage` 結算。 |
+| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 全域 DoT 傷害乘數，與 `damage` 結算。受擊時即時讀取施加者：$\text{dps} = \text{mag} \times \text{scale} \times \text{dot\_damage}$（非玩家施加者視為 `1.0`）。 |
 | `physical_damage` | **物理傷害** | `1.0` (100%) | 物理系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
 | `fire_damage` | **火焰傷害** | `1.0` (100%) | 火焰系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
 | `cold_damage` | **冰霜傷害** | `1.0` (100%) | 冰霜系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
@@ -142,15 +142,15 @@ $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 | `aoe_damage` | **範圍傷害** | `1.0` (100%) | 僅 `AOE` 標籤技能生效，與 `damage` 在通用加成池中加法累計 (`increased`)。 |
 | `projectile_damage` | **投射物傷害** | `1.0` (100%) | 僅 `Projectile` 標籤技能生效，與 `damage` 在通用加成池中加法累計 (`increased`)。 |
 | `minion_damage` | **召喚物傷害** | `1.0` (100%) | 僅 `Minion` 標籤技能生效（現無，待召喚技能），與 `damage` 在通用加成池中加法累計 (`increased`)。 |
-| `ailment_effect` | **異常效果** | `1.0` (100%) | 異常狀態強度乘數（DoT 傷害除外）。 |
+| `ailment_effect` | **異常效果** | `1.0` (100%) | 異常狀態強度乘數（DoT 傷害除外，由 `dot_damage` 負責）。受擊時即時讀取施加者，非 DoT 通道 magnitude 乘上該倍率，持續時間不變。 |
 
 #### 2. 通用生存與防禦屬性（Defense & Survival）
 | 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
 | :--- | :--- | :--- | :--- |
 | `max_health` | **最大生命值** | `100.0` | 細胞膜破裂前可承受的最大總耐久。 |
 | `health_regen` | **生命自癒率** | `0.0` (HP/s) | 胞膜每秒自動修復的固定生命值。 |
-| `armor` | **膜剛性 / 護甲** | `0.0` (點) | POE 護甲公式：$\text{減傷率} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$，大傷害穿透深。 |
-| `damage_taken` | **承受傷害** | `1.0` (100%) | 受到傷害乘數（與護甲曲線獨立）。 |
+| `armor` | **膜剛性 / 護甲** | `0.0` (點) | POE 護甲公式：$\text{減傷率} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$，大傷害穿透深。DoT 以每秒 dps 為單位走同形曲線（`DotArmorFactor` 可調），同樣吃護甲穿透。 |
+| `damage_taken` | **承受傷害** | `1.0` (100%) | 受到傷害乘數（與護甲曲線獨立）。玩家防禦為突變倍率與該屬性相乘，直擊與 DoT 入場各乘一次，延傷池 drain 不重複計算。 |
 | `move_speed` | **移動速度** | `230.0` (px/s) | 玩家細胞在常態巡航下的基礎遊動速度。 |
 | `evasion` | **流體閃避率** | `0.0` (0%) | 胞膜阿米巴流體變形完全免傷機率（硬上限 `0.60` 即 60%）。受擊第一順位判定。 |
 | `block` | **糖萼格擋率** | `0.0` (0%) | 細胞表面緻密糖萼屏障偏轉阻絕傷害機率（硬上限 `0.75` 即 75%）。受擊第二順位判定。 |

@@ -8,23 +8,19 @@
 ## 總覽綱要 (Executive Summary)
 
 * **通用屬性總數**：35 項（戰鬥 23 項 + 生存 11 項 + 機制 1 項）
-* **已完整接入實戰計算公式**：**32 項** (91.4%)
-* **完全未接入計算公式**：**1 項** (`ailment_effect`)
-* **存在公式但未接入即時戰鬥管線 / 玩家受擊屬性**：**2 項** (`dot_damage`, `damage_taken`)
+* **已完整接入實戰計算公式**：**35 項** (100%，`ailment_effect`／`dot_damage`／`damage_taken` 已於本次補齊，見 §四修復記錄)
+* **完全未接入計算公式**：**0 項**
 
 ```
 全域屬性字典池 (35 項)
 ├── 通用戰鬥屬性 (Combat - 23 項)
-│   ├── ✅ 完整接入 (21 項): damage, area, cooldown_reduction, projectile_speed, duration,
+│   ├── ✅ 完整接入 (23 項): damage, area, cooldown_reduction, projectile_speed, duration,
 │   │                         amount, pierce, crit_chance, crit_damage, armor_penetration,
-│   │                         ailment_chance, physical/fire/cold/lightning/chaos_damage,
+│   │                         ailment_chance, ailment_effect, dot_damage, physical/fire/cold/lightning/chaos_damage,
 │   │                         melee/spell/aoe/projectile/minion_damage (Increased 加法池)
-│   ├── ⚠️ 僅有獨立 Helper，未接實戰管線 (1 項): dot_damage
-│   └── ❌ 完全未接入結算公式 (1 項): ailment_effect
 ├── 通用生存屬性 (Defense - 11 項)
-│   ├── ✅ 完整接入 (10 項): max_health, health_regen, armor, move_speed, evasion,
+│   ├── ✅ 完整接入 (11 項): max_health, health_regen, armor, damage_taken, move_speed, evasion,
 │   │                         block, life_steal, stagger, recoup, ailment_threshold
-│   └── ⚠️ 管線有乘數，但 PlayerActor 漏乘屬性 (1 項): damage_taken
 └── 通用機制屬性 (Utility - 1 項)
     └── ✅ 完整接入 (1 項): magnet
 ```
@@ -46,7 +42,7 @@
 | 9 | `crit_damage` | 暴擊傷害倍率 | ✅ 已接入 | [`BaseSkill.cs:405`](scripts/skills/BaseSkill.cs#L405)<br>[`HitPipeline.cs:65`](scripts/combat/HitPipeline.cs#L65) | 凍結至 [`HitPayload.CritMultiplier`](scripts/combat/DamageService.cs#L40)，若暴擊判定成功則 $\text{rawDamage} = \text{damage} \times \text{crit\_damage}$。 |
 | 10 | `armor_penetration` | 護甲穿透 | ✅ 已接入 | [`BaseSkill.cs:414`](scripts/skills/BaseSkill.cs#L414)<br>[`CombatInterfaces.cs:28`](scripts/combat/CombatInterfaces.cs#L28) | 凍結至 [`HitPayload.ArmorPenetration`](scripts/combat/DamageService.cs#L41)，以 $\text{Armor}_{\text{eff}} = \text{Armor} \times (1.0 - \text{pen})$ 削減目標護甲。 |
 | 11 | `ailment_chance` | 異常觸發率 | ✅ 已接入 | [`BaseSkill.cs:421`](scripts/skills/BaseSkill.cs#L421)<br>[`HitPipeline.cs:88`](scripts/combat/HitPipeline.cs#L88) | 命中後以 $\text{isCrit} \lor (\text{randf}() < \text{ailment\_chance})$ 判定是否觸發掛載之 [`EffectSpec`](scripts/combat/EffectSpec.cs)。 |
-| 12 | `dot_damage` | 持續傷害倍率 | ⚠️ 未接實戰 | [`StatBlock.cs:327`](scripts/core/StatBlock.cs#L327) | `CalculateDotDamage(baseDps)` 實作了 $\text{baseDps} \times \text{damage} \times \text{dot\_damage}$，但主動技能烘焙 On-Hit 異常與 [`StatusController`](scripts/combat/StatusController.cs#L255) 運算未調用此屬性。 |
+| 12 | `dot_damage` | 持續傷害倍率 | ✅ 已接入（hit-time） | [`HitPipeline.cs`](scripts/combat/HitPipeline.cs) `DispatchEffects`／`DotDamageOf` | 受擊時即時讀取施加者：$\text{dps} = \text{mag} \times \text{scale} \times \text{dot\_damage}$（有意未走烘焙期，見 §四.2 修復記錄）。 |
 | 13 | `physical_damage` | 物理傷害加成 | ✅ 已接入 | [`BaseSkill.cs:355`](scripts/skills/BaseSkill.cs#L355) | 技能 `damage_type: physical` 時，與 `damage` 加算進 Increased 加法池。 |
 | 14 | `fire_damage` | 火焰傷害加成 | ✅ 已接入 | [`BaseSkill.cs:351`](scripts/skills/BaseSkill.cs#L351) | 技能 `damage_type: fire` 時，與 `damage` 加算進 Increased 加法池。 |
 | 15 | `cold_damage` | 冰霜傷害加成 | ✅ 已接入 | [`BaseSkill.cs:352`](scripts/skills/BaseSkill.cs#L352) | 技能 `damage_type: cold` 時，與 `damage` 加算進 Increased 加法池。 |
@@ -57,7 +53,7 @@
 | 20 | `aoe_damage` | 範圍傷害條件加成 | ✅ 已接入 | [`BaseSkill.cs:302`](scripts/skills/BaseSkill.cs#L302) | 若技能攜帶 `AOE` 標籤，加算進 Increased 加法池。 |
 | 21 | `projectile_damage`| 投射物條件加成 | ✅ 已接入 | [`BaseSkill.cs:303`](scripts/skills/BaseSkill.cs#L303) | 若技能攜帶 `Projectile` 標籤，加算進 Increased 加法池。 |
 | 22 | `minion_damage` | 召喚物條件加成 | ✅ 已接入 | [`BaseSkill.cs:304`](scripts/skills/BaseSkill.cs#L304) | 若技能攜帶 `Minion` 標籤，加算進 Increased 加法池（待召喚技能）。 |
-| 23 | `ailment_effect`| 異常效果強度乘數 | ❌ 完全未接入 | [`StatBlock.cs:57`](scripts/core/StatBlock.cs#L57) | 僅於屬性池中定義預設值 $1.0$，[`HitPipeline.DispatchEffects`](scripts/combat/HitPipeline.cs#L135-L148) 施加狀態強度與時間時從未讀取攻擊者的 `ailment_effect`。 |
+| 23 | `ailment_effect`| 異常效果強度乘數 | ✅ 已接入（hit-time） | [`HitPipeline.cs`](scripts/combat/HitPipeline.cs) `DispatchEffects`／`AilmentEffectOf` + [`StatusController.IsDotChannel`](scripts/combat/StatusController.cs) | 非 DoT 通道 $\text{mag} = \text{mag} \times \text{scale} \times \text{ailment\_effect}$，持續時間不變，DoT 通道排除；非玩家施加者視為 `1.0`。 |
 
 ---
 
@@ -75,7 +71,7 @@
 | 8 | `stagger` | 偏轉/延傷 | ✅ 已接入 | [`PlayerActor.cs:568-570`](scripts/player/PlayerActor.cs#L568-L570)<br>[`PlayerActor.cs:380-385`](scripts/player/PlayerActor.cs#L380-L385) | 直擊受傷拆分：$\text{instant} = \text{damage} \times (1.0 - \text{stagger})$，其餘計入 `StaggerPool` 在 4 秒內平攤為無視護甲之 DoT 扣除。硬上限 $0.60$。 |
 | 9 | `recoup` | 回收/延補 | ✅ 已接入 | [`PlayerActor.cs:571-572`](scripts/player/PlayerActor.cs#L571-L572)<br>[`PlayerActor.cs:388-394`](scripts/player/PlayerActor.cs#L388-L394) | 直擊受傷回補：$\text{RecoupPool} += \text{damage} \times \text{recoup}$，在 4 秒內分期自動治癒回復 HP。硬上限 $0.30$。 |
 | 10 | `ailment_threshold`| 異常閾值 | ✅ 已接入 | [`HitPipeline.cs:150-166`](scripts/combat/HitPipeline.cs#L150-L166) | 異常承受門檻：$\text{Threshold} = \text{MaxHP} \times 0.05 \times \text{ailment\_threshold}$；<br>異常強度縮放因子 $\text{scale} = \text{clamp}(\text{DamageDealt} / \text{Threshold}, 0.0, 1.0)$。 |
-| 11 | `damage_taken` | 承受傷害乘數 | ⚠️ 漏乘屬性 | [`HitPipeline.cs:73`](scripts/combat/HitPipeline.cs#L73)<br>[`PlayerActor.cs:172`](scripts/player/PlayerActor.cs#L172) | [`HitPipeline`](scripts/combat/HitPipeline.cs) 會乘以 `def.DamageTakenMultiplier`，但 [`PlayerActor.Defenses`](scripts/player/PlayerActor.cs#L165-L173) 僅賦值突變倍率 `RunMutatorService.IncomingDamageMultiplier`，未乘入 `Stats.GetStat("damage_taken")`。 |
+| 11 | `damage_taken` | 承受傷害乘數 | ✅ 已接入 | [`PlayerActor.cs`](scripts/player/PlayerActor.cs) `InvalidateDefenses`／`TakeDoTDamage` | 玩家防禦＝突變倍率 × `damage_taken`；直擊與 DoT 入場各乘一次，延傷池 drain 走原始路徑不重複計算；`0` 視為未設置而跳過（與管線守衛一致）。 |
 
 ---
 
@@ -87,10 +83,11 @@
 
 ---
 
-## 四、缺失與待修復點分析 (Gap Analysis & Action Plan)
+## 四、缺失與待修復點分析 (Gap Analysis & Action Plan) —— §1–3 已修復，記錄保留備查
 
-### 1. `ailment_effect` 異常效果乘數完全未介入
-* **現狀**：當玩家掛載異常時，[`HitPipeline.DispatchEffects`](scripts/combat/HitPipeline.cs#L135-L148) 僅根據受到傷害與目標的 `ailment_threshold` 計算 `scale`，攻擊者身上的 `ailment_effect`（如天賦、裝備加成）完全未影響異常強度。
+### 1. `ailment_effect` 異常效果乘數完全未介入 → ✅ 已修復（hit-time）
+* **原狀**：當玩家掛載異常時，[`HitPipeline.DispatchEffects`](scripts/combat/HitPipeline.cs#L135-L148) 僅根據受到傷害與目標的 `ailment_threshold` 計算 `scale`，攻擊者身上的 `ailment_effect`（如天賦、裝備加成）完全未影響異常強度。
+* **實際修復**：`DispatchEffects` 即時讀取施加者 `ailment_effect`（`AilmentEffectOf`，非玩家＝`1.0`），`ApplyEffect` 僅對非 DoT 通道（`StatusController.IsDotChannel` 判定）施加 `mag × scale × ailment_effect`，持續時間不變。
 * **建議補齊方式**：
   在 [`HitPipeline.DispatchEffects`](scripts/combat/HitPipeline.cs#L135) 或 [`HitPayload`](scripts/combat/DamageService.cs#L36) 中傳入施加者的異常效果倍率，將最終施加的非 DoT 效果 magnitude 乘上該倍率：
   ```csharp
@@ -98,13 +95,15 @@
   float mag = e.Magnitude >= 0.0f ? e.Magnitude * scale * attackerAilEffect : e.Magnitude;
   ```
 
-### 2. `dot_damage` 持續傷害倍率未進入技能 On-Hit 烘焙
-* **現狀**：[`BaseSkill.BuildOnHitEffects`](scripts/skills/BaseSkill.cs#L245-L269) 解析 `active.json` 中的 `on_hit` 異常（如 ignite、bleed）時，僅依直擊傷害 `dmg * mult` 計算 magnitude，漏掉了 `dot_damage` 乘數；此外 [`StatusController.Tick`](scripts/combat/StatusController.cs#L255) 亦無施加者屬性聯動。
+### 2. `dot_damage` 持續傷害倍率未進入技能 On-Hit 烘焙 → ✅ 已修復（改走 hit-time，非烘焙期）
+* **原狀**：[`BaseSkill.BuildOnHitEffects`](scripts/skills/BaseSkill.cs#L245-L269) 解析 `active.json` 中的 `on_hit` 異常（如 ignite、bleed）時，僅依直擊傷害 `dmg * mult` 計算 magnitude，漏掉了 `dot_damage` 乘數；此外 [`StatusController.Tick`](scripts/combat/StatusController.cs#L255) 亦無施加者屬性聯動。
+* **實際修復**：有意未走烘焙期——`HitPipeline.ApplyEffect` 受擊時即時讀取施加者 `dot_damage`（`DotDamageOf`），DoT 通道 `mag × scale × dot_damage`；另新增護甲對 DoT：`× (1 − FromArmorDot(armor, dps, pen))`，`DotArmorFactor = 5.0`（調大減傷變弱），以每秒 dps 為單位（非總量，duration 中性、與 refresh 語義相容）。
 * **建議補齊方式**：
   在 [`BaseSkill.TryParseOnHit`](scripts/skills/BaseSkill.cs#L230-L239) 或主動技能烘焙 EffectSpec 時，若該狀態為 DoT Channel（或在技能參數定義中），乘入 `host.GetStat("dot_damage")`。
 
-### 3. `damage_taken` 承受傷害未綁定玩家防禦結構體
-* **現狀**：[`PlayerActor.cs:172`](scripts/player/PlayerActor.cs#L172) 中 `_cachedDefenses.DamageTakenMultiplier` 僅被賦予 `RunMutatorService.IncomingDamageMultiplier`，忽視了天賦星盤或負面效果對玩家 `damage_taken` 屬性的修改。
+### 3. `damage_taken` 承受傷害未綁定玩家防禦結構體 → ✅ 已修復（含 DoT 入場）
+* **原狀**：[`PlayerActor.cs:172`](scripts/player/PlayerActor.cs#L172) 中 `_cachedDefenses.DamageTakenMultiplier` 僅被賦予 `RunMutatorService.IncomingDamageMultiplier`，忽視了天賦星盤或負面效果對玩家 `damage_taken` 屬性的修改。
+* **實際修復**：`InvalidateDefenses` 改為突變倍率 × `damage_taken`；`TakeDoTDamage` 入場同乘（劇本直傷與延傷池 drain 不經此路徑）；`0` 視為未設置而跳過，與管線守衛一致。
 * **建議補齊方式**：
   ```csharp
   DamageTakenMultiplier = RunMutatorService.IncomingDamageMultiplier * (Stats?.GetStat("damage_taken") ?? 1.0f),

@@ -116,7 +116,7 @@ public class Stat
 | `armor_penetration` | **護甲穿透** | `0.0` (0%) | 戰鬥 | 開火時凍結的護甲穿透比例：$\text{Armor}_{\text{eff}} = \text{Armor} \times (1.0 - \text{Pen})$，硬上限 `1.0` (100%)。 |
 | `ailment_chance` | **異常觸發率** | `1.0` (100%) | 戰鬥 | 命中時觸發 `on_hit` 異常的機率（開火時凍結）；暴擊必定觸發。硬上限 `1.0` (100%)。 |
 | `ailment_threshold` | **異常閾值** | `1.0` (100%) | 生存 | 自身異常閾值乘數：$\text{Threshold} = \text{MaxHP} \times 0.05 \times \text{Mult}$，僅下限 `0.0`，無上限。 |
-| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 戰鬥 | 全域 DoT 傷害乘數，與 `damage` 相乘結算。 |
+| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 戰鬥 | 全域 DoT 傷害乘數，與 `damage` 相乘結算。受擊時即時讀取施加者：$\text{dps} = \text{mag} \times \text{scale} \times \text{dot\_damage}$（非玩家施加者視為 `1.0`）。 |
 | `physical_damage` | **物理傷害** | `1.0` (100%) | 戰鬥 | 物理系傷害加成，與 `damage` 加算進 Increased 池（`damage_type: physical` 技能）。 |
 | `fire_damage` | **火焰傷害** | `1.0` (100%) | 戰鬥 | 火焰系傷害加成，與 `damage` 加算進 Increased 池。 |
 | `cold_damage` | **冰霜傷害** | `1.0` (100%) | 戰鬥 | 冰霜系傷害加成，與 `damage` 加算進 Increased 池。 |
@@ -127,11 +127,11 @@ public class Stat
 | `aoe_damage` | **範圍傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `AOE` 標籤技能生效，加算進 Increased 池。 |
 | `projectile_damage` | **投射物傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `Projectile` 標籤技能生效，加算進 Increased 池。 |
 | `minion_damage` | **召喚物傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `Minion` 標籤技能生效，加算進 Increased 池。 |
-| `ailment_effect` | **異常效果** | `1.0` (100%) | 戰鬥 | 異常狀態強度乘數（DoT 傷害除外，由 `dot_damage` 負責）。 |
+| `ailment_effect` | **異常效果** | `1.0` (100%) | 戰鬥 | 異常狀態強度乘數（DoT 傷害除外，由 `dot_damage` 負責）。受擊時即時讀取施加者：非 DoT 通道 $\text{mag} = \text{mag} \times \text{scale} \times \text{ailment\_effect}$，持續時間不受影響（非玩家施加者視為 `1.0`）。 |
 | `max_health` | **最大生命值** | `100.0` | 生存 | 細胞膜破裂前可承受的最大耐久上限。 |
 | `health_regen` | **生命自癒率** | `0.0` (HP/s) | 生存 | 每秒自動修復的細胞膜生命值。 |
-| `armor` | **膜剛性 / 護甲** | `0.0` (點) | 生存 | POE 邊際減傷公式：$\text{DR} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$，大傷害穿透深。 |
-| `damage_taken` | **承受傷害** | `1.0` (100%) | 生存 | 受到傷害乘數（與護甲曲線獨立；低於 1 為減傷）。 |
+| `armor` | **膜剛性 / 護甲** | `0.0` (點) | 生存 | POE 邊際減傷公式：$\text{DR} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$，大傷害穿透深。DoT 以每秒 dps 為單位走同形曲線：$\text{DR}_{\text{dot}} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{dps}}$（`DotArmorFactor` 常數可調；調大減傷變弱），同樣吃護甲穿透、上限 85%。 |
+| `damage_taken` | **承受傷害** | `1.0` (100%) | 生存 | 受到傷害乘數（與護甲曲線獨立；低於 1 為減傷）。玩家防禦：$\text{mult} = \text{突變倍率} \times \text{damage\_taken}$，直擊與 DoT 入場各乘一次；延傷池 drain 不再重複計算；`0` 視為未設置而跳過（與管線守衛一致）。 |
 | `move_speed` | **游動速度** | `230.0` (px/s) | 生存/機動 | 玩家細胞常態巡航下的基礎游動速度。 |
 | `evasion` | **流體閃避率** | `0.0` (0%) | 生存/機動 | 胞膜阿米巴流體變形完全免傷機率。硬上限設為 `0.60` (60%)。受擊第一順位判定。 |
 | `block` | **糖萼格擋率** | `0.0` (0%) | 生存/防護 | 表面緻密糖萼屏障偏轉阻絕傷害機率。硬上限設為 `0.75` (75%)。受擊第二順位判定。 |
@@ -160,7 +160,7 @@ public class Stat
 - 當處於特定器官流體力學（如血流剪切、肺泡氣流）中時，環境流體向量直接與本體速度進行線性向量疊加。
 
 ### 4.3 受擊結算管線 (Damage Resolution Pipeline)
-當玩家細胞受到病原體碰撞或飛行物傷害時，遵循四階段漏斗式順序判定：
+當玩家細胞受到病原體碰撞或飛行物傷害時，遵循漏斗式順序判定：
 
 ```mermaid
 flowchart TD
@@ -169,7 +169,9 @@ flowchart TD
     EvCheck -- 失敗 --> BlkCheck{"2. 格擋判定 (Block Roll)<br>randf() < stats.block"}
     BlkCheck -- 成功 --> Blocked["【完全格擋 (BLOCKED)】<br>受到 0 傷害 · 糖萼屏障晶體偏轉"]
     BlkCheck -- 失敗 --> ArmorDR["3. 護甲減傷 (Armor DR)<br>Damage * (1 - ArmorEff / (ArmorEff + 5*Damage))<br>ArmorEff = Armor * (1 - pen)"]
-    ArmorDR --> HPLoss["4. 扣減生命 (HP Loss)<br>扣除生命耐久 · 若 HP <= 0 胞膜破裂陣亡"]
-    HPLoss --> AilRoll{"5. 異常判定 (Ailment Roll)<br>暴擊必定觸發 · 否則 randf() < ailment_chance"}
-    AilRoll -- 觸發 --> AilScale["異常強度按閾值縮放<br>scale = dealt / (MaxHP * 0.05 * 閾值乘數)"]
+    ArmorDR --> TakenMult["4. 承受傷害 (Damage Taken)<br>Damage * 突變倍率 * damage_taken (0 = 跳過)"]
+    TakenMult --> HPLoss["5. 扣減生命 (HP Loss)<br>扣除生命耐久 · 若 HP <= 0 胞膜破裂陣亡"]
+    HPLoss --> AilRoll{"6. 異常判定 (Ailment Roll)<br>暴擊必定觸發 · 否則 randf() < ailment_chance"}
+    AilRoll -- 觸發 --> AilScale["異常強度按閾值縮放<br>scale = clamp(dealt / (MaxHP * 0.05 * 閾值乘數), 0, 1)"]
+    AilScale --> AilMag["異常強度分流 (hit-time, 施加者/目標 live 讀取)<br>非DoT: mag * scale * ailment_effect (持續時間不變)<br>DoT: mag * scale * dot_damage * (1 - armorDoT)<br>armorDoT = Armor / (Armor + 5*dps), 上限 85%, 穿透沿用"]
 ```
