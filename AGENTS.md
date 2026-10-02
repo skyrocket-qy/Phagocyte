@@ -193,6 +193,7 @@ PHAGOCYTE_CAPTURE_DIR=/tmp/xxx Godot --path . -s res://tests/TestAchievementPrev
 - No compatibility shims for removed mechanics: update the call sites,
   don't keep adapters (`DamageOrEngulf`-style fallbacks).
 - No speculative hooks: if nothing calls it, it doesn't ship.
+- No test-only wrappers in production code: a convenience overload or helper in `scripts/` whose only callers live in `tests/` or `benchmarks/` is dead weight — tests call the real API directly, and the wrapper gets deleted. A new overload ships only with a production caller.
 - **Co-locate small POCO types; avoid file fragmentation:** Do not create tiny standalone
   files (< 20 lines) for plain C# interfaces, enums, or POCO structs that belong to a
   single consumer subsystem (e.g. `DamageResult` in `DamageService.cs`, `ISlowable` in
