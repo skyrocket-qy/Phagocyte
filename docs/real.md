@@ -1,69 +1,69 @@
-# 《Project: Phagocyte》生物擬真與遊戲化設計哲學 (Realism & Edutainment Philosophy)
+# Project: Phagocyte — Biological Fidelity & Gamification Design Philosophy (Realism & Edutainment Philosophy)
 
 ---
 
-## 1. 核心定位與設計願景
+## 1. Core Positioning and Design Vision
 
-《Project: Phagocyte（吞噬體）》的核心理念是 **「玩遊戲即理解免疫學」**。我們致力於打造一款既具備頂級動作肉鴿（Survivor-like）爽快心流，又深度還原人體微觀免疫對抗真實機制的硬核生化遊戲。
+The core idea of *Project: Phagocyte* is **"playing the game is learning immunology"**. We are building a hardcore biochemical game with both top-tier action-roguelite (Survivor-like) flow and deeply faithful recreations of real human microscopic immune combat.
 
-本專案拒絕「披著生物皮的換皮打怪」，也拒絕「枯燥說教式的課堂教學軟體」。我們的目標是：**讓真實生理學機制本身成為最好玩的遊戲機制**。
+This project rejects both "monster-bashing reskins wearing a biology costume" and "dry lecture-style teaching software". Our goal: **make real physiology itself the most fun game mechanic**.
 
 ```mermaid
 flowchart LR
-    A["嚴謹生物醫學原型<br>(Real Immunology)"] -->|機制抽象與爽點提煉| B["頂級肉鴿戰鬥心流<br>(Survivor-like Loop)"]
-    B -->|高反饋操作與反覆遊玩| C["隱性認知內化<br>(Intuitive Learning)"]
-    C -->|反哺策略建構| A
+    A["Rigorous biomedical prototypes<br>(Real Immunology)"] -->|Mechanic abstraction and fun-point distillation| B["Top-tier roguelite combat flow<br>(Survivor-like Loop)"]
+    B -->|High-feedback controls and repeat play| C["Implicit cognitive internalization<br>(Intuitive Learning)"]
+    C -->|Feeding back into strategy building| A
 ```
 
 ---
 
-## 2. 三大核心設計支柱 (The Three Core Pillars)
+## 2. Three Core Design Pillars (The Three Core Pillars)
 
-### 支柱一：邊玩邊學（隱性科普，拒絕生硬背誦）
-- **機制即教學**：玩家不需要先閱讀厚重的免疫學教科書才能開始遊戲。教學融入於核心循環——例如：
-  - 玩家操控巨噬細胞伸出動態偽足鏈射打擊細菌時，自然體會到**「偽足運動（Pseudopod Extension）」**與**「接觸殺傷（Contact Killing）」**的細胞戰鬥直覺。
-  - 當玩家為抗體齊射搭配調理素被動時，自然理解了**「調理作用（Opsonization）」**是如何標記病原體並大幅提高殲滅效率。
-- **正向知識反饋**：每一次局內升級、超武合成或天賦點亮，都在視覺與機制上揭示細胞生物學的真實巧思（如三羧酸循環超頻、微管蛋白定向聚合）。
+### Pillar 1: Learn While Playing (Implicit popularization, no rote memorization)
+- **Mechanics are the tutorial**: players never need to read a heavy immunology textbook before starting. Teaching lives inside the core loop — for example:
+  - Piloting a Macrophage to extend dynamic pseudopod chains and strike bacteria teaches **"pseudopod extension"** and **"contact killing"** combat intuition firsthand.
+  - Pairing an antibody salvo with an opsonin passive naturally teaches how **"opsonization"** tags pathogens and massively boosts kill efficiency.
+- **Positive knowledge feedback**: every in-run level-up, super-weapon fusion, or talent lighting reveals genuine cell-biology ingenuity in visuals and mechanics (e.g., TCA-cycle overclocking, directed microtubule polymerization).
 
-### 支柱二：知識直覺性（具備背景知識者直覺精通，無背景者直覺上手）
-- **醫學知識直覺**：具備生命科學或醫學背景的玩家，能夠完全憑藉常識預判戰術與配裝克制：
-  - 面對具備厚重纖維蛋白包膜的金黃色葡萄球菌，直覺使用活性氧（ROS）或水解酵素破盾。
-  - 看到變異流感病毒每隔一段時間抗原漂移，直覺理解特異性暴擊為何失效，需切換廣譜破膜攻擊。
-  - 看到血液流經狹窄肺泡微血管時，直覺利用偽足錨定上皮細胞抵抗氣流剪切。
-- **新手直覺建構**：即使對生物學一無所知的玩家，也能透過生動的視覺反饋（如顏色、形狀、流體反應）快速建立心理模型，並在遊玩數小時後驚喜地發現自己已掌握人體先天免疫與後天免疫的大半精髓。
+### Pillar 2: Knowledge Intuition (Experts predict by instinct, newcomers pick up by instinct)
+- **Medical intuition**: players with life-science or medical backgrounds can predict tactics and loadout counters purely from common sense:
+  - Facing Staphylococcus aureus wrapped in a thick fibrin coat, instinctively break the shield with reactive oxygen species (ROS) or hydrolases.
+  - Watching variant influenza drift its antigens on a timer, instinctively grasp why targeted crits fail and switch to broad-spectrum membrane-breaking attacks.
+  - Watching blood squeeze through narrow alveolar capillaries, instinctively anchor pseudopods to epithelial cells against shear flow.
+- **Newcomer intuition building**: even players with zero biology background quickly build mental models through vivid visual feedback (colors, shapes, fluid responses), and after a few hours delightedly discover they have absorbed most of innate and adaptive human immunity.
 
-### 支柱三：反枯燥心流（極致割草節奏與硬核科學的無縫共振）
-- **拒絕課堂感**：絕不在遊戲中彈出大段文字強制背誦，所有科普知識全部包裝在：
-  - 爽快即時的物理碰撞與變形回饋。
-  - 局後「病歷單」與「微觀檔案館（Immunology Codex）」的冷凍電鏡資料中，供有興趣深入研究的玩家探索。
-- **生化中二感與策略 Build**：將「造血幹細胞分化」與「表觀遺傳突變」包裝為 PoE 式天賦星盤與超武合成，賦予玩家培育出「阿米巴原生巨口」、「過氧化利維坦」等究極生化嵌合體的成就感。
+### Pillar 3: Anti-Boredom Flow (Seamless resonance of extreme mowing pace and hardcore science)
+- **No classroom vibes**: never pop up long passages of forced-memorization text; all popular-science knowledge is packaged inside:
+  - Snappy real-time physics collisions and deformation feedback.
+  - Post-run "case reports" and the "Microscopy Archive (Immunology Codex)" cryo-EM dossiers, for players who want to dig deeper.
+- **Biochemical edge plus strategic builds**: packaging "hematopoietic stem-cell differentiation" and "epigenetic mutation" as a PoE-style talent tree plus super-weapon fusion gives players the accomplishment of cultivating ultimate biochemical chimeras like the "Amoeboid Primordial Maw" and the "Peroxide Leviathan".
 
 ---
 
-## 3. 生理機制遊戲化對照矩陣 (Biological Mechanism to Gameplay Matrix)
+## 3. Physiology-to-Gameplay Reference Matrix (Biological Mechanism to Gameplay Matrix)
 
-本專案嚴格將人體微觀防禦機制轉化為通用遊戲玩法：
+This project rigorously converts real human microscopic defense mechanisms into generic gameplay:
 
-| 真實免疫生理機制 | 傳統醫學描述 | 《Phagocyte》遊戲機制轉化 | 玩家心流爽點 |
+| Real Immune Physiology | Classic Medical Description | *Phagocyte* Gameplay Conversion | Player Flow Payoff |
 | :--- | :--- | :--- | :--- |
-| **動態偽足變形 (Pseudopods)** | 肌動蛋白微絲定向聚合，推動細胞膜向前伸展。 | 頂點噪聲驅動的有機物理變形，多邊形邊界即時同步為接觸碰撞箱。 | 鏈射抓取、接觸爆發的解壓快感。 |
-| **抗原調理作用 (Opsonization)** | 抗體或補體片段標記病原體表面，增強吞噬受體識別。 | 被動特質【調理素親和】，提供全域 `crit_chance` 與 `crit_damage` 加成。 | 敵人被高亮熒光標記，所有武器打出滿屏暴擊黃字。 |
-| **穿孔素成孔 (Perforin Pore-forming)** | 殺手 T 細胞分泌穿孔素，在靶細胞膜上打孔導致裂解。 | 主動武器【穿孔素長矛】，高初速螺旋光束貫穿敵群，附帶破膜效果。 | 單體直線超長穿透，狙殺高危精英病原體。 |
-| **呼吸爆發 (Respiratory Burst)** | 吞噬細胞活化 NADPH 氧化酶，大量釋放活性氧自由基 ($\text{H}_2\text{O}_2$)。 | 主動武器【活性氧射流】，朝游動方向噴射高壓錐形酸霧，造成 DoT 腐蝕破甲。 | 近身噴射大範圍溶解酸霧，融化聚集的抱團細菌。 |
-| **中性粒細胞胞外誘捕網 (NETosis)** | 嗜中性球殉職釋放染色質網狀纖維，誘捕並殺滅病原體。 | 嗜中性球專屬天賦與自爆殉職機制，瀕死時爆發全屏阻滯黏網與劇烈殉爆。 | 絕境翻盤、犧牲殉職引發的連鎖清屏震撼。 |
-| **造血幹細胞分化 (Hematopoiesis)** | HSC 在骨髓中分化為骨髓系與淋巴系前驅細胞。 | PoE 式單一聯合天賦星盤，五大細胞共享星盤但具備不同起始特化門戶。 | 跨越譜系的自由構建（如讓 B 細胞學會巨噬細胞的大偽足猛擊）。 |
+| **Dynamic pseudopod deformation (Pseudopods)** | Actin filaments polymerize directionally, pushing the membrane forward. | Organic physical deformation driven by vertex noise, with polygon boundaries synced live into contact colliders. | The cathartic joy of chain-grabbing and contact-bursting. |
+| **Antigen opsonization (Opsonization)** | Antibodies or complement fragments tag pathogen surfaces, boosting phagocytic-receptor recognition. | Passive trait [Opsonin Affinity], granting global `crit_chance` and `crit_damage` bonuses. | Enemies glow with highlight fluorescent tags while every weapon sprays full-screen yellow crit numbers. |
+| **Perforin pore formation (Perforin Pore-forming)** | Killer T cells secrete perforin, punching holes in target membranes until they lyse. | Active weapon [Perforin Lance], a high-velocity spiral beam piercing enemy packs with membrane-breaking effects. | Ultra-long single-line penetration for sniping high-threat elite pathogens. |
+| **Respiratory burst (Respiratory Burst)** | Phagocytes activate NADPH oxidase, dumping reactive oxygen radicals ($\text{H}_2\text{O}_2$). | Active weapon [ROS Jet], spraying a high-pressure cone of acid mist along the swim direction, dealing armor-melting corrosive DoT. | Hose down clustered bacteria at close range with dissolving acid fog. |
+| **Neutrophil extracellular traps (NETosis)** | Neutrophils die to cast chromatin-fiber webs that trap and kill pathogens. | Neutrophil-exclusive talents plus a death-martyrdom loop: near-death bursts of field-wide snaring webs plus violent martyrdom blasts. | Clutch comebacks — the screen-clearing shock of a sacrificial martyrdom. |
+| **Hematopoietic stem-cell differentiation (Hematopoiesis)** | HSCs in bone marrow differentiate into myeloid and lymphoid progenitors. | PoE-style single unified talent tree shared by all five cells, each with its own specialized starting gate. | Free cross-lineage building (e.g., teaching a B cell the Macrophage's giant pseudopod slam). |
 
 ---
 
-## 4. 微觀美學與感官擬真原則
+## 4. Microscopic Aesthetics and Sensory Fidelity Principles
 
-為了讓玩家沉浸於真實的人體微觀世界，遊戲在視聽呈現上貫徹以下原則：
+To immerse players in the real human microscopic world, the game's audiovisuals follow these principles:
 
-1. **顯微鏡共軛焦螢光語言（Confocal Fluorescence）**：
-   - 界面與技能特效採用微觀螢光染色風格（青綠 GFP、深紅 RFP、亮藍 DAPI 染色核酸）。
-   - 背景深邃（模擬暗視野顯微鏡），場景中懸浮著布朗運動的微米級膠體顆粒與折射光斑。
-2. **有機原生質流體物理**：
-   - 細胞邊界不是僵硬的精靈圖（Sprite），而是如同阿米巴原蟲般不斷蠕動、具備黏滯度與張力的動態流體。
-   - 細胞核懸浮於質內，隨著細胞加速衝刺與轉向，呈現微幅延遲的彈簧阻尼物理運動（Spring Physics）。
-3. **器官微環境沉浸感**：
-   - 每個關卡都是真實器官的微觀切片——肺泡的呼吸風暴、皮下創口的滲出流、胃壁的強酸巨浪與血腦屏障的高壓切應力，使環境不再是單純的死板貼圖，而是具備流體力學互動的動態戰場。
+1. **Confocal fluorescence microscope language (Confocal Fluorescence)**:
+   - UI and skill effects use microscopic fluorescence-staining styles (cyan-green GFP, deep-red RFP, bright-blue DAPI nucleic-acid stains).
+   - Deep dark backgrounds (simulating dark-field microscopy) with Brownian-motion micron-scale colloidal particles and refractive light spots drifting through scenes.
+2. **Organic protoplasmic fluid physics**:
+   - Cell boundaries are never stiff sprites — they creep and churn like amoebae, dynamic fluids with viscosity and tension.
+   - Nuclei float inside the cytoplasm and lag with subtle spring-damper physics (Spring Physics) as the cell sprints and turns.
+3. **Organ micro-environment immersion**:
+   - Every stage is a microscopic slice of a real organ — alveolar breathing storms, wound-exudate currents, gastric-wall acid surges, and blood-brain-barrier high-pressure shear — environments that are dynamic fluid-mechanical battlefields to interact with, never static dead textures.

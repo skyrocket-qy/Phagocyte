@@ -1,88 +1,88 @@
-# 《Project: Phagocyte》終局系統：無盡細胞因子風暴模式規格書 (End Game: Endless Cytokine Storm Mode)
+# Project: Phagocyte — Endgame System: Endless Cytokine Storm Mode (End Game: Endless Cytokine Storm Mode)
 
 ---
 
-## 1. 終局願景：極限 Build 的終極試煉場
+## 1. Endgame Vision: The Ultimate Proving Ground for Extreme Builds
 
-在常規 15 分鐘關卡全部通關後，玩家往往面臨「Build 成型後無處施展、全破後不知道能幹嘛」的長草痛點。
+After clearing all standard 15-minute stages, players often hit the dried-up content slump of "my build is complete but has nowhere to shine — nothing left to do after 100%."
 
-《Phagocyte》設計了專屬的終局機制——**【全身性細胞因子風暴無盡模式（Endless Cytokine Storm Overdrive）】**。本模式定位為硬核玩家測試極限配裝、挑戰操作上限與全球衝榜的終極舞台。
+*Phagocyte* answers with a dedicated endgame — **[Systemic Cytokine Storm Endless Mode (Endless Cytokine Storm Overdrive)]**. This mode is the ultimate stage for hardcore players to test extreme loadouts, push execution ceilings, and climb the global leaderboards.
 
 ```mermaid
 flowchart TD
-    A["通關急性危象 (Hard 難度)"] --> B["解鎖【無盡細胞因子風暴】入口"]
-    B --> C["自主加裝【病理過載詞綴】(Afflictions)<br>(自選難度熱度 · 疊加結算積分倍率)"]
-    C --> D["進入無盡戰場 (突破 15:00 限制)"]
-    D --> E["3 分鐘階梯式過載 (指數級數值 + 複合環境)"]
-    D --> F["3 分鐘雙生/三聯 Boss 連環突襲"]
-    E & F --> G["生命膜破裂終止 (Game Over)"]
-    G --> H["生成【終末慢性病歷單】(Chronic Chart)<br>(結算 SSS 級評級 · 登錄全球天梯榜)"]
+    A["Clear an Acute Crisis (Hard difficulty)"] --> B["Unlock the Endless Cytokine Storm entrance"]
+    B --> C["Freely equip Pathological Afflictions<br>(Self-selected heat · Stacked score multipliers)"]
+    C --> D["Enter the endless battlefield (past the 15:00 limit)"]
+    D --> E["3-minute escalating overload (exponential stats + combined environments)"]
+    D --> F["Twin/triple Boss raids every 3 minutes"]
+    E & F --> G["Membrane rupture ends the run (Game Over)"]
+    G --> H["Generate the Terminal Chronic Chart<br>(SSS-rank settlement · Global leaderboard entry)"]
 ```
 
 ---
 
-## 2. 解鎖條件與世界觀包裝
+## 2. Unlock Conditions and Worldbuilding
 
-- **解鎖條件**：通關任意器官地圖的「急性危象（Hard 難度）」，達成成就【創口清道夫：膿毒終結】（`wound_hard_clear`）。
-- **生物學世界觀**：
-  - *臨床診斷*：`【慢性重症感染 · 不可逆全身性細胞因子風暴 (CRS)】`。
-  - 宿主雖然在局部病灶抵禦了最初 15 分鐘的急性入侵，但促炎因子（TNF-$\alpha$、IL-6）大量失控入血。全體器官進入持續高熱過載狀態，白血球必須在不可逆的生理崩潰前盡可能多地清除病原體，延緩多器官衰竭。
-
----
-
-## 3. 無盡核心機制 (Core Endless Mechanics)
-
-### 3.1 無上限時間軸 (Uncapped Timeline)
-- 進入無盡模式後，計時器跨過 15:00 不會強制結算，而是轉為燃燒的暗金螢光色繼續推進（`15:01`、`18:00`、`24:00`、`30:00+`），直至玩家生命值歸零。
-
-### 3.2 3 分鐘指數級過載階梯 (3-Min Overdrive Escalation)
-每 3 分鐘為一個過載週期，全場難度階梯式暴增：
-
-| 存活時長 | 怪物血量修正 | 怪物移速修正 | 複合器官環境異變事件 |
-| :--- | :--- | :--- | :--- |
-| **15:00～18:00** | $+50\%$ | $+15\%$ | 地面隨機出現血纖維蛋白黏網。 |
-| **18:00～21:00** | $+120\%$ | $+30\%$ | 跨器官雙生 Boss 突襲全面展開。 |
-| **21:00～24:00** | $+220\%$ | $+50\%$ | 膽汁酸水解流席捲，週期性破除全場護甲 3 秒。 |
-| **24:00～27:00** | $+360\%$ | $+70\%$ | 胃酸潮湧酸蝕爆發，場景可安全游動區域大幅縮減。 |
-| **27:00+ (終末極限)** | 指數級無上限增長 | 移速達上限 (+100%) | **雙器官複合環境**（如膽汁酸水解 ＋ 胃酸潮湧同時存在）。 |
-
-### 3.3 連環雙生/三聯 Boss 突襲 (Multi-Boss Incursions)
-- 在 `18:00`、`21:00`、`24:00` 等每個 3 分鐘整點，系統將跨地圖隨機抽取 **雙生 Boss（2 隻不同器官的原發 Boss 同場出現）**！
-- 在 `30:00+` 的極限階段，將直接遭遇 **三聯原發 Boss 群體圍攻**，極度考驗滿配超武的瞬間爆發與走位微操。
-
-### 3.4 無盡同屏上限與動態擊殺通量 (Endless Screen Cap & Kill-Driven Loop)
-- **無盡同屏上限擴展**：無盡模式同屏活躍怪物上限提升至 **500 隻**（`MAX_ACTIVE_ENDLESS = 500`）。
-- **「通量 vs 血量膨脹」博弈**：
-  - 前期（15:00～21:00）：滿配超武瞬秒病原體，缺額即刻補滿，形成「殺得越快生得越快」的極限割草漩渦，KPM 與 ATP 瘋狂飆升。
-  - 後期（24:00+）：怪物血量指數級膨脹 $+360\%+$，玩家清怪速度逐漸跟不上回補速度，怪物開始長時間佔據 500 隻同屏上限，形成巨大的物理與彈道包圍網，直至胞膜破裂。
-- 這使全球排行榜不再是單純「堆肉裝繞圈苟活比時間」，而是必須在「極限輸出清怪衝分數」與「保命生存」之間取得完美平衡。
+- **Unlock condition**: clear any organ map's "Acute Crisis (Hard difficulty)", earning the achievement [Wound Scavenger: Septic Finale] (`wound_hard_clear`).
+- **Biological framing**:
+  - *Clinical diagnosis*: `[Chronic severe infection · Irreversible systemic cytokine storm (CRS)]`.
+  - Although the host survived the first 15 minutes of acute invasion at the local lesion, pro-inflammatory factors (TNF-$\alpha$, IL-6) have flooded the blood out of control. All organs enter a sustained hyperpyretic overload state, and white blood cells must clear as many pathogens as possible before irreversible physiological collapse, delaying multi-organ failure.
 
 ---
 
-## 4. 自選病理過載詞綴系統 (Pathological Afflictions / Risk Modifiers)
+## 3. Endless Core Mechanics (Core Endless Mechanics)
 
-借鑑《Hades》熱度契約與《PoE》地圖詞綴理念，玩家進入無盡模式前，可自主勾選病理負面詞綴：
+### 3.1 Uncapped Timeline
+- Entering endless mode, the timer sails past 15:00 without forcing settlement, switching to a burning dark-gold fluorescent look as it keeps climbing (`15:01`, `18:00`, `24:00`, `30:00+`) until player HP hits zero.
 
-| 詞綴名稱 | 生物學機制 | 負面懲罰效果 | 衝榜積分倍率 |
+### 3.2 3-Minute Exponential Overload Ladder (3-Min Overdrive Escalation)
+Every 3 minutes form one overload cycle, with difficulty spiking stepwise across the whole field:
+
+| Survival Time | Monster HP Modifier | Monster Speed Modifier | Combined Organ Environment Events |
 | :--- | :--- | :--- | :--- |
-| **【高熱驚厥】** | 宿主核心體溫持續 $>41^\circ\text{C}$ | 玩家細胞每 5 秒承受最大生命 2% 的環境灼傷。 | $+25\%$ |
-| **【內毒素血症】** | 血液遍布革蘭氏陰性菌 LPS | 受到的所有傷害增加 $+50\%$。 | $+30\%$ |
-| **【自噬衰竭】** | 溶酶體酵素耗盡，無法自愈 | 全域通用屬性 `health_regen` 強制歸零（無法自然回血）。 | $+40\%$ |
-| **【微管硬化】** | 骨架微絲聚合受阻 | 禁止翻滾閃避（Dodge Roll）。 | $+35\%$ |
-| **【抗原全漂移】** | 病毒突變頻率超頻 | 全場病原體每 20 秒強制重置一次所有特異性易傷標記。 | $+20\%$ |
-| **【極限黏滯】** | 血液濃縮高凝狀態 | 玩家基礎移動速度降低 $-25\%$。 | $+25\%$ |
+| **15:00-18:00** | $+50\%$ | $+15\%$ | Fibrin sticky webs appear randomly on the ground. |
+| **18:00-21:00** | $+120\%$ | $+30\%$ | Cross-organ twin Boss raids unfold in full. |
+| **21:00-24:00** | $+220\%$ | $+50\%$ | Bile-acid hydrolysis sweeps through, periodically stripping all armor field-wide for 3 seconds. |
+| **24:00-27:00** | $+360\%$ | $+70\%$ | Gastric-acid surges erupt, drastically shrinking the safely swimmable area. |
+| **27:00+ (terminal extreme)** | Exponential uncapped growth | Speed capped (+100%) | **Dual-organ combined environments** (e.g., bile-acid hydrolysis + gastric-acid surge active simultaneously). |
+
+### 3.3 Chained Twin/Triple Boss Raids (Multi-Boss Incursions)
+- At each 3-minute mark (`18:00`, `21:00`, `24:00`, ...), the system randomly draws **twin Bosses (2 primary Bosses from different organs on the field together)** from across maps!
+- Past `30:00+` in the extreme phase, **triple primary-Boss packs** besiege the player directly, brutally testing maxed-out super-weapon burst and positioning micro-skills.
+
+### 3.4 Endless Screen Cap and Kill-Driven Loop (Endless Screen Cap & Kill-Driven Loop)
+- **Expanded endless screen cap**: endless mode raises the active-monster cap to **500** (`MAX_ACTIVE_ENDLESS = 500`).
+- **"Throughput vs. HP inflation" gamble**:
+  - Early (15:00-21:00): maxed super-weapons instantly vaporize pathogens and vacancies refill immediately, forming an extreme mowing vortex of "the faster you kill, the faster they spawn", with KPM and ATP skyrocketing.
+  - Late (24:00+): monster HP inflates exponentially ($+360\%+$), player clear speed gradually falls behind the respawn rate, and monsters start permanently occupying the 500-entity screen cap, forming a giant physical and ballistic encirclement until the membrane ruptures.
+- This keeps the global leaderboard from degenerating into "stack bulk, kite in circles, compare survival time" — instead it demands a perfect balance between "extreme-DPS clear for score" and "staying alive".
+
+---
+
+## 4. Optional Pathological Affliction System (Pathological Afflictions / Risk Modifiers)
+
+Borrowing from *Hades* heat pacts and *PoE* map affixes, players freely tick pathological debuffs before entering endless mode:
+
+| Affliction Name | Biological Mechanism | Debuff Effect | Leaderboard Score Multiplier |
+| :--- | :--- | :--- | :--- |
+| **[Febrile Seizure]** | Host core temperature stays $>41^\circ\text{C}$ | Player cells take ambient burn equal to 2% of max HP every 5 seconds. | $+25\%$ |
+| **[Endotoxemia]** | Blood saturated with Gram-negative LPS | All damage taken increased by $+50\%$. | $+30\%$ |
+| **[Autophagy Failure]** | Lysosomal enzymes exhausted, no self-repair | Universal `health_regen` forced to zero (no natural healing). | $+40\%$ |
+| **[Microtubule Rigidity]** | Cytoskeletal filament polymerization blocked | Dodge Roll forbidden. | $+35\%$ |
+| **[Total Antigenic Drift]** | Viral mutation rate overclocked | All targeted vulnerability marks field-wide forcibly reset every 20 seconds. | $+20\%$ |
+| **[Extreme Viscosity]** | Hemoconcentrated hypercoagulable blood | Player base move speed reduced by $-25\%$. | $+25\%$ |
 
 > [!TIP]
-> 玩家可自由疊加多個詞綴，總積分倍率為累加計算（最高可達 $+175\%$ 積分加成），激勵頂級玩家挑戰極限。
+> Players may stack multiple afflictions freely; total score multiplier sums additively (up to $+175\%$ bonus), tempting top players to challenge the limit.
 
 ---
 
-## 5. 終局追求與榮譽殿堂 (Endless Rewards & Hall of Fame)
+## 5. Endgame Pursuits and Hall of Fame (Endless Rewards & Hall of Fame)
 
-1. **終末慢性病歷單 (Chronic Pathology Chart)**：
-   - 專屬的金色全息病歷外觀，詳細記錄本次挑戰所勾選的詞綴、存活時長、超武配裝與總擊殺數（Kills）。
-   - 結算評級開放最高 **Rank SSS（超載神話）** 與 **Rank EX（破格存在）**。
-2. **微管天賦重鑄結晶 (Cytoskeleton Catalysts)**：
-   - 無盡模式結算依據存活時長，獎勵微管重鑄道具，可用於在天賦星盤中解鎖專屬的傳奇螢光外觀塗裝與粒子拖尾。
-3. **Steam 全球微觀天梯榜 (Global Leaderboards)**：
-   - 接入 Steamworks 排行榜，即時展示全球玩家在無盡模式下的最高存活時長與積分排名。
+1. **Terminal Chronic Chart (Chronic Pathology Chart)**:
+   - Exclusive golden holographic chart look, recording the afflictions ticked, survival time, super-weapon loadout, and total kills for the run.
+   - Settlement ratings unlock the top **Rank SSS (Overload Mythic)** and **Rank EX (Anomalous Existence)**.
+2. **Cytoskeleton Recast Catalysts (Cytoskeleton Catalysts)**:
+   - Endless settlement awards microtubule-recast items based on survival time, redeemable on the talent tree for exclusive legendary fluorescent paint jobs and particle trails.
+3. **Steam Global Micro Leaderboards (Global Leaderboards)**:
+   - Plugged into Steamworks leaderboards, showing every player's best endless survival time and score ranking worldwide in real time.

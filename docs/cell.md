@@ -1,99 +1,99 @@
-# 《Project: Phagocyte》細胞角色形態學與底盤系統規格書 (Cell Morphology & Chassis Architecture)
+# Project: Phagocyte — Cell Morphology & Chassis Architecture
 
 ---
 
-## 1. 架構概述：解耦三層生物學模型
+## 1. Architecture Overview: Decoupled Three-Layer Biological Model
 
-為解決傳統 2D 骨骼動畫「形態與技能強耦合、無法自由換裝細胞器與複用技能」的架構瓶頸，本專案將所有白血球解構為三層生物學模型：
+To solve the classic 2D skeletal-animation bottleneck of "morphology hard-coupled to skills, no free organelle reskins or skill reuse", this project decomposes every white blood cell into a three-layer biological model:
 
 ```mermaid
 graph TD
-    A["統一微絲微管底盤 (Unified Chassis)<br>物理碰撞半徑標準化 (base_radius = 24.0)"] --> B["動態頂點噪聲參數 (Morphology Modifiers)<br>FastNoiseLite 驅動邊界起伏與細胞核物理"]
-    B --> C["外掛式細胞器 (Modular Organelles)<br>PackedScene 懸浮受體、IK 捕捉爪、溶酶體泡"]
-    C --> D["表觀遺傳嵌合體 (Chimera Mutations)<br>解鎖全能幹細胞基因庫，自由裝配跨界技能"]
+    A["Unified Filament-Microtubule Chassis<br>Standardized physics collision radius (base_radius = 24.0)"] --> B["Dynamic Vertex-Noise Parameters (Morphology Modifiers)<br>FastNoiseLite-driven boundary undulation and nuclear physics"]
+    B --> C["Plug-in Organelles<br>PackedScene hover receptors, IK grapple claws, lysosome vesicles"]
+    C --> D["Epigenetic Chimeras (Chimera Mutations)<br>Unlock the pluripotent stem-cell gene pool and freely assemble cross-lineage skills"]
 ```
 
-### 1.1 統一底盤（Unified Chassis）
-- 所有白血球在物理底層均共享相同的微絲微管動力學系統。
-- **初始半徑標準化**：所有角色在 Lv.1 時初始受擊與碰撞半徑統一為 `base_radius = 24.0`（直徑 $48\,\text{px}$）。此舉確保前期走位手感一致，消弭前期數值失衡。
-- **多邊形與碰撞即時同步**：底層使用 `Polygon2D` 繪製細胞邊界，並在 `_PhysicsProcess` 中將頂點座標逐幀即時烘焙至 `CollisionPolygon2D`，實現「所見即所得」的物理邊界。
+### 1.1 Unified Chassis
+- All white blood cells share the same filament-microtubule dynamics system at the physics layer.
+- **Standardized starting radius**: every character starts at Lv.1 with a unified hit and collision radius of `base_radius = 24.0` (diameter $48\,\text{px}$). This keeps early-game positioning feel consistent and eliminates early balance skew.
+- **Real-time polygon-collision sync**: the base layer draws the cell boundary with a `Polygon2D` and bakes vertex positions into the `CollisionPolygon2D` every frame inside `_PhysicsProcess`, delivering true what-you-see-is-what-you-collide-with physics.
 
-### 1.2 頂點噪聲參數模組（Morphology Modifiers）
-透過 `FastNoiseLite` 在極座標系下對多邊形頂點進行動態半徑位移：
+### 1.2 Vertex-Noise Parameter Module (Morphology Modifiers)
+Dynamic radial vertex displacement in polar coordinates via `FastNoiseLite`:
 $$R(\theta, t) = R_{\text{base}} \times \left(1.0 + \text{Amplitude} \times \text{Noise}(\theta \cdot \text{Frequency}, t \cdot \text{Speed})\right)$$
-- **Amplitude（偽足伸展振幅）**：控制邊界突起與偽足延伸的長度。受全域通用屬性 `area` 動態加成。
-- **Frequency（突觸/刺突密度）**：控制邊緣波峰波谷的密集程度。數值高則毛刺密集（如樹突狀細胞）；數值低則圓潤平滑（如未活化 T 細胞）。
-- **Smoothness（黏滯流體度）**：決定邊界如同阿米巴原蟲般緩慢流動，或是像緊繃細胞膜般高頻微顫。
+- **Amplitude (pseudopod extension)**: controls the length of boundary protrusions and pseudopod reaches. Scaled dynamically by the universal `area` stat.
+- **Frequency (synapse/spike density)**: controls how densely packed the edge peaks and valleys are. High values yield dense bristles (e.g., dendritic cells); low values yield smooth round shapes (e.g., resting T cells).
+- **Smoothness (viscous fluidity)**: decides whether the boundary flows slowly like an amoeba or trembles at high frequency like a taut cell membrane.
 
-### 1.3 外掛式細胞器（Modular Organelles）
-超出主網格拓撲範圍的特殊構造，封裝為獨立的子節點（PackedScene）：
-- **吞噬偽足鏈式打擊（`PseudopodChainVisual`）**：吞噬偽足發射的暫態鏈式偽足，沿用宿主細胞配色，以鏈射延伸→命中爆發兩段打擊；舊 `PseudopodLimb` IK 捕捉爪器官已併入此機制並刪除。
-- **受體棘刺陣列（`ReceptorSpikes.tscn`）**：圍繞細胞邊緣排列的環狀旋轉受體，提供化學感應、接觸反傷與旋轉攔截。
+### 1.3 Plug-in Organelles (Modular Organelles)
+Special structures extending beyond the main mesh topology, packaged as standalone child nodes (PackedScene):
+- **Phagocytic pseudopod chain strike (`PseudopodChainVisual`)**: transient chained pseudopods fired by devouring pseudopods, tinted with the host cell palette, striking in two phases — chain extension, then on-hit burst; the old `PseudopodLimb` IK grapple-claw organ has been merged into this mechanism and deleted.
+- **Receptor spike array (`ReceptorSpikes.tscn`)**: a rotating ring of receptors arranged around the cell edge, providing chemosensing, contact retaliation, and spinning interception.
 
-### 1.4 胞器腔室裝備（Organelle Chamber 2x2，第三系統）
+### 1.4 Organelle Chamber Loadout (Organelle Chamber 2x2, Third System)
 
-除視覺外掛件外，每個細胞掛載一個與 `SkillManager` 並列的 `GearChamber` 節點（`BaseCell._Ready` 接線，缺節點時 code fallback 補建，與 `CellStats` 缺失模式一致）：
-- **槽位與能量**：2x2＝最多 4 件，基礎能量 6，`energy_cost ∈ [-1, 4]`（`-1`＝`+1` 發電且必帶重度負面）；已用＝Σ正成本，上限＝6＋Σ發電量；卸下／替換經 `CellStats.Add/RemoveModifier` 精確回滾，`_ExitTree` 清理。
-- **出戰流程**：選細胞→選配裝（`LoadoutManager` 每細胞多套預設，預設 4 空槽裸裝開局）→選天賦→選地圖；開局 `Main.ApplyChamberLoadout` 讀 active profile，非法／鎖定項略過。
-- **局內獲取**：打怪掉落解鎖（`GearUnlockManager`，基礎機率 2%，`BaseEnemy.Die` 單一入口）→升級三選一 `new_gear` 卡（僅已解鎖且未擁有，每輪最多 1 張）→滿槽進同一 modal 內換裝（替換／存入背包／丟棄＋回血 15%／取消）。背包 run-scoped，上限 12。
-- 六類 12 件數值表見 `docs/skill.md` §4.1，能量約束見 `docs/stat.md` §3.1。
+Beyond visual attachments, every cell carries a `GearChamber` node alongside the `SkillManager` (`BaseCell._Ready` wiring, with a code fallback that builds it when missing, matching the `CellStats` missing-node pattern):
+- **Slots and energy**: 2x2 = up to 4 pieces, base energy 6, `energy_cost ∈ [-1, 4]` (`-1` = generates `+1` power but always carries a heavy drawback); spent = sum of positive costs, cap = 6 + total generated; unequip/replace rolls back precisely via `CellStats.Add/RemoveModifier`, with `_ExitTree` cleanup.
+- **Pre-run flow**: pick cell, then pick loadout (`LoadoutManager` keeps multiple preset profiles per cell; default is 4 empty slots, i.e., naked start), then pick talents, then pick map; at run start `Main.ApplyChamberLoadout` reads the active profile and skips illegal/locked entries.
+- **In-run acquisition**: monster drops unlock gear (`GearUnlockManager`, base 2% chance, single entry via `BaseEnemy.Die`) — level-up draft offers a `new_gear` card (only unlocked-and-unowned gear, at most 1 per round) — with a full loadout the swap happens in the same modal (replace / stash to backpack / discard + heal 15% / cancel). The backpack is run-scoped, capped at 12.
+- See `docs/skill.md` §4.1 for the six-category 12-item stat table, and `docs/stat.md` §3.1 for energy constraints.
 
 ---
 
-## 2. 五大白血球角色矩陣 (The 5 Immune Cell Classes)
+## 2. Five White Blood Cell Class Matrix (The 5 Immune Cell Classes)
 
-所有角色在 `GameManager.ClassData` 中註冊，具備鮮明的顯微鏡可辨識特徵、細胞核形狀、專屬固有技能與起始星盤定位：
+All classes are registered in `GameManager.ClassData` with distinct microscope-readable silhouettes, nuclear shapes, signature innate skills, and starting talent-tree positions:
 
-| 細胞種類 | 英文/代碼 | 真實尺寸 | 遊戲外觀形態與邊界特徵 | 細胞核辨識形狀 | 固有技能 (Innate) | 初始天賦起點定位 (Starting Hub) | 解鎖條件 (成就) |
+| Cell Type | English/Code | Real Size | In-Game Morphology & Boundary | Identification Nucleus Shape | Innate Skill | Starting Talent Hub | Unlock Condition (Achievement) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **巨噬細胞** | `macrophage` | $20 \sim 40\,\mu\text{m}$ | **流體阿米巴狀**。邊界劇烈起伏，粗大偽足持續伸張，體內可見深色溶酶體泡。 | **巨大腎形 / 馬蹄形單核**（偏心排列）。 | **吞噬偽足**<br>(Phagocytic Grasp，主動：由近到遠抓 2 + `amount` 加成，鏈射命中造成接觸傷害) | **【巨噬起點中心】**<br>(左上 · 體積/血量/護甲/格擋) | **預設解鎖** |
-| **殺手 T 細胞** | `ctl` | $7 \sim 10\,\mu\text{m}$ | **緊湊微絨毛球體**。平滑圓整，高頻微幅顫動；衝刺時前端極化為免疫突觸。 | **超大正圓形核**（佔據體內 $\sim 80\%$ 空間，僅留薄層胞質）。 | **穿孔素長矛**<br>(Perforin Lance) | **【殺手 T 起點中心】**<br>(右側 · 移速/暴擊/穿透/閃避) | 單局擊殺 200 隻病原體<br>(`engulf_20`) |
-| **嗜中性球** | `neutrophil` | $10 \sim 15\,\mu\text{m}$ | **高頻焦躁顫膜**。邊界極不穩定，易破碎呈顆粒狀；胞質密布細微殺菌顆粒。 | **分節多葉核（3～5 葉）**（呈念珠或香腸串狀）。 | **顆粒酶殉爆**<br>(Granzyme Detonation) | **【嗜中性球起點中心】**<br>(左側 · 傷害/擊退/自癒) | 單局擊殺 500 隻病原體<br>(`devour_50`) |
-| **B 淋巴細胞** | `b_cell` | $8 \sim 12\,\mu\text{m}$ | **受體密布圓球**。靜息時緊湊圓潤，外圍環繞 Y 型受體；活化時內質網如工廠展開。 | **車輪狀 / 鐘面狀核**（染色質呈輪輻放射狀排列）。 | **Y 型抗體齊射**<br>(Antibody Salvo) | **【B 細胞起點中心】**<br>(右下 · 彈道數/彈速/CDR/汲取) | 單局細胞達到等級 15<br>(`reach_level_5`) |
-| **樹突狀細胞** | `dendritic` | $15 \sim 30\,\mu\text{m}$ | **星芒樹突海葵狀**。向 360 度四面八方伸出密集的樹枝狀感知觸角，感應半徑極大。 | **中心不規則卵形核**。 | **MHC 抗原追蹤束**<br>(MHC Tracer Beam) | **【樹突狀起點中心】**<br>(正上 · 拾取/持續/冷卻) | 單局存活滿 8 分鐘 (480 秒)<br>(`survive_180s`) |
+| **Macrophage** | `macrophage` | $20 \sim 40\,\mu\text{m}$ | **Fluid amoeboid**. Violently undulating boundary with thick extending pseudopods and dark lysosome vesicles visible inside. | **Giant kidney/horseshoe-shaped single nucleus** (eccentrically placed). | **Phagocytic Grasp**<br>(Phagocytic Grasp, active: grabs 2 nearest targets plus `amount` bonus, chained shot dealing contact damage) | **[Macrophage Start Hub]**<br>(top-left · bulk/HP/armor/block) | **Unlocked by default** |
+| **Killer T cell** | `ctl` | $7 \sim 10\,\mu\text{m}$ | **Compact microvilli sphere**. Smooth and round with high-frequency low-amplitude shimmer; front polarizes into an immune synapse when dashing. | **Oversized perfectly round nucleus** (occupying $\sim 80\%$ of the interior, leaving only a thin cytoplasmic rim). | **Perforin Lance**<br>(Perforin Lance) | **[Killer T Start Hub]**<br>(right · move speed/crit/pierce/evasion) | Kill 200 pathogens in a single run<br>(`engulf_20`) |
+| **Neutrophil** | `neutrophil` | $10 \sim 15\,\mu\text{m}$ | **High-frequency jittery membrane**. Extremely unstable boundary that fragments into granules; cytoplasm packed with fine bactericidal granules. | **Segmented multi-lobed nucleus (3-5 lobes)** (beaded or sausage-string shaped). | **Granzyme Detonation**<br>(Granzyme Detonation) | **[Neutrophil Start Hub]**<br>(left · damage/knockback/self-heal) | Kill 500 pathogens in a single run<br>(`devour_50`) |
+| **B cell** | `b_cell` | $8 \sim 12\,\mu\text{m}$ | **Receptor-studded sphere**. Compact and round at rest with a ring of Y-shaped receptors; endoplasmic reticulum unfolds like a factory when activated. | **Cartwheel/clock-face nucleus** (chromatin arranged in radial spokes). | **Antibody Salvo**<br>(Antibody Salvo) | **[B Cell Start Hub]**<br>(bottom-right · projectile count/speed/CDR/leech) | Reach level 15 in a single run<br>(`reach_level_5`) |
+| **Dendritic cell** | `dendritic` | $15 \sim 30\,\mu\text{m}$ | **Stellate dendritic anemone**. Dense branch-like sensory antennae extending in all 360 degrees, with a huge sensing radius. | **Central irregular ovoid nucleus**. | **MHC Tracer Beam**<br>(MHC Tracer Beam) | **[Dendritic Start Hub]**<br>(top · pickup/duration/cooldown) | Survive 8 full minutes (480 seconds) in a single run<br>(`survive_180s`) |
 
 ---
 
-## 3. 初始基礎屬性分佈 (Base Stat Profiles)
+## 3. Starting Base Stat Profiles (Base Stat Profiles)
 
-依據各細胞的生物機能，在通用屬性矩陣中設定差異化起始基準：
+Differentiated starting baselines on the universal stat matrix, matched to each cell's biological role:
 
 ```
-[巨噬細胞]   HP: 140 | Armor: 10 | Speed: 210 | Area: 1.25 | Damage: 1.0 | Block:   8%
-[殺手 T]     HP:  90 | Armor:  0 | Speed: 260 | Crit: 15%  | Evasion: 10%| Pierce: +1
-[嗜中性球]   HP: 100 | Armor:  5 | Speed: 230 | Damage: 1.2 | Knock: 1.4  | Regen: 0.5
-[B 細胞]     HP:  95 | Armor:  0 | Speed: 220 | ProjSpd: 1.3| CDR:  10%   | Amount: +1
-[樹突細胞]   HP: 110 | Armor:  2 | Speed: 225 | Magnet: 260 | Duration: 1.2| CDR: 10%
+[Macrophage]   HP: 140 | Armor: 10 | Speed: 210 | Area: 1.25 | Damage: 1.0 | Block:   8%
+[Killer T]     HP:  90 | Armor:  0 | Speed: 260 | Crit: 15%  | Evasion: 10%| Pierce: +1
+[Neutrophil]   HP: 100 | Armor:  5 | Speed: 230 | Damage: 1.2 | Knock: 1.4  | Regen: 0.5
+[B Cell]       HP:  95 | Armor:  0 | Speed: 220 | ProjSpd: 1.3| CDR:  10%   | Amount: +1
+[Dendritic]    HP: 110 | Armor:  2 | Speed: 225 | Magnet: 260 | Duration: 1.2| CDR: 10%
 ```
 
-選角檔案欄（`ClassView/HBox/DetailPanel`）直接取用上表數值：生命／移速／護甲顯示原始數值，第四行為各職業簽名屬性（格擋／暴擊／傷害／彈速／拾取，白話標籤）；簡介（`CLASS_<ID>_BIO`）與固有技能分別取自文案表與技能目錄（`type=innate`）。數值源頭仍是各 `*Cell.cs` 的 `ApplyClassBaseStats`，`classes.json` 僅做展示鏡像，調數值時兩邊需同步。
+The class-pick detail panel (`ClassView/HBox/DetailPanel`) reads directly from the table above: HP/move speed/armor show raw values, and the fourth row shows each class's signature stat (block/crit/damage/projectile speed/pickup, with plain-language labels); bios (`CLASS_<ID>_BIO`) and innate skills come from the copy table and the skill catalog (`type=innate`) respectively. The numeric source of truth remains each `*Cell.cs`'s `ApplyClassBaseStats`; `classes.json` is only a display mirror, so both sides must be synced when tuning values.
 
 ---
 
-## 4. 動態體積與範圍縮放機制 (Volume & Area Scaling)
+## 4. Dynamic Volume and Area Scaling (Volume & Area Scaling)
 
-在《Phagocyte》中，體積大小嚴格遵循直覺且純粹的 **Area（範圍）聯動機制**（類似《流亡黯道 PoE》的 AoE 範圍縮放），徹底剔除複雜冗餘的慣性與額外發射點運算，保持戰鬥手感輕快純粹：
+In *Phagocyte*, body size strictly follows an intuitive, pure **Area-linkage mechanism** (like AoE scaling in Path of Exile), with all redundant inertia and extra-spawn-point math stripped out to keep combat feeling snappy and clean:
 
-### 4.1 即時體積縮放係數 $\alpha$
+### 4.1 Real-Time Volume Scale Factor $\alpha$
 $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area.get_value()}$$
 
-- **「體積越大，接觸面越大」（碰撞區域等比縮放）**：
-  - 細胞多邊形碰撞箱直接隨 $\alpha$ 等比縮放。
-  - **優勢**：偽足鏈射程隨之放大，遠距離先手打擊。
-  - **代價**：受擊截面同步放大，貼怪時同時觸發更多碰撞 tick。
-- **技能判定與投射物等比放大（PoE 式 AoE 縮放）**：
-  - 所有主動生化技能的判定範圍、投射物尺寸與爆炸半徑，均直接乘以 $\alpha$。
-  - 舉例：活性氧酸霧覆蓋範圍等比放大、補體瀑布地雷爆炸半徑等比擴展、穿孔長矛光束判定變寬。
-- **純粹性原則（拒絕隱性複雜機制）**：
-  - **不加入質量慣性與衝撞延遲**：無論體積多大，白血球轉向與急停手感均保持一致敏捷，杜絕操作延遲感。
-  - **發射彈道數量不受體積影響**：額外彈道數 100% 僅由通用屬性 `amount` 控制，屬性職責分明、絕不相互雜揉。
+- **"Bigger body, bigger contact surface" (collision area scales proportionally)**:
+  - The cell polygon collider scales directly with $\alpha$.
+  - **Upside**: pseudopod chain range grows with it, enabling long-range first strikes.
+  - **Cost**: the hittable cross-section grows in lockstep, triggering more concurrent collision ticks when hugging monsters.
+- **Skill hitboxes and projectiles scale proportionally (PoE-style AoE scaling)**:
+  - All active biochemical skills' hitbox areas, projectile sizes, and blast radii multiply directly by $\alpha$.
+  - Examples: ROS acid-fog coverage expands proportionally, complement-waterfall mine blast radius widens proportionally, perforin lance beam width widens.
+- **Purity principle (no hidden complexity)**:
+  - **No mass inertia or impact delay**: no matter how large the body, white blood cell turning and hard stops stay equally agile, with zero input-lag feel.
+  - **Body size never grants extra projectiles**: bonus projectile count is 100% governed by the universal `amount` stat — stat responsibilities stay cleanly separated, never blended.
 
 ---
 
-## 5. 世界觀：表觀遺傳與異變嵌合體 (Chimera Mutations)
+## 5. Worldbuilding: Epigenetics and Chimera Mutations (Chimera Mutations)
 
-- **世界觀背景**：「所有白血球皆源自全能造血幹細胞，體內皆沉睡著分化譜系的完整基因組。」
-- **跨界組合包裝**：
-  - 當 B 淋巴細胞裝配巨噬細胞專屬的「偽足猛擊」時，UI 提示：`【解鎖沉睡基因：清道夫受體 CD36】`。
-  - 視覺上，B 細胞周圍浮現溶酶體顆粒，並突發長出肉質阿米巴抓手。
-  - 這種自由 Build 被定義為**「異變嵌合體（Chimera Mutation）」**，兼顧嚴謹生物學依據與玩家建構跨界流派的極致爽點。
+- **World premise**: "Every white blood cell descends from a pluripotent hematopoietic stem cell, and each carries the complete lineage genome dormant inside."
+- **Cross-lineage build packaging**:
+  - When a B lymphocyte equips the Macrophage-exclusive "Pseudopod Slam", the UI announces: `[Unlocked dormant gene: Scavenger Receptor CD36]`.
+  - Visually, lysosome granules surface around the B cell as fleshy amoeboid graspers burst out.
+  - This freeform building is defined as **"Chimera Mutation"**, grounding rigorous biology while delivering the ultimate joy of cross-lineage buildcraft.

@@ -1,110 +1,110 @@
 # Universal Stat System Pipeline Survey
-# 全域通用 Stat 數值計算與公式接入審查報告
+# Universal Stat Computation and Formula Integration Audit Report
 
-本報告針對《Project: Phagocyte》規格書（[`docs/stat.md`](docs/stat.md)）與全域通用屬性池（[`StatProfiles.Full`](scripts/core/StatBlock.cs)）所定義之 **35 項全域通用屬性**，逐一審查其在底層公式、技能開火快照（[`HitPayload`](scripts/combat/DamageService.cs)）、受擊結算管線（[`HitPipeline`](scripts/combat/HitPipeline.cs)）、主動技能系統（[`BaseSkill`](scripts/skills/BaseSkill.cs)）與角色實體上的實際接入狀況。
+This report audits each of the **35 universal stats** defined by the Project: Phagocyte spec ([`docs/stat.md`](docs/stat.md)) and the universal stat pool ([`StatProfiles.Full`](scripts/core/StatBlock.cs)), verifying their actual integration across core formulas, skill fire snapshots ([`HitPayload`](scripts/combat/DamageService.cs)), the on-hit resolution pipeline ([`HitPipeline`](scripts/combat/HitPipeline.cs)), the active skill system ([`BaseSkill`](scripts/skills/BaseSkill.cs)), and character entities.
 
 ---
 
-## 總覽綱要 (Executive Summary)
+## Executive Summary (Executive Summary)
 
-* **通用屬性總數**：35 項（戰鬥 23 項 + 生存 11 項 + 機制 1 項）
-* **已完整接入實戰計算公式**：**35 項** (100%，`ailment_effect`／`dot_damage`／`damage_taken` 已於本次補齊，見 §四修復記錄)
-* **完全未接入計算公式**：**0 項**
+* **Total universal stats**: 35 (23 Combat + 11 Survival + 1 Utility)
+* **Fully integrated into live combat formulas**: **35** (100%; `ailment_effect`/`dot_damage`/`damage_taken` were completed in this pass, see the Section 4 fix log)
+* **Not integrated into any formula**: **0**
 
 ```
-全域屬性字典池 (35 項)
-├── 通用戰鬥屬性 (Combat - 23 項)
-│   ├── ✅ 完整接入 (23 項): damage, area, cooldown_reduction, projectile_speed, duration,
+Universal stat dictionary pool (35 stats)
+├── Universal Combat stats (Combat - 23 stats)
+│   ├── ✅ Fully integrated (23 stats): damage, area, cooldown_reduction, projectile_speed, duration,
 │   │                         amount, pierce, crit_chance, crit_damage, armor_penetration,
 │   │                         ailment_chance, ailment_effect, dot_damage, physical/fire/cold/lightning/chaos_damage,
-│   │                         melee/spell/aoe/projectile/minion_damage (Increased 加法池)
-├── 通用生存屬性 (Defense - 11 項)
-│   ├── ✅ 完整接入 (11 項): max_health, health_regen, armor, damage_taken, move_speed, evasion,
+│   │                         melee/spell/aoe/projectile/minion_damage (Increased additive pool)
+├── Universal Survival stats (Defense - 11 stats)
+│   ├── ✅ Fully integrated (11 stats): max_health, health_regen, armor, damage_taken, move_speed, evasion,
 │   │                         block, life_steal, stagger, recoup, ailment_threshold
-└── 通用機制屬性 (Utility - 1 項)
-    └── ✅ 完整接入 (1 項): magnet
+└── Universal Utility stats (Utility - 1 stat)
+    └── ✅ Fully integrated (1 stat): magnet
 ```
 
 ---
 
-## 一、通用戰鬥屬性 (Combat - 23 項)
+## I. Universal Combat Stats (Combat - 23 stats)
 
-| # | 屬性標識 (Key) | 顯示名稱 | 狀態 | 核心實作位置 | 運算公式與架構行為 |
+| # | Stat Key | Display Name | Status | Core Implementation | Formula & Architectural Behavior |
 | :- | :--- | :--- | :-: | :--- | :--- |
-| 1 | `damage` | 通用傷害 | ✅ 已接入 | [`BaseSkill.cs:296-308`](scripts/skills/BaseSkill.cs#L296-L308) | $\text{dmg} = \text{base} \times \max(0, 1.0 + \text{inc})$，其中 $\text{inc} = (\text{damage}-1) + (\text{type}-1) + \sum (\text{tag}-1)$（PoE 風格 Increased 加法池）。 |
-| 2 | `area` | 範圍/體積 | ✅ 已接入 | [`BaseSkill.cs:362`](scripts/skills/BaseSkill.cs#L362)<br>[`PlayerActor.cs:247`](scripts/player/PlayerActor.cs#L247) | 技能判定半徑：$R = R_{\text{base}} \times \text{area}$；<br>角色本體幾何受擊面：$R_{\text{player}} = R_{\text{base}} \times \text{area}$，同步縮放視覺形變幅度。 |
-| 3 | `cooldown_reduction` | CDR (冷卻縮減) | ✅ 已接入 | [`BaseSkill.cs:290`](scripts/skills/BaseSkill.cs#L290)<br>[`StatBlock.cs:129`](scripts/core/StatBlock.cs#L129) | $T_{\text{actual}} = T_{\text{base}} \times (1.0 - \text{CDR})$，在 `StatBlock` 內部硬上限鉗制於 $0.75$ (75%)。 |
-| 4 | `projectile_speed` | 彈道速度 | ✅ 已接入 | [`BaseSkill.cs:383`](scripts/skills/BaseSkill.cs#L383) | $V = V_{\text{base}} \times \text{projectile\_speed}$，套用於 [`SalvoSkill`](scripts/skills/SalvoSkill.cs) 與各類飛行實體發射初速。 |
-| 5 | `duration` | 持續時間 | ✅ 已接入 | [`BaseSkill.cs:390`](scripts/skills/BaseSkill.cs#L390)<br>[`StatBlock.cs:335`](scripts/core/StatBlock.cs#L335) | $D = D_{\text{base}} \times \text{duration}$，影響 [`ZoneSkill`](scripts/skills/ZoneSkill.cs#L54) 地面區域、酸霧與地雷留存引信時間。 |
-| 6 | `amount` | 額外發射數量 | ✅ 已接入 | [`BaseSkill.cs:369`](scripts/skills/BaseSkill.cs#L369) | $N = N_{\text{base}} + \lfloor\text{amount}\rfloor$，在發射循環中直接增加彈道投射物束數、地雷拋射個數。 |
-| 7 | `pierce` | 穿透次數 | ✅ 已接入 | [`BaseSkill.cs:376`](scripts/skills/BaseSkill.cs#L376) | $P = P_{\text{base}} + \lfloor\text{pierce}\rfloor$，注入彈道實體 Pierce 計數器，穿透目標後不銷毀繼續前行。 |
-| 8 | `crit_chance` | 特異性暴擊率 | ✅ 已接入 | [`BaseSkill.cs:397`](scripts/skills/BaseSkill.cs#L397)<br>[`HitPipeline.cs:108`](scripts/combat/HitPipeline.cs#L108) | 施法時凍結進 [`HitPayload.CritChance`](scripts/combat/DamageService.cs#L39)，受擊時以 $\text{randf}() < \text{crit\_chance}$ 判定暴擊。硬上限 $1.0$。 |
-| 9 | `crit_damage` | 暴擊傷害倍率 | ✅ 已接入 | [`BaseSkill.cs:405`](scripts/skills/BaseSkill.cs#L405)<br>[`HitPipeline.cs:65`](scripts/combat/HitPipeline.cs#L65) | 凍結至 [`HitPayload.CritMultiplier`](scripts/combat/DamageService.cs#L40)，若暴擊判定成功則 $\text{rawDamage} = \text{damage} \times \text{crit\_damage}$。 |
-| 10 | `armor_penetration` | 護甲穿透 | ✅ 已接入 | [`BaseSkill.cs:414`](scripts/skills/BaseSkill.cs#L414)<br>[`CombatInterfaces.cs:28`](scripts/combat/CombatInterfaces.cs#L28) | 凍結至 [`HitPayload.ArmorPenetration`](scripts/combat/DamageService.cs#L41)，以 $\text{Armor}_{\text{eff}} = \text{Armor} \times (1.0 - \text{pen})$ 削減目標護甲。 |
-| 11 | `ailment_chance` | 異常觸發率 | ✅ 已接入 | [`BaseSkill.cs:421`](scripts/skills/BaseSkill.cs#L421)<br>[`HitPipeline.cs:88`](scripts/combat/HitPipeline.cs#L88) | 命中後以 $\text{isCrit} \lor (\text{randf}() < \text{ailment\_chance})$ 判定是否觸發掛載之 [`EffectSpec`](scripts/combat/EffectSpec.cs)。 |
-| 12 | `dot_damage` | 持續傷害倍率 | ✅ 已接入（hit-time） | [`HitPipeline.cs`](scripts/combat/HitPipeline.cs) `DispatchEffects`／`DotDamageOf` | 受擊時即時讀取施加者：$\text{dps} = \text{mag} \times \text{scale} \times \text{dot\_damage}$（有意未走烘焙期，見 §四.2 修復記錄）。 |
-| 13 | `physical_damage` | 物理傷害加成 | ✅ 已接入 | [`BaseSkill.cs:355`](scripts/skills/BaseSkill.cs#L355) | 技能 `damage_type: physical` 時，與 `damage` 加算進 Increased 加法池。 |
-| 14 | `fire_damage` | 火焰傷害加成 | ✅ 已接入 | [`BaseSkill.cs:351`](scripts/skills/BaseSkill.cs#L351) | 技能 `damage_type: fire` 時，與 `damage` 加算進 Increased 加法池。 |
-| 15 | `cold_damage` | 冰霜傷害加成 | ✅ 已接入 | [`BaseSkill.cs:352`](scripts/skills/BaseSkill.cs#L352) | 技能 `damage_type: cold` 時，與 `damage` 加算進 Increased 加法池。 |
-| 16 | `lightning_damage`| 閃電傷害加成 | ✅ 已接入 | [`BaseSkill.cs:353`](scripts/skills/BaseSkill.cs#L353) | 技能 `damage_type: lightning` 時，與 `damage` 加算進 Increased 加法池。 |
-| 17 | `chaos_damage` | 混沌傷害加成 | ✅ 已接入 | [`BaseSkill.cs:354`](scripts/skills/BaseSkill.cs#L354) | 技能 `damage_type: chaos` 時，與 `damage` 加算進 Increased 加法池。 |
-| 18 | `melee_damage` | 近戰傷害條件加成 | ✅ 已接入 | [`BaseSkill.cs:300`](scripts/skills/BaseSkill.cs#L300) | 若技能攜帶 `Melee` 標籤，加算進 Increased 加法池。 |
-| 19 | `spell_damage` | 法術傷害條件加成 | ✅ 已接入 | [`BaseSkill.cs:301`](scripts/skills/BaseSkill.cs#L301) | 若技能攜帶 `Spell` 標籤，加算進 Increased 加法池。 |
-| 20 | `aoe_damage` | 範圍傷害條件加成 | ✅ 已接入 | [`BaseSkill.cs:302`](scripts/skills/BaseSkill.cs#L302) | 若技能攜帶 `AOE` 標籤，加算進 Increased 加法池。 |
-| 21 | `projectile_damage`| 投射物條件加成 | ✅ 已接入 | [`BaseSkill.cs:303`](scripts/skills/BaseSkill.cs#L303) | 若技能攜帶 `Projectile` 標籤，加算進 Increased 加法池。 |
-| 22 | `minion_damage` | 召喚物條件加成 | ✅ 已接入 | [`BaseSkill.cs:304`](scripts/skills/BaseSkill.cs#L304) | 若技能攜帶 `Minion` 標籤，加算進 Increased 加法池（待召喚技能）。 |
-| 23 | `ailment_effect`| 異常效果強度乘數 | ✅ 已接入（hit-time） | [`HitPipeline.cs`](scripts/combat/HitPipeline.cs) `DispatchEffects`／`AilmentEffectOf` + [`StatusController.IsDotChannel`](scripts/combat/StatusController.cs) | 非 DoT 通道 $\text{mag} = \text{mag} \times \text{scale} \times \text{ailment\_effect}$，持續時間不變，DoT 通道排除；非玩家施加者視為 `1.0`。 |
+| 1 | `damage` | Universal Damage | ✅ Integrated | [`BaseSkill.cs:296-308`](scripts/skills/BaseSkill.cs#L296-L308) | $\text{dmg} = \text{base} \times \max(0, 1.0 + \text{inc})$, where $\text{inc} = (\text{damage}-1) + (\text{type}-1) + \sum (\text{tag}-1)$ (PoE-style Increased additive pool). |
+| 2 | `area` | Area/Volume | ✅ Integrated | [`BaseSkill.cs:362`](scripts/skills/BaseSkill.cs#L362)<br>[`PlayerActor.cs:247`](scripts/player/PlayerActor.cs#L247) | Skill hit radius: $R = R_{\text{base}} \times \text{area}$;<br>Character body geometric hit surface: $R_{\text{player}} = R_{\text{base}} \times \text{area}$, scaling the visual deformation amplitude in sync. |
+| 3 | `cooldown_reduction` | CDR (Cooldown Reduction) | ✅ Integrated | [`BaseSkill.cs:290`](scripts/skills/BaseSkill.cs#L290)<br>[`StatBlock.cs:129`](scripts/core/StatBlock.cs#L129) | $T_{\text{actual}} = T_{\text{base}} \times (1.0 - \text{CDR})$, hard-capped at $0.75$ (75%) inside `StatBlock`. |
+| 4 | `projectile_speed` | Projectile Speed | ✅ Integrated | [`BaseSkill.cs:383`](scripts/skills/BaseSkill.cs#L383) | $V = V_{\text{base}} \times \text{projectile\_speed}$, applied to [`SalvoSkill`](scripts/skills/SalvoSkill.cs) and the launch velocity of all flying entities. |
+| 5 | `duration` | Duration | ✅ Integrated | [`BaseSkill.cs:390`](scripts/skills/BaseSkill.cs#L390)<br>[`StatBlock.cs:335`](scripts/core/StatBlock.cs#L335) | $D = D_{\text{base}} \times \text{duration}$, affecting ground zones, acid mist, and mine persistence/fuse time for [`ZoneSkill`](scripts/skills/ZoneSkill.cs#L54). |
+| 6 | `amount` | Bonus Projectile Count | ✅ Integrated | [`BaseSkill.cs:369`](scripts/skills/BaseSkill.cs#L369) | $N = N_{\text{base}} + \lfloor\text{amount}\rfloor$, directly adding projectile beams and lobbed mines in the fire loop. |
+| 7 | `pierce` | Pierce Count | ✅ Integrated | [`BaseSkill.cs:376`](scripts/skills/BaseSkill.cs#L376) | $P = P_{\text{base}} + \lfloor\text{pierce}\rfloor$, injected into the projectile entity's Pierce counter so it keeps travelling instead of despawning after penetrating a target. |
+| 8 | `crit_chance` | Specificity Crit Chance | ✅ Integrated | [`BaseSkill.cs:397`](scripts/skills/BaseSkill.cs#L397)<br>[`HitPipeline.cs:108`](scripts/combat/HitPipeline.cs#L108) | Frozen into [`HitPayload.CritChance`](scripts/combat/DamageService.cs#L39) at cast time; crit is rolled on hit with $\text{randf}() < \text{crit\_chance}$. Hard cap $1.0$. |
+| 9 | `crit_damage` | Crit Damage Multiplier | ✅ Integrated | [`BaseSkill.cs:405`](scripts/skills/BaseSkill.cs#L405)<br>[`HitPipeline.cs:65`](scripts/combat/HitPipeline.cs#L65) | Frozen into [`HitPayload.CritMultiplier`](scripts/combat/DamageService.cs#L40); on a successful crit roll, $\text{rawDamage} = \text{damage} \times \text{crit\_damage}$. |
+| 10 | `armor_penetration` | Armor Penetration | ✅ Integrated | [`BaseSkill.cs:414`](scripts/skills/BaseSkill.cs#L414)<br>[`CombatInterfaces.cs:28`](scripts/combat/CombatInterfaces.cs#L28) | Frozen into [`HitPayload.ArmorPenetration`](scripts/combat/DamageService.cs#L41), reducing target armor via $\text{Armor}_{\text{eff}} = \text{Armor} \times (1.0 - \text{pen})$. |
+| 11 | `ailment_chance` | Ailment Chance | ✅ Integrated | [`BaseSkill.cs:421`](scripts/skills/BaseSkill.cs#L421)<br>[`HitPipeline.cs:88`](scripts/combat/HitPipeline.cs#L88) | After a hit, $\text{isCrit} \lor (\text{randf}() < \text{ailment\_chance})$ decides whether the attached [`EffectSpec`](scripts/combat/EffectSpec.cs) triggers. |
+| 12 | `dot_damage` | Damage-over-Time Multiplier | ✅ Integrated (hit-time) | [`HitPipeline.cs`](scripts/combat/HitPipeline.cs) `DispatchEffects`/`DotDamageOf` | Reads the applier live on hit: $\text{dps} = \text{mag} \times \text{scale} \times \text{dot\_damage}$ (deliberately not baked at cast time, see the Section IV.2 fix log). |
+| 13 | `physical_damage` | Physical Damage Bonus | ✅ Integrated | [`BaseSkill.cs:355`](scripts/skills/BaseSkill.cs#L355) | When the skill's `damage_type: physical`, adds together with `damage` into the Increased additive pool. |
+| 14 | `fire_damage` | Fire Damage Bonus | ✅ Integrated | [`BaseSkill.cs:351`](scripts/skills/BaseSkill.cs#L351) | When the skill's `damage_type: fire`, adds together with `damage` into the Increased additive pool. |
+| 15 | `cold_damage` | Cold Damage Bonus | ✅ Integrated | [`BaseSkill.cs:352`](scripts/skills/BaseSkill.cs#L352) | When the skill's `damage_type: cold`, adds together with `damage` into the Increased additive pool. |
+| 16 | `lightning_damage`| Lightning Damage Bonus | ✅ Integrated | [`BaseSkill.cs:353`](scripts/skills/BaseSkill.cs#L353) | When the skill's `damage_type: lightning`, adds together with `damage` into the Increased additive pool. |
+| 17 | `chaos_damage` | Chaos Damage Bonus | ✅ Integrated | [`BaseSkill.cs:354`](scripts/skills/BaseSkill.cs#L354) | When the skill's `damage_type: chaos`, adds together with `damage` into the Increased additive pool. |
+| 18 | `melee_damage` | Melee Conditional Damage Bonus | ✅ Integrated | [`BaseSkill.cs:300`](scripts/skills/BaseSkill.cs#L300) | When the skill carries the `Melee` tag, adds into the Increased additive pool. |
+| 19 | `spell_damage` | Spell Conditional Damage Bonus | ✅ Integrated | [`BaseSkill.cs:301`](scripts/skills/BaseSkill.cs#L301) | When the skill carries the `Spell` tag, adds into the Increased additive pool. |
+| 20 | `aoe_damage` | Area Conditional Damage Bonus | ✅ Integrated | [`BaseSkill.cs:302`](scripts/skills/BaseSkill.cs#L302) | When the skill carries the `AOE` tag, adds into the Increased additive pool. |
+| 21 | `projectile_damage`| Projectile Conditional Bonus | ✅ Integrated | [`BaseSkill.cs:303`](scripts/skills/BaseSkill.cs#L303) | When the skill carries the `Projectile` tag, adds into the Increased additive pool. |
+| 22 | `minion_damage` | Minion Conditional Bonus | ✅ Integrated | [`BaseSkill.cs:304`](scripts/skills/BaseSkill.cs#L304) | When the skill carries the `Minion` tag, adds into the Increased additive pool (pending summon skills). |
+| 23 | `ailment_effect`| Ailment Effect Multiplier | ✅ Integrated (hit-time) | [`HitPipeline.cs`](scripts/combat/HitPipeline.cs) `DispatchEffects`/`AilmentEffectOf` + [`StatusController.IsDotChannel`](scripts/combat/StatusController.cs) | For non-DoT channels, $\text{mag} = \text{mag} \times \text{scale} \times \text{ailment\_effect}$ with duration unchanged; DoT channels excluded; non-player appliers count as `1.0`. |
 
 ---
 
-## 二、通用生存屬性 (Defense - 11 項)
+## II. Universal Survival Stats (Defense - 11 stats)
 
-| # | 屬性標識 (Key) | 顯示名稱 | 狀態 | 核心實作位置 | 運算公式與架構行為 |
+| # | Stat Key | Display Name | Status | Core Implementation | Formula & Architectural Behavior |
 | :- | :--- | :--- | :-: | :--- | :--- |
-| 1 | `max_health` | 最大生命 | ✅ 已接入 | [`PlayerActor.cs:242`](scripts/player/PlayerActor.cs#L242)<br>[`PlayerActor.cs:578`](scripts/player/PlayerActor.cs#L578) | 初始化生命基準，受擊扣血與自癒上限限制；屬性變更時依百分比等比重算當前血量。 |
-| 2 | `health_regen` | 自癒率 | ✅ 已接入 | [`PlayerActor.cs:369-373`](scripts/player/PlayerActor.cs#L369-L373) | 每物理幀由 `HandleRegen` 驅動：$\text{Heal}(\text{health\_regen} \times \Delta t)$（受突變詞條禁用約束）。 |
-| 3 | `armor` | 膜剛性/護甲 | ✅ 已接入 | [`HitPipeline.cs:72`](scripts/combat/HitPipeline.cs#L72)<br>[`CombatInterfaces.cs:31`](scripts/combat/CombatInterfaces.cs#L31) | POE 邊際減傷公式：<br>$\text{DR} = \frac{\text{Armor}_{\text{eff}}}{\text{Armor}_{\text{eff}} + 5.0 \times \text{Damage}}$，大傷害穿透深，減傷上限 85%。 |
-| 4 | `move_speed` | 移動速度 | ✅ 已接入 | [`PlayerActor.cs:404`](scripts/player/PlayerActor.cs#L404) | 驅動玩家物理移動向量 $V = \text{InputDirection} \times \text{move\_speed}$，包含衝刺速度的基準錨點。 |
-| 5 | `evasion` | 流體閃避率 | ✅ 已接入 | [`HitPipeline.cs:35`](scripts/combat/HitPipeline.cs#L35)<br>[`StatBlock.cs:133`](scripts/core/StatBlock.cs#L133) | 受擊第 1 順位防禦判定：$\text{randf}() < \text{evasion}$ 觸發 `EVADED`，完全免疫該次直擊傷害。硬上限 $0.60$ (60%)。 |
-| 6 | `block` | 糖萼格擋率 | ✅ 已接入 | [`HitPipeline.cs:48`](scripts/combat/HitPipeline.cs#L48)<br>[`StatBlock.cs:134`](scripts/core/StatBlock.cs#L134) | 受擊第 2 順位防禦判定：$\text{randf}() < \text{block}$ 觸發 `BLOCKED`，偏轉吸收傷害。硬上限 $0.75$ (75%)。 |
-| 7 | `life_steal` | 受體汲取/吸血 | ✅ 已接入 | [`HitPipeline.cs:179`](scripts/combat/HitPipeline.cs#L179)<br>[`StatBlock.cs:135`](scripts/core/StatBlock.cs#L135) | 攻擊命中敵人時觸發：$\text{randf}() < \text{life\_steal}$ 觸發立即修復 1 點生命值。硬上限 $0.20$ (20%)。 |
-| 8 | `stagger` | 偏轉/延傷 | ✅ 已接入 | [`PlayerActor.cs:568-570`](scripts/player/PlayerActor.cs#L568-L570)<br>[`PlayerActor.cs:380-385`](scripts/player/PlayerActor.cs#L380-L385) | 直擊受傷拆分：$\text{instant} = \text{damage} \times (1.0 - \text{stagger})$，其餘計入 `StaggerPool` 在 4 秒內平攤為無視護甲之 DoT 扣除。硬上限 $0.60$。 |
-| 9 | `recoup` | 回收/延補 | ✅ 已接入 | [`PlayerActor.cs:571-572`](scripts/player/PlayerActor.cs#L571-L572)<br>[`PlayerActor.cs:388-394`](scripts/player/PlayerActor.cs#L388-L394) | 直擊受傷回補：$\text{RecoupPool} += \text{damage} \times \text{recoup}$，在 4 秒內分期自動治癒回復 HP。硬上限 $0.30$。 |
-| 10 | `ailment_threshold`| 異常閾值 | ✅ 已接入 | [`HitPipeline.cs:150-166`](scripts/combat/HitPipeline.cs#L150-L166) | 異常承受門檻：$\text{Threshold} = \text{MaxHP} \times 0.05 \times \text{ailment\_threshold}$；<br>異常強度縮放因子 $\text{scale} = \text{clamp}(\text{DamageDealt} / \text{Threshold}, 0.0, 1.0)$。 |
-| 11 | `damage_taken` | 承受傷害乘數 | ✅ 已接入 | [`PlayerActor.cs`](scripts/player/PlayerActor.cs) `InvalidateDefenses`／`TakeDoTDamage` | 玩家防禦＝突變倍率 × `damage_taken`；直擊與 DoT 入場各乘一次，延傷池 drain 走原始路徑不重複計算；`0` 視為未設置而跳過（與管線守衛一致）。 |
+| 1 | `max_health` | Max Health | ✅ Integrated | [`PlayerActor.cs:242`](scripts/player/PlayerActor.cs#L242)<br>[`PlayerActor.cs:578`](scripts/player/PlayerActor.cs#L578) | Establishes the baseline HP; bounds on-hit HP loss and self-heal caps; current HP is rescaled proportionally when the stat changes. |
+| 2 | `health_regen` | Self-Heal Rate | ✅ Integrated | [`PlayerActor.cs:369-373`](scripts/player/PlayerActor.cs#L369-L373) | Driven by `HandleRegen` every physics frame: $\text{Heal}(\text{health\_regen} \times \Delta t)$ (subject to mutator-based disable constraints). |
+| 3 | `armor` | Membrane Rigidity/Armor | ✅ Integrated | [`HitPipeline.cs:72`](scripts/combat/HitPipeline.cs#L72)<br>[`CombatInterfaces.cs:31`](scripts/combat/CombatInterfaces.cs#L31) | POE diminishing-returns formula:<br>$\text{DR} = \frac{\text{Armor}_{\text{eff}}}{\text{Armor}_{\text{eff}} + 5.0 \times \text{Damage}}$, large hits penetrate deeper; damage-reduction cap 85%. |
+| 4 | `move_speed` | Move Speed | ✅ Integrated | [`PlayerActor.cs:404`](scripts/player/PlayerActor.cs#L404) | Drives the player physics movement vector $V = \text{InputDirection} \times \text{move\_speed}$, including the baseline anchor for dash speed. |
+| 5 | `evasion` | Fluid Evasion Chance | ✅ Integrated | [`HitPipeline.cs:35`](scripts/combat/HitPipeline.cs#L35)<br>[`StatBlock.cs:133`](scripts/core/StatBlock.cs#L133) | First-priority defense roll on hit: $\text{randf}() < \text{evasion}$ triggers `EVADED`, fully negating that direct hit. Hard cap $0.60$ (60%). |
+| 6 | `block` | Glycocalyx Block Chance | ✅ Integrated | [`HitPipeline.cs:48`](scripts/combat/HitPipeline.cs#L48)<br>[`StatBlock.cs:134`](scripts/core/StatBlock.cs#L134) | Second-priority defense roll on hit: $\text{randf}() < \text{block}$ triggers `BLOCKED`, deflecting and absorbing the damage. Hard cap $0.75$ (75%). |
+| 7 | `life_steal` | Receptor Leech/Life Steal | ✅ Integrated | [`HitPipeline.cs:179`](scripts/combat/HitPipeline.cs#L179)<br>[`StatBlock.cs:135`](scripts/core/StatBlock.cs#L135) | Triggers when an attack hits an enemy: $\text{randf}() < \text{life\_steal}$ triggers an instant 1-HP restore. Hard cap $0.20$ (20%). |
+| 8 | `stagger` | Deflect/Delayed Damage | ✅ Integrated | [`PlayerActor.cs:568-570`](scripts/player/PlayerActor.cs#L568-L570)<br>[`PlayerActor.cs:380-385`](scripts/player/PlayerActor.cs#L380-L385) | Direct-hit damage split: $\text{instant} = \text{damage} \times (1.0 - \text{stagger})$, with the remainder booked into `StaggerPool` and spread over 4 seconds as armor-ignoring DoT deductions. Hard cap $0.60$. |
+| 9 | `recoup` | Recoup/Delayed Healing | ✅ Integrated | [`PlayerActor.cs:571-572`](scripts/player/PlayerActor.cs#L571-L572)<br>[`PlayerActor.cs:388-394`](scripts/player/PlayerActor.cs#L388-L394) | Direct-hit recovery: $\text{RecoupPool} += \text{damage} \times \text{recoup}$, automatically healing back HP in installments over 4 seconds. Hard cap $0.30$. |
+| 10 | `ailment_threshold`| Ailment Threshold | ✅ Integrated | [`HitPipeline.cs:150-166`](scripts/combat/HitPipeline.cs#L150-L166) | Ailment tolerance gate: $\text{Threshold} = \text{MaxHP} \times 0.05 \times \text{ailment\_threshold}$;<br>Ailment intensity scale factor $\text{scale} = \text{clamp}(\text{DamageDealt} / \text{Threshold}, 0.0, 1.0)$. |
+| 11 | `damage_taken` | Damage Taken Multiplier | ✅ Integrated | [`PlayerActor.cs`](scripts/player/PlayerActor.cs) `InvalidateDefenses`/`TakeDoTDamage` | Player defense = mutator multiplier x `damage_taken`; direct hits and DoT entries each multiply once on intake, while stagger-pool drains take the original path without double-counting; `0` counts as unset and is skipped (consistent with the pipeline guard). |
 
 ---
 
-## 三、通用機制屬性 (Utility - 1 項)
+## III. Universal Utility Stats (Utility - 1 stat)
 
-| # | 屬性標識 (Key) | 顯示名稱 | 狀態 | 核心實作位置 | 運算公式與架構行為 |
+| # | Stat Key | Display Name | Status | Core Implementation | Formula & Architectural Behavior |
 | :- | :--- | :--- | :-: | :--- | :--- |
-| 1 | `magnet` | 趨化引力 (拾取) | ✅ 已接入 | [`EquipmentDrop.cs:72-80`](scripts/core/EquipmentDrop.cs#L72-L80) | 當掉落物與玩家距離 $\text{dist} \le \text{magnet}$ 時觸發牽引；<br>拉取速度 $V_{\text{pull}} = \text{lerp}(V_{\text{max}}, V_{\text{min}}, \text{dist} / \text{magnet})$ 沿方向向量平滑吸附。 |
+| 1 | `magnet` | Chemotactic Pull (Pickup) | ✅ Integrated | [`EquipmentDrop.cs:72-80`](scripts/core/EquipmentDrop.cs#L72-L80) | Pull triggers when a drop is within $\text{dist} \le \text{magnet}$ of the player;<br>pull speed $V_{\text{pull}} = \text{lerp}(V_{\text{max}}, V_{\text{min}}, \text{dist} / \text{magnet})$ smoothly attracts it along the direction vector. |
 
 ---
 
-## 四、缺失與待修復點分析 (Gap Analysis & Action Plan) —— §1–3 已修復，記錄保留備查
+## IV. Gap Analysis & Action Plan (Gap Analysis & Action Plan) — Sections 1-3 Fixed, Records Kept for Reference
 
-### 1. `ailment_effect` 異常效果乘數完全未介入 → ✅ 已修復（hit-time）
-* **原狀**：當玩家掛載異常時，[`HitPipeline.DispatchEffects`](scripts/combat/HitPipeline.cs#L135-L148) 僅根據受到傷害與目標的 `ailment_threshold` 計算 `scale`，攻擊者身上的 `ailment_effect`（如天賦、裝備加成）完全未影響異常強度。
-* **實際修復**：`DispatchEffects` 即時讀取施加者 `ailment_effect`（`AilmentEffectOf`，非玩家＝`1.0`），`ApplyEffect` 僅對非 DoT 通道（`StatusController.IsDotChannel` 判定）施加 `mag × scale × ailment_effect`，持續時間不變。
-* **建議補齊方式**：
-  在 [`HitPipeline.DispatchEffects`](scripts/combat/HitPipeline.cs#L135) 或 [`HitPayload`](scripts/combat/DamageService.cs#L36) 中傳入施加者的異常效果倍率，將最終施加的非 DoT 效果 magnitude 乘上該倍率：
+### 1. `ailment_effect` Ailment-Effect Multiplier Never Applied -> ✅ Fixed (hit-time)
+* **Original state**: when the player applied ailments, [`HitPipeline.DispatchEffects`](scripts/combat/HitPipeline.cs#L135-L148) computed `scale` only from damage dealt and the target's `ailment_threshold`; the attacker's `ailment_effect` (e.g. talent and equipment bonuses) never affected ailment intensity.
+* **Actual fix**: `DispatchEffects` reads the applier's `ailment_effect` live (`AilmentEffectOf`, non-players = `1.0`), and `ApplyEffect` applies `mag × scale × ailment_effect` only to non-DoT channels (decided by `StatusController.IsDotChannel`), with duration unchanged.
+* **Suggested completion**:
+  Pass the applier's ailment-effect multiplier in [`HitPipeline.DispatchEffects`](scripts/combat/HitPipeline.cs#L135) or [`HitPayload`](scripts/combat/DamageService.cs#L36) so the final applied non-DoT effect magnitude is multiplied by it:
   ```csharp
   float attackerAilEffect = attacker is PlayerActor pa ? pa.Stats?.GetStat("ailment_effect") ?? 1.0f : 1.0f;
   float mag = e.Magnitude >= 0.0f ? e.Magnitude * scale * attackerAilEffect : e.Magnitude;
   ```
 
-### 2. `dot_damage` 持續傷害倍率未進入技能 On-Hit 烘焙 → ✅ 已修復（改走 hit-time，非烘焙期）
-* **原狀**：[`BaseSkill.BuildOnHitEffects`](scripts/skills/BaseSkill.cs#L245-L269) 解析 `active.json` 中的 `on_hit` 異常（如 ignite、bleed）時，僅依直擊傷害 `dmg * mult` 計算 magnitude，漏掉了 `dot_damage` 乘數；此外 [`StatusController.Tick`](scripts/combat/StatusController.cs#L255) 亦無施加者屬性聯動。
-* **實際修復**：有意未走烘焙期——`HitPipeline.ApplyEffect` 受擊時即時讀取施加者 `dot_damage`（`DotDamageOf`），DoT 通道 `mag × scale × dot_damage`；另新增護甲對 DoT：`× (1 − FromArmorDot(armor, dps, pen))`，`DotArmorFactor = 5.0`（調大減傷變弱），以每秒 dps 為單位（非總量，duration 中性、與 refresh 語義相容）。
-* **建議補齊方式**：
-  在 [`BaseSkill.TryParseOnHit`](scripts/skills/BaseSkill.cs#L230-L239) 或主動技能烘焙 EffectSpec 時，若該狀態為 DoT Channel（或在技能參數定義中），乘入 `host.GetStat("dot_damage")`。
+### 2. `dot_damage` DoT Multiplier Missing from Skill On-Hit Baking -> ✅ Fixed (moved to hit-time, not bake-time)
+* **Original state**: when [`BaseSkill.BuildOnHitEffects`](scripts/skills/BaseSkill.cs#L245-L269) parsed `on_hit` ailments (e.g. ignite, bleed) from `active.json`, it computed magnitude only from direct-hit damage `dmg * mult`, dropping the `dot_damage` multiplier; [`StatusController.Tick`](scripts/combat/StatusController.cs#L255) likewise had no applier-stat linkage.
+* **Actual fix**: deliberately not bake-time — `HitPipeline.ApplyEffect` reads the applier's `dot_damage` live on hit (`DotDamageOf`), with DoT channels using `mag × scale × dot_damage`; armor vs. DoT was also added: `× (1 − FromArmorDot(armor, dps, pen))`, with `DotArmorFactor = 5.0` (raising it weakens mitigation), computed per-second in dps units (not totals, duration-neutral and compatible with refresh semantics).
+* **Suggested completion**:
+  In [`BaseSkill.TryParseOnHit`](scripts/skills/BaseSkill.cs#L230-L239) or when baking EffectSpecs for active skills, multiply in `host.GetStat("dot_damage")` if the status is a DoT Channel (or in the skill parameter definitions).
 
-### 3. `damage_taken` 承受傷害未綁定玩家防禦結構體 → ✅ 已修復（含 DoT 入場）
-* **原狀**：[`PlayerActor.cs:172`](scripts/player/PlayerActor.cs#L172) 中 `_cachedDefenses.DamageTakenMultiplier` 僅被賦予 `RunMutatorService.IncomingDamageMultiplier`，忽視了天賦星盤或負面效果對玩家 `damage_taken` 屬性的修改。
-* **實際修復**：`InvalidateDefenses` 改為突變倍率 × `damage_taken`；`TakeDoTDamage` 入場同乘（劇本直傷與延傷池 drain 不經此路徑）；`0` 視為未設置而跳過，與管線守衛一致。
-* **建議補齊方式**：
+### 3. `damage_taken` Damage-Taken Multiplier Not Bound to Player Defense Struct -> ✅ Fixed (including DoT intake)
+* **Original state**: [`PlayerActor.cs:172`](scripts/player/PlayerActor.cs#L172) assigned `_cachedDefenses.DamageTakenMultiplier` only from `RunMutatorService.IncomingDamageMultiplier`, ignoring talent-tree or debuff modifications to the player's `damage_taken` stat.
+* **Actual fix**: `InvalidateDefenses` now uses mutator multiplier x `damage_taken`; `TakeDoTDamage` multiplies likewise on intake (scripted direct damage and stagger-pool drains bypass this path); `0` counts as unset and is skipped, consistent with the pipeline guard.
+* **Suggested completion**:
   ```csharp
   DamageTakenMultiplier = RunMutatorService.IncomingDamageMultiplier * (Stats?.GetStat("damage_taken") ?? 1.0f),
   ```

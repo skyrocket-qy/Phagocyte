@@ -1,27 +1,27 @@
-# 《Project: Phagocyte》造血幹細胞正交天賦星盤規格書 (Hematopoiesis Talent Matrix)
+# Project: Phagocyte Hematopoietic Stem Cell Orthogonal Talent Tree Spec (Hematopoiesis Talent Matrix)
 
 ---
 
-## 1. 核心設計概念與五大起點架構
+## 1. Core Design Concept and Five-Starting-Hub Architecture
 
-天賦系統將《流亡黯道》（Path of Exile）的單一大星盤架構與微觀生物學結合，打造為頂級的**共軛焦螢光微觀生化星盤（Confocal Fluorescence Microtubule Board）**：
+The talent system combines the Path of Exile single-giant-tree architecture with microscopic biology to build a top-tier **confocal fluorescence microscopic biochemical tree (Confocal Fluorescence Microtubule Board)**:
 
-- **五大白血球獨立起點中心 (5 Distinct Cell Starting Hubs)**：
-  不同於傳統單一中心向外輻射的設計，**五種免疫細胞各有獨立的專屬起點中心**。
-  當玩家出戰巨噬細胞時，直接從「巨噬起點中心」點亮起步；出戰 CTL 時，從「CTL 起點中心」起步。玩家既能在自身譜系內深耕，也能沿著微管網絡延伸至中央互通幹道，跨入其他細胞的起點與特化區域（跨界嵌合分化）。
+- **Five White Blood Cells, Independent Starting Hubs (5 Distinct Cell Starting Hubs)**:
+  Unlike traditional designs radiating from a single center, **each of the five immune cells has its own dedicated starting hub**.
+  When the player deploys a Macrophage, they light up directly from the "Macrophage starting hub"; when deploying a CTL, they start from the "CTL starting hub". Players can deepen their own lineage or extend along the microtubule network to the central interconnect trunk and cross into other cells' starting hubs and specialization zones (cross-lineage chimeric differentiation).
 
 ```mermaid
 flowchart TD
-    subgraph StartingHubs [五大細胞獨立起點中心 (5 Distinct Starting Hubs)]
-        HUB_MAC["【巨噬起點中心】<br>(Macrophage Hub · 左上方)<br>體積 Area / 生命 HP / 護甲 Armor / 格擋 Block"]
-        HUB_CTL["【殺手 T 起點中心】<br>(CTL Hub · 右上方)<br>移速 Speed / 暴擊 Crit / 穿透 Pierce / 閃避 Evasion"]
-        HUB_NEU["【嗜中性球起點中心】<br>(Neutrophil Hub · 左下方)<br>傷害 Damage / 擊退 Knock / 自癒 Regen"]
-        HUB_B["【B 細胞起點中心】<br>(B-Cell Hub · 右下方)<br>彈道數 Amount / 彈速 ProjSpd / CDR / 汲取 LifeSteal"]
-        HUB_DC["【樹突狀起點中心】<br>(Dendritic Hub · 左中段)<br>拾取 Magnet / 持續 Duration / 冷卻 CDR"]
+    subgraph StartingHubs [Five Independent Cell Starting Hubs (5 Distinct Starting Hubs)]
+        HUB_MAC["[Macrophage Starting Hub]<br>(Macrophage Hub - top-left)<br>Bulk Area / Health HP / Armor / Block"]
+        HUB_CTL["[Killer T Starting Hub]<br>(CTL Hub - top-right)<br>Move Speed / Crit / Pierce / Evasion"]
+        HUB_NEU["[Neutrophil Starting Hub]<br>(Neutrophil Hub - bottom-left)<br>Damage / Knockback / Regen"]
+        HUB_B["[B Cell Starting Hub]<br>(B-Cell Hub - bottom-right)<br>Projectile Count Amount / Projectile Speed ProjSpd / CDR / Drain LifeSteal"]
+        HUB_DC["[Dendritic Starting Hub]<br>(Dendritic Hub - mid-left)<br>Pickup Magnet / Duration / Cooldown CDR"]
     end
 
-    subgraph CentralHighway [中央微管聯通主幹網絡 (Inter-Hub Microtubules)]
-        CORE["【微管互通交叉網絡 (Nexus)】<br>跨界嵌合分化通道"]
+    subgraph CentralHighway [Central Microtubule Interconnect Trunk Network (Inter-Hub Microtubules)]
+        CORE["[Microtubule Interconnect Nexus (Nexus)]<br>Cross-lineage chimera differentiation channel"]
     end
 
     HUB_MAC <--> CORE
@@ -31,130 +31,130 @@ flowchart TD
     HUB_DC <--> CORE
 ```
 
-### 1.1 六區域方格排列 (2×3 Region Matrix)
+### 1.1 Six-Region Grid Layout (2x3 Region Matrix)
 
-每個區域都是 **3×3 = 9 個節點的完整方格（Region Square）**，細胞起點位於方格正中心；
-五個細胞方格加上「造血核心區」共六個方格，以 **2 欄 × 3 列** 緊密相連（edge-to-edge、無間隙），
-拼成一整塊 **6×9 的節點棋盤（共 54 個節點）**：
+Each region is a complete **3x3 = 9-node square (Region Square)** with the cell start at the exact center of the square;
+the five cell squares plus the "Hematopoietic Core" form six squares joined edge-to-edge with no gaps in a tight **2-column x 3-row** arrangement,
+assembling into one **6x9 node board (54 nodes total)**:
 
 ```
-[巨噬 vitality ][CTL precision  ]
-[樹突 senses   ][核心 core      ]
-[嗜中 motility ][B 細胞 ballistics]
+[macrophage vitality ][CTL precision  ]
+[dendritic senses   ][core core      ]
+[neutrophil motility ][B cell ballistics]
 ```
 
-- 每一格節點都與上下左右相鄰節點以單位正交微管相連（含跨區邊界），全盤共 93 條連線。
-- **造血核心區（Hematopoietic Core）** 位於棋盤中段右欄，與樹突、CTL、B 細胞三區相鄰。
-- 每個區域方格邊長 450px（3 格）；起點先天點亮，玩家由起點向四方逐步點亮，可自由跨越區界。
+- Every grid node connects to its orthogonally adjacent nodes above, below, left, and right with unit orthogonal microtubules (including cross-region borders), 93 edges total.
+- The **Hematopoietic Core** sits in the middle-right column of the board, adjacent to the dendritic, CTL, and B cell regions.
+- Each region square has a side length of 450px (3 cells); starts are lit innately, and players light outward in all four directions from their start, freely crossing region borders.
 
-### 1.2 節點－性狀－數值三層架構 (Node → Trait → Stat)
+### 1.2 Node-Trait-Stat Three-Layer Architecture (Node -> Trait -> Stat)
 
-資料嚴格分為三層，與微管星盤的「天賦點／性狀／屬性」對應：
+Data is strictly split into three layers, matching the microtubule tree's "talent points / traits / attributes":
 
-- **節點（Node）**：只擁有位置與所屬區域 `{id, branch, col, row}`，外加一個 `trait` 參照。
-- **性狀（Trait）**：可重用的天賦定義 `{id, name_key, desc_key, icon, rarity, modifiers[]}`。
-  名稱、圖示、稀有度與屬性**全部由性狀擁有**——因此**相同性狀必定有相同圖示**，不可能出現同名不同圖。
-- **屬性（Stat）**：性狀內的 `modifiers` 直接對應 `stat_labels.json` 的通用屬性。
+- **Node**: owns only position and region `{id, branch, col, row}`, plus one `trait` reference.
+- **Trait**: a reusable talent definition `{id, name_key, desc_key, icon, rarity, modifiers[]}`.
+  Name, icon, rarity, and attributes are **all owned by the trait** - so **the same trait always has the same icon**, and same-name-different-icon cases are impossible.
+- **Stat**: `modifiers` inside a trait map directly to the generic attributes in `stat_labels.json`.
 
-目前 54 個節點各自對應 54 個性狀（一節點一性狀）；未來新增重複的小節點時，只需共用既有性狀 id，即可自動繼承同樣的名稱、圖示與數值。
-例外是五個細胞起點：它們的性狀**不帶任何屬性**（`modifiers` 為空），僅作為出發錨點，因此五個起點外觀完全一致（青色正方形、新稀有度「起始」）。
+Currently the 54 nodes map to 54 traits one-to-one (one node, one trait); when small repeat nodes are added later, sharing an existing trait id automatically inherits the same name, icon, and values.
+The exception is the five cell starts: their traits carry **no attributes** (`modifiers` empty) and serve only as departure anchors, so all five starts look exactly identical (cyan square, new "Start" rarity).
 
 ---
 
-## 2. 正交微管網格棋盤拓撲與環層定義 (Orthogonal Grid & Ring Layers)
+## 2. Orthogonal Microtubule Grid Board Topology and Ring-Layer Definitions (Orthogonal Grid & Ring Layers)
 
-為杜絕蜘蛛網交錯與斜線重疊的視覺混亂，全星盤嚴格採用 **90 度正交網格（Orthogonal Grid Board）**：
+To eliminate spider-web crossings and diagonal-overlap visual chaos, the whole tree strictly uses a **90-degree orthogonal grid (Orthogonal Grid Board)**:
 
-- **單格單節點原則**：每個節點精準落於單一整數網格點 $(col, row)$。
-- **世界座標映射公式**：
+- **One node per cell principle**: each node lands precisely on a single integer grid point $(col, row)$.
+- **World-coordinate mapping formula**:
   $$\text{Position} = \text{WorldCenter} + \begin{pmatrix} col \times \text{GridStep} \\ -row \times \text{GridStep} \end{pmatrix} \quad (\text{GridStep} = 150.0\,\text{px})$$
-- **正交相鄰連線原則**：微管光纖僅允許在上下左右相鄰格點間鋪設，**絕不允許斜向連線，絕不交叉重疊**。
-- **3×3 區域方格（Region Squares）**：五個細胞區域與造血核心各佔一個完整的 3×3 節點方格（9 節點），以 2 欄×3 列拼成一塊 6×9 棋盤；細胞起點固定在所屬方格正中心。所有上下左右相鄰的節點（含跨區邊界）皆以單位正交微管相連，因此可自由跨區點亮。
-- **細胞專屬曼哈頓環層（Cell-Specific Ring Layer $L$）**：
-  每個節點相對於各細胞專屬起點 $(col_{\text{start}}, row_{\text{start}})$ 的層級深度由曼哈頓步數決定：
+- **Orthogonal-adjacency edge principle**: microtubule fibers may only run between orthogonally adjacent grid points above, below, left, and right; **diagonal edges are never allowed, and crossings/overlaps never occur**.
+- **3x3 Region Squares (Region Squares)**: the five cell regions and the hematopoietic core each occupy one complete 3x3 node square (9 nodes), tiled 2 columns x 3 rows into one 6x9 board; each cell start is fixed at the exact center of its square. All orthogonally adjacent nodes (including cross-region borders) connect with unit orthogonal microtubules, so regions can be freely lit across borders.
+- **Cell-Specific Manhattan Ring Layer ($L$)**:
+  Each node's depth relative to each cell-specific start $(col_{\text{start}}, row_{\text{start}})$ is determined by Manhattan steps:
   $$\text{Ring Layer } L_{\text{cell}} = |col - col_{\text{start}}| + |row - row_{\text{start}}|$$
-  - **$L = 0$**：該細胞的專屬起點中心（先天永久點亮、消耗 0 點）。
-  - **$L = 1 \sim 2$**：該細胞的近端核心代謝環（提供核心生存與專精基礎屬性）。
-  - **$L = 3 \sim 4$**：中程特化微管與通往中央互通網絡的聯絡幹道。
-  - **$L \ge 5$**：進入中央微管樞紐，或跨界滲透進入其他細胞的特化領域。
+  - **$L = 0$**: that cell's dedicated starting hub (innately and permanently lit, costs 0 points).
+  - **$L = 1 \sim 2$**: that cell's proximal core metabolism ring (provides core survival and specialization base attributes).
+  - **$L = 3 \sim 4$**: mid-range specialization microtubules and liaison trunks to the central interconnect network.
+  - **$L \ge 5$**: entry into the central microtubule nexus, or cross-lineage infiltration into other cells' specialization domains.
 
 ---
 
-## 3. 節點稀有度與「零複雜 Scaling」數值設計原則
+## 3. Node Rarity and "Zero-Complexity Scaling" Numeric Design Principles
 
 > [!IMPORTANT]
-> **簡約數值原則 (Simple & No Scaling Philosophy)**：
-> 目前版本階段，天賦屬性設計嚴格遵守**「純粹、直觀、無複合二次縮放（No Scaling / No Cross-Attribute Conversion）」**原則。
-> - 🚫 **嚴禁屬性聯動轉化**（例如：「每 100 點生命增加 5% 傷害」、「將護甲折算為暴擊率」等一律不採用）。
-> - ✅ **嚴格採用標準雙軌基礎加成**：
->   - **純固定值 (Flat)**：如 `max_health +15`、`armor +2`、`amount +1`、`pierce +1`。
->   - **純百分比 (Simple Percent)**：如 `damage +5%`、`move_speed +5%`、`area +6%`、`cooldown_reduction +4%`、`evasion +3%`、`block +4%`、`life_steal +1%`。
-> - 最終通用公式純粹透明：$\text{FinalStat} = (\text{Base} + \text{FlatBonus}) \times (1.0 + \text{PercentBonus})$。
+> **Simple numeric principles (Simple & No Scaling Philosophy)**:
+> At the current version stage, talent attribute design strictly follows the **"pure, intuitive, no compound derived scaling (No Scaling / No Cross-Attribute Conversion)"** principle.
+> - 🚫 **Attribute-linkage conversions are forbidden** (e.g. "gain 5% damage per 100 health", "convert armor into crit rate" are all rejected).
+> - ✅ **Strictly use the standard dual-track base bonuses**:
+>   - **Pure flat (Flat)**: e.g. `max_health +15`, `armor +2`, `amount +1`, `pierce +1`.
+>   - **Pure percent (Simple Percent)**: e.g. `damage +5%`, `move_speed +5%`, `area +6%`, `cooldown_reduction +4%`, `evasion +3%`, `block +4%`, `life_steal +1%`.
+> - The final generic formula stays pure and transparent: $\text{FinalStat} = (\text{Base} + \text{FlatBonus}) \times (1.0 + \text{PercentBonus})$.
 
-### 節點稀有度分級表
+### Node Rarity Tier Table
 
-全盤 54 節點固定配額：**傳奇 2 ／ 稀有 4 ／ 魔法 10 ／ 普通 33 ／ 起始 5**；
-稀有度採 **分散配置（scatter）**：每個區域至少一個非普通節點、單區最多 3 個特殊節點，
-2 個傳奇分居不同區域，稀有橫跨 3 個區域；
-五個細胞起點統一為新稀有度「起始」——青色正方形、先天點亮、不帶任何屬性。
+Fixed quota of 54 nodes: **2 legendary / 4 rare / 10 magic / 33 normal / 5 start**;
+rarity uses **scattered placement (scatter)**: every region holds at least one non-normal node and at most 3 special nodes,
+the 2 legendaries sit in different regions, rares span 3 regions;
+the five cell starts share the new "Start" rarity - cyan squares, innately lit, carrying no attributes.
 
-| 稀有度等級 | 外觀圖元 | 數值加成結構 (純粹直觀加成) | 生物代謝代價 (Trade-off) | 當前版本狀態 |
+| Rarity Tier | Appearance Primitive | Numeric Bonus Structure (Pure Intuitive Bonuses) | Biological Metabolic Cost (Trade-off) | Current Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **普通 (Normal)** | 白色正圓形小囊泡 | 提供單一基礎通用屬性（如 `damage +4%` 或 `health_regen +0.3`）。 | 無代價。 | **正式實裝（33 個）** |
-| **魔法 (Magic)** | 藍色正圓形囊泡（較大） | 提供單一加強或兩個相輔相成的通用屬性（如 `duration +14%`、`magnet +40%`）。 | 無代價。 | **正式實裝（10 個）** |
-| **稀有 (Rare)** | 金色菱形生化複合體圖騰 | 提供兩項大幅度純屬性加成（如 `armor +3` ＋ `block +4%`、`crit_damage +15%` ＋ `crit_chance +3%`）。 | 無代價。 | **正式實裝（4 個）** |
-| **獨特/傳奇 (Unique)** | 橙色六邊形圖騰 | 頂級多重屬性圖騰（如 `max_health +15%` ＋ `armor +2`、`area +30%` 等多達五項）。 | 顯著固定代價（如 `max_health -25%`）。 | **正式實裝（2 個）** |
-| **起始 (Start)** | 青色正方形中樞 | **不帶任何屬性**——僅作為各細胞的出發點；五個起點外觀完全一致。 | 先天點亮（0 點）。 | **正式實裝（5 個）** |
+| **Normal (Normal)** | Small white round vesicle | Grants one basic generic attribute (e.g. `damage +4%` or `health_regen +0.3`). | No cost. | **Shipped (33)** |
+| **Magic (Magic)** | Larger blue round vesicle | Grants one stronger or two complementary generic attributes (e.g. `duration +14%`, `magnet +40%`). | No cost. | **Shipped (10)** |
+| **Rare (Rare)** | Gold diamond biochemical complex totem | Grants two large pure-attribute bonuses (e.g. `armor +3` + `block +4%`, `crit_damage +15%` + `crit_chance +3%`). | No cost. | **Shipped (4)** |
+| **Unique/Legendary (Unique)** | Orange hexagon totem | Top-tier multi-attribute totem (e.g. `max_health +15%` + `armor +2`, `area +30%`, up to five bonuses). | Significant flat cost (e.g. `max_health -25%`). | **Shipped (2)** |
+| **Start (Start)** | Cyan square hub | **Carries no attributes** - serves only as each cell's departure point; all five starts look exactly identical. | Innately lit (0 points). | **Shipped (5)** |
 
 ---
 
-## 4. 五大細胞專屬起點與區域特化
+## 4. Five Cell-Specific Starts and Region Specializations
 
-各細胞起點與周圍微管網絡呈現專屬的微觀螢光染色氛圍：
+Each cell start and its surrounding microtubule network carry a dedicated microscopic fluorescence staining atmosphere:
 
-### 4.1 巨噬細胞起點中心 (Macrophage Starting Hub)
-- **色調**：暗紅褐與暖琥珀螢光。
-- **位置**：星盤左上方。
-- **專精純屬性**：`area`（體積/範圍）、`max_health`（生命上限）、`armor`（膜剛性減傷）、`block`（糖萼格擋率）。
+### 4.1 Macrophage Starting Hub (Macrophage Starting Hub)
+- **Palette**: dark reddish-brown with warm amber fluorescence.
+- **Position**: top-left of the tree.
+- **Specialized pure attributes**: `area` (bulk/area), `max_health` (max health), `armor` (membrane rigidity mitigation), `block` (glycocalyx block rate).
 
-### 4.2 殺手 T 細胞起點中心 (CTL Starting Hub)
-- **色調**：冰藍色與銳利青綠螢光。
-- **位置**：星盤右上方。
-- **專精純屬性**：`move_speed`（移動速度）、`crit_chance`（暴擊率）、`crit_damage`（暴擊傷害）、`pierce`（彈道穿透數）、`evasion`（流體閃避率）。
+### 4.2 Killer T Cell Starting Hub (CTL Starting Hub)
+- **Palette**: ice blue with sharp cyan-green fluorescence.
+- **Position**: top-right of the tree.
+- **Specialized pure attributes**: `move_speed` (move speed), `crit_chance` (crit rate), `crit_damage` (crit damage), `pierce` (projectile pierce count), `evasion` (fluid evasion rate).
 
-### 4.3 嗜中性球起點中心 (Neutrophil Starting Hub)
-- **色調**：烈焰橙與酸性亮黃螢光。
-- **位置**：星盤左下方。
-- **專精純屬性**：`damage`（傷害強度）、`health_regen`（生命自癒）、`armor`（膜剛性護甲）。
+### 4.3 Neutrophil Starting Hub (Neutrophil Starting Hub)
+- **Palette**: blaze orange with acidic bright-yellow fluorescence.
+- **Position**: bottom-left of the tree.
+- **Specialized pure attributes**: `damage` (damage strength), `health_regen` (health regen), `armor` (membrane rigidity armor).
 
-### 4.4 B 淋巴細胞起點中心 (B-Cell Starting Hub)
-- **色調**：深靛藍與電離紫螢光。
-- **位置**：星盤右下方。
-- **專精純屬性**：`amount`（投射物發射數量）、`projectile_speed`（投射物速度）、`cooldown_reduction`（技能冷卻縮減）、`life_steal`（受體汲取/命中吸血）。
+### 4.4 B Cell Starting Hub (B-Cell Starting Hub)
+- **Palette**: deep indigo with ionized violet fluorescence.
+- **Position**: bottom-right of the tree.
+- **Specialized pure attributes**: `amount` (projectile spawn count), `projectile_speed` (projectile velocity), `cooldown_reduction` (skill cooldown reduction), `life_steal` (receptor drain/life on hit).
 
-### 4.5 樹突狀細胞起點中心 (Dendritic Starting Hub)
-- **色調**：電離紫與微光金綠螢光。
-- **位置**：星盤左中段。
-- **專精純屬性**：`magnet`（ATP 拾取半徑）、`duration`（狀態與光環持續時間）、`cooldown_reduction`（技能冷卻縮減）、`area`（感知與效果範圍）。
+### 4.5 Dendritic Cell Starting Hub (Dendritic Starting Hub)
+- **Palette**: ionized violet with faint gold-green fluorescence.
+- **Position**: mid-left of the tree.
+- **Specialized pure attributes**: `magnet` (ATP pickup radius), `duration` (status and aura duration), `cooldown_reduction` (skill cooldown reduction), `area` (sensing and effect area).
 
 ---
 
-## 5. 點亮機制與跨譜系構築 (Progression & Cross-Lineage Builds)
+## 5. Lighting Mechanics and Cross-Lineage Builds (Progression & Cross-Lineage Builds)
 
-1. **點數消耗原則**：
-   - 每個普通／魔法／稀有／傳奇節點僅能點亮一次，每次購買固定消耗 **1 點微管天賦點**；節點只有已放置／未放置兩種狀態，沒有層數概念。
-   - 當前選中細胞的起點中心節點為先天生效、永久點亮，消耗 0 點；五個起點不帶任何屬性，且外觀統一為青色正方形（稀有度「起始」）。
-2. **天賦點獲取途徑**：
-   - **地圖通關獎勵**：通關 5 大器官地圖的 Normal 與 Hard 難度，各提供 1 點（共穩定獲取 10 點）。
-   - **成就里程碑解鎖**：達成特定單一條件科研成就發放額外天賦點。
-3. **跨界嵌合分化（Cross-Lineage Differentiation）**：
-   - 玩家可自本體細胞起點出發，朝向中央微管互通交叉網絡點亮，隨後自由延伸進入其他細胞的特化領域：
-     - *例*：嗜中性球從左側起步，穿過中央微管網絡點入右下方 B 細胞區域，打造「高額發射數 ＋ 狂暴高傷」的重砲流；
-     - *例*：巨噬細胞自左上方起步，穿過中央點入右側 CTL 區域，打造「高移速 ＋ 巨大體積碾壓」的高速巨噬流。
-4. **無痛洗點體驗**：
-   - 星盤數據保存於本地 `user://passive_tree.json`，隨時支援 **單鍵免費重置（Reset All）**，鼓勵玩家隨心嘗試不同純屬性流派。
-5. **多設定檔構築（Build Profiles，最多 3 檔）**：
-   - 每個細胞擁有 1～3 個天賦設定檔（動態新增／刪除，`＋`／紅色`刪除`）；新檔為空並自動成為當前檔，刪除當前檔時自動退回前一檔，最後一檔不可刪除。
-   - 細胞等級與成就天賦點由該細胞三檔共用；切換設定檔只改變已花費點數，不需洗點。
-   - 出戰採用按下「下一步」時選中的設定檔；舊版單檔存檔會自動遷移為設定檔一。
-   - 暫停選單的天賦總覽會標示當前設定檔名稱（唯讀）。
+1. **Point-spend principles**:
+   - Each normal / magic / rare / legendary node lights once, costing a flat **1 microtubule talent point** per purchase; nodes have only placed / unplaced states, with no rank concept.
+   - The currently selected cell's starting-hub node is innately active and permanently lit, costing 0 points; the five starts carry no attributes and uniformly appear as cyan squares ("Start" rarity).
+2. **Talent point sources**:
+   - **Map clearance rewards**: clearing the 5 organ maps on Normal and Hard grants 1 point each (10 points steadily obtainable in total).
+   - **Achievement milestones**: hitting specific single-condition research achievements grants bonus talent points.
+3. **Cross-Lineage Differentiation (Cross-Lineage Differentiation)**:
+   - Players start from their own cell start, light toward the central microtubule interconnect nexus, then freely extend into other cells' specialization domains:
+     - *Example*: a Neutrophil starts on the left, crosses the central microtubule network into the bottom-right B cell region, building a "huge projectile count + furious high damage" artillery build;
+     - *Example*: a Macrophage starts top-left, crosses the center into the right-side CTL region, building a "high move speed + giant-body crush" speedy-macrophage build.
+4. **Painless respec experience**:
+   - Tree data is saved locally to `user://passive_tree.json`, with **one-click free reset (Reset All)** at any time, encouraging players to try different pure-attribute archetypes freely.
+5. **Multiple build profiles (Build Profiles, up to 3 slots)**:
+   - Each cell owns 1-3 talent profiles (dynamically added/removed, `+` / red `Delete`); a new profile starts empty and automatically becomes current, deleting the current profile falls back to the previous one automatically, and the last profile cannot be deleted.
+   - Cell levels and achievement talent points are shared across the cell's three profiles; switching profiles only changes spent points, with no respec needed.
+   - Deployment uses the profile selected when "Next" was pressed; legacy single-profile saves auto-migrate into profile one.
+   - The pause-menu talent overview labels the current profile name (read-only).

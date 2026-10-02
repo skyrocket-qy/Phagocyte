@@ -1,105 +1,105 @@
-# 《Project: Phagocyte》病原體圖鑑、屬性矩陣與 AI 行為規格書 (Pathogen Codex, Stat Profiles & AI Behaviors)
+# Project: Phagocyte — Pathogen Codex, Stat Profiles & AI Behaviors
 
 ---
 
-## 1. 設計哲學：無硬編碼特殊克制，以純屬性與 AI 技能展現真實
+## 1. Design Philosophy: No Hardcoded Counters, Realism Through Pure Stats and AI Skills
 
-為了保證程式架構的高度通用性、模組化與可維護性，《Phagocyte》的病原體系統貫徹以下核心原則：
+To guarantee a highly generic, modular, and maintainable code architecture, the pathogen system in *Phagocyte* follows these core principles:
 
 > [!IMPORTANT]
-> **無特殊免疫克制原則 (No Hardcoded Weaknesses or Immunity Counters)**：
-> - **先不做特殊免疫對抗或克制弱點**（例如：「只能被某特定技能傷害」、「必須用特定細胞吞噬」、「免疫某種武器」等）。此類機制需要為每隻怪物編寫獨立特化代碼，破壞系統通用性。
-> - 所有病原體嚴格繼承自統一的 `BaseEnemy` 基礎架構，遵循標準的受擊、護甲減傷、狀態異常（減速/眩暈）、擊退物理與死亡結算流程。
+> **No Special Immunity/Counters Principle (No Hardcoded Weaknesses or Immunity Counters)**:
+> - **No special immunity matchups or hard counters** (e.g., "can only be damaged by a specific skill", "must be engulfed by a specific cell", "immune to a certain weapon"). Such mechanics require bespoke per-monster code and destroy system generality.
+> - All pathogens strictly inherit from the unified `BaseEnemy` foundation and follow the standard hit, armor mitigation, status (slow/stun), knockback physics, and death-settlement pipeline.
 
-### 生物學真實性的兩大表現維度
-病原體的真實性與多樣性，完全透過以下兩大通用維度展現：
-1. **差異化基礎屬性分佈 (Differentiated Base Stat Profiles)**：
-   - **生命耐久 (MaxHealth)**：極薄脆皮（諾羅病毒 $12$） vs 超厚血牛（結核桿菌 $120$）。
-   - **移動游動速度 (FloatSpeed)**：緩慢逼近（結核桿菌 $25$） vs 狂暴疾馳（狂犬病毒 $80$）。
-   - **碰撞傷害 (TouchDamage)**：微量觸碰刮傷 vs 致命撕咬。
-   - **質量與擊退抗性 (Knockback Resistance)**：微小病毒極易被震飛，巨大肉芽腫菌團巋然不動。
-   - **體積與碰撞半徑 (Collision Radius)**：微小顆粒（$8\,\text{px}$）到巨大病灶（$48\,\text{px}$）。
-2. **專屬技能表現與 AI 行為模式 (Skill Manifestation & AI Steering Behaviors)**：
-   - **移動運動學（Steering）**：群體抱團（Flocking）、螺旋漂移（Spiral）、蓄力直線衝刺（Dash/Charge）、之字形突進（Zig-zag Rush）。
-   - **通用技能組件（Modular Skills）**：地面殘留危險區域（Hazard Area）、週期性範圍脈衝（Aura Pulse）、死亡分裂孵化（Death Spawn）、定時增殖分裂（Replication）。
+### Two Dimensions of Biological Authenticity
+Pathogen authenticity and diversity are expressed entirely through the following two generic dimensions:
+1. **Differentiated Base Stat Profiles**:
+   - **Max Health (MaxHealth)**: paper-thin (Norovirus $12$) vs. ultra-tanky (M. tuberculosis $120$).
+   - **Swim Speed (FloatSpeed)**: slow approach (M. tuberculosis $25$) vs. frenzied dash (Rabies virus $80$).
+   - **Contact Damage (TouchDamage)**: light touch scratches vs. lethal bites.
+   - **Mass & Knockback Resistance**: tiny viruses are easily knocked flying, while massive granuloma clusters stand unmoved.
+   - **Body Size & Collision Radius**: from tiny particles ($8\,\text{px}$) to massive lesions ($48\,\text{px}$).
+2. **Signature Skills & AI Steering Behaviors**:
+   - **Locomotion kinematics (Steering)**: clustering (Flocking), spiral drift (Spiral), charged linear dash (Dash/Charge), zig-zag rush (Zig-zag Rush).
+   - **Modular skill components**: lingering ground hazard zones (Hazard Area), periodic radial pulses (Aura Pulse), death-split spawning (Death Spawn), timed proliferative division (Replication).
 
 ```mermaid
 flowchart TD
-    A["通用底層 BaseEnemy<br>(標準生命 · 碰撞體 · 狀態機)"] --> B["差異化基礎屬性矩陣<br>HP · 移速 · 碰撞傷害 · 擊退抗性 · 尺寸"]
-    A --> C["標準運動學 AI Steering<br>抱團 Flocking · 螺旋 Spiral · 直線衝鋒 Charge · 之字狂奔"]
-    A --> D["可複用通用技能組件<br>地面殘留 Hazard · 範圍脈衝 Pulse · 死亡分裂 Spawn"]
-    B & C & D --> E["活靈活現的真實微生物生態<br>(零獨立特化 Code · 100% 模組化複用)"]
+    A["Generic Base BaseEnemy<br>(Standard HP · Collider · State Machine)"] --> B["Differentiated Base Stat Matrix<br>HP · Move Speed · Contact Damage · Knockback Resist · Size"]
+    A --> C["Standard Kinematic AI Steering<br>Flocking · Spiral · Charge · Zig-zag Rush"]
+    A --> D["Reusable Generic Skill Components<br>Ground Hazard · Radial Pulse · Death Spawn"]
+    B & C & D --> E["Vivid, Living Microbial Ecology<br>(Zero Bespoke Code · 100% Modular Reuse)"]
 ```
 
 ---
 
-## 2. 病原體六大門類圖鑑與行為矩陣 (The 6 Pathogen Taxa)
+## 2. Codex and Behavior Matrix of the Six Pathogen Taxa (The 6 Pathogen Taxa)
 
-### 2.1 細菌門類 (Bacteria)
+### 2.1 Bacteria
 
-| 病原體名稱 | 代碼識別 | 尺寸與顯微特徵 | 基礎屬性特徵 (數值表現) | 專屬技能表現與 AI 行為模式 | 生物學真實原型 |
+| Pathogen Name | Code ID | Size & Microscopic Features | Base Stat Profile (Values) | Signature Skills & AI Behavior | Real-World Biological Prototype |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **金黃色葡萄球菌<br>(Staph)** | `staph` | 亮黃色葡萄串狀球菌集群 ($18\,\text{px}$)。 | 中血量 ($35$)、中速 ($35$)、高擊退抗性。 | **抱團蜂擁群聚 (Flocking AI)**：天生傾向 3～6 隻抱團靠攏推進，形成密集球菌盾牆阻擋玩家前進。 | 凝固酶促成纖維蛋白凝塊抱團生長。 |
-| **綠膿桿菌<br>(Pseudomonas)** | `pseudomonas` | 散發螢光綠色素的短桿菌 ($16\,\text{px}$)。 | 中低血量 ($26$)、中速 ($38$)。 | **藻酸鹽黏泥殘留 (Biofilm Trail)**：游動時週期性在地面生成持續 6 秒的酸性生物膜區域，踏入的玩家移速 $-25\%$ 並承受每秒 DoT。 | 分泌胞外多醣生物膜，在組織表面形成持久污染。 |
-| **大腸桿菌<br>(E. Coli)** | `e_coli` | 周生鞭毛短桿菌 ($15\,\text{px}$)。 | 低血量 ($28$)、常態慢速 ($25$) / 衝鋒極速 ($120$)。 | **周生鞭毛蓄力突刺 (Charge Dash)**：平時緩慢游動；進入追擊半徑後短暫蓄力（前搖 $0.6\text{s}$），隨後朝玩家方位發動直線高速衝鋒。 | 鞭毛反轉滾動與定向平飛（Run & Tumble）游動。 |
-| **幽門螺桿菌<br>(H. Pylori)** | `h_pylori` | 單極多鞭毛螺旋桿菌 ($20\,\text{px}$)。 | 中高血量 ($45$)、中高移速 ($42$)。 | **螺旋鑽進游動 (Spiral Kinematics)**：行進軌跡呈現正弦螺旋波紋，移動路線難以直線預判，持續逼近宿主細胞膜。 | 螺旋鑽透黏液凝膠層的微觀運動學特徵。 |
-| **結核分枝桿菌<br>(TB)** | `tb` | 細長抗酸性桿菌 ($22\,\text{px}$)。 | **極高血量 ($120$)**、極低移速 ($20$)、**超高擊退抗性 ($90\%$)**。 | **厚重前線推進 (Heavy Behemoth)**：緩慢堅定地向玩家逼近，充當天然肉盾吸收彈道；死亡時形成乾酪樣阻礙障礙物。 | 緻密分枝菌酸蠟質外壁賦予的極強機械防禦。 |
-| **炭疽芽孢與桿菌<br>(Anthrax)** | `anthrax_spore` | 折光性厚壁休眠卵形芽孢 ($14\,\text{px}$)。 | 休眠形態高防低傷 ($40$)；復甦桿菌高攻高速。 | **二階段復甦機制 (Spore Awakening)**：平時以低速休眠芽孢游蕩；受到累積傷害達到 50% 時破殼活化，轉化為狂暴炭疽桿菌（移速 $+80\%$，攻擊力 $+50\%$）。 | 惡劣環境休眠芽孢在受刺激後迅速發芽復甦。 |
-| **破傷風梭菌<br>(Tetanus)** | `tetanus` | 鼓槌狀帶端生芽孢桿菌 ($18\,\text{px}$)。 | 中等血量 ($32$)、慢速 ($28$)。 | **神經痙攣脈衝 (Tetanus Pulse)**：每間隔 4 秒以自身為中心向外擴散一圈青紫色毒素震波，造成中範圍 AOE 傷害並擊退玩家。 | 破傷風痙攣毒素阻斷抑制性神經遞質釋放。 |
+| **Staphylococcus aureus<br>(Staph)** | `staph` | Bright-yellow grape-like cocci clusters ($18\,\text{px}$). | Medium HP ($35$), medium speed ($35$), high knockback resistance. | **Clustering swarm (Flocking AI)**: naturally tends to clump in groups of 3-6 and push forward together, forming a dense cocci shield wall that blocks player movement. | Coagulase-driven fibrin clots that grow in clustered masses. |
+| **Pseudomonas aeruginosa<br>(Pseudomonas)** | `pseudomonas` | Short rods exuding fluorescent green pigment ($16\,\text{px}$). | Low-medium HP ($26$), medium speed ($38$). | **Alginate slime trail (Biofilm Trail)**: periodically deposits acidic biofilm zones lasting 6 seconds while swimming; players stepping inside suffer $-25\%$ move speed plus per-second DoT. | Secretes exopolysaccharide biofilm that persistently contaminates tissue surfaces. |
+| **Escherichia coli<br>(E. Coli)** | `e_coli` | Peritrichous short rods ($15\,\text{px}$). | Low HP ($28$), slow cruise ($25$) / extreme charge speed ($120$). | **Peritrichous charged thrust (Charge Dash)**: swims slowly by default; after entering pursuit radius, winds up briefly (telegraph $0.6\text{s}$), then launches a high-speed linear charge at the player. | Flagellar reversal-driven run-and-tumble swimming. |
+| **Helicobacter pylori<br>(H. Pylori)** | `h_pylori` | Spiral rods with a single polar tuft of flagella ($20\,\text{px}$). | Medium-high HP ($45$), medium-high move speed ($42$). | **Spiral boring locomotion (Spiral Kinematics)**: travels along sinusoidal spiral-wave tracks that are hard to predict linearly, closing in on host membranes relentlessly. | Microscopic kinematics of spirals drilling through mucus gel layers. |
+| **Mycobacterium tuberculosis<br>(TB)** | `tb` | Slender acid-fast rods ($22\,\text{px}$). | **Very high HP ($120$)**, very low move speed ($20$), **extreme knockback resistance ($90\%$)**. | **Heavy frontline advance (Heavy Behemoth)**: slowly and inexorably closes in on the player, acting as a living shield that soaks projectiles; forms a caseous blocking obstacle on death. | Extremely tough mechanical defense granted by a dense mycolic-acid waxy cell wall. |
+| **Anthrax spores and bacilli<br>(Anthrax)** | `anthrax_spore` | Refractile thick-walled dormant ovoid spores ($14\,\text{px}$). | Dormant form: high defense, low damage ($40$); awakened bacilli: high attack, high speed. | **Two-stage awakening (Spore Awakening)**: drifts as a slow dormant spore by default; once cumulative damage reaches 50%, it hatches into a frenzied anthrax bacillus (move speed $+80\%$, attack $+50\%$). | Dormant spores in harsh environments germinating rapidly once stimulated. |
+| **Clostridium tetani<br>(Tetanus)** | `tetanus` | Drumstick-shaped rods with terminal spores ($18\,\text{px}$). | Medium HP ($32$), slow speed ($28$). | **Spasmic pulse (Tetanus Pulse)**: every 4 seconds emits a violet toxin shockwave centered on itself, dealing medium-range AOE damage and knocking the player back. | Tetanospasmin blocking inhibitory neurotransmitter release. |
 
 ---
 
-### 2.2 病毒門類 (Viruses)
+### 2.2 Viruses
 
-| 病原體名稱 | 代碼識別 | 尺寸與顯微特徵 | 基礎屬性特徵 (數值表現) | 專屬技能表現與 AI 行為模式 | 生物學真實原型 |
+| Pathogen Name | Code ID | Size & Microscopic Features | Base Stat Profile (Values) | Signature Skills & AI Behavior | Real-World Biological Prototype |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **冠狀病毒<br>(S-Virus)** | `s_virus` | 密布棒狀刺突蛋白球體 ($16\,\text{px}$)。 | 中低血量 ($22$)、中速 ($45$)。 | **刺突黏滯附著 (Spike Adhesion)**：碰撞玩家時施加強烈黏著減速效果（移速 $-40\%$，持續 $1.5\text{s}$），容易被後續怪堆跟上包圍。 | S 刺突蛋白與 ACE2 受體高親和力結合。 |
-| **變異流感病毒<br>(Flu-Drift)** | `flu_drift` | 多形性多刺微粒 ($14\,\text{px}$)。 | 低血量 ($18$)、高移速 ($55$)。 | **高頻抗原漂移 (Antigenic Drift Shift)**：每 15 秒全身螢光染色發生一次突變閃爍，瞬時獲得短暫 $1\text{s}$ 加速推進與隨機轉向。 | 血凝素 (HA) 與神經氨酸酶 (NA) 基因高頻突變。 |
-| **諾羅病毒<br>(Norovirus)** | `norovirus` | 極微小二十面體顆粒 ($10\,\text{px}$)。 | **極低血量 ($12$)**、中高移速 ($50$)、零擊退抗性。 | **超密集微型蜂擁 (Micro-Swarm)**：永遠以 $15\sim 30$ 隻超密集集群形式刷新，靠群體體積壓迫受擊邊界。 | 極低感染劑量與高密度爆發式微粒排放。 |
-| **狂犬病毒<br>(Rabies)** | `rabies` | 子彈狀包膜微粒 ($15\,\text{px}$)。 | 中等血量 ($25$)、**極高移速 ($80$)**。 | **嗜神經之字衝撞 (Zig-zag Assault)**：以極高速度採取高頻之字形（Zig-zag）軌跡向玩家發動撲擊，考驗玩家走位微操。 | 沿軸突逆行極速向中樞 thần kinh 突進。 |
-| **人類免疫缺陷病毒<br>(HIV)** | `hiv` | 圓球狀顆粒，帶 gp120 突刺 ($16\,\text{px}$)。 | 中等血量 ($30$)、慢速 ($30$)。 | **衰竭干擾光環 (Exhaustion Aura)**：在周圍 $180\text{px}$ 範圍內形成持續衰竭力場，處於光環內的玩家技能冷卻恢復速度降低 $20\%$。 | 破壞免疫核心指揮官，造成免疫系統整體遲滯。 |
-| **伊波拉病毒<br>(Ebola)** | `ebola` | 「6」字形或長條絲狀 ($24\,\text{px}$)。 | 中高血量 ($48$)、中速 ($36$)。 | **長鞭擺動橫掃 (Filament Sweep)**：身軀細長，隨游動方向呈鞭狀大幅擺動，碰撞受擊判定範圍隨身體波動動態擴展。 | 絲狀病毒科典型的長條形捲曲結構。 |
-| **水痘帶狀疱疹病毒<br>(Varicella-Zoster)** | `varicella_zoster` | 二十面體雙鏈顆粒 ($15\,\text{px}$)。 | 低血量 ($20$)、中速 ($40$)。 | **神經突觸定點短瞬移 (Synaptic Blink)**：每游動 3 秒發動一次短距離向玩家方位的無前搖折躍（距離 $120\text{px}$）。 | 沿背根神經節軸突的跳躍式軸漿運輸。 |
+| **Coronavirus<br>(S-Virus)** | `s_virus` | Sphere densely studded with club-shaped spike proteins ($16\,\text{px}$). | Low-medium HP ($22$), medium speed ($45$). | **Spike adhesion (Spike Adhesion)**: on contact, applies a strong sticky slow to the player (move speed $-40\%$ for $1.5\text{s}$), letting trailing monsters catch up and surround the victim. | High-affinity binding of S spike protein to ACE2 receptors. |
+| **Variant influenza virus<br>(Flu-Drift)** | `flu_drift` | Pleomorphic multi-spiked particles ($14\,\text{px}$). | Low HP ($18$), high move speed ($55$). | **High-frequency antigenic drift (Antigenic Drift Shift)**: every 15 seconds its fluorescence flashes through a mutation, instantly gaining a brief $1\text{s}$ speed burst with a random turn. | High-frequency mutations in hemagglutinin (HA) and neuraminidase (NA) genes. |
+| **Norovirus<br>(Norovirus)** | `norovirus` | Extremely tiny icosahedral particles ($10\,\text{px}$). | **Extremely low HP ($12$)**, medium-high move speed ($50$), zero knockback resistance. | **Ultra-dense micro-swarm (Micro-Swarm)**: always spawns as an ultra-dense cluster of $15\sim 30$ individuals that overwhelms hit boundaries with sheer numbers. | Extremely low infectious dose with high-density burst particle shedding. |
+| **Rabies virus<br>(Rabies)** | `rabies` | Bullet-shaped enveloped particles ($15\,\text{px}$). | Medium HP ($25$), **extremely high move speed ($80$)**. | **Neurotropic zig-zag strike (Zig-zag Assault)**: lunges at the player at extreme speed along high-frequency zig-zag (Zig-zag) tracks, testing positioning micro-skills. | Retrograde sprint along axons toward the central nervous system at extreme speed. |
+| **Human immunodeficiency virus<br>(HIV)** | `hiv` | Spherical particles studded with gp120 spikes ($16\,\text{px}$). | Medium HP ($30$), slow speed ($30$). | **Exhaustion aura (Exhaustion Aura)**: projects a persistent exhaustion field within $180\text{px}$; players inside regenerate skill cooldowns $20\%$ more slowly. | Destroys the core commanders of immunity, slowing the whole immune system. |
+| **Ebola virus<br>(Ebola)** | `ebola` | Figure-"6" or long filamentous threads ($24\,\text{px}$). | Medium-high HP ($48$), medium speed ($36$). | **Filament lash sweep (Filament Sweep)**: its slender body whips widely with swimming direction, dynamically extending its contact-hit range as the body undulates. | Typical long, coiled filamentous structure of the filovirus family. |
+| **Varicella-zoster virus<br>(Varicella-Zoster)** | `varicella_zoster` | Icosahedral double-stranded particles ($15\,\text{px}$). | Low HP ($20$), medium speed ($40$). | **Synaptic blink (Synaptic Blink)**: every 3 seconds of swimming, instantly blinks a short distance toward the player with no telegraph (range $120\text{px}$). | Saltatory axoplasmic transport along dorsal-root-ganglion axons. |
 
 ---
 
-### 2.3 真菌門類 (Fungi)
+### 2.3 Fungi
 
-| 病原體名稱 | 代碼識別 | 尺寸與顯微特徵 | 基礎屬性特徵 (數值表現) | 專屬技能表現與 AI 行為模式 | 生物學真實原型 |
+| Pathogen Name | Code ID | Size & Microscopic Features | Base Stat Profile (Values) | Signature Skills & AI Behavior | Real-World Biological Prototype |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **白色念珠菌<br>(Candida)** | `candida` | 卵圓酵母相與長菌絲複合體 ($20\,\text{px}$)。 | 中血量 ($36$)、慢速 ($28$)。 | **假菌絲長程伸展 (Hyphal Extension)**：接近玩家到 $200\text{px}$ 時，本體定格並向前伸出一條長達 $150\text{px}$ 的刺狀假菌絲進行遠距穿刺。 | 酵母相向尖銳菌絲相的二型性轉化與穿刺侵襲。 |
-| **煙麴黴<br>(Aspergillus)** | `aspergillus` | 頂囊分生孢子放射頭 ($25\,\text{px}$)。 | 高血量 ($60$)、極低移速 ($15$)。 | **分生孢子煙幕 (Spore Dispersion)**：每隔 5 秒向周圍彈射一圈微型孢子氣溶膠，在場上形成持續 4 秒的小範圍毒霧。 | 麴黴頂囊向空氣中大量揚起微小分生孢子。 |
+| **Candida albicans<br>(Candida)** | `candida` | Ovoid yeast forms combined with long hyphae ($20\,\text{px}$). | Medium HP ($36$), slow speed ($28$). | **Hyphal extension (Hyphal Extension)**: when within $200\text{px}$ of the player, roots itself and extends a $150\text{px}$-long spiked pseudohypha forward for a long-range stab. | Dimorphic yeast-to-sharp-hypha transition with piercing invasion. |
+| **Aspergillus fumigatus<br>(Aspergillus)** | `aspergillus` | Radiate conidial heads on apical vesicles ($25\,\text{px}$). | High HP ($60$), extremely low move speed ($15$). | **Conidial smokescreen (Spore Dispersion)**: every 5 seconds ejects a ring of micro-conidia aerosol that forms small toxic clouds lasting 4 seconds. | Aspergillus vesicles lofting large numbers of tiny conidia into the air. |
 
 ---
 
-### 2.4 原蟲與寄生蟲 (Parasites)
+### 2.4 Protozoa and Parasites (Parasites)
 
-| 病原體名稱 | 代碼識別 | 尺寸與顯微特徵 | 基礎屬性特徵 (數值表現) | 專屬技能表現與 AI 行為模式 | 生物學真實原型 |
+| Pathogen Name | Code ID | Size & Microscopic Features | Base Stat Profile (Values) | Signature Skills & AI Behavior | Real-World Biological Prototype |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **惡性瘧原蟲帶蟲體<br>(Plasmodium Carrier)** | `plasmodium` | 寄生於紅血球內的環狀/裂殖體 ($24\,\text{px}$)。 | 高血量 ($50$)、慢速 ($24$)。 | **裂殖子陣亡爆發 (Merozoite Burst)**：死亡破裂時，瞬間在原地生成 $4\sim 6$ 隻極速游動的小裂殖子（`merozoite`，高移速、低血量）向四周散開。 | 裂殖體成熟後脹破紅血球釋放裂殖子。 |
-| **剛地弓形蟲<br>(Toxoplasma)** | `toxoplasma` | 新月形速殖子假包囊 ($22\,\text{px}$)。 | 中高血量 ($42$)、中速 ($35$)。 | **假包囊破裂四向彈射 (Radial Ejection)**：血量降至零時，向上下左右四個正交方向彈射高初速速殖子飛行物。 | 組織內假包囊破裂導致急性速殖子擴散。 |
+| **Plasmodium carrier<br>(Plasmodium Carrier)** | `plasmodium` | Ring/schizont stages parasitizing red blood cells ($24\,\text{px}$). | High HP ($50$), slow speed ($24$). | **Merozoite burst on death (Merozoite Burst)**: on death it ruptures, instantly releasing $4\sim 6$ extremely fast micro-merozoites (`merozoite`, high speed, low HP) that scatter in all directions. | Mature schizonts bursting red blood cells to release merozoites. |
+| **Toxoplasma gondii<br>(Toxoplasma)** | `toxoplasma` | Crescent-shaped tachyzoite pseudocysts ($22\,\text{px}$). | Medium-high HP ($42$), medium speed ($35$). | **Pseudocyst radial ejection (Radial Ejection)**: when HP reaches zero, fires high-velocity tachyzoite projectiles along the four cardinal directions. | Tissue pseudocyst rupture driving acute tachyzoite spread. |
 
 ---
 
-### 2.5 朊病毒 (Prions)
+### 2.5 Prions (Prions)
 
-| 病原體名稱 | 代碼識別 | 尺寸與顯微特徵 | 基礎屬性特徵 (數值表現) | 專屬技能表現與 AI 行為模式 | 生物學真實原型 |
+| Pathogen Name | Code ID | Size & Microscopic Features | Base Stat Profile (Values) | Signature Skills & AI Behavior | Real-World Biological Prototype |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **錯誤折疊朊病毒<br>(Prion / PrPsc)** | `prion` | $\beta$-摺疊澱粉樣纖維晶體 ($16\,\text{px}$)。 | 中高血量 ($55$)、極高護甲減傷、中移速 ($38$)。 | **接觸同化增生 (Contact Accretion)**：碰撞其他病原體時使其微量回血；每次受到命中時向外崩解微型結晶碎片。 | 催化正常 PrPc 蛋白轉化為異常空間構象。 |
+| **Misfolded prion<br>(Prion / PrPsc)** | `prion` | $\beta$-sheet amyloid fibril crystals ($16\,\text{px}$). | Medium-high HP ($55$), extremely high armor mitigation, medium move speed ($38$). | **Contact assimilation (Contact Accretion)**: heals other pathogens slightly on contact; sheds micro-crystal fragments outward on every hit taken. | Catalyzes normal PrPc proteins into abnormal conformations. |
 
 ---
 
-### 2.6 異變與惡性細胞 (Malignant Cells)
+### 2.6 Mutant and Malignant Cells (Malignant Cells)
 
-| 病原體名稱 | 代碼識別 | 尺寸與顯微特徵 | 基礎屬性特徵 (數值表現) | 專屬技能表現與 AI 行為模式 | 生物學真實原型 |
+| Pathogen Name | Code ID | Size & Microscopic Features | Base Stat Profile (Values) | Signature Skills & AI Behavior | Real-World Biological Prototype |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **異變癌細胞<br>(Malignant Cell)** | `malignant_cell` | 巨大畸形多核細胞 ($36\,\text{px}$)。 | **極高血量 ($180$)**、慢移速 ($22$)、高碰撞傷害。 | **自主週期複製 (Autonomous Mitosis)**：存活時間每超過 20 秒，若周圍無過多同類，則原地分裂出一隻半血量的子癌細胞。 | 失去接觸抑制與凋亡機制的無限自主增殖。 |
+| **Mutant cancer cell<br>(Malignant Cell)** | `malignant_cell` | Giant deformed multinucleated cells ($36\,\text{px}$). | **Extremely high HP ($180$)**, slow speed ($22$), high contact damage. | **Autonomous periodic replication (Autonomous Mitosis)**: every 20 seconds of survival, if few siblings are nearby, divides in place to spawn a half-HP daughter cancer cell. | Infinite autonomous proliferation after losing contact inhibition and apoptosis. |
 
 ---
 
-## 3. 程式碼模組化落實規範 (Implementation Guidelines)
+## 3. Code-Side Modularization Rules (Implementation Guidelines)
 
-所有敵人在 C# 中統一採用標準元件化設計：
+All enemies in C# share a unified component-based design:
 
 ```csharp
 // scripts/enemies/BaseEnemy.cs
@@ -111,11 +111,10 @@ public abstract partial class BaseEnemy : Node2D
     [Export] public float KnockbackResistance { get; set; } = 0.0f;
     [Export] public float AtpValue { get; set; } = 10.0f;
 
-    // 通用狀態機控制 (Drifting, Windup, Charging, SkillCooldown)
-    // 完全依賴通用物理與運動學，不對任何玩家技能作硬編碼特判！
+    // Generic state-machine control (Drifting, Windup, Charging, SkillCooldown)
+    // Fully driven by generic physics and kinematics, with no hardcoded branches for any player skill!
 }
 ```
 
-- **高內聚低耦合**：武器與技能只負責向周圍 Area2D 判定點分發 `Damage`、`Knockback` 與通用狀態效果（減速/眩暈）。
-- **零特定條件判斷**：代碼中絕不出現 `if (enemy is Prion && weapon is Laser)` 這樣的硬編碼，所有效果均由通用的傷害防禦數值計算完成！
-
+- **High cohesion, low coupling**: weapons and skills only dispatch `Damage`, `Knockback`, and generic status effects (slow/stun) to surrounding Area2D query points.
+- **Zero special-case branching**: code never contains hardcoded checks like `if (enemy is Prion && weapon is Laser)` — every effect resolves through generic damage-versus-defense math!

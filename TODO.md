@@ -10,7 +10,7 @@ Emergency fixes for visual bugs, text collisions, and broken layout containers a
 
 - [x] **Full-Screen Dark Backdrop Scrims for All Modals**:
   - Add or configure full-viewport backdrop dimming shield (`Color(0.01, 0.02, 0.03, 0.98)`) across `EndgameSetupModal`, `SettingsModal`, and `CodexModal`.
-  - Prevent background bleed-through: Eliminated main menu title (`噬血者`) and navigation buttons (`开始免疫行动`, `退出游戏`) from glowing through semi-transparent modal headers.
+  - Prevent background bleed-through: Eliminated main menu title (`Blood Devourer`) and navigation buttons (`Start Immune Operation`, `Quit Game`) from glowing through semi-transparent modal headers.
 - [x] **Center `EndgameSetupModal`**:
   - Fixed anchor presets (`layout_mode = 1`, `anchors_preset = 15`) so the affliction selection window is centered in the 1280x720 viewport instead of pinned against the left edge.
 - [x] **Fix `CodexModal` Scroll List Clipping**:
@@ -42,16 +42,16 @@ Elevating screens from flat wireframes to high-tech immunobiology interfaces:
 
 - [x] **Class Selection (`ClassView`) Overhaul**:
   - Replaced raw text stat lists with animated polygonal `BioRadarChart` (Vitals, Motility, Armor, Special Trait), featuring concentric cyber-fluorescent grid webs, glowing polygons, and vertex pips.
-  - Added illuminated microscopy specimen containment brackets, 方案 B asymmetric chamfer (`12, 3, 12, 3`), and glowing active button highlights in `ClassList`.
+  - Added illuminated microscopy specimen containment brackets, Scheme B asymmetric chamfer (`12, 3, 12, 3`), and glowing active button highlights in `ClassList`.
 - [x] **Passive Talent Tree (`PassiveView`) Organic Rework**:
   - Replaced 6 rigid rectangular coordinate boxes with organic Epigenetic Chromatin Networks (breathing territorial wash + sinusoidal chromatin micro-filaments).
   - Added DNA Methylation / Histone Octamer Hubs with multi-ring bio-respiration pulsing halos.
   - Enhanced active edge lines (`DrawEdges`) with multi-stage fluorophore excitation trails and harmonic electron pulses.
 - [x] **Organelle Chamber (`LoadoutView`) Polish**:
-  - Upgraded the 4 static socket frames into double-ring bio-energy rails with 方案 B asymmetric chamfers (`14, 4, 14, 4`) and cyan outer glow.
+  - Upgraded the 4 static socket frames into double-ring bio-energy rails with Scheme B asymmetric chamfers (`14, 4, 14, 4`) and cyan outer glow.
   - Upgraded `EnergyPips` with dynamic ATP glowing halos, concentric rims, and specular photon excitation cores.
   - Added flowing ATP energy pulses along microtubule channels in `ChamberLinks`.
-  - Unified category tabs and profile buttons with 方案 B cyber-fluorescence styling.
+  - Unified category tabs and profile buttons with Scheme B cyber-fluorescence styling.
 
 ---
 
@@ -80,7 +80,7 @@ Combat visuals verified live (godot-ai headed screenshots) plus headless suites
     per-instance fill stylebox; `VitalsView` untouched.
 
 
-- [x] **每個skill視覺設計要跟他的asset圖一樣 (All 17 Active & Innate Skills Visual Alignment)**:
+- [x] **Match every skill's visuals to its asset artwork (All 17 Active & Innate Skills Visual Alignment)**:
   - Extended `SkillAssetPalette` (`scripts/skills/SkillAssetPalette.cs`) with saturated accent & white-excitation core colors for all 17 skills.
   - Aligned shape languages, kinetic behaviors, and shader/glow rendering to canonical 256x256 icon artwork:
     - `perforin_lance`: Confocal laser lance (`#39c06a`) with pore puncture decals.

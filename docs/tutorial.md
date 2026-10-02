@@ -1,82 +1,80 @@
-# 《Project: Phagocyte》新手引導與直覺 UI/UX 規範書 (Onboarding & Intuitive UI/UX)
+# Project: Phagocyte — Onboarding & Intuitive UI/UX (Onboarding & Intuitive UI/UX)
 
 ---
 
-## 1. 新手教學核心設計原則 (Onboarding Philosophy)
+## 1. Core Onboarding Design Principles (Onboarding Philosophy)
 
-在《Phagocyte》中，我們堅持 **「以直覺的介面反饋替代生硬的文字說教」**。
+In *Phagocyte*, we insist on **"replacing stiff text lectures with intuitive interface feedback"**.
 
-作為一款快節奏的微觀動作肉鴿遊戲，**打斷玩家心流的大段彈窗教學是最糟糕的體驗**。我們的設計準則是：
-- **見形知意（Intuitive by Design）**：靠真實生物物理、顯微鏡視覺反饋與音效引導，讓玩家憑直覺本能探索。
-- **無侵入式微引導（Non-Intrusive Micro-Cues）**：絕不暫停遊戲強制彈出對話框；必要的操作指引以懸浮呼吸燈、環境波紋與動態按鍵圖元自然融入 HUD。
-- **漸進式揭露（Progressive Disclosure）**：只在玩家生理或環境狀態初次觸發特定機制時，才以極簡形式提示該關鍵功能。
+As a fast-paced microscopic action roguelite, **long modal tutorials that break player flow are the worst possible experience**. Our guidelines:
+- **Intuitive by Design**: rely on real biophysics, microscope visuals, and audio cues so players explore by instinct.
+- **Non-Intrusive Micro-Cues**: never pause the game for forced dialogs; necessary control hints blend into the HUD naturally as floating breathing lights, environment ripples, and dynamic key glyphs.
+- **Progressive Disclosure**: a key feature is hinted in the most minimal form only the first time the player's physiology or the environment actually triggers that mechanic.
 
 ```mermaid
 flowchart TD
-    A["進入戰場 (Game Start)"] --> B["隱性微觀物理教學<br>(移動走位 · 碰撞傷害 · 擊殺經驗)"]
-    B --> C["初次滿額經驗<br>(三選一卡牌暫停 · 標籤篩選)"]
-    C --> D["遭遇危險密集雜兵<br>(非侵入提示 [Space] 翻滾閃避)"]
-    D --> E["首隻精英突襲<br>(環境警報 · 弱點抗原高亮標記)"]
-    E --> F["首局結算 (中和 / SIRS)<br>(病歷單生成 · 導引點亮微管天賦)"]
+    A["Enter the battlefield (Game Start)"] --> B["Implicit micro-physics tutorial<br>(Movement · Contact damage · Kill-to-XP)"]
+    B --> C["First full XP bar<br>(Draft-1-of-3 pause · Tag filters)"]
+    C --> D["First dense horde scare<br>(Non-intrusive [Space] dodge-roll hint)"]
+    D --> E["First elite raid<br>(Environment alarm · Antigen weakpoint highlight)"]
+    E --> F["First run settlement (Neutralized / SIRS)<br>(Case report generated · Guided cytoskeleton-talent lighting)"]
 ```
 
 ---
 
-## 2. 核心戰鬥中的「必要最低限度引導」清單
+## 2. Minimum Necessary In-Combat Guidance Checklist
 
-雖然追求極簡，但以下 **4 項核心操作與獨特機制** 必須在首局遊玩的前 3 分鐘內以最輕量的方式完成引導：
+Minimalist as we are, the following **4 core moves and signature mechanics** must be taught in the lightest possible way within the first 3 minutes of the first run:
 
-| 教學項目 | 觸發時機 | 介面呈現方式 (UI/UX) | 核心學習目標 |
+| Tutorial Item | Trigger | Presentation (UI/UX) | Core Learning Goal |
 | :--- | :--- | :--- | :--- |
-| **1. 移動與碰撞傷害<br>(Move & Contact)** | 戰鬥開始時 | 前方 150px 處刷新 2 隻靜止的微型葡萄球菌。 | 理解白血球貼怪會被啃咬扣血，保持距離走位、用技能清怪，享受阿米巴邊緣形變反饋。 |
-| **2. 經驗吸收與初次升級<br>(ATP & Card Draft)** | 擊殺第 3 隻病原體，<br>首次升級時 | 遊戲時間以 0.5 秒的時間平滑進入慢動作（Bullet Time）最後定格，三選一突變卡以顯微載玻片樣式浮現。 | 理解「擊殺轉化為經驗」，主動技能與被動特質的分野。 |
-| **3. 翻滾閃避微操<br>(Dodge Roll)** | 首次受到碰撞傷害，<br>或周邊病原體 $>15$ 隻 | 細胞頭頂彈出極簡短懸浮文字：`按一下 [Space] 翻滾`（手把顯示 `[L2]`），細胞邊界泛出青白色爆發光環。 | 理解「次數 1、2.5 秒回充、突進無敵 0.22 秒」，用於高壓突圍。 |
-| **4. 超武質變合成預兆<br>(Evolution Synergy)** | 任意主動技能達到 Lv.5 時 | 在局內三選一介面中，對應被動特質卡牌外框泛出金色共鳴光環，卡面角標浮現 `【超武催化劑】` 標籤。 | 直覺理解「滿級主動 ＋ 對應被動 = 超武質變」的二合一配裝公式。 |
+| **1. Move & Contact** | Combat start | Spawn 2 stationary micro-staphylococci 150px ahead. | Learn that hugging monsters as a white blood cell means getting bitten and losing HP — keep distance, kite, clear with skills, and enjoy the amoeba-edge deformation feedback. |
+| **2. XP Absorption & First Level-Up<br>(ATP & Card Draft)** | On the 3rd pathogen kill,<br>first level-up | Game time eases into slow motion (Bullet Time) over 0.5 seconds, then freezes, with the draft-1-of-3 mutation cards surfacing like microscope slides. | Learn that "kills convert into XP", and the split between active skills and passive traits. |
+| **3. Dodge Roll<br>(Dodge Roll)** | On first contact damage,<br>or when nearby pathogens exceed $>15$ | A minimal floating line pops over the cell: `Press [Space] to roll` (gamepad shows `[L2]`), with a pale-white burst halo flashing across the cell boundary. | Learn "1 charge, 2.5s recharge, 0.22s invulnerable dash" for clutch escapes under pressure. |
+| **4. Super-Weapon Fusion Omen<br>(Evolution Synergy)** | Any active skill reaches Lv.5 | In the in-run draft UI, the matching passive trait card glows with a golden resonance rim, with a `[Super-Weapon Catalyst]` tag floating at the card corner. | Intuitively grasp the two-in-one loadout formula of "maxed active + matching passive = super-weapon transformation". |
 
 ---
 
-## 3. 直覺化 UI/UX 視覺語言規範 (Diegetic & Sensory Cues)
+## 3. Intuitive UI/UX Visual Language (Diegetic & Sensory Cues)
 
-為了消弭傳統龐雜 UI 的認知負擔，所有生理狀態均映射為顯微鏡下的有機物理視覺：
+To erase the cognitive load of traditionally bloated UI, every physiological state maps to organic under-the-microscope physics visuals:
 
-### 3.1 生命膜耐久度 (Health & Membrane Integrity)
-- **非傳統血條**：細胞膜外圈包裹一層「菲涅爾螢光膜（Fresnel Membrane Ring）」。
-  - 膜健康（$100\%$）：鮮亮青藍色，邊界張力充沛。
-  - 膜受損（$<50\%$）：轉為高頻焦躁的橙紅色微顫，邊界向外微幅脫落細碎顆粒。
-  - 瀕死危象（$<20\%$）：全螢幕四周浮現暗紅色溶血光暈（非傳統刺眼紅屏，而是帶有組織液酸蝕質感的暗調暈影），心跳脈衝音效低沉響起。
-
-### 3.2 攻擊冷卻與自動開火 (Cooldowns & Auto-fire)
-- **主動武器全自動循環**：玩家不需要手動瞄準普通雜兵，主動技能冷卻完畢自動向最近敵方開火。
-- **冷卻指示器**：HUD 槽位中的細胞器圖示外圈有細微順時針充能進度環，開火瞬間爆發微幅螢光光暈。
-
-### 3.3 敵方抗原與弱點標記 (Opsonin & Weakpoints)
-- 當敵人受到【調理素】標記或處於易傷狀態時，敵人頭頂浮現微小的 Y 型螢光受體標記，受到攻擊時爆出大號亮黃色暴擊數值。
+### 3.1 Health & Membrane Integrity (Health & Membrane Integrity)
+- **No traditional HP bar**: the membrane is wrapped in a "Fresnel Membrane Ring".
+  - Healthy membrane ($100\%$): vivid cyan-blue with taut boundaries.
+  - Damaged membrane ($<50\%$): shifts to anxiously flickering orange-red micro-tremor, shedding fine granules outward.
+  - Near-death crisis ($<20\%$): dark-red hemolysis halos surface on all four screen edges (not a glaring red flash, but a dim tissue-acid-etched vignette), with a low-pitched heartbeat pulse sounding.
+### 3.2 Attack Cooldowns & Auto-Fire (Cooldowns & Auto-fire)
+- **All active weapons cycle fully automatically**: players never aim manually at ordinary mobs — active skills fire at the nearest enemy on cooldown.
+- **Cooldown indicators**: organelle icons in HUD slots carry a fine clockwise charge ring; firing bursts a subtle fluorescent halo.
+### 3.3 Enemy Antigens & Weakpoint Marks (Opsonin & Weakpoints)
+- When an enemy carries an [opsonin] mark or sits in a vulnerable state, a tiny Y-shaped fluorescent receptor mark floats overhead, bursting oversized bright-yellow crit numbers when struck.
 
 ---
 
-## 4. 局後引導：病歷單與星盤初次啟動
+## 4. Post-Run Guidance: First Opening of the Case Report and Talent Tree
 
-當玩家完成或終止第一局戰鬥時，介面以流暢的轉場銜接至局外養成：
+When the player finishes or aborts the first run, the interface flows seamlessly into out-of-run progression:
 
 ```mermaid
 flowchart LR
-    A["戰鬥結束 (HP 歸零或 Boss 擊破)"] --> B["淡入：微觀臨床病歷單 (Clinical Chart)<br>直觀展示存活時間、擊殺量與 S/A/B 評級"]
-    B --> C["病歷單點擊【確定】<br>畫面無縫平移至造血幹細胞星盤"]
-    C --> D["星盤中心 HSC 核心脈動發光<br>一根微管延伸至相鄰出門節點，提示【點亮】"]
-    D --> E["解鎖首個天賦，進入自由探索狀態"]
+    A["Combat ends (HP zero or Boss slain)"] --> B["Fade in: clinical case report (Clinical Chart)<br>Showing survival time, kill count, and S/A/B grades at a glance"]
+    B --> C["Confirm the case report<br>Camera glides seamlessly to the stem-cell tree"]
+    C --> D["HSC core pulses at the tree center<br>A microtubule reaches to the neighboring gate node, hinting Light Up"]
+    D --> E["Light the first talent, enter free exploration"]
 ```
 
-1. **病歷單的幽默與成就感**：
-   - 即便新手第一局很快破膜陣亡，病歷單也不會給予挫敗打擊，而是顯示臨床診斷：`【急性炎性反應 · 代償終止】`，並結算本局擊殺的病原體總數與成就進度。
-2. **星盤的視覺引導**：
-   - 玩家首次獲得微管天賦點進入星盤時，**絕不彈出大段操作說明**。
-   - 系統自動將相機鏡頭平滑聚焦在中央發光的 HSC 細胞核，並沿著微管向玩家所選細胞的起始門戶發出一道柔和的流動電脈衝，玩家自然會點擊該發光囊泡完成點亮。
+1. **Humor and accomplishment in the case report**:
+   - Even if a rookie's membrane ruptures quickly in run one, the report never punishes — instead it shows the clinical diagnosis `[Acute inflammatory response · Compensated termination]`, plus total pathogens killed and achievement progress.
+2. **Visual guidance on the talent tree**:
+   - When players first enter the tree with talent points, **no long how-to text ever pops up**.
+   - The system smoothly focuses the camera on the glowing HSC nucleus at the center and sends a soft flowing electric pulse along the microtubule toward the player's cell gate — players naturally click the glowing vesicle to light it.
 
 ---
 
-## 5. 設計防呆與檢核清單 (Anti-Frustration Checklist)
+## 5. Anti-Frustration Design Checklist (Anti-Frustration Checklist)
 
-- [ ] **無操作防呆**：若玩家開局 5 秒完全未輸入任何移動指令，細胞微幅向前漂移並自動擊殺路徑上的第一隻微型雜兵，直觀展示清怪概念。
-- [ ] **零強制閱讀**：全遊戲內不存在任何「必須點擊 OK 才能繼續」的教學彈窗。
-- [ ] **控制自定義與預設支援**：鍵盤（WASD）、滑鼠、手把（左右類比搖桿）隨插即用，操作提示圖示依據當前輸入設備無縫切換。
-- [ ] **隨時可查閱的顯微檔案館**：所有病原體弱點、器官環境機制與技能公式，隨時可在主選單【微觀檔案館（Codex）】中查閱，把學習的主動權徹底交還給玩家。
+- [ ] **Idle-input safety**: if the player gives zero movement input for the first 5 seconds, the cell drifts slightly forward and auto-kills the first micro-mob in its path, demonstrating the clear-and-kill concept visually.
+- [ ] **Zero forced reading**: no "must click OK to continue" tutorial popup exists anywhere in the game.
+- [ ] **Customizable controls with sensible defaults**: keyboard (WASD), mouse, and gamepad (twin sticks) all plug-and-play, with prompt glyphs switching seamlessly to the active input device.
+- [ ] **Always-browsable microscopy archive**: all pathogen weaknesses, organ environment mechanics, and skill formulas stay browsable in the main-menu [Microscopy Archive (Codex)], handing the initiative for learning fully back to the player.

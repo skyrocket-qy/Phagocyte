@@ -1,62 +1,62 @@
-# 《Project: Phagocyte》全域通用 Stat 數值系統規格書 (Universal Stat System Specification)
+# Project: Phagocyte Universal Stat System Specification
 
 ---
 
-## 1. 數值哲學：100% 全域通用 Stat 屬性矩陣
+## 1. Stat Philosophy: 100% Universal Stat Attribute Matrix
 
-為貫徹 Survivor-like 的極致模組化、可平衡性與豐富的構築（Build）多樣性，《Project: Phagocyte》的數值架構**徹底剔除任何「單一技能特化私有屬性」**（例如嚴格禁止出現「抗體射程+10%」或「酸液半徑+20%」等私有變量）。
+To uphold the extreme modularity, balanceability, and build diversity of a Survivor-like, the stat architecture of Project: Phagocyte **eliminates every per-skill private stat** (private variables such as "+10% antibody range" or "+20% acid radius" are strictly forbidden).
 
-所有白血球底盤、局外造血幹細胞天賦星盤、局內被動特質（細胞器）以及升級加成，**100% 操作同一個全域通用 Stat 屬性池**：
+All white blood cell chassis, out-of-run hematopoietic stem cell (HSC) talent tree, in-run passive traits (organelles), and level-up bonuses operate **100% on the same universal Stat pool**:
 
 ```
                     ┌─────────────────────────┐
-                    │ 全域通用 Stat 字典 (Pool) │
+                    │ Universal Stat Pool     │
                     └────────────┬────────────┘
-         ┌───────────────────────┼───────────────────────┐
-         ▼                       ▼                       ▼
-【通用戰鬥屬性 (Combat - 23項)】     【通用生存屬性 (Defense - 11項)】   【通用機制屬性 (Utility - 1項)】
-· Damage (通用傷害)                 · Max Health (最大生命)          · Magnet (趨化拾取半徑)
-· Area (範圍/體積)                  · Health Regen (自癒率)
-· CDR (冷卻縮減)                    · Armor (膜剛性/減傷)
-· Projectile Speed (彈道速度)       · Move Speed (移動速度)
-· Duration (持續時間)               · Evasion (流體閃避率)
-· Amount (額外發射數量)             · Block (糖萼格擋率)
-· Pierce (穿透次數)                 · Life Steal (受體汲取/吸血)
-· Crit Chance (特異性暴擊率)         · Stagger (偏转/延傷)
-· Crit Damage (暴擊傷害倍率)         · Recoup (回收/延補)
-· Armor Penetration (護甲穿透)       · Ailment Threshold (異常閾值)
-· Ailment Chance (異常觸發率)
-· Dot Damage (持續傷害倍率)
-· Physical／Fire／Cold／Lightning／Chaos Damage (五系傷害加成，與 `damage` 同屬 Increased 加法池；技能 `damage_type` 決定吃哪一系)
-· Melee／Spell／AoE／Projectile／Minion Damage (標籤條件加成，僅帶對應標籤的技能生效；與 `damage` 同屬 Increased 加法池)
-· Ailment Effect (異常效果，異常狀態強度乘數；DoT 傷害除外)
+          ┌───────────────────────┼───────────────────────┐
+          ▼                       ▼                       ▼
+[Combat Stats (23 total)]     [Defense Stats (11 total)]   [Utility Stats (1 total)]
+· Damage (generic damage)                 · Max Health          · Magnet (chemotaxis pickup radius)
+· Area (range/volume)                  · Health Regen (self-heal rate)
+· CDR (cooldown reduction)                    · Armor (membrane rigidity / damage reduction)
+· Projectile Speed (projectile velocity)       · Move Speed (movement speed)
+· Duration (duration)               · Evasion (fluid dodge chance)
+· Amount (bonus projectile count)             · Block (glycocalyx block chance)
+· Pierce (pierce count)                 · Life Steal (receptor leech / life steal)
+· Crit Chance (specificity crit rate)         · Stagger (deflect / delayed damage)
+· Crit Damage (crit damage multiplier)         · Recoup (reclaim / delayed heal)
+· Armor Penetration (armor penetration)       · Ailment Threshold (ailment threshold)
+· Ailment Chance (ailment trigger chance)
+· Dot Damage (damage-over-time multiplier)
+· Physical / Fire / Cold / Lightning / Chaos Damage (five damage-type bonuses, sharing the Increased additive pool with `damage`; the skill's `damage_type` decides which one applies)
+· Melee / Spell / AoE / Projectile / Minion Damage (tag-conditional bonuses, applying only to skills with the matching tag; sharing the Increased additive pool with `damage`)
+· Ailment Effect (ailment strength multiplier; excludes DoT damage, which is handled by `dot_damage`)
 ```
 
 ```mermaid
 graph TD
-    CHASSIS["五大細胞基礎底盤<br>(cell.md)"] --> POOL["全域通用 Stat 屬性池<br>(CellStats.cs)"]
-    TREE["造血幹細胞天賦星盤<br>(passivetree.md)"] --> POOL
-    PASSIVES["局內 5 大被動特質<br>(skill.md)"] --> POOL
-    POOL --> ACTIVES["5 大主動技能 & 超武<br>(全自動讀取 Stat 計算彈道與範圍)"]
-    POOL --> BODY["白血球有機物理邊界<br>(體積縮放 · 碰撞面 · 游動速度)"]
+    CHASSIS["Five Cell Base Chassis<br>(cell.md)"] --> POOL["Universal Stat Pool<br>(CellStats.cs)"]
+    TREE["HSC Talent Tree<br>(passivetree.md)"] --> POOL
+    PASSIVES["5 In-Run Passive Traits<br>(skill.md)"] --> POOL
+    POOL --> ACTIVES["5 Active Skills & Super-Weapons<br>(fully auto-read Stats for projectile and range math)"]
+    POOL --> BODY["White Blood Cell Physical Body<br>(volume scaling · collision surface · swim speed)"]
 ```
 
 ---
 
-## 2. 屬性底層計算模型 (`Stat.cs` & `CellStats.cs`)
+## 2. Underlying Stat Computation Model (`Stat.cs` & `CellStats.cs`)
 
-每個屬性封裝為獨立的數值對象，基礎公式為標準的雙軌疊加計算：
+Each stat is encapsulated as an independent value object, using the standard dual-track additive formula:
 
 $$\text{FinalValue} = (\text{BaseValue} + \text{FlatBonus}) \times (1.0 + \text{PercentBonus})$$
 
-Flat/Pct 池由三種來源組成（Vistrace 式，見 `StatBlock.ScaledRecord` / `StatRule`）：直接加成、縮放加成、內建跨屬性規則。
+The Flat/Pct pools are fed by three sources (Vistrace-style, see `StatBlock.ScaledRecord` / `StatRule`): direct bonuses, scaled bonuses, and built-in cross-stat rules.
 
-縮放加成（per-modifier scaling）：`value × (sourceStat / scalePer)`，由 `scaling_stat` / `scale_per`
-在 modifier 條目中顯式聲明（gear / 天賦皆可選配，缺省即為舊行為）；任何屬性變動都會觸發
-`RecomputeScaled` 即時重算（fixed-point 上限 8 輪，循環會警告——約定為無環）。
+Scaled bonuses (per-modifier scaling): `value × (sourceStat / scalePer)`, explicitly declared on the modifier entry via `scaling_stat` / `scale_per`
+(optional on both gear and talents; omitting them preserves the legacy behavior); any stat change triggers
+an immediate `RecomputeScaled` recompute (fixed-point cap of 8 passes; cycles warn — the convention is acyclic).
 
-內建跨屬性規則：`flat += ratio × sourceStat`（flat 通道限定），由 `AddStatRule` 註冊，
-同樣即時重算、可精確移除。
+Built-in cross-stat rules: `flat += ratio × sourceStat` (flat channel only), registered via `AddStatRule`,
+likewise recomputed immediately and removable precisely.
 
 ```csharp
 // scripts/core/Stat.cs
@@ -91,87 +91,87 @@ public class Stat
 ```
 
 > [!IMPORTANT]
-> **顯式 Scaling 原則**（取代舊版「拒絕隱性複合 Scaling」）：
-> - ✅ 允許屬性間交叉轉換（如「每 50 點生命 +1 護甲」），但必須在數據條目中顯式聲明（`scaling_stat` / `scale_per`），禁止隱性硬編碼。
-> - ✅ 縮放加成即時重算、`StatChanged` 發射前保證為最終值；移除時精確回滾。
-> - 🚫 縮放圖約定為無環；循環會被截斷並警告，不得依賴循環行為。
+> **Explicit Scaling Principle** (replacing the old "no implicit compound scaling" rule):
+> - ✅ Cross-stat conversion is allowed (e.g. "+1 armor per 50 max health"), but must be explicitly declared on the data entry (`scaling_stat` / `scale_per`); implicit hardcoding is forbidden.
+> - ✅ Scaled bonuses recompute immediately, and the value is guaranteed final before `StatChanged` fires; removal rolls back precisely.
+> - 🚫 The scaling graph is acyclic by convention; cycles are truncated with a warning, and no behavior may depend on cycles.
 
 ---
 
-## 3. 全域通用屬性字典規範表 (Universal Stat Dictionary)
+## 3. Universal Stat Dictionary Specification (Universal Stat Dictionary)
 
-所有屬性鍵名統一使用蛇形命名法（Snake_case），並在 `scripts/core/StatBlock.cs` 中註冊（共 35 項）：
+All stat keys use snake_case naming and are registered in `scripts/core/StatBlock.cs` (35 total):
 
-| 屬性標識 (Key) | 顯示名稱 | 基準預設值 | 類別 | 影響範圍與通用運算規則 |
+| Stat Key (Key) | Display Name | Base Default | Category | Scope and Generic Computation Rules |
 | :--- | :--- | :--- | :--- | :--- |
-| `damage` | **通用傷害** | `1.0` (100%) | 戰鬥 | 通用基礎傷害加成。與五系傷害及標籤傷害共同構成 Increased 加法池。 |
-| `area` | **範圍 / 體積** | `1.0` (100%) | 戰鬥/形態 | 幾何尺寸乘數。等比縮放投射物尺寸、爆炸半徑、噴霧角度以及**玩家細胞本體碰撞受擊面**。 |
-| `cooldown_reduction` | **冷卻縮減 (CDR)** | `0.0` (0%) | 戰鬥 | 縮短所有主動技能循環週期。計算公式：$T_{\text{actual}} = T_{\text{base}} \times (1.0 - \text{CDR})$，硬上限 `0.75` (75%)。 |
-| `projectile_speed` | **彈道速度** | `1.0` (100%) | 戰鬥 | 所有飛行實體（抗體、穿孔射線、飛濺酸液、彈射抓手）的飛行速度乘數。 |
-| `duration` | **持續時間** | `1.0` (100%) | 戰鬥 | 場上留存實體（酸霧殘留、補體陣列地雷、黏網陷阱）的存活時間乘數。 |
-| `amount` | **額外數量** | `0` (發) | 戰鬥 | **固定增加所有技能單次發射/生成個數**（如抗體 $+1$ 枚、穿孔長矛 $+1$ 束、偽足多出 $+1$ 抓手）。 |
-| `pierce` | **穿透次數** | `0` (次) | 戰鬥 | 投射物貫穿病原體的額外次數（穿透後繼續飛行）。 |
-| `crit_chance` | **特異性暴擊率** | `0.05` (5%) | 戰鬥 | 命中敵人時觸發致命特異性暴擊的機率。 |
-| `crit_damage` | **暴擊傷害倍率** | `2.0` (200%) | 戰鬥 | 觸發暴擊時的結算傷害乘數。 |
-| `armor_penetration` | **護甲穿透** | `0.0` (0%) | 戰鬥 | 開火時凍結的護甲穿透比例：$\text{Armor}_{\text{eff}} = \text{Armor} \times (1.0 - \text{Pen})$，硬上限 `1.0` (100%)。 |
-| `ailment_chance` | **異常觸發率** | `1.0` (100%) | 戰鬥 | 命中時觸發 `on_hit` 異常的機率（開火時凍結）；暴擊必定觸發。硬上限 `1.0` (100%)。 |
-| `ailment_threshold` | **異常閾值** | `1.0` (100%) | 生存 | 自身異常閾值乘數：$\text{Threshold} = \text{MaxHP} \times 0.05 \times \text{Mult}$，僅下限 `0.0`，無上限。 |
-| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 戰鬥 | 全域 DoT 傷害乘數，與 `damage` 相乘結算。受擊時即時讀取施加者：$\text{dps} = \text{mag} \times \text{scale} \times \text{dot\_damage}$（非玩家施加者視為 `1.0`）。 |
-| `physical_damage` | **物理傷害** | `1.0` (100%) | 戰鬥 | 物理系傷害加成，與 `damage` 加算進 Increased 池（`damage_type: physical` 技能）。 |
-| `fire_damage` | **火焰傷害** | `1.0` (100%) | 戰鬥 | 火焰系傷害加成，與 `damage` 加算進 Increased 池。 |
-| `cold_damage` | **冰霜傷害** | `1.0` (100%) | 戰鬥 | 冰霜系傷害加成，與 `damage` 加算進 Increased 池。 |
-| `lightning_damage` | **閃電傷害** | `1.0` (100%) | 戰鬥 | 閃電系傷害加成，與 `damage` 加算進 Increased 池。 |
-| `chaos_damage` | **混沌傷害** | `1.0` (100%) | 戰鬥 | 混沌系傷害加成，與 `damage` 加算進 Increased 池。 |
-| `melee_damage` | **近戰傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `Melee` 標籤技能生效，加算進 Increased 池。 |
-| `spell_damage` | **法術傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `Spell` 標籤技能生效，加算進 Increased 池。 |
-| `aoe_damage` | **範圍傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `AOE` 標籤技能生效，加算進 Increased 池。 |
-| `projectile_damage` | **投射物傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `Projectile` 標籤技能生效，加算進 Increased 池。 |
-| `minion_damage` | **召喚物傷害** | `1.0` (100%) | 戰鬥 | 標籤條件加成：僅 `Minion` 標籤技能生效，加算進 Increased 池。 |
-| `ailment_effect` | **異常效果** | `1.0` (100%) | 戰鬥 | 異常狀態強度乘數（DoT 傷害除外，由 `dot_damage` 負責）。受擊時即時讀取施加者：非 DoT 通道 $\text{mag} = \text{mag} \times \text{scale} \times \text{ailment\_effect}$，持續時間不受影響（非玩家施加者視為 `1.0`）。 |
-| `max_health` | **最大生命值** | `100.0` | 生存 | 細胞膜破裂前可承受的最大耐久上限。 |
-| `health_regen` | **生命自癒率** | `0.0` (HP/s) | 生存 | 每秒自動修復的細胞膜生命值。 |
-| `armor` | **膜剛性 / 護甲** | `0.0` (點) | 生存 | POE 邊際減傷公式：$\text{DR} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$，大傷害穿透深。DoT 以每秒 dps 為單位走同形曲線：$\text{DR}_{\text{dot}} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{dps}}$（`DotArmorFactor` 常數可調；調大減傷變弱），同樣吃護甲穿透、上限 85%。 |
-| `damage_taken` | **承受傷害** | `1.0` (100%) | 生存 | 受到傷害乘數（與護甲曲線獨立；低於 1 為減傷）。玩家防禦：$\text{mult} = \text{突變倍率} \times \text{damage\_taken}$，直擊與 DoT 入場各乘一次；延傷池 drain 不再重複計算；`0` 視為未設置而跳過（與管線守衛一致）。 |
-| `move_speed` | **游動速度** | `230.0` (px/s) | 生存/機動 | 玩家細胞常態巡航下的基礎游動速度。 |
-| `evasion` | **流體閃避率** | `0.0` (0%) | 生存/機動 | 胞膜阿米巴流體變形完全免傷機率。硬上限設為 `0.60` (60%)。受擊第一順位判定。 |
-| `block` | **糖萼格擋率** | `0.0` (0%) | 生存/防護 | 表面緻密糖萼屏障偏轉阻絕傷害機率。硬上限設為 `0.75` (75%)。受擊第二順位判定。 |
-| `life_steal` | **受體汲取 / 命中吸血** | `0.0` (0%) | 生存/續航 | 任何攻擊或傷害命中敵人時觸發自體修復的機率（觸發時固定回復 1 點 HP）。硬上限設為 `0.20` (20%)。 |
-| `stagger` | **偏转 / 延傷** | `0.0` (0%) | 生存/緩衝 | 命中傷害按比例轉入延傷池（4 秒指數衰減為無視護甲 DoT），僅玩家、僅直擊。硬上限設為 `0.60` (60%)。 |
-| `recoup` | **回收 / 延補** | `0.0` (0%) | 生存/續航 | 受到直擊後按比例在 4 秒內分期回復 HP（不受回血鎖定影響），僅玩家。硬上限設為 `0.30` (30%)。 |
-| `magnet` | **趨化引力 (拾取)** | `150.0` (px) | 機制 | 自動吸附周邊 ATP 經驗滴與抗原碎片的有效半徑。 |
+| `damage` | **Generic Damage** | `1.0` (100%) | Combat | Generic base damage bonus. Forms the Increased additive pool together with the five damage-type bonuses and tag bonuses. |
+| `area` | **Range / Volume** | `1.0` (100%) | Combat/Morphology | Geometry size multiplier. Scales projectile size, explosion radius, spray angle, and the **player cell's own collision hit surface** proportionally. |
+| `cooldown_reduction` | **Cooldown Reduction (CDR)** | `0.0` (0%) | Combat | Shortens the cycle period of all active skills. Formula: $T_{\text{actual}} = T_{\text{base}} \times (1.0 - \text{CDR})$, hard-capped at `0.75` (75%). |
+| `projectile_speed` | **Projectile Speed** | `1.0` (100%) | Combat | Flight-speed multiplier for all flying entities (antibodies, perforin beams, splashing acid, rebound grapples). |
+| `duration` | **Duration** | `1.0` (100%) | Combat | Lifetime multiplier for persistent field entities (acid mist residue, complement array mines, web traps). |
+| `amount` | **Bonus Count** | `0` (shots) | Combat | **Flat bonus to every skill's per-cast spawn count** (e.g. antibodies $+1$ round, perforin lances $+1$ beam, pseudopod $+1$ extra grapple). |
+| `pierce` | **Pierce Count** | `0` (hits) | Combat | Bonus times a projectile keeps flying after punching through pathogens. |
+| `crit_chance` | **Specificity Crit Chance** | `0.05` (5%) | Combat | Chance to land a lethal specificity crit when hitting an enemy. |
+| `crit_damage` | **Crit Damage Multiplier** | `2.0` (200%) | Combat | Final damage multiplier applied when a crit triggers. |
+| `armor_penetration` | **Armor Penetration** | `0.0` (0%) | Combat | Armor penetration ratio frozen at fire time: $\text{Armor}_{\text{eff}} = \text{Armor} \times (1.0 - \text{Pen})$, hard-capped at `1.0` (100%). |
+| `ailment_chance` | **Ailment Trigger Chance** | `1.0` (100%) | Combat | Chance to apply an `on_hit` ailment on hit (frozen at fire time); crits always apply. Hard-capped at `1.0` (100%). |
+| `ailment_threshold` | **Ailment Threshold** | `1.0` (100%) | Defense | Own ailment-threshold multiplier: $\text{Threshold} = \text{MaxHP} \times 0.05 \times \text{Mult}$, floored at `0.0` only, with no upper cap. |
+| `dot_damage` | **Damage-Over-Time Multiplier** | `1.0` (100%) | Combat | Global DoT damage multiplier, multiplied with `damage` at resolution. Read live from the applier on hit: $\text{dps} = \text{mag} \times \text{scale} \times \text{dot\_damage}$ (non-player appliers count as `1.0`). |
+| `physical_damage` | **Physical Damage** | `1.0` (100%) | Combat | Physical-type damage bonus, added into the Increased pool with `damage` (`damage_type: physical` skills). |
+| `fire_damage` | **Fire Damage** | `1.0` (100%) | Combat | Fire-type damage bonus, added into the Increased pool with `damage`. |
+| `cold_damage` | **Cold Damage** | `1.0` (100%) | Combat | Cold-type damage bonus, added into the Increased pool with `damage`. |
+| `lightning_damage` | **Lightning Damage** | `1.0` (100%) | Combat | Lightning-type damage bonus, added into the Increased pool with `damage`. |
+| `chaos_damage` | **Chaos Damage** | `1.0` (100%) | Combat | Chaos-type damage bonus, added into the Increased pool with `damage`. |
+| `melee_damage` | **Melee Damage** | `1.0` (100%) | Combat | Tag-conditional bonus: only `Melee`-tagged skills benefit, added into the Increased pool. |
+| `spell_damage` | **Spell Damage** | `1.0` (100%) | Combat | Tag-conditional bonus: only `Spell`-tagged skills benefit, added into the Increased pool. |
+| `aoe_damage` | **Area Damage** | `1.0` (100%) | Combat | Tag-conditional bonus: only `AOE`-tagged skills benefit, added into the Increased pool. |
+| `projectile_damage` | **Projectile Damage** | `1.0` (100%) | Combat | Tag-conditional bonus: only `Projectile`-tagged skills benefit, added into the Increased pool. |
+| `minion_damage` | **Minion Damage** | `1.0` (100%) | Combat | Tag-conditional bonus: only `Minion`-tagged skills benefit, added into the Increased pool. |
+| `ailment_effect` | **Ailment Effect** | `1.0` (100%) | Combat | Ailment strength multiplier (excludes DoT damage, which is handled by `dot_damage`). Read live from the applier on hit: non-DoT channels use $\text{mag} = \text{mag} \times \text{scale} \times \text{ailment\_effect}$, duration unaffected (non-player appliers count as `1.0`). |
+| `max_health` | **Max Health** | `100.0` | Defense | Maximum durability cap before the cell membrane ruptures. |
+| `health_regen` | **Health Regen Rate** | `0.0` (HP/s) | Defense | Cell membrane health automatically repaired per second. |
+| `armor` | **Membrane Rigidity / Armor** | `0.0` (points) | Defense | POE-style marginal damage reduction: $\text{DR} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$, so large hits penetrate deeper. DoT runs on the same-shaped curve using per-second dps: $\text{DR}_{\text{dot}} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{dps}}$ (`DotArmorFactor` constant is tunable; raising it weakens reduction), likewise subject to armor penetration with an 85% cap. |
+| `damage_taken` | **Damage Taken** | `1.0` (100%) | Defense | Damage-taken multiplier (independent of the armor curve; below 1 is reduction). Player defense: $\text{mult} = \text{mutator multiplier} \times \text{damage\_taken}$, applied once each at direct-hit and DoT entry; delayed-pool drain is not multiplied again; `0` means unset and is skipped (consistent with the pipeline guard). |
+| `move_speed` | **Swim Speed** | `230.0` (px/s) | Defense/Mobility | Base swim speed of the player cell under normal cruising. |
+| `evasion` | **Fluid Evasion Chance** | `0.0` (0%) | Defense/Mobility | Chance for amoeboid membrane fluid deformation to fully avoid damage. Hard-capped at `0.60` (60%). First check on being hit. |
+| `block` | **Glycocalyx Block Chance** | `0.0` (0%) | Defense/Protection | Chance for the dense surface glycocalyx barrier to deflect and negate damage. Hard-capped at `0.75` (75%). Second check on being hit. |
+| `life_steal` | **Receptor Leech / Life on Hit** | `0.0` (0%) | Defense/Sustain | Chance for any attack or damage hit on an enemy to trigger self-repair (restores a flat 1 HP when triggered). Hard-capped at `0.20` (20%). |
+| `stagger` | **Deflect / Delayed Damage** | `0.0` (0%) | Defense/Buffer | Proportion of hit damage diverted into the delayed-damage pool (decays exponentially over 4 seconds as armor-ignoring DoT), player-only, direct hits only. Hard-capped at `0.60` (60%). |
+| `recoup` | **Reclaim / Delayed Heal** | `0.0` (0%) | Defense/Sustain | Proportion of a direct hit recovered in installments over 4 seconds (ignores heal lockout), player-only. Hard-capped at `0.30` (30%). |
+| `magnet` | **Chemotaxis Pull (Pickup)** | `150.0` (px) | Utility | Radius for automatically attracting nearby ATP experience drops and antigen fragments. |
 
-### 3.1 能量約束層（非第 36 屬性）
+### 3.1 Energy Constraint Layer (Not the 36th Stat)
 
-胞器腔室的能量是**約束層，而非通用 Stat**：`CellStats` 內無 `energy` 槽位，所有胞器 `modifiers`／`drawback` 亦不得引用 `energy`。能量模型（已用-上限）：已用＝Σ正成本，上限＝6＋Σ發電量（`energy_cost == -1` 即 `+1` 發電，必帶重度負面），合法⇔已用≤上限且件數≤4。背包（run-scoped，上限 12）永不計入能量。硬上限複查（Phase 4）：腔室 CDR 合計 `+0.26`＋被動滿級 `+0.40`＋底盤 `0.10` 仍被 `0.75` 鉗制；腔室 `evasion +0.02`／`block +0.04` 僅為微調，遠低於 `0.60`／`0.75` 上限；`amount +1` 唯一來源鎖 4 費（佔基礎預算 2/3），`4+3` 超載、`4+1+1` 滿配。
+Organelle chamber energy is a **constraint layer, not a universal Stat**: `CellStats` holds no `energy` slot, and no organelle `modifiers` / `drawback` may reference `energy`. Energy model (used vs. cap): used = sum of positive costs, cap = 6 + sum of generation (`energy_cost == -1` means `+1` generation and always carries a heavy downside); legal iff used <= cap and item count <= 4. The backpack (run-scoped, cap 12) never counts toward energy. Hard-cap review (Phase 4): chamber CDR total `+0.26` + maxed passive `+0.40` + chassis `0.10` is still clamped by `0.75`; chamber `evasion +0.02` / `block +0.04` are micro-tuning only, far below the `0.60` / `0.75` caps; the single `amount +1` source is locked behind a 4-cost item (2/3 of the base budget), `4+3` overloads, `4+1+1` is a full build.
 
 ---
 
-## 4. 動態屬性聯動規範
+## 4. Dynamic Stat Linkage Rules
 
-雖然拒絕二次複雜 Scaling，但以下基礎物理與防禦屬性具備直接的直覺幾何與受擊聯動：
+Although secondary compound scaling is rejected, the following basic physical and defensive stats have direct, intuitive geometric and on-hit linkages:
 
-### 4.1 體積與範圍縮放 (`area` -> 碰撞體與 AoE)
-- **碰撞體等比放大**：細胞多邊形碰撞半徑 $R = R_{\text{base}} \times \text{area}$。
-- **技能彈道等比放大**：所有主動技能生成的判定圈或 Sprite 尺寸直接乘以 $\text{area}$。
-- 體現「範圍越大，打得越廣，但受擊面積也越大」的經典 PoE 風格平衡。
+### 4.1 Volume and Range Scaling (`area` -> Colliders and AoE)
+- **Proportional collider growth**: the cell polygon collision radius is $R = R_{\text{base}} \times \text{area}$.
+- **Proportional skill projectile growth**: the hit circle or sprite size of every active-skill spawn is multiplied directly by $\text{area}$.
+- This embodies the classic PoE-style tradeoff: "bigger area hits wider, but also takes hits over a larger surface."
 
-### 4.2 游動速度 (`move_speed` -> 物理位移)
-- 玩家細胞在 `_PhysicsProcess` 中的基礎游動速度向量 $V = \text{InputDirection} \times \text{move_speed}$。
-- 當處於特定器官流體力學（如血流剪切、肺泡氣流）中時，環境流體向量直接與本體速度進行線性向量疊加。
+### 4.2 Swim Speed (`move_speed` -> Physical Displacement)
+- The player cell's base swim velocity vector in `_PhysicsProcess` is $V = \text{InputDirection} \times \text{move_speed}$.
+- Inside organ-specific fluid dynamics (blood shear flow, alveolar airflow), the ambient fluid vector adds linearly to the body velocity.
 
-### 4.3 受擊結算管線 (Damage Resolution Pipeline)
-當玩家細胞受到病原體碰撞或飛行物傷害時，遵循漏斗式順序判定：
+### 4.3 Damage Resolution Pipeline (Damage Resolution Pipeline)
+When the player cell takes pathogen collision or projectile damage, it follows a funnel-style sequential resolution:
 
 ```mermaid
 flowchart TD
-    Hit["遭受病原體碰撞 / 技能傷害 (Incoming Hit)"] --> EvCheck{"1. 閃避判定 (Evasion Roll)<br>randf() < stats.evasion"}
-    EvCheck -- 成功 --> Evaded["【完全閃避 (EVADED)】<br>受到 0 傷害 · 胞膜流體變形水波紋"]
-    EvCheck -- 失敗 --> BlkCheck{"2. 格擋判定 (Block Roll)<br>randf() < stats.block"}
-    BlkCheck -- 成功 --> Blocked["【完全格擋 (BLOCKED)】<br>受到 0 傷害 · 糖萼屏障晶體偏轉"]
-    BlkCheck -- 失敗 --> ArmorDR["3. 護甲減傷 (Armor DR)<br>Damage * (1 - ArmorEff / (ArmorEff + 5*Damage))<br>ArmorEff = Armor * (1 - pen)"]
-    ArmorDR --> TakenMult["4. 承受傷害 (Damage Taken)<br>Damage * 突變倍率 * damage_taken (0 = 跳過)"]
-    TakenMult --> HPLoss["5. 扣減生命 (HP Loss)<br>扣除生命耐久 · 若 HP <= 0 胞膜破裂陣亡"]
-    HPLoss --> AilRoll{"6. 異常判定 (Ailment Roll)<br>暴擊必定觸發 · 否則 randf() < ailment_chance"}
-    AilRoll -- 觸發 --> AilScale["異常強度按閾值縮放<br>scale = clamp(dealt / (MaxHP * 0.05 * 閾值乘數), 0, 1)"]
-    AilScale --> AilMag["異常強度分流 (hit-time, 施加者/目標 live 讀取)<br>非DoT: mag * scale * ailment_effect (持續時間不變)<br>DoT: mag * scale * dot_damage * (1 - armorDoT)<br>armorDoT = Armor / (Armor + 5*dps), 上限 85%, 穿透沿用"]
+    Hit["Pathogen Collision / Skill Damage Taken (Incoming Hit)"] --> EvCheck{"1. Evasion Roll<br>randf() < stats.evasion"}
+    EvCheck -- Success --> Evaded["[Fully Evaded (EVADED)]<br>0 damage taken · membrane fluid-deformation ripple"]
+    EvCheck -- Fail --> BlkCheck{"2. Block Roll<br>randf() < stats.block"}
+    BlkCheck -- Success --> Blocked["[Fully Blocked (BLOCKED)]<br>0 damage taken · glycocalyx barrier crystal deflection"]
+    BlkCheck -- Fail --> ArmorDR["3. Armor DR<br>Damage * (1 - ArmorEff / (ArmorEff + 5*Damage))<br>ArmorEff = Armor * (1 - pen)"]
+    ArmorDR --> TakenMult["4. Damage Taken<br>Damage * mutator multiplier * damage_taken (0 = skip)"]
+    TakenMult --> HPLoss["5. HP Loss<br>Lose life durability · membrane ruptures and dies if HP <= 0"]
+    HPLoss --> AilRoll{"6. Ailment Roll<br>Crits always apply · otherwise randf() < ailment_chance"}
+    AilRoll -- Applied --> AilScale["Ailment magnitude scales with threshold<br>scale = clamp(dealt / (MaxHP * 0.05 * threshold multiplier), 0, 1)"]
+    AilScale --> AilMag["Ailment magnitude split (hit-time, live read of applier/target)<br>Non-DoT: mag * scale * ailment_effect (duration unchanged)<br>DoT: mag * scale * dot_damage * (1 - armorDoT)<br>armorDoT = Armor / (Armor + 5*dps), cap 85%, penetration carries over"]
 ```

@@ -1,332 +1,332 @@
-# 《Project: Phagocyte（吞噬體）》產品設計需求書（GDD / PRD）
+# Project: Phagocyte Product Design Document (GDD / PRD)
 
 ---
 
-## 1. 產品概述與核心定位
+## 1. Product Overview and Core Positioning
 
-- **遊戲類型**：2D 俯視角微觀動作肉鴿（Top-Down Microscopic Survivor-like）。
-- **平台目標**：PC（Steam），支援手把與鍵鼠操作。
-- **引擎選型**：Godot 4.x（基於 2D 物理與 RenderingServer 高併發優勢）。
-- **核心價值主張（USP）**：
-  - **所見即所得的有機物理變形**：白血球外形動態隨機伸展，多邊形邊界與碰撞箱完全即時同步。
-  - **硬核生理學機制遊戲化**：將抗原呈遞、調理作用、過載消化、NETosis 轉化為核心爽點，實現「遊玩即理解免疫學」。
-  - **「底盤 ＋ 形態模組 ＋ 外掛細胞器」解耦架構**：所有白血球共享相同微絲微管底盤，形態與行為完全技能化與參數化，支持自由裝配與異變。
-  - **純通用全域 Stat 數值矩陣**：嚴格依循 Survivor-like 哲學，所有屬性 100% 通用化，絕無單一技能特化私有屬性。
-  - **經典「主動 5 ＋ 被動 5」欄位與 1:1 終極超武閉環**：5 大自動發射主動生化技能，5 大通用 Stat 被動特質，滿級二合一合成 5 大終極表觀遺傳超武。
-  - **PoE 式單一聯合造血幹細胞天賦大星盤**：基於骨髓系與淋巴系真實分化路徑，所有細胞共享星盤但具備不同起始特化門戶，支持跨界生化流派構築（Build）。
+- **Genre**: 2D top-down microscopic action roguelite (Top-Down Microscopic Survivor-like).
+- **Target platforms**: PC (Steam), with gamepad and keyboard/mouse support.
+- **Engine**: Godot 4.x (chosen for its 2D physics and RenderingServer high-concurrency advantages).
+- **Core value proposition (USP)**:
+  - **WYSIWYG organic physical morphing**: White blood cell bodies stretch dynamically and randomly, with polygon boundaries and collision shapes fully synchronized in real time.
+  - **Hardcore physiology gamified**: Antigen presentation, opsonization, overload digestion, and NETosis are turned into core power fantasies, delivering "playing is understanding immunology".
+  - **Decoupled "chassis + morphology modules + plug-in organelles" architecture**: All white blood cells share the same microfilament/microtubule chassis; morphology and behavior are fully skill-driven and parameterized, supporting free loadouts and mutations.
+  - **Purely generic global Stat matrix**: Strictly following Survivor-like philosophy, all attributes are 100% generic, with absolutely no single-skill-specific private attributes.
+  - **Classic "5 actives + 5 passives" slots with a 1:1 ultimate super-weapon loop**: 5 auto-firing active biochemical skills, 5 generic-Stat passive traits, max-level pairwise fusion into 5 ultimate epigenetic super-weapons.
+  - **PoE-style single unified hematopoietic stem cell (HSC) talent tree**: Based on the real myeloid and lymphoid differentiation pathways, all cells share one tree but start from different specialized portals, supporting cross-lineage biochemical build crafting.
 
 ---
 
-## 2. 核心玩法與變形解耦架構
+## 2. Core Gameplay and Morphology-Decoupled Architecture
 
-### 核心戰鬥迴圈（Core Loop）
+### Core Combat Loop
 
 ```mermaid
 graph TD
-    A["走位與誘捕 (Navigating & Luring)<br>利用動態走位保持距離、拉扯怪群"] --> B["擊殺清怪與儲能 (Kills & EXP)<br>擊殺病原體，轉化為免疫經驗"]
-    B --> C["抗原採樣與過載 (Antigen Sampling & Burst)<br>達閾值觸發全自動技能齊射"]
-    C --> D["表觀遺傳質變 (Epigenetic Mutations)<br>局內三選一：升級主動5/被動5與超武二合一融合"]
-    D --> E["病理波次結算 (Wave Clear & Differentiation)<br>獲得微管天賦點，點亮造血幹細胞天賦星盤"]
+    A["Positioning and Luring (Navigating & Luring)<br>Use dynamic movement to keep distance and kite hordes"] --> B["Kills and Energy Storage (Kills & EXP)<br>Kill pathogens and convert them into immune EXP"]
+    B --> C["Antigen Sampling and Overload (Antigen Sampling & Burst)<br>Trigger a full automatic skill volley on reaching the threshold"]
+    C --> D["Epigenetic Mutation (Epigenetic Mutations)<br>In-run draft of 3: upgrade the 5 actives / 5 passives and fuse super-weapons pairwise"]
+    D --> E["Pathology Wave Settlement (Wave Clear & Differentiation)<br>Earn microtubule talent points and light up the hematopoietic stem cell talent tree"]
     E --> A
 ```
 
-### 「底盤 ＋ 形態參數模組 ＋ 外掛細胞器」解耦架構
+### "Chassis + Morphology Parameter Modules + Plug-in Organelles" Decoupled Architecture
 
-為解決「細胞形態與專有動畫綁定導致技能無法複用」的架構難題，本專案將細胞解構為三層生物學模型：
+To solve the architectural problem of "cell morphology bound to bespoke animations makes skills impossible to reuse", this project decomposes cells into a three-layer biological model:
 
-1. **統一底盤（Unified Chassis）**：
-   - 所有白血球在物理底層均具備相同的微絲微管系統。
-   - **初始半徑標準化**：統一設定為 `base_radius = 24.0`，確保所有細胞在 1 級時擁有公平平等的受擊面積與基礎機動性，消弭前期數值失衡。
-2. **頂點噪聲參數模組（Morphology Modifiers）**：
-   - 不使用骨骼動畫，而是透過 `FastNoiseLite` 驅動 `Polygon2D` 頂點動態位移。
-   - 提煉三大底層噪聲參數池，供技能與天賦系統隨時動態修改：
-     - **Amplitude（偽足伸展振幅）**：控制偽足伸出的長度。受全域通用屬性 `area` 動態加成。
-     - **Frequency（突觸/刺突密度）**：控制邊緣起伏的頻率。數值越高，毛刺與突起越密集（如樹突細胞）；數值越低，輪廓越圓滑平整（如未活化 T/B 細胞）。
-     - **Smoothness（黏滯流體度）**：決定邊界如阿米巴流體般蠕動，或是像堅硬細胞壁般緊湊微顫。
-3. **外掛式細胞器（Modular Organelles）**：
-   - 超出本體網格拓撲範圍的特殊攻擊，做成獨立子節點掛載（PackedScene）：
-     - **吞噬偽足鏈式打擊（`PseudopodChainVisual`）**：吞噬偽足發射的暫態鏈式偽足，鏈射延伸→命中爆發兩段打擊；舊偽足捕捉爪 IK 器官已併入此機制並刪除。
-     - **受體棘刺陣列（`ReceptorSpikes.tscn`）**：圍繞細胞邊緣排列的環狀懸浮受體，提供旋轉射擊、接觸反傷或化學感應。
-4. **生物學合理化包裝（表觀遺傳與異變嵌合體）**：
-   - **世界觀設定**：「所有白血球體內皆沉睡著造血幹細胞的完整基因庫。」
-   - 當 B 細胞裝備巨噬專屬的「偽足猛擊」時，UI 提示：【解鎖沉睡基因：清道夫受體 CD36】；視覺上 B 細胞浮現溶酶體並突發長出巨型肉質偽足。
-   - 跨界組合被包裝為【異變嵌合體（Chimera Mutation）】，賦予玩家培育出生化怪物極致 build 的中二感與策略樂趣。
+1. **Unified Chassis**:
+   - All white blood cells share the same microfilament/microtubule system at the physics level.
+   - **Standardized initial radius**: uniformly set to `base_radius = 24.0`, so every cell has a fair and equal hit area and baseline mobility at level 1, eliminating early-game balance skew.
+2. **Vertex Noise Parameter Modules (Morphology Modifiers)**:
+   - No skeletal animation; instead `FastNoiseLite` drives dynamic `Polygon2D` vertex displacement.
+   - Three low-level noise parameter pools are distilled for the skill and talent systems to modify dynamically at any time:
+     - **Amplitude (pseudopod extension amplitude)**: controls how far pseudopods extend. Scales dynamically with the global generic attribute `area`.
+     - **Frequency (synapse/spike density)**: controls the frequency of edge undulation. Higher values mean denser bristles and protrusions (e.g. dendritic cell); lower values mean smoother, rounder outlines (e.g. resting T/B cells).
+     - **Smoothness (viscous fluidity)**: determines whether the boundary creeps like amoebic fluid or trembles tightly like a rigid cell wall.
+3. **Modular Organelles**:
+   - Special attacks that exceed the body mesh topology are built as independent mounted child nodes (PackedScene):
+     - **Phagocytic pseudopod chain strike (`PseudopodChainVisual`)**: transient chained pseudopods fired by engulfing pseudopods, dealing two-stage chain-extend-then-burst-on-hit damage; the old pseudopod grapple-claw IK organ has been merged into this mechanic and removed.
+     - **Receptor spike array (`ReceptorSpikes.tscn`)**: a ring of hovering receptors arranged around the cell edge, providing rotating fire, contact retaliation, or chemosensing.
+4. **Biological Rationalization (Epigenetics and Chimera Mutation)**:
+   - **Setting**: "Every white blood cell carries the complete gene library of the hematopoietic stem cell, lying dormant inside."
+   - When a B cell equips the Macrophage-exclusive "Pseudopod Slam", the UI prompts: [Dormant gene unlocked: scavenger receptor CD36]; visually, lysosomes surface on the B cell as it suddenly sprouts giant fleshy pseudopods.
+   - Cross-lineage combinations are framed as [Chimera Mutation], giving players the chuuni thrill and strategic joy of cultivating biochemical monster builds.
 
 ---
 
-## 3. 角色矩陣與細胞形態學（Cell Morphology & Visual Matrix）
+## 3. Character Matrix and Cell Morphology (Cell Morphology & Visual Matrix)
 
-### 初始底盤與顯微特徵對照表
+### Starting Chassis and Microscopy Feature Reference
 
-所有角色初始碰撞判定面積統一（`base_radius = 24.0`），但依據真實顯微鏡觀察，在多邊形噪聲參數、細胞核幾何圖元與細胞器細節上建立鮮明辨識度：
+All characters share the same starting collision area (`base_radius = 24.0`), but are given strong visual identity based on real microscope observations, through polygon noise parameters, nuclear geometric primitives, and organelle details:
 
-| 細胞種類 | 體型大小（真實 μm） | 遊戲外觀形態與邊界特徵 | 細胞核形狀（顯微鏡辨識關鍵） | 初始天賦起點定位 |
+| Cell Type | Body Size (Real μm) | In-Game Appearance and Boundary Features | Nucleus Shape (Key Microscopy Identifier) | Starting Talent Portal |
 | :--- | :--- | :--- | :--- | :--- |
-| **巨噬細胞<br>(Macrophage)** | 極大<br>($20 \sim 40\,\mu\text{m}$) | **流體阿米巴狀**。邊界劇烈起伏，表面皺褶多、粗大偽足持續伸張，體內可見深色溶酶體顆粒。 | **巨大腎形 / 馬蹄形單核**（偏心排列）。 | 【單核巨化區域】<br>近戰重裝、偽足打擊、全傷減免 |
-| **殺手 T 細胞<br>(CTL / CD8+)** | 偏小<br>($7 \sim 10\,\mu\text{m}$) | **緊湊微絨毛球體**。表面平滑圓整，高頻微幅顫動；衝刺活化時前端形成極化扁平「免疫突觸」。 | **超大正圓形核**（佔據體內 $\sim 80\%$ 空間，邊緣僅留薄圈胞質）。 | 【極化纖毛區域】<br>高速刺客、穿刺破膜、單體處決 |
-| **嗜中性球<br>(Neutrophil)** | 中等<br>($10 \sim 15\,\mu\text{m}$) | **高頻焦躁顫膜**。邊界極不穩定，易破碎呈顆粒狀；胞質內密布細小微白殺菌顆粒。 | **分節多葉核（3～5 葉）**（如串聯香腸或念珠狀）。 | 【顆粒活化區域】<br>陣地自爆、高頻拋射、酸液濺射 |
-| **B 淋巴細胞<br>(B-Cell)** | 中偏小<br>($8 \sim 12\,\mu\text{m}$) | **受體密布圓球**。靜息時緊湊圓潤，外圍環繞一圈 Y 型受體光點；活化轉為漿細胞時體積膨脹，內質網如工廠排布。 | **車輪狀 / 鐘面狀核**（染色質呈放射狀輪輻排列）。 | 【內質網工廠】<br>遠端制導、高頻抗體射擊、自動追蹤 |
-| **樹突狀細胞<br>(Dendritic Cell)** | 大型伸展<br>($15 \sim 30\,\mu\text{m}$) | **星芒樹突海葵狀**。本體緊湊，但向 360 度四面八方伸展出密密麻麻的樹枝狀長分支，感知半徑極大。 | **中心不規則卵形核**。 | 【抗原感知中樞】<br>廣域採樣、信號傳導、巡邏軍召喚 |
+| **Macrophage<br>(Macrophage)** | Very large<br>($20 \sim 40\,\mu\text{m}$) | **Fluid amoeboid form**. Violently undulating boundary with many surface wrinkles and continuously extending thick pseudopods; dark lysosome granules visible inside the body. | **Giant kidney-shaped / horseshoe single nucleus** (eccentrically placed). | [Mononuclear Giant Region]<br>Melee tank, pseudopod strikes, all-damage reduction |
+| **Killer T cell<br>(CTL / CD8+)** | Fairly small<br>($7 \sim 10\,\mu\text{m}$) | **Compact microvilli-covered sphere**. Smooth round surface with high-frequency low-amplitude shimmer; on dash activation the front polarizes into a flat "immune synapse". | **Oversized perfectly round nucleus** (occupying $\sim 80\%$ of the body, leaving only a thin rim of cytoplasm at the edge). | [Polarized Cilia Region]<br>High-speed assassin, piercing membrane rupture, single-target execution |
+| **Neutrophil<br>(Neutrophil)** | Medium<br>($10 \sim 15\,\mu\text{m}$) | **High-frequency jittery membrane**. Extremely unstable boundary that fragments easily into granules; cytoplasm packed with tiny pale bactericidal granules. | **Segmented multi-lobed nucleus (3-5 lobes)** (like linked sausages or beads). | [Granule Activation Region]<br>Entrenched self-detonation, high-frequency lobbing, acid splash |
+| **B cell<br>(B-Cell)** | Small-to-medium<br>($8 \sim 12\,\mu\text{m}$) | **Receptor-dotted sphere**. Compact and round at rest, ringed by Y-shaped receptor light spots; swells when activated into a plasma cell, with endoplasmic reticulum arranged like factory lines. | **Cartwheel / clock-face nucleus** (chromatin arranged in radial spokes). | [Endoplasmic Reticulum Factory]<br>Ranged guidance, rapid antibody fire, auto-homing |
+| **Dendritic cell<br>(Dendritic Cell)** | Large and spreading<br>($15 \sim 30\,\mu\text{m}$) | **Star-shaped dendritic anemone**. Compact body extending dense branching dendrites in all 360 degrees, with an enormous sensing radius. | **Central irregular oval nucleus**. | [Antigen Sensing Hub]<br>Wide-area sampling, signal transduction, patrol-army summoning |
 
 ---
 
-### 動態體積與範圍縮放機制（Volume & Area Scaling）
+### Dynamic Volume and Area Scaling (Volume & Area Scaling)
 
-在「碰撞傷害＋擊殺經驗」為核心的機制下，體積大小嚴格遵循直覺且純粹的 **Area 範圍等比縮放機制**（類似《流亡黯道 PoE》的 AoE 縮放），不引入繁複的慣性與額外發射點運算，保持戰鬥手感輕快純粹：
+Under the core "collision damage + kill EXP" mechanic, body size strictly follows an intuitive and pure **Area-proportional scaling rule** (like Path of Exile AoE scaling), with no added inertia or extra-emitter math, keeping combat feeling fast and pure:
 
-#### 體積動態聯動公式
+#### Dynamic Volume Linkage Formula
 
-定義全域即時體積縮放係數 $\alpha$：
+Define the global real-time volume scaling factor $\alpha$:
 $$\alpha = \frac{R_{\text{current}}}{R_{\text{base}}} = \text{stats.area}$$
 
-- **「受擊箱越大，接觸面越大」（碰撞區域等比縮放）**：細胞多邊形碰撞箱隨 $\alpha$ 等比放大。接觸判定面更廣，一次能命中更多雜兵，但受擊截面亦同步放大。
-- **技能判定與投射物等比放大（PoE 式 AoE 縮放）**：所有主動生化技能的判定範圍、投射物尺寸與爆炸半徑，均直接乘以 $\alpha$。
-- **純粹性原則（拒絕隱性複雜機制）**：
-  - **不加入質量慣性與衝撞延遲**：轉向與急停手感始終敏捷一致，無操作延遲。
-  - **發射彈道數量不受體積影響**：額外彈道數 100% 僅由通用屬性 `amount` 控制，屬性邊界清晰。
+- **"Bigger hitbox, bigger contact surface" (proportional collision-area scaling)**: the cell polygon hitbox scales proportionally with $\alpha$. A wider contact surface hits more trash mobs at once, but the vulnerable cross-section grows in sync.
+- **Proportional skill-hitbox and projectile scaling (PoE-style AoE scaling)**: the hit range, projectile size, and blast radius of all active biochemical skills are multiplied directly by $\alpha$.
+- **Purity principle (no hidden complex mechanics)**:
+  - **No mass inertia or charge delay**: steering and emergency stops always feel equally agile, with no input lag.
+  - **Projectile count is unaffected by body size**: bonus projectile count is 100% controlled by the generic attribute `amount`, keeping attribute boundaries crisp.
 
 ---
 
-## 4. 全域通用 Stat 屬性矩陣（Universal Character Stats）
+## 4. Global Generic Stat Matrix (Universal Character Stats)
 
-為貫徹模組化與高可複用性，本遊戲的數值系統**徹底剔除任何「單一技能特化屬性」**。所有角色、被動特質、天賦節點與局內升級均僅操作以下純通用屬性池：
+For modularity and high reusability, this game's numeric system **completely eliminates any "single-skill-specific attribute"**. All characters, passive traits, talent nodes, and in-run upgrades operate only on the following purely generic attribute pool:
 
 ```
-                    ┌─────────────────────────┐
-                    │ 全域通用 Stat 字典 (Pool) │
-                    └────────────┬────────────┘
-         ┌───────────────────────┼───────────────────────┐
-         ▼                       ▼                       ▼
-【通用戰鬥屬性 (Combat - 23項)】 【通用生存屬性 (Defense - 11項)】 【通用輔助與機制 (Utility - 1項)】
-· Damage (傷害倍率)             · Max Health (最大生命)        · Magnet (拾取半徑)
-· Area (範圍/體積)              · Health Regen (生命自癒)
-· Cooldown Reduction (CDR)     · Armor (減傷/護甲)
-· Projectile Speed (彈道速度)   · Move Speed (移動速度)
-· Duration (持續時間)           · Evasion (流體閃避率)
-· Amount (額外數量)             · Block (糖萼格擋率)
-· Pierce (穿透次數)             · Life Steal (受體汲取/吸血)
-· Crit Chance (暴擊機率)        · Stagger (偏转/延傷)
-· Crit Damage (暴擊倍率)        · Recoup (回收/延補)
-· Armor Penetration (護甲穿透)  · Ailment Threshold (異常閾值)
-· Ailment Chance (異常觸發率)
-· Dot Damage (持續傷害倍率)
-· Physical／Fire／Cold／Lightning／Chaos Damage (五系傷害)
-· Melee／Spell／AoE／Projectile／Minion Damage (標籤條件傷害)
-· Ailment Effect (異常效果)
+                     ┌─────────────────────────┐
+                     │ Universal Stat Dictionary (Pool) │
+                     └────────────┬────────────┘
+          ┌───────────────────────┼───────────────────────┐
+          ▼                       ▼                       ▼
+ [Universal Combat Stats (Combat - 23 items)] [Universal Survival Stats (Defense - 11 items)] [Universal Utility Stats (Utility - 1 item)]
+ · Damage (Damage Multiplier)             · Max Health (Max Health)        · Magnet (Pickup Radius)
+ · Area (Area/Volume)              · Health Regen (Health Regen)
+ · Cooldown Reduction (CDR)     · Armor (Mitigation/Armor)
+ · Projectile Speed (Projectile Speed)   · Move Speed (Move Speed)
+ · Duration (Duration)           · Evasion (Fluid Evasion Rate)
+ · Amount (Bonus Count)             · Block (Glycocalyx Block Rate)
+ · Pierce (Pierce Count)             · Life Steal (Receptor Drain/Life Steal)
+ · Crit Chance (Crit Chance)        · Stagger (Deflect/Delayed Damage)
+ · Crit Damage (Crit Multiplier)        · Recoup (Recovery/Delayed Heal)
+ · Armor Penetration (Armor Penetration)  · Ailment Threshold (Ailment Threshold)
+ · Ailment Chance (Ailment Proc Rate)
+ · Dot Damage (Damage-over-Time Multiplier)
+ · Physical/Fire/Cold/Lightning/Chaos Damage (Five Damage Types)
+ · Melee/Spell/AoE/Projectile/Minion Damage (Tag-Conditional Damage)
+ · Ailment Effect (Ailment Effect)
 ```
 
-### 通用 Stat 詳細字典
+### Generic Stat Dictionary in Detail
 
-#### 1. 通用戰鬥屬性（Combat Stats）—— 所有 5 大主動技能共通消費
-| 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
+#### 1. Generic Combat Stats - consumed by all 5 active skills
+| Stat Code | Display Name | Default Baseline | Generic Resolution Rule |
 | :--- | :--- | :--- | :--- |
-| `damage` | **傷害倍率** | `1.0` (100%) | 全域傷害基礎百分比池。無論是直擊、DoT 腐蝕或地雷爆破，均參與結算。與屬性/標籤傷害採 PoE 式加法合併為 Increased Pool：`inc = (damage - 1) + (type - 1) + sum(tag - 1)`，總倍率為 `max(0, 1 + inc)`。 |
-| `area` | **範圍 / 體積** | `1.0` (100%) | 全域尺寸乘數。等比放大投射物尺寸、AoE 爆炸半徑、噴霧角度以及**細胞本體接觸判定面**。 |
-| `cooldown_reduction` | **冷卻縮減 (CDR)** | `0.0` (0%) | 百分比縮短所有主動技能的循環冷卻時間（上限設為 `0.75` 即 75%）。 |
-| `projectile_speed` | **彈道速度** | `1.0` (100%) | 所有投射物（抗體、射線、酸液水滴、彈出的偽足抓手）的飛行速度乘數。 |
-| `duration` | **持續時間** | `1.0` (100%) | 所有場上留存實體（酸霧 DoT 殘留、補體陣列地雷、黏網陷阱）的存活時間乘數。 |
-| `amount` | **額外數量** | `0` (發) | **固定增加所有技能的單次發射/生成個數**（如抗體 $+1$ 枚、穿孔素連發 $+1$ 束、偽足多出 $+1$ 爪）。 |
-| `pierce` | **穿透次數** | `0` (次) | 投射物貫穿敵人的額外次數（穿透後繼續向前飛行）。 |
-| `crit_chance` | **暴擊機率** | `0.05` (5%) | 任何傷害來源命中敵人弱點時觸發致命特異性暴擊的機率。 |
-| `crit_damage` | **暴擊倍率** | `2.0` (200%) | 觸發暴擊時的結算傷害倍率。 |
-| `armor_penetration` | **護甲穿透** | `0.0` (0%) | 開火時凍結的護甲穿透比例（硬上限 `1.0`）。 |
-| `ailment_chance` | **異常觸發率** | `1.0` (100%) | 命中時觸發 `on_hit` 異常的機率；暴擊必定觸發。 |
-| `dot_damage` | **持續傷害倍率** | `1.0` (100%) | 全域 DoT 傷害乘數，與 `damage` 結算。受擊時即時讀取施加者：$\text{dps} = \text{mag} \times \text{scale} \times \text{dot\_damage}$（非玩家施加者視為 `1.0`）。 |
-| `physical_damage` | **物理傷害** | `1.0` (100%) | 物理系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
-| `fire_damage` | **火焰傷害** | `1.0` (100%) | 火焰系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
-| `cold_damage` | **冰霜傷害** | `1.0` (100%) | 冰霜系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
-| `lightning_damage` | **閃電傷害** | `1.0` (100%) | 閃電系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
-| `chaos_damage` | **混沌傷害** | `1.0` (100%) | 混沌系傷害加成，與 `damage` 及其他標籤傷害在通用加成池中加法累計 (`increased`)。 |
-| `melee_damage` | **近戰傷害** | `1.0` (100%) | 僅 `Melee` 標籤技能生效，與 `damage` 在通用加成池中加法累計 (`increased`)。 |
-| `spell_damage` | **法術傷害** | `1.0` (100%) | 僅 `Spell` 標籤技能生效，與 `damage` 在通用加成池中加法累計 (`increased`)。 |
-| `aoe_damage` | **範圍傷害** | `1.0` (100%) | 僅 `AOE` 標籤技能生效，與 `damage` 在通用加成池中加法累計 (`increased`)。 |
-| `projectile_damage` | **投射物傷害** | `1.0` (100%) | 僅 `Projectile` 標籤技能生效，與 `damage` 在通用加成池中加法累計 (`increased`)。 |
-| `minion_damage` | **召喚物傷害** | `1.0` (100%) | 僅 `Minion` 標籤技能生效（現無，待召喚技能），與 `damage` 在通用加成池中加法累計 (`increased`)。 |
-| `ailment_effect` | **異常效果** | `1.0` (100%) | 異常狀態強度乘數（DoT 傷害除外，由 `dot_damage` 負責）。受擊時即時讀取施加者，非 DoT 通道 magnitude 乘上該倍率，持續時間不變。 |
+| `damage` | **Damage Multiplier** | `1.0` (100%) | Global base damage percentage pool. Applies to every resolution, whether direct hits, DoT corrosion, or mine detonations. Merges with elemental/tag damage PoE-style as an additive Increased pool: `inc = (damage - 1) + (type - 1) + sum(tag - 1)`, total multiplier is `max(0, 1 + inc)`. |
+| `area` | **Area / Volume** | `1.0` (100%) | Global size multiplier. Scales projectile size, AoE blast radius, spray cone angle, and the **cell body contact surface** proportionally. |
+| `cooldown_reduction` | **Cooldown Reduction (CDR)** | `0.0` (0%) | Shortens the cycle cooldown of all active skills by a percentage (capped at `0.75`, i.e. 75%). |
+| `projectile_speed` | **Projectile Speed** | `1.0` (100%) | Flight-speed multiplier for all projectiles (antibodies, beams, acid droplets, ejected pseudopod grapples). |
+| `duration` | **Duration** | `1.0` (100%) | Lifetime multiplier for all persistent field entities (acid-mist DoT residue, complement array mines, mucus snare traps). |
+| `amount` | **Bonus Count** | `0` (shots) | **Flat bonus to the per-cast spawn count of every skill** (e.g. antibodies $+1$ missile, perforin volley $+1$ beam, pseudopod $+1$ extra claw). |
+| `pierce` | **Pierce Count** | `0` (times) | Extra times a projectile passes through enemies (keeps flying forward after piercing). |
+| `crit_chance` | **Crit Chance** | `0.05` (5%) | Chance for any damage source to critically strike an enemy weak point for lethal specific damage. |
+| `crit_damage` | **Crit Multiplier** | `2.0` (200%) | Resolved damage multiplier when a crit triggers. |
+| `armor_penetration` | **Armor Penetration** | `0.0` (0%) | Armor penetration fraction frozen at fire time (hard cap `1.0`). |
+| `ailment_chance` | **Ailment Proc Rate** | `1.0` (100%) | Chance to apply an `on_hit` ailment on hit; crits always apply. |
+| `dot_damage` | **Damage-over-Time Multiplier** | `1.0` (100%) | Global DoT damage multiplier, resolved together with `damage`. Read live from the applier on hit: $\text{dps} = \text{mag} \times \text{scale} \times \text{dot\_damage}$ (non-player appliers count as `1.0`). |
+| `physical_damage` | **Physical Damage** | `1.0` (100%) | Physical damage bonus, accumulated additively (`increased`) with `damage` and other tag damage in the generic bonus pool. |
+| `fire_damage` | **Fire Damage** | `1.0` (100%) | Fire damage bonus, accumulated additively (`increased`) with `damage` and other tag damage in the generic bonus pool. |
+| `cold_damage` | **Cold Damage** | `1.0` (100%) | Cold damage bonus, accumulated additively (`increased`) with `damage` and other tag damage in the generic bonus pool. |
+| `lightning_damage` | **Lightning Damage** | `1.0` (100%) | Lightning damage bonus, accumulated additively (`increased`) with `damage` and other tag damage in the generic bonus pool. |
+| `chaos_damage` | **Chaos Damage** | `1.0` (100%) | Chaos damage bonus, accumulated additively (`increased`) with `damage` and other tag damage in the generic bonus pool. |
+| `melee_damage` | **Melee Damage** | `1.0` (100%) | Applies only to `Melee`-tagged skills, accumulated additively (`increased`) with `damage` in the generic bonus pool. |
+| `spell_damage` | **Spell Damage** | `1.0` (100%) | Applies only to `Spell`-tagged skills, accumulated additively (`increased`) with `damage` in the generic bonus pool. |
+| `aoe_damage` | **Area Damage** | `1.0` (100%) | Applies only to `AOE`-tagged skills, accumulated additively (`increased`) with `damage` in the generic bonus pool. |
+| `projectile_damage` | **Projectile Damage** | `1.0` (100%) | Applies only to `Projectile`-tagged skills, accumulated additively (`increased`) with `damage` in the generic bonus pool. |
+| `minion_damage` | **Minion Damage** | `1.0` (100%) | Applies only to `Minion`-tagged skills (none yet, reserved for summon skills), accumulated additively (`increased`) with `damage` in the generic bonus pool. |
+| `ailment_effect` | **Ailment Effect** | `1.0` (100%) | Ailment strength multiplier (DoT damage excluded, handled by `dot_damage`). Read live from the applier on hit; non-DoT channel magnitudes are multiplied by it, duration unchanged. |
 
-#### 2. 通用生存與防禦屬性（Defense & Survival）
-| 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
+#### 2. Generic Survival and Defense Stats (Defense & Survival)
+| Stat Code | Display Name | Default Baseline | Generic Resolution Rule |
 | :--- | :--- | :--- | :--- |
-| `max_health` | **最大生命值** | `100.0` | 細胞膜破裂前可承受的最大總耐久。 |
-| `health_regen` | **生命自癒率** | `0.0` (HP/s) | 胞膜每秒自動修復的固定生命值。 |
-| `armor` | **膜剛性 / 護甲** | `0.0` (點) | POE 護甲公式：$\text{減傷率} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$，大傷害穿透深。DoT 以每秒 dps 為單位走同形曲線（`DotArmorFactor` 可調），同樣吃護甲穿透。 |
-| `damage_taken` | **承受傷害** | `1.0` (100%) | 受到傷害乘數（與護甲曲線獨立）。玩家防禦為突變倍率與該屬性相乘，直擊與 DoT 入場各乘一次，延傷池 drain 不重複計算。 |
-| `move_speed` | **移動速度** | `230.0` (px/s) | 玩家細胞在常態巡航下的基礎遊動速度。 |
-| `evasion` | **流體閃避率** | `0.0` (0%) | 胞膜阿米巴流體變形完全免傷機率（硬上限 `0.60` 即 60%）。受擊第一順位判定。 |
-| `block` | **糖萼格擋率** | `0.0` (0%) | 細胞表面緻密糖萼屏障偏轉阻絕傷害機率（硬上限 `0.75` 即 75%）。受擊第二順位判定。 |
-| `life_steal` | **受體汲取 / 命中吸血** | `0.0` (0%) | 任何傷害來源命中敵人時觸發自體修復的機率（觸發時固定回復 1 點 HP，硬上限 `0.20` 即 20%）。 |
-| `stagger` | **偏转 / 延傷** | `0.0` (0%) | 命中傷害按比例轉入延傷池（4 秒指數衰減為無視護甲 DoT），僅玩家、僅直擊（硬上限 `0.60` 即 60%）。 |
-| `recoup` | **回收 / 延補** | `0.0` (0%) | 受到直擊後按比例在 4 秒內分期回復 HP（不受回血鎖定影響），僅玩家（硬上限 `0.30` 即 30%）。 |
-| `ailment_threshold` | **異常閾值** | `1.0` (100%) | 自身異常閾值乘數（僅下限 `0.0`，無上限）。 |
+| `max_health` | **Max Health** | `100.0` | Maximum total durability before the cell membrane ruptures. |
+| `health_regen` | **Health Regen Rate** | `0.0` (HP/s) | Flat health the membrane auto-repairs per second. |
+| `armor` | **Membrane Rigidity / Armor** | `0.0` (points) | POE armor formula: $\text{mitigation} = \frac{\text{Armor}}{\text{Armor} + 5.0 \times \text{Damage}}$; big hits penetrate deeper. DoTs use per-second dps through the same-shaped curve (`DotArmorFactor` tunable), and also respect armor penetration. |
+| `damage_taken` | **Damage Taken** | `1.0` (100%) | Damage-taken multiplier (independent of the armor curve). Player defense is the mutation multiplier times this attribute; direct hits and DoT entries each multiply once, while stagger-pool drains are not double-counted. |
+| `move_speed` | **Move Speed** | `230.0` (px/s) | Baseline cruising swim speed of the player cell. |
+| `evasion` | **Fluid Evasion Rate** | `0.0` (0%) | Chance for amoebic membrane fluid deformation to fully avoid damage (hard cap `0.60`, i.e. 60%). First check on being hit. |
+| `block` | **Glycocalyx Block Rate** | `0.0` (0%) | Chance for the dense surface glycocalyx barrier to deflect and negate damage (hard cap `0.75`, i.e. 75%). Second check on being hit. |
+| `life_steal` | **Receptor Drain / Life on Hit** | `0.0` (0%) | Chance for any damage source to trigger self-repair on hitting an enemy (restores a flat 1 HP on proc, hard cap `0.20`, i.e. 20%). |
+| `stagger` | **Deflect / Delayed Damage** | `0.0` (0%) | Fraction of hit damage diverted into a stagger pool (decays exponentially over 4 seconds as armor-ignoring DoT), players only, direct hits only (hard cap `0.60`, i.e. 60%). |
+| `recoup` | **Recovery / Delayed Heal** | `0.0` (0%) | Fraction of a direct hit recovered in installments over 4 seconds (ignores heal suppression), players only (hard cap `0.30`, i.e. 30%). |
+| `ailment_threshold` | **Ailment Threshold** | `1.0` (100%) | Self ailment-threshold multiplier (floor `0.0` only, no cap). |
 
-#### 3. 通用輔助與機制屬性（Utility & Economy）
-| 屬性代碼 | 顯示名稱 | 預設基準值 | 通用運算規則 |
+#### 3. Generic Utility and Economy Stats (Utility & Economy)
+| Stat Code | Display Name | Default Baseline | Generic Resolution Rule |
 | :--- | :--- | :--- | :--- |
-| `magnet` | **趨化引力 (拾取)** | `150.0` (px) | 自動吸附周遭經驗光點（ATP）與抗原碎片的有效半徑。 |
+| `magnet` | **Chemotactic Pull (Pickup)** | `150.0` (px) | Effective radius for auto-collecting nearby EXP motes (ATP) and antigen fragments. |
 
 ---
 
-## 5. 技能欄位「主動 5 ＋ 被動 5 ＋ 胞器腔室 4」與終極超武體系
+## 5. Skill Slots: "5 Actives + 5 Passives + 4 Organelle Chambers" and the Ultimate Super-Weapon System
 
-玩家在單局內最多持有 **5 個主動生化技能**、**5 個被動代謝特質**與 **4 件胞器腔室裝備**，滿級時主動＋被動 1:1 合成 5 大終極超武：
+In a single run the player holds at most **5 active biochemical skills**, **5 passive metabolic traits**, and **4 organelle chamber pieces**. At max level, actives plus passives fuse 1:1 into 5 ultimate super-weapons:
 
 ```
 ┌────────────────────────────────────────────────────────┐
-│ 主動技能槽位 (Active Cytokines x5) - 全自動獨立循環開火    │
-│ [1: 穿孔素長矛] [2: 補體瀑布] [3: 抗體齊射] [4: 活性氧射流] [5: 偽足猛擊] │
+│ Active Skill Slots (Active Cytokines x5) - Fully automatic independent firing cycles │
+│ [1: Perforin Lance] [2: Complement Cascade] [3: Antibody Salvo] [4: ROS Spray] [5: Pseudopod Lunge] │
 ├────────────────────────────────────────────────────────┤
-│ 被動特質槽位 (Passive Organelles x5) - 提供純通用 Stat 加成│
-│ [1: 溶酶體酵素] [2: 肌動蛋白] [3: 調理素]   [4: 線粒體]   [5: 趨化受體] │
+│ Passive Trait Slots (Passive Organelles x5) - Provide pure generic Stat bonuses │
+│ [1: Lysosome Enzymes] [2: Actin] [3: Opsonin]   [4: Mitochondria]   [5: Chemokine Receptor] │
 │   (Damage+Regen) (Area+Speed)  (Crit+Dmg)     (CDR+Dur)   (Magnet+Speed)│
 ├────────────────────────────────────────────────────────┤
-│ 胞器腔室 (Organelle Chamber 2x2) - 高費極端件＋發電拼圖    │
-│ [槽1] [槽2]                                            │
-│ [槽3] [槽4]   已用/上限＝Σ正成本／(6＋發電數)    │
+│ Organelle Chamber (Organelle Chamber 2x2) - High-cost extremes + generator puzzle    │
+│ [Slot 1] [Slot 2]                                            │
+│ [Slot 3] [Slot 4]   Used/Cap = sum of positive costs / (6 + generator count)    │
 └────────────────────────────────────────────────────────┘
 ```
 
-胞器腔室為獨立第三系統：基礎能量 6，`energy_cost ∈ [-1, 4]`（`-1`＝`+1` 發電且必帶重度負面），已用＝Σ正成本，上限＝6＋Σ發電量，合法⇔已用≤上限且件數≤4。所有效果 100% 走通用 Stat（詳見 `docs/skill.md` §4、`docs/stat.md` 能量註記）。
+The organelle chamber is an independent third system: base energy 6, `energy_cost ∈ [-1, 4]` (`-1` = `+1` generation with a mandatory heavy downside), used = sum of positive costs, cap = 6 + total generation, legal iff used <= cap and piece count <= 4. All effects run 100% through generic Stats (see `docs/skill.md` section 4 and the energy notes in `docs/stat.md`).
 
-### 5 大主動生化技能（Active Cytokines）—— 自動循環發射
-所有主動技能依循冷卻時間（Cooldown）獨立循環觸發，自動調用通用 Stat 計算：
+### 5 Active Biochemical Skills (Active Cytokines) - Automatic Cyclic Fire
+All active skills trigger independently on cooldown (Cooldown) cycles and resolve automatically with generic Stats:
 
-| 主動技能名稱 | 醫學機制 | 消耗的通用 Stat | 戰鬥表現與機制 |
+| Active Skill Name | Medical Mechanism | Consumed Generic Stats | Combat Behavior and Mechanics |
 | :--- | :--- | :--- | :--- |
-| **1. 穿孔素長矛<br>(Perforin Lance)** | 膜上穿孔素成孔 | `damage`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近精英射出高初速螺旋光束。`amount` 增加連發數，`pierce` 增加貫穿人數。 |
-| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解反應 | `damage`, `area`, `cooldown_reduction`, `duration` | 在隨機周遭地面生成生化光環，`area` 擴大地雷半徑，延遲 2 秒引發強烈擊退爆破。 |
-| **3. Y 型抗體齊射<br>(Antibody Salvo)** | 游離特異性抗體分泌 | `damage`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發尋航 Y 型飛彈，`amount` 直接增加飛彈發射數量。 |
-| **4. 活性氧射流<br>(ROS Spray)** | NADPH 氧化酶釋放 $\text{H}_2\text{O}_2$ | `damage`, `area`, `duration`, `cooldown_reduction` | 朝游動方向噴射高壓錐形酸霧，`area` 擴大噴射錐形面積，造成 DoT 溶解破甲。 |
-| **5. 偽足猛擊<br>(Pseudopod Lunge)** | 微絲聚合瞬間彈射 | `damage`, `area`, `amount`, `cooldown_reduction` | 向外猛烈彈射阿米巴抓手，`area` 增加抓手伸長距離，`amount` 增加多向抓手數量。 |
+| **1. Perforin Lance<br>(Perforin Lance)** | Perforin pore formation on membranes | `damage`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | Fires a high-velocity spiral beam at the nearest elite. `amount` adds volley count, `pierce` adds enemies pierced. |
+| **2. Complement Cascade<br>(Complement Cascade)** | Complement chain cleavage cascade | `damage`, `area`, `cooldown_reduction`, `duration` | Spawns biochemical halos on random nearby ground; `area` enlarges mine radius, detonating after a 2-second delay with a violent knockback blast. |
+| **3. Y-Shaped Antibody Salvo<br>(Antibody Salvo)** | Free specific antibody secretion | `damage`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | Periodically erupts homing Y-shaped missiles in 360 degrees; `amount` directly increases missiles per volley. |
+| **4. Reactive Oxygen Species Spray<br>(ROS Spray)** | NADPH oxidase releasing $\text{H}_2\text{O}_2$ | `damage`, `area`, `duration`, `cooldown_reduction` | Sprays a high-pressure cone of acid mist in the swim direction; `area` widens the spray cone, dealing armor-stripping DoT corrosion. |
+| **5. Pseudopod Lunge<br>(Pseudopod Lunge)** | Instant microfilament-polymerization snap | `damage`, `area`, `amount`, `cooldown_reduction` | Violently ejects amoebic grapples outward; `area` extends grapple reach, `amount` adds grapples in more directions. |
 
 ---
 
-### 5 大被動代謝特質（Passive Organelles）—— 提供純通用 Stat
-被動技能不包含任何特定技能邏輯，純粹為宿主提供通用 Stat 加成：
+### 5 Passive Metabolic Traits (Passive Organelles) - Provide Pure Generic Stats
+Passive skills contain no skill-specific logic and purely grant the host generic Stat bonuses:
 
-| 被動特質名稱 | 生物學包裝 | 提供的純通用 Stat 加成（每級遞增） |
+| Passive Trait Name | Biological Flavor | Pure Generic Stat Bonus Granted (per level) |
 | :--- | :--- | :--- |
-| **1. 溶酶體酵素 (Lysosome Priming)** | 胞內水解酶活化 | `damage +10%` / `health_regen +0.6 HP/s`（全傷害強化與自噬修復） |
-| **2. 肌動蛋白微絲 (Actin Polymerization)** | 骨架微絲定向聚合 | `area +12%` / `move_speed +6%`（全技能範圍放大與走位加速） |
-| **3. 調理素親和 (Opsonin Affinity)** | 特異性識別受體增生 | `crit_chance +5%` / `crit_damage +25%`（全傷害暴擊率與暴擊倍率飆升） |
-| **4. 線粒體超頻 (Mitochondrial Overclock)**| 三羧酸循環產能倍增 | `cooldown_reduction +8%` / `duration +10%`（全技能開火加速與留場延長） |
-| **5. 趨化因子受體 (Chemokine Receptors)** | 表面化學天線陣列 | `magnet +25%` / `move_speed +6%`（自動吸附範圍擴大與趨化游動加速） |
+| **1. Lysosome Enzymes (Lysosome Priming)** | Intracellular hydrolase activation | `damage +10%` / `health_regen +0.6 HP/s` (all-damage boost and autophagic repair) |
+| **2. Actin Microfilaments (Actin Polymerization)** | Directed cytoskeletal microfilament polymerization | `area +12%` / `move_speed +6%` (all-skill area growth and repositioning speed) |
+| **3. Opsonin Affinity (Opsonin Affinity)** | Specific recognition receptor proliferation | `crit_chance +5%` / `crit_damage +25%` (all-damage crit rate and crit multiplier surge) |
+| **4. Mitochondrial Overclock (Mitochondrial Overclock)** | TCA-cycle energy output multiplication | `cooldown_reduction +8%` / `duration +10%` (all-skill fire-rate acceleration and field persistence) |
+| **5. Chemokine Receptors (Chemokine Receptors)** | Surface chemical antenna array | `magnet +25%` / `move_speed +6%` (auto-pickup radius growth and chemotactic swim speed) |
 
 ---
 
-### 5 大終極表觀遺傳超武（Epigenetic Evolutions / 1:1 滿級合成）
+### 5 Ultimate Epigenetic Super-Weapons (Epigenetic Evolutions / 1:1 Max-Level Fusion)
 
-當主動技能達 Lv.5（Max）且持有對應被動特質時，於精英寶箱解鎖質變形態：
+When an active skill reaches Lv.5 (Max) and its matching passive trait is held, its mutated form unlocks from an elite chest:
 
 ```mermaid
 graph LR
-    subgraph 5組超武二合一矩陣
-        A1["穿孔素長矛 (Max)"] + B1["溶酶體酵素"] --> EVO1["【顆粒酶死刑】<br>(Granzyme Apoptosis)"]
-        A2["補體瀑布 (Max)"] + B2["肌動蛋白微絲"] --> EVO2["【膜攻擊終結陣列】<br>(MAC Hyper-Array)"]
-        A3["Y型抗體齊射 (Max)"] + B3["調理素親和"] --> EVO3["【中和高壓風暴】<br>(Neutralizing Tempest)"]
-        A4["活性氧射流 (Max)"] + B4["線粒體超頻"] --> EVO4["【過氧化利維坦】<br>(Superoxide Leviathan)"]
-        A5["偽足猛擊 (Max)"] + B5["趨化因子受體"] --> EVO5["【阿米巴原生巨口】<br>(Amoebic Maelstrom)"]
+    subgraph Five Two-in-One Super-Weapon Matrix
+        A1["Perforin Lance (Max)"] + B1["Lysosome Enzymes"] --> EVO1["[Granzyme Execution]<br>(Granzyme Apoptosis)"]
+        A2["Complement Cascade (Max)"] + B2["Actin Microfilaments"] --> EVO2["[Membrane Attack Termination Array]<br>(MAC Hyper-Array)"]
+        A3["Y-Shaped Antibody Salvo (Max)"] + B3["Opsonin Affinity"] --> EVO3["[Neutralizing High-Pressure Tempest]<br>(Neutralizing Tempest)"]
+        A4["ROS Spray (Max)"] + B4["Mitochondrial Overclock"] --> EVO4["[Peroxide Leviathan]<br>(Superoxide Leviathan)"]
+        A5["Pseudopod Lunge (Max)"] + B5["Chemokine Receptors"] --> EVO5["[Amoebic Primordial Maw]<br>(Amoebic Maelstrom)"]
     end
 ```
 
-1. **【顆粒酶死刑】(Granzyme Apoptosis)**（穿孔素長矛 ＋ 溶酶體酵素）：
-   - 注入顆粒酶引發程序性凋亡。目標 1 秒後炸裂自毀，並向四周噴射 6 枚連鎖穿孔射線，引發骨牌式清屏。
-2. **【膜攻擊終結陣列】(MAC Hyper-Array)**（補體瀑布 ＋ 肌動蛋白微絲）：
-   - 補體地雷直接附著在玩家偽足末端，走位即在戰場留下移動化學渦流，接觸病毒直接裂解為 ATP 經驗滴。
-3. **【中和高壓風暴】(Neutralizing Tempest)**（Y 型抗體齊射 ＋ 調理素親和）：
-   - 發射 32 枚高頻抗體。抗體命中不同目標時在其間拉出「高壓免疫網線」，對切割過的所有雜兵造成最大生命值百分比真傷。
-4. **【過氧化利維坦】(Superoxide Leviathan)**（活性氧射流 ＋ 線粒體超頻）：
-   - 取消前方噴射。全細胞邊界包裹青藍色超氧離子等離子光膜，化為接觸即融化一切非 Boss 病原體的旋轉粉碎機。
-5. **【阿米巴原生巨口】(Amoebic Maelstrom)**（偽足猛擊 ＋ 趨化因子受體）：
-   - 偽足彈射分裂為 4 根全向巨型阿米巴抓手，形成超大吸力生化風暴，將全屏病毒與經驗光點一口氣強力拖入絞殺力場粉碎！
+1. **[Granzyme Execution] (Granzyme Apoptosis)** (Perforin Lance + Lysosome Enzymes):
+   - Injects granzyme to trigger programmed apoptosis. The target detonates and self-destructs after 1 second, spraying 6 chained perforin beams in all directions and setting off a domino screen clear.
+2. **[Membrane Attack Termination Array] (MAC Hyper-Array)** (Complement Cascade + Actin Microfilaments):
+   - Complement mines attach directly to the player's pseudopod tips, so movement paints roaming chemical vortices across the battlefield; viruses that touch them lyse directly into ATP EXP drops.
+3. **[Neutralizing High-Pressure Tempest] (Neutralizing Tempest)** (Y-Shaped Antibody Salvo + Opsonin Affinity):
+   - Fires 32 high-frequency antibodies. Antibodies hitting different targets string "high-pressure immune filaments" between them, dealing max-HP-percentage true damage to every mob the filaments cut across.
+4. **[Peroxide Leviathan] (Superoxide Leviathan)** (ROS Spray + Mitochondrial Overclock):
+   - Cancels the forward spray. The whole cell boundary is wrapped in a blue-green superoxide plasma membrane, becoming a spinning shredder that melts any non-Boss pathogen on contact.
+5. **[Amoebic Primordial Maw] (Amoebic Maelstrom)** (Pseudopod Lunge + Chemokine Receptors):
+   - Pseudopod shots split into 4 omnidirectional giant amoebic grapples, forming a super suction biochemical storm that drags the whole screen of viruses and EXP motes into a strangling force field and shreds them!
 
 ---
 
-### 6. 造血幹細胞天賦星盤（Hematopoiesis Talent Matrix）
+### 6. Hematopoietic Stem Cell Talent Tree (Hematopoiesis Talent Matrix)
 
-天賦星盤採用 **方格電路板（Grid Board）× 共軛焦螢光顯微（Confocal Fluorescence）** 的正交網格設計：五大白血球具備各自獨立的**五大起點中心（5 Distinct Starting Hubs）**，每個節點佔據單一整數網格點，連線嚴格限制在上下左右相鄰節點之間（90 度正交），微管永不重疊、永不交叉。
+The talent tree uses an **orthogonal grid board x confocal fluorescence microscopy** design: the five white blood cells have their own **5 distinct starting hubs**, each node occupying a single integer grid point, with edges strictly limited to orthogonally adjacent nodes (90-degree connections) so microtubules never overlap and never cross.
 
 ```
-              巨噬起點中心 (左上)        樹突狀起點中心 (正上)
-                     ┌───────────────────────┐
-       嗜中性球起點   │  中央微管互通交叉網絡  │   殺手 T 起點中心 (右)
-                     └───────────────────────┘
-                            B 細胞起點中心 (右下)
+               Macrophage starting hub (top-left)        Dendritic starting hub (top-center)
+                      ┌───────────────────────┐
+        Neutrophil start   │  Central microtubule interconnect network  │   Killer T starting hub (right)
+                      └───────────────────────┘
+                             B cell starting hub (bottom-right)
 ```
 
-- **五大獨立起點中心**：
-  - 巨噬起點中心（左上）：側重 `area`（體積/範圍）、`max_health`（血上限）、`armor`（膜剛性減傷）、`block`（糖萼格擋率）。
-  - 殺手 T 起點中心（右側）：側重 `move_speed`（移速）、`crit_chance`（暴擊率）、`pierce`（穿透）、`evasion`（流體閃避率）。
-  - 嗜中性球起點中心（左側）：側重 `damage`（傷害強度）、`health_regen`（生命自癒）。
-  - B 細胞起點中心（右下）：側重 `amount`（彈道數）、`projectile_speed`（彈速）、`cooldown_reduction`（CDR）、`life_steal`（受體汲取/吸血）。
-  - 樹突狀起點中心（正上）：側重 `magnet`（拾取半徑）、`duration`（狀態與光環持續時間）、`cooldown_reduction`（冷卻縮減）、`area`（感知與效果範圍）。
-- **細胞專屬曼哈頓環層**：以出戰細胞之起點中心為原點，$L_{\text{cell}} = |col - col_{\text{start}}| + |row - row_{\text{start}}|$。
-  - $L = 0$：該細胞之專屬起點中心（先天生效、消耗 0 點）。
-  - $L = 1 \sim 2$：專屬核心代謝環與初階通用屬性。
-  - $L = 3 \sim 4$：進階特化微管與通向中央樞紐的幹道。
-  - $L \ge 5$：中央互通樞紐與跨入其他細胞之特化領域（跨界嵌合分化）。
+- **Five independent starting hubs**:
+  - Macrophage starting hub (top-left): focuses `area` (bulk/area), `max_health` (max HP), `armor` (membrane rigidity mitigation), `block` (glycocalyx block rate).
+  - Killer T starting hub (right): focuses `move_speed` (move speed), `crit_chance` (crit rate), `pierce` (pierce), `evasion` (fluid evasion rate).
+  - Neutrophil starting hub (left): focuses `damage` (damage strength), `health_regen` (health regen).
+  - B cell starting hub (bottom-right): focuses `amount` (projectile count), `projectile_speed` (projectile velocity), `cooldown_reduction` (CDR), `life_steal` (receptor drain/life steal).
+  - Dendritic starting hub (top-center): focuses `magnet` (pickup radius), `duration` (status and aura duration), `cooldown_reduction` (cooldown reduction), `area` (sensing and effect area).
+- **Cell-specific Manhattan ring layers**: with the deployed cell's starting hub as the origin, $L_{\text{cell}} = |col - col_{\text{start}}| + |row - row_{\text{start}}|$.
+  - $L = 0$: that cell's exclusive starting hub (innate, costs 0 points).
+  - $L = 1 \sim 2$: exclusive core metabolism ring and entry-level generic attributes.
+  - $L = 3 \sim 4$: advanced specialization microtubules and trunk routes to the central nexus.
+  - $L \ge 5$: central interconnect nexus and cross-entry into other cells' specialization domains (cross-lineage chimeric differentiation).
 
-### 節點購買規則與「零複雜 Scaling」數值原則
+### Node Purchase Rules and "Zero-Complexity Scaling" Numeric Principles
 
-- **購買規則**：每個節點僅能購買一次（單層堆疊），每次消耗 1 點被動天賦點；出戰細胞之起點中心為先天生效、消耗 0 點。
-- **純粹基礎屬性（No Scaling 原則）**：
-  - 目前版本**嚴禁任何複雜屬性聯動或二次縮放**（如「每 X 點血量加 Y 點傷害」或「護甲折算暴擊」）。
-  - 所有節點僅提供透明直觀的純固定值（Flat）或純百分比（Percent）：
+- **Purchase rules**: each node can be bought once (single stack), costing 1 passive talent point per purchase; the deployed cell's starting hub is innate and costs 0 points.
+- **Pure base attributes only (No Scaling principle)**:
+  - The current version **forbids any complex attribute linkage or derived scaling** (e.g. "gain Y damage per X HP" or "convert armor into crit").
+  - All nodes grant only transparent flat or percent values:
     $$\text{FinalStat} = (\text{Base} + \text{FlatBonus}) \times (1.0 + \text{PercentBonus})$$
-- **稀有度分級狀態**：
-  - **普通 (Normal)**：單項小額基礎屬性（如 `damage +5%`、`max_health +10`）。
-  - **魔法 (Magic)**：較高額屬性或雙項互補屬性（如 `area +8%` ＋ `armor +2`）。
-  - **稀有 (Rare)**：高額純屬性加成（如 `damage +15%`、`move_speed +10%`）。
-  - **獨特/傳奇 (Unique / Keystones)**：**[TODO in the future / 未來擴展]** 當前版本暫不實裝機制顛覆型 Keystone，優先保障早期版本數值穩定與調試簡潔性。
+- **Rarity tiers**:
+  - **Normal**: single small base attribute (e.g. `damage +5%`, `max_health +10`).
+  - **Magic**: larger or dual complementary attributes (e.g. `area +8%` + `armor +2`).
+  - **Rare**: large pure-attribute bonuses (e.g. `damage +15%`, `move_speed +10%`).
+  - **Unique / Keystones**: **[TODO in the future]** Not implemented in the current version; mechanic-subverting Keystones are deferred to keep early-version numbers stable and debugging simple.
 
-### 渲染語言（Confocal Fluorescence）
+### Rendering Language (Confocal Fluorescence)
 
-- 背景深青黑 `#050B14`，中央棋盤格與徑向冷青螢光，外圈搭配布朗運動塵埃。
-- 連線為垂直／水平正交微管；已點亮路徑沿線流動 ATP 生物電脈衝；所有連線僅連接相鄰格點，保證無重疊、無交叉。
-- 節點為有機囊泡：依稀有度呈現圓形／菱形／六角／星形，每個節點固定於單一格點。
-- 每個節點僅能購買一次（單層堆疊），效果不隨堆疊成長。
-
----
-
-## 7. 關卡病理機制與敵人圖鑑 (詳細參見 docs/stages.md 與 docs/pathogen.md)
-
-### 難度雙軌制與成就解鎖鏈 (Achievement Map Unlocks)
-- **解鎖哲學**：除初始地圖「皮下創口」外，後續所有人體器官微觀地圖與「急性危象（Hard）」難度均需透過達成對應的臨床通關成就解鎖。
-- **解鎖鏈條**：
-  1. 通關【皮下創口 (`acute_wound`)】Normal（成就：`wound_clear`）$\to$ 解鎖【肺泡氣體微腔 (`alveolar_space`)】Normal 及創口 Hard 難度。
-  2. 通關【肺泡微腔 (`alveolar_space`)】Normal（成就：`alveolar_clear`）$\to$ 解鎖【肝血竇微循環 (`hepatic_sinusoid`)】Normal 及肺泡 Hard 難度。
-  3. 通關【肝血竇微循環 (`hepatic_sinusoid`)】Normal（成就：`hepatic_clear`）$\to$ 解鎖【胃腔極酸黏膜 (`gastric_lumen`)】Normal 及肝血竇 Hard 難度。
-  4. 通關【胃腔極酸黏膜 (`gastric_lumen`)】Normal（成就：`gastric_clear`）$\to$ 解鎖【血腦屏障毛細血管 (`blood_brain_barrier`)】Normal 及胃黏膜 Hard 難度。
-  5. 通關【血腦屏障 (`blood_brain_barrier`)】Normal（成就：`bbb_clear`）$\to$ 解鎖血腦屏障 Hard 難度與通關紀念獎勵。
-
-### 5 大動態病理器官關卡與流體力學
-- **01. 表皮裂口 (Acute Wound)**：微血管破裂，週期性產生指向傷口外緣的強大組織液吸力；地面覆蓋血纖維蛋白網，阻礙常規移動。
-- **02. 肺泡微腔 (Alveolar Space)**：週期性呼吸氣流剪切帶來大範圍下推/上推流體推力；需利用偽足錨定防失控；場景漂浮高氧激發氣泡（CDR +25%）。
-- **03. 肝血竇微循環 (Hepatic Sinusoid)**：週期性席捲微量膽汁酸水解流弱化護甲；內皮微型窗孔篩選阻隔巨化細胞（翻滾不穿牆）。
-- **04. 胃腔極酸黏膜 (Gastric Lumen)**：地面週期性湧起強腐蝕性胃酸潮波；幽門螺桿菌尿素酶中和圈提供局部避難庇護。
-- **05. 血腦屏障毛細血管 (Blood-Brain Barrier)**：極窄微血管高剪切血流；星形膠質腳突通道迷宮；神經電脈衝干擾走位。
-- **終局模式：無盡細胞因子風暴 (Endless Cytokine Storm - 詳見 docs/endgame.md)**：通關 Hard 難度後開放，突破 15:00 時間上限，每 3 分鐘數值指數過載、雙生/三聯 Boss 連環突襲，支援自選病理過載詞綴（Afflictions）。
-
-### 3 分鐘高頻波次進階節奏 (3-Minute Escalation Loop)
-為避免傳統 5 分鐘節奏的枯燥，關卡嚴格採用 3 分鐘為一週期的動態心流：
-`03:00` 首波機制精英 $\to$ `06:00` 初次蜂擁潮 ＋ 雙精英 $\to$ `09:00` 次級領主決戰 (必掉超武寶箱) $\to$ `12:00` 極限大蜂擁潮 $\to$ `15:00` 原發 Boss 鎖屏決戰。
-
-### 畫面同屏上限與「殺得越快、重生越快」動態回補 (Kill-Driven Dynamic Backfill)
-- **同屏怪物上限**：普通波次鎖定 **300 隻**，極限蜂擁潮動態擴張至 **450 隻**，兼顧低階硬體 60 FPS 幀率與微觀包圍壓迫感。
-- **即時回補機制**：當前怪物數低於上限時，生成器即刻（延遲 $<0.15\text{s}$）在視野邊界外回補缺額。
-- **打破通關同質化**：秒怪極速的超武高輸出 Build 殺怪越快、回補刷新越快，15 分鐘通關可擊殺 **5,000～8,000+ 隻**；消極苟活防守 Build 因場上滿額不回補，僅能擊殺 **800～1,200 隻**。兩者結算積分可拉開 **5～8 倍級距**，徹底區分玩家實力與 Build 擊殺通量（KPM）（詳見 `docs/stages.md` 與 `docs/record.md`）。
-
-### 病原體行為矩陣 (20+ 種微生物，詳見 docs/pathogen.md)
-- **冠狀病毒 (S-Virus)**：表面刺突蛋白，碰撞施加減速黏著效果。
-- **金黃色葡萄球菌 (Staph)**：葡萄串抱團移動 AI，形成密集菌團盾牆。
-- **大腸桿菌 (E. Coli)**：周生鞭毛直線蓄力衝刺（Charge Dash）。
-- **變異流感病毒 (Flu-Drift)**：高移速多刺微粒，週期性突發漂移加速。
-- **異變癌細胞 (Malignant Cell)**：超高耐久血牛，存活超時自主複製分裂出子細胞。
+- Deep blue-black background `#050B14`, central checkerboard with radial cold-cyan fluorescence, plus Brownian-motion dust in the outer ring.
+- Edges are vertical/horizontal orthogonal microtubules; lit paths flow with ATP bioelectric pulses along the lines; all edges connect only adjacent grid points, guaranteeing no overlaps and no crossings.
+- Nodes are organic vesicles: circles / diamonds / hexagons / stars by rarity, each pinned to a single grid point.
+- Each node can be bought once (single stack), and effects do not grow with stacking.
 
 ---
 
-## 8. 技術管線與 Godot 4 程式架構
+## 7. Stage Pathology Mechanics and Enemy Bestiary (see docs/stages.md and docs/pathogen.md for details)
 
-### 通用屬性類實作規範（`Stat.gd` & `CellStats.gd`）
+### Dual Difficulty Tracks and Achievement Unlock Chain (Achievement Map Unlocks)
+- **Unlock philosophy**: except for the starting map "Acute Wound", all later human-organ micro maps and the "Hard" acute-crisis difficulty unlock by earning the corresponding clinical-clearance achievements.
+- **Unlock chain**:
+  1. Clear [Acute Wound (`acute_wound`)] Normal (achievement: `wound_clear`) $\to$ unlock [Alveolar Space (`alveolar_space`)] Normal and Acute Wound Hard.
+  2. Clear [Alveolar Space (`alveolar_space`)] Normal (achievement: `alveolar_clear`) $\to$ unlock [Hepatic Sinusoid (`hepatic_sinusoid`)] Normal and Alveolar Space Hard.
+  3. Clear [Hepatic Sinusoid (`hepatic_sinusoid`)] Normal (achievement: `hepatic_clear`) $\to$ unlock [Gastric Lumen (`gastric_lumen`)] Normal and Hepatic Sinusoid Hard.
+  4. Clear [Gastric Lumen (`gastric_lumen`)] Normal (achievement: `gastric_clear`) $\to$ unlock [Blood-Brain Barrier (`blood_brain_barrier`)] Normal and Gastric Mucosa Hard.
+  5. Clear [Blood-Brain Barrier (`blood_brain_barrier`)] Normal (achievement: `bbb_clear`) $\to$ unlock Blood-Brain Barrier Hard plus a completion memorial reward.
+
+### 5 Dynamic Pathology Organ Stages and Fluid Mechanics
+- **01. Acute Wound (Acute Wound)**: ruptured microvessels periodically generate strong tissue-fluid suction pointing toward the outer wound edge; fibrin mesh covers the ground and hampers normal movement.
+- **02. Alveolar Space (Alveolar Space)**: periodic breathing airflow shear brings wide-area downward/upward fluid thrust; anchor with pseudopods to avoid losing control; the scene floats high-oxygen stimulation bubbles (CDR +25%).
+- **03. Hepatic Sinusoid (Hepatic Sinusoid)**: periodic sweeping micro bile-acid hydrolysis currents weaken armor; endothelial micro-fenestrae filter and block hypertrophic cells (dash does not pass through walls).
+- **04. Gastric Lumen (Gastric Lumen)**: the ground periodically surges with strongly corrosive gastric-acid tidal waves; Helicobacter pylori urease neutralization rings provide local shelter.
+- **05. Blood-Brain Barrier Capillaries (Blood-Brain Barrier)**: extremely narrow microvessels with high-shear blood flow; astrocyte end-foot channel maze; neural electric pulses disrupt positioning.
+- **Endgame mode: Endless Cytokine Storm (Endless Cytokine Storm - see docs/endgame.md for details)**: unlocked after clearing Hard, breaks the 15:00 time cap, with exponential stat overload every 3 minutes, twin/triple Boss ambushes, and opt-in pathology overload affixes (Afflictions).
+
+### 3-Minute High-Frequency Wave Escalation (3-Minute Escalation Loop)
+To avoid the dullness of the traditional 5-minute pacing, stages strictly use a 3-minute dynamic flow cycle:
+`03:00` first mechanic elite $\to$ `06:00` first horde swarm + double elites $\to$ `09:00` mid lesser-lord showdown (guaranteed super-weapon chest) $\to$ `12:00` extreme mega-horde $\to$ `15:00` primary Boss lock-in showdown.
+
+### On-Screen Cap and "Faster Kills, Faster Respawns" Dynamic Backfill (Kill-Driven Dynamic Backfill)
+- **Concurrent monster cap**: normal waves are locked at **300**, extreme hordes dynamically expand to **450**, balancing 60 FPS on low-end hardware with microscopic encirclement pressure.
+- **Instant backfill**: when the live monster count drops below the cap, the spawner immediately (delay $<0.15\text{s}$) backfills the deficit just outside the view boundary.
+- **Breaking clear homogeneity**: extreme-output super-weapon builds that vaporize mobs refill faster, killing **5,000-8,000+** in a 15-minute clear; passive turtling defense builds that keep the field full and never backfill only kill **800-1,200**. Final scores can differ by **5-8x**, cleanly separating player skill and build kill-throughput (KPM) (see `docs/stages.md` and `docs/record.md`).
+
+### Pathogen Behavior Matrix (20+ microbes, see docs/pathogen.md)
+- **Coronavirus (S-Virus)**: surface spike proteins that apply slowing adhesion on collision.
+- **Staphylococcus aureus (Staph)**: grape-cluster huddling movement AI that forms dense colony shield walls.
+- **Escherichia coli (E. Coli)**: peritrichous-flagella straight-line charge dash (Charge Dash).
+- **Mutant influenza virus (Flu-Drift)**: fast multi-spiked particles with periodic burst drift acceleration.
+- **Mutant cancer cell (Malignant Cell)**: ultra-durable bullet sponge that self-replicates into daughter cells if it survives too long.
+
+---
+
+## 8. Tech Pipeline and Godot 4 Code Architecture
+
+### Generic Attribute Class Implementation Spec (`Stat.gd` & `CellStats.gd`)
 
 ```gdscript
 # scripts/core/stat.gd
@@ -348,7 +348,7 @@ func add_modifier(flat: float, pct: float) -> void:
 	percent_bonus += pct
 ```
 
-`CellStats.gd` 統一管理宿主的全域 Stat 實例：
+`CellStats.gd` manages all global Stat instances of the host uniformly:
 
 ```gdscript
 # scripts/core/cell_stats.gd
@@ -378,10 +378,10 @@ var recoup: Stat = Stat.new(0.0)
 var magnet: Stat = Stat.new(150.0)
 ```
 
-### 主動技能調用通用 Stat 規範
+### Active Skill Generic Stat Usage Spec
 
 ```gdscript
-# 所有 ActiveSkill 在計算彈道或傷害時的統一寫法
+# Unified pattern for all ActiveSkills when computing projectiles or damage
 func get_calculated_damage() -> float:
 	var base = base_damage * stats.damage.get_value()
 	if randf() < stats.crit_chance.get_value():
@@ -396,7 +396,7 @@ func get_projectile_count() -> int:
 	return base_amount + int(stats.amount.get_value())
 ```
 
-### 技能管理器（`SkillManager.gd`）「主動 5 ＋ 被動 5」架構
+### Skill Manager (`SkillManager.gd`) "5 Actives + 5 Passives" Architecture
 
 ```gdscript
 # scripts/skills/skill_manager.gd
@@ -407,7 +407,7 @@ var active_slots: Array[BaseSkill] = []
 var passive_slots: Array[BaseSkill] = []
 
 func update_all_skills(delta: float) -> void:
-	# 僅主動技能執行每幀循環計時與發射
+	# Only active skills run per-frame cycle timing and firing
 	for skill in active_slots:
 		if skill:
 			skill.update_skill(delta)
@@ -415,61 +415,61 @@ func update_all_skills(delta: float) -> void:
 
 ---
 
-## 9. 研發實施任務清單（Implementation TODO Checklist）
+## 9. Implementation TODO Checklist
 
-### Phase 1: 核心通用 Stat 與技能架構 (Core Stats & 5+5 Architecture)
-- [x] 實作 `Stat.cs` 數值計算類（支援 base / flat / percent 複合運算）
-- [x] 實作 `CellStats.cs` 全域屬性管理器，封裝通用屬性池
-- [x] 重構 `SkillManager.cs` 為「主動 5 ＋ 被動 5」獨立槽位架構
-- [x] 搭建通用白血球底盤節點 (`BaseCell`)，物理半徑標準化 `BaseRadius = 48.0`
-- [x] 實現 `FastNoiseLite` 動態頂點變形並同步至 `CollisionPolygon2D`（於 `BaseCell` 內）
+### Phase 1: Core Generic Stats and Skill Architecture (Core Stats & 5+5 Architecture)
+- [x] Implement the `Stat.cs` numeric class (supports base / flat / percent composite math)
+- [x] Implement the `CellStats.cs` global attribute manager encapsulating the generic attribute pool
+- [x] Refactor `SkillManager.cs` into the "5 actives + 5 passives" independent slot architecture
+- [x] Build the generic white blood cell chassis node (`BaseCell`) with standardized physics radius `BaseRadius = 48.0`
+- [x] Implement `FastNoiseLite` dynamic vertex morphing synced to `CollisionPolygon2D` (inside `BaseCell`)
 
-### Phase 2: 擊殺循環與戰鬥手感 (Combat & Kill Loop)
-- [x] 實現擊殺病原體轉化為免疫經驗（EXP）計量
-- [ ] 實現點按空白鍵「翻滾閃避（Dodge Roll）」微操機制（次數 1、2.5 秒回充、突進無敵）
-- [x] 實現局內三選一升級抽取介面（主動 / 被動 / 質變突變卡）
+### Phase 2: Kill Loop and Combat Feel (Combat & Kill Loop)
+- [x] Implement kill-to-immune-EXP (EXP) conversion for pathogens
+- [ ] Implement tap-Space "Dodge Roll" micro-mechanic (1 charge, 2.5s recharge, dash i-frames)
+- [x] Implement the in-run draft-of-3 upgrade UI (active / passive / mutation cards)
 
-### Phase 3: 五大白血球形態與細胞核 (Immune Cell Morphology)
-- [x] 實作 `GameManager.ClassData` 數值與外觀映射
-- [x] **巨噬細胞**：流體阿米巴邊界、偏心腎形/馬蹄形核、大偽足
-- [x] **殺手 T 細胞**：緊湊正圓球體、80% 佔比大圓核、極化突觸
-- [x] **嗜中性球**：高頻焦躁顫膜、3～5 葉分節核、殺菌顆粒
-- [x] **B 淋巴細胞**：圓球外觀、車輪狀核、外圍受體光點
-- [x] **樹突狀細胞**：星芒樹突海葵狀、中心卵形核、廣域感知觸角
+### Phase 3: Five White Blood Cell Morphologies and Nuclei (Immune Cell Morphology)
+- [x] Implement `GameManager.ClassData` numeric and appearance mapping
+- [x] **Macrophage**: fluid amoebic boundary, eccentric kidney/horseshoe nucleus, large pseudopods
+- [x] **Killer T cell**: compact perfect-sphere body, 80%-occupancy giant round nucleus, polarized synapse
+- [x] **Neutrophil**: high-frequency jittery membrane, 3-5-lobe segmented nucleus, bactericidal granules
+- [x] **B cell**: spherical appearance, cartwheel nucleus, peripheral receptor light spots
+- [x] **Dendritic cell**: star-shaped dendritic anemone form, central oval nucleus, wide-area sensing antennae
 
-### Phase 4: 5 主動 ＋ 5 被動 ＋ 5 終極超武實作 (Skills & Evolutions)
-- [x] 實作 5 大主動生化技能：穿孔素長矛、補體瀑布、Y 型抗體齊射、活性氧射流、偽足猛擊
-- [x] 實作外掛細胞器：`ReceptorSpikes.tscn` (受體棘刺)；`PseudopodLimb.tscn` (IK 抓爪) 已併入吞噬偽足鏈式打擊並刪除
-- [x] 實作被動特質（純通用 Stat 增幅，共 13 種）：溶酶體酵素、肌動蛋白微絲、調理素親和、線粒體超頻、趨化因子受體等
-- [ ] 實作終極表觀遺傳超武合成邏輯（主動 ＋ 被動 質變合成尚未實作）
+### Phase 4: 5 Actives + 5 Passives + 5 Ultimate Super-Weapons (Skills & Evolutions)
+- [x] Implement the 5 active biochemical skills: Perforin Lance, Complement Cascade, Y-Shaped Antibody Salvo, ROS Spray, Pseudopod Lunge
+- [x] Implement plug-in organelles: `ReceptorSpikes.tscn` (receptor spikes); `PseudopodLimb.tscn` (IK grapple claw) merged into the phagocytic pseudopod chain strike and removed
+- [x] Implement passive traits (pure generic Stat boosts, 13 total): Lysosome Enzymes, Actin Microfilaments, Opsonin Affinity, Mitochondrial Overclock, Chemokine Receptors, etc.
+- [ ] Implement ultimate epigenetic super-weapon fusion logic (active + passive mutation fusion not yet implemented)
 
-### Phase 5: 造血幹細胞天賦星盤實作 (Hematopoiesis Talent Matrix)
-- [x] 搭建全域相連天賦星盤 UI 與數據儲存架構
-- [x] 實作正交網格棋盤佈局（五大譜系橫向帶 + 中央 HSC 核心，單格單節點）
-- [x] 實現中央幹細胞向五大起點門戶分化邏輯（核 → 核心代謝環 → 各譜系門戶）
-- [x] 實現出門小節點通用 `StatModifier` 累加計算（單次購買、單一效果）
-- [x] 實現五大特化核心關鍵節點
-- [x] 實作共軛焦螢光渲染：正交微管脈衝、囊泡節點、棋盤格背景（保證無重疊、無交叉）
-- [x] 驗證跨盤點法（跨譜系門戶經核心環開啟，測試套件涵蓋）
+### Phase 5: Hematopoietic Stem Cell Talent Tree (Hematopoiesis Talent Matrix)
+- [x] Build the globally connected talent tree UI and data persistence architecture
+- [x] Implement the orthogonal grid board layout (five lineage bands + central HSC core, one node per cell)
+- [x] Implement differentiation logic from the central stem cell to the five starting portals (nucleus -> core metabolism ring -> lineage portals)
+- [x] Implement entry-node generic `StatModifier` accumulation (single purchase, single effect)
+- [x] Implement the five specialization core keystones
+- [x] Implement confocal fluorescence rendering: orthogonal microtubule pulses, vesicle nodes, checkerboard background (guaranteed no overlaps, no crossings)
+- [x] Verify cross-board allocation (cross-lineage portals open through the core ring, covered by test suites)
 
-### Phase 6: 敵人體系與高併發效能優化 (Enemies & Performance Pipeline)
-- [ ] 實現 2D `QuadTree` 空間分割管理
-- [ ] 使用 `MultiMeshInstance2D` 實現同屏海量病原體 GPU 批次渲染
-- [x] 為大量病原體配置輕量級 `CircleShape2D` 碰撞
-- [x] **冠狀病毒 (S-Virus)**：刺突減速黏著、紅血球入侵複製 AI
-- [x] **金黃色葡萄球菌 (Staph)**：葡萄串抱團移動 AI、纖維蛋白護盾判定
-- [x] **變異流感病毒 (Flu-Drift)**：抗原漂移重置靶向暴擊加成機制
-- [x] **異變癌細胞 (Malignant Cell)**：MHC-I 隱匿、巨噬破膜 / NK 模組判定
+### Phase 6: Enemy System and High-Concurrency Optimization (Enemies & Performance Pipeline)
+- [ ] Implement 2D `QuadTree` spatial partitioning
+- [ ] Use `MultiMeshInstance2D` for GPU-batched rendering of massive on-screen pathogen counts
+- [x] Fit massive pathogen counts with lightweight `CircleShape2D` collisions
+- [x] **Coronavirus (S-Virus)**: spike slow-adhesion, red blood cell invasion/replication AI
+- [x] **Staphylococcus aureus (Staph)**: grape-cluster huddling movement AI, fibrin shield resolution
+- [x] **Mutant influenza virus (Flu-Drift)**: antigenic drift resetting targeted-crit bonus mechanic
+- [x] **Mutant cancer cell (Malignant Cell)**: MHC-I concealment, macrophage-rupture / NK-module resolution
 
-### Phase 7: 動態關卡病理環境 (Pathological Level Stages)
-- [x] **急性表皮裂口 (Acute Wound)**：組織液向外吸力場、血纖維蛋白網移動減速黏網
-- [x] **肺泡腔室 (Alveolar Space)**：呼吸氣流推力場、偽足錨定上皮細胞機制
-- [ ] **全域危機：細胞因子風暴 (Cytokine Storm)**：促炎超標過熱狀態、雙刃劍數值加成與宿主倒數計時
+### Phase 7: Dynamic Stage Pathology Environments (Pathological Level Stages)
+- [x] **Acute Epidermal Fissure (Acute Wound)**: outward tissue-fluid suction field, fibrin-mesh movement-snare webs
+- [x] **Alveolar Chamber (Alveolar Space)**: breathing airflow thrust field, pseudopod-anchored epithelial cell mechanic
+- [ ] **Global crisis: Cytokine Storm (Cytokine Storm)**: pro-inflammatory overdrive overheat state, double-edged numeric bonuses with a host countdown timer
 
-### Phase 8: 微觀美學、Shader 渲染與科普檔案 (Microscopic Visuals & Edutainment)
-- [x] 2D CanvasItem Shader：菲涅爾邊緣螢光（Fresnel Glow）
-- [ ] $1024 \times 1024$ 無縫半透明原生質、凝膠流體貼圖 (Normal / Roughness)
-- [x] 細胞核懸浮微幅延遲彈簧物理（Spring Physics）
-- [x] 多層次視差滾動與景深模擬 (DoF)
-- [x] 微觀檔案館（Immunology Codex）圖鑑系統與冷凍電鏡資料
-- [x] 病歷單結算系統（存活達 05:00 觸發抗體中和通關；HP 歸零觸發 SIRS 膜破裂陣亡；結算面板含該場數據、通關/陣亡分類與可持久化的歷史病歷）
+### Phase 8: Microscopic Aesthetics, Shader Rendering, and Science Codex (Microscopic Visuals & Edutainment)
+- [x] 2D CanvasItem Shader: Fresnel edge glow (Fresnel Glow)
+- [ ] $1024 \times 1024$ seamless translucent cytoplasm gel fluid texture (Normal / Roughness)
+- [x] Floating nucleus with slight delayed spring physics (Spring Physics)
+- [x] Multi-layer parallax scrolling and depth-of-field simulation (DoF)
+- [x] Immunology Codex collection system with cryo-EM data
+- [x] Case report settlement system (surviving to 05:00 triggers antibody-neutralization victory; HP hitting zero triggers SIRS membrane-rupture death; the settlement panel shows run data, victory/death classification, and persistable historical case reports)

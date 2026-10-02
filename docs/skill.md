@@ -1,117 +1,117 @@
-# 《Project: Phagocyte》技能系統、超武體系與微操規格書 (Skill System, Evolutions & Dodge Roll)
+# Project: Phagocyte Skill System, Super-Weapon Arsenal & Micro-Control Spec (Skill System, Evolutions & Dodge Roll)
 
 ---
 
-## 1. 技能架構與數值對接原則
+## 1. Skill Architecture and Stat Integration Principles
 
-在《Project: Phagocyte》中，技能系統是玩家戰鬥構築（Build）的核心載體。所有技能嚴格遵守「高內聚、低耦合」的模組化原則：
+In Project: Phagocyte, the skill system is the core vehicle for player combat builds. All skills strictly follow the modular principle of "high cohesion, low coupling":
 
-- **全域通用 Stat 注入**：所有主動技能的冷卻（`cooldown_reduction`）、傷害（`damage`）、範圍（`area`）、彈道速度（`projectile_speed`）、發射數量（`amount`）與穿透次數（`pierce`），**100% 動態讀取自全域通用屬性池**，絕不定義私有變數。
-- **全域數值模型專題文檔**：全域 19 項通用屬性定義、標準計算公式與邊界約束，請直接參閱專題文檔 👉 **[`docs/stat.md`](file:///Users/zelin/project/Phagocyte/docs/stat.md)**。
-- **全自動獨立開火迴圈**：每個主動技能掛載於細胞實體下方，具備獨立的冷卻計時器與索敵邏輯，冷卻就緒時自動觸發，讓玩家專注於走位拉扯與微觀物理微操。
+- **Universal Stat Injection**: cooldown (`cooldown_reduction`), damage (`damage`), area (`area`), projectile speed (`projectile_speed`), projectile count (`amount`), and pierce (`pierce`) for every active skill are **read 100% dynamically from the universal stat pool** and never defined as private variables.
+- **Universal Numerical Model Reference**: for the 19 universal stat definitions, standard formulas, and boundary constraints, see the dedicated spec 👉 **[`docs/stat.md`](file:///Users/zelin/project/Phagocyte/docs/stat.md)**.
+- **Fully Automatic Independent Fire Loops**: each active skill is mounted under the cell entity with its own cooldown timer and targeting logic, firing automatically when ready so players can focus on positioning, kiting, and micro-physics maneuvering.
 
 ---
 
-## 2. 槽位架構：「主動 5 ＋ 被動 5」經典閉環
+## 2. Slot Architecture: The "5 Actives + 5 Passives" Classic Loop
 
-單局內，玩家最多可裝配 **5 個主動生化技能** 與 **5 個被動代謝特質**：
+In a single run, the player can equip up to **5 active biochemical skills** and **5 passive metabolic traits**:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│ 主動技能槽位 (Active Cytokines x5) - 全自動循環獨立開火                    │
-│ [1: 穿孔素長矛]  [2: 補體瀑布]  [3: 抗體齊射]  [4: 活性氧射流]  [5: 偽足猛擊]    │
+│ Active Skill Slots (Active Cytokines x5) - Fully Automatic Cyclic Fire  │
+│ [1: Perforin Lance] [2: Complement Falls] [3: Antibody Salvo] [4: ROS Torrent] [5: Pseudopod Lunge] │
 ├────────────────────────────────────────────────────────────────────────┤
-│ 被動特質槽位 (Passive Organelles x5) - 提供純通用 Stat 加成              │
-│ [1: 溶酶體酵素]  [2: 肌動蛋白]  [3: 調理素]    [4: 線粒體]    [5: 趨化受體]    │
+│ Passive Trait Slots (Passive Organelles x5) - Pure Universal Stat Bonus │
+│ [1: Lysosome] [2: Actin] [3: Opsonin] [4: Mitochondria] [5: Chemokine Receptor] │
 │   (Damage+Regen) (Area+Speed)  (Crit+Dmg)     (CDR+Dur)     (Magnet+Speed)  │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. 五大主動生化技能 (Active Cytokines)
+## 3. The Five Active Biochemical Skills (Active Cytokines)
 
-主動技能具備獨立的冷卻循環計時器，依據通用屬性即時運算輸出：
+Each active skill runs on its own cooldown cycle timer, with output computed live from universal stats:
 
-| 主動技能名稱 | 醫學原型機制 | 消耗的通用 Stat | 戰鬥表現與機制細節 |
+| Active Skill | Medical Prototype | Universal Stats Consumed | Combat Behavior & Mechanics |
 | :--- | :--- | :--- | :--- |
-| **0. 吞噬偽足<br>(Phagocytic Grasp，巨噬固有)** | 巨噬細胞偽足快速伸出打擊 | `damage`, `area`, `amount`, `cooldown_reduction` | 由近到遠伸出 2 根偽足抓取，`amount` 增加抓取隻數；鏈射命中造成接觸傷害。阿米巴變形本身為全細胞共用底盤視覺。 |
-| **1. 穿孔素長矛<br>(Perforin Lance)** | 殺手 T 細胞在靶膜成孔 | `damage`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | 朝最近高危病原體射出高初速螺旋光束。`amount` 增加連發射線束數，`pierce` 增加貫穿人數。 |
-| **2. 補體瀑布<br>(Complement Cascade)** | 補體連鎖裂解沉積引發爆破 | `damage`, `area`, `cooldown_reduction`, `duration` | 在玩家周圍隨機生成生化光環地雷，`area` 擴大地雷半徑，延遲引發強烈衝擊波造成範圍傷害。 |
-| **3. Y 型抗體齊射<br>(Antibody Salvo)** | B 細胞分泌游離抗體中和病原體 | `damage`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | 週期性向 360 度噴發巡航尋的 Y 型抗體飛彈，`amount` 直接增加單輪發射彈道數。 |
-| **4. 活性氧射流<br>(ROS Torrent / Spray)** | 吞噬細胞呼吸爆發釋放 $\text{H}_2\text{O}_2$ | `damage`, `area`, `duration`, `cooldown_reduction` | 朝游動前方噴射高壓錐形酸霧，`area` 放大錐形覆蓋角度與射程，造成持續溶解破甲 DoT。 |
-| **5. 偽足猛擊<br>(Pseudopod Lunge)** | 肌動蛋白微絲瞬間定向爆發彈射 | `damage`, `area`, `amount`, `cooldown_reduction` | 向外猛烈彈出阿米巴肉質抓手，`area` 延長彈射距離，命中時將敵人擊暈並強制向內拖曳。 |
+| **0. Phagocytic Grasp<br>(Phagocytic Grasp, Macrophage Innate)** | Rapid pseudopod strike of the Macrophage | `damage`, `area`, `amount`, `cooldown_reduction` | Extends 2 pseudopods from near to far to grab; `amount` adds grabs; chained hits deal contact damage. Amoeboid deformation itself is the shared chassis visual for all cells. |
+| **1. Perforin Lance<br>(Perforin Lance)** | Killer T cell pore formation on target membranes | `damage`, `projectile_speed`, `amount`, `pierce`, `crit_chance` | Fires a high-velocity spiral beam at the nearest high-threat pathogen. `amount` adds beams per volley, `pierce` adds targets penetrated. |
+| **2. Complement Cascade<br>(Complement Cascade)** | Detonation triggered by chained complement cleavage and deposition | `damage`, `area`, `cooldown_reduction`, `duration` | Spawns biochemical halo mines at random positions around the player; `area` expands mine radius, detonating after a delay with a powerful area shockwave. |
+| **3. Y-Type Antibody Salvo<br>(Antibody Salvo)** | B cell secretion of free antibodies neutralizing pathogens | `damage`, `amount`, `cooldown_reduction`, `projectile_speed`, `duration` | Periodically erupts homing Y-shaped antibody missiles in 360 degrees; `amount` directly adds projectiles per volley. |
+| **4. ROS Torrent<br>(ROS Torrent / Spray)** | Phagocyte respiratory burst releasing $\text{H}_2\text{O}_2$ | `damage`, `area`, `duration`, `cooldown_reduction` | Sprays a high-pressure cone of acid mist ahead of movement; `area` widens the cone angle and range, melting armor with a sustained-dissolve DoT. |
+| **5. Pseudopod Lunge<br>(Pseudopod Lunge)** | Instant directional burst ejection of actin filaments | `damage`, `area`, `amount`, `cooldown_reduction` | Violently ejects amoeboid fleshy grabs outward; `area` extends lunge distance, stunning enemies on hit and forcibly dragging them inward. |
 
 ---
 
-## 4. 五大被動代謝特質 (Passive Organelles)
+## 4. The Five Passive Metabolic Traits (Passive Organelles)
 
-被動特質不含任何專有武器邏輯，純粹為宿主提供通用 Stat 加成（每級遞增）：
+Passive traits contain no weapon-specific logic; they purely grant the host universal Stat bonuses (scaling per level):
 
-| 被動特質名稱 | 生物學包裝 | 提供的純通用 Stat 加成 (每級遞增) | 戰術定位 |
+| Passive Trait | Biological Flavor | Pure Universal Stat Bonus (per level) | Tactical Role |
 | :--- | :--- | :--- | :--- |
-| **1. 溶酶體酵素<br>(Lysosome Priming)** | 胞內水解酶儲備與活化 | `damage +10%` / `health_regen +0.6 HP/s` | 全傷害強化與自噬持續修復 |
-| **2. 肌動蛋白微絲<br>(Actin Polymerization)** | 細胞骨架微絲定向聚合 | `area +12%` / `move_speed +6%` | 全技能範圍放大與機動走位 |
-| **3. 調理素親和<br>(Opsonin Affinity)** | 表面特異性受體增生 | `crit_chance +5%` / `crit_damage +25%` | 致命弱點暴擊與超額處決 |
-| **4. 線粒體超頻<br>(Mitochondrial Overclock)**| 三羧酸循環 ATP 產能倍增 | `cooldown_reduction +8%` / `duration +10%` | 全技能循環開火加速與留場延長 |
-| **5. 趨化因子受體<br>(Chemokine Receptors)** | 表面高敏化學引力天線 | `magnet +25%` / `move_speed +6%` | 廣域自動吸附與定向趨化游動加速 |
+| **1. Lysosome Priming<br>(Lysosome Priming)** | Intracellular hydrolase reserves and activation | `damage +10%` / `health_regen +0.6 HP/s` | All-damage scaling plus sustained autophagic repair |
+| **2. Actin Polymerization<br>(Actin Polymerization)** | Directed polymerization of cytoskeletal filaments | `area +12%` / `move_speed +6%` | All-skill area scaling plus mobile positioning |
+| **3. Opsonin Affinity<br>(Opsonin Affinity)** | Surface-specific receptor proliferation | `crit_chance +5%` / `crit_damage +25%` | Lethal weak-point crits and overkill execution |
+| **4. Mitochondrial Overclock<br>(Mitochondrial Overclock)**| Multiplied ATP output from the tricarboxylic acid cycle | `cooldown_reduction +8%` / `duration +10%` | Faster fire cycles for all skills plus longer effect persistence |
+| **5. Chemokine Receptors<br>(Chemokine Receptors)** | Highly sensitive chemotactic antennae on the surface | `magnet +25%` / `move_speed +6%` | Wide-area auto-collection plus directed chemotactic swim speed |
 
-### 4.1 胞器腔室六類（Organelle Chamber 2x2，第三系統）
+### 4.1 Six Organelle Chamber Categories (Organelle Chamber 2x2, Third System)
 
-與主動 5＋被動 5 並存的獨立裝備系統：被動＝通用底盤加成，腔室＝高費極端件＋發電拼圖。2x2＝最多 4 件（全 1x1 無拼接），基礎能量 6，`energy_cost ∈ [-1, 4]`（`-1`＝`+1` 發電且必帶重度負面）。已用＝Σ正成本，上限＝6＋Σ發電量，合法⇔已用≤上限且件數≤4。取得走打怪掉落解鎖（基礎機率 2%）→升級三選一（每輪最多 1張胞器卡，滿槽進換裝）→出戰前配裝頁預配（裸裝開局，預設 4 空槽）。
+An independent equipment system coexisting with the 5 actives + 5 passives: passives = universal chassis bonuses, chambers = high-cost extreme pieces + power-generation puzzle. 2x2 = up to 4 pieces (all 1x1, no merging), base energy 6, `energy_cost ∈ [-1, 4]` (`-1` = generates `+1` power but always carries a heavy drawback). Used = sum of positive costs, cap = 6 + total generation; legal iff used <= cap and piece count <= 4. Acquisition flows from enemy drops (base 2% chance) -> upgrade drafts of three choices (at most 1 organelle card per round; swap loadout when slots are full) -> pre-run loadout page (runs start unequipped with 4 empty slots by default).
 
-| 類別 | 高費核心 | 低費／發電對照 | 能量 |
+| Category | High-Cost Core | Budget / Generator Counterpart | Energy |
 | :--- | :--- | :--- | :--- |
-| **代謝 (metabolism)** | 線粒體 MkII：`CDR +0.16`／`duration +10%` | 糖酵解旁路：`CDR +0.05`／`move_speed +3%` | 4／1 |
-| **消化 (digestion)** | 強酸溶酶體：`damage +12%`／`dot_damage +15%` | 蛋白酶體篩：`dot_damage +8%`／`health_regen +0.3` | 3／1 |
-| **骨架 (cytoskeleton)** | 鞭毛基座：`move_speed +12%` | 微管錨點：`move_speed +4%`／`area +4%` | 3／1 |
-| **合成 (synthesis)** | 粗面內質網：`amount +1`／`projectile_speed +8%`（唯一 `amount+1`，鎖 4 費） | 核糖體簇：`projectile_speed +8%`／`duration +8%` | 4／2 |
-| **感知 (sensing)** | 離子通道陣列：`armor +3`／`block +0.04`／`magnet +15%` | 趨化貼片：`magnet +20%`／`evasion +0.02` | 3／1 |
-| **共生 (symbiosis，發電件)** | 共生菌群：`+1` 發電，代價 `move_speed -30%`／`damage -15%`（殘廢流） | 噬菌體碎片：`+1` 發電／`CDR +0.05`，代價 `max_health -20%`（血換電） | -1／-1 |
+| **Metabolism (metabolism)** | Mitochondria MkII: `CDR +0.16`/`duration +10%` | Glycolytic Bypass: `CDR +0.05`/`move_speed +3%` | 4/1 |
+| **Digestion (digestion)** | Strong-Acid Lysosome: `damage +12%`/`dot_damage +15%` | Proteasome Sieve: `dot_damage +8%`/`health_regen +0.3` | 3/1 |
+| **Cytoskeleton (cytoskeleton)** | Flagellar Base: `move_speed +12%` | Microtubule Anchor: `move_speed +4%`/`area +4%` | 3/1 |
+| **Synthesis (synthesis)** | Rough Endoplasmic Reticulum: `amount +1`/`projectile_speed +8%` (only `amount+1`, locked at 4 cost) | Ribosome Cluster: `projectile_speed +8%`/`duration +8%` | 4/2 |
+| **Sensing (sensing)** | Ion Channel Array: `armor +3`/`block +0.04`/`magnet +15%` | Chemotaxis Patch: `magnet +20%`/`evasion +0.02` | 3/1 |
+| **Symbiosis (symbiosis, generator)** | Symbiotic Flora: `+1` generation at the cost of `move_speed -30%`/`damage -15%` (cripple build) | Phage Fragment: `+1` generation/`CDR +0.05` at the cost of `max_health -20%` (health-for-power) | -1/-1 |
 
 ---
 
-## 5. 五大終極表觀遺傳超武 (Epigenetic Evolutions)
+## 5. The Five Ultimate Epigenetic Super-Weapons (Epigenetic Evolutions)
 
-當主動技能升至 **Lv.5 (Max)**，且持有對應的 **被動特質（任意等級）** 時，擊殺精英怪物開啟寶箱即可觸發 1:1 二合一質變進化：
+When an active skill reaches **Lv.5 (Max)** and its matching **passive trait (any level)** is held, killing an elite opens a chest that triggers a 1:1 two-in-one transformative evolution:
 
 ```mermaid
 graph LR
-    subgraph 5組超武二合一融合矩陣
-        A1["穿孔素長矛 (Lv.5)"] + B1["溶酶體酵素"] --> EVO1["【顆粒酶死刑】<br>(Granzyme Apoptosis)"]
-        A2["補體瀑布 (Lv.5)"] + B2["肌動蛋白微絲"] --> EVO2["【膜攻擊終結陣列】<br>(MAC Hyper-Array)"]
-        A3["Y型抗體齊射 (Lv.5)"] + B3["調理素親和"] --> EVO3["【中和高壓風暴】<br>(Neutralizing Tempest)"]
-        A4["活性氧射流 (Lv.5)"] + B4["線粒體超頻"] --> EVO4["【過氧化利維坦】<br>(Superoxide Leviathan)"]
-        A5["偽足猛擊 (Lv.5)"] + B5["趨化因子受體"] --> EVO5["【阿米巴原生巨口】<br>(Amoebic Maelstrom)"]
+    subgraph 5-Unit Super-Weapon Two-in-One Fusion Matrix
+        A1["Perforin Lance (Lv.5)"] + B1["Lysosome Priming"] --> EVO1["Granzyme Execution<br>(Granzyme Apoptosis)"]
+        A2["Complement Cascade (Lv.5)"] + B2["Actin Polymerization"] --> EVO2["Membrane Attack Final Array<br>(MAC Hyper-Array)"]
+        A3["Y-Type Antibody Salvo (Lv.5)"] + B3["Opsonin Affinity"] --> EVO3["Neutralizing High-Pressure Storm<br>(Neutralizing Tempest)"]
+        A4["ROS Torrent (Lv.5)"] + B4["Mitochondrial Overclock"] --> EVO4["Peroxide Leviathan<br>(Superoxide Leviathan)"]
+        A5["Pseudopod Lunge (Lv.5)"] + B5["Chemokine Receptors"] --> EVO5["Amoebic Primal Maw<br>(Amoebic Maelstrom)"]
     end
 ```
 
-### 5.1 超武機制詳細說明
-1. **【顆粒酶死刑】(Granzyme Apoptosis)**：
-   - *機制原型*：穿孔素在膜上打孔後，顆粒酶迅速注入引發靶細胞程序性凋亡。
-   - *遊戲效果*：光束貫穿命中敵人後植入凋亡印記。目標 1 秒後引爆，化為向 6 個正交方向飛濺的高速連鎖穿刺射線，造成骨牌式連鎖清屏。
-2. **【膜攻擊終結陣列】(MAC Hyper-Array)**：
-   - *機制原型*：補體 C5b-9 複合物直接在細胞膜上組裝成不可逆的膜攻擊孔道。
-   - *遊戲效果*：補體地雷不再隨機散落，而是直接附著於玩家動態偽足末端。走位時在身後拖曳出一條流動的化學渦流帶，接觸到的所有病原體瞬間裂解為 ATP 經驗滴。
-3. **【中和高壓風暴】(Neutralizing Tempest)**：
-   - *機制原型*：高親和力抗體大量交聯聚集病原體，形成不溶性免疫複合物。
-   - *遊戲效果*：向全屏發射 32 枚高頻巡航抗體。抗體命中不同目標時在其間拉出「高壓生化網線」，對穿過網線的所有雜兵造成最大生命值百分比真傷。
-4. **【過氧化利維坦】(Superoxide Leviathan)**：
-   - *機制原型*：全細胞膜表面過氧化物超頻富集，化身為強氧化性離子渦輪。
-   - *遊戲效果*：取消前方噴射限制。全細胞周邊包裹一層青藍色等離子超氧光膜，將細胞本身轉化為碰觸即融化一切非 Boss 病原體的旋轉粉碎機。
-5. **【阿米巴原生巨口】(Amoebic Maelstrom)**：
-   - *機制原型*：極限偽足爆發，微管牽引全域絞殺。
-   - *遊戲效果*：偽足彈射分裂為 4 根全向巨型阿米巴觸角，在場地中心引發巨大引力漩渦，將全屏病原體雜兵與 ATP 經驗光點一口氣強行拖入絞殺力場粉碎！
+### 5.1 Super-Weapon Mechanics in Detail
+1. **Granzyme Execution (Granzyme Apoptosis)**:
+   - *Mechanism prototype*: after perforin punches pores in the membrane, granzyme is rapidly injected to trigger programmed apoptosis in the target cell.
+   - *Gameplay effect*: a piercing beam implants an apoptosis mark on hit. The target detonates after 1 second, bursting into high-speed chaining pierce rays splashing along 6 orthogonal directions for domino-style screen clears.
+2. **Membrane Attack Final Array (MAC Hyper-Array)**:
+   - *Mechanism prototype*: the complement C5b-9 complex assembles directly on the cell membrane into irreversible membrane attack pores.
+   - *Gameplay effect*: complement mines no longer scatter randomly but attach directly to the tips of the player's dynamic pseudopods. While repositioning, they trail a flowing chemical vortex wake behind the player, instantly lysing every pathogen touched into ATP experience drops.
+3. **Neutralizing High-Pressure Storm (Neutralizing Tempest)**:
+   - *Mechanism prototype*: mass cross-linking and aggregation of pathogens by high-affinity antibodies, forming insoluble immune complexes.
+   - *Gameplay effect*: fires 32 high-frequency cruising antibodies across the screen. When antibodies hit different targets, they stretch "high-voltage biochemical web strands" between them, dealing max-HP-percentage true damage to all lesser enemies crossing the strands.
+4. **Peroxide Leviathan (Superoxide Leviathan)**:
+   - *Mechanism prototype*: peroxide super-enrichment across the whole cell membrane surface, transforming the cell into a strongly oxidizing ion turbine.
+   - *Gameplay effect*: removes the forward-spray restriction. The whole cell is wrapped in a cyan-blue plasma superoxide film, turning the cell itself into a spinning shredder that melts every non-Boss pathogen on contact.
+5. **Amoebic Primal Maw (Amoebic Maelstrom)**:
+   - *Mechanism prototype*: limit-break pseudopod eruption with microtubule-towed global strangulation.
+   - *Gameplay effect*: pseudopod lunges split into 4 omnidirectional giant amoeboid tentacles, opening a massive gravity vortex at the arena center that drags all on-screen pathogen minions and ATP experience motes into a strangling force field and shreds them in one gulp!
 
 ---
 
-## 6. 微操機制：翻滾閃避 (Dodge Roll)
+## 6. Micro-Control: Dodge Roll (Dodge Roll)
 
-為了在 Survivor-like 的自動開火體系中增添硬核微操深度，本專案設計了「翻滾閃避機制」：
+To add hardcore micro-control depth to the Survivor-like auto-fire formula, this project includes a dodge-roll mechanic:
 
-- **操作指令**：點按 `Space`（空白鍵）或手把 `L2`，向當前移動方向 burst 位移。
-- **生理機制對照**：白血球肌動蛋白爆發性聚合的短程快速趨化跳躍。
-- **戰術數值**：
-  - 翻滾次數 1 次，每 2.5 秒補充 1 次。
-  - 突進 0.18 秒 ×3.2 倍速，無敵 0.22 秒（突進＋餘暉），期間任何傷害（含環境）直接判定閃避。
-  - 當被海量病原體包圍或面對密集彈幕時，一滾穿過怪堆或無傷吃下 Boss 大招。
+- **Input**: tap `Space` (spacebar) or gamepad `L2` to burst-displace along the current movement direction.
+- **Physiological counterpart**: a short, rapid chemotactic leap driven by explosive actin polymerization in the white blood cell.
+- **Tactical numbers**:
+  - 1 dodge charge, replenished every 2.5 seconds.
+  - 0.18-second dash at 3.2x speed with 0.22 seconds of invulnerability (dash + afterglow), during which all damage (including environmental) counts as dodged.
+  - When surrounded by pathogen hordes or facing dense bullet patterns, one roll carries you through the pack or lets you eat a Boss ultimate unscathed.
