@@ -18,11 +18,6 @@ public static class CombatMath
     /// <summary>DoT curve factor over per-second dps (parity with hits; raise to soften).</summary>
     public const float DotArmorFactor = 5.0f;
 
-    public static float FromArmor(float armor, float damage)
-    {
-        return FromArmorPenetrated(armor, damage, 0.0f);
-    }
-
     public static float FromArmorPenetrated(float armor, float damage, float penetration)
     {
         if (armor <= 0.0f || damage <= 0.0f)

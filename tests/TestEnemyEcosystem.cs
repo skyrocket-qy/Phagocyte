@@ -145,7 +145,7 @@ public partial class TestEnemyEcosystem : SceneTree
         var tb = EnemySpawner.CreateEnemy("tb")!;
         testContainer.AddChild(tb);
         HitPipeline.ResolveHit(new HitPayload { RawDamage = 10.0f }, tb);
-        AssertThat(tb.CurrentHealth).IsEqualApprox(35.0f - 10.0f * (1.0f - CombatMath.FromArmor(tb.Armor, 10.0f)), 0.01f);
+        AssertThat(tb.CurrentHealth).IsEqualApprox(35.0f - 10.0f * (1.0f - CombatMath.FromArmorPenetrated(tb.Armor, 10.0f, 0.0f)), 0.01f);
         GD.Print("[PASS] Test 6: Mycobacterium tuberculosis mycolic wax armor verified.");
 
         // -------------------------------------------------------------

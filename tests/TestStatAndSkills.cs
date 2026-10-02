@@ -71,8 +71,8 @@ public partial class TestStatAndSkills : TestHarness
 
         // Test POE armour formula: small hits mitigated, big hits penetrate
         cs.AddModifier("armor", 50.0f, 0.0f);
-        AssertThat(CombatMath.FromArmor(cs.GetStat("armor"), 50.0f)).IsEqualApprox(50.0f / 300.0f, 0.001f);
-        AssertThat(CombatMath.FromArmor(3.0f, 50.0f)).IsLess(0.02f);
+        AssertThat(CombatMath.FromArmorPenetrated(cs.GetStat("armor"), 50.0f, 0.0f)).IsEqualApprox(50.0f / 300.0f, 0.001f);
+        AssertThat(CombatMath.FromArmorPenetrated(3.0f, 50.0f, 0.0f)).IsLess(0.02f);
         GD.Print("[PASS] Test 2: ActorStats 20 universal stats, clamps (CDR, evasion, block, life steal, stagger, recoup) & armor formula verified.");
 
         // --- Test 3: SkillManager 5 Active + 5 Passive Routing ---

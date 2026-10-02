@@ -237,7 +237,6 @@ public partial class TestDamageContracts : TestHarness
         AssertThat(CombatMath.FromArmorPenetrated(20.0f, 20.0f, 2.0f)).IsEqual(0.0f);
         AssertThat(CombatMath.FromArmorPenetrated(20.0f, 20.0f, -1.0f)).IsEqualApprox(20.0f / 120.0f, 0.0001f);
         AssertThat(CombatMath.FromArmorPenetrated(0.0f, 20.0f, 0.5f)).IsEqual(0.0f);
-        AssertThat(CombatMath.FromArmor(20.0f, 20.0f)).IsEqualApprox(CombatMath.FromArmorPenetrated(20.0f, 20.0f, 0.0f), 0.0001f);
         GD.Print("[PASS] Armor penetration scales effective armor per the POE curve.");
 
         var cell = new PlayerActor { GlobalPosition = new Vector2(300, 300) };
