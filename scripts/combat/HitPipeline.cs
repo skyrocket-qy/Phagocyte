@@ -141,11 +141,12 @@ public static class HitPipeline
         float threshold = AilmentThresholdOf(target);
         float scale = threshold > 0.0f ? Mathf.Clamp(dealt / threshold, 0.0f, 1.0f) : 1.0f;
         float ailEffect = AilmentEffectOf(payload.AttackerId);
-        ApplyEffect(host.Status, payload.Effect0, scale, ailEffect);
+        float dotMult = DotDamageOf(payload.AttackerId);
+        ApplyEffect(host.Status, payload.Effect0, scale, ailEffect, dotMult);
         if (payload.EffectCount > 1)
-            ApplyEffect(host.Status, payload.Effect1, scale, ailEffect);
+            ApplyEffect(host.Status, payload.Effect1, scale, ailEffect, dotMult);
         if (payload.EffectCount > 2)
-            ApplyEffect(host.Status, payload.Effect2, scale, ailEffect);
+            ApplyEffect(host.Status, payload.Effect2, scale, ailEffect, dotMult);
     }
 
     internal static float AilmentThresholdOf(Node target)
@@ -166,7 +167,7 @@ public static class HitPipeline
         return Mathf.Max(0.0f, maxHp * AilmentThresholdFraction * Mathf.Max(0.0f, mult));
     }
 
-    private static void ApplyEffect(StatusController status, in EffectSpec e, float scale, float ailEffect)
+    private static void ApplyEffect(StatusController status, in EffectSpec e, float scale, float ailEffect, float dotMult)
     {
         if (string.IsNullOrEmpty(e.EffectId))
             return;
@@ -174,7 +175,9 @@ public static class HitPipeline
         if (mag >= 0.0f)
         {
             mag *= scale;
-            if (!status.IsDotChannel(e.EffectId))
+            if (status.IsDotChannel(e.EffectId))
+                mag *= dotMult;
+            else
                 mag *= ailEffect;
         }
         float dur = e.Duration >= 0.0f ? Mathf.Max(0.1f, e.Duration * scale) : e.Duration;
@@ -186,6 +189,14 @@ public static class HitPipeline
         Node2D? attacker = ResolveAttacker(attackerId);
         if (attacker is PlayerActor pa && pa.Stats is ActorStats st)
             return Mathf.Max(0.0f, st.GetStat("ailment_effect"));
+        return 1.0f;
+    }
+
+    private static float DotDamageOf(ulong attackerId)
+    {
+        Node2D? attacker = ResolveAttacker(attackerId);
+        if (attacker is PlayerActor pa && pa.Stats is ActorStats st)
+            return Mathf.Max(0.0f, st.GetStat("dot_damage"));
         return 1.0f;
     }
 
