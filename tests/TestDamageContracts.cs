@@ -100,6 +100,7 @@ public partial class TestDamageContracts : TestHarness
         AssertThat(result.TargetKilled).IsFalse();
         AssertThat(result.IsCrit).IsFalse();
         AssertThat(result.IsEvaded).IsFalse();
+        AssertThat(result.IsInvulnerable).IsFalse();
         AssertThat(result.IsBlocked).IsFalse();
         GD.Print("[PASS] HitResult defaults are zero.");
     }
@@ -206,6 +207,7 @@ public partial class TestDamageContracts : TestHarness
         }
         AssertThat(dodged.DamageDealt).IsEqual(0.0f);
         AssertThat(dodged.IsEvaded).IsTrue();
+        AssertThat(dodged.IsInvulnerable).IsFalse();
         AssertThat(dodged.IsBlocked).IsFalse();
         stats.SetBase("evasion", 0.0f);
         stats.SetBase("block", 0.75f);
@@ -218,6 +220,7 @@ public partial class TestDamageContracts : TestHarness
         AssertThat(stopped.DamageDealt).IsEqual(0.0f);
         AssertThat(stopped.IsBlocked).IsTrue();
         AssertThat(stopped.IsEvaded).IsFalse();
+        AssertThat(stopped.IsInvulnerable).IsFalse();
         stats.SetBase("block", 0.0f);
         GD.Print("[PASS] Avoided hits report IsEvaded / IsBlocked.");
 

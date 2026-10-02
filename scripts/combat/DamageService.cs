@@ -30,6 +30,7 @@ public struct HitResult
     public bool TargetKilled;
     public bool IsCrit;
     public bool IsEvaded;
+    public bool IsInvulnerable;
     public bool IsBlocked;
 }
 

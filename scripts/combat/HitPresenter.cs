@@ -9,7 +9,12 @@ public static class HitPresenter
     public static HitResult ResolveAndPresent(in HitPayload payload, Node? targetNode)
     {
         HitResult result = HitPipeline.ResolveHit(payload, targetNode);
-        if (result.IsEvaded)
+        if (result.IsInvulnerable)
+        {
+            if (targetNode is Node2D immune)
+                DamageNumberSpawner.ShowImmune(immune.GlobalPosition);
+        }
+        else if (result.IsEvaded)
         {
             if (targetNode is Node2D evaded)
                 DamageNumberSpawner.ShowEvaded(evaded.GlobalPosition);

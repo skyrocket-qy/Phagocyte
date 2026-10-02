@@ -23,7 +23,7 @@ public static class HitPipeline
         // Stage 1: Avoidance (Invulnerability & Evasion)
         if (def.IsInvulnerable)
         {
-            result.IsEvaded = true;
+            result.IsInvulnerable = true;
             return result;
         }
 

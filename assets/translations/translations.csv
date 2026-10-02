@@ -549,6 +549,7 @@ ACH_BBB_HARD_CLEAR_REWARD,Microtube talent point +1.,微管天賦點 +1。,微�
 HARD_LOCKED_HINT,Clear Normal to unlock.,通关Normal解锁。,通關Normal解鎖。,Normalで解放。,Normal schaffen.,Finir le normal.,Пройдите нормал.,Supera el normal.
 TOOLTIP_EMPTY_PASSIVE,Empty,空,空,空,Leer,Vide,Пусто,Vacío
 COMBAT_EVADED,EVADED!,闪避！,闪避！,回避！,AUSGEWICHEN!,ESQUIVÉ !,МИМО!,¡EVADIDO!
+COMBAT_IMMUNE,IMMUNE!,免疫！,免疫！,免疫！,IMMUN!,IMMUNISÉ !,ИММУН!,¡INMUNE!
 COMBAT_BLOCKED,BLOCKED!,格挡！,格挡！,格挡！,GEBLOCKT!,BLOQUÉ !,БЛОК!,¡BLOQUEADO!
 COMBAT_CRIT,CRIT!,暴击！,暴击！,会心！,KRIT!,CRITIQUE !,КРИТ!,¡CRÍTICO!
 ACH_HEADER_ARCHETYPE,🧬 IMMUNE ARCHETYPE UNLOCKED!,🧬 免疫原型已解锁！,🧬 免疫原型已解锁！,🧬 免疫原型解放！,🧬 IMMUN-ARCHETYP FREIGESCHALTET!,🧬 ARCHÉTYPE IMMUNITAIRE DÉBLOQUÉ !,🧬 ИММУННЫЙ АРХЕТИП РАЗБЛОКИРОВАН!,🧬 ¡ARQUETIPO INMUNE DESBLOQUEADO!
