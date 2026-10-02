@@ -15,7 +15,6 @@ public readonly struct DefenseProfile
 /// <summary>POE armour curve shared by every damageable: big hits penetrate.</summary>
 public static class CombatMath
 {
-    /// <summary>DoT curve factor over per-second dps (parity with hits; raise to soften).</summary>
     public const float DotArmorFactor = 5.0f;
 
     public static float FromArmorPenetrated(float armor, float damage, float penetration)
