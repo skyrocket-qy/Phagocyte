@@ -59,7 +59,7 @@ public static class HitPipeline
         float critMult = GetCritMultiplier(payload, attacker);
         float rawDamage = isCrit ? payload.RawDamage * critMult : payload.RawDamage;
         if (isBlocked)
-            rawDamage *= (1.0f - blockMitigation);
+            rawDamage *= 1.0f - blockMitigation;
 
         // Stage 4: Target Defense Mitigation (POE armour + vulnerability)
         float damage = rawDamage;
