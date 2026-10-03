@@ -560,7 +560,7 @@ public partial class PlayerActor : CharacterBody2D, IDamageable, IStatusHost
 
     /// <summary>Pure damage intake (IDamageable): staggers part of the hit into a
     /// DoT pool, schedules recoup healing, deducts the instant remainder from HP.</summary>
-    public float TakeDamage(float finalDamage, Node2D? source = null, bool isCrit = false)
+    public float TakeDamage(float finalDamage, bool isCrit = false)
     {
         if (IsDead || finalDamage <= 0.0f)
             return 0.0f;

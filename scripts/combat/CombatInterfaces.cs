@@ -45,7 +45,7 @@ public interface IDamageable
 {
     DefenseProfile Defenses { get; }
     bool IsDead { get; }
-    float TakeDamage(float finalDamage, Node2D? source = null, bool isCrit = false);
+    float TakeDamage(float finalDamage, bool isCrit = false);
     void TakeDoTDamage(float dotDamage);
 }
 

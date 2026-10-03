@@ -324,18 +324,18 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
         };
     }
 
-    public virtual float TakeDamage(float finalDamage, Node2D? source = null, bool isCrit = false)
+    public virtual float TakeDamage(float finalDamage, bool isCrit = false)
     {
-        PreDamageTraits(finalDamage, source);
+        PreDamageTraits(finalDamage);
 
-        finalDamage = ApplyShellAbsorb(finalDamage, source, isCrit);
+        finalDamage = ApplyShellAbsorb(finalDamage, isCrit);
 
         CurrentHealth -= finalDamage;
 
         BossPhase?.NotifyHealthChanged(CurrentHealth, MaxHealth);
 
         DamageNumberSpawner.ShowDamage(GlobalPosition, finalDamage, isCrit);
-        RunTelemetryManager.Instance?.RecordDamageDealt(source?.Name ?? "direct", finalDamage);
+        RunTelemetryManager.Instance?.RecordDamageDealt("direct", finalDamage);
 
         AudioManager.Instance?.PlayHit(isCrit);
         if (isCrit)
@@ -347,14 +347,14 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
 
         if (CurrentHealth <= 0.0f)
         {
-            Die(source);
+            Die();
         }
         else
         {
             RedrawIfVisible();
         }
 
-        PostDamageTraits(finalDamage, source);
+        PostDamageTraits(finalDamage);
         return finalDamage;
     }
 
@@ -369,7 +369,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
 
         if (CurrentHealth <= 0.0f)
         {
-            Die(null);
+            Die();
         }
     }
 
@@ -455,7 +455,7 @@ public partial class EnemyActor : Node2D, IDamageable, IStatusHost
 
     // Virtual for the testing dummy (Game.Debug.TargetDummy), which
     // suppresses death/exp. Production enemies never subclass.
-    public virtual void Die(Node2D? killer)
+    public virtual void Die()
     {
         DeadEntityRegistry.Add(GetInstanceId());
         RunDeathTraits();

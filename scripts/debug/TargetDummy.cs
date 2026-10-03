@@ -37,7 +37,7 @@ public partial class TargetDummy : EnemyActor
 
     public override float GetCollisionRadius() => 20.0f;
 
-    public override float TakeDamage(float damage, Node2D? source = null, bool isCrit = false)
+    public override float TakeDamage(float damage, bool isCrit = false)
     {
         HitsReceived++;
         DamageAccumulated += damage;
@@ -53,7 +53,7 @@ public partial class TargetDummy : EnemyActor
         CurrentHealth = MaxHealth;
     }
 
-    public override void Die(Node2D? killer)
+    public override void Die()
     {
         // Suppress exp granting and queue-freeing
         CurrentHealth = MaxHealth;

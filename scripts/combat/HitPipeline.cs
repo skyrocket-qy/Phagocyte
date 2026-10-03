@@ -68,7 +68,7 @@ public static class HitPipeline
             damage *= def.DamageTakenMultiplier;
 
         // Stage 5: Target Pure Intake
-        float actualDamage = target.TakeDamage(damage, attacker, isCrit);
+        float actualDamage = target.TakeDamage(damage, isCrit);
 
         result.DamageDealt = actualDamage;
         result.IsCrit = isCrit;

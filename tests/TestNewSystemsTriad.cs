@@ -18,7 +18,7 @@ public partial class MockEnemyForAilment : Node2D, IDamageable
     public DefenseProfile Defenses => new();
     public bool IsDead => Health <= 0.0f;
 
-    public float TakeDamage(float finalDamage, Node2D? source = null, bool isCrit = false)
+    public float TakeDamage(float finalDamage, bool isCrit = false)
     {
         Health -= finalDamage;
         return finalDamage;

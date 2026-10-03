@@ -121,7 +121,7 @@ public partial class TestEnemyEcosystem : SceneTree
         var pseudo = EnemySpawner.CreateEnemy("pseudomonas")!;
         pseudo.GlobalPosition = new Vector2(100, 100);
         testContainer.AddChild(pseudo);
-        pseudo.Die(player);
+        pseudo.Die();
 
         // Find spawned hazard zone from the death drop
         Zone? biofilm = null;
@@ -161,7 +161,7 @@ public partial class TestEnemyEcosystem : SceneTree
         var anthrax = EnemySpawner.CreateEnemy("anthrax_spore")!;
         anthrax.GlobalPosition = new Vector2(200, 200);
         testContainer.AddChild(anthrax);
-        anthrax.Die(player);
+        anthrax.Die();
 
         EnemyActor? bacillus = null;
         foreach (var child in testContainer.GetChildren())

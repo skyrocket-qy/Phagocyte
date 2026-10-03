@@ -217,7 +217,7 @@ public partial class EnemyActor
             SplitBurst(splitHp);
     }
 
-    private void PreDamageTraits(float damage, Node2D? source)
+    private void PreDamageTraits(float damage)
     {
         if (_enemyDef.Count == 0)
             return;
@@ -235,7 +235,7 @@ public partial class EnemyActor
             ExtendLine(line);
     }
 
-    private void PostDamageTraits(float damage, Node2D? source)
+    private void PostDamageTraits(float damage)
     {
         if (_enemyDef.Count == 0)
             return;
@@ -279,7 +279,7 @@ public partial class EnemyActor
         }
     }
 
-    private float ApplyShellAbsorb(float damage, Node2D? source, bool isCrit)
+    private float ApplyShellAbsorb(float damage, bool isCrit)
     {
         var shell = Trait("shell");
         if (shell == null || _shellBroken)
@@ -995,7 +995,7 @@ public partial class EnemyActor
                 SourceFaction = Team.Enemy,
                 AttackerId = GetInstanceId(),
             }, player);
-            Die(null);
+            Die();
         }
     }
 

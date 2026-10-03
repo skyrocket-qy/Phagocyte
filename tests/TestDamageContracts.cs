@@ -653,7 +653,7 @@ public partial class TestDamageContracts : TestHarness
         AssertThat(Engine.TimeScale).IsEqualApprox(0.35f, 0.001f);
         GD.Print("[PASS] Lethal blows open grace: dead, downed, settlement pending.");
 
-        AssertThat(cell.TakeDamage(10.0f, null, false)).IsEqual(0.0f);
+        AssertThat(cell.TakeDamage(10.0f)).IsEqual(0.0f);
         cell._PhysicsProcess(0.5);
         AssertThat(cell.IsDowned).IsTrue();
         AssertThat(diedEmitted).IsFalse();
