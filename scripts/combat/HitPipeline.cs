@@ -56,10 +56,10 @@ public static class HitPipeline
         // Stage 3: Attacker Damage & Crit Roll (Payload snapshot preferred, fallback to live attacker)
         Node2D? attacker = ResolveAttacker(payload.AttackerId);
         bool isCrit = RollCrit(payload, attacker);
+        float rawDamage = payload.RawDamage;
         float critMult = GetCritMultiplier(payload, attacker);
-        float rawDamage = isCrit ? payload.RawDamage * critMult : payload.RawDamage;
-        if (isBlocked)
-            rawDamage *= 1.0f - blockMitigation;
+        if (isCrit) rawDamage *= critMult;
+        if (isBlocked) rawDamage *= 1.0f - blockMitigation;
 
         // Stage 4: Target Defense Mitigation (POE armour + vulnerability)
         float damage = rawDamage;
