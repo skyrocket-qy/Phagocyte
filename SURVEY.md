@@ -53,7 +53,7 @@ Universal stat dictionary pool (35 stats)
 | 20 | `aoe_damage` | Area Conditional Damage Bonus | ✅ Integrated | [`BaseSkill.cs:302`](scripts/skills/BaseSkill.cs#L302) | When the skill carries the `AOE` tag, adds into the Increased additive pool. |
 | 21 | `projectile_damage`| Projectile Conditional Bonus | ✅ Integrated | [`BaseSkill.cs:303`](scripts/skills/BaseSkill.cs#L303) | When the skill carries the `Projectile` tag, adds into the Increased additive pool. |
 | 22 | `minion_damage` | Minion Conditional Bonus | ✅ Integrated | [`BaseSkill.cs:304`](scripts/skills/BaseSkill.cs#L304) | When the skill carries the `Minion` tag, adds into the Increased additive pool (pending summon skills). |
-| 23 | `ailment_effect`| Ailment Effect Multiplier | ✅ Integrated (hit-time) | [`HitPipeline.cs`](scripts/combat/HitPipeline.cs) `DispatchEffects`/`AilmentEffectOf` + [`StatusController.IsDotChannel`](scripts/combat/StatusController.cs) | For non-DoT channels, $\text{mag} = \text{mag} \times \text{scale} \times \text{ailment\_effect}$ with duration unchanged; DoT channels excluded; non-player appliers count as `1.0`. |
+| 23 | `ailment_effect`| Ailment Effect Multiplier | ✅ Integrated (hit-time) | [`HitPipeline.cs`](scripts/combat/HitPipeline.cs) channel dispatch + [`StatusController.MainChannelOf`](scripts/combat/StatusController.cs) | Slow/amp land fixed `0.3 × ailment_effect` on damage-derived odds; DoT/stun unaffected; non-player appliers count as `1.0`. |
 
 ---
 
@@ -70,7 +70,7 @@ Universal stat dictionary pool (35 stats)
 | 7 | `life_steal` | Receptor Leech/Life Steal | ✅ Integrated | [`HitPipeline.cs:179`](scripts/combat/HitPipeline.cs#L179)<br>[`StatBlock.cs:135`](scripts/core/StatBlock.cs#L135) | Triggers when an attack hits an enemy: $\text{randf}() < \text{life\_steal}$ triggers an instant 1-HP restore. Hard cap $0.20$ (20%). |
 | 8 | `stagger` | Deflect/Delayed Damage | ✅ Integrated | [`PlayerActor.cs:568-570`](scripts/player/PlayerActor.cs#L568-L570)<br>[`PlayerActor.cs:380-385`](scripts/player/PlayerActor.cs#L380-L385) | Direct-hit damage split: $\text{instant} = \text{damage} \times (1.0 - \text{stagger})$, with the remainder booked into `StaggerPool` and spread over 4 seconds as armor-ignoring DoT deductions. Hard cap $0.60$. |
 | 9 | `recoup` | Recoup/Delayed Healing | ✅ Integrated | [`PlayerActor.cs:571-572`](scripts/player/PlayerActor.cs#L571-L572)<br>[`PlayerActor.cs:388-394`](scripts/player/PlayerActor.cs#L388-L394) | Direct-hit recovery: $\text{RecoupPool} += \text{damage} \times \text{recoup}$, automatically healing back HP in installments over 4 seconds. Hard cap $0.30$. |
-| 10 | `ailment_threshold`| Ailment Threshold | ✅ Integrated | [`HitPipeline.cs:150-166`](scripts/combat/HitPipeline.cs#L150-L166) | Ailment tolerance gate: $\text{Threshold} = \text{MaxHP} \times 0.05 \times \text{ailment\_threshold}$;<br>Ailment intensity scale factor $\text{scale} = \text{clamp}(\text{DamageDealt} / \text{Threshold}, 0.0, 1.0)$. |
+| 10 | `ailment_threshold`| Ailment Threshold | ✅ Integrated | [`HitPipeline.cs`](scripts/combat/HitPipeline.cs) `ControlThresholdOf` | Control-threshold multiplier: slow/amp $\text{Threshold} = \text{MaxHP} \times 0.10 \times \text{mult}$, stun $\text{Threshold} = \text{MaxHP} \times 0.20 \times \text{mult}$;<br>control odds $\text{chance} = \min(\text{dealt} / \text{Threshold} \times (1 + \text{ailment\_chance}) \times (\text{crit} ? 2 : 1), 1.0)$; landed slow/amp fix at `0.3`, stun at `0.5s`. |
 | 11 | `damage_taken` | Damage Taken Multiplier | ✅ Integrated | [`PlayerActor.cs`](scripts/player/PlayerActor.cs) `InvalidateDefenses`/`TakeDoTDamage` | Player defense = mutator multiplier x `damage_taken`; direct hits and DoT entries each multiply once on intake, while stagger-pool drains take the original path without double-counting; `0` counts as unset and is skipped (consistent with the pipeline guard). |
 
 ---
@@ -86,8 +86,8 @@ Universal stat dictionary pool (35 stats)
 ## IV. Gap Analysis & Action Plan (Gap Analysis & Action Plan) — Sections 1-3 Fixed, Records Kept for Reference
 
 ### 1. `ailment_effect` Ailment-Effect Multiplier Never Applied -> ✅ Fixed (hit-time)
-* **Original state**: when the player applied ailments, [`HitPipeline.DispatchEffects`](scripts/combat/HitPipeline.cs#L135-L148) computed `scale` only from damage dealt and the target's `ailment_threshold`; the attacker's `ailment_effect` (e.g. talent and equipment bonuses) never affected ailment intensity.
-* **Actual fix**: `DispatchEffects` reads the applier's `ailment_effect` live (`AilmentEffectOf`, non-players = `1.0`), and `ApplyEffect` applies `mag × scale × ailment_effect` only to non-DoT channels (decided by `StatusController.IsDotChannel`), with duration unchanged.
+* **Original state**: when the player applied ailments, `HitPipeline.DispatchEffects` computed `scale` only from damage dealt and the target's `ailment_threshold`; the attacker's `ailment_effect` (e.g. talent and equipment bonuses) never affected ailment intensity.
+* **Actual fix (control rework)**: slow/amp land fixed `0.3 × ailment_effect` on a damage-derived roll (`AilmentEffectOf`, non-players = `1.0`); stun lands fixed `0.5s`; DoT anchors to dealt damage instead of scaling.
 * **Suggested completion**:
   Pass the applier's ailment-effect multiplier in [`HitPipeline.DispatchEffects`](scripts/combat/HitPipeline.cs#L135) or [`HitPayload`](scripts/combat/DamageService.cs#L36) so the final applied non-DoT effect magnitude is multiplied by it:
   ```csharp
@@ -97,9 +97,9 @@ Universal stat dictionary pool (35 stats)
 
 ### 2. `dot_damage` DoT Multiplier Missing from Skill On-Hit Baking -> ✅ Fixed (moved to hit-time, not bake-time)
 * **Original state**: when [`BaseSkill.BuildOnHitEffects`](scripts/skills/BaseSkill.cs#L245-L269) parsed `on_hit` ailments (e.g. ignite, bleed) from `active.json`, it computed magnitude only from direct-hit damage `dmg * mult`, dropping the `dot_damage` multiplier; [`StatusController.Tick`](scripts/combat/StatusController.cs#L255) likewise had no applier-stat linkage.
-* **Actual fix**: deliberately not bake-time — `HitPipeline.ApplyEffect` reads the applier's `dot_damage` live on hit (`DotDamageOf`), with DoT channels using `mag × scale × dot_damage`; armor vs. DoT was also added: `× (1 − FromArmorDot(armor, dps, pen))`, with `DotArmorFactor = 5.0` (raising it weakens mitigation), computed per-second in dps units (not totals, duration-neutral and compatible with refresh semantics).
+* **Actual fix (control rework)**: DoT dps anchors to dealt damage — `mag = dealt × (baked / RawDamage) × dot_damage × (1 − FromArmorDot)`, duration fixed from payload; `dot_damage` still read live on hit (`DotDamageOf`).
 * **Suggested completion**:
-  In [`BaseSkill.TryParseOnHit`](scripts/skills/BaseSkill.cs#L230-L239) or when baking EffectSpecs for active skills, multiply in `host.GetStat("dot_damage")` if the status is a DoT Channel (or in the skill parameter definitions).
+  In [`BaseSkill.TryParseOnHit`](scripts/skills/BaseSkill.cs#L230-L239) or when baking EffectSpecs for active skills, multiply in `host.GetStat("dot_damage")` if the status is a DoT kind (or in the skill parameter definitions).
 
 ### 3. `damage_taken` Damage-Taken Multiplier Not Bound to Player Defense Struct -> ✅ Fixed (including DoT intake)
 * **Original state**: [`PlayerActor.cs:172`](scripts/player/PlayerActor.cs#L172) assigned `_cachedDefenses.DamageTakenMultiplier` only from `RunMutatorService.IncomingDamageMultiplier`, ignoring talent-tree or debuff modifications to the player's `damage_taken` stat.

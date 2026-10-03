@@ -1,4 +1,4 @@
-import { AilmentId, AilmentChannel, AilmentStackRule } from "../ids/ailment";
+import { AilmentId, AilmentKind, AilmentStackRule } from "../ids/ailment";
 export * from "../ids/ailment";
 import { z } from "zod";
 
@@ -8,7 +8,7 @@ export interface AilmentDef {
   duration: number;
   magnitude: number;
   stack: AilmentStackRule;
-  channels: readonly AilmentChannel[];
+  kinds: readonly AilmentKind[];
   move_multiplier?: number;
   max_stacks?: number;
   min_magnitude?: number;
@@ -22,7 +22,7 @@ export const AilmentDefZodSchema = z.object({
   duration: z.number().positive(),
   magnitude: z.number(),
   stack: z.string().min(1),
-  channels: z.array(z.string().min(1)).min(1),
+  kinds: z.array(z.string().min(1)).min(1),
   move_multiplier: z.number().min(1).optional(),
   max_stacks: z.number().int().optional(),
   min_magnitude: z.number().optional(),

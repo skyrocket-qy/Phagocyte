@@ -888,7 +888,7 @@ public partial class EnemyActor
                 {
                     if (other.HasMeta("mhc_marked"))
                         other.RemoveMeta("mhc_marked");
-                    other.Status.ClearChannel("amp");
+                    other.Status.ClearKind("amp");
                 }
             }
         }

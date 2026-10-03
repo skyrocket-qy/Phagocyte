@@ -16,7 +16,7 @@ public enum StatusStackRule
 }
 
 /// <summary>
-/// One status definition. Magnitude means dps for the "dot" channel and a
+/// One status definition. Magnitude means dps for the "dot" kind and a
 /// 0-1 fraction for "slow"/"amp". min/max_magnitude are optional clamps
 /// (NaN = unclamped). max_stacks &lt;= 0 means unlimited stacks.
 /// </summary>
@@ -37,8 +37,8 @@ public sealed class StatusDef
     [JsonPropertyName("stack")]
     public string Stack { get; set; } = "refresh_max";
 
-    [JsonPropertyName("channels")]
-    public string[] Channels { get; set; } = Array.Empty<string>();
+    [JsonPropertyName("kinds")]
+    public string[] Kinds { get; set; } = Array.Empty<string>();
 
     [JsonPropertyName("move_multiplier")]
     public float MoveMultiplier { get; set; } = 1.0f;
@@ -79,7 +79,7 @@ public sealed class StatusDataException : Exception
 
 /// <summary>
 /// Status and ailment controller: manages active status effects, timers, stacking,
-/// channel aggregation, DoT damage, floating numbers, and hit VFX on actors.
+/// kind aggregation, DoT damage, floating numbers, and hit VFX on actors.
 /// </summary>
 public partial class StatusController : Node
 {
@@ -124,10 +124,10 @@ public partial class StatusController : Node
         }
     }
 
-    /// <summary>True while any slow-channel ailment is active.</summary>
+    /// <summary>True while any slow-kind ailment is active.</summary>
     public bool HasSlow => SpeedMultiplier < 1.0f;
 
-    /// <summary>Longest remaining timer across slow-channel defs (0 when clean).</summary>
+    /// <summary>Longest remaining timer across slow-kind defs (0 when clean).</summary>
     public float SlowTimer
     {
         get
@@ -136,14 +136,14 @@ public partial class StatusController : Node
             float longest = 0.0f;
             foreach (var slot in _slots.Values)
             {
-                if (HasChannel(slot, "slow"))
+                if (HasKind(slot, "slow"))
                     longest = Math.Max(longest, Math.Max(0.0f, slot.Timer));
             }
             return longest;
         }
     }
 
-    /// <summary>True while any stun-channel ailment is active.</summary>
+    /// <summary>True while any stun-kind ailment is active.</summary>
     public bool IsStunned
     {
         get
@@ -151,7 +151,7 @@ public partial class StatusController : Node
             EnsureConfigured();
             foreach (var slot in _slots.Values)
             {
-                if (HasChannel(slot, "stun") && slot.Timer > 0.0f)
+                if (HasKind(slot, "stun") && slot.Timer > 0.0f)
                     return true;
             }
             return false;
@@ -235,13 +235,13 @@ public partial class StatusController : Node
         return true;
     }
 
-    /// <summary>Generic slow by channel (routes to the slow-carrier def from JSON).</summary>
+    /// <summary>Generic slow by kind (routes to the slow-carrier def from JSON).</summary>
     public void ApplySlow(float duration = -1.0f, float slowPct = -1.0f)
     {
         EnsureConfigured();
         if (string.IsNullOrEmpty(_slowCarrierId))
         {
-            GD.PushWarning("[StatusController] No slow-channel status defined.");
+            GD.PushWarning("[StatusController] No slow-kind status defined.");
             return;
         }
         Apply(_slowCarrierId, slowPct, duration);
@@ -262,7 +262,7 @@ public partial class StatusController : Node
         {
             if (slot.Rule == StatusStackRule.Independent)
             {
-                if (HasChannel(slot, "dot") && slot.Stacks.Count > 0)
+                if (HasKind(slot, "dot") && slot.Stacks.Count > 0)
                 {
                     float stackDps = 0.0f;
                     for (int i = slot.Stacks.Count - 1; i >= 0; i--)
@@ -284,7 +284,7 @@ public partial class StatusController : Node
 
             if (slot.Timer <= 0.0f)
                 continue;
-            if (HasChannel(slot, "dot"))
+            if (HasKind(slot, "dot"))
                 frameDot += ApplyMoveMult(slot, slot.Magnitude * dt, moving);
             slot.Timer -= dt;
             if (slot.Timer <= 0.0f)
@@ -379,23 +379,48 @@ public partial class StatusController : Node
         slot.Stacks.Clear();
     }
 
-    /// <summary>Clears every def carrying a channel (e.g. antigenic drift clears "amp").</summary>
-    public void ClearChannel(string channel)
+    /// <summary>Clears every def carrying a kind (e.g. antigenic drift clears "amp").</summary>
+    public void ClearKind(string kind)
     {
         EnsureConfigured();
         foreach (var slot in _slots.Values)
         {
-            if (HasChannel(slot, channel))
+            if (HasKind(slot, kind))
                 Clear(slot.Def.Id);
         }
     }
 
-    public bool IsDotChannel(string id)
+    /// <summary>Static dot-kind check for cast-time baking (reads shipped data, no instance needed).</summary>
+    public static bool IsDotKind(string id)
+    {
+        EnsureDefsLoaded();
+        var defs = _sharedDefs;
+        if (defs == null)
+            return false;
+        foreach (var def in defs)
+        {
+            if (string.Equals(def.Id, id, StringComparison.OrdinalIgnoreCase))
+                return HasKind(def, "dot");
+        }
+        return false;
+    }
+
+    /// <summary>Primary kind of a status id (first declared kind, "" when unknown).</summary>
+    public string KindOf(string id)
     {
         EnsureConfigured();
         if (!_slots.TryGetValue(id, out var slot))
-            return false;
-        return HasChannel(slot, "dot");
+            return "";
+        return slot.Def.Kinds.Length > 0 ? slot.Def.Kinds[0] : "";
+    }
+
+    /// <summary>Current applied magnitude of a status id (0 when inactive/unknown).</summary>
+    public float GetMagnitude(string id)
+    {
+        EnsureConfigured();
+        if (!_slots.TryGetValue(id, out var slot))
+            return 0.0f;
+        return slot.Timer > 0.0f ? slot.Magnitude : 0.0f;
     }
 
     public void ClearAll()
@@ -454,7 +479,7 @@ public partial class StatusController : Node
                         Duration = CatalogLoader.GetFloat(d, "duration", 3.0f),
                         Magnitude = CatalogLoader.GetFloat(d, "magnitude", 0.0f),
                         Stack = CatalogLoader.GetString(d, "stack", "refresh_max"),
-                        Channels = CatalogLoader.GetStringArray(d, "channels"),
+                        Kinds = CatalogLoader.GetStringArray(d, "kinds"),
                         MoveMultiplier = CatalogLoader.GetFloat(d, "move_multiplier", 1.0f),
                         MaxStacks = CatalogLoader.GetInt(d, "max_stacks", 0),
                         MinMagnitude = GetOptionalFloat(d, "min_magnitude"),
@@ -475,7 +500,7 @@ public partial class StatusController : Node
                             throw new DataLoadException(DataPaths.Ailments, $"Unknown vfx '{def.Vfx}' on status '{def.Id}'.");
                         _vfxById[def.Id] = vfx;
                     }
-                    if (_slowCarrierId == "" && HasChannel(def, "slow"))
+                    if (_slowCarrierId == "" && HasKind(def, "slow"))
                         _slowCarrierId = def.Id;
                 }
                 _sharedDefs = defs;
@@ -496,15 +521,15 @@ public partial class StatusController : Node
             throw new StatusDataException("Def with empty id.");
         if (def.Duration <= 0.0f)
             throw new StatusDataException($"'{def.Id}': duration must be > 0.");
-        if (def.Channels == null || def.Channels.Length == 0)
-            throw new StatusDataException($"'{def.Id}': at least one channel required.");
-        foreach (var ch in def.Channels)
+        if (def.Kinds == null || def.Kinds.Length == 0)
+            throw new StatusDataException($"'{def.Id}': at least one kind required.");
+        foreach (var ch in def.Kinds)
         {
             if (!string.Equals(ch, "dot", StringComparison.OrdinalIgnoreCase)
                 && !string.Equals(ch, "slow", StringComparison.OrdinalIgnoreCase)
                 && !string.Equals(ch, "amp", StringComparison.OrdinalIgnoreCase)
                 && !string.Equals(ch, "stun", StringComparison.OrdinalIgnoreCase))
-                throw new StatusDataException($"'{def.Id}': unknown channel '{ch}'.");
+                throw new StatusDataException($"'{def.Id}': unknown kind '{ch}'.");
         }
         bool hasMin = !float.IsNaN(def.MinMagnitude);
         bool hasMax = !float.IsNaN(def.MaxMagnitude);
@@ -533,27 +558,27 @@ public partial class StatusController : Node
         return dot;
     }
 
-    private static bool HasChannel(StatusDef def, string channel)
+    private static bool HasKind(StatusDef def, string kind)
     {
-        foreach (var ch in def.Channels)
+        foreach (var ch in def.Kinds)
         {
-            if (string.Equals(ch, channel, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(ch, kind, StringComparison.OrdinalIgnoreCase))
                 return true;
         }
         return false;
     }
 
-    private static bool HasChannel(Slot slot, string channel)
+    private static bool HasKind(Slot slot, string kind)
     {
-        return HasChannel(slot.Def, channel);
+        return HasKind(slot.Def, kind);
     }
 
-    private float StrongestActive(string channel)
+    private float StrongestActive(string kind)
     {
         float strongest = 0.0f;
         foreach (var slot in _slots.Values)
         {
-            if (slot.Timer > 0.0f && slot.Rule != StatusStackRule.Independent && HasChannel(slot, channel))
+            if (slot.Timer > 0.0f && slot.Rule != StatusStackRule.Independent && HasKind(slot, kind))
                 strongest = Math.Max(strongest, slot.Magnitude);
         }
         return strongest;

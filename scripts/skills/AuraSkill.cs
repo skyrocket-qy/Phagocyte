@@ -42,7 +42,7 @@ public partial class AuraSkill : BaseSkill
         float baseDmg = GetBaseDamageForLevel(ParamFloat(p, "base_damage", 8.0f));
         float dmg = GetCalculatedDamage(baseDmg);
         ulong attackerId = Host!.GetInstanceId();
-        int fxCount = BuildOnHitEffects(p, dmg, out var fx0, out var fx1, out var fx2);
+        int fxCount = BuildOnHitEffects(p, out var fx0, out var fx1, out var fx2);
         string sfx = ParamString(p, "sfx");
         bool hitAny = false;
 

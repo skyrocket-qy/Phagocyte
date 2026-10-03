@@ -44,7 +44,7 @@ public partial class ZoneSkill : BaseSkill
                 return;
             var fx0 = default(EffectSpec);
             var fx1 = default(EffectSpec);
-            int fxCount = BuildOnHitEffects(p, dmg, out fx0, out fx1, out _);
+            int fxCount = BuildOnHitEffects(p, out fx0, out fx1, out _);
             parent.AddChild(new Zone
             {
                 SourceTeam = Team.Player,

@@ -7,7 +7,7 @@ export enum AilmentId {
   Stun = "stun",
 }
 
-export enum AilmentChannel {
+export enum AilmentKind {
   Dot = "dot",
   Slow = "slow",
   Amp = "amp",

@@ -6,10 +6,10 @@
     {
       "id": "ignite",
       "name": "ROS Oxidative Burn",
-      "duration": 3,
+      "duration": 4,
       "magnitude": 0,
       "stack": "refresh_max",
-      "channels": [
+      "kinds": [
         "dot"
       ]
     },
@@ -19,7 +19,7 @@
       "duration": 2.5,
       "magnitude": 0.4,
       "stack": "strongest_wins",
-      "channels": [
+      "kinds": [
         "slow"
       ],
       "min_magnitude": 0.05,
@@ -31,7 +31,7 @@
       "duration": 4,
       "magnitude": 0.3,
       "stack": "refresh_max",
-      "channels": [
+      "kinds": [
         "amp"
       ],
       "min_magnitude": 0.1,
@@ -41,24 +41,24 @@
     {
       "id": "bleed",
       "name": "Membrane Leakage",
-      "duration": 3,
+      "duration": 5,
       "magnitude": 0,
       "stack": "refresh_max",
-      "channels": [
+      "kinds": [
         "dot"
       ],
-      "move_multiplier": 3
+      "move_multiplier": 2
     },
     {
       "id": "poison",
       "name": "Endotoxin",
-      "duration": 4,
+      "duration": 6,
       "magnitude": 0,
       "stack": "independent",
-      "channels": [
+      "kinds": [
         "dot"
       ],
-      "max_stacks": 0
+      "max_stacks": 5
     },
     {
       "id": "stun",
@@ -66,7 +66,7 @@
       "duration": 1,
       "magnitude": 0,
       "stack": "refresh_max",
-      "channels": [
+      "kinds": [
         "stun"
       ]
     }

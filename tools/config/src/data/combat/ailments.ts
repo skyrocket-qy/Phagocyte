@@ -1,6 +1,6 @@
-import { AilmentId, AilmentChannel, AilmentStackRule, type AilmentsFile } from "../../schemas/ailment.schema";
+import { AilmentId, AilmentKind, AilmentStackRule, type AilmentsFile } from "../../schemas/ailment.schema";
 
-export { AilmentId, AilmentChannel, AilmentStackRule };
+export { AilmentId, AilmentKind, AilmentStackRule };
 
 export const Ailments: AilmentsFile = {
   schema: 1,
@@ -10,11 +10,11 @@ export const Ailments: AilmentsFile = {
     {
       id: AilmentId.Ignite,
       name: "ROS Oxidative Burn",
-      duration: 3,
+      duration: 4,
       magnitude: 0,
       stack: AilmentStackRule.RefreshMax,
-      channels: [
-        AilmentChannel.Dot
+      kinds: [
+        AilmentKind.Dot
       ]
     },
     {
@@ -23,8 +23,8 @@ export const Ailments: AilmentsFile = {
       duration: 2.5,
       magnitude: 0.4,
       stack: AilmentStackRule.StrongestWins,
-      channels: [
-        AilmentChannel.Slow
+      kinds: [
+        AilmentKind.Slow
       ],
       min_magnitude: 0.05,
       max_magnitude: 0.75
@@ -35,8 +35,8 @@ export const Ailments: AilmentsFile = {
       duration: 4,
       magnitude: 0.3,
       stack: AilmentStackRule.RefreshMax,
-      channels: [
-        AilmentChannel.Amp
+      kinds: [
+        AilmentKind.Amp
       ],
       min_magnitude: 0.1,
       max_magnitude: 0.6,
@@ -45,24 +45,24 @@ export const Ailments: AilmentsFile = {
     {
       id: AilmentId.Bleed,
       name: "Membrane Leakage",
-      duration: 3,
+      duration: 5,
       magnitude: 0,
       stack: AilmentStackRule.RefreshMax,
-      channels: [
-        AilmentChannel.Dot
+      kinds: [
+        AilmentKind.Dot
       ],
-      move_multiplier: 3
+      move_multiplier: 2
     },
     {
       id: AilmentId.Poison,
       name: "Endotoxin",
-      duration: 4,
+      duration: 6,
       magnitude: 0,
       stack: AilmentStackRule.Independent,
-      channels: [
-        AilmentChannel.Dot
+      kinds: [
+        AilmentKind.Dot
       ],
-      max_stacks: 0
+      max_stacks: 5
     },
     {
       id: AilmentId.Stun,
@@ -70,8 +70,8 @@ export const Ailments: AilmentsFile = {
       duration: 1,
       magnitude: 0,
       stack: AilmentStackRule.RefreshMax,
-      channels: [
-        AilmentChannel.Stun
+      kinds: [
+        AilmentKind.Stun
       ]
     }
   ]

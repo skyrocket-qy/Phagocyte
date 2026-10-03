@@ -8,7 +8,10 @@ namespace Game.Combat;
 /// <summary>Central hit resolution: avoidance, block, damage calculation, mitigation, intake, ailments, leech.</summary>
 public static class HitPipeline
 {
-    public const float AilmentThresholdFraction = 0.05f;
+    public const float SlowAmpThresholdFraction = 0.10f;
+    public const float StunThresholdFraction = 0.20f;
+    public const float ControlFixedMagnitude = 0.3f;
+    public const float StunDuration = 0.5f;
 
     public static HitResult ResolveHit(in HitPayload payload, Node? targetNode)
     {
@@ -79,8 +82,7 @@ public static class HitPipeline
             return result;
 
         // Stage 6: Post-Hit Procs
-        if (payload.EffectCount > 0 && (isCrit || RollAilment(payload.AilmentChance)))
-            DispatchEffects(payload, targetNode, actualDamage);
+        DispatchEffects(payload, targetNode, actualDamage, isCrit);
         result.LifeStolen = ApplyLeech(attacker, actualDamage);
         return result;
     }
@@ -126,25 +128,67 @@ public static class HitPipeline
         return GD.Randf() < chance;
     }
 
-    private static void DispatchEffects(in HitPayload payload, Node target, float dealt)
+    /// <summary>Damage-derived control chance: scale x (1 + ailment_chance), crits double, capped at 1.</summary>
+    public static float ControlApplyChance(float scale, float ailmentChance, bool isCrit)
+    {
+        float chance = scale * (1.0f + ailmentChance) * (isCrit ? 2.0f : 1.0f);
+        return Mathf.Clamp(chance, 0.0f, 1.0f);
+    }
+
+    private static void DispatchEffects(in HitPayload payload, Node target, float dealt, bool isCrit)
     {
         if (payload.EffectCount <= 0)
             return;
         if (target is not IStatusHost host)
             return;
-        float threshold = AilmentThresholdOf(target);
-        float scale = threshold > 0.0f ? Mathf.Clamp(dealt / threshold, 0.0f, 1.0f) : 1.0f;
+        float ailChance = payload.AilmentChance;
         float ailEffect = AilmentEffectOf(payload.AttackerId);
         float dotMult = DotDamageOf(payload.AttackerId);
         float armor = target is IDamageable damageable ? damageable.Defenses.Armor : 0.0f;
-        ApplyEffect(host.Status, payload.Effect0, scale, ailEffect, dotMult, armor, payload.ArmorPenetration);
+        ApplyEffect(host.Status, payload.Effect0, target, dealt, isCrit, ailChance, ailEffect, dotMult, armor, payload);
         if (payload.EffectCount > 1)
-            ApplyEffect(host.Status, payload.Effect1, scale, ailEffect, dotMult, armor, payload.ArmorPenetration);
+            ApplyEffect(host.Status, payload.Effect1, target, dealt, isCrit, ailChance, ailEffect, dotMult, armor, payload);
         if (payload.EffectCount > 2)
-            ApplyEffect(host.Status, payload.Effect2, scale, ailEffect, dotMult, armor, payload.ArmorPenetration);
+            ApplyEffect(host.Status, payload.Effect2, target, dealt, isCrit, ailChance, ailEffect, dotMult, armor, payload);
     }
 
-    internal static float AilmentThresholdOf(Node target)
+    private static void ApplyEffect(StatusController status, in EffectSpec e, Node target, float dealt, bool isCrit, float ailChance, float ailEffect, float dotMult, float armor, in HitPayload payload)
+    {
+        if (string.IsNullOrEmpty(e.EffectId))
+            return;
+        string kind = status.KindOf(e.EffectId);
+        if (kind == "dot")
+        {
+            if (!isCrit && !RollAilment(ailChance))
+                return;
+            float ratio = e.Ratio;
+            if (ratio <= 0.0f)
+                return;
+            float dps = dealt * ratio * dotMult;
+            dps *= 1.0f - CombatMath.FromArmorDot(armor, dps, payload.ArmorPenetration);
+            status.Apply(e.EffectId, dps, e.Duration);
+            return;
+        }
+        if (kind == "slow" || kind == "amp" || kind == "stun")
+        {
+            float fraction = kind == "stun" ? StunThresholdFraction : SlowAmpThresholdFraction;
+            float threshold = ControlThresholdOf(target, fraction);
+            float scale = threshold > 0.0f ? dealt / threshold : 1.0f;
+            if (GD.Randf() >= ControlApplyChance(scale, ailChance, isCrit))
+                return;
+            if (kind == "stun")
+            {
+                status.Apply(e.EffectId, 0.0f, StunDuration);
+                return;
+            }
+            status.Apply(e.EffectId, ControlFixedMagnitude * ailEffect, e.Duration);
+            return;
+        }
+        GD.PushWarning($"[HitPipeline] Unknown status kind for '{e.EffectId}'.");
+        return;
+    }
+
+    internal static float ControlThresholdOf(Node target, float fraction)
     {
         float maxHp = 0.0f;
         float mult = 1.0f;
@@ -159,27 +203,7 @@ public static class HitPipeline
                 mult = ea.AilmentThresholdMult;
                 break;
         }
-        return Mathf.Max(0.0f, maxHp * AilmentThresholdFraction * Mathf.Max(0.0f, mult));
-    }
-
-    private static void ApplyEffect(StatusController status, in EffectSpec e, float scale, float ailEffect, float dotMult, float armor, float penetration)
-    {
-        if (string.IsNullOrEmpty(e.EffectId))
-            return;
-        float mag = e.Magnitude;
-        if (mag >= 0.0f)
-        {
-            mag *= scale;
-            if (status.IsDotChannel(e.EffectId))
-            {
-                mag *= dotMult;
-                mag *= 1.0f - CombatMath.FromArmorDot(armor, mag, penetration);
-            }
-            else
-                mag *= ailEffect;
-        }
-        float dur = e.Duration >= 0.0f ? Mathf.Max(0.1f, e.Duration * scale) : e.Duration;
-        status.Apply(e.EffectId, mag, dur);
+        return Mathf.Max(0.0f, maxHp * fraction * Mathf.Max(0.0f, mult));
     }
 
     private static float AilmentEffectOf(ulong attackerId)

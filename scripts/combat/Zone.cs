@@ -32,7 +32,7 @@ public partial class Zone : Node2D
     public float PullEff { get; set; } = 0.4f;
 
     /// <summary>
-    /// Channel slow as a 0-1 speed multiplier (applied via the slow-carrier
+    /// Route slow as a 0-1 speed multiplier (applied via the slow-carrier
     /// def, no ailment id anywhere). Negative = no slow.
     /// </summary>
     public float SlowFactor { get; set; } = -1.0f;

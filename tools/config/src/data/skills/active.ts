@@ -87,13 +87,13 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
       on_hit: [
         {
           ailment: AilmentId.Ignite,
-          mult: 0.4,
-          duration: 1.5
+          mult: 0.1,
+          duration: 4
         },
         {
           ailment: AilmentId.Bleed,
-          mult: 0.3,
-          duration: 2
+          mult: 0.06,
+          duration: 5
         }
       ],
       sfx: SfxId.Desecrate
@@ -141,8 +141,8 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
       on_hit: [
         {
           ailment: AilmentId.Ignite,
-          mult: 0.35,
-          duration: 2
+          mult: 0.1,
+          duration: 4
         }
       ],
       sfx: SfxId.Incinerate
@@ -375,8 +375,8 @@ export const ActiveSkills: readonly ActiveSkillDef[] = [
       on_hit: [
         {
           ailment: AilmentId.Bleed,
-          mult: 0.25,
-          duration: 1.5
+          mult: 0.06,
+          duration: 5
         }
       ],
       sfx: SfxId.ShockNova

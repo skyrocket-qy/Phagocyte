@@ -79,7 +79,7 @@ public partial class TestDamageContracts : TestHarness
 
         HitPayload full = DamageService.Snapshot(
             8.0f, DamageType.Fire, Team.Enemy,
-            new EffectSpec { EffectId = "burn", Magnitude = 2.0f, Duration = 3.0f }, default, default, 1, 42,
+            new EffectSpec { EffectId = "burn", Ratio = 2.0f, Duration = 3.0f }, default, default, 1, 42,
             HitFlags.AlwaysCrit | HitFlags.CannotBeEvaded);
         AssertThat(full.RawDamage).IsEqual(8.0f);
         AssertThat(full.Type).IsEqual(DamageType.Fire);
@@ -156,7 +156,7 @@ public partial class TestDamageContracts : TestHarness
         GD.Print("[PASS] Crit rolls at hit from live attacker stats; NeverCrit forces it off.");
         stats.SetBase("crit_chance", 0.0f);
 
-        var stunFx = new EffectSpec { EffectId = "stun", Magnitude = 0.0f, Duration = 1.0f };
+        var stunFx = new EffectSpec { EffectId = "stun", Ratio = 0.0f, Duration = 1.0f };
         var fullFoe = NewEnemy(100.0f);
         Root.AddChild(fullFoe);
         HitPipeline.ResolveHit(new HitPayload
@@ -167,19 +167,23 @@ public partial class TestDamageContracts : TestHarness
             Effect0 = stunFx,
             EffectCount = 1,
         }, fullFoe);
-        AssertThat(fullFoe.StunTimer).IsEqualApprox(1.0f, 0.01f);
+        AssertThat(fullFoe.StunTimer).IsEqualApprox(0.5f, 0.01f);
         var chipFoe = NewEnemy(1000.0f);
         Root.AddChild(chipFoe);
-        HitPipeline.ResolveHit(new HitPayload
+        for (int i = 0; i < 500 && chipFoe.StunTimer <= 0.0f; i++)
         {
-            RawDamage = 10.0f,
-            AttackerId = attackerId,
-            AilmentChance = 1.0f,
-            Effect0 = stunFx,
-            EffectCount = 1,
-        }, chipFoe);
-        AssertThat(chipFoe.StunTimer).IsEqualApprox(0.2f, 0.01f);
-        GD.Print("[PASS] Sub-threshold hits attenuate ailments vs max-HP threshold.");
+            chipFoe.CurrentHealth = 1000.0f;
+            HitPipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = 10.0f,
+                AttackerId = attackerId,
+                AilmentChance = 1.0f,
+                Effect0 = stunFx,
+                EffectCount = 1,
+            }, chipFoe);
+        }
+        AssertThat(chipFoe.StunTimer).IsEqualApprox(0.5f, 0.01f);
+        GD.Print("[PASS] Sub-threshold hits roll damage-derived control odds.");
 
         cell.Health = 50.0f;
         stats.SetBase("life_steal", 0.2f);
@@ -321,7 +325,55 @@ public partial class TestDamageContracts : TestHarness
         AssertThat(stats.GetStat("damage_taken")).IsEqual(1.0f);
         GD.Print("[PASS] Ailment chance caps at 100%; threshold floors at zero.");
 
-        var stun4 = new EffectSpec { EffectId = "stun", Magnitude = 0.0f, Duration = 4.0f };
+        var stunFx = new EffectSpec { EffectId = "stun", Ratio = 0.0f, Duration = 4.0f };
+        AssertThat(HitPipeline.ControlApplyChance(0.05f, 1.0f, false)).IsEqualApprox(0.1f, 0.001f);
+        AssertThat(HitPipeline.ControlApplyChance(0.125f, 1.0f, false)).IsEqualApprox(0.25f, 0.001f);
+        AssertThat(HitPipeline.ControlApplyChance(2.5f, 0.0f, false)).IsEqualApprox(1.0f, 0.001f);
+        AssertThat(HitPipeline.ControlApplyChance(0.2f, 0.0f, true)).IsEqualApprox(0.4f, 0.001f);
+        GD.Print("[PASS] Control chance is damage-derived, capped, crits double.");
+
+        var igniteFx = new EffectSpec { EffectId = "ignite", Ratio = 0.1f, Duration = 4.0f };
+        var burnFoe = NewEnemy(100.0f);
+        Root.AddChild(burnFoe);
+        HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = 20.0f,
+            AttackerId = attackerId,
+            AilmentChance = 1.0f,
+            Effect0 = igniteFx,
+            EffectCount = 1,
+        }, burnFoe);
+        AssertThat(burnFoe.Status.GetMagnitude("ignite")).IsEqualApprox(2.0f, 0.01f);
+        AssertThat(burnFoe.Status.GetTimer("ignite")).IsEqualApprox(4.0f, 0.01f);
+        var scorched = NewEnemy(1000.0f);
+        scorched.Armor = 10.0f;
+        Root.AddChild(scorched);
+        HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = 20.0f,
+            AttackerId = attackerId,
+            AilmentChance = 1.0f,
+            Effect0 = igniteFx,
+            EffectCount = 1,
+        }, scorched);
+        AssertThat(scorched.Status.GetMagnitude("ignite")).IsEqualApprox(0.87f, 0.05f);
+        GD.Print("[PASS] DoT anchors to dealt damage with fixed duration.");
+
+        var shockFx = new EffectSpec { EffectId = "shock", Ratio = 0.0f, Duration = 2.5f };
+        var marked = NewEnemy(1000.0f);
+        Root.AddChild(marked);
+        HitPipeline.ResolveHit(new HitPayload
+        {
+            RawDamage = 500.0f,
+            AttackerId = attackerId,
+            AilmentChance = 1.0f,
+            Effect0 = shockFx,
+            EffectCount = 1,
+        }, marked);
+        AssertThat(marked.Status.DamageTakenMultiplier).IsEqualApprox(1.3f, 0.01f);
+        AssertThat(marked.Status.GetTimer("shock")).IsEqualApprox(2.5f, 0.01f);
+        GD.Print("[PASS] Control lands fixed magnitude with refreshed duration.");
+
         var gated = NewEnemy(1000.0f);
         Root.AddChild(gated);
         HitPipeline.ResolveHit(new HitPayload
@@ -329,11 +381,11 @@ public partial class TestDamageContracts : TestHarness
             RawDamage = 500.0f,
             AttackerId = attackerId,
             AilmentChance = 0.0f,
-            Effect0 = stun4,
+            Effect0 = stunFx,
             EffectCount = 1,
         }, gated);
-        AssertThat(gated.StunTimer).IsEqual(0.0f);
-        GD.Print("[PASS] Zero ailment chance blocks non-crit procs.");
+        AssertThat(gated.StunTimer).IsEqualApprox(0.5f, 0.01f);
+        GD.Print("[PASS] Damage-derived control applies despite zero ailment_chance.");
 
         stats.SetBase("crit_chance", 1.0f);
         var critGated = NewEnemy(1000.0f);
@@ -343,53 +395,68 @@ public partial class TestDamageContracts : TestHarness
             RawDamage = 500.0f,
             AttackerId = attackerId,
             AilmentChance = 0.0f,
-            Effect0 = stun4,
+            Effect0 = stunFx,
             EffectCount = 1,
         }, critGated);
         AssertThat(critHit.IsCrit).IsTrue();
-        AssertThat(critGated.StunTimer).IsEqualApprox(4.0f, 0.01f);
+        AssertThat(critGated.StunTimer).IsEqualApprox(0.5f, 0.01f);
         stats.SetBase("crit_chance", 0.0f);
-        GD.Print("[PASS] Crits guarantee ailment application regardless of chance.");
+        GD.Print("[PASS] Crits double control odds; stun lands fixed 0.5s.");
 
         var thick = NewEnemy(1000.0f);
         thick.AilmentThresholdMult = 4.0f;
         Root.AddChild(thick);
         var thin = NewEnemy(1000.0f);
         Root.AddChild(thin);
-        HitPipeline.ResolveHit(new HitPayload
+        for (int i = 0; i < 500 && thin.StunTimer <= 0.0f; i++)
         {
-            RawDamage = 25.0f,
-            AttackerId = attackerId,
-            AilmentChance = 1.0f,
-            Effect0 = stun4,
-            EffectCount = 1,
-        }, thin);
-        HitPipeline.ResolveHit(new HitPayload
+            thin.CurrentHealth = 1000.0f;
+            HitPipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = 25.0f,
+                AttackerId = attackerId,
+                AilmentChance = 1.0f,
+                Effect0 = stunFx,
+                EffectCount = 1,
+            }, thin);
+        }
+        for (int i = 0; i < 1500 && thick.StunTimer <= 0.0f; i++)
         {
-            RawDamage = 25.0f,
-            AttackerId = attackerId,
-            AilmentChance = 1.0f,
-            Effect0 = stun4,
-            EffectCount = 1,
-        }, thick);
-        AssertThat(thin.StunTimer).IsEqualApprox(2.0f, 0.01f);
+            thick.CurrentHealth = 1000.0f;
+            HitPipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = 25.0f,
+                AttackerId = attackerId,
+                AilmentChance = 1.0f,
+                Effect0 = stunFx,
+                EffectCount = 1,
+            }, thick);
+        }
+        AssertThat(thin.StunTimer).IsEqualApprox(0.5f, 0.01f);
         AssertThat(thick.StunTimer).IsEqualApprox(0.5f, 0.01f);
-        GD.Print("[PASS] Enemy threshold mult attenuates weak-hit ailments.");
+        GD.Print("[PASS] Threshold mult lowers control odds; landed stuns are fixed 0.5s.");
 
         stats.SetBase("max_health", 400.0f);
         stats.SetBase("ailment_threshold", 4.0f);
         cell.Health = 400.0f;
-        HitPipeline.ResolveHit(new HitPayload
+        for (int i = 0; i < 1500 && cell.StunTimer <= 0.0f; i++)
         {
-            RawDamage = 10.0f,
-            AilmentChance = 1.0f,
-            Effect0 = stun4,
-            EffectCount = 1,
-        }, cell);
+            cell.Health = 400.0f;
+            HitPipeline.ResolveHit(new HitPayload
+            {
+                RawDamage = 10.0f,
+                AilmentChance = 1.0f,
+                Effect0 = stunFx,
+                EffectCount = 1,
+            }, cell);
+        }
         AssertThat(cell.StunTimer).IsEqualApprox(0.5f, 0.01f);
         stats.SetBase("ailment_threshold", 1.0f);
-        GD.Print("[PASS] Player threshold stat scales incoming ailment strength.");
+        GD.Print("[PASS] Player threshold stat scales incoming control odds.");
 
+        burnFoe.QueueFree();
+        scorched.QueueFree();
+        marked.QueueFree();
         gated.QueueFree();
         critGated.QueueFree();
         thick.QueueFree();

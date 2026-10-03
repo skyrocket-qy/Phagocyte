@@ -91,11 +91,11 @@ export function runCrossValidation(data: {
 
   const skillIds = new Set([...activeIds, ...passiveIds]);
 
-  // 1. Ailments: channel + stack vocab
+  // 1. Ailments: kind + stack vocab
   for (const a of ailmentList) {
-    for (const c of a.channels ?? []) {
+    for (const c of a.kinds ?? []) {
       if (c !== "dot" && c !== "slow" && c !== "amp" && c !== "stun") {
-        addError("Ailments", `Ailment '${a.id}' has unknown channel '${c}'.`);
+        addError("Ailments", `Ailment '${a.id}' has unknown kind '${c}'.`);
       }
     }
     if (!["refresh_max", "strongest_wins", "independent"].includes(a.stack)) {

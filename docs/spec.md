@@ -142,7 +142,7 @@ For modularity and high reusability, this game's numeric system **completely eli
 | `aoe_damage` | **Area Damage** | `1.0` (100%) | Applies only to `AOE`-tagged skills, accumulated additively (`increased`) with `damage` in the generic bonus pool. |
 | `projectile_damage` | **Projectile Damage** | `1.0` (100%) | Applies only to `Projectile`-tagged skills, accumulated additively (`increased`) with `damage` in the generic bonus pool. |
 | `minion_damage` | **Minion Damage** | `1.0` (100%) | Applies only to `Minion`-tagged skills (none yet, reserved for summon skills), accumulated additively (`increased`) with `damage` in the generic bonus pool. |
-| `ailment_effect` | **Ailment Effect** | `1.0` (100%) | Ailment strength multiplier (DoT damage excluded, handled by `dot_damage`). Read live from the applier on hit; non-DoT channel magnitudes are multiplied by it, duration unchanged. |
+| `ailment_effect` | **Ailment Effect** | `1.0` (100%) | Ailment strength multiplier (DoT damage excluded, handled by `dot_damage`). Read live from the applier on hit; slow/amp kinds land fixed `0.3` multiplied by it, duration refreshed. |
 
 #### 2. Generic Survival and Defense Stats (Defense & Survival)
 | Stat Code | Display Name | Default Baseline | Generic Resolution Rule |

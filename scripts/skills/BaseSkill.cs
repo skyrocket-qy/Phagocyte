@@ -217,13 +217,13 @@ public partial class BaseSkill : Node2D
 
     /// <summary>
     /// Parses one on_hit entry (data: ailment id + mult/flat/duration).
-    /// magnitude = mult != null ? dmg * mult : flat (both absent = def default).
+    /// multOut carries the raw multiplier (NaN when the entry uses flat/absent).
     /// </summary>
-    private static bool TryParseOnHit(Variant item, float dmg, out string ailment, out float mag, out float dur)
+    private static bool TryParseOnHit(Variant item, out string ailment, out float dur, out float mult)
     {
         ailment = "";
-        mag = -1.0f;
         dur = -1.0f;
+        mult = float.NaN;
         if (item.VariantType != Variant.Type.Dictionary)
             return false;
         var e = item.AsGodotDictionary();
@@ -231,9 +231,7 @@ public partial class BaseSkill : Node2D
         if (ailment == "")
             return false;
         if (e.TryGetValue("mult", out var mv) && mv.VariantType != Variant.Type.Nil)
-            mag = dmg * CatalogLoader.ToFloat(mv);
-        else if (e.TryGetValue("flat", out var fv) && fv.VariantType != Variant.Type.Nil)
-            mag = CatalogLoader.ToFloat(fv);
+            mult = CatalogLoader.ToFloat(mv);
         dur = CatalogLoader.GetFloat(e, "duration", -1.0f);
         return true;
     }
@@ -242,7 +240,7 @@ public partial class BaseSkill : Node2D
     /// Bakes on_hit entries into pooled EffectSpecs for spawn-time handoff
     /// (salvo/zone). Truncates past 3 with a warning (hit-rate paths only).
     /// </summary>
-    protected int BuildOnHitEffects(Dictionary p, float dmg, out EffectSpec e0, out EffectSpec e1, out EffectSpec e2)
+    protected int BuildOnHitEffects(Dictionary p, out EffectSpec e0, out EffectSpec e1, out EffectSpec e2)
     {
         e0 = default;
         e1 = default;
@@ -252,9 +250,21 @@ public partial class BaseSkill : Node2D
         int n = 0;
         foreach (var item in v.AsGodotArray())
         {
-            if (!TryParseOnHit(item, dmg, out string ailment, out float mag, out float dur))
+            if (!TryParseOnHit(item, out string ailment, out float dur, out float mult))
                 continue;
-            var fx = new EffectSpec { EffectId = ailment, Magnitude = mag, Duration = dur };
+            // DoT entries store the raw ratio (pipeline anchors to dealt damage);
+            // control kinds ignore payload magnitude downstream.
+            float ratio = 0.0f;
+            if (StatusController.IsDotKind(ailment))
+            {
+                if (float.IsNaN(mult))
+                {
+                    GD.PushWarning($"[BaseSkill] dot on_hit '{ailment}' should use mult (ratio) in '{SkillId}'.");
+                    continue;
+                }
+                ratio = mult;
+            }
+            var fx = new EffectSpec { EffectId = ailment, Ratio = ratio, Duration = dur };
             if (n == 0) e0 = fx;
             else if (n == 1) e1 = fx;
             else if (n == 2) e2 = fx;

@@ -172,7 +172,7 @@ public partial class SalvoSkill : BaseSkill
         var fx0 = default(EffectSpec);
         var fx1 = default(EffectSpec);
         var fx2 = default(EffectSpec);
-        int fxCount = BuildOnHitEffects(p, dmg, out fx0, out fx1, out fx2);
+        int fxCount = BuildOnHitEffects(p, out fx0, out fx1, out fx2);
         float singleCrit = GetCalculatedCritChance();
         float singleMult = GetCalculatedCritDamage();
         float singlePen = GetCalculatedArmorPenetration();

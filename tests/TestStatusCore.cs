@@ -67,12 +67,12 @@ public partial class TestStatusCore : TestHarness
         var core = new StatusController();
         core.Configure(new List<StatusDef>
         {
-            new() { Id = "burn", Duration = 3.0f, Stack = "refresh_max", Channels = new[] { "dot" } },
-            new() { Id = "slow_a", Duration = 2.0f, Magnitude = 0.40f, Stack = "strongest_wins", Channels = new[] { "slow" } },
-            new() { Id = "slow_b", Duration = 5.0f, Magnitude = 0.25f, Stack = "strongest_wins", Channels = new[] { "slow" } },
-            new() { Id = "amp", Duration = 4.0f, Magnitude = 0.30f, Stack = "refresh_max", Channels = new[] { "amp" } },
-            new() { Id = "leak", Duration = 3.0f, Stack = "refresh_max", Channels = new[] { "dot" }, MoveMultiplier = 3.0f },
-            new() { Id = "stacks", Duration = 4.0f, Stack = "independent", Channels = new[] { "dot" }, MaxStacks = 2 }
+            new() { Id = "burn", Duration = 3.0f, Stack = "refresh_max", Kinds = new[] { "dot" } },
+            new() { Id = "slow_a", Duration = 2.0f, Magnitude = 0.40f, Stack = "strongest_wins", Kinds = new[] { "slow" } },
+            new() { Id = "slow_b", Duration = 5.0f, Magnitude = 0.25f, Stack = "strongest_wins", Kinds = new[] { "slow" } },
+            new() { Id = "amp", Duration = 4.0f, Magnitude = 0.30f, Stack = "refresh_max", Kinds = new[] { "amp" } },
+            new() { Id = "leak", Duration = 3.0f, Stack = "refresh_max", Kinds = new[] { "dot" }, MoveMultiplier = 3.0f },
+            new() { Id = "stacks", Duration = 4.0f, Stack = "independent", Kinds = new[] { "dot" }, MaxStacks = 2 }
         }, new StatusOptions { AmpAppliesToOwnDot = ampOwnDot });
         return core;
     }
@@ -155,13 +155,13 @@ public partial class TestStatusCore : TestHarness
         // Duplicate id.
         AssertThat(WrapConfigure(new List<StatusDef>
         {
-            new() { Id = "x", Duration = 1.0f, Channels = new[] { "dot" } },
-            new() { Id = "X", Duration = 1.0f, Channels = new[] { "dot" } }
+            new() { Id = "x", Duration = 1.0f, Kinds = new[] { "dot" } },
+            new() { Id = "X", Duration = 1.0f, Kinds = new[] { "dot" } }
         }, null)).IsTrue();
 
         // Bad stack rule / channel / duration / clamps / move mult / aggregation.
         AssertThat(WrapConfigure(OneDef(stack: "bogus"), null)).IsTrue();
-        AssertThat(WrapConfigure(OneDef(channels: new[] { "bogus" }), null)).IsTrue();
+        AssertThat(WrapConfigure(OneDef(kinds: new[] { "bogus" }), null)).IsTrue();
         AssertThat(WrapConfigure(OneDef(duration: 0.0f), null)).IsTrue();
         AssertThat(WrapConfigure(OneDef(minMag: 0.5f, maxMag: 0.2f), null)).IsTrue();
         AssertThat(WrapConfigure(OneDef(moveMult: 0.5f), null)).IsTrue();
@@ -171,7 +171,7 @@ public partial class TestStatusCore : TestHarness
     }
 
     private static List<StatusDef> OneDef(
-        string stack = "refresh_max", string[]? channels = null, float duration = 1.0f,
+        string stack = "refresh_max", string[]? kinds = null, float duration = 1.0f,
         float minMag = float.NaN, float maxMag = float.NaN, float moveMult = 1.0f)
     {
         return new List<StatusDef>
@@ -179,7 +179,7 @@ public partial class TestStatusCore : TestHarness
             new()
             {
                 Id = "x", Duration = duration, Stack = stack,
-                Channels = channels ?? new[] { "dot" },
+                Kinds = kinds ?? new[] { "dot" },
                 MoveMultiplier = moveMult, MinMagnitude = minMag, MaxMagnitude = maxMag
             }
         };
@@ -219,7 +219,7 @@ public partial class TestStatusCore : TestHarness
         AssertThat(status.IsActive("poison")).IsTrue();
         AssertThat(status.GetStackCount("poison")).IsEqual(1);
 
-        status.ClearChannel("amp");
+        status.ClearKind("amp");
         AssertThat(status.IsActive("shock")).IsFalse();
         status.ClearAll();
         AssertThat(status.IsActive("ignite")).IsFalse();

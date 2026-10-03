@@ -122,17 +122,17 @@ public partial class TestNewSystemsTriad : SceneTree
         AssertThat(status.IsActive("bleed")).IsFalse();
         AssertThat(status.IsActive("poison")).IsFalse();
 
-        // 3a. Slow channel (data: chill row)
+        // 3a. Slow kind (data: chill row)
         status.ApplySlow(duration: 2.0f, slowPct: 0.40f);
         AssertThat(status.HasSlow).IsTrue();
         AssertThat(status.SpeedMultiplier).IsEqualApprox(0.60f, 0.01f);
 
-        // 3b. Amp channel (data: shock row)
+        // 3b. Amp kind (data: shock row)
         status.Apply("shock", 0.30f, 3.0f);
         AssertThat(status.IsActive("shock")).IsTrue();
         AssertThat(status.DamageTakenMultiplier).IsEqualApprox(1.30f, 0.01f);
 
-        // 3c. DoT channel (data: ignite row)
+        // 3c. DoT kind (data: ignite row)
         status.Apply("ignite", 10.0f, 2.0f);
         AssertThat(status.IsActive("ignite")).IsTrue();
 
@@ -143,17 +143,17 @@ public partial class TestNewSystemsTriad : SceneTree
         AssertThat(mockEnemy.Health).IsEqualApprox(87.0f, 0.05f);
         AssertThat(status.GetTimer("ignite")).IsEqualApprox(1.0f, 0.01f);
 
-        // 3d. Move-scaled DoT (data: bleed row, 3x while moving)
+        // 3d. Move-scaled DoT (data: bleed row, 2x while moving)
         mockEnemy.Velocity = new Vector2(100.0f, 0.0f); // moving
         status.Apply("bleed", 5.0f, 2.0f);
         AssertThat(status.IsActive("bleed")).IsTrue();
 
         // Next 1 second:
         // Burn: 10.0 * 1.0 = 10.0
-        // Leak: 5.0 * 3.0 (moving) * 1.0 = 15.0
-        // Total unamplified = 25.0, amplified by 1.30 = 32.5
+        // Leak: 5.0 * 2.0 (moving) * 1.0 = 10.0
+        // Total unamplified = 20.0, amplified by 1.30 = 26.0
         status._PhysicsProcess(1.0);
-        AssertThat(mockEnemy.Health).IsEqualApprox(87.0f - 32.5f, 0.1f);
+        AssertThat(mockEnemy.Health).IsEqualApprox(87.0f - 26.0f, 0.1f);
 
         // 3e. Independent stacks (data: poison row)
         status.Apply("poison", 2.0f, 2.0f);
@@ -169,7 +169,7 @@ public partial class TestNewSystemsTriad : SceneTree
         AssertThat(status.IsActive("poison")).IsFalse();
 
         mockEnemy.QueueFree();
-        GD.Print("[PASS] Test 3: generic ailment effects (DoT, slow/amp channels, move scaling, stacks) verified.");
+        GD.Print("[PASS] Test 3: generic ailment effects (DoT, slow/amp kinds, move scaling, stacks) verified.");
 
         // ====================================================================
         // Test 4: BossPhaseComponent transitions & Damage Reduction

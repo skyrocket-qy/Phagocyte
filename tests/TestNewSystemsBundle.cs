@@ -151,7 +151,7 @@ public partial class TestNewSystemsBundle : SceneTree
 
         AssertThat(player.Health).IsLess(hpBeforeHazard);
         AssertThat(player.Status != null && player.Status.HasSlow).IsTrue();
-        GD.Print("[PASS] Step 3: Zone periodic tick damage and channel slow application verified.");
+        GD.Print("[PASS] Step 3: Zone periodic tick damage and kind slow application verified.");
 
         hazard.QueueFree();
         player.QueueFree();
